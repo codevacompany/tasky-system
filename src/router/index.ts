@@ -3,26 +3,25 @@ import type { RouteRecordRaw } from 'vue-router';
 
 // Import layouts
 // import PublicLayout from '@/layouts/PublicLayout.vue';
-import UserLayout from '@/layouts/UserLayout.vue';
-import AdminLayout from '@/layouts/AdminLayout.vue';
-import Login from '@/pages/public/Login.vue';
+import LoginPage from '@/pages/public/LoginPage.vue';
 import UserHome from '@/pages/user/UserHome.vue';
 import AdminDashboard from '@/pages/admin/AdminDashboard.vue';
 import TicketsReceived from '@/pages/user/TicketsReceived.vue';
 import TicketsCreated from '@/pages/user/TicketsCreated.vue';
 import DepartmentTickets from '@/pages/user/DepartmentTickets.vue';
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
 
 const routes: RouteRecordRaw[] = [
   // Public Routes (No Layout)
   {
     path: '/login',
-    component: Login,
+    component: LoginPage,
   },
 
   // User Panel Routes
   {
     path: '/',
-    component: UserLayout,
+    component: DashboardLayout,
     children: [
       { path: '', component: UserHome },
       { path: 'meus-tickets/recebidos', component: TicketsReceived },
@@ -34,7 +33,7 @@ const routes: RouteRecordRaw[] = [
   // Admin Panel Routes
   {
     path: '/admin',
-    component: AdminLayout,
+    component: DashboardLayout,
     children: [
       { path: '', component: AdminDashboard },
     ]

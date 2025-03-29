@@ -1,29 +1,29 @@
 import type { Notification, CreateNotificationDto, UpdateNotificationDto } from '@/models';
-import axios from '@/utils/axiosInstance';
+import apiClient from '@/utils/axiosInstance';
 import type { AxiosResponse } from 'axios';
 
-export const NotificationService = {
+export const notificationService = {
   async create(data: CreateNotificationDto): Promise<AxiosResponse<Notification>> {
-    return axios.post<Notification>('/notifications', data);
+    return apiClient.post<Notification>('/notifications', data);
   },
 
   async fetch(): Promise<AxiosResponse<Notification[]>> {
-    return axios.get<Notification[]>('/notifications');
+    return apiClient.get<Notification[]>('/notifications');
   },
 
   async getBytargetUser(targetUserId: number): Promise<AxiosResponse<Notification>> {
-    return axios.get<Notification>(`/notifications/target-user/${targetUserId}`);
+    return apiClient.get<Notification>(`/notifications/target-user/${targetUserId}`);
   },
 
   async update(id: number, data: UpdateNotificationDto): Promise<AxiosResponse<Notification>> {
-    return axios.patch<Notification>(`/notifications/${id}`, data);
+    return apiClient.patch<Notification>(`/notifications/${id}`, data);
   },
 
   async markAllAsRead(): Promise<AxiosResponse<Notification>> {
-    return axios.post<Notification>(`/notifications/mark-as-read`);
+    return apiClient.post<Notification>(`/notifications/mark-as-read`);
   },
 
   async markAsRead(id: number): Promise<AxiosResponse<Notification>> {
-    return axios.post<Notification>(`/notifications/${id}/mark-as-read`);
+    return apiClient.post<Notification>(`/notifications/${id}/mark-as-read`);
   },
 };

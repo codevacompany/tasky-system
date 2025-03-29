@@ -1,5 +1,6 @@
 <template>
   <div id="ticketsCreatedSection">
+    <DashboardLayout />
     <TitleCard
       title="Tickets Recebidos"
       subtitle="Visualize e gerencie os ticlets atribuídos a você"
@@ -81,6 +82,7 @@
 
 <script setup lang="ts">
 import TitleCard from '@/components/TitleCard.vue'
+import DashboardLayout from '@/layouts/DashboardLayout.vue';
 
 // function getTicketRowHTML(ticket) {
 //   const departmentName = ticket.department ? ticket.department.name : '-'
