@@ -1,15 +1,10 @@
-<!-- <script setup lang="ts"></script> -->
-
 <template>
-  <div id="novoTicketSection" class="user-section">
-    <div class="welcome-card">
-      <div class="plus-icon">
-        <font-awesome-icon icon="plus-circle" size="3x"/>
-      </div>
-      <h2>Novo Ticket</h2>
-      <p>Crie um novo ticket de suporte para sua solicitação</p>
-    </div>
-
+  <div id="novoTicketSection">
+    <TitleCard
+      title="Novo Ticket"
+      subtitle="Crie um novo ticket de suporte para sua solicitação"
+      icon="plus-circle"
+    />
     <div class="novo-ticket-container">
       <div class="ticket-form-container">
         <form id="ticketForm">
@@ -93,6 +88,7 @@
 </template>
 
 <script setup lang="ts">
+import TitleCard from '@/components/TitleCard.vue'
 // function criarTicketHTML(ticket) {
 //   const tempoRestante = this.calcularTempoRestante(ticket.completionDate)
 //   const targetUserName = ticket.targetUser ? ticket.targetUser.firstName : 'Não atribuído'
