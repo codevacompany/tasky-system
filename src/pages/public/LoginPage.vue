@@ -2,7 +2,7 @@
   <section id="loginSection" class="login-section">
     <div class="login-container">
       <div class="login-header">
-        <img src="@/assets/tasky-white.png" alt="Tasky Logo" class="login-logo" id="loginLogo" />
+        <img src="@/assets/images/tasky-white.png" alt="Tasky Logo" class="login-logo" id="loginLogo" />
       </div>
 
       <div class="login-form-container">
@@ -80,7 +80,7 @@ const login = async () => {
   background-color: #f5f7fa;
   background-image:
     linear-gradient(to bottom right, rgba(245, 247, 250, 0.95), rgba(245, 247, 250, 0.8)),
-    url('../images/login-bg.svg');
+    url('@/assets/images/login-bg.svg');
   background-size: cover;
   background-position: center;
   padding-top: 40px;

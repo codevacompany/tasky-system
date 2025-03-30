@@ -88,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import TitleCard from '@/components/TitleCard.vue'
+import TitleCard from '@/components/common/TitleCard.vue';
 // function criarTicketHTML(ticket) {
 //   const tempoRestante = this.calcularTempoRestante(ticket.completionDate)
 //   const targetUserName = ticket.targetUser ? ticket.targetUser.firstName : 'Não atribuído'

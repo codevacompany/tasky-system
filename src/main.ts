@@ -14,14 +14,20 @@ import {
   faTags,
   faChartLine,
   faSignOutAlt,
-  faBell,
   faPlusCircle,
   faInbox,
   faPaperPlane,
+  faChartBar,
+  faTag,
+  faPlus,
+  faTicket,
+  faTachometerAltAverage,
+  faMoon,
 } from '@fortawesome/free-solid-svg-icons'
 
 import App from './App.vue'
 import router from './router'
+import { faBell } from '@fortawesome/free-regular-svg-icons'
 
 library.add(
   faHome,
@@ -30,13 +36,19 @@ library.add(
   faUserPlus,
   faBuilding,
   faTags,
+  faTag,
   faChartLine,
   faSignOutAlt,
   faBell,
   faPlusCircle,
   faInbox,
   faPaperPlane,
-  faBuilding
+  faBuilding,
+  faTicket,
+  faChartBar,
+  faPlus,
+  faTachometerAltAverage,
+  faMoon
 )
 
 const app = createApp(App)

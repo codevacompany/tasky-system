@@ -80,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import TitleCard from '@/components/TitleCard.vue'
+import TitleCard from '@/components/common/TitleCard.vue';
 
 // function getTicketRowHTML(ticket) {
 //   const departmentName = ticket.department ? ticket.department.name : '-'
@@ -261,7 +261,6 @@ import TitleCard from '@/components/TitleCard.vue'
   background: #f8fafc;
 }
 
-
 /* Larguras das colunas */
 .col-id {
   width: 5%;
@@ -324,33 +323,33 @@ import TitleCard from '@/components/TitleCard.vue'
 }
 
 .priority-flag.alta {
-  color: #EF4444;
-  background: #FEE2E2;
+  color: #ef4444;
+  background: #fee2e2;
 }
 
 .priority-flag.media {
-  color: #F59E0B;
-  background: #FEF3C7;
+  color: #f59e0b;
+  background: #fef3c7;
 }
 
 .priority-flag.baixa {
-  color: #10B981;
-  background: #DCFCE7;
+  color: #10b981;
+  background: #dcfce7;
 }
 
 .status-flag.pendente {
-  color: #F59E0B;
-  background: #FEF3C7;
+  color: #f59e0b;
+  background: #fef3c7;
 }
 
 .status-flag.em_andamento {
-  color: #3B82F6;
-  background: #EFF6FF;
+  color: #3b82f6;
+  background: #eff6ff;
 }
 
 .status-flag.finalizado {
-  color: #10B981;
-  background: #DCFCE7;
+  color: #10b981;
+  background: #dcfce7;
 }
 
 @media (max-width: 1024px) {

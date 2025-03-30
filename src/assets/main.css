@@ -306,16 +306,6 @@
   animation: fadeIn 0.3s ease;
 }
 
-/* Formulários compactos */
-.compact-form {
-  background-color: var(--card-bg);
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  box-shadow: var(--card-shadow);
-  margin-bottom: 2rem;
-  max-width: 500px;
-}
-
 /* Tabelas de dados */
 .table-container {
   background-color: var(--card-bg);
@@ -516,159 +506,6 @@ body.dark-mode .dropdown-menu a {
 
 body.dark-mode .dropdown-menu a:hover {
   background-color: rgba(255, 255, 255, 0.05);
-}
-
-/* Header */
-.main-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e0e0e0;
-  height: 65px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.header-nav {
-  flex: 1;
-  margin-left: 1rem;
-}
-
-/* Ajustes de cores para o header */
-.main-nav ul li a {
-  display: flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  text-decoration: none;
-  color: #1a2233;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.main-nav ul li a:hover,
-.main-nav ul li a.active {
-  background-color: #1a2233;
-  color: #f8f9fa;
-}
-
-/* Botão primário com melhor contraste */
-.btn-primary {
-  background-color: #1a2233;
-  color: #ffffff;
-  border: none;
-}
-
-.btn-primary:hover {
-  background-color: #141b2a;
-  color: #ffffff;
-}
-
-/* Estilo do botão no modo escuro */
-body.dark-mode .btn-primary {
-  background-color: #f8f9fa;
-  color: #1a2233;
-}
-
-body.dark-mode .btn-primary:hover {
-  background-color: #e8eaed;
-  color: #1a2233;
-}
-
-/* Ajustes para elementos no header */
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.notification-icon {
-  color: #1a2233;
-  position: relative;
-  cursor: pointer;
-}
-
-.notification-icon i {
-  font-size: 1.2rem;
-  color: #1a2233;
-}
-
-.user-profile {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  color: #1a2233;
-}
-
-.user-profile .user-name {
-  margin: 0 0.5rem;
-  color: #1a2233;
-}
-
-.user-profile i {
-  font-size: 0.8rem;
-  color: #1a2233;
-}
-
-.dark-mode-toggle {
-  color: #1a2233;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-.dark-mode-toggle i {
-  font-size: 1.2rem;
-}
-
-/* Cores invertidas para o modo escuro */
-body.dark-mode .notification-icon i,
-body.dark-mode .user-profile,
-body.dark-mode .user-profile .user-name,
-body.dark-mode .user-profile i,
-body.dark-mode .dark-mode-toggle,
-body.dark-mode .theme-toggle {
-  color: #f8f9fa;
-}
-
-/* Ajustes para o logo no header */
-.header-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 1.5rem;
-  min-width: 150px;
-  background-color: #e8eaed;
-  height: 100%;
-  position: relative;
-}
-
-.header-logo .logo {
-  height: 70px;
-  width: auto;
-  display: block;
-  margin: 0 auto;
-  position: relative;
-  top: 7px;
-}
-
-.header-logo .logo-text {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1a2233;
-}
-
-/* Cores inversas para o modo escuro */
-body.dark-mode .header-logo {
-  background-color: #2d3446;
-}
-
-body.dark-mode .header-logo .logo-text {
-  color: #f8f9fa;
 }
 
 /* Ajustes para usar todo o espaço disponível na tela */
@@ -1284,14 +1121,22 @@ body.dark-mode .section-header h1 {
   grid-template-columns: repeat(2, 1fr);
   gap: 15px;
 }
-
-.compact-form .form-group {
+ .form-group {
   margin-bottom: 16px;
 }
 
-.compact-form input,
-.compact-form select,
-.compact-form textarea {
+/* input, select, textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 100%;
+  transition: border-color 0.2s;
+} */
+
+select,
+input,
+text-area {
+  background-color: white;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -1299,9 +1144,9 @@ body.dark-mode .section-header h1 {
   transition: border-color 0.2s;
 }
 
-.compact-form input:focus,
-.compact-form select:focus,
-.compact-form textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   border-color: var(--primary-color);
   outline: none;
   box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
@@ -1376,14 +1221,14 @@ body.dark-mode .modal-header {
   border-bottom: 1px solid #444;
 }
 
-body.dark-mode .compact-form input,
-body.dark-mode .compact-form select,
-body.dark-mode .compact-form textarea {
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
   background-color: #333;
   border-color: #555;
   color: #e1e1e1;
 }
 
-body.dark-mode .compact-form label {
+body.dark-mode label {
   color: #ddd;
 }
