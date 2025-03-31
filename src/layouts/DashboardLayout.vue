@@ -9,27 +9,50 @@
         <div class="header-nav">
           <nav class="main-nav">
             <ul>
-              <li>
-                <a class="active"><font-awesome-icon icon="tachometer-alt-average" /> Dashboard</a>
-              </li>
-              <li>
-                <a><font-awesome-icon icon="ticket" />Tickets</a>
-              </li>
-              <li v-if="user?.isAdmin">
-                <a class="admin-menu-item">
-                  <font-awesome-icon icon="chart-line" />
-                  Relatórios
-                </a>
-              </li>
-              <li v-if="user?.isAdmin">
-                <a class="admin-menu-item"><font-awesome-icon icon="users" />Usuários</a>
-              </li>
-              <li v-if="user?.isAdmin">
-                <a class="admin-menu-item"><font-awesome-icon icon="building" /> Setores</a>
-              </li>
-              <li v-if="user?.isAdmin">
-                <a class="admin-menu-item"><font-awesome-icon icon="tag" /> Categorias</a>
-              </li>
+              <router-link to="/">
+                <li>
+                  <div :class="{ active: isActive('/') }">
+                    <font-awesome-icon icon="tachometer-alt-average" /> Dashboard
+                  </div>
+                </li>
+              </router-link>
+              <router-link to="/meus-tickets">
+                <li>
+                  <div :class="{ active: isActive('/meus-tickets') }">
+                    <font-awesome-icon icon="ticket" />Tickets
+                  </div>
+                </li>
+              </router-link>
+              <router-link to="/admin/relatorios">
+                <li v-if="user?.isAdmin">
+                  <div class="admin-menu-item" :class="{ active: isActive('/admin/relatorios') }">
+                    <font-awesome-icon icon="chart-line" />
+                    Relatórios
+                  </div>
+                </li>
+              </router-link>
+
+              <router-link to="/admin/usuarios">
+                <li v-if="user?.isAdmin">
+                  <div class="admin-menu-item" :class="{ active: isActive('/admin/usuarios') }">
+                    <font-awesome-icon icon="users" />Usuários
+                  </div>
+                </li>
+              </router-link>
+              <router-link to="/admin/setores">
+                <li v-if="user?.isAdmin">
+                  <div class="admin-menu-item" :class="{ active: isActive('/admin/setores') }">
+                    <font-awesome-icon icon="building" /> Setores
+                  </div>
+                </li>
+              </router-link>
+              <router-link to="/admin/categorias">
+                <li v-if="user?.isAdmin">
+                  <div class="admin-menu-item" :class="{ active: isActive('/admin/categorias') }">
+                    <font-awesome-icon icon="tag" /> Categorias
+                  </div>
+                </li>
+              </router-link>
             </ul>
           </nav>
         </div>
@@ -40,9 +63,9 @@
             <span class="btn-text">Novo Ticket</span>
           </button>
 
-          <div class="notification-icon">
-            <i class="far fa-bell"></i>
-            <span class="notification-badge">0</span>
+          <div class="notification-icon" @click="toggleNotificationsModal">
+            <font-awesome-icon :icon="['far', 'bell']" />
+            <span v-if="unreadCount > 0" class="notification-badge">{{ unreadCount }}</span>
           </div>
 
           <!-- Dark Mode Toggle Button -->
@@ -57,6 +80,7 @@
               class="user-avatar"
             />
             <span class="user-name">Usuário</span>
+            <font-awesome-icon icon="chevron-down" />
           </div>
         </div>
       </header>
@@ -66,26 +90,44 @@
       </main>
     </div>
 
-    <!-- New Ticket Modal -->
     <NewTicketModal :isOpen="isTicketModalOpen" @close="closeTicketModal" />
 
-    <!-- Profile Modal -->
     <ProfileModal :showProfileModal="showProfileModal" @close="toggleProfileModal" />
+
+    <NotificationsModal
+      :showNotificationsModal="showNotificationsModal"
+      @close="toggleNotificationsModal"
+      @notifications-read="fetchUnreadCount"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import NewTicketModal from '@/components/layout/NewTicketModal.vue';
 import ProfileModal from '@/components/layout/ProfileModal.vue';
+import NotificationsModal from '@/components/layout/NotificationsModal.vue';
 import { useUserStore } from '@/stores/user';
-
-// const { isOpen, open, close } = useModal();
+import { useRoute } from 'vue-router';
+import { notificationService } from '@/services/notificationService';
 
 const user = useUserStore().user;
+const route = useRoute();
 
 const isTicketModalOpen = ref(false);
 const showProfileModal = ref(false);
+const showNotificationsModal = ref(false);
+const unreadCount = ref(0);
+
+// Fetch unread notifications count
+const fetchUnreadCount = async () => {
+  try {
+    const response = await notificationService.fetch();
+    unreadCount.value = response.data.filter((notification) => !notification.read).length;
+  } catch (error) {
+    console.error('Erro ao buscar notificações não lidas:', error);
+  }
+};
 
 // Open and close ticket modal
 const openTicketModal = () => {
@@ -101,15 +143,25 @@ const toggleProfileModal = () => {
   showProfileModal.value = !showProfileModal.value;
 };
 
+const toggleNotificationsModal = () => {
+  showNotificationsModal.value = !showNotificationsModal.value;
+};
+
 // Dark mode toggle function
 const toggleDarkMode = () => {
   const isDarkMode = document.body.classList.toggle('dark-mode');
   localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
 };
+
+const isActive = (path: string) => route.path === path;
+
+// Fetch unread count when component mounts
+onMounted(fetchUnreadCount);
 </script>
-
-
 <style scoped>
+.content {
+  padding: 10px 0px;
+}
 .dark-mode-toggle {
   display: flex;
   align-items: center;
@@ -146,7 +198,7 @@ const toggleDarkMode = () => {
 }
 
 /* Ajustes de cores para o header */
-.main-nav ul li a {
+.main-nav ul li div {
   display: flex;
   align-items: center;
   padding: 0.5rem 1rem;
@@ -156,10 +208,11 @@ const toggleDarkMode = () => {
   font-weight: 500;
   transition: all 0.2s ease;
   white-space: nowrap;
+  gap: 8px;
 }
 
-.main-nav ul li a:hover,
-.main-nav ul li a.active {
+.main-nav ul li div:hover,
+.main-nav ul li div.active {
   background-color: #1a2233;
   color: #f8f9fa;
 }

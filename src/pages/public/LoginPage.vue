@@ -2,7 +2,12 @@
   <section id="loginSection" class="login-section">
     <div class="login-container">
       <div class="login-header">
-        <img src="@/assets/images/tasky-white.png" alt="Tasky Logo" class="login-logo" id="loginLogo" />
+        <img
+          src="@/assets/images/tasky-white.png"
+          alt="Tasky Logo"
+          class="login-logo"
+          id="loginLogo"
+        />
       </div>
 
       <div class="login-form-container">
@@ -11,7 +16,13 @@
             <label for="loginEmail">E-mail</label>
             <div class="input-group">
               <i class="fas fa-envelope"></i>
-              <input type="email" id="loginEmail" placeholder="Seu e-mail" v-model="email" required />
+              <input
+                type="email"
+                id="loginEmail"
+                placeholder="Seu e-mail"
+                v-model="email"
+                required
+              />
             </div>
           </div>
 
@@ -19,7 +30,13 @@
             <label for="loginPassword">Senha</label>
             <div class="input-group">
               <i class="fas fa-lock"></i>
-              <input type="password" id="loginPassword" placeholder="Sua senha" v-model="password" required />
+              <input
+                type="password"
+                id="loginPassword"
+                placeholder="Sua senha"
+                v-model="password"
+                required
+              />
             </div>
           </div>
 
@@ -65,7 +82,8 @@ const login = async () => {
     localStorageService.setUser(user);
 
     router.push('/');
-  } catch {
+  } catch (error) {
+    console.log(error);
     errorMessage.value = 'Email ou senha incorretos';
   }
 };

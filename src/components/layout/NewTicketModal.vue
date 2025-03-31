@@ -6,56 +6,46 @@
         <button @click="$emit('close')" class="close-btn">X</button>
       </header>
       <div class="modal-body">
-        <form id="newTicketForm" @submit.prevent="submitTicket">
-          <div class="form-group">
-            <label for="ticketTitle">Título</label>
-            <input type="text" id="ticketTitle" v-model="ticket.title" required />
+        <div class="ticket-form-container">
+        <form id="ticketForm" @submit.prevent="submitTicket">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nome">Assunto:</label>
+              <input type="text" id="nome" placeholder="Digite o assunto do ticket" required />
+            </div>
+            <div class="form-group">
+              <label for="prioridade">Prioridade:</label>
+              <select id="prioridade" required>
+                <option value="Baixa">Baixa</option>
+                <option value="Média">Média</option>
+                <option value="Alta">Alta</option>
+              </select>
+            </div>
           </div>
-
-          <div class="form-group">
-            <label for="ticketDepartment">Departamento</label>
-            <select id="ticketDepartment" v-model="ticket.department" required>
-              <option value="">Selecione...</option>
-              <option value="sales">Vendas</option>
-              <option value="support">Suporte</option>
-              <option value="marketing">Marketing</option>
-            </select>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="setorDestino">Setor Destino:</label>
+              <select id="setorDestino" required></select>
+            </div>
+            <div class="form-group">
+              <label for="usuarioDestino">Usuário Destino:</label>
+              <select id="usuarioDestino" required></select>
+            </div>
           </div>
-
           <div class="form-group">
-            <label for="ticketCategory">Categoria</label>
-            <select id="ticketCategory" v-model="ticket.category" required>
-              <option value="">Selecione...</option>
-              <option value="bug">Bug</option>
-              <option value="feature">Feature</option>
-              <option value="question">Question</option>
-            </select>
+            <label for="descricao">Descrição:</label>
+            <textarea id="descricao" placeholder="Descreva o ticket" rows="4" required></textarea>
           </div>
-
           <div class="form-group">
-            <label for="ticketPriority">Prioridade</label>
-            <select id="ticketPriority" v-model="ticket.priority" required>
-              <option value="low">Baixa</option>
-              <option value="medium">Média</option>
-              <option value="high">Alta</option>
-            </select>
+            <label for="conclusao">Data de Conclusão:</label>
+            <input type="datetime-local" id="conclusao" />
           </div>
-
-          <div class="form-group">
-            <label for="ticketDeadline">Prazo</label>
-            <input type="date" id="ticketDeadline" v-model="ticket.deadline" />
-          </div>
-
-          <div class="form-group">
-            <label for="ticketDescription">Descrição</label>
-            <textarea id="ticketDescription" v-model="ticket.description" rows="5" required></textarea>
-          </div>
-
-          <div class="form-actions">
-            <button type="button" class="btn btn-secondary" @click="$emit('close')">Cancelar</button>
-            <button type="submit" class="btn btn-primary">Criar Ticket</button>
+          <div class="button-group">
+            <button type="reset" class="btn-secondary">Limpar</button>
+            <button type="submit" class="btn-primary">Enviar</button>
           </div>
         </form>
+      </div>
       </div>
     </div>
   </div>
@@ -117,7 +107,9 @@ const submitTicket = () => {
   border-radius: 8px;
   padding: 20px;
   width: 80%;
-  max-width: 600px;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: scroll;
 }
 
 .modal-header {
@@ -134,7 +126,6 @@ const submitTicket = () => {
 }
 </style>
 
-
 <style scoped>
 .modal-form {
   display: flex;
@@ -142,39 +133,51 @@ const submitTicket = () => {
   gap: 1rem;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-label {
-  font-weight: 600;
-  margin-bottom: 5px;
-  color: #333;
-}
-
-input,
-textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
+.ticket-form-container {
+  flex: 1;
+  min-width: 300px;
+  max-width: 1000px;
+  background: #fff;
+  padding: 20px;
   border-radius: 8px;
-  font-size: 1rem;
-  transition:
-    border 0.3s ease,
-    box-shadow 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-input:focus,
-textarea:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #1e293b;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
   outline: none;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 100px;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 /* Buttons */

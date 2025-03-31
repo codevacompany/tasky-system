@@ -11,8 +11,8 @@ export const userService = {
     return apiClient.get<User[]>('/users');
   },
 
-  async getByEmail(email: string): Promise<AxiosResponse<User[]>> {
-    return apiClient.get<User[]>(`/users/${email}`);
+  async getByEmail(email: string): Promise<AxiosResponse<User>> {
+    return apiClient.get<User>(`/users/${email}`);
   },
 
   async update(id: number, data: UpdateUserDto): Promise<AxiosResponse<User>> {

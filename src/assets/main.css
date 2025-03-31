@@ -302,7 +302,6 @@
 
 /* Estilos para as seções administrativas */
 .admin-section {
-  display: none;
   animation: fadeIn 0.3s ease;
 }
 
@@ -866,18 +865,15 @@ body.dark-mode .header-action-btn:hover {
 
 .summary-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   background-color: var(--card-bg);
   padding: 1rem;
   border-radius: 8px;
-  min-width: 120px;
+  min-width: 220px;
   flex-grow: 1;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .summary-item:hover {
@@ -885,20 +881,64 @@ body.dark-mode .header-action-btn:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.summary-item-content {
+  display: flex;
+  align-items: center;
+}
+
+.summary-item .stat-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 1.3rem;
+  margin-right: 0.75rem;
+  background-color: rgba(var(--primary-rgb), 0.1);
+  color: var(--primary-color);
+}
+
+.summary-item .stat-icon.orange {
+  background-color: rgba(var(--warning-rgb), 0.1);
+  color: var(--warning-color);
+}
+
+.summary-item .stat-icon.blue {
+  background-color: rgba(var(--info-rgb), 0.1);
+  color: var(--info-color);
+}
+
+.summary-item .stat-icon.green {
+  background-color: rgba(var(--success-rgb), 0.1);
+  color: var(--success-color);
+}
+
+.summary-info {
+  display: flex;
+  flex-direction: column;
+}
+
 .summary-label {
   font-size: 0.85rem;
   color: var(--text-light);
-  margin-bottom: 0.5rem;
+  display: block;
+  font-weight: 500;
 }
 
 .stat-number {
-  font-size: 1.75rem;
+  font-size: 1.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--text-color);
+  display: block;
+  text-align: right;
+  min-width: 30px;
 }
 
+/* Cores para os contadores */
 .summary-item:nth-child(1) .stat-number {
-  color: var(--primary);
+  color: var(--primary-color);
 }
 
 .summary-item:nth-child(2) .stat-number {
@@ -906,11 +946,24 @@ body.dark-mode .header-action-btn:hover {
 }
 
 .summary-item:nth-child(3) .stat-number {
-  color: #5d78ff; /* Em andamento - azul */
+  color: #2196f3; /* Em andamento - azul */
 }
 
 .summary-item:nth-child(4) .stat-number {
   color: #4caf50; /* Resolvidos - verde */
+}
+
+/* Dark mode para os itens de sumário */
+body.dark-mode .summary-item {
+  background-color: var(--card-bg-dark);
+}
+
+body.dark-mode .stat-number {
+  color: var(--text-color-dark);
+}
+
+body.dark-mode .summary-label {
+  color: var(--text-light-dark);
 }
 
 /* Adicionar estilos para o botão de tema */

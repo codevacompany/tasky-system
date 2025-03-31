@@ -5,11 +5,13 @@ import type { RouteRecordRaw } from 'vue-router';
 // import PublicLayout from '@/layouts/PublicLayout.vue';
 import LoginPage from '@/pages/public/LoginPage.vue';
 import UserHome from '@/pages/user/UserHome.vue';
-import AdminDashboard from '@/pages/admin/AdminDashboard.vue';
-import TicketsReceived from '@/pages/user/TicketsReceived.vue';
-import TicketsCreated from '@/pages/user/TicketsCreated.vue';
-import DepartmentTickets from '@/pages/user/DepartmentTickets.vue';
+// import AdminDashboard from '@/pages/admin/AdminDashboard.vue';
 import DashboardLayout from '@/layouts/DashboardLayout.vue';
+import UserList from '@/pages/admin/UserList.vue';
+import DepartmentList from '@/pages/admin/DepartmentList.vue';
+import ReportsPage from '@/pages/admin/ReportsPage.vue';
+import CategoryList from '@/pages/admin/CategoryList.vue';
+import TicketsPage from '@/pages/user/TicketsPage.vue';
 
 const routes: RouteRecordRaw[] = [
   // Public Routes (No Layout)
@@ -24,10 +26,8 @@ const routes: RouteRecordRaw[] = [
     component: DashboardLayout,
     children: [
       { path: '', component: UserHome },
-      { path: 'meus-tickets/recebidos', component: TicketsReceived },
-      { path: 'meus-tickets/criados', component: TicketsCreated },
-      { path: 'tickets-do-setor', component: DepartmentTickets },
-    ]
+      { path: 'meus-tickets', component: TicketsPage },
+    ],
   },
 
   // Admin Panel Routes
@@ -35,14 +35,18 @@ const routes: RouteRecordRaw[] = [
     path: '/admin',
     component: DashboardLayout,
     children: [
-      { path: '', component: AdminDashboard },
-    ]
-  }
+      { path: '', component: UserHome },
+      { path: 'relatorios', component: ReportsPage },
+      { path: 'usuarios', component: UserList },
+      { path: 'setores', component: DepartmentList },
+      { path: 'categorias', component: CategoryList },
+    ],
+  },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 });
 
 export default router;

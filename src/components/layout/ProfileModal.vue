@@ -1,25 +1,16 @@
 <template>
   <Teleport to="body">
     <!-- Backdrop -->
-    <div
-      v-if="showProfileModal"
-      class="backdrop"
-      @click="closeModal"
-    ></div>
+    <div v-if="showProfileModal" class="backdrop" @click="closeModal"></div>
 
     <!-- Profile Modal/Dropdown -->
-    <div
-      v-if="showProfileModal"
-      class="profile-dropdown"
-      id="profileModal"
-      @click.stop
-    >
+    <div v-if="showProfileModal" class="profile-dropdown" id="profileModal" @click.stop>
       <!-- Modal content -->
       <div class="modal-content">
         <div class="modal-header">
           <h2>Meu Perfil</h2>
           <button class="close-btn" @click="closeModal">
-            <i class="fas fa-times"></i>
+            <font-awesome-icon icon="times" size="lg" />
           </button>
         </div>
         <div class="modal-body">
@@ -28,31 +19,21 @@
               <img src="./images/user-placeholder.jpg" alt="Avatar" id="profileAvatar" />
             </div>
             <div class="profile-info">
-              <h3 id="profileName">Usuário</h3>
-              <p id="profileRole">Sem departamento</p>
+              <h3 id="profileName">{{ user?.firstName }}</h3>
+              <p id="profileRole">{{ user?.department.name }}</p>
             </div>
           </div>
 
           <div class="profile-details">
             <div class="info-group">
-              <label>Nome</label>
-              <p id="profileNomeDisplay">-</p>
-            </div>
-
-            <div class="info-group">
-              <label>E-mail</label>
+              <label>{{ user?.email }}</label>
               <p id="profileEmailDisplay">-</p>
-            </div>
-
-            <div class="info-group">
-              <label>Setor</label>
-              <p id="profileSetorDisplay">-</p>
             </div>
           </div>
 
           <div class="form-actions right-aligned">
-            <button type="button" id="logoutBtn" class="btn btn-danger">
-              <i class="fas fa-sign-out-alt"></i>
+            <button type="button" id="logoutBtn" class="btn btn-danger" @click="logout">
+              <font-awesome-icon icon="sign-out-alt" />
               Sair
             </button>
           </div>
@@ -63,6 +44,12 @@
 </template>
 
 <script setup lang="ts">
+import { useUserStore } from '@/stores/user';
+import { authService } from '@/services/authService';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
 defineProps({
   showProfileModal: Boolean,
 });
@@ -71,9 +58,16 @@ const emit = defineEmits<{
   (event: 'close'): void;
 }>();
 
+const user = useUserStore().user;
+
 const closeModal = () => {
-  emit('close'); // Emit close event when the backdrop or close button is clicked
+  emit('close');
 };
+
+const logout = () => {
+  authService.logout();
+  router.push('/login')
+}
 </script>
 
 <style scoped>
@@ -83,8 +77,8 @@ const closeModal = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: transparent; /* Semi-transparent black */
-  z-index: 999; /* Behind the modal */
+  background-color: transparent;
+  z-index: 999;
   pointer-events: auto;
 }
 
@@ -104,6 +98,10 @@ const closeModal = () => {
     opacity 0.3s ease;
   pointer-events: auto; /* Changed from 'none' to 'auto' */
   border: 1px solid var(--border-color);
+}
+
+.modal-content {
+  width: 100%;
 }
 
 .profile-dropdown .modal-header {

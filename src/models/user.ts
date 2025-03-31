@@ -1,9 +1,12 @@
+import type { Department } from "./department";
+
 export interface User {
   id: number;
   firstName: string;
   lastName: string;
   email: string;
   departmentId: number;
+  department: Department;
   isAdmin?: boolean;
 }
 

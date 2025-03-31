@@ -27,6 +27,6 @@ export const authService = {
   },
 
   logout() {
-    localStorageService.clear()
+    localStorageService.clear();
   },
 };

@@ -11,8 +11,8 @@ export const notificationService = {
     return apiClient.get<Notification[]>('/notifications');
   },
 
-  async getBytargetUser(targetUserId: number): Promise<AxiosResponse<Notification>> {
-    return apiClient.get<Notification>(`/notifications/target-user/${targetUserId}`);
+  async getBytargetUser(targetUserId: number): Promise<AxiosResponse<Notification[]>> {
+    return apiClient.get<Notification[]>(`/notifications/target-user/${targetUserId}`);
   },
 
   async update(id: number, data: UpdateNotificationDto): Promise<AxiosResponse<Notification>> {
