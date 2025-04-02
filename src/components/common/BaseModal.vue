@@ -7,7 +7,7 @@
             <h2>{{ title }}</h2>
           </slot>
           <button class="close-btn" @click="close">
-            <i class="fas fa-times"></i>
+            <font-awesome-icon icon="times" size="md" />
           </button>
         </div>
         <div class="modal-body">

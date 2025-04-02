@@ -38,9 +38,6 @@
               >
                 <font-awesome-icon icon="bell" size="lg" />
                 <div class="notification-content">
-                  <div class="notification-title">
-                    {{ notification.title }}
-                  </div>
                   <div class="notification-message">
                     {{ notification.message }}
                   </div>

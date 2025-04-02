@@ -34,17 +34,17 @@
         </tbody>
       </table>
       <div v-if="tickets.length === 0" class="no-tickets-message">
-        <i class="fas fa-ticket-alt"></i>
+        <font-awesome-icon icon="ticket" />
         <p>Nenhum ticket encontrado</p>
       </div>
     </div>
     <div class="pagination">
       <button class="pagination-btn" id="prevPageSetor">
-        <i class="fas fa-chevron-left"></i>
+        <font-awesome-icon icon="chevron-left" />
       </button>
       <span id="paginationInfoSetor">Página 1 de 1</span>
       <button class="pagination-btn" id="nextPageSetor">
-        <i class="fas fa-chevron-right"></i>
+        <font-awesome-icon icon="chevron-right" />
       </button>
     </div>
   </div>
@@ -98,5 +98,43 @@ const calculateDeadline = (ticket: Ticket) => {
 
 .tickets-table tr:hover td {
   background-color: rgba(0, 0, 0, 0.02);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.pagination-btn:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#paginationInfo {
+  font-size: 0.9rem;
+  color: var(--text-light);
 }
 </style>

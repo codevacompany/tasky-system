@@ -28,6 +28,75 @@
       </div>
 
       <div class="tab-content">
+        <div class="ticket-filters">
+          <div class="filter-group">
+            <label for="statusFilter">Status:</label>
+            <select id="statusFilter">
+              <option value="all">Todos</option>
+              <option value="Pendente">Pendentes</option>
+              <option value="Em andamento">Em Andamento</option>
+              <option value="Finalizado">Resolvidos</option>
+              <option value="Cancelado">Cancelados</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="priorityFilter">Prioridade:</label>
+            <select id="priorityFilter">
+              <option value="all">Todas</option>
+              <option value="baixa">Baixa</option>
+              <option value="media">Média</option>
+              <option value="alta">Alta</option>
+            </select>
+          </div>
+
+          <div class="search-group">
+            <input type="text" id="searchTickets" placeholder="Buscar tickets..." />
+            <button class="btn-icon">
+              <font-awesome-icon icon="search" />
+            </button>
+          </div>
+        </div>
+
+        <div class="tickets-summary">
+          <div class="summary-item">
+            <div class="summary-item-content">
+              <div class="stat-icon">
+                <font-awesome-icon icon="ticket" />
+              </div>
+              <span class="summary-label">Total</span>
+            </div>
+            <span class="stat-number">{{ totalTickets }}</span>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item-content">
+              <div class="stat-icon orange">
+                <font-awesome-icon icon="clock" />
+              </div>
+              <span class="summary-label">Pendentes</span>
+            </div>
+            <span class="stat-number">{{ pendingTickets }}</span>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item-content">
+              <div class="stat-icon blue">
+                <font-awesome-icon icon="spinner" />
+              </div>
+              <span class="summary-label">Em Andamento</span>
+            </div>
+            <span class="stat-number">{{ inProgressTickets }}</span>
+          </div>
+          <div class="summary-item">
+            <div class="summary-item-content">
+              <div class="stat-icon green">
+                <font-awesome-icon icon="check-circle" />
+              </div>
+              <span class="summary-label">Resolvidos</span>
+            </div>
+            <span class="stat-number">{{ resolvedTickets }}</span>
+          </div>
+        </div>
+
         <TicketTable :tickets="tickets" @viewTicket="handleViewTicket" />
       </div>
     </div>
@@ -35,10 +104,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from '@/stores/user';
 import type { Ticket } from '@/models';
+import { TicketStatus } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
 
 const user = useUserStore().user;
@@ -48,20 +118,30 @@ const tickets = ref<Ticket[]>([]);
 const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor') => {
   activeTab.value = tab;
   try {
+    let response;
     if (tab === 'recebidos') {
-      const response = await ticketService.getByTargetUser(user!.id);
-      tickets.value = response.data;
+      response = await ticketService.getByTargetUser(user!.id);
     } else if (tab === 'criados') {
-      const response = await ticketService.getByRequester(user!.id);
-      tickets.value = response.data;
-    } else if (tab === 'setor') {
-      const response = await ticketService.getByDepartment(user!.department.id);
-      tickets.value = response.data;
+      response = await ticketService.getByRequester(user!.id);
+    } else {
+      response = await ticketService.getByDepartment(user!.department.id);
     }
+    tickets.value = response.data;
   } catch (error) {
     console.error('Error fetching tickets:', error);
   }
 };
+
+const totalTickets = computed(() => tickets.value.length);
+const pendingTickets = computed(
+  () => tickets.value.filter((ticket) => ticket.status === TicketStatus.Pending).length,
+);
+const inProgressTickets = computed(
+  () => tickets.value.filter((ticket) => ticket.status === TicketStatus.InProgress).length,
+);
+const resolvedTickets = computed(
+  () => tickets.value.filter((ticket) => ticket.status === TicketStatus.Completed).length,
+);
 
 const handleViewTicket = (ticket: Ticket) => {
   console.log('Viewing ticket:', ticket);

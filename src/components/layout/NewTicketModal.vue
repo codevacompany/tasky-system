@@ -1,21 +1,22 @@
 <template>
-  <div v-if="isOpen" class="modal-overlay">
-    <div class="modal-content">
-      <header class="modal-header">
-        <h3>Criar Novo Ticket</h3>
-        <button @click="$emit('close')" class="close-btn">X</button>
-      </header>
-      <div class="modal-body">
-        <div class="ticket-form-container">
+  <BaseModal :isOpen="isOpen" title="Criar Novo Ticket" @close="closeModal">
+    <div class="modal-body">
+      <div class="ticket-form-container">
         <form id="ticketForm" @submit.prevent="submitTicket">
           <div class="form-row">
             <div class="form-group">
               <label for="nome">Assunto:</label>
-              <input type="text" id="nome" placeholder="Digite o assunto do ticket" required />
+              <input
+                v-model="ticketData.name"
+                type="text"
+                id="nome"
+                placeholder="Digite o assunto do ticket"
+                required
+              />
             </div>
             <div class="form-group">
               <label for="prioridade">Prioridade:</label>
-              <select id="prioridade" required>
+              <select v-model="ticketData.priority" id="prioridade" required>
                 <option value="Baixa">Baixa</option>
                 <option value="Média">Média</option>
                 <option value="Alta">Alta</option>
@@ -25,99 +26,152 @@
           <div class="form-row">
             <div class="form-group">
               <label for="setorDestino">Setor Destino:</label>
-              <select id="setorDestino" required></select>
+              <select
+                v-model="selectedDepartment"
+                id="setorDestino"
+                @change="updateUsersList"
+                required
+              >
+                <option :value="null" disabled selected>Selecione um setor</option>
+                <option v-for="dept in departments" :key="dept.id" :value="dept.id">
+                  {{ dept.name }}
+                </option>
+              </select>
             </div>
             <div class="form-group">
               <label for="usuarioDestino">Usuário Destino:</label>
-              <select id="usuarioDestino" required></select>
+              <select
+                v-model="selectedUser"
+                id="usuarioDestino"
+                :disabled="!selectedDepartment"
+                required
+              >
+                <option :value="null" disabled selected>Selecione um usuário</option>
+                <option v-for="user in availableUsers" :key="user.id" :value="user.id">
+                  {{ user.firstName }} {{ user.lastName }}
+                </option>
+              </select>
             </div>
           </div>
           <div class="form-group">
             <label for="descricao">Descrição:</label>
-            <textarea id="descricao" placeholder="Descreva o ticket" rows="4" required></textarea>
+            <textarea
+              v-model="ticketData.description"
+              id="descricao"
+              placeholder="Descreva o ticket"
+              rows="4"
+              required
+            ></textarea>
           </div>
           <div class="form-group">
             <label for="conclusao">Data de Conclusão:</label>
-            <input type="datetime-local" id="conclusao" />
+            <input v-model="ticketData.completionDate" type="datetime-local" id="conclusao" />
           </div>
           <div class="button-group">
-            <button type="reset" class="btn-secondary">Limpar</button>
+            <button type="reset" @click="resetForm" class="btn-secondary">Limpar</button>
             <button type="submit" class="btn-primary">Enviar</button>
           </div>
         </form>
       </div>
-      </div>
     </div>
-  </div>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { departmentService } from '@/services/departmentService';
+import { userService } from '@/services/userService';
+import { ticketService } from '@/services/ticketService';
+import { useUserStore } from '@/stores/user';
+import { TicketPriority, type User } from '@/models';
+import BaseModal from '../common/BaseModal.vue';
 
 defineProps({
   isOpen: Boolean,
 });
 
-const emit = defineEmits<{
-  (event: 'close'): void;
-}>();
+const emit = defineEmits(['close']);
 
-const ticket = ref({
-  title: '',
-  department: '',
-  category: '',
-  priority: 'medium',
-  deadline: '',
+const ticketData = ref({
+  name: '',
+  priority: TicketPriority.Low,
   description: '',
+  departmentId: null as number | null,
+  targetUserId: null as number | null,
+  completionDate: '',
+  requesterId: useUserStore().user!.id,
 });
 
-const submitTicket = () => {
-  console.log('Ticket criado:', ticket.value);
+const departments = ref<{ id: number; name: string }[]>([]);
+const selectedDepartment = ref<number | null>(null);
+const selectedUser = ref<number | null>(null);
+const availableUsers = ref<User[]>([]);
 
-  // Reset form and close modal
-  ticket.value = {
-    title: '',
-    department: '',
-    category: '',
-    priority: 'medium',
-    deadline: '',
+const fetchDepartments = async () => {
+  try {
+    const response = await departmentService.fetch();
+    departments.value = response.data;
+  } catch (error) {
+    console.error('Erro ao carregar setores:', error);
+  }
+};
+
+const updateUsersList = async () => {
+  if (!selectedDepartment.value) {
+    availableUsers.value = [];
+    selectedUser.value = null;
+    return;
+  }
+  try {
+    const response = await userService.getByDepartment(selectedDepartment.value);
+    availableUsers.value = response.data;
+  } catch (error) {
+    console.error('Erro ao carregar usuários:', error);
+    availableUsers.value = [];
+  }
+};
+
+const resetForm = () => {
+  ticketData.value = {
+    name: '',
+    priority: TicketPriority.Low,
     description: '',
+    departmentId: null,
+    targetUserId: null,
+    completionDate: '',
+    requesterId: useUserStore().user!.id,
   };
+  selectedDepartment.value = null;
+  selectedUser.value = null;
+  availableUsers.value = [];
+};
 
+const closeModal = () => {
+  resetForm();
   emit('close');
 };
+
+const submitTicket = async () => {
+  if (!selectedDepartment.value || !selectedUser.value) {
+    console.error('Departamento e Usuário são obrigatórios');
+    return;
+  }
+
+  ticketData.value.departmentId = selectedDepartment.value;
+  ticketData.value.targetUserId = selectedUser.value;
+
+  try {
+    await ticketService.create(ticketData.value);
+    closeModal();
+  } catch (error) {
+    console.error('Erro ao criar ticket:', error);
+  }
+};
+
+onMounted(fetchDepartments);
 </script>
 
 <style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-}
-
-.modal-content {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 20px;
-  width: 80%;
-  max-width: 900px;
-  max-height: 90vh;
-  overflow-y: scroll;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .close-btn {
   background: none;
   border: none;

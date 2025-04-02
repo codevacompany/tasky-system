@@ -40,9 +40,9 @@ export interface CreateTicketDto {
   name: string;
   priority: TicketPriority;
   description: string;
-  departmentId: number;
-  requesterId: User;
-  targetUserId: User;
+  departmentId: number | null;
+  requesterId: number;
+  targetUserId: number | null;
   completionDate?: string;
 }
 

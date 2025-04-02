@@ -6,7 +6,7 @@
     <div class="dashboard-stats">
       <div class="stat-card">
         <div class="stat-icon">
-          <i class="fas fa-ticket-alt"></i>
+          <font-awesome-icon icon="ticket" />
         </div>
         <div class="stat-info">
           <h3>Total de Tickets</h3>
@@ -16,7 +16,7 @@
 
       <div class="stat-card">
         <div class="stat-icon orange">
-          <i class="fas fa-clock"></i>
+          <font-awesome-icon icon="clock" />
         </div>
         <div class="stat-info">
           <h3>Pendentes</h3>
@@ -26,7 +26,7 @@
 
       <div class="stat-card">
         <div class="stat-icon blue">
-          <i class="fas fa-spinner"></i>
+          <font-awesome-icon icon="spinner" />
         </div>
         <div class="stat-info">
           <h3>Em Andamento</h3>
@@ -36,7 +36,7 @@
 
       <div class="stat-card">
         <div class="stat-icon green">
-          <i class="fas fa-check-circle"></i>
+          <font-awesome-icon icon="check-circle" />
         </div>
         <div class="stat-info">
           <h3>Finalizados</h3>
@@ -49,7 +49,7 @@
     <div class="dashboard-stats">
       <div class="stat-card">
         <div class="stat-icon purple">
-          <i class="fas fa-chart-pie"></i>
+          <font-awesome-icon icon="chart-pie" />
         </div>
         <div class="stat-info">
           <h3>Taxa de Resolução</h3>
@@ -59,7 +59,7 @@
 
       <div class="stat-card">
         <div class="stat-icon teal">
-          <i class="fas fa-hourglass-half"></i>
+          <font-awesome-icon icon="hourglass-half" />
         </div>
         <div class="stat-info">
           <h3>Tempo Médio de Aceite</h3>
@@ -69,7 +69,7 @@
 
       <div class="stat-card">
         <div class="stat-icon indigo">
-          <i class="fas fa-calendar-check"></i>
+          <font-awesome-icon icon="calendar-check" />
         </div>
         <div class="stat-info">
           <h3>Tempo Médio de Conclusão</h3>
@@ -106,7 +106,7 @@
               </tr>
               <tr v-if="latestReceivedTickets.length === 0">
                 <td colspan="5" class="empty-state">
-                  <i class="fas fa-inbox"></i> Nenhum ticket recebido recentemente
+                  <font-awesome-icon icon="inbox" /> Nenhum ticket recebido recentemente
                 </td>
               </tr>
             </tbody>
@@ -140,7 +140,7 @@
               </tr>
               <tr v-if="latestCreatedTickets.length === 0">
                 <td colspan="5" class="empty-state">
-                  <i class="fas fa-plus-circle"></i> Nenhum ticket criado recentemente
+                  <font-awesome-icon icon="plus-cicle" /> Nenhum ticket criado recentemente
                 </td>
               </tr>
             </tbody>

@@ -19,6 +19,15 @@ import {
   faMoon,
   faTimes,
   faBellSlash,
+  faClock,
+  faSpinner,
+  faCheckCircle,
+  faHourglassHalf,
+  faChartPie,
+  faCalendarCheck,
+  faSearch,
+  faChevronLeft,
+  faChevronRight,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { faBell } from '@fortawesome/free-regular-svg-icons';
@@ -27,6 +36,8 @@ const icons = [
   faHome,
   faUsers,
   faChevronDown,
+  faChevronLeft,
+  faChevronRight,
   faUserPlus,
   faBuilding,
   faTags,
@@ -44,6 +55,13 @@ const icons = [
   faMoon,
   faTimes,
   faBellSlash,
+  faClock,
+  faSpinner,
+  faCheckCircle,
+  faHourglassHalf,
+  faChartPie,
+  faCalendarCheck,
+  faSearch,
 ];
 
 library.add(...icons);
