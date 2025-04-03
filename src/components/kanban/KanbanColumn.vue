@@ -85,6 +85,7 @@ function handleDrop(e: DragEvent) {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease;
+  min-height: 500px;
 }
 
 .column.drag-over {
@@ -111,5 +112,10 @@ function handleDrop(e: DragEvent) {
   border-radius: 6px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   cursor: grab;
+}
+
+.drag-ghost {
+  opacity: 0.5;
+  border: 2px dashed #d1d5db; /* Equivalent to Tailwind's border-gray-400 */
 }
 </style>

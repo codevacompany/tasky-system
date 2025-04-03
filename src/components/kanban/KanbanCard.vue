@@ -14,10 +14,16 @@ defineProps<{ task: Task }>();
 <style>
 .task-card {
   background: white;
-  padding: 10px;
+  padding: 16px;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  cursor: move;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.task-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
 .task-title {
@@ -28,5 +34,10 @@ defineProps<{ task: Task }>();
 .task-description {
   font-size: 14px;
   color: #555;
+}
+
+.drag-ghost {
+  opacity: 0.5;
+  border: 2px dashed #d1d5db; /* Equivalent to Tailwind's border-gray-400 */
 }
 </style>
