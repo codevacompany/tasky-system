@@ -28,6 +28,7 @@ import {
   faSearch,
   faChevronLeft,
   faChevronRight,
+  faExclamationTriangle,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { faBell } from '@fortawesome/free-regular-svg-icons';
@@ -62,6 +63,7 @@ const icons = [
   faChartPie,
   faCalendarCheck,
   faSearch,
+  faExclamationTriangle
 ];
 
 library.add(...icons);

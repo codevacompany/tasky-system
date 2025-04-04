@@ -15,7 +15,7 @@ export interface CreateUserDto {
   lastName: string;
   email: string;
   password: string;
-  departmentId: number;
+  departmentId: number | null;
   isAdmin?: boolean;
 }
 

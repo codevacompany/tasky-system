@@ -17,18 +17,31 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="ticket in tickets" :key="ticket.id">
+          <tr v-for="ticket in tickets" :key="ticket.id" @click="openTicketDetails(ticket)">
             <td>{{ ticket.id }}</td>
             <td>{{ ticket.name }}</td>
             <td>{{ ticket.requester.firstName }} {{ ticket.requester.lastName }}</td>
             <td>{{ ticket.department.name }}</td>
-            <td>{{ ticket.priority }}</td>
-            <td>{{ ticket.status }}</td>
+            <td>
+              <span :class="['priority-label', priorityColor(ticket.priority)]">{{
+                ticket.priority
+              }}</span>
+            </td>
+            <td>
+              <span :class="['status-label', statusColor(ticket.status)]">{{ ticket.status }}</span>
+            </td>
             <td>{{ formatDate(ticket.createdAt) }}</td>
             <td>{{ formatDate(ticket.completionDate) }}</td>
-            <td>{{ calculateDeadline(ticket) }}</td>
+            <td :class="{ 'past-deadline': isPastDeadline(ticket.completionDate) }">
+              {{ calculateDeadline(ticket) }}
+              <font-awesome-icon
+                v-if="isPastDeadline(ticket.completionDate)"
+                icon="exclamation-triangle"
+                class="warning-icon"
+              />
+            </td>
             <td>
-              <button @click="$emit('viewTicket', ticket)">Ver</button>
+              <button @click.stop="$emit('viewTicket', ticket)">Ver</button>
             </td>
           </tr>
         </tbody>
@@ -47,19 +60,74 @@
         <font-awesome-icon icon="chevron-right" />
       </button>
     </div>
+
+    <TicketDetailsModal :isOpen="isModalOpen" :ticket="selectedTicket!" @close="closeModal" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import type { Ticket } from '@/models';
-import { defineProps, defineEmits } from 'vue';
+import { defineProps } from 'vue';
+import { TicketStatus, TicketPriority } from '@/models';
+import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 
 defineProps<{ tickets: Ticket[] }>();
-const emit = defineEmits(['viewTicket']);
+const isModalOpen = ref(false);
+const selectedTicket = ref<Ticket | null>(null);
+
+const openTicketDetails = (ticket: Ticket) => {
+  selectedTicket.value = ticket;
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
+  selectedTicket.value = null;
+};
 
 const formatDate = (date?: string) => (date ? new Date(date).toLocaleDateString() : '—');
 const calculateDeadline = (ticket: Ticket) => {
   return ticket.completionDate ? formatDate(ticket.completionDate) : '—';
+};
+
+const isPastDeadline = (date?: string) => {
+  if (!date) return false;
+  return new Date(date) < new Date();
+};
+
+const statusColor = (status: TicketStatus) => {
+  switch (status) {
+    case TicketStatus.Pending:
+      return 'status-pending';
+    case TicketStatus.InProgress:
+      return 'status-in-progress';
+    case TicketStatus.AwaitingVerification:
+      return 'status-awaiting-verification';
+    case TicketStatus.Overdue:
+      return 'status-overdue';
+    case TicketStatus.Completed:
+      return 'status-completed';
+    case TicketStatus.Returned:
+      return 'status-returned';
+    case TicketStatus.Rejected:
+      return 'status-rejected';
+    default:
+      return '';
+  }
+};
+
+const priorityColor = (priority: TicketPriority) => {
+  switch (priority) {
+    case TicketPriority.Low:
+      return 'priority-low';
+    case TicketPriority.Medium:
+      return 'priority-medium';
+    case TicketPriority.High:
+      return 'priority-high';
+    default:
+      return '';
+  }
 };
 </script>
 
@@ -136,5 +204,83 @@ const calculateDeadline = (ticket: Ticket) => {
 #paginationInfo {
   font-size: 0.9rem;
   color: var(--text-light);
+}
+
+.status-label,
+.priority-label {
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 400;
+  text-align: center;
+  display: inline-block;
+  font-size: small;
+}
+
+.status-pending {
+  background-color: #ffecb3;
+  color: #ff9800;
+  border: 1px solid rgba(255, 152, 0, 0.5);
+}
+
+.status-in-progress {
+  background-color: #e8f4fd;
+  color: #288fe4;
+  border: 1px solid rgba(40, 143, 228, 0.5);
+}
+
+.status-awaiting-verification {
+  background-color: #e1bee7;
+  color: #9c27b0;
+  border: 1px solid rgba(156, 39, 176, 0.5);
+}
+
+.status-overdue {
+  background-color: #ffcdd2;
+  color: #f44336;
+  border: 1px solid rgba(244, 67, 54, 0.5);
+}
+
+.status-completed {
+  background-color: #c8e6c9;
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.5);
+}
+
+.status-returned {
+  background-color: #ffccbc;
+  color: #ff5722;
+  border: 1px solid rgba(255, 87, 34, 0.5);
+}
+
+.status-rejected {
+  background-color: #f8bbd0;
+  color: #e91e63;
+  border: 1px solid rgba(233, 30, 99, 0.5);
+}
+
+.priority-low {
+  background-color: #ecf8ec;
+  color: #63b900;
+  border: 1px solid rgba(139, 195, 74, 0.5);
+}
+
+.priority-medium {
+  background-color: #ffecb3;
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.5);
+}
+
+.priority-high {
+  background-color: #ffcdd2;
+  color: #f44336;
+  border: 1px solid rgba(244, 67, 54, 0.5);
+}
+
+.past-deadline {
+  color: red;
+}
+
+.warning-icon {
+  margin-left: 5px;
 }
 </style>

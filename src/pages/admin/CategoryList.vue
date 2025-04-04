@@ -2,7 +2,7 @@
   <section id="categoriasSection" class="section-content admin-section">
     <div class="section-header">
       <h1>Categorias</h1>
-      <button id="newCategoriaBtn" class="header-action-btn">
+      <button id="newCategoriaBtn" class="header-action-btn" @click="openModal">
         <font-awesome-icon icon="plus" />
         <p>Nova Categoria</p>
       </button>
@@ -24,6 +24,9 @@
         </tbody>
       </table>
     </div>
+
+    <!-- New Category Modal -->
+    <NewCategoryModal :isOpen="isModalOpen" @close="closeModal" @categoryCreated="loadCategories" />
   </section>
 </template>
 
@@ -31,8 +34,10 @@
 import { ref, onMounted } from 'vue';
 import { categoryService } from '@/services/categoryService';
 import type { Category } from '@/models';
+import NewCategoryModal from '@/components/categories/NewCategoryModal.vue';
 
 const categories = ref<Category[]>([]);
+const isModalOpen = ref(false);
 
 const loadCategories = async () => {
   try {
@@ -41,6 +46,14 @@ const loadCategories = async () => {
   } catch (error) {
     console.error('Erro ao buscar categorias:', error);
   }
+};
+
+const openModal = () => {
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
 };
 
 onMounted(loadCategories);
