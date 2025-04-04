@@ -16,18 +16,12 @@
         <div class="modal-body">
           <div class="profile-header">
             <div class="profile-avatar">
-              <img src="./images/user-placeholder.jpg" alt="Avatar" id="profileAvatar" />
+              <span class="initials">{{ userInitials }}</span>
             </div>
             <div class="profile-info">
-              <h3 id="profileName">{{ user?.firstName }}</h3>
-              <p id="profileRole">{{ user?.department.name }}</p>
-            </div>
-          </div>
-
-          <div class="profile-details">
-            <div class="info-group">
-              <label>{{ user?.email }}</label>
-              <p id="profileEmailDisplay">-</p>
+              <h3 class="user-name">{{ user?.firstName }} {{ user?.lastName }}</h3>
+              <p class="user-info">{{ user?.department.name }}</p>
+              <p class="user-info">{{ user?.email }}</p>
             </div>
           </div>
 
@@ -44,6 +38,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { authService } from '@/services/authService';
 import { useRouter } from 'vue-router';
@@ -66,8 +61,15 @@ const closeModal = () => {
 
 const logout = () => {
   authService.logout();
-  router.push('/login')
-}
+  router.push('/login');
+};
+
+const userInitials = computed(() => {
+  if (user?.firstName && user?.lastName) {
+    return user.firstName.charAt(0) + user.lastName.charAt(0);
+  }
+  return '';
+});
 </script>
 
 <style scoped>
@@ -82,7 +84,6 @@ const logout = () => {
   pointer-events: auto;
 }
 
-/* Profile Dropdown */
 .profile-dropdown {
   position: fixed;
   top: calc(var(--header-height) + 4px);
@@ -96,7 +97,7 @@ const logout = () => {
   transition:
     transform 0.3s ease,
     opacity 0.3s ease;
-  pointer-events: auto; /* Changed from 'none' to 'auto' */
+  pointer-events: auto;
   border: 1px solid var(--border-color);
 }
 
@@ -104,7 +105,7 @@ const logout = () => {
   width: 100%;
 }
 
-.profile-dropdown .modal-header {
+.modal-header {
   padding: 1rem;
   border-bottom: 1px solid var(--border-color);
   background-color: transparent;
@@ -114,12 +115,13 @@ const logout = () => {
   align-items: center;
 }
 
-.profile-dropdown .modal-header h2 {
+.modal-header h2 {
   margin: 0;
   font-size: 1.2rem;
+  font-weight: 600;
 }
 
-.profile-dropdown .modal-header .close-btn {
+.modal-header .close-btn {
   color: var(--text-color);
   opacity: 0.8;
   background: none;
@@ -161,6 +163,13 @@ body.dark-mode .profile-dropdown .modal-header {
   border-radius: 50%;
   overflow: hidden;
   margin-right: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 .profile-avatar img {
@@ -174,35 +183,8 @@ body.dark-mode .profile-dropdown .modal-header {
   font-size: 1.1rem;
 }
 
-.profile-info p {
-  margin: 0;
-  color: var(--text-muted);
+.user-info {
   font-size: 0.9rem;
-}
-
-.profile-details {
-  margin-bottom: 1.5rem;
-}
-
-.info-group {
-  margin-bottom: 1rem;
-}
-
-.info-group label {
-  display: block;
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-bottom: 0.25rem;
-}
-
-.info-group p {
-  margin: 0;
-  font-size: 1rem;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
 }
 
 .btn {

@@ -2,7 +2,7 @@
   <section id="colaboradoresSection" class="section-content admin-section">
     <div class="section-header">
       <h1>Colaboradores</h1>
-      <button id="newColaboradorBtn" class="header-action-btn">
+      <button id="newColaboradorBtn" class="header-action-btn" @click="openModal">
         <font-awesome-icon icon="plus" />
         <p>Novo Colaborador</p>
       </button>
@@ -30,6 +30,8 @@
         </tbody>
       </table>
     </div>
+
+    <NewUserModal :isOpen="isModalOpen" @close="closeModal" @userCreated="loadUsers" />
   </section>
 </template>
 
@@ -37,8 +39,10 @@
 import { ref, onMounted } from 'vue';
 import { userService } from '@/services/userService';
 import type { User } from '@/models';
+import NewUserModal from '@/components/users/NewUserModal.vue';
 
 const users = ref<User[]>([]);
+const isModalOpen = ref(false);
 
 const loadUsers = async () => {
   try {
@@ -47,6 +51,14 @@ const loadUsers = async () => {
   } catch (error) {
     console.error('Erro ao buscar usuários:', error);
   }
+};
+
+const openModal = () => {
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
 };
 
 onMounted(loadUsers);

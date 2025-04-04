@@ -2,7 +2,7 @@
   <section id="setoresSection" class="section-content admin-section">
     <div class="section-header">
       <h1>Setores</h1>
-      <button id="newSetorBtn" class="header-action-btn">
+      <button id="newSetorBtn" class="header-action-btn" @click="openModal">
         <font-awesome-icon icon="plus" />
         <p>Novo Setor</p>
       </button>
@@ -24,6 +24,8 @@
         </tbody>
       </table>
     </div>
+
+    <NewDepartmentModal :isOpen="isModalOpen" @close="closeModal" @departmentCreated="loadDepartments" />
   </section>
 </template>
 
@@ -31,8 +33,10 @@
 import { ref, onMounted } from 'vue';
 import { departmentService } from '@/services/departmentService';
 import type { Department } from '@/models';
+import NewDepartmentModal from '@/components/departments/NewDepartmentModal.vue';
 
 const departments = ref<Department[]>([]);
+const isModalOpen = ref(false);
 
 const loadDepartments = async () => {
   try {
@@ -41,6 +45,14 @@ const loadDepartments = async () => {
   } catch (error) {
     console.error('Erro ao buscar setores:', error);
   }
+};
+
+const openModal = () => {
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
 };
 
 onMounted(loadDepartments);

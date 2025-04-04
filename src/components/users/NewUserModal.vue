@@ -2,12 +2,13 @@
   <BaseModal :isOpen="isOpen" title="Novo Colaborador" @close="closeModal">
     <div class="modal-body">
       <div class="ticket-form-container">
-        <form id="cadastroColaboradorForm" class="form-grid">
+        <form id="cadastroColaboradorForm" class="form-grid" @submit.prevent="createUser">
           <div class="form-group">
             <label for="nomeColaborador">Nome</label>
             <input
               type="text"
               id="nomeColaborador"
+              v-model="userData.firstName"
               placeholder="Digite o nome do colaborador"
               required
             />
@@ -15,46 +16,55 @@
 
           <div class="form-group">
             <label for="sobrenomeColaborador">Sobrenome</label>
-            <input type="text" id="sobrenomeColaborador" placeholder="Digite o sobrenome" />
+            <input
+              type="text"
+              id="sobrenomeColaborador"
+              v-model="userData.lastName"
+              placeholder="Digite o sobrenome"
+            />
           </div>
 
           <div class="form-group">
             <label for="emailColaborador">E-mail</label>
-            <input type="email" id="emailColaborador" placeholder="Digite o e-mail" required />
+            <input
+              type="email"
+              id="emailColaborador"
+              v-model="userData.email"
+              placeholder="Digite o e-mail"
+              required
+            />
           </div>
 
           <div class="form-group">
             <label for="setorColaborador">Setor</label>
-            <select id="setorColaborador" required>
-              <!-- Os setores serão inseridos aqui -->
+            <select id="setorColaborador" v-model="userData.departmentId" required>
+              <option v-for="department in departments" :key="department.id" :value="department.id">
+                {{ department.name }}
+              </option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="senhaColaborador">Senha</label>
-            <input type="password" id="senhaColaborador" placeholder="Digite a senha" required />
+            <input
+              type="password"
+              id="senhaColaborador"
+              v-model="userData.password"
+              placeholder="Digite a senha"
+              required
+            />
           </div>
 
           <div class="form-group">
             <label for="isAdminColaborador">Administrador</label>
-            <select id="isAdminColaborador" required>
+            <select id="isAdminColaborador" v-model="userData.isAdmin" required>
               <option value="false">Não</option>
               <option value="true">Sim</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="ativoColaborador">Ativo</label>
-            <select id="ativoColaborador" required>
-              <option value="true">Sim</option>
-              <option value="false">Não</option>
             </select>
           </div>
 
           <div class="form-actions">
-            <button type="button" class="btn btn-secondary" data-close-modal="colaboradorModal">
-              Cancelar
-            </button>
+            <button type="button" class="btn btn-secondary" @click="closeModal">Cancelar</button>
             <button type="submit" class="btn btn-primary">Cadastrar</button>
           </div>
         </form>
@@ -67,18 +77,21 @@
 import { ref, onMounted } from 'vue';
 import { departmentService } from '@/services/departmentService';
 import BaseModal from '../common/BaseModal.vue';
+import { userService } from '@/services/userService';
 
 defineProps({
   isOpen: Boolean,
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'userCreated']);
 
-const ticketData = ref({
+const userData = ref({
   firstName: '',
   lastName: '',
   email: '',
+  password: '',
   departmentId: null as number | null,
+  isAdmin: false,
 });
 
 const departments = ref<{ id: number; name: string }[]>([]);
@@ -94,11 +107,13 @@ const fetchDepartments = async () => {
 };
 
 const resetForm = () => {
-  ticketData.value = {
+  userData.value = {
     firstName: '',
     lastName: '',
     email: '',
+    password: '',
     departmentId: null,
+    isAdmin: false,
   };
   selectedDepartment.value = null;
 };
@@ -106,6 +121,16 @@ const resetForm = () => {
 const closeModal = () => {
   resetForm();
   emit('close');
+};
+
+const createUser = async () => {
+  try {
+    await userService.create(userData.value);
+    emit('userCreated');
+    closeModal();
+  } catch (error) {
+    console.error('Erro ao criar usuário:', error);
+  }
 };
 
 onMounted(fetchDepartments);
@@ -127,7 +152,7 @@ onMounted(fetchDepartments);
   gap: 1rem;
 }
 
-.ticket-form-container {
+.user-form-container {
   flex: 1;
   min-width: 300px;
   max-width: 1000px;

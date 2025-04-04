@@ -74,12 +74,10 @@
           </button>
 
           <div class="user-profile" @click="toggleProfileModal">
-            <img
-              src="https://ui-avatars.com/api/?name=U&background=random&color=fff"
-              alt="Perfil"
-              class="user-avatar"
-            />
-            <span class="user-name">Usuário</span>
+            <div class="profile-avatar">
+              <span class="initials">{{ userInitials }}</span>
+            </div>
+            <span class="user-name">{{ user?.firstName }}</span>
             <font-awesome-icon icon="chevron-down" />
           </div>
         </div>
@@ -103,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import NewTicketModal from '@/components/layout/NewTicketModal.vue';
 import ProfileModal from '@/components/layout/ProfileModal.vue';
 import NotificationsModal from '@/components/layout/NotificationsModal.vue';
@@ -119,7 +117,6 @@ const showProfileModal = ref(false);
 const showNotificationsModal = ref(false);
 const unreadCount = ref(0);
 
-// Fetch unread notifications count
 const fetchUnreadCount = async () => {
   try {
     const response = await notificationService.fetch();
@@ -129,7 +126,6 @@ const fetchUnreadCount = async () => {
   }
 };
 
-// Open and close ticket modal
 const openTicketModal = () => {
   isTicketModalOpen.value = true;
 };
@@ -138,7 +134,6 @@ const closeTicketModal = () => {
   isTicketModalOpen.value = false;
 };
 
-// Toggle profile modal visibility
 const toggleProfileModal = () => {
   showProfileModal.value = !showProfileModal.value;
 };
@@ -147,7 +142,6 @@ const toggleNotificationsModal = () => {
   showNotificationsModal.value = !showNotificationsModal.value;
 };
 
-// Dark mode toggle function
 const toggleDarkMode = () => {
   const isDarkMode = document.body.classList.toggle('dark-mode');
   localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
@@ -155,9 +149,16 @@ const toggleDarkMode = () => {
 
 const isActive = (path: string) => route.path === path;
 
-// Fetch unread count when component mounts
+const userInitials = computed(() => {
+  if (user?.firstName && user?.lastName) {
+    return user.firstName.charAt(0) + user.lastName.charAt(0);
+  }
+  return '';
+});
+
 onMounted(fetchUnreadCount);
 </script>
+
 <style scoped>
 .content {
   padding: 10px 0px;
@@ -330,5 +331,25 @@ body.dark-mode .header-logo {
 
 body.dark-mode .header-logo .logo-text {
   color: #f8f9fa;
+}
+
+.profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 </style>
