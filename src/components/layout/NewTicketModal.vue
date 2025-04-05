@@ -1,150 +1,201 @@
 <template>
-  <BaseModal :isOpen="isOpen" title="Criar Novo Ticket" @close="closeModal">
-    <div class="modal-body">
-      <div class="ticket-form-container">
-        <form id="ticketForm" @submit.prevent="submitTicket">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="nome">Assunto:</label>
+  <div class="modal-overlay" v-if="isOpen" @click="closeModal">
+    <div class="modal-content" @click.stop>
+      <div class="modal-header">
+        <h2>Novo Ticket</h2>
+        <button class="close-btn" @click="closeModal">×</button>
+      </div>
+
+      <form @submit.prevent="handleSubmit" class="ticket-form">
+        <div class="form-grid">
+          <div class="form-group span-2">
+            <label for="assunto">Assunto: <span class="required">*</span></label>
               <input
-                v-model="ticketData.name"
                 type="text"
-                id="nome"
-                placeholder="Digite o assunto do ticket"
+              id="assunto"
+              v-model="formData.assunto"
                 required
               />
             </div>
+
             <div class="form-group">
-              <label for="prioridade">Prioridade:</label>
-              <select v-model="ticketData.priority" id="prioridade" required>
-                <option value="Baixa">Baixa</option>
-                <option value="Média">Média</option>
-                <option value="Alta">Alta</option>
-              </select>
+            <label>Prioridade: <span class="required">*</span></label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" v-model="formData.prioridade" value="Baixa" name="prioridade" required>
+                Baixa
+              </label>
+              <label class="radio-label">
+                <input type="radio" v-model="formData.prioridade" value="Média" name="prioridade">
+                Média
+              </label>
+              <label class="radio-label">
+                <input type="radio" v-model="formData.prioridade" value="Alta" name="prioridade">
+                Alta
+              </label>
             </div>
           </div>
-          <div class="form-row">
+
             <div class="form-group">
-              <label for="setorDestino">Setor Destino:</label>
-              <select
-                v-model="selectedDepartment"
-                id="setorDestino"
-                @change="updateUsersList"
-                required
-              >
-                <option :value="null" disabled selected>Selecione um setor</option>
-                <option v-for="dept in departments" :key="dept.id" :value="dept.id">
-                  {{ dept.name }}
-                </option>
+            <label for="setorDestino">Setor Destino: <span class="required">*</span></label>
+            <select id="setorDestino" v-model="formData.setorDestino" required>
+              <option value="">Selecione um setor</option>
+              <option value="TI">TI</option>
+              <option value="RH">RH</option>
+              <option value="Financeiro">Financeiro</option>
+              <option value="Comercial">Comercial</option>
               </select>
             </div>
+
             <div class="form-group">
-              <label for="usuarioDestino">Usuário Destino:</label>
-              <select
-                v-model="selectedUser"
-                id="usuarioDestino"
-                :disabled="!selectedDepartment"
-                required
-              >
-                <option :value="null" disabled selected>Selecione um usuário</option>
-                <option v-for="user in availableUsers" :key="user.id" :value="user.id">
-                  {{ user.firstName }} {{ user.lastName }}
-                </option>
+            <label for="usuarioDestino">Usuário Destino: <span class="required">*</span></label>
+            <select id="usuarioDestino" v-model="formData.usuarioDestino" required>
+              <option value="">Selecione um setor primeiro</option>
               </select>
             </div>
-          </div>
+
           <div class="form-group">
-            <label for="descricao">Descrição:</label>
+            <label for="categoria">Categoria: <span class="required">*</span></label>
+            <select id="categoria" v-model="formData.categoria" required>
+              <option value="">Selecione uma categoria</option>
+              <option value="TI">TI</option>
+              <option value="RH">RH</option>
+              <option value="Financeiro">Financeiro</option>
+              <option value="Comercial">Comercial</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="anexo">Anexar arquivo:</label>
+            <div class="file-input-wrapper">
+              <input
+                type="file"
+                id="anexo"
+                @change="handleFileChange"
+                class="file-input"
+              />
+              <button type="button" class="file-input-button" @click="triggerFileInput">
+                Escolher arquivo
+              </button>
+              <span class="file-name" v-if="selectedFileName">{{ selectedFileName }}</span>
+            </div>
+          </div>
+
+          <div class="form-group span-2">
+            <label for="dataConclusao">Concluir até:</label>
+            <input
+              type="datetime-local"
+              id="dataConclusao"
+              v-model="formData.dataConclusao"
+            />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="descricao">Descrição: <span class="required">*</span></label>
             <textarea
-              v-model="ticketData.description"
               id="descricao"
-              placeholder="Descreva o ticket"
-              rows="4"
+              v-model="formData.descricao"
               required
+              rows="4"
             ></textarea>
           </div>
-          <div class="form-group">
-            <label for="conclusao">Data de Conclusão:</label>
-            <input v-model="ticketData.completionDate" type="datetime-local" id="conclusao" />
           </div>
-          <div class="button-group">
-            <button type="reset" @click="resetForm" class="btn btn-secondary">Limpar</button>
-            <button type="submit" class="btn btn-primary">Enviar</button>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" @click="resetForm">
+            Limpar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Criar Ticket
+          </button>
           </div>
         </form>
       </div>
     </div>
-  </BaseModal>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { departmentService } from '@/services/departmentService';
-import { userService } from '@/services/userService';
+import { ref } from 'vue';
 import { ticketService } from '@/services/ticketService';
-import { useUserStore } from '@/stores/user';
-import { TicketPriority, type User } from '@/models';
-import BaseModal from '../common/BaseModal.vue';
 import { toast } from 'vue3-toastify';
 
-defineProps({
-  isOpen: Boolean,
+const props = defineProps<{
+  isOpen: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: 'close'): void;
+  (e: 'ticketCreated'): void;
+}>();
+
+const selectedFileName = ref('');
+const fileInput = ref<HTMLInputElement | null>(null);
+
+const formData = ref({
+  assunto: '',
+  categoria: '',
+  setorDestino: '',
+  usuarioDestino: '',
+  prioridade: 'Baixa',
+  dataConclusao: '',
+  descricao: '',
+  anexo: null as File | null
 });
 
-const emit = defineEmits(['close']);
-
-const ticketData = ref({
-  name: '',
-  priority: TicketPriority.Low,
-  description: '',
-  departmentId: null as number | null,
-  targetUserId: null as number | null,
-  completionDate: '',
-  requesterId: useUserStore().user?.id || null,
-});
-
-const departments = ref<{ id: number; name: string }[]>([]);
-const selectedDepartment = ref<number | null>(null);
-const selectedUser = ref<number | null>(null);
-const availableUsers = ref<User[]>([]);
-
-const fetchDepartments = async () => {
-  try {
-    const response = await departmentService.fetch();
-    departments.value = response.data;
-  } catch {
-    toast.error('Erro ao carregar setores. Tente novamente.');
+const handleFileChange = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files[0]) {
+    formData.value.anexo = input.files[0];
+    selectedFileName.value = input.files[0].name;
   }
 };
 
-const updateUsersList = async () => {
-  if (!selectedDepartment.value) {
-    availableUsers.value = [];
-    selectedUser.value = null;
-    return;
+const triggerFileInput = () => {
+  const input = document.querySelector('#anexo') as HTMLInputElement;
+  if (input) {
+    input.click();
   }
-  try {
-    const response = await userService.getByDepartment(selectedDepartment.value);
-    availableUsers.value = response.data;
-  } catch {
-    toast.error('Erro ao carregar usuários. Tente novamente.');
-    availableUsers.value = [];
+};
+
+const validateForm = () => {
+  if (!formData.value.assunto.trim()) {
+    toast.error('O campo Assunto é obrigatório');
+    return false;
   }
+  if (!formData.value.categoria) {
+    toast.error('O campo Categoria é obrigatório');
+    return false;
+  }
+  if (!formData.value.setorDestino) {
+    toast.error('O campo Setor Destino é obrigatório');
+    return false;
+  }
+  if (!formData.value.usuarioDestino) {
+    toast.error('O campo Usuário Destino é obrigatório');
+    return false;
+  }
+  if (!formData.value.prioridade) {
+    toast.error('O campo Prioridade é obrigatório');
+    return false;
+  }
+  if (!formData.value.descricao.trim()) {
+    toast.error('O campo Descrição é obrigatório');
+    return false;
+  }
+  return true;
 };
 
 const resetForm = () => {
-  ticketData.value = {
-    name: '',
-    priority: TicketPriority.Low,
-    description: '',
-    departmentId: null,
-    targetUserId: null,
-    completionDate: '',
-    requesterId: useUserStore().user!.id,
+  formData.value = {
+    assunto: '',
+    categoria: '',
+    setorDestino: '',
+    usuarioDestino: '',
+    prioridade: 'Baixa',
+    dataConclusao: '',
+    descricao: '',
+    anexo: null
   };
-  selectedDepartment.value = null;
-  selectedUser.value = null;
-  availableUsers.value = [];
 };
 
 const closeModal = () => {
@@ -152,157 +203,258 @@ const closeModal = () => {
   emit('close');
 };
 
-const submitTicket = async () => {
-  if (!selectedDepartment.value || !selectedUser.value) {
-    toast.error('Departamento e Usuário são obrigatórios');
-    return;
-  }
-
-  ticketData.value.departmentId = selectedDepartment.value;
-  ticketData.value.targetUserId = selectedUser.value;
+const handleSubmit = async () => {
+  if (!validateForm()) return;
 
   try {
-    await ticketService.create(ticketData.value);
+    await ticketService.create(formData.value);
     toast.success('Ticket criado com sucesso!');
+    emit('ticketCreated');
     closeModal();
-  } catch {
-    toast.error('Erro ao criar ticket. Tente novamente.');
+  } catch (error) {
+    toast.error('Erro ao criar ticket');
   }
 };
-
-onMounted(fetchDepartments);
 </script>
 
 <style scoped>
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: #1a2233;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.modal-header h2 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 0;
+}
+
 .close-btn {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  color: #ffffff;
   cursor: pointer;
-}
-</style>
-
-<style scoped>
-.modal-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.ticket-form-container {
-  flex: 1;
-  min-width: 300px;
-  max-width: 1000px;
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #1e293b;
-  font-weight: 500;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 14px;
-  color: #1e293b;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* Buttons */
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 1rem;
-}
-
-.button-group {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.btn {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  height: 36px;
+  font-size: 24px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 24px;
+  height: 24px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
 }
 
-.btn-primary {
-  background-color: #1a2233;
-  color: #ffffff;
+.close-btn:hover {
+  opacity: 1;
 }
 
-.btn-primary:hover {
-  background-color: #141b2a;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+.ticket-form {
+  padding: 24px;
 }
 
-.btn-secondary {
-  background-color: #f5f7fa;
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group.span-2 {
+  grid-column: span 2;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group:has(.radio-group) {
+  grid-column: span 1;
+}
+
+.form-group:has([type="datetime-local"]) {
+  grid-column: span 1;
+}
+
+.radio-group {
+  display: flex;
+  gap: 16px;
+  padding-top: 4px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #1a2233;
+  cursor: pointer;
+}
+
+label {
+  font-size: 14px;
   color: #1a2233;
 }
 
-.btn-secondary:hover {
-  background-color: #e8eaed;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #1a2233;
+  background: #fff;
+  width: 100%;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+textarea {
+  min-height: 120px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
 }
 
 /* Dark mode */
-body.dark-mode .btn-primary {
+:deep(body.dark-mode) .modal-content {
+  background: #141b2a;
+}
+
+:deep(body.dark-mode) .modal-header {
+  background: #1a2233;
+}
+
+:deep(body.dark-mode) label {
+  color: #e2e8f0;
+}
+
+:deep(body.dark-mode) .radio-label {
+  color: #e2e8f0;
+}
+
+:deep(body.dark-mode) input,
+:deep(body.dark-mode) select,
+:deep(body.dark-mode) textarea {
+  background: #1a2233;
+  border-color: #2d3748;
+  color: #e2e8f0;
+}
+
+:deep(body.dark-mode) input:focus,
+:deep(body.dark-mode) select:focus,
+:deep(body.dark-mode) textarea:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.1);
+}
+
+:deep(body.dark-mode) .form-actions {
+  border-top-color: #2d3748;
+}
+
+.required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.file-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-input {
+  display: none;
+}
+
+.file-input-button {
+  padding: 8px 12px;
   background-color: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
   color: #1a2233;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
 }
 
-body.dark-mode .btn-primary:hover {
-  background-color: #e8eaed;
+.file-input-button:hover {
+  background-color: #e2e8f0;
 }
 
-body.dark-mode .btn-secondary {
-  background-color: #272b3a;
-  color: #e2e2e2;
+.file-name {
+  font-size: 14px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 }
 
-body.dark-mode .btn-secondary:hover {
-  background-color: #32374b;
+/* Dark mode additions */
+:deep(body.dark-mode) .file-input-button {
+  background-color: #1a2233;
+  border-color: #2d3748;
+  color: #e2e8f0;
+}
+
+:deep(body.dark-mode) .file-input-button:hover {
+  background-color: #2d3748;
+}
+
+:deep(body.dark-mode) .file-name {
+  color: #94a3b8;
 }
 </style>

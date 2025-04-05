@@ -184,7 +184,7 @@ const getStatusClass = (status: string) => {
 .tickets-table th,
 .tickets-table td {
   padding: 1rem;
-  text-align: left;
+  text-align: center;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -193,6 +193,7 @@ const getStatusClass = (status: string) => {
   font-weight: 600;
   color: var(--text-light);
   background-color: rgba(0, 0, 0, 0.02);
+  text-align: center;
 }
 
 .tickets-table tr:last-child td {
@@ -342,5 +343,14 @@ const getStatusClass = (status: string) => {
 :deep(body.dark-mode) .loading-spinner {
   border-color: #2d3748;
   border-top-color: #818cf8;
+}
+
+.notification-text {
+  font-size: 12px;
+  color: #1a2233;
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+  text-align: center;
 }
 </style>

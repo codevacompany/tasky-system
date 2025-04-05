@@ -80,6 +80,34 @@ const statusColor = (status: TicketStatus) => {
   text-align: center;
 }
 
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.75rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-light);
+  background-color: rgba(0, 0, 0, 0.02);
+  text-align: center;
+}
+
+.data-table tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table tr:hover td {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
 .status-label {
   padding: 0.1rem 0.5rem;
   border-radius: 4px;
