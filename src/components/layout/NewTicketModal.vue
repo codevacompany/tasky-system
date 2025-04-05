@@ -100,7 +100,7 @@ const ticketData = ref({
   departmentId: null as number | null,
   targetUserId: null as number | null,
   completionDate: '',
-  requesterId: useUserStore().user!.id,
+  requesterId: useUserStore().user?.id || null,
 });
 
 const departments = ref<{ id: number; name: string }[]>([]);

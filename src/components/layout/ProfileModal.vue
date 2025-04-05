@@ -188,7 +188,7 @@ body.dark-mode .profile-dropdown .modal-header {
 }
 
 .btn {
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.5rem;
   border-radius: var(--radius);
   font-size: 0.9rem;
   cursor: pointer;

@@ -49,7 +49,6 @@
 
 <script setup lang="ts">
 import { authService } from '@/services/authService';
-import { localStorageService } from '@/utils/localStorageService';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
@@ -64,13 +63,7 @@ const isLoading = ref(false);
 const login = async () => {
   isLoading.value = true;
   try {
-    const response = await authService.login({ email: email.value, password: password.value });
-    const { accessToken, refreshToken } = response.data.token;
-    const user = response.data.user;
-
-    localStorageService.setAccessToken(accessToken);
-    localStorageService.setRefreshToken(refreshToken);
-    localStorageService.setUser(user);
+    await authService.login({ email: email.value, password: password.value });
 
     router.push('/');
   } catch {
