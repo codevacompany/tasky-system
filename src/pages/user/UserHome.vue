@@ -160,10 +160,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { ticketService } from '@/services/ticketService';
 import { TicketStatus, type Ticket } from '@/models';
 import { useUserStore } from '@/stores/user';
+import { toast } from 'vue3-toastify';
 
 const latestReceivedTickets = ref<Ticket[]>([]);
 const latestCreatedTickets = ref<Ticket[]>([]);
@@ -210,8 +211,8 @@ const loadTickets = async () => {
     const resolvedCount = resolvedTickets.value;
     resolutionRate.value =
       totalTickets.value > 0 ? Math.round((resolvedCount / totalTickets.value) * 100) : 0;
-  } catch (error) {
-    console.error('Erro ao buscar tickets:', error);
+  } catch {
+    toast.error('Erro aos buscar tickets. Tente novamente.');
   }
 };
 

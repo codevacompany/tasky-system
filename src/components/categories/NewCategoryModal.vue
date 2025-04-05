@@ -28,6 +28,7 @@
 import { ref } from 'vue';
 import BaseModal from '../common/BaseModal.vue';
 import { categoryService } from '@/services/categoryService';
+import { toast } from 'vue3-toastify';
 
 defineProps({
   isOpen: Boolean,
@@ -54,9 +55,10 @@ const createCategory = async () => {
   try {
     await categoryService.create(categoryData.value);
     emit('categoryCreated');
+    toast.success('Categoria criada com sucesso');
     closeModal();
-  } catch (error) {
-    console.error('Erro ao criar categoria:', error);
+  } catch {
+    toast.error('Erro ao criar categoria');
   }
 };
 </script>
@@ -103,7 +105,9 @@ const createCategory = async () => {
   border-radius: 6px;
   font-size: 14px;
   color: #1e293b;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
 }
 
 .form-group input:focus {
@@ -125,7 +129,9 @@ const createCategory = async () => {
   border-radius: 8px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
+  transition:
+    background 0.3s ease,
+    transform 0.2s ease;
 }
 
 .btn-primary {

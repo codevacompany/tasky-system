@@ -85,6 +85,7 @@ import { ticketService } from '@/services/ticketService';
 import { useUserStore } from '@/stores/user';
 import { TicketPriority, type User } from '@/models';
 import BaseModal from '../common/BaseModal.vue';
+import { toast } from 'vue3-toastify';
 
 defineProps({
   isOpen: Boolean,
@@ -111,8 +112,8 @@ const fetchDepartments = async () => {
   try {
     const response = await departmentService.fetch();
     departments.value = response.data;
-  } catch (error) {
-    console.error('Erro ao carregar setores:', error);
+  } catch {
+    toast.error('Erro ao carregar setores. Tente novamente.');
   }
 };
 
@@ -125,8 +126,8 @@ const updateUsersList = async () => {
   try {
     const response = await userService.getByDepartment(selectedDepartment.value);
     availableUsers.value = response.data;
-  } catch (error) {
-    console.error('Erro ao carregar usuários:', error);
+  } catch {
+    toast.error('Erro ao carregar usuários. Tente novamente.');
     availableUsers.value = [];
   }
 };
@@ -153,7 +154,7 @@ const closeModal = () => {
 
 const submitTicket = async () => {
   if (!selectedDepartment.value || !selectedUser.value) {
-    console.error('Departamento e Usuário são obrigatórios');
+    toast.error('Departamento e Usuário são obrigatórios');
     return;
   }
 
@@ -162,9 +163,10 @@ const submitTicket = async () => {
 
   try {
     await ticketService.create(ticketData.value);
+    toast.success('Ticket criado com sucesso!');
     closeModal();
-  } catch (error) {
-    console.error('Erro ao criar ticket:', error);
+  } catch {
+    toast.error('Erro ao criar ticket. Tente novamente.');
   }
 };
 

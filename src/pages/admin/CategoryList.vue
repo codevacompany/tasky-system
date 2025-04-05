@@ -35,6 +35,7 @@ import { ref, onMounted } from 'vue';
 import { categoryService } from '@/services/categoryService';
 import type { Category } from '@/models';
 import NewCategoryModal from '@/components/categories/NewCategoryModal.vue';
+import { toast } from 'vue3-toastify';
 
 const categories = ref<Category[]>([]);
 const isModalOpen = ref(false);
@@ -43,8 +44,8 @@ const loadCategories = async () => {
   try {
     const response = await categoryService.fetch();
     categories.value = response.data;
-  } catch (error) {
-    console.error('Erro ao buscar categorias:', error);
+  } catch {
+    toast.error('Erro ao carregar categorias. Tente novamente.');
   }
 };
 

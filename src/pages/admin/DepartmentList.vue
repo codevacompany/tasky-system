@@ -34,6 +34,7 @@ import { ref, onMounted } from 'vue';
 import { departmentService } from '@/services/departmentService';
 import type { Department } from '@/models';
 import NewDepartmentModal from '@/components/departments/NewDepartmentModal.vue';
+import { toast } from 'vue3-toastify';
 
 const departments = ref<Department[]>([]);
 const isModalOpen = ref(false);
@@ -42,8 +43,8 @@ const loadDepartments = async () => {
   try {
     const response = await departmentService.fetch();
     departments.value = response.data;
-  } catch (error) {
-    console.error('Erro ao buscar setores:', error);
+  } catch {
+    toast.error('Erro ao carregar setores. Tente novamente.');
   }
 };
 
