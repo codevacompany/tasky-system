@@ -9,36 +9,36 @@
       <form @submit.prevent="handleSubmit" class="ticket-form">
         <div class="form-grid">
           <div class="form-group span-2">
-            <label for="assunto">Assunto: <span class="required">*</span></label>
+            <label for="title">Title: <span class="required">*</span></label>
               <input
                 type="text"
-              id="assunto"
-              v-model="formData.assunto"
+              id="title"
+              v-model="formData.title"
                 required
               />
             </div>
 
             <div class="form-group">
-            <label>Prioridade: <span class="required">*</span></label>
+            <label>Priority: <span class="required">*</span></label>
             <div class="radio-group">
               <label class="radio-label">
-                <input type="radio" v-model="formData.prioridade" value="Baixa" name="prioridade" required>
-                Baixa
+                <input type="radio" v-model="formData.priority" value="Low" name="priority" required>
+                Low
               </label>
               <label class="radio-label">
-                <input type="radio" v-model="formData.prioridade" value="Média" name="prioridade">
-                Média
+                <input type="radio" v-model="formData.priority" value="Medium" name="priority">
+                Medium
               </label>
               <label class="radio-label">
-                <input type="radio" v-model="formData.prioridade" value="Alta" name="prioridade">
-                Alta
+                <input type="radio" v-model="formData.priority" value="High" name="priority">
+                High
               </label>
             </div>
           </div>
 
             <div class="form-group">
-            <label for="setorDestino">Setor Destino: <span class="required">*</span></label>
-            <select id="setorDestino" v-model="formData.setorDestino" required>
+            <label for="targetDepartment">Target Department: <span class="required">*</span></label>
+            <select id="targetDepartment" v-model="formData.targetDepartment" required>
               <option value="">Selecione um setor</option>
               <option value="TI">TI</option>
               <option value="RH">RH</option>
@@ -48,15 +48,15 @@
             </div>
 
             <div class="form-group">
-            <label for="usuarioDestino">Usuário Destino: <span class="required">*</span></label>
-            <select id="usuarioDestino" v-model="formData.usuarioDestino" required>
+            <label for="targetUser">Target User: <span class="required">*</span></label>
+            <select id="targetUser" v-model="formData.targetUser" required>
               <option value="">Selecione um setor primeiro</option>
               </select>
             </div>
 
           <div class="form-group">
-            <label for="categoria">Categoria: <span class="required">*</span></label>
-            <select id="categoria" v-model="formData.categoria" required>
+            <label for="category">Category: <span class="required">*</span></label>
+            <select id="category" v-model="formData.category" required>
               <option value="">Selecione uma categoria</option>
               <option value="TI">TI</option>
               <option value="RH">RH</option>
@@ -65,36 +65,20 @@
             </select>
           </div>
 
-          <div class="form-group">
-            <label for="anexo">Anexar arquivo:</label>
-            <div class="file-input-wrapper">
-              <input
-                type="file"
-                id="anexo"
-                @change="handleFileChange"
-                class="file-input"
-              />
-              <button type="button" class="file-input-button" @click="triggerFileInput">
-                Escolher arquivo
-              </button>
-              <span class="file-name" v-if="selectedFileName">{{ selectedFileName }}</span>
-            </div>
-          </div>
-
           <div class="form-group span-2">
-            <label for="dataConclusao">Concluir até:</label>
+            <label for="completionDate">Concluir até:</label>
             <input
               type="datetime-local"
-              id="dataConclusao"
-              v-model="formData.dataConclusao"
+              id="completionDate"
+              v-model="formData.completionDate"
             />
           </div>
 
           <div class="form-group full-width">
-            <label for="descricao">Descrição: <span class="required">*</span></label>
+            <label for="description">Description: <span class="required">*</span></label>
             <textarea
-              id="descricao"
-              v-model="formData.descricao"
+              id="description"
+              v-model="formData.description"
               required
               rows="4"
             ></textarea>
@@ -128,57 +112,38 @@ const emit = defineEmits<{
   (e: 'ticketCreated'): void;
 }>();
 
-const selectedFileName = ref('');
-const fileInput = ref<HTMLInputElement | null>(null);
-
 const formData = ref({
-  assunto: '',
-  categoria: '',
-  setorDestino: '',
-  usuarioDestino: '',
-  prioridade: 'Baixa',
-  dataConclusao: '',
-  descricao: '',
-  anexo: null as File | null
+  title: '',
+  category: '',
+  targetDepartment: '',
+  targetUser: '',
+  priority: 'Low',
+  completionDate: '',
+  description: ''
 });
 
-const handleFileChange = (event: Event) => {
-  const input = event.target as HTMLInputElement;
-  if (input.files && input.files[0]) {
-    formData.value.anexo = input.files[0];
-    selectedFileName.value = input.files[0].name;
-  }
-};
-
-const triggerFileInput = () => {
-  const input = document.querySelector('#anexo') as HTMLInputElement;
-  if (input) {
-    input.click();
-  }
-};
-
 const validateForm = () => {
-  if (!formData.value.assunto.trim()) {
+  if (!formData.value.title.trim()) {
     toast.error('O campo Assunto é obrigatório');
     return false;
   }
-  if (!formData.value.categoria) {
+  if (!formData.value.category) {
     toast.error('O campo Categoria é obrigatório');
     return false;
   }
-  if (!formData.value.setorDestino) {
+  if (!formData.value.targetDepartment) {
     toast.error('O campo Setor Destino é obrigatório');
     return false;
   }
-  if (!formData.value.usuarioDestino) {
+  if (!formData.value.targetUser) {
     toast.error('O campo Usuário Destino é obrigatório');
     return false;
   }
-  if (!formData.value.prioridade) {
+  if (!formData.value.priority) {
     toast.error('O campo Prioridade é obrigatório');
     return false;
   }
-  if (!formData.value.descricao.trim()) {
+  if (!formData.value.description.trim()) {
     toast.error('O campo Descrição é obrigatório');
     return false;
   }
@@ -187,14 +152,13 @@ const validateForm = () => {
 
 const resetForm = () => {
   formData.value = {
-    assunto: '',
-    categoria: '',
-    setorDestino: '',
-    usuarioDestino: '',
-    prioridade: 'Baixa',
-    dataConclusao: '',
-    descricao: '',
-    anexo: null
+    title: '',
+    category: '',
+    targetDepartment: '',
+    targetUser: '',
+    priority: 'Low',
+    completionDate: '',
+    description: ''
   };
 };
 
@@ -409,52 +373,11 @@ textarea {
   margin-left: 2px;
 }
 
-.file-input-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.file-input {
-  display: none;
-}
-
-.file-input-button {
-  padding: 8px 12px;
-  background-color: #f8f9fa;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
-  color: #1a2233;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
-}
-
-.file-input-button:hover {
-  background-color: #e2e8f0;
-}
-
+/* Remove file input styles */
+.file-input-wrapper,
+.file-input,
+.file-input-button,
 .file-name {
-  font-size: 14px;
-  color: #64748b;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 150px;
-}
-
-/* Dark mode additions */
-:deep(body.dark-mode) .file-input-button {
-  background-color: #1a2233;
-  border-color: #2d3748;
-  color: #e2e8f0;
-}
-
-:deep(body.dark-mode) .file-input-button:hover {
-  background-color: #2d3748;
-}
-
-:deep(body.dark-mode) .file-name {
-  color: #94a3b8;
+  display: none;
 }
 </style>
