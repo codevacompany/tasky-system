@@ -65,7 +65,10 @@
 
           <div class="form-actions">
             <button type="button" class="btn btn-secondary" @click="closeModal">Cancelar</button>
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
+            <button type="submit" class="btn btn-primary">
+              <LoadingSpinner v-if="isLoading" :size="22" />
+              <p v-else>Cadastrar</p>
+            </button>
           </div>
         </form>
       </div>
@@ -79,6 +82,9 @@ import { departmentService } from '@/services/departmentService';
 import BaseModal from '../common/BaseModal.vue';
 import { userService } from '@/services/userService';
 import { toast } from 'vue3-toastify';
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
+
+const isLoading = ref(false);
 
 defineProps({
   isOpen: Boolean,
@@ -125,6 +131,7 @@ const closeModal = () => {
 };
 
 const createUser = async () => {
+  isLoading.value = true;
   try {
     await userService.create(userData.value);
     emit('userCreated');
@@ -132,6 +139,8 @@ const createUser = async () => {
     closeModal();
   } catch {
     toast.error('Algo deu errado. Tente novamente.');
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -210,7 +219,9 @@ onMounted(fetchDepartments);
 }
 
 .btn {
-  padding: 10px 16px;
+  width: 116px;
+  height: 36px;
+  padding: 0 16px;
   border: none;
   border-radius: 8px;
   font-size: 1rem;

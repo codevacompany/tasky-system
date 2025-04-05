@@ -33,7 +33,10 @@
             <a href="#" class="forgot-password">Esqueceu a senha?</a>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+          <button type="submit" class="btn btn-primary btn-block" :disabled="isLoading">
+            <LoadingSpinner v-if="isLoading" :size="22"/>
+            <span v-else>Entrar</span>
+          </button>
         </form>
       </div>
 
@@ -50,17 +53,18 @@ import { localStorageService } from '@/utils/localStorageService';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
 const router = useRouter();
 
 const email = ref('');
 const password = ref('');
-// const errorMessage = ref('');
+const isLoading = ref(false);
 
 const login = async () => {
+  isLoading.value = true;
   try {
     const response = await authService.login({ email: email.value, password: password.value });
-
     const { accessToken, refreshToken } = response.data.token;
     const user = response.data.user;
 
@@ -71,6 +75,8 @@ const login = async () => {
     router.push('/');
   } catch {
     toast.error('Email ou senha incorretos');
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>
@@ -228,7 +234,7 @@ const login = async () => {
 
 .login-form .btn-primary {
   width: 100%;
-  padding: 0.85rem;
+  height: 46px;
   border: none;
   border-radius: 4px;
   background-color: #1a2233;

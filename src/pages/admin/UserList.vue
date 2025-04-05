@@ -20,7 +20,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="user in users" :key="user.id">
+          <tr v-if="isLoading">
+            <td colspan="5" class="loading-cell">
+              <div class="loading-wrapper">
+                <LoadingSpinner :size="28" />
+              </div>
+            </td>
+          </tr>
+          <tr v-else v-for="user in users" :key="user.id">
             <td>{{ user.id }}</td>
             <td>{{ user.firstName }} {{ user.lastName }}</td>
             <td>{{ user.department?.name || 'N/A' }}</td>
@@ -41,16 +48,21 @@ import { userService } from '@/services/userService';
 import type { User } from '@/models';
 import NewUserModal from '@/components/users/NewUserModal.vue';
 import { toast } from 'vue3-toastify';
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
 const users = ref<User[]>([]);
 const isModalOpen = ref(false);
+const isLoading = ref(false);
 
 const loadUsers = async () => {
+  isLoading.value = true;
   try {
     const response = await userService.fetch();
     users.value = response.data;
   } catch {
     toast.error('Erro ao carregar usuários. Tente novamente.');
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -66,6 +78,17 @@ onMounted(loadUsers);
 </script>
 
 <style scoped>
+.loading-cell {
+  margin: 2rem 0;
+}
+
+.loading-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
 h1,
 h3 {
   color: black;

@@ -16,7 +16,10 @@
 
           <div class="form-actions">
             <button type="button" class="btn btn-secondary" @click="closeModal">Cancelar</button>
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
+            <button type="submit" class="btn btn-primary">
+              <LoadingSpinner v-if="isLoading" :size="22" />
+              <p v-else>Cadastrar</p>
+            </button>
           </div>
         </form>
       </div>
@@ -29,6 +32,7 @@ import { ref } from 'vue';
 import BaseModal from '../common/BaseModal.vue';
 import { categoryService } from '@/services/categoryService';
 import { toast } from 'vue3-toastify';
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
 defineProps({
   isOpen: Boolean,
@@ -39,6 +43,8 @@ const emit = defineEmits(['close', 'categoryCreated']);
 const categoryData = ref({
   name: '',
 });
+
+const isLoading = ref(false);
 
 const resetForm = () => {
   categoryData.value = {
@@ -52,6 +58,7 @@ const closeModal = () => {
 };
 
 const createCategory = async () => {
+  isLoading.value = true;
   try {
     await categoryService.create(categoryData.value);
     emit('categoryCreated');
@@ -59,6 +66,8 @@ const createCategory = async () => {
     closeModal();
   } catch {
     toast.error('Erro ao criar categoria');
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>
@@ -124,7 +133,9 @@ const createCategory = async () => {
 }
 
 .btn {
-  padding: 10px 16px;
+  width: 116px;
+  height: 36px;
+  padding: 0 16px;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
@@ -152,3 +163,4 @@ const createCategory = async () => {
   background-color: #cbd5e1;
 }
 </style>
+
