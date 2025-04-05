@@ -24,6 +24,11 @@
               </div>
             </td>
           </tr>
+          <tr v-else-if="!tickets || tickets.length === 0">
+            <td colspan="10" class="empty-state">
+              <p>Nenhum ticket encontrado</p>
+            </td>
+          </tr>
           <tr v-else v-for="ticket in tickets" :key="ticket.id" @click="openTicketDetails(ticket)">
             <td>{{ ticket.id }}</td>
             <td>{{ ticket.name }}</td>
@@ -35,7 +40,9 @@
               }}</span>
             </td>
             <td>
-              <span :class="['status-label', statusColor(ticket.status)]">{{ ticket.status }}</span>
+              <span :class="['status-badge', getStatusClass(ticket.status)]">
+                {{ ticket.status }}
+              </span>
             </td>
             <td>{{ formatDate(ticket.createdAt) }}</td>
             <td>{{ formatDate(ticket.completionDate) }}</td>
@@ -53,17 +60,13 @@
           </tr>
         </tbody>
       </table>
-      <div v-if="!isLoading && tickets.length === 0" class="no-tickets-message">
-        <font-awesome-icon icon="ticket" />
-        <p>Nenhum ticket encontrado</p>
-      </div>
     </div>
     <div class="pagination">
-      <button class="pagination-btn" id="prevPageSetor">
+      <button class="btn btn-icon" id="prevPageSetor">
         <font-awesome-icon icon="chevron-left" />
       </button>
       <span id="paginationInfoSetor">Página 1 de 1</span>
-      <button class="pagination-btn" id="nextPageSetor">
+      <button class="btn btn-icon" id="nextPageSetor">
         <font-awesome-icon icon="chevron-right" />
       </button>
     </div>
@@ -137,6 +140,19 @@ const priorityColor = (priority: TicketPriority) => {
       return '';
   }
 };
+
+const getStatusClass = (status: string) => {
+  switch (status) {
+    case 'Pendente':
+      return 'pendente';
+    case 'Em andamento':
+      return 'em-andamento';
+    case 'Atrasado':
+      return 'atrasado';
+    default:
+      return '';
+  }
+};
 </script>
 
 <style scoped>
@@ -195,7 +211,7 @@ const priorityColor = (priority: TicketPriority) => {
   margin-top: 1.5rem;
 }
 
-.pagination-btn {
+.btn-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -209,13 +225,13 @@ const priorityColor = (priority: TicketPriority) => {
   transition: var(--transition);
 }
 
-.pagination-btn:hover {
+.btn-icon:hover {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
   color: white;
 }
 
-.pagination-btn:disabled {
+.btn-icon:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -225,7 +241,30 @@ const priorityColor = (priority: TicketPriority) => {
   color: var(--text-light);
 }
 
-.status-label,
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge.pendente {
+  background-color: #fff7ed;
+  color: #f97316;
+}
+
+.status-badge.em-andamento {
+  background-color: #eef2ff;
+  color: #4f46e5;
+}
+
+.status-badge.atrasado {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
 .priority-label {
   padding: 0.1rem 0.5rem;
   border-radius: 4px;
@@ -233,48 +272,6 @@ const priorityColor = (priority: TicketPriority) => {
   text-align: center;
   display: inline-block;
   font-size: small;
-}
-
-.status-pending {
-  background-color: #ffecb3;
-  color: #ff9800;
-  border: 1px solid rgba(255, 152, 0, 0.5);
-}
-
-.status-in-progress {
-  background-color: #e8f4fd;
-  color: #288fe4;
-  border: 1px solid rgba(40, 143, 228, 0.5);
-}
-
-.status-awaiting-verification {
-  background-color: #e1bee7;
-  color: #9c27b0;
-  border: 1px solid rgba(156, 39, 176, 0.5);
-}
-
-.status-overdue {
-  background-color: #ffcdd2;
-  color: #f44336;
-  border: 1px solid rgba(244, 67, 54, 0.5);
-}
-
-.status-completed {
-  background-color: #c8e6c9;
-  color: #4caf50;
-  border: 1px solid rgba(76, 175, 80, 0.5);
-}
-
-.status-returned {
-  background-color: #ffccbc;
-  color: #ff5722;
-  border: 1px solid rgba(255, 87, 34, 0.5);
-}
-
-.status-rejected {
-  background-color: #f8bbd0;
-  color: #e91e63;
-  border: 1px solid rgba(233, 30, 99, 0.5);
 }
 
 .priority-low {
@@ -301,5 +298,49 @@ const priorityColor = (priority: TicketPriority) => {
 
 .warning-icon {
   margin-left: 5px;
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e2e8f0;
+  border-radius: 50%;
+  border-top-color: #4f46e5;
+  animation: spin 1s linear infinite;
+  margin-bottom: 8px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Dark mode */
+:deep(body.dark-mode) .tickets-table th {
+  background: #1a2233;
+  color: #94a3b8;
+  border-color: #2d3748;
+}
+
+:deep(body.dark-mode) .tickets-table td {
+  color: #e2e8f0;
+  border-color: #2d3748;
+}
+
+:deep(body.dark-mode) .tickets-table tr:hover td {
+  background-color: #1e293b;
+}
+
+:deep(body.dark-mode) .loading-spinner {
+  border-color: #2d3748;
+  border-top-color: #818cf8;
 }
 </style>

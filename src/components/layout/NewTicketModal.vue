@@ -68,8 +68,8 @@
             <input v-model="ticketData.completionDate" type="datetime-local" id="conclusao" />
           </div>
           <div class="button-group">
-            <button type="reset" @click="resetForm" class="btn-secondary">Limpar</button>
-            <button type="submit" class="btn-primary">Enviar</button>
+            <button type="reset" @click="resetForm" class="btn btn-secondary">Limpar</button>
+            <button type="submit" class="btn btn-primary">Enviar</button>
           </div>
         </form>
       </div>
@@ -244,14 +244,65 @@ onMounted(fetchDepartments);
   margin-top: 1rem;
 }
 
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
 .btn {
   padding: 10px 16px;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition:
-    background 0.3s ease,
-    transform 0.2s ease;
+  transition: all 0.2s ease;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background-color: #1a2233;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: #141b2a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-secondary {
+  background-color: #f5f7fa;
+  color: #1a2233;
+}
+
+.btn-secondary:hover {
+  background-color: #e8eaed;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Dark mode */
+body.dark-mode .btn-primary {
+  background-color: #f8f9fa;
+  color: #1a2233;
+}
+
+body.dark-mode .btn-primary:hover {
+  background-color: #e8eaed;
+}
+
+body.dark-mode .btn-secondary {
+  background-color: #272b3a;
+  color: #e2e2e2;
+}
+
+body.dark-mode .btn-secondary:hover {
+  background-color: #32374b;
 }
 </style>
