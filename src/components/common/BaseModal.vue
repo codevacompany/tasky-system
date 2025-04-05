@@ -51,10 +51,12 @@ const close = () => {
   background-color: var(--card-bg);
   border-radius: var(--radius);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  width: 500px;
-  max-width: 95%;
+  width: auto;
+  max-width: 85%;
   max-height: 90vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   animation: modalSlideIn 0.3s ease;
 }
 
@@ -104,6 +106,9 @@ const close = () => {
 
 .modal-body {
   padding: 1.5rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(90vh - 72px);
 }
 
 .modal-footer {

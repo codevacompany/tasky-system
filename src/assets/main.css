@@ -48,6 +48,10 @@
   --input-bg-dark: #2d2d2d;
   --disabled-bg: #f8f9fa;
 
+  /* Cores dos botões */
+  --button-primary-color: #02153b;
+  --button-secondary-color: #f5f7fa;
+
   /* Box shadows */
   --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   --card-shadow-hover: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -757,54 +761,6 @@ body.dark-mode .section-content h1 {
 }
 
 /* Estilos para botões de ação como Novo Setor, Nova Categoria, Novo Colaborador */
-.header-action-btn {
-  padding: 0.5rem 1rem;
-  font-size: 0.85rem;
-  border-radius: 4px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #1a2233;
-  color: #ffffff;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.header-action-btn i {
-  color: #ffffff;
-  margin-right: 5px;
-  font-size: 0.85rem;
-}
-
-.header-action-btn .btn-text {
-  color: #ffffff;
-  font-weight: 500;
-}
-
-.header-action-btn:hover {
-  background-color: #141b2a;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-body.dark-mode .header-action-btn {
-  background-color: #f8f9fa;
-  color: #1a2233;
-}
-
-body.dark-mode .header-action-btn i,
-body.dark-mode .header-action-btn,
-body.dark-mode .header-action-btn .btn-text {
-  color: #1a2233;
-}
-
-body.dark-mode .header-action-btn:hover {
-  background-color: #e8eaed;
-}
 
 /* Botões de ação na tabela */
 .action-btn {
@@ -1288,6 +1244,7 @@ body.dark-mode label {
 /* Botões Padronizados */
 .btn {
   display: inline-flex;
+  gap: 8px;
   align-items: center;
   justify-content: center;
   padding: 0.5rem 1rem;
@@ -1306,18 +1263,17 @@ body.dark-mode label {
 }
 
 .btn-primary {
-  background-color: #1a2233;
+  background-color: var(--button-primary-color);
   color: #ffffff;
 }
 
 .btn-primary:hover {
-  background-color: #141b2a;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .btn-secondary {
-  background-color: #f5f7fa;
+  background-color: var(--button-secondary-color);
   color: #1a2233;
 }
 
@@ -1590,76 +1546,6 @@ body {
 .nav-link.active {
   color: #1a2233;
   background: #f8f9fa;
-}
-
-/* Botões */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-primary {
-  background: #1a2233;
-  color: #fff;
-  border: none;
-}
-
-.btn-primary:hover {
-  background: #141b2a;
-}
-
-.header-action-btn {
-  background: #1a2233;
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.header-action-btn:hover {
-  background: #141b2a;
-}
-
-/* Dark Mode */
-body.dark-mode {
-  background: #1a2233;
-}
-
-body.dark-mode .section-content h1,
-body.dark-mode .stat-value,
-body.dark-mode .tickets-table td {
-  color: #fff;
-}
-
-body.dark-mode .stat-card,
-body.dark-mode .tickets-table-container,
-body.dark-mode .main-header {
-  background: #141b2a;
-  border-color: #2d3748;
-}
-
-body.dark-mode .tickets-table th {
-  background: #1a2233;
-  color: #94a3b8;
-  border-color: #2d3748;
-}
-
-body.dark-mode .tickets-table td {
-  border-color: #2d3748;
 }
 
 body.dark-mode .nav-link {

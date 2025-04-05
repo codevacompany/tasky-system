@@ -58,9 +58,9 @@
         </div>
 
         <div class="header-actions">
-          <button class="header-action-btn" @click="openTicketModal">
+          <button class="btn btn-primary new-ticket-button" @click="openTicketModal">
             <font-awesome-icon icon="plus" />
-            <span class="btn-text">Novo Ticket</span>
+            <p>Novo Ticket</p>
           </button>
 
           <div class="notification-icon" @click="toggleNotificationsModal">
@@ -224,32 +224,12 @@ onMounted(fetchUnreadCount);
 
 .main-nav ul li div:hover,
 .main-nav ul li div.active {
-  background-color: #1a2233;
+  background-color: var(--button-primary-color);
   color: #f8f9fa;
 }
 
 /* Botão primário com melhor contraste */
-.btn-primary {
-  background-color: #1a2233;
-  color: #ffffff;
-  border: none;
-}
-
-.btn-primary:hover {
-  background-color: #141b2a;
-  color: #ffffff;
-}
-
 /* Estilo do botão no modo escuro */
-body.dark-mode .btn-primary {
-  background-color: #f8f9fa;
-  color: #1a2233;
-}
-
-body.dark-mode .btn-primary:hover {
-  background-color: #e8eaed;
-  color: #1a2233;
-}
 
 /* Ajustes para elementos no header */
 .header-actions {
@@ -295,6 +275,10 @@ body.dark-mode .btn-primary:hover {
 
 .dark-mode-toggle i {
   font-size: 1.2rem;
+}
+
+.new-ticket-button {
+  gap: 8px;
 }
 
 /* Cores invertidas para o modo escuro */

@@ -31,6 +31,8 @@ import {
   faExclamationTriangle,
   faEnvelope,
   faLock,
+  faCheck,
+  faArrowRight,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { faBell } from '@fortawesome/free-regular-svg-icons';
@@ -68,6 +70,8 @@ const icons = [
   faExclamationTriangle,
   faEnvelope,
   faLock,
+  faCheck,
+  faArrowRight
 ];
 
 library.add(...icons);

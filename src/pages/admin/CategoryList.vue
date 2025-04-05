@@ -2,7 +2,7 @@
   <section id="categoriasSection" class="section-content admin-section">
     <div class="section-header">
       <h1>Categorias</h1>
-      <button id="newCategoriaBtn" class="header-action-btn" @click="openModal">
+      <button id="newCategoriaBtn" class="btn btn-primary" @click="openModal">
         <font-awesome-icon icon="plus" />
         <p>Nova Categoria</p>
       </button>
