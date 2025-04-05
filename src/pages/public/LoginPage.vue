@@ -2,12 +2,7 @@
   <section id="loginSection" class="login-section">
     <div class="login-container">
       <div class="login-header">
-        <img
-          src="@/assets/images/tasky-white.png"
-          alt="Tasky Logo"
-          class="login-logo"
-          id="loginLogo"
-        />
+        <img src="@/assets/images/tasky-white.png" alt="Tasky Logo" class="login-logo" id="loginLogo" />
       </div>
 
       <div class="login-form-container">
@@ -15,34 +10,24 @@
           <div class="form-group">
             <label for="loginEmail">E-mail</label>
             <div class="input-group">
-              <i class="fas fa-envelope"></i>
-              <input
-                type="email"
-                id="loginEmail"
-                placeholder="Seu e-mail"
-                v-model="email"
-                required
-              />
+              <font-awesome-icon class="input-icon" icon="envelope" />
+              <input type="email" id="loginEmail" placeholder="Seu e-mail" v-model="email" required />
             </div>
           </div>
 
           <div class="form-group">
             <label for="loginPassword">Senha</label>
             <div class="input-group">
-              <i class="fas fa-lock"></i>
-              <input
-                type="password"
-                id="loginPassword"
-                placeholder="Sua senha"
-                v-model="password"
-                required
-              />
+              <font-awesome-icon class="input-icon" icon="lock" />
+              <input type="password" id="loginPassword" placeholder="Sua senha" v-model="password" required />
             </div>
           </div>
 
           <div class="form-actions">
             <div class="remember-me">
-              <input type="checkbox" id="rememberMe" />
+              <div>
+                <input type="checkbox" id="rememberMe" />
+              </div>
               <label for="rememberMe">Lembrar-me</label>
             </div>
             <a href="#" class="forgot-password">Esqueceu a senha?</a>
@@ -117,15 +102,18 @@ const login = async () => {
 }
 
 .login-header {
+  height: 220px;
   padding: 0.8rem 0;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: #1a2233;
   position: relative;
 }
 
 .login-logo {
   height: auto;
-  max-width: 300px;
+  width: 170px;
   margin: 0 auto;
   padding: 0.5rem 0;
   position: relative;
@@ -144,7 +132,7 @@ const login = async () => {
 }
 
 .login-form-container {
-  padding: 2.5rem 2rem;
+  padding: 2rem 2rem 0 2rem;
 }
 
 .login-form {
@@ -209,10 +197,11 @@ const login = async () => {
 .remember-me {
   display: flex;
   align-items: center;
-  text-align: left;
+  justify-content: start;
 }
 
-.remember-me input[type='checkbox'] {
+.remember-me input {
+  background-color: green;
   margin: 0;
   cursor: pointer;
 }
@@ -258,6 +247,7 @@ const login = async () => {
   text-align: center;
   color: #666666;
   font-size: 0.9rem;
+  margin-bottom: 0.3rem;
 }
 
 .login-footer a {
@@ -269,6 +259,17 @@ const login = async () => {
 .login-footer a:hover {
   color: #333333;
   text-decoration: underline;
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 30%;
+  color: #666666;
 }
 
 /* Forçar estilos claros mesmo em modo escuro */
