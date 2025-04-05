@@ -82,8 +82,7 @@ const login = async () => {
   min-height: 100vh;
   background-color: #f5f7fa;
   background-image:
-    linear-gradient(to bottom right, rgba(245, 247, 250, 0.95), rgba(245, 247, 250, 0.8)),
-    url('@/assets/images/login-bg.svg');
+    linear-gradient(to bottom right, rgba(245, 247, 250, 0.95), rgba(245, 247, 250, 0.8));
   background-size: cover;
   background-position: center;
   padding-top: 40px;
