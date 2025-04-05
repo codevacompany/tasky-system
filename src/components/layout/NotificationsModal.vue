@@ -22,7 +22,7 @@
           <!-- Mark all as read button -->
           <button
             v-if="notifications.some((n) => !n.read)"
-            class="mark-all-btn"
+            class="btn btn-secondary mark-all-btn"
             @click="markAllAsRead"
           >
             Marcar todas como lidas
@@ -330,20 +330,33 @@ onMounted(fetchNotifications);
 }
 
 .mark-all-btn {
-  background-color: #007bff;
-  color: white;
+  background-color: #1a2233;
+  color: #ffffff;
   border: none;
   padding: 8px 12px;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
   margin-bottom: 10px;
   display: block;
   width: 100%;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .mark-all-btn:hover {
-  background-color: #0056b3;
+  background-color: #141b2a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+body.dark-mode .mark-all-btn {
+  background-color: #f8f9fa;
+  color: #1a2233;
+}
+
+body.dark-mode .mark-all-btn:hover {
+  background-color: #e8eaed;
 }
 
 /* Responsividade */
