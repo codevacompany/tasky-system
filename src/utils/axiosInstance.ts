@@ -8,19 +8,25 @@ const apiClient = axios.create({
   },
 });
 
-const PUBLIC_ENDPOINTS = ['/login'];
+// ✅ Include all public (unauthenticated) endpoints
+const PUBLIC_ENDPOINTS = ['/auth/login', '/auth/refresh-token'];
+
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
 
-// Helper function to notify all subscribers when a new token is available
 const onTokenRefreshed = (newToken: string) => {
   refreshSubscribers.forEach((callback) => callback(newToken));
   refreshSubscribers = [];
 };
 
-// Request interceptor - attach token to headers
+// ✅ Helper to check if request is to a public endpoint
+function isPublicEndpoint(url?: string): boolean {
+  return PUBLIC_ENDPOINTS.some((endpoint) => url?.includes(endpoint));
+}
+
+// ✅ Request interceptor - attach token if not public
 apiClient.interceptors.request.use((config) => {
-  if (!PUBLIC_ENDPOINTS.includes(config.url || '')) {
+  if (!isPublicEndpoint(config.url)) {
     const token = localStorageService.getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -29,13 +35,18 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor - handle token expiration
+// ✅ Response interceptor - handle expired tokens
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Don't retry login or refresh endpoints
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isPublicEndpoint(originalRequest.url)
+    ) {
       const refreshToken = localStorageService.getRefreshToken();
 
       if (!refreshToken) {
@@ -47,7 +58,7 @@ apiClient.interceptors.response.use(
       if (!isRefreshing) {
         isRefreshing = true;
         try {
-          const { data } = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/refresh-token`, {
+          const { data } = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/refresh-token`, {
             refreshToken,
           });
 
@@ -56,7 +67,7 @@ apiClient.interceptors.response.use(
           onTokenRefreshed(newAccessToken);
           isRefreshing = false;
 
-          // Retry the original request with the new token
+          // Retry the original request
           originalRequest._retry = true;
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
           return apiClient(originalRequest);
@@ -67,7 +78,7 @@ apiClient.interceptors.response.use(
         }
       }
 
-      // If another request is already refreshing, queue the failed request
+      // Queue failed requests until refresh finishes
       return new Promise((resolve) => {
         refreshSubscribers.push((newToken) => {
           originalRequest._retry = true;
@@ -78,7 +89,7 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export default apiClient;

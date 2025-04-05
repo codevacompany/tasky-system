@@ -78,6 +78,7 @@ import { ref, onMounted } from 'vue';
 import { departmentService } from '@/services/departmentService';
 import BaseModal from '../common/BaseModal.vue';
 import { userService } from '@/services/userService';
+import { toast } from 'vue3-toastify';
 
 defineProps({
   isOpen: Boolean,
@@ -101,8 +102,8 @@ const fetchDepartments = async () => {
   try {
     const response = await departmentService.fetch();
     departments.value = response.data;
-  } catch (error) {
-    console.error('Erro ao carregar setores:', error);
+  } catch {
+    toast.error('Erro ao carregar setores.');
   }
 };
 
@@ -127,9 +128,10 @@ const createUser = async () => {
   try {
     await userService.create(userData.value);
     emit('userCreated');
+    toast.success('Colaborador criado com sucesso!');
     closeModal();
-  } catch (error) {
-    console.error('Erro ao criar usuário:', error);
+  } catch {
+    toast.error('Algo deu errado. Tente novamente.');
   }
 };
 

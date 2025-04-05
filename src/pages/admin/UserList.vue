@@ -40,6 +40,7 @@ import { ref, onMounted } from 'vue';
 import { userService } from '@/services/userService';
 import type { User } from '@/models';
 import NewUserModal from '@/components/users/NewUserModal.vue';
+import { toast } from 'vue3-toastify';
 
 const users = ref<User[]>([]);
 const isModalOpen = ref(false);
@@ -48,8 +49,8 @@ const loadUsers = async () => {
   try {
     const response = await userService.fetch();
     users.value = response.data;
-  } catch (error) {
-    console.error('Erro ao buscar usuários:', error);
+  } catch {
+    toast.error('Erro ao carregar usuários. Tente novamente.');
   }
 };
 

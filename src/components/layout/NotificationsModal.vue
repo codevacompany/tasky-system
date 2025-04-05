@@ -63,6 +63,7 @@
 import { ref, onMounted } from 'vue';
 import { notificationService } from '@/services/notificationService';
 import type { Notification } from '@/models';
+import { toast } from 'vue3-toastify';
 
 defineProps({
   showNotificationsModal: Boolean,
@@ -78,8 +79,8 @@ const fetchNotifications = async () => {
   try {
     const response = await notificationService.fetch();
     notifications.value = response.data;
-  } catch (error) {
-    console.error('Erro ao buscar notificações:', error);
+  } catch {
+    toast.error('Erro ao carregar notificações. Tente novamente.');
   }
 };
 
@@ -87,8 +88,9 @@ const markAllAsRead = async () => {
   try {
     await notificationService.markAllAsRead();
     notifications.value.forEach((notification) => (notification.read = true));
-  } catch (error) {
-    console.error('Erro ao marcar notificações como lidas:', error);
+    toast.success('Notificações marcadas como lidas.');
+  } catch {
+    toast.error('Erro ao marcar notificações como lidas.');
   }
 };
 

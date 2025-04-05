@@ -110,6 +110,7 @@ import { useUserStore } from '@/stores/user';
 import type { Ticket } from '@/models';
 import { TicketStatus } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
+import { toast } from 'vue3-toastify';
 
 const user = useUserStore().user;
 const activeTab = ref<'recebidos' | 'criados' | 'setor'>('recebidos');
@@ -127,8 +128,8 @@ const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor') => {
       response = await ticketService.getByDepartment(user!.department.id);
     }
     tickets.value = response.data;
-  } catch (error) {
-    console.error('Error fetching tickets:', error);
+  } catch {
+    toast.error('Erro ao carregar tickets. Tente novamente.');
   }
 };
 

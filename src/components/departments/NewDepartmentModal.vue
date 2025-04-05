@@ -28,6 +28,7 @@
 import { ref } from 'vue';
 import BaseModal from '../common/BaseModal.vue';
 import { departmentService } from '@/services/departmentService';
+import { toast } from 'vue3-toastify';
 
 defineProps({
   isOpen: Boolean,
@@ -54,9 +55,10 @@ const createDepartment = async () => {
   try {
     await departmentService.create(departmentData.value);
     emit('departmentCreated');
+    toast.success('Setor criado com sucesso!');
     closeModal();
-  } catch (error) {
-    console.error('Erro ao criar setor:', error);
+  } catch {
+    toast.error('Erro ao criar setor. Tente novamente.');
   }
 };
 </script>

@@ -108,6 +108,7 @@ import NotificationsModal from '@/components/layout/NotificationsModal.vue';
 import { useUserStore } from '@/stores/user';
 import { useRoute } from 'vue-router';
 import { notificationService } from '@/services/notificationService';
+import { toast } from 'vue3-toastify';
 
 const user = useUserStore().user;
 const route = useRoute();
@@ -121,8 +122,8 @@ const fetchUnreadCount = async () => {
   try {
     const response = await notificationService.fetch();
     unreadCount.value = response.data.filter((notification) => !notification.read).length;
-  } catch (error) {
-    console.error('Erro ao buscar notificações não lidas:', error);
+  } catch {
+    toast.error('Erro ao carregar notificações. Tente novamente.');
   }
 };
 

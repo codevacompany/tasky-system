@@ -64,16 +64,18 @@ import { authService } from '@/services/authService';
 import { localStorageService } from '@/utils/localStorageService';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { toast } from 'vue3-toastify';
 
 const router = useRouter();
 
 const email = ref('');
 const password = ref('');
-const errorMessage = ref('');
+// const errorMessage = ref('');
 
 const login = async () => {
   try {
     const response = await authService.login({ email: email.value, password: password.value });
+
     const { accessToken, refreshToken } = response.data.token;
     const user = response.data.user;
 
@@ -82,9 +84,8 @@ const login = async () => {
     localStorageService.setUser(user);
 
     router.push('/');
-  } catch (error) {
-    console.log(error);
-    errorMessage.value = 'Email ou senha incorretos';
+  } catch {
+    toast.error('Email ou senha incorretos');
   }
 };
 </script>
