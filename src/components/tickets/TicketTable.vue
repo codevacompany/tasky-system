@@ -17,7 +17,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="ticket in tickets" :key="ticket.id" @click="openTicketDetails(ticket)">
+          <tr v-if="isLoading">
+            <td colspan="10" class="loading-cell">
+              <div class="loading-wrapper">
+                <LoadingSpinner :size="28" />
+              </div>
+            </td>
+          </tr>
+          <tr v-else v-for="ticket in tickets" :key="ticket.id" @click="openTicketDetails(ticket)">
             <td>{{ ticket.id }}</td>
             <td>{{ ticket.name }}</td>
             <td>{{ ticket.requester.firstName }} {{ ticket.requester.lastName }}</td>
@@ -46,7 +53,7 @@
           </tr>
         </tbody>
       </table>
-      <div v-if="tickets.length === 0" class="no-tickets-message">
+      <div v-if="!isLoading && tickets.length === 0" class="no-tickets-message">
         <font-awesome-icon icon="ticket" />
         <p>Nenhum ticket encontrado</p>
       </div>
@@ -71,8 +78,9 @@ import type { Ticket } from '@/models';
 import { defineProps } from 'vue';
 import { TicketStatus, TicketPriority } from '@/models';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
+import LoadingSpinner from '../common/LoadingSpinner.vue';
 
-defineProps<{ tickets: Ticket[] }>();
+defineProps<{ tickets: Ticket[]; isLoading: boolean }>();
 const isModalOpen = ref(false);
 const selectedTicket = ref<Ticket | null>(null);
 
@@ -132,6 +140,17 @@ const priorityColor = (priority: TicketPriority) => {
 </script>
 
 <style scoped>
+.loading-cell {
+  margin: 2rem 0;
+}
+
+.loading-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
 .tickets-table-container {
   background-color: var(--card-bg);
   border-radius: var(--radius);

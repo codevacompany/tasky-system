@@ -16,7 +16,10 @@
 
           <div class="form-actions">
             <button type="button" class="btn btn-secondary" @click="closeModal">Cancelar</button>
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
+            <button type="submit" class="btn btn-primary">
+              <LoadingSpinner v-if="isLoading" :size="22" />
+              <p v-else>Cadastrar</p>
+            </button>
           </div>
         </form>
       </div>
@@ -29,6 +32,7 @@ import { ref } from 'vue';
 import BaseModal from '../common/BaseModal.vue';
 import { departmentService } from '@/services/departmentService';
 import { toast } from 'vue3-toastify';
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
 defineProps({
   isOpen: Boolean,
@@ -39,6 +43,8 @@ const emit = defineEmits(['close', 'departmentCreated']);
 const departmentData = ref({
   name: '',
 });
+
+const isLoading = ref(false);
 
 const resetForm = () => {
   departmentData.value = {
@@ -52,6 +58,7 @@ const closeModal = () => {
 };
 
 const createDepartment = async () => {
+  isLoading.value = true;
   try {
     await departmentService.create(departmentData.value);
     emit('departmentCreated');
@@ -59,6 +66,8 @@ const createDepartment = async () => {
     closeModal();
   } catch {
     toast.error('Erro ao criar setor. Tente novamente.');
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>
@@ -70,9 +79,7 @@ const createDepartment = async () => {
   font-size: 1.5rem;
   cursor: pointer;
 }
-</style>
 
-<style scoped>
 .modal-form {
   display: flex;
   flex-direction: column;
@@ -125,7 +132,9 @@ const createDepartment = async () => {
 }
 
 .btn {
-  padding: 10px 16px;
+  width: 116px;
+  height: 36px;
+  padding: 0 16px;
   border: none;
   border-radius: 8px;
   font-size: 1rem;

@@ -14,16 +14,20 @@ export interface LoginResponse {
 
 export const authService = {
   async login(data: { email: string; password: string }): Promise<AxiosResponse<LoginResponse>> {
-    const response = await apiClient.post('/auth/login', data);
+    try {
+      const response = await apiClient.post('/auth/login', data);
 
-    if (response.status === 200) {
       const userstore = useUserStore();
+      console.log(response.data);
       userstore.setUser(response.data.user);
+      localStorageService.setUser(response.data.user);
       localStorageService.setAccessToken(response.data.token.accessToken);
       localStorageService.setRefreshToken(response.data.token.refreshToken);
-    }
 
-    return response;
+      return response;
+    } catch (error) {
+      throw error;
+    }
   },
 
   logout() {

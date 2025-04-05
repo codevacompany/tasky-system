@@ -17,7 +17,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="department in departments" :key="department.id">
+          <tr v-if="isLoading">
+            <td colspan="2" class="loading-cell">
+              <div class="loading-wrapper">
+                <LoadingSpinner :size="28" />
+              </div>
+            </td>
+          </tr>
+          <tr v-else v-for="department in departments" :key="department.id">
             <td>{{ department.id }}</td>
             <td>{{ department.name }}</td>
           </tr>
@@ -35,16 +42,21 @@ import { departmentService } from '@/services/departmentService';
 import type { Department } from '@/models';
 import NewDepartmentModal from '@/components/departments/NewDepartmentModal.vue';
 import { toast } from 'vue3-toastify';
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
+const isLoading = ref(false);
 const departments = ref<Department[]>([]);
 const isModalOpen = ref(false);
 
 const loadDepartments = async () => {
+  isLoading.value = true;
   try {
     const response = await departmentService.fetch();
     departments.value = response.data;
   } catch {
     toast.error('Erro ao carregar setores. Tente novamente.');
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -60,6 +72,17 @@ onMounted(loadDepartments);
 </script>
 
 <style scoped>
+.loading-cell {
+  margin: 2rem 0;
+}
+
+.loading-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
 h1,
 h3 {
   color: black;

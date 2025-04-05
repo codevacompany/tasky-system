@@ -97,7 +97,7 @@
           </div>
         </div>
 
-        <TicketTable :tickets="tickets" @viewTicket="handleViewTicket" />
+        <TicketTable :tickets="tickets" :isLoading="isLoading" @viewTicket="handleViewTicket" />
       </div>
     </div>
   </section>
@@ -115,9 +115,11 @@ import { toast } from 'vue3-toastify';
 const user = useUserStore().user;
 const activeTab = ref<'recebidos' | 'criados' | 'setor'>('recebidos');
 const tickets = ref<Ticket[]>([]);
+const isLoading = ref(false);
 
 const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor') => {
   activeTab.value = tab;
+  isLoading.value = true;
   try {
     let response;
     if (tab === 'recebidos') {
@@ -130,6 +132,8 @@ const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor') => {
     tickets.value = response.data;
   } catch {
     toast.error('Erro ao carregar tickets. Tente novamente.');
+  } finally {
+    isLoading.value = false;
   }
 };
 

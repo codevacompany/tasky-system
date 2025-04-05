@@ -43,9 +43,9 @@ class StorageService {
   }
 
   clear(): void {
-    localStorage.removeItem(this.accessTokenKey);
-    localStorage.removeItem(this.refreshTokenKey);
-    localStorage.removeItem(this.userKey);
+    this.removeAccessToken();
+    this.removeRefreshToken();
+    this.removeUser();
   }
 }
 

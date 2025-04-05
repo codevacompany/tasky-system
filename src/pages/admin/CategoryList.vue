@@ -17,7 +17,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="category in categories" :key="category.id">
+          <tr v-if="isLoading">
+            <td colspan="2" class="loading-cell">
+              <div class="loading-wrapper">
+                <LoadingSpinner :size="28" />
+              </div>
+            </td>
+          </tr>
+          <tr v-else v-for="category in categories" :key="category.id">
             <td>{{ category.id }}</td>
             <td>{{ category.name }}</td>
           </tr>
@@ -36,16 +43,21 @@ import { categoryService } from '@/services/categoryService';
 import type { Category } from '@/models';
 import NewCategoryModal from '@/components/categories/NewCategoryModal.vue';
 import { toast } from 'vue3-toastify';
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
+const isLoading = ref(false);
 const categories = ref<Category[]>([]);
 const isModalOpen = ref(false);
 
 const loadCategories = async () => {
+  isLoading.value = true;
   try {
     const response = await categoryService.fetch();
     categories.value = response.data;
   } catch {
     toast.error('Erro ao carregar categorias. Tente novamente.');
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -61,6 +73,17 @@ onMounted(loadCategories);
 </script>
 
 <style scoped>
+.loading-cell {
+  margin: 2rem 0;
+}
+
+.loading-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
 h1,
 h3 {
   color: black;

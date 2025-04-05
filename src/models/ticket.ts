@@ -41,7 +41,7 @@ export interface CreateTicketDto {
   priority: TicketPriority;
   description: string;
   departmentId: number | null;
-  requesterId: number;
+  requesterId: number | null;
   targetUserId: number | null;
   completionDate?: string;
 }
