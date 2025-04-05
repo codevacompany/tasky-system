@@ -88,11 +88,20 @@
       </main>
     </div>
 
-    <NewTicketModal :isOpen="isTicketModalOpen" @close="closeTicketModal" />
+    <NewTicketModal
+      v-if="isTicketModalOpen"
+      :isOpen="isTicketModalOpen"
+      @close="closeTicketModal"
+    />
 
-    <ProfileModal :showProfileModal="showProfileModal" @close="toggleProfileModal" />
+    <ProfileModal
+      v-if="showProfileModal"
+      :showProfileModal="showProfileModal"
+      @close="toggleProfileModal"
+    />
 
     <NotificationsModal
+      v-if="showNotificationsModal"
       :showNotificationsModal="showNotificationsModal"
       @close="toggleNotificationsModal"
       @notifications-read="fetchUnreadCount"

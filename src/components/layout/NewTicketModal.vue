@@ -10,27 +10,28 @@
         <div class="form-grid">
           <div class="form-group span-2">
             <label for="title">Assunto: <span class="required">*</span></label>
-              <input
-                type="text"
-                id="title"
-                v-model="formData.title"
-                required
-              />
+            <input type="text" id="title" v-model="formData.name" required />
           </div>
 
           <div class="form-group">
             <label>Prioridade: <span class="required">*</span></label>
             <div class="radio-group">
               <label class="radio-label">
-                <input type="radio" v-model="formData.priority" value="Baixa" name="priority" required>
+                <input
+                  type="radio"
+                  v-model="formData.priority"
+                  value="Baixa"
+                  name="priority"
+                  required
+                />
                 Baixa
               </label>
               <label class="radio-label">
-                <input type="radio" v-model="formData.priority" value="Média" name="priority">
+                <input type="radio" v-model="formData.priority" value="Média" name="priority" />
                 Média
               </label>
               <label class="radio-label">
-                <input type="radio" v-model="formData.priority" value="Alta" name="priority">
+                <input type="radio" v-model="formData.priority" value="Alta" name="priority" />
                 Alta
               </label>
             </div>
@@ -38,8 +39,13 @@
 
           <div class="form-group">
             <label for="targetDepartment">Setor Destino: <span class="required">*</span></label>
-            <select id="targetDepartment" v-model="formData.targetDepartment" required>
-              <option value="">Selecione um setor</option>
+            <select
+              id="targetDepartment"
+              v-model="selectedDepartment"
+              required
+              @change="updateUsersList"
+            >
+              <option :value="null">Selecione um setor</option>
               <option v-for="department in departments" :key="department.id" :value="department.id">
                 {{ department.name }}
               </option>
@@ -47,10 +53,10 @@
           </div>
 
           <div class="form-group">
-            <label for="targetUser">Usuário Destino: <span class="required">*</span></label>
-            <select id="targetUser" v-model="formData.targetUser" required>
-              <option value="">Selecione um setor primeiro</option>
-              <option v-for="user in users" :key="user.id" :value="user.id">
+            <label for="targetUser">Usuário Destino:</label>
+            <select id="targetUser" v-model="selectedUser" :disabled="!selectedDepartment">
+              <option :value=null>Selecione um setor primeiro</option>
+              <option v-for="user in availableUsers" :key="user.id" :value="user.id">
                 {{ user.firstName }} {{ user.lastName }}
               </option>
             </select>
@@ -58,8 +64,8 @@
 
           <div class="form-group">
             <label for="category">Categoria: <span class="required">*</span></label>
-            <select id="category" v-model="formData.category" required>
-              <option value="">Selecione uma categoria</option>
+            <select id="category" v-model="selectedCategory" required>
+              <option :value=null>Selecione uma categoria</option>
               <option v-for="category in categories" :key="category.id" :value="category.id">
                 {{ category.name }}
               </option>
@@ -68,31 +74,18 @@
 
           <div class="form-group span-2">
             <label for="completionDate">Concluir até:</label>
-            <input
-              type="datetime-local"
-              id="completionDate"
-              v-model="formData.completionDate"
-            />
+            <input type="datetime-local" id="completionDate" v-model="formData.completionDate" />
           </div>
 
           <div class="form-group full-width">
             <label for="description">Descrição: <span class="required">*</span></label>
-            <textarea
-              id="description"
-              v-model="formData.description"
-              required
-              rows="4"
-            ></textarea>
+            <textarea id="description" v-model="formData.description" required rows="4"></textarea>
           </div>
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn btn-secondary" @click="resetForm">
-            Limpar
-          </button>
-          <button type="submit" class="btn btn-primary">
-            Criar Ticket
-          </button>
+          <button type="button" class="btn btn-secondary" @click="resetForm">Limpar</button>
+          <button type="submit" class="btn btn-primary">Criar Ticket</button>
         </div>
       </form>
     </div>
@@ -100,14 +93,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { ticketService } from '@/services/ticketService';
 import { departmentService } from '@/services/departmentService';
 import { userService } from '@/services/userService';
 import { categoryService } from '@/services/categoryService';
 import { toast } from 'vue3-toastify';
+import { TicketPriority, type Category, type Department, type User } from '@/models';
+import { useUserStore } from '@/stores/user';
 
-const props = defineProps<{
+defineProps<{
   isOpen: boolean;
 }>();
 
@@ -116,58 +111,75 @@ const emit = defineEmits<{
   (e: 'ticketCreated'): void;
 }>();
 
-const departments = ref([]);
-const users = ref([]);
-const categories = ref([]);
+const departments = ref<Department[]>([]);
+const availableUsers = ref<User[]>([]);
+const selectedDepartment = ref<number | null>(null);
+const selectedUser = ref<number | null>(null);
+const categories = ref<Category[]>([]);
+const selectedCategory = ref<number | null>(null);
 
 const formData = ref({
-  title: '',
-  category: '',
-  targetDepartment: '',
-  targetUser: '',
-  priority: 'Baixa',
+  name: '',
+  priority: TicketPriority.Low,
+  description: '',
+  departmentId: null as number | null,
+  targetUserId: null as number | null,
   completionDate: '',
-  description: ''
+  requesterId: useUserStore().user?.id || null,
+  categoryId: null as number | null,
 });
 
 // Carregar departamentos
 const loadDepartments = async () => {
   try {
-    const { data } = await departmentService.get('/department');
+    const { data } = await departmentService.fetch();
     departments.value = data;
-  } catch (error) {
+  } catch {
     toast.error('Erro ao carregar departamentos');
-  }
-};
-
-// Carregar usuários do departamento selecionado
-const loadDepartmentUsers = async () => {
-  if (!formData.value.targetDepartment) {
-    users.value = [];
-    formData.value.targetUser = '';
-    return;
-  }
-
-  try {
-    const { data } = await userService.get(`/user/department/${formData.value.targetDepartment}`);
-    users.value = data;
-  } catch (error) {
-    toast.error('Erro ao carregar usuários do departamento');
   }
 };
 
 // Carregar categorias
 const loadCategories = async () => {
   try {
-    const { data } = await categoryService.get('/category');
+    const { data } = await categoryService.fetch();
     categories.value = data;
-  } catch (error) {
+  } catch {
     toast.error('Erro ao carregar categorias');
   }
 };
 
-// Watch para carregar usuários quando o departamento mudar
-watch(() => formData.value.targetDepartment, loadDepartmentUsers);
+const updateUsersList = async () => {
+  if (!selectedDepartment.value) {
+    availableUsers.value = [];
+    selectedUser.value = null;
+    return;
+  }
+  try {
+    const response = await userService.getByDepartment(selectedDepartment.value);
+    availableUsers.value = response.data;
+  } catch {
+    toast.error('Erro ao carregar usuários. Tente novamente.');
+    availableUsers.value = [];
+  }
+};
+
+const resetForm = () => {
+  formData.value = {
+    name: '',
+    priority: TicketPriority.Low,
+    description: '',
+    departmentId: null,
+    targetUserId: null,
+    completionDate: '',
+    requesterId: useUserStore().user!.id,
+    categoryId: null,
+  };
+  selectedDepartment.value = null;
+  selectedUser.value = null;
+  availableUsers.value = [];
+  selectedCategory.value = null;
+};
 
 onMounted(() => {
   loadDepartments();
@@ -175,19 +187,19 @@ onMounted(() => {
 });
 
 const validateForm = () => {
-  if (!formData.value.title.trim()) {
+  if (!formData.value.name.trim()) {
     toast.error('O campo Assunto é obrigatório');
     return false;
   }
-  if (!formData.value.category) {
+  if (!selectedCategory.value) {
     toast.error('O campo Categoria é obrigatório');
     return false;
   }
-  if (!formData.value.targetDepartment) {
+  if (!selectedDepartment.value) {
     toast.error('O campo Setor Destino é obrigatório');
     return false;
   }
-  if (!formData.value.targetUser) {
+  if (!selectedUser.value) {
     toast.error('O campo Usuário Destino é obrigatório');
     return false;
   }
@@ -202,18 +214,6 @@ const validateForm = () => {
   return true;
 };
 
-const resetForm = () => {
-  formData.value = {
-    title: '',
-    category: '',
-    targetDepartment: '',
-    targetUser: '',
-    priority: 'Baixa',
-    completionDate: '',
-    description: ''
-  };
-};
-
 const closeModal = () => {
   resetForm();
   emit('close');
@@ -222,12 +222,16 @@ const closeModal = () => {
 const handleSubmit = async () => {
   if (!validateForm()) return;
 
+  formData.value.departmentId = selectedDepartment.value;
+  formData.value.targetUserId = selectedUser.value;
+  formData.value.categoryId = selectedCategory.value;
+
   try {
-    await ticketService.post('/ticket', formData.value);
+    await ticketService.create(formData.value);
     toast.success('Ticket criado com sucesso!');
     emit('ticketCreated');
     closeModal();
-  } catch (error) {
+  } catch {
     toast.error('Erro ao criar ticket');
   }
 };
@@ -323,7 +327,7 @@ const handleSubmit = async () => {
   grid-column: span 1;
 }
 
-.form-group:has([type="datetime-local"]) {
+.form-group:has([type='datetime-local']) {
   grid-column: span 1;
 }
 
@@ -347,7 +351,7 @@ label {
   color: #1a2233;
 }
 
-input[type="radio"] {
+input[type='radio'] {
   margin: 0;
   cursor: pointer;
 }

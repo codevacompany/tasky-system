@@ -43,6 +43,7 @@ export interface CreateTicketDto {
   departmentId: number | null;
   requesterId: number | null;
   targetUserId: number | null;
+  categoryId: number | null;
   completionDate?: string;
 }
 
@@ -53,5 +54,6 @@ export interface UpdateTicketDto {
   departmentId?: number;
   requesterId?: User;
   targetUserId?: User;
+  categoryId?: number | null;
   completionDate?: string;
 }
