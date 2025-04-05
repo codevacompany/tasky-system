@@ -9,59 +9,60 @@
       <form @submit.prevent="handleSubmit" class="ticket-form">
         <div class="form-grid">
           <div class="form-group span-2">
-            <label for="title">Title: <span class="required">*</span></label>
+            <label for="title">Assunto: <span class="required">*</span></label>
               <input
                 type="text"
-              id="title"
-              v-model="formData.title"
+                id="title"
+                v-model="formData.title"
                 required
               />
-            </div>
+          </div>
 
-            <div class="form-group">
-            <label>Priority: <span class="required">*</span></label>
+          <div class="form-group">
+            <label>Prioridade: <span class="required">*</span></label>
             <div class="radio-group">
               <label class="radio-label">
-                <input type="radio" v-model="formData.priority" value="Low" name="priority" required>
-                Low
+                <input type="radio" v-model="formData.priority" value="Baixa" name="priority" required>
+                Baixa
               </label>
               <label class="radio-label">
-                <input type="radio" v-model="formData.priority" value="Medium" name="priority">
-                Medium
+                <input type="radio" v-model="formData.priority" value="Média" name="priority">
+                Média
               </label>
               <label class="radio-label">
-                <input type="radio" v-model="formData.priority" value="High" name="priority">
-                High
+                <input type="radio" v-model="formData.priority" value="Alta" name="priority">
+                Alta
               </label>
             </div>
           </div>
 
-            <div class="form-group">
-            <label for="targetDepartment">Target Department: <span class="required">*</span></label>
+          <div class="form-group">
+            <label for="targetDepartment">Setor Destino: <span class="required">*</span></label>
             <select id="targetDepartment" v-model="formData.targetDepartment" required>
               <option value="">Selecione um setor</option>
-              <option value="TI">TI</option>
-              <option value="RH">RH</option>
-              <option value="Financeiro">Financeiro</option>
-              <option value="Comercial">Comercial</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-            <label for="targetUser">Target User: <span class="required">*</span></label>
-            <select id="targetUser" v-model="formData.targetUser" required>
-              <option value="">Selecione um setor primeiro</option>
-              </select>
-            </div>
+              <option v-for="department in departments" :key="department.id" :value="department.id">
+                {{ department.name }}
+              </option>
+            </select>
+          </div>
 
           <div class="form-group">
-            <label for="category">Category: <span class="required">*</span></label>
+            <label for="targetUser">Usuário Destino: <span class="required">*</span></label>
+            <select id="targetUser" v-model="formData.targetUser" required>
+              <option value="">Selecione um setor primeiro</option>
+              <option v-for="user in users" :key="user.id" :value="user.id">
+                {{ user.firstName }} {{ user.lastName }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="category">Categoria: <span class="required">*</span></label>
             <select id="category" v-model="formData.category" required>
               <option value="">Selecione uma categoria</option>
-              <option value="TI">TI</option>
-              <option value="RH">RH</option>
-              <option value="Financeiro">Financeiro</option>
-              <option value="Comercial">Comercial</option>
+              <option v-for="category in categories" :key="category.id" :value="category.id">
+                {{ category.name }}
+              </option>
             </select>
           </div>
 
@@ -75,7 +76,7 @@
           </div>
 
           <div class="form-group full-width">
-            <label for="description">Description: <span class="required">*</span></label>
+            <label for="description">Descrição: <span class="required">*</span></label>
             <textarea
               id="description"
               v-model="formData.description"
@@ -83,7 +84,7 @@
               rows="4"
             ></textarea>
           </div>
-          </div>
+        </div>
 
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" @click="resetForm">
@@ -92,15 +93,18 @@
           <button type="submit" class="btn btn-primary">
             Criar Ticket
           </button>
-          </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { ticketService } from '@/services/ticketService';
+import { departmentService } from '@/services/departmentService';
+import { userService } from '@/services/userService';
+import { categoryService } from '@/services/categoryService';
 import { toast } from 'vue3-toastify';
 
 const props = defineProps<{
@@ -112,14 +116,62 @@ const emit = defineEmits<{
   (e: 'ticketCreated'): void;
 }>();
 
+const departments = ref([]);
+const users = ref([]);
+const categories = ref([]);
+
 const formData = ref({
   title: '',
   category: '',
   targetDepartment: '',
   targetUser: '',
-  priority: 'Low',
+  priority: 'Baixa',
   completionDate: '',
   description: ''
+});
+
+// Carregar departamentos
+const loadDepartments = async () => {
+  try {
+    const { data } = await departmentService.get('/department');
+    departments.value = data;
+  } catch (error) {
+    toast.error('Erro ao carregar departamentos');
+  }
+};
+
+// Carregar usuários do departamento selecionado
+const loadDepartmentUsers = async () => {
+  if (!formData.value.targetDepartment) {
+    users.value = [];
+    formData.value.targetUser = '';
+    return;
+  }
+
+  try {
+    const { data } = await userService.get(`/user/department/${formData.value.targetDepartment}`);
+    users.value = data;
+  } catch (error) {
+    toast.error('Erro ao carregar usuários do departamento');
+  }
+};
+
+// Carregar categorias
+const loadCategories = async () => {
+  try {
+    const { data } = await categoryService.get('/category');
+    categories.value = data;
+  } catch (error) {
+    toast.error('Erro ao carregar categorias');
+  }
+};
+
+// Watch para carregar usuários quando o departamento mudar
+watch(() => formData.value.targetDepartment, loadDepartmentUsers);
+
+onMounted(() => {
+  loadDepartments();
+  loadCategories();
 });
 
 const validateForm = () => {
@@ -156,7 +208,7 @@ const resetForm = () => {
     category: '',
     targetDepartment: '',
     targetUser: '',
-    priority: 'Low',
+    priority: 'Baixa',
     completionDate: '',
     description: ''
   };
@@ -171,7 +223,7 @@ const handleSubmit = async () => {
   if (!validateForm()) return;
 
   try {
-    await ticketService.create(formData.value);
+    await ticketService.post('/ticket', formData.value);
     toast.success('Ticket criado com sucesso!');
     emit('ticketCreated');
     closeModal();
