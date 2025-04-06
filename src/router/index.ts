@@ -43,6 +43,16 @@ const routes: RouteRecordRaw[] = [
     ],
     meta: { requiresAuth: true },
   },
+
+  {
+    path: '/admin/dashboard',
+    name: 'AdminDashboard',
+    component: () => import('../pages/AdminDashboard.vue'),
+    meta: {
+      requiresAuth: true,
+      isAdmin: true
+    }
+  }
 ];
 
 const router = createRouter({
@@ -56,6 +66,14 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAuth && !loggedIn) {
     return next('/login');
+  }
+
+  if (to.meta.requiresAuth) {
+    // Verificar autenticação
+    // if (!isAuthenticated) return next('/login')
+    
+    // Verificar permissões de admin
+    // if (to.meta.isAdmin && !isAdmin) return next('/')
   }
 
   next();
