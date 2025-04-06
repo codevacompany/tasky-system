@@ -30,4 +30,8 @@ export const ticketService = {
   async update(id: number): Promise<AxiosResponse<Ticket>> {
     return apiClient.patch(`/tickets/${id}`);
   },
+
+  async accept(id: number): Promise<AxiosResponse<Ticket>> {
+    return apiClient.post(`/tickets/${id}/accept`);
+  },
 };

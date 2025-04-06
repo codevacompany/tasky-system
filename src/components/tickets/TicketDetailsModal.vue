@@ -1,5 +1,5 @@
 <template>
-  <BaseModal :isOpen="isOpen" title="Detalhes do Ticket" @close="closeModal">
+  <BaseModal v-if="isOpen" :isOpen="isOpen" title="Detalhes do Ticket" @close="closeModal">
     <div class="content">
       <div class="ticket-details ticket-details-grid">
         <div class="details-row">
@@ -16,17 +16,22 @@
         <div class="details-row">
           <div class="details-item">
             <strong>Prioridade:</strong>
-            <span :class="['priority-label', getPriorityClass(ticket!.priority)]">{{ ticket?.priority.toUpperCase() }}</span>
+            <span :class="['priority-label', getPriorityClass(ticket!.priority)]">{{
+              ticket?.priority.toUpperCase()
+            }}</span>
           </div>
           <div class="details-item">
             <strong>Status:</strong>
-            <span :class="['status-label', getStatusClass(ticket!.status)]">{{ ticket?.status.toUpperCase() }}</span>
+            <span :class="['status-label', getStatusClass(ticket!.status)]">{{
+              ticket?.status
+            }}</span>
           </div>
         </div>
 
         <div class="details-row">
           <div class="details-item">
-            <strong>Solicitante:</strong> {{ ticket?.requester.firstName }} {{ ticket?.requester.lastName }}
+            <strong>Solicitante:</strong> {{ ticket?.requester.firstName }}
+            {{ ticket?.requester.lastName }}
           </div>
           <div class="details-item"><strong>Setor:</strong> {{ ticket?.department.name }}</div>
         </div>
@@ -44,12 +49,16 @@
           <div class="details-item">
             <strong>Data de Conclusão:</strong> {{ formatDate(ticket?.completionDate) }}
           </div>
-          <div class="details-item">
-            <strong>Prazo:</strong>
-            <div :class="{ 'past-deadline': isPastDeadline(ticket?.completionDate) }">
-              {{ calculateDeadline(ticket!) }}
-              <font-awesome-icon v-if="isPastDeadline(ticket?.completionDate)" icon="exclamation-triangle" class="warning-icon" />
-            </div>
+          <div
+            class="details-item"
+            :class="{ 'past-deadline': isPastDeadline(ticket?.completionDate) }"
+          >
+            <strong>Prazo:</strong> {{ calculateDeadline(ticket!) }}
+            <font-awesome-icon
+              v-if="isPastDeadline(ticket?.completionDate)"
+              icon="exclamation-triangle"
+              class="warning-icon"
+            />
           </div>
         </div>
 
@@ -58,13 +67,25 @@
         </div>
 
         <div class="ticket-actions">
-          <button v-if="ticket?.status === 'Pendente'" class="btn btn-success" @click="acceptTicket(ticket?.id)">
+          <button
+            v-if="ticket?.status === 'Pendente'"
+            class="btn btn-success"
+            @click="acceptTicket(ticket?.id)"
+          >
             <font-awesome-icon icon="check" /> Aceitar
           </button>
-          <button v-else-if="ticket?.status === 'Em andamento'" class="btn btn-primary" @click="sendForReview(ticket?.id)">
+          <button
+            v-else-if="ticket?.status === 'Em andamento'"
+            class="btn btn-primary"
+            @click="sendForReview(ticket?.id)"
+          >
             <font-awesome-icon icon="arrow-right" /> Enviar para Revisão
           </button>
-          <span v-else-if="ticket?.status === TicketStatus.AwaitingVerification" class="action-icon" title="Aguardando verificação">
+          <span
+            v-else-if="ticket?.status === TicketStatus.AwaitingVerification"
+            class="action-icon"
+            title="Aguardando verificação"
+          >
             <font-awesome-icon icon="clock" />
           </span>
         </div>
@@ -72,11 +93,29 @@
 
       <div class="comment-section">
         <label for="novoComentario">Adicionar comentário</label>
-        <textarea id="novoComentario" placeholder="Digite seu comentário aqui..." class="update-input"></textarea>
+        <textarea
+          id="novoComentario"
+          v-model="newComment"
+          placeholder="Digite seu comentário aqui..."
+          class="update-input"
+        ></textarea>
         <div class="comment-actions">
           <button @click="comment()" class="btn btn-primary">
             <font-awesome-icon icon="paper-plane" /> Enviar comentário
           </button>
+        </div>
+      </div>
+
+      <div class="comments-list">
+        <div v-for="comment in comments" :key="comment.id" class="comment-item">
+          <div class="comment-avatar">{{ comment.user.firstName.charAt(0) }}</div>
+          <div class="comment-content">
+            <div class="comment-author">
+              {{ comment.user.firstName }} {{ comment.user.lastName }}
+              <div class="comment-meta">{{ formatTimeAgo(comment.createdAt) }}</div>
+            </div>
+            <div class="comment-text">{{ comment.content }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -85,14 +124,22 @@
 
 <script setup lang="ts">
 import BaseModal from '../common/BaseModal.vue';
-import { TicketStatus, type Ticket } from '@/models';
+import { TicketStatus, type Ticket, type TicketComment } from '@/models';
+import { ref, watch } from 'vue';
+import { ticketCommentService } from '@/services/ticketCommentService';
+import { useUserStore } from '@/stores/user';
+import { toast } from 'vue3-toastify';
+import { ticketService } from '@/services/ticketService';
 
-defineProps({
-  isOpen: Boolean,
-  ticket: Object as () => Ticket,
-});
+const props = defineProps<{
+  isOpen: boolean;
+  ticket: Ticket;
+}>();
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'refresh']);
+const userStore = useUserStore();
+const newComment = ref('');
+const comments = ref<TicketComment[]>([]);
 
 const closeModal = () => {
   emit('close');
@@ -139,9 +186,14 @@ const isPastDeadline = (date?: string) => {
   return new Date(date) < new Date();
 };
 
-const acceptTicket = (ticketId: number) => {
-  console.log(`Accepting ticket with ID: ${ticketId}`);
-  // Add logic to accept the ticket
+const acceptTicket = async (ticketId: number) => {
+  try {
+    await ticketService.accept(ticketId);
+    toast.success('Ticket aceito com sucesso');
+    emit('refresh');
+  } catch {
+    toast.error('Erro ao aceitar o ticket');
+  }
 };
 
 const sendForReview = (ticketId: number) => {
@@ -149,10 +201,75 @@ const sendForReview = (ticketId: number) => {
   // Add logic to send the ticket for review
 };
 
-const comment = () => {
-  console.log('Adding comment');
-  // Add logic to add a comment
+const comment = async () => {
+  if (!newComment.value.trim()) {
+    toast.error('Comentário não pode estar vazio');
+    return;
+  }
+
+  try {
+    await ticketCommentService.create({
+      ticketId: props.ticket!.id,
+      userId: userStore.user!.id,
+      content: newComment.value,
+    });
+
+    fetchComments();
+    newComment.value = '';
+    toast.success('Comentário adicionado com sucesso');
+  } catch {
+    toast.error('Erro ao adicionar comentário');
+  }
 };
+
+const fetchComments = async () => {
+  try {
+    const response = await ticketCommentService.getByTicket(props.ticket!.id);
+    comments.value = response.data;
+  } catch {
+    toast.error('Erro ao buscar comentários');
+  }
+};
+
+const formatTimeAgo = (date: string) => {
+  const now = new Date();
+  const past = new Date(date);
+  const diff = now.getTime() - past.getTime();
+
+  const diffMinutes = Math.floor(diff / (1000 * 60));
+  const diffHours = Math.floor(diff / (1000 * 60 * 60));
+  const diffDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  if (diffDays > 5) {
+    return formatDateTime(past);
+  } else if (diffDays > 0) {
+    return `${diffDays}d ago`;
+  } else if (diffHours > 0) {
+    return `${diffHours}h ago`;
+  } else if (diffMinutes > 0) {
+    return `${diffMinutes}m ago`;
+  } else {
+    return 'Now';
+  }
+};
+
+const formatDateTime = (date: Date) => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+};
+
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    if (isOpen && props.ticket?.id) {
+      fetchComments();
+    }
+  },
+);
 </script>
 
 <style scoped>
@@ -249,6 +366,56 @@ const comment = () => {
   display: flex;
   justify-content: flex-end;
   margin-top: 12px;
+}
+
+.comments-list {
+  margin-top: 20px;
+}
+
+.comment-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.comment-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #3498db;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.comment-content {
+  flex: 1;
+}
+
+.comment-text {
+  font-size: 0.95rem;
+  color: #2c3e50;
+}
+
+.comment-meta {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+.comment-author {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #34495e;
+  margin-bottom: 4px;
 }
 
 /* Classes para as etiquetas de prioridade */

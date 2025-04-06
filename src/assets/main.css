@@ -4,7 +4,7 @@
 :root {
   /* Variáveis de cores primárias no formato RGB para facilitar opacidade */
   --primary-rgb: 66, 99, 235;
-  --success-rgb: 52, 195, 143;
+  --success-rgb: 10, 197, 125;
   --info-rgb: 80, 181, 255;
   --warning-rgb: 241, 180, 76;
   --danger-rgb: 244, 81, 108;
@@ -1292,6 +1292,15 @@ body.dark-mode label {
   background-color: #d32f2f;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-success {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #05b681;
 }
 
 .btn-icon {
