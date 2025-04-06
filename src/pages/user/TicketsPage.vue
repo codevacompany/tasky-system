@@ -97,9 +97,9 @@
           </div>
         </div>
 
-        <TicketTable 
-          :tickets="tickets" 
-          :isLoading="isLoading" 
+        <TicketTable
+          :tickets="tickets"
+          :isLoading="isLoading"
           @viewTicket="handleViewTicket"
           @editTicket="handleEditTicket"
           @deleteTicket="handleDeleteTicket"
@@ -187,13 +187,13 @@ const handleAcceptTicket = async (ticket: Ticket) => {
   }
 };
 
-const handleVerifyTicket = async (ticket: Ticket) => {
+const handleVerifyTicket = async (ticketId: number) => {
   try {
-    await ticketService.sendForVerification(ticket.id);
-    toast.success('Ticket enviado para verificação!');
+    await ticketService.update(ticketId, { status: TicketStatus.AwaitingVerification });
+    toast.success('Ticket enviado para revisão');
     fetchTickets(activeTab.value);
   } catch {
-    toast.error('Erro ao enviar ticket para verificação. Tente novamente.');
+    toast.error('Erro ao enviar o ticket para revisão');
   }
 };
 

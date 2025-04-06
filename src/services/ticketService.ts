@@ -34,4 +34,8 @@ export const ticketService = {
   async accept(id: number): Promise<AxiosResponse<Ticket>> {
     return apiClient.post(`/tickets/${id}/accept`);
   },
+
+  async delete(id: number) {
+    return apiClient.delete(`/tickets/${id}`);
+  },
 };

@@ -1,4 +1,4 @@
-import { api } from '@/plugins/axios'
+import apiClient from "@/utils/axiosInstance"
 
 export interface TicketStatistics {
   totalTickets: number
@@ -14,22 +14,22 @@ export interface ChartData {
 
 export const reportService = {
   async getTicketStatistics(): Promise<TicketStatistics> {
-    const response = await api.get('/api/reports/statistics')
+    const response = await apiClient.get('/reports/statistics')
     return response.data
   },
 
   async getTicketsByStatus(): Promise<ChartData> {
-    const response = await api.get('/api/reports/by-status')
+    const response = await apiClient.get('/reports/by-status')
     return response.data
   },
 
   async getTicketsByPriority(): Promise<ChartData> {
-    const response = await api.get('/api/reports/by-priority')
+    const response = await apiClient.get('/reports/by-priority')
     return response.data
   },
 
   async getRecentTickets(limit: number = 10) {
-    const response = await api.get(`/api/reports/recent-tickets?limit=${limit}`)
+    const response = await apiClient.get(`/reports/recent-tickets?limit=${limit}`)
     return response.data
   }
-} 
+}
