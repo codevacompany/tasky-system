@@ -2,7 +2,7 @@
   <section id="colaboradoresSection" class="section-content admin-section">
     <div class="section-header">
       <h1>Colaboradores</h1>
-      <button id="newColaboradorBtn" class="header-action-btn" @click="openModal">
+      <button id="newColaboradorBtn" class="btn btn-primary" @click="openModal">
         <font-awesome-icon icon="plus" />
         <p>Novo Colaborador</p>
       </button>

@@ -1,6 +1,6 @@
 import type { Category } from './category';
 import type { Department } from './department';
-import type { TicketUpdate } from './ticketUpdate';
+import type { TicketComment } from './ticketComment';
 import type { User } from './user';
 
 export enum TicketPriority {
@@ -31,7 +31,7 @@ export interface Ticket {
   completionDate?: string;
   acceptanceDate?: string;
   category?: Category;
-  updates: TicketUpdate[];
+  comments: TicketComment[];
   disapprovalReason?: string;
   createdAt: string;
 }

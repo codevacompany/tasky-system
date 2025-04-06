@@ -71,7 +71,7 @@
       </button>
     </div>
 
-    <TicketDetailsModal :isOpen="isModalOpen" :ticket="selectedTicket!" @close="closeModal" />
+    <TicketDetailsModal :isOpen="isModalOpen" :ticket="selectedTicket!" @close="closeModal" @refresh="refreshSelectedTicket" />
   </div>
 </template>
 
@@ -79,9 +79,10 @@
 import { ref } from 'vue';
 import type { Ticket } from '@/models';
 import { defineProps } from 'vue';
-import { TicketStatus, TicketPriority } from '@/models';
+import { TicketPriority, TicketStatus } from '@/models';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
+import { ticketService } from '@/services/ticketService';
 
 defineProps<{ tickets: Ticket[]; isLoading: boolean }>();
 const isModalOpen = ref(false);
@@ -90,6 +91,12 @@ const selectedTicket = ref<Ticket | null>(null);
 const openTicketDetails = (ticket: Ticket) => {
   selectedTicket.value = ticket;
   isModalOpen.value = true;
+};
+
+const refreshSelectedTicket = async () => {
+  if (!selectedTicket.value?.id) return;
+  const response = await ticketService.getById(selectedTicket.value.id);
+  selectedTicket.value = response.data;
 };
 
 const closeModal = () => {
@@ -107,27 +114,6 @@ const isPastDeadline = (date?: string) => {
   return new Date(date) < new Date();
 };
 
-const statusColor = (status: TicketStatus) => {
-  switch (status) {
-    case TicketStatus.Pending:
-      return 'status-pending';
-    case TicketStatus.InProgress:
-      return 'status-in-progress';
-    case TicketStatus.AwaitingVerification:
-      return 'status-awaiting-verification';
-    case TicketStatus.Overdue:
-      return 'status-overdue';
-    case TicketStatus.Completed:
-      return 'status-completed';
-    case TicketStatus.Returned:
-      return 'status-returned';
-    case TicketStatus.Rejected:
-      return 'status-rejected';
-    default:
-      return '';
-  }
-};
-
 const priorityColor = (priority: TicketPriority) => {
   switch (priority) {
     case TicketPriority.Low:
@@ -143,11 +129,11 @@ const priorityColor = (priority: TicketPriority) => {
 
 const getStatusClass = (status: string) => {
   switch (status) {
-    case 'Pendente':
+    case TicketStatus.Pending:
       return 'pendente';
-    case 'Em andamento':
+    case TicketStatus.InProgress:
       return 'em-andamento';
-    case 'Atrasado':
+    case TicketStatus.Overdue:
       return 'atrasado';
     default:
       return '';

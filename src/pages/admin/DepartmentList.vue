@@ -2,7 +2,7 @@
   <section id="setoresSection" class="section-content admin-section">
     <div class="section-header">
       <h1>Setores</h1>
-      <button id="newSetorBtn" class="header-action-btn" @click="openModal">
+      <button id="newSetorBtn" class="btn btn-primary" @click="openModal">
         <font-awesome-icon icon="plus" />
         <p>Novo Setor</p>
       </button>

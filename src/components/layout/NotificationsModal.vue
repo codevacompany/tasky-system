@@ -36,7 +36,6 @@
                 class="notification-item"
                 :class="{ unread: !notification.read }"
               >
-                <font-awesome-icon icon="bell" size="lg" />
                 <div class="notification-content">
                   <div class="notification-message">
                     {{ notification.message }}
