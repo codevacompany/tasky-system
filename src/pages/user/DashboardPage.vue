@@ -6,7 +6,7 @@
     <div class="dashboard-stats">
       <!-- Total de Tickets Recebidos -->
       <div class="stat-card">
-        <div class="stat-icon blue">
+        <div class="stat-icon teal">
           <font-awesome-icon icon="ticket" />
         </div>
         <div class="stat-info">
@@ -17,7 +17,7 @@
 
       <!-- Pendentes -->
       <div class="stat-card">
-        <div class="stat-icon orange">
+        <div class="stat-icon teal">
           <font-awesome-icon icon="clock" />
         </div>
         <div class="stat-info">
@@ -28,7 +28,7 @@
 
       <!-- Em Andamento -->
       <div class="stat-card">
-        <div class="stat-icon blue">
+        <div class="stat-icon teal">
           <font-awesome-icon icon="spinner" />
         </div>
         <div class="stat-info">
@@ -39,7 +39,7 @@
 
       <!-- Finalizados -->
       <div class="stat-card">
-        <div class="stat-icon green">
+        <div class="stat-icon teal">
           <font-awesome-icon icon="check-circle" />
         </div>
         <div class="stat-info">
@@ -53,7 +53,7 @@
     <div class="dashboard-stats">
       <!-- Taxa de Resolução -->
       <div class="stat-card">
-        <div class="stat-icon purple">
+        <div class="stat-icon teal">
           <font-awesome-icon icon="chart-pie" />
         </div>
         <div class="stat-info">
@@ -64,7 +64,7 @@
 
       <!-- Tempo Médio de Aceite -->
       <div class="stat-card">
-        <div class="stat-icon green">
+        <div class="stat-icon teal">
           <font-awesome-icon icon="hourglass-half" />
         </div>
         <div class="stat-info">
@@ -75,7 +75,7 @@
 
       <!-- Tempo Médio de Conclusão -->
       <div class="stat-card">
-        <div class="stat-icon blue">
+        <div class="stat-icon teal">
           <font-awesome-icon icon="calendar-check" />
         </div>
         <div class="stat-info">
@@ -164,24 +164,48 @@ onMounted(fetchDashboardData);
   font-size: 24px;
 }
 
-.stat-icon.blue {
-  background-color: #eef2ff;
-  color: #4f46e5;
+/* Cores dos ícones */
+.stat-icon.teal {
+  background-color: #0d9488;
 }
 
-.stat-icon.orange {
-  background-color: #fff7ed;
-  color: #f97316;
+.stat-icon.teal svg {
+  color: white !important;
 }
 
-.stat-icon.purple {
-  background-color: #faf5ff;
-  color: #9333ea;
+/* Primeira linha */
+.stat-card:nth-child(1) .stat-icon {
+  background-color: #4f46e5; /* Indigo */
 }
 
-.stat-icon.green {
-  background-color: #f0fdf4;
-  color: #22c55e;
+.stat-card:nth-child(2) .stat-icon {
+  background-color: #f97316; /* Laranja */
+}
+
+.stat-card:nth-child(3) .stat-icon {
+  background-color: #3b82f6; /* Azul */
+}
+
+.stat-card:nth-child(4) .stat-icon {
+  background-color: #22c55e; /* Verde */
+}
+
+/* Segunda linha */
+.dashboard-stats:nth-child(3) .stat-card:nth-child(1) .stat-icon {
+  background-color: #8b5cf6; /* Roxo */
+}
+
+.dashboard-stats:nth-child(3) .stat-card:nth-child(2) .stat-icon {
+  background-color: #0d9488; /* Verde-água */
+}
+
+.dashboard-stats:nth-child(3) .stat-card:nth-child(3) .stat-icon {
+  background-color: #6366f1; /* Indigo */
+}
+
+/* Forçar cor branca em todos os ícones */
+.stat-icon svg {
+  color: white !important;
 }
 
 .stat-info {

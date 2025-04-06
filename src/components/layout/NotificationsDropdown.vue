@@ -7,22 +7,24 @@
       </div>
 
       <div class="notifications-content">
-        <button class="mark-all-btn" @click="markAllAsRead">
-          <font-awesome-icon icon="check" />
+        <button v-if="notifications.some(n => !n.read)" class="mark-all-btn" @click="markAllAsRead">
           Marcar todas como lidas
         </button>
 
         <div class="notifications-list">
-          <div v-for="notification in sortedNotifications" :key="notification.id" class="notification-item">
-            <div class="notification-icon" :class="notification.type">
-              <font-awesome-icon :icon="getNotificationIcon(notification.type)" />
+          <div v-for="notification in sortedNotifications" :key="notification.id" class="notification-item" :class="{ unread: !notification.read }">
+            <div class="notification-icon">
+              <font-awesome-icon :icon="getNotificationIcon(notification.type)" :class="getNotificationIconClass(notification.type)" />
             </div>
             <div class="notification-details">
-              <div class="notification-row">
-                <p class="notification-text">{{ notification.text }}</p>
-                <span class="notification-time">{{ formatRelativeTime(notification.date) }}</span>
-              </div>
+              <p class="notification-text">{{ notification.message }}</p>
+              <span class="notification-time">{{ formatRelativeTime(notification.createdAt) }}</span>
             </div>
+          </div>
+          
+          <div v-if="sortedNotifications.length === 0" class="empty-notifications">
+            <font-awesome-icon icon="bell-slash" size="lg" />
+            <p>Nenhuma notificação</p>
           </div>
         </div>
       </div>
@@ -31,7 +33,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { notificationService } from '@/services/notificationService';
+import type { Notification } from '@/models';
+import { NotificationType } from '@/models';
+import { toast } from 'vue3-toastify';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -41,78 +47,88 @@ const emit = defineEmits<{
   (e: 'close'): void;
 }>();
 
-interface Notification {
-  id: number;
-  type: 'new_ticket' | 'update' | 'mention' | 'assigned';
-  text: string;
-  date: Date;
-}
-
-const notifications = ref<Notification[]>([
-  {
-    id: 1,
-    type: 'new_ticket',
-    text: 'Novo ticket criado por Rayandson Silva',
-    date: new Date('2025-03-27T08:17:00')
-  },
-  {
-    id: 2,
-    type: 'new_ticket',
-    text: 'Novo ticket criado por Rayandson Silva',
-    date: new Date('2025-03-28T09:22:00')
-  },
-  {
-    id: 3,
-    type: 'new_ticket',
-    text: 'Novo ticket criado por Isaac Silva Jr',
-    date: new Date('2025-03-28T09:23:00')
-  },
-  {
-    id: 4,
-    type: 'new_ticket',
-    text: 'Novo ticket criado por Isaac Silva Jr',
-    date: new Date('2025-03-30T22:41:00')
-  }
-]);
+const notifications = ref<Notification[]>([]);
 
 const sortedNotifications = computed(() => {
   return [...notifications.value]
-    .sort((a, b) => b.date.getTime() - a.date.getTime())
-    .slice(0, 5);
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 });
 
-const getNotificationIcon = (type: string) => {
-  switch (type) {
-    case 'new_ticket':
-      return 'ticket';
-    case 'update':
-      return 'sync';
-    case 'mention':
-      return 'at';
-    case 'assigned':
-      return 'user-plus';
-    default:
-      return 'bell';
+const formatRelativeTime = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  const diffInDays = Math.floor(diffInHours / 24);
+  const diffInMonths = Math.floor(diffInDays / 30);
+  const diffInYears = Math.floor(diffInDays / 365);
+
+  if (diffInSeconds < 60) {
+    return 'Agora';
   }
-};
 
-const formatRelativeTime = (date: Date) => {
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
+  if (diffInMinutes < 60) {
+    return `Há ${diffInMinutes}min`;
+  }
 
-  return `${day}/${month}/${year}, ${hours}:${minutes}`;
+  if (diffInHours < 24) {
+    return `Há ${diffInHours}h`;
+  }
+
+  if (diffInMonths < 12) {
+    return `Há ${diffInMonths}m`;
+  }
+
+  return `Há ${diffInYears}a`;
 };
 
 const closeModal = () => {
   emit('close');
 };
 
-const markAllAsRead = () => {
-  // Implementar lógica para marcar todas como lidas
+const fetchNotifications = async () => {
+  try {
+    const response = await notificationService.fetch();
+    notifications.value = response.data;
+  } catch {
+    toast.error('Erro ao carregar notificações. Tente novamente.');
+  }
 };
+
+const markAllAsRead = async () => {
+  try {
+    await notificationService.markAllAsRead();
+    await fetchNotifications();
+    toast.success('Notificações marcadas como lidas.');
+  } catch {
+    toast.error('Erro ao marcar notificações como lidas.');
+  }
+};
+
+const getNotificationIcon = (type: NotificationType) => {
+  switch (type) {
+    case NotificationType.Open:
+      return 'ticket';
+    case NotificationType.Comment:
+      return 'comment';
+    default:
+      return 'bell';
+  }
+};
+
+const getNotificationIconClass = (type: NotificationType) => {
+  switch (type) {
+    case NotificationType.Open:
+      return 'icon-ticket';
+    case NotificationType.Comment:
+      return 'icon-comment';
+    default:
+      return '';
+  }
+};
+
+onMounted(fetchNotifications);
 </script>
 
 <style scoped>
@@ -122,166 +138,232 @@ const markAllAsRead = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 60px;
-  z-index: 1000;
+  background-color: transparent;
+  z-index: 999;
+  pointer-events: auto;
 }
 
 .modal-content {
-  background: #fff;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 350px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: calc(var(--header-height) + 4px);
+  right: 20px;
+  width: 360px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
 }
 
 .modal-header h2 {
   font-size: 14px;
   font-weight: 500;
-  color: #1a2233;
+  color: #212529;
   margin: 0;
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: #64748b;
+  color: #6c757d;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 20px;
   padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
+  line-height: 1;
 }
 
 .notifications-content {
-  padding: 8px;
+  padding: 0;
 }
 
 .mark-all-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background-color: #212529;
   border: none;
-  color: #4f46e5;
-  font-size: 12px;
+  color: white;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  padding: 4px;
-  margin-bottom: 8px;
+  text-align: center;
 }
 
 .mark-all-btn:hover {
-  text-decoration: underline;
+  background-color: #343a40;
 }
 
 .notifications-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .notification-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e9ecef;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 8px;
-  border-radius: 4px;
-  background: #f8fafc;
+  gap: 12px;
+}
+
+.notification-item.unread {
+  background-color: rgba(13, 110, 253, 0.05);
+  border-left: 3px solid #0d6efd;
+}
+
+.notification-item.unread .notification-text {
+  font-weight: 500;
+}
+
+.notification-item:hover {
+  background-color: #f8f9fa;
+  transform: translateX(2px);
+}
+
+.close-btn, .mark-all-btn {
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #212529;
+  transform: scale(1.1);
+}
+
+.mark-all-btn:hover {
+  background-color: #343a40;
+  transform: translateY(-1px);
+}
+
+.mark-all-btn:active {
+  transform: translateY(0);
+}
+
+/* Melhorias de acessibilidade */
+.close-btn:focus, .mark-all-btn:focus {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
+}
+
+.close-btn, .mark-all-btn {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .notification-icon {
+  flex-shrink: 0;
   width: 24px;
   height: 24px;
-  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 12px;
+  font-size: 16px;
+}
+
+.icon-ticket {
+  color: #0d6efd;
+}
+
+.icon-comment {
+  color: #0dcaf0;
 }
 
 .notification-details {
   flex: 1;
-}
-
-.notification-row {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
 .notification-text {
-  font-size: 12px;
-  color: #1a2233;
+  font-size: 13px;
+  color: #212529;
   margin: 0;
   line-height: 1.4;
-  flex: 1;
 }
 
 .notification-time {
-  font-size: 11px;
-  color: #64748b;
-  white-space: nowrap;
+  font-size: 12px;
+  color: #6c757d;
 }
 
-.notification-icon.new_ticket {
-  background-color: #4f46e5;
+.empty-notifications {
+  padding: 24px 16px;
+  text-align: center;
+  color: #6c757d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
-.notification-icon.update {
-  background-color: #0ea5e9;
-}
-
-.notification-icon.mention {
-  background-color: #f59e0b;
-}
-
-.notification-icon.assigned {
-  background-color: #10b981;
+.empty-notifications p {
+  font-size: 13px;
+  margin: 0;
 }
 
 /* Dark mode */
 :deep(body.dark-mode) .modal-content {
-  background: #141b2a;
+  background-color: #212529;
+  border: 1px solid #343a40;
 }
 
 :deep(body.dark-mode) .modal-header {
-  border-bottom-color: #2d3748;
+  background-color: #343a40;
+  border-bottom-color: #495057;
 }
 
 :deep(body.dark-mode) .modal-header h2 {
-  color: #e2e8f0;
+  color: #f8f9fa;
 }
 
-:deep(body.dark-mode) .close-btn {
-  color: #94a3b8;
+:deep(body.dark-mode) .notification-item.unread {
+  background-color: rgba(13, 110, 253, 0.1);
+  border-left: 3px solid #0d6efd;
 }
 
-:deep(body.dark-mode) .notification-item {
-  background: #1a2233;
+:deep(body.dark-mode) .notification-item:hover {
+  background-color: #2c3237;
+}
+
+:deep(body.dark-mode) .close-btn:hover {
+  color: #f8f9fa;
 }
 
 :deep(body.dark-mode) .notification-text {
-  color: #e2e8f0;
+  color: #f8f9fa;
 }
 
 :deep(body.dark-mode) .notification-time {
-  color: #94a3b8;
+  color: #adb5bd;
+}
+
+:deep(body.dark-mode) .mark-all-btn {
+  background-color: #495057;
+}
+
+:deep(body.dark-mode) .mark-all-btn:hover {
+  background-color: #6c757d;
+}
+
+:deep(body.dark-mode) .icon-ticket {
+  color: #3b82f6;
+}
+
+:deep(body.dark-mode) .icon-comment {
+  color: #22d3ee;
 }
 </style> 

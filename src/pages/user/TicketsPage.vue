@@ -97,7 +97,15 @@
           </div>
         </div>
 
-        <TicketTable :tickets="tickets" :isLoading="isLoading" @viewTicket="handleViewTicket" />
+        <TicketTable 
+          :tickets="tickets" 
+          :isLoading="isLoading" 
+          @viewTicket="handleViewTicket"
+          @editTicket="handleEditTicket"
+          @deleteTicket="handleDeleteTicket"
+          @acceptTicket="handleAcceptTicket"
+          @verifyTicket="handleVerifyTicket"
+        />
       </div>
     </div>
   </section>
@@ -150,6 +158,43 @@ const resolvedTickets = computed(
 
 const handleViewTicket = (ticket: Ticket) => {
   console.log('Viewing ticket:', ticket);
+};
+
+const handleEditTicket = (ticket: Ticket) => {
+  console.log('Editing ticket:', ticket);
+  // Implementar lógica de edição
+};
+
+const handleDeleteTicket = async (ticket: Ticket) => {
+  if (confirm('Tem certeza que deseja excluir este ticket?')) {
+    try {
+      await ticketService.delete(ticket.id);
+      toast.success('Ticket excluído com sucesso!');
+      fetchTickets(activeTab.value);
+    } catch {
+      toast.error('Erro ao excluir ticket. Tente novamente.');
+    }
+  }
+};
+
+const handleAcceptTicket = async (ticket: Ticket) => {
+  try {
+    await ticketService.accept(ticket.id);
+    toast.success('Ticket aceito com sucesso!');
+    fetchTickets(activeTab.value);
+  } catch {
+    toast.error('Erro ao aceitar ticket. Tente novamente.');
+  }
+};
+
+const handleVerifyTicket = async (ticket: Ticket) => {
+  try {
+    await ticketService.sendForVerification(ticket.id);
+    toast.success('Ticket enviado para verificação!');
+    fetchTickets(activeTab.value);
+  } catch {
+    toast.error('Erro ao enviar ticket para verificação. Tente novamente.');
+  }
 };
 
 onMounted(() => fetchTickets(activeTab.value));

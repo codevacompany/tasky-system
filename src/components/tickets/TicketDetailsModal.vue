@@ -3,118 +3,199 @@
     <div class="content">
       <div class="ticket-details ticket-details-grid">
         <div class="details-row">
-          <div class="details-item"><strong>ID:</strong> {{ ticket?.id }}</div>
           <div class="details-item">
-            <strong>Categoria:</strong> {{ ticket!.category?.name || '-' }}
+            <div class="detail-icon">
+              <font-awesome-icon icon="hashtag" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">ID</div>
+              <div class="detail-value">{{ ticket?.id }}</div>
+            </div>
+          </div>
+          <div class="details-item">
+            <div class="detail-icon">
+              <font-awesome-icon icon="folder" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Categoria</div>
+              <div class="detail-value">{{ ticket?.category?.name || '-' }}</div>
+            </div>
           </div>
         </div>
 
         <div class="details-row full-width">
-          <div class="details-item"><strong>Assunto:</strong> {{ ticket?.name }}</div>
-        </div>
-
-        <div class="details-row">
           <div class="details-item">
-            <strong>Prioridade:</strong>
-            <span :class="['priority-label', getPriorityClass(ticket!.priority)]">{{
-              ticket?.priority.toUpperCase()
-            }}</span>
-          </div>
-          <div class="details-item">
-            <strong>Status:</strong>
-            <span :class="['status-label', getStatusClass(ticket!.status)]">{{
-              ticket?.status
-            }}</span>
+            <div class="detail-icon">
+              <font-awesome-icon icon="file-alt" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Assunto</div>
+              <div class="detail-value">{{ ticket?.name }}</div>
+            </div>
           </div>
         </div>
 
         <div class="details-row">
           <div class="details-item">
-            <strong>Solicitante:</strong> {{ ticket?.requester.firstName }}
-            {{ ticket?.requester.lastName }}
+            <div class="detail-icon">
+              <font-awesome-icon icon="exclamation-circle" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Prioridade</div>
+              <div class="detail-value">
+                <span :class="['priority-label', getPriorityClass(ticket!.priority)]">
+                  <font-awesome-icon :icon="getPriorityIcon(ticket!.priority)" class="badge-icon" />
+                  {{ ticket?.priority }}
+                </span>
+              </div>
+            </div>
           </div>
-          <div class="details-item"><strong>Setor:</strong> {{ ticket?.department.name }}</div>
+          <div class="details-item">
+            <div class="detail-icon">
+              <font-awesome-icon icon="clock" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Status</div>
+              <div class="detail-value">
+                <span :class="['status-label', getStatusClass(ticket!.status)]">
+                  <font-awesome-icon :icon="getStatusIcon(ticket!.status)" class="badge-icon" />
+                  {{ ticket?.status.toUpperCase() }}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="details-row">
           <div class="details-item">
-            <strong>Data de Criação:</strong> {{ formatDate(ticket?.createdAt) }}
+            <div class="detail-icon">
+              <font-awesome-icon icon="user-tie" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Solicitante</div>
+              <div class="detail-value">{{ ticket?.requester.firstName }} {{ ticket?.requester.lastName }}</div>
+            </div>
           </div>
           <div class="details-item">
-            <strong>Data de Aceitação:</strong> {{ formatDate(ticket?.acceptanceDate) }}
+            <div class="detail-icon">
+              <font-awesome-icon icon="sitemap" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Setor</div>
+              <div class="detail-value">{{ ticket?.department.name }}</div>
+            </div>
           </div>
         </div>
 
         <div class="details-row">
           <div class="details-item">
-            <strong>Data de Conclusão:</strong> {{ formatDate(ticket?.completionDate) }}
+            <div class="detail-icon">
+              <font-awesome-icon icon="calendar-day" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Data de Criação</div>
+              <div class="detail-value">{{ formatDate(ticket?.createdAt) }}</div>
+            </div>
           </div>
-          <div
-            class="details-item"
-            :class="{ 'past-deadline': isPastDeadline(ticket?.completionDate) }"
-          >
-            <strong>Prazo:</strong> {{ calculateDeadline(ticket!) }}
+          <div class="details-item">
+            <div class="detail-icon">
+              <font-awesome-icon icon="user-check" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Data de Aceitação</div>
+              <div class="detail-value">{{ formatDate(ticket?.acceptanceDate) }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="details-row">
+          <div class="details-item">
+            <div class="detail-icon">
+              <font-awesome-icon icon="calendar-check" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Data de Conclusão</div>
+              <div class="detail-value">{{ formatDate(ticket?.completionDate) }}</div>
+            </div>
+          </div>
+          <div class="details-item" :class="getDeadlineClass(ticket?.completionDate)">
+            <div class="detail-icon">
+              <font-awesome-icon icon="hourglass-end" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Prazo</div>
+              <div class="detail-value">
+                {{ calculateDeadline(ticket!) }}
             <font-awesome-icon
               v-if="isPastDeadline(ticket?.completionDate)"
               icon="exclamation-triangle"
               class="warning-icon"
             />
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="details-row full-width">
-          <div class="details-item"><strong>Descrição:</strong> {{ ticket?.description }}</div>
+          <div class="details-item">
+            <div class="detail-icon">
+              <font-awesome-icon icon="file-alt" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Descrição</div>
+              <div class="detail-value description-text">{{ ticket?.description }}</div>
+            </div>
+          </div>
         </div>
 
         <div class="ticket-actions" v-if="showActionButton">
           <button
             v-if="ticket?.status === TicketStatus.Pending && isTargetUser"
-            class="btn btn-success"
+            class="action-button accept"
             @click="acceptTicket(ticket?.id)"
           >
             <font-awesome-icon icon="check" /> Aceitar
           </button>
           <button
             v-else-if="ticket?.status === TicketStatus.InProgress && isTargetUser"
-            class="btn btn-primary"
+            class="action-button verify"
             @click="sendForReview(ticket?.id)"
           >
-            <font-awesome-icon icon="arrow-right" /> Enviar para Revisão
+            <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
           </button>
-          <button
+          <div
             v-else-if="ticket?.status === TicketStatus.AwaitingVerification && isTargetUser"
-            class="btn btn-primary disabled"
-            disabled
+            class="status-waiting"
           >
-            Aguardando Verificação
-          </button>
+            <font-awesome-icon icon="hourglass-half" class="waiting-icon" /> AGUARDANDO VERIFICAÇÃO
+          </div>
           <button
             v-else-if="ticket?.status === TicketStatus.Completed && isTargetUser"
             class="btn btn-success disabled"
             disabled
           >
-            Resolvido
+            <font-awesome-icon icon="check-circle" /> RESOLVIDO
           </button>
           <button
             v-else-if="ticket?.status === TicketStatus.Rejected && isTargetUser"
             class="btn btn-danger disabled"
             disabled
           >
-            Reprovado
+            <font-awesome-icon icon="times-circle" /> REPROVADO
           </button>
           <button
             v-else-if="ticket?.status === TicketStatus.Pending && isRequester"
             class="btn btn-primary disabled"
             disabled
           >
-            Pendente
+            <font-awesome-icon icon="clock" /> PENDENTE
           </button>
           <button
             v-else-if="ticket?.status === TicketStatus.InProgress && isRequester"
             class="btn btn-primary disabled"
             disabled
           >
-            Em andamento
+            <font-awesome-icon icon="spinner" /> EM ANDAMENTO
           </button>
           <div v-else-if="ticket?.status === TicketStatus.AwaitingVerification && isRequester">
             <button class="btn btn-success" @click="approveTicket(ticket?.id)">
@@ -131,27 +212,31 @@
       </div>
 
       <div class="comment-section">
-        <label for="novoComentario">Adicionar comentário</label>
+        <div class="section-header">
+          <font-awesome-icon icon="comments" />
+          <h3>Comentários</h3>
+        </div>
+        <div class="comment-input">
         <textarea
-          id="novoComentario"
           v-model="newComment"
           placeholder="Digite seu comentário aqui..."
           class="update-input"
         ></textarea>
-        <div class="comment-actions">
           <button @click="comment()" class="btn btn-primary">
-            <font-awesome-icon icon="paper-plane" /> Enviar comentário
+            <font-awesome-icon icon="paper-plane" /> Enviar
           </button>
         </div>
       </div>
 
       <div class="comments-list">
         <div v-for="comment in comments" :key="comment.id" class="comment-item">
-          <div class="comment-avatar">{{ comment.user.firstName.charAt(0) }}</div>
+          <div class="comment-avatar">
+            <font-awesome-icon icon="user-circle" />
+          </div>
           <div class="comment-content">
-            <div class="comment-author">
-              {{ comment.user.firstName }} {{ comment.user.lastName }}
-              <div class="comment-meta">{{ formatTimeAgo(comment.createdAt) }}</div>
+            <div class="comment-header">
+              <span class="comment-author">{{ comment.user.firstName }} {{ comment.user.lastName }}</span>
+              <span class="comment-time">{{ formatTimeAgo(comment.createdAt) }}</span>
             </div>
             <div class="comment-text">{{ comment.content }}</div>
           </div>
@@ -217,12 +302,54 @@ const getStatusClass = (status: string) => {
 };
 
 const calculateDeadline = (ticket: Ticket) => {
-  return ticket.completionDate ? formatDate(ticket.completionDate) : '—';
+  if (!ticket.completionDate) return '—';
+  
+  const deadline = new Date(ticket.completionDate);
+  const today = new Date();
+  
+  // Reset hours to compare just dates
+  deadline.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+  
+  const diffTime = deadline.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays < 0) {
+    return 'ATRASADO';
+  }
+  
+  return `${diffDays} dias restantes`;
 };
 
 const isPastDeadline = (date?: string) => {
   if (!date) return false;
-  return new Date(date) < new Date();
+  const deadline = new Date(date);
+  const today = new Date();
+  
+  // Reset hours to compare just dates
+  deadline.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+  
+  const diffTime = deadline.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  return diffDays <= 3; // Retorna true se faltam 3 dias ou menos
+};
+
+const getDeadlineClass = (date?: string) => {
+  if (!date) return '';
+  const deadline = new Date(date);
+  const today = new Date();
+  
+  // Reset hours to compare just dates
+  deadline.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+  
+  const diffTime = deadline.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays <= 3) return 'deadline-danger';
+  return 'deadline-normal';
 };
 
 const acceptTicket = async (ticketId: number) => {
@@ -336,6 +463,36 @@ const showActionButton = computed(() => {
   return false;
 });
 
+const getPriorityIcon = (priority: string) => {
+  switch (priority) {
+    case 'Baixa':
+      return 'arrow-down';
+    case 'Média':
+      return 'minus';
+    case 'Alta':
+      return 'arrow-up';
+    default:
+      return 'exclamation-circle';
+  }
+};
+
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case TicketStatus.Pending:
+      return 'clock';
+    case TicketStatus.InProgress:
+      return 'spinner';
+    case TicketStatus.AwaitingVerification:
+      return 'hourglass-half';
+    case TicketStatus.Completed:
+      return 'check-circle';
+    case TicketStatus.Rejected:
+      return 'times-circle';
+    default:
+      return 'question-circle';
+  }
+};
+
 watch(
   () => props.isOpen,
   (isOpen) => {
@@ -349,17 +506,18 @@ watch(
 <style scoped>
 .content {
   min-width: 800px;
+  padding: 1.5rem;
 }
 
 .ticket-details-grid {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .details-row {
   display: flex;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .details-row.full-width {
@@ -369,209 +527,337 @@ watch(
 .details-item {
   flex: 1;
   background: #f8f9fa;
-  padding: 12px 16px;
+  padding: 1rem;
   border-radius: 8px;
   display: flex;
   align-items: flex-start;
-  flex-wrap: wrap;
-  overflow: hidden;
-  min-height: 45px;
+  gap: 1rem;
+  transition: all 0.3s ease;
 }
 
-.details-row.full-width .details-item {
-  width: 100%;
-  white-space: normal;
-  word-break: break-word;
+.details-item:hover {
+  background: #f0f2f5;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.ticket-details strong {
-  color: #2c3e50;
-  margin-right: 8px;
-  font-weight: 600;
-  min-width: 120px;
-  display: inline-block;
+.detail-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: #e9ecef;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #495057;
+  font-size: 1.1rem;
+}
+
+.detail-content {
+  flex: 1;
+}
+
+.detail-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+
+.detail-value {
+  font-size: 1rem;
+  color: #212529;
+  font-weight: normal;
+}
+
+.description-text {
+  white-space: pre-wrap;
+  line-height: 1.5;
+  font-weight: normal;
+}
+
+.priority-label,
+.status-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  gap: 0.5rem;
+}
+
+.badge-icon {
+  font-size: 0.9rem;
+}
+
+.priority-label.priority-baixa {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.priority-label.priority-media {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.priority-label.priority-alta {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status-label.status-pendente {
+  background-color: #fff3e0;
+  color: #f57c00;
+  border: 1px solid rgba(245, 124, 0, 0.3);
+}
+
+.status-label.status-em-andamento {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid rgba(25, 118, 210, 0.3);
+}
+
+.status-label.status-em-verificacao {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+  border: 1px solid rgba(123, 31, 162, 0.3);
+}
+
+.status-label.status-resolvido {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid rgba(46, 125, 50, 0.3);
+}
+
+.status-label.status-cancelado {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid rgba(198, 40, 40, 0.3);
 }
 
 .ticket-actions {
   display: flex;
-  justify-content: end;
-  margin-top: 20px;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.action-button.accept {
+  background-color: #16a34a;
+}
+
+.action-button.accept:hover {
+  background-color: #15803d;
+}
+
+.action-button.verify {
+  background-color: #0284c7;
+}
+
+.action-button.verify:hover {
+  background-color: #0369a1;
+}
+
+.status-waiting {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #7e22ce;
+}
+
+.waiting-icon {
+  color: #7e22ce;
 }
 
 .comment-section {
-  margin-top: 32px;
-  padding: 20px;
-  border: 1px solid var(--border-color, #e0e0e0);
+  margin-top: 2rem;
+  background: #f8f9fa;
   border-radius: 8px;
-  background-color: #fafafa;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  padding: 1.5rem;
 }
 
-.comment-section label {
-  font-weight: 600;
-  color: var(--text-color, #2c3e50);
-  display: block;
-  margin-bottom: 8px;
-  font-size: 1rem;
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: #495057;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.comment-input {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .update-input {
   width: 100%;
   min-height: 100px;
-  padding: 12px;
-  font-size: 0.95rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
   resize: vertical;
   font-family: inherit;
   line-height: 1.5;
   background: white;
-  box-sizing: border-box;
-  transition: border-color 0.2s ease-in-out;
+  transition: all 0.3s ease;
 }
 
 .update-input:focus {
   outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.15);
-}
-
-.comment-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 12px;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
 }
 
 .comments-list {
-  margin-top: 20px;
+  margin-top: 1.5rem;
 }
 
 .comment-item {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid #e0e0e0;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .comment-avatar {
-  width: 36px;
-  height: 36px;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: #e9ecef;
   border-radius: 50%;
-  background-color: #3498db;
-  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  font-weight: 600;
+  color: #495057;
+  font-size: 1.5rem;
 }
 
 .comment-content {
   flex: 1;
 }
 
-.comment-text {
-  font-size: 0.95rem;
-  color: #2c3e50;
-}
-
-.comment-meta {
-  font-size: 0.8rem;
-  color: #7f8c8d;
-  font-weight: 500;
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
 .comment-author {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #34495e;
-  margin-bottom: 4px;
-}
-
-.disabled {
-  opacity: 70%;
-  cursor: not-allowed;
-}
-
-/* Classes para as etiquetas de prioridade */
-.priority-label,
-.status-label {
-  display: inline-block;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.85rem;
   font-weight: 500;
-  text-align: center;
-  min-width: 80px;
+  color: #212529;
 }
 
-.priority-baixa {
-  background-color: #28a745 !important;
-  color: white !important;
-  border-radius: 4px !important;
-  padding: 2px 6px !important;
+.comment-time {
+  font-size: 0.8rem;
+  color: #6c757d;
 }
 
-.priority-media {
-  background-color: #ffc107 !important;
-  color: black !important;
-  border-radius: 4px !important;
-  padding: 2px 6px !important;
+.comment-text {
+  color: #495057;
+  line-height: 1.5;
 }
 
-.priority-alta {
-  background-color: #dc3545 !important;
-  color: white !important;
-  border-radius: 4px !important;
-  padding: 2px 6px !important;
+.deadline-danger {
+  background: #fff3f3 !important;
 }
 
-/* Classes para as etiquetas de status */
-.status-pendente,
-.status-flag.pendente,
-[data-status='Pendente'],
-.status-flag.status-pendente {
-  background-color: rgba(255, 152, 0, 0.1) !important;
-  color: #ff9800 !important;
-  border: 1px solid rgba(255, 152, 0, 0.3) !important;
+.deadline-danger .detail-value {
+  color: #dc3545 !important;
+  font-weight: bold !important;
 }
 
-.status-em-andamento,
-.status-flag.em_andamento,
-[data-status='Em andamento'],
-.status-flag.status-em-andamento {
-  background-color: #e8f4fd !important;
-  color: #3498db !important;
-  border: 1px solid rgba(52, 152, 219, 0.3) !important;
+.deadline-normal {
+  background: #f0fff4 !important;
 }
 
-.status-em-verificacao,
-.status-flag.em_verificacao,
-[data-status='Em verificação'],
-.status-flag.status-em-verificacao {
-  background-color: rgba(156, 39, 176, 0.1) !important;
-  color: #9c27b0 !important;
-  border: 1px solid rgba(156, 39, 176, 0.3) !important;
-}
-
-.status-resolvido,
-.status-flag.resolvido,
-[data-status='Resolvido'],
-.status-flag.status-resolvido {
-  background-color: #e9f7ef !important;
-  color: #27ae60 !important;
-  border: 1px solid rgba(39, 174, 96, 0.3) !important;
-}
-
-.past-deadline {
-  color: red;
+.deadline-normal .detail-value {
+  color: #28a745 !important;
 }
 
 .warning-icon {
-  margin-left: 5px;
+  color: #dc3545;
+  margin-left: 0.5rem;
+}
+
+/* Dark mode */
+:deep(body.dark-mode) .details-item {
+  background: #1a2233;
+}
+
+:deep(body.dark-mode) .details-item:hover {
+  background: #1e293b;
+}
+
+:deep(body.dark-mode) .detail-icon {
+  background: #2d3748;
+  color: #94a3b8;
+}
+
+:deep(body.dark-mode) .detail-label {
+  color: #94a3b8;
+}
+
+:deep(body.dark-mode) .detail-value {
+  color: #e2e8f0;
+}
+
+:deep(body.dark-mode) .comment-section {
+  background: #1a2233;
+}
+
+:deep(body.dark-mode) .comment-item {
+  background: #1e293b;
+}
+
+:deep(body.dark-mode) .comment-avatar {
+  background: #2d3748;
+  color: #94a3b8;
+}
+
+:deep(body.dark-mode) .comment-author {
+  color: #e2e8f0;
+}
+
+:deep(body.dark-mode) .comment-text {
+  color: #94a3b8;
+}
+
+:deep(body.dark-mode) .update-input {
+  background: #1e293b;
+  border-color: #2d3748;
+  color: #e2e8f0;
+}
+
+:deep(body.dark-mode) .update-input:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.1);
 }
 </style>

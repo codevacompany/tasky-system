@@ -41,12 +41,12 @@
             </td>
             <td>
               <span :class="['status-badge', getStatusClass(ticket.status)]">
-                {{ ticket.status }}
+                {{ ticket.status.toUpperCase() }}
               </span>
             </td>
             <td>{{ formatDate(ticket.createdAt) }}</td>
             <td>{{ formatDate(ticket.completionDate) }}</td>
-            <td :class="{ 'past-deadline': isPastDeadline(ticket.completionDate) }">
+            <td :class="getDeadlineClass(ticket.completionDate)">
               {{ calculateDeadline(ticket) }}
               <font-awesome-icon
                 v-if="isPastDeadline(ticket.completionDate)"
@@ -55,7 +55,31 @@
               />
             </td>
             <td>
-              <button @click.stop="$emit('viewTicket', ticket)">Ver</button>
+              <div class="action-buttons">
+                <button 
+                  v-if="ticket.status === TicketStatus.Pending"
+                  class="action-btn accept" 
+                  @click.stop="$emit('acceptTicket', ticket)" 
+                  title="Aceitar"
+                >
+                  <font-awesome-icon icon="check" />
+                </button>
+                <button 
+                  v-else-if="ticket.status === TicketStatus.InProgress"
+                  class="action-btn verify" 
+                  @click.stop="$emit('verifyTicket', ticket)" 
+                  title="Enviar para Verificação"
+                >
+                  <font-awesome-icon icon="arrow-right" />
+                </button>
+                <div 
+                  v-else-if="ticket.status === TicketStatus.AwaitingVerification"
+                  class="action-btn waiting" 
+                  title="Aguardando Verificação"
+                >
+                  <font-awesome-icon icon="hourglass-half" spin />
+                </div>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -106,12 +130,54 @@ const closeModal = () => {
 
 const formatDate = (date?: string) => (date ? new Date(date).toLocaleDateString() : '—');
 const calculateDeadline = (ticket: Ticket) => {
-  return ticket.completionDate ? formatDate(ticket.completionDate) : '—';
+  if (!ticket.completionDate) return '—';
+  
+  const deadline = new Date(ticket.completionDate);
+  const today = new Date();
+  
+  // Reset hours to compare just dates
+  deadline.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+  
+  const diffTime = deadline.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays < 0) {
+    return 'ATRASADO';
+  }
+  
+  return `${diffDays} dias restantes`;
 };
 
 const isPastDeadline = (date?: string) => {
   if (!date) return false;
-  return new Date(date) < new Date();
+  const deadline = new Date(date);
+  const today = new Date();
+  
+  // Reset hours to compare just dates
+  deadline.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+  
+  const diffTime = deadline.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  return diffDays <= 3; // Retorna true se faltam 3 dias ou menos
+};
+
+const getDeadlineClass = (date?: string) => {
+  if (!date) return '';
+  const deadline = new Date(date);
+  const today = new Date();
+  
+  // Reset hours to compare just dates
+  deadline.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+  
+  const diffTime = deadline.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays <= 3) return 'deadline-danger';
+  return 'deadline-normal';
 };
 
 const priorityColor = (priority: TicketPriority) => {
@@ -130,11 +196,17 @@ const priorityColor = (priority: TicketPriority) => {
 const getStatusClass = (status: string) => {
   switch (status) {
     case TicketStatus.Pending:
-      return 'pendente';
+      return 'status-pending';
     case TicketStatus.InProgress:
-      return 'em-andamento';
+      return 'status-in-progress';
+    case TicketStatus.AwaitingVerification:
+      return 'status-awaiting-verification';
+    case TicketStatus.Completed:
+      return 'status-completed';
+    case TicketStatus.Rejected:
+      return 'status-rejected';
     case TicketStatus.Overdue:
-      return 'atrasado';
+      return 'status-overdue';
     default:
       return '';
   }
@@ -233,23 +305,45 @@ const getStatusClass = (status: string) => {
   align-items: center;
   padding: 4px 8px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 0.85rem;
   font-weight: 500;
+  gap: 0.5rem;
 }
 
-.status-badge.pendente {
-  background-color: #fff7ed;
-  color: #f97316;
+.status-badge.status-pending {
+  background-color: #fff3e0;
+  color: #f57c00;
+  border: 1px solid rgba(245, 124, 0, 0.3);
 }
 
-.status-badge.em-andamento {
-  background-color: #eef2ff;
-  color: #4f46e5;
+.status-badge.status-in-progress {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid rgba(25, 118, 210, 0.3);
 }
 
-.status-badge.atrasado {
-  background-color: #fef2f2;
-  color: #ef4444;
+.status-badge.status-awaiting-verification {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+  border: 1px solid rgba(123, 31, 162, 0.3);
+}
+
+.status-badge.status-overdue {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid rgba(198, 40, 40, 0.3);
+}
+
+.status-badge.status-completed {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid rgba(46, 125, 50, 0.3);
+}
+
+.status-badge.status-rejected {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid rgba(198, 40, 40, 0.3);
 }
 
 .priority-label {
@@ -279,12 +373,18 @@ const getStatusClass = (status: string) => {
   border: 1px solid rgba(244, 67, 54, 0.5);
 }
 
-.past-deadline {
-  color: red;
+.deadline-danger {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.deadline-normal {
+  color: #28a745;
 }
 
 .warning-icon {
   margin-left: 5px;
+  color: #dc3545;
 }
 
 .loading-state,
@@ -338,5 +438,47 @@ const getStatusClass = (status: string) => {
   line-height: 1.4;
   flex: 1;
   text-align: center;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.action-btn.accept {
+  background-color: #16a34a;
+}
+
+.action-btn.accept:hover {
+  background-color: #15803d;
+}
+
+.action-btn.verify {
+  background-color: #0284c7;
+}
+
+.action-btn.verify:hover {
+  background-color: #0369a1;
+}
+
+.action-btn.waiting {
+  background-color: #7e22ce;
+  color: white;
+  cursor: default;
 }
 </style>

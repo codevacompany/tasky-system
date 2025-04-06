@@ -28,7 +28,7 @@
             <td>{{ ticket.department.name }}</td>
             <td>{{ new Date(ticket.createdAt).toLocaleDateString() }}</td>
             <td>
-              <span :class="['status-label', statusColor(ticket.status)]">{{ ticket.status }}</span>
+              <span :class="['status-label', statusColor(ticket.status)]">{{ ticket.status.toUpperCase() }}</span>
             </td>
           </tr>
           <tr v-if="!isLoading && tickets.length === 0">
@@ -109,43 +109,43 @@ const statusColor = (status: TicketStatus) => {
 }
 
 .status-label {
-  padding: 0.1rem 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
   border-radius: 4px;
-  color: #fff;
-  font-weight: 400;
-  text-align: center;
-  display: inline-block;
-  font-size: small;
+  font-size: 0.85rem;
+  font-weight: 500;
+  gap: 0.5rem;
 }
 
 .status-pending {
-  background-color: #ffecb3;
-  color: #ff9800;
-  border: 1px solid rgba(255, 152, 0, 0.3);
+  background-color: #fff3e0;
+  color: #f57c00;
+  border: 1px solid rgba(245, 124, 0, 0.3);
 }
 
 .status-in-progress {
-  background-color: #e8f4fd;
-  color: #288fe4;
-  border: 1px solid rgba(40, 143, 228, 0.3);
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid rgba(25, 118, 210, 0.3);
 }
 
 .status-awaiting-verification {
-  background-color: #e1bee7;
-  color: #9c27b0;
-  border: 1px solid rgba(156, 39, 176, 0.3);
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+  border: 1px solid rgba(123, 31, 162, 0.3);
 }
 
 .status-overdue {
-  background-color: #ffcdd2;
-  color: #f44336;
-  border: 1px solid rgba(244, 67, 54, 0.3);
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid rgba(198, 40, 40, 0.3);
 }
 
 .status-completed {
-  background-color: #c8e6c9;
-  color: #4caf50;
-  border: 1px solid rgba(76, 175, 80, 0.3);
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid rgba(46, 125, 50, 0.3);
 }
 
 .status-returned {
@@ -155,8 +155,8 @@ const statusColor = (status: TicketStatus) => {
 }
 
 .status-rejected {
-  background-color: #f8bbd0;
-  color: #e91e63;
-  border: 1px solid rgba(233, 30, 99, 0.3);
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid rgba(198, 40, 40, 0.3);
 }
 </style>
