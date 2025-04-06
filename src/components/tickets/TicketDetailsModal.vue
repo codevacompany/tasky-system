@@ -66,28 +66,67 @@
           <div class="details-item"><strong>Descrição:</strong> {{ ticket?.description }}</div>
         </div>
 
-        <div class="ticket-actions">
+        <div class="ticket-actions" v-if="showActionButton">
           <button
-            v-if="ticket?.status === 'Pendente'"
+            v-if="ticket?.status === TicketStatus.Pending && isTargetUser"
             class="btn btn-success"
             @click="acceptTicket(ticket?.id)"
           >
             <font-awesome-icon icon="check" /> Aceitar
           </button>
           <button
-            v-else-if="ticket?.status === 'Em andamento'"
+            v-else-if="ticket?.status === TicketStatus.InProgress && isTargetUser"
             class="btn btn-primary"
             @click="sendForReview(ticket?.id)"
           >
             <font-awesome-icon icon="arrow-right" /> Enviar para Revisão
           </button>
-          <span
-            v-else-if="ticket?.status === TicketStatus.AwaitingVerification"
-            class="action-icon"
-            title="Aguardando verificação"
+          <button
+            v-else-if="ticket?.status === TicketStatus.AwaitingVerification && isTargetUser"
+            class="btn btn-primary disabled"
+            disabled
           >
-            <font-awesome-icon icon="clock" />
-          </span>
+            Aguardando Verificação
+          </button>
+          <button
+            v-else-if="ticket?.status === TicketStatus.Completed && isTargetUser"
+            class="btn btn-success disabled"
+            disabled
+          >
+            Resolvido
+          </button>
+          <button
+            v-else-if="ticket?.status === TicketStatus.Rejected && isTargetUser"
+            class="btn btn-danger disabled"
+            disabled
+          >
+            Reprovado
+          </button>
+          <button
+            v-else-if="ticket?.status === TicketStatus.Pending && isRequester"
+            class="btn btn-primary disabled"
+            disabled
+          >
+            Pendente
+          </button>
+          <button
+            v-else-if="ticket?.status === TicketStatus.InProgress && isRequester"
+            class="btn btn-primary disabled"
+            disabled
+          >
+            Em andamento
+          </button>
+          <div v-else-if="ticket?.status === TicketStatus.AwaitingVerification && isRequester">
+            <button class="btn btn-success" @click="approveTicket(ticket?.id)">
+              <font-awesome-icon icon="check" /> Aprovar
+            </button>
+            <button class="btn btn-warning" @click="requestCorrection(ticket?.id)">
+              <font-awesome-icon icon="edit" /> Solicitar Correção
+            </button>
+            <button class="btn btn-danger" @click="rejectTicket(ticket?.id)">
+              <font-awesome-icon icon="times" /> Reprovar
+            </button>
+          </div>
         </div>
       </div>
 
@@ -125,11 +164,11 @@
 <script setup lang="ts">
 import BaseModal from '../common/BaseModal.vue';
 import { TicketStatus, type Ticket, type TicketComment } from '@/models';
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { ticketCommentService } from '@/services/ticketCommentService';
+import { ticketService } from '@/services/ticketService';
 import { useUserStore } from '@/stores/user';
 import { toast } from 'vue3-toastify';
-import { ticketService } from '@/services/ticketService';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -162,15 +201,15 @@ const getPriorityClass = (priority: string) => {
 
 const getStatusClass = (status: string) => {
   switch (status) {
-    case 'Pendente':
+    case TicketStatus.Pending:
       return 'status-pendente';
-    case 'Em andamento':
+    case TicketStatus.InProgress:
       return 'status-em-andamento';
-    case 'Em verificação':
+    case TicketStatus.AwaitingVerification:
       return 'status-em-verificacao';
-    case 'Resolvido':
+    case TicketStatus.Completed:
       return 'status-resolvido';
-    case 'Cancelado':
+    case TicketStatus.Rejected:
       return 'status-cancelado';
     default:
       return '';
@@ -196,9 +235,44 @@ const acceptTicket = async (ticketId: number) => {
   }
 };
 
-const sendForReview = (ticketId: number) => {
-  console.log(`Sending ticket with ID: ${ticketId} for review`);
-  // Add logic to send the ticket for review
+const sendForReview = async (ticketId: number) => {
+  try {
+    await ticketService.update(ticketId, { status: TicketStatus.AwaitingVerification });
+    toast.success('Ticket enviado para revisão');
+    emit('refresh');
+  } catch {
+    toast.error('Erro ao enviar o ticket para revisão');
+  }
+};
+
+const approveTicket = async (ticketId: number) => {
+  try {
+    await ticketService.update(ticketId, { status: TicketStatus.Completed });
+    toast.success('Ticket aprovado com sucesso');
+    emit('refresh');
+  } catch {
+    toast.error('Erro ao aprovar o ticket');
+  }
+};
+
+const requestCorrection = async (ticketId: number) => {
+  try {
+    await ticketService.update(ticketId, { status: TicketStatus.InProgress });
+    toast.success('Correção solicitada com sucesso');
+    emit('refresh');
+  } catch {
+    toast.error('Erro ao solicitar correção');
+  }
+};
+
+const rejectTicket = async (ticketId: number) => {
+  try {
+    await ticketService.update(ticketId, { status: TicketStatus.Rejected });
+    toast.success('Ticket reprovado com sucesso');
+    emit('refresh');
+  } catch {
+    toast.error('Erro ao reprovar o ticket');
+  }
 };
 
 const comment = async () => {
@@ -208,13 +282,12 @@ const comment = async () => {
   }
 
   try {
-    await ticketCommentService.create({
+    const response = await ticketCommentService.create({
       ticketId: props.ticket!.id,
       userId: userStore.user!.id,
       content: newComment.value,
     });
-
-    fetchComments();
+    comments.value.push(response.data);
     newComment.value = '';
     toast.success('Comentário adicionado com sucesso');
   } catch {
@@ -235,32 +308,33 @@ const formatTimeAgo = (date: string) => {
   const now = new Date();
   const past = new Date(date);
   const diff = now.getTime() - past.getTime();
-
-  const diffMinutes = Math.floor(diff / (1000 * 60));
-  const diffHours = Math.floor(diff / (1000 * 60 * 60));
   const diffDays = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const diffHours = Math.floor(diff / (1000 * 60 * 60));
+  const diffMinutes = Math.floor(diff / (1000 * 60));
 
-  if (diffDays > 5) {
-    return formatDateTime(past);
-  } else if (diffDays > 0) {
+  if (diffDays > 0) {
     return `${diffDays}d ago`;
   } else if (diffHours > 0) {
     return `${diffHours}h ago`;
-  } else if (diffMinutes > 0) {
-    return `${diffMinutes}m ago`;
   } else {
-    return 'Now';
+    return `${diffMinutes}m ago`;
   }
 };
 
-const formatDateTime = (date: Date) => {
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${day}/${month}/${year} ${hours}:${minutes}`;
-};
+const isTargetUser = computed(() => userStore.user?.id === props.ticket?.targetUser.id);
+const isRequester = computed(() => userStore.user?.id === props.ticket?.requester.id);
+
+const showActionButton = computed(() => {
+  if (isTargetUser.value) {
+    return true;
+  } else if (isRequester.value) {
+    return (
+      props.ticket?.status !== TicketStatus.Completed &&
+      props.ticket?.status !== TicketStatus.Rejected
+    );
+  }
+  return false;
+});
 
 watch(
   () => props.isOpen,
@@ -416,6 +490,11 @@ watch(
   font-size: 0.9rem;
   color: #34495e;
   margin-bottom: 4px;
+}
+
+.disabled {
+  opacity: 70%;
+  cursor: not-allowed;
 }
 
 /* Classes para as etiquetas de prioridade */

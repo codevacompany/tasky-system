@@ -51,6 +51,7 @@ export interface UpdateTicketDto {
   name?: string;
   priority?: TicketPriority;
   description?: string;
+  status?: TicketStatus;
   departmentId?: number;
   requesterId?: User;
   targetUserId?: User;
