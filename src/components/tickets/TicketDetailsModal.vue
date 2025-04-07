@@ -236,7 +236,7 @@
           <div class="comment-content">
             <div class="comment-header">
               <span class="comment-author">{{ comment.user.firstName }} {{ comment.user.lastName }}</span>
-              <span class="comment-time">{{ formatTimeAgo(comment.createdAt) }}</span>
+              <span class="comment-time">{{ formatRelativeTime(comment.createdAt) }}</span>
             </div>
             <div class="comment-text">{{ comment.content }}</div>
           </div>
@@ -254,6 +254,7 @@ import { ticketCommentService } from '@/services/ticketCommentService';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from '@/stores/user';
 import { toast } from 'vue3-toastify';
+import { formatRelativeTime } from '@/utils/date';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -303,21 +304,21 @@ const getStatusClass = (status: string) => {
 
 const calculateDeadline = (ticket: Ticket) => {
   if (!ticket.completionDate) return '—';
-  
+
   const deadline = new Date(ticket.completionDate);
   const today = new Date();
-  
+
   // Reset hours to compare just dates
   deadline.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
-  
+
   const diffTime = deadline.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays < 0) {
     return 'ATRASADO';
   }
-  
+
   return `${diffDays} dias restantes`;
 };
 
@@ -325,14 +326,14 @@ const isPastDeadline = (date?: string) => {
   if (!date) return false;
   const deadline = new Date(date);
   const today = new Date();
-  
+
   // Reset hours to compare just dates
   deadline.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
-  
+
   const diffTime = deadline.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   return diffDays <= 3; // Retorna true se faltam 3 dias ou menos
 };
 
@@ -340,14 +341,14 @@ const getDeadlineClass = (date?: string) => {
   if (!date) return '';
   const deadline = new Date(date);
   const today = new Date();
-  
+
   // Reset hours to compare just dates
   deadline.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
-  
+
   const diffTime = deadline.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays <= 3) return 'deadline-danger';
   return 'deadline-normal';
 };
@@ -428,23 +429,6 @@ const fetchComments = async () => {
     comments.value = response.data;
   } catch {
     toast.error('Erro ao buscar comentários');
-  }
-};
-
-const formatTimeAgo = (date: string) => {
-  const now = new Date();
-  const past = new Date(date);
-  const diff = now.getTime() - past.getTime();
-  const diffDays = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const diffHours = Math.floor(diff / (1000 * 60 * 60));
-  const diffMinutes = Math.floor(diff / (1000 * 60));
-
-  if (diffDays > 0) {
-    return `${diffDays}d ago`;
-  } else if (diffHours > 0) {
-    return `${diffHours}h ago`;
-  } else {
-    return `${diffMinutes}m ago`;
   }
 };
 

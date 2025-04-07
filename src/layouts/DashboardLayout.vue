@@ -100,9 +100,9 @@
       @close="toggleProfileModal"
     />
 
-    <NotificationsModal
+    <NotificationsDropdown
       v-if="showNotificationsModal"
-      :showNotificationsModal="showNotificationsModal"
+      :isOpen="showNotificationsModal"
       @close="toggleNotificationsModal"
       @notifications-read="fetchUnreadCount"
     />
@@ -113,7 +113,7 @@
 import { ref, computed, onMounted } from 'vue';
 import NewTicketModal from '@/components/layout/NewTicketModal.vue';
 import ProfileModal from '@/components/layout/ProfileModal.vue';
-import NotificationsModal from '@/components/layout/NotificationsModal.vue';
+import NotificationsDropdown from '@/components/layout/NotificationsDropdown.vue';
 import { useUserStore } from '@/stores/user';
 import { useRoute } from 'vue-router';
 import { notificationService } from '@/services/notificationService';
