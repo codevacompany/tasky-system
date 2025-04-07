@@ -59,7 +59,7 @@ import {
   faUser
 } from '@fortawesome/free-solid-svg-icons';
 
-import { faBell as faBellRegular , faClock as faClockRegular } from '@fortawesome/free-regular-svg-icons';
+import { faBell as faBellRegular, faClock as faClockRegular } from '@fortawesome/free-regular-svg-icons';
 
 const icons = [
   faHome,
@@ -120,7 +120,8 @@ const icons = [
   faClockRegular,
   faEye,
   faComment,
-  faBellRegular
+  faBellRegular,
+  faClockRegular,
 ];
 
 library.add(...icons);
