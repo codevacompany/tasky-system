@@ -52,7 +52,7 @@
             <td :class="calculateDeadline(ticket) === '—' ? '' : getDeadlineClass(ticket.completionDate)">
               {{ calculateDeadline(ticket) }}
               <font-awesome-icon
-                v-if="isPastDeadline(ticket.completionDate) && calculateDeadline(ticket) !== '—'"
+                v-if="calculateDeadline(ticket) === 'Atrasado'"
                 icon="exclamation-triangle"
                 class="warning-icon"
               />
@@ -100,7 +100,7 @@
                     class="action-btn doing" 
                     title="Fazendo"
                   >
-                    <font-awesome-icon icon="play-circle" />
+                    <font-awesome-icon icon="cog" />
                   </div>
                   <div 
                     v-else-if="ticket.status === TicketStatus.Rejected"
@@ -179,6 +179,7 @@ import { TicketPriority, TicketStatus } from '@/models';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { ticketService } from '@/services/ticketService';
+import { formatDate } from '@/utils/date';
 
 defineProps<{ 
   tickets: Ticket[]; 
@@ -202,17 +203,6 @@ const refreshSelectedTicket = async () => {
 const closeModal = () => {
   isModalOpen.value = false;
   selectedTicket.value = null;
-};
-
-const formatDate = (date?: string) => {
-  if (!date) return '—';
-  const d = new Date(date);
-  const day = d.getDate().toString().padStart(2, '0');
-  const month = (d.getMonth() + 1).toString().padStart(2, '0');
-  const year = d.getFullYear().toString().slice(-2);
-  const hours = d.getHours().toString().padStart(2, '0');
-  const minutes = d.getMinutes().toString().padStart(2, '0');
-  return `${day}/${month}/${year} ${hours}:${minutes}`;
 };
 
 const calculateDeadline = (ticket: Ticket) => {
