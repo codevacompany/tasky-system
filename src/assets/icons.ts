@@ -51,6 +51,8 @@ import {
   faUserCircle,
   faAlignLeft,
   faList,
+  faEye,
+  faComment
 } from '@fortawesome/free-solid-svg-icons';
 
 import { faBell, faClock as faClockRegular } from '@fortawesome/free-regular-svg-icons';
@@ -109,6 +111,8 @@ const icons = [
   faAlignLeft,
   faList,
   faClockRegular,
+  faEye,
+  faComment
 ];
 
 library.add(...icons);
