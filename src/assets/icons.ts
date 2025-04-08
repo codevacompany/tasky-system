@@ -50,7 +50,9 @@ import {
   faComments,
   faUserCircle,
   faAlignLeft,
-  faList
+  faList,
+  faEye,
+  faComment
 } from '@fortawesome/free-solid-svg-icons';
 
 import { faBell } from '@fortawesome/free-regular-svg-icons';
@@ -107,7 +109,9 @@ const icons = [
   faComments,
   faUserCircle,
   faAlignLeft,
-  faList
+  faList,
+  faEye,
+  faComment
 ];
 
 library.add(...icons);

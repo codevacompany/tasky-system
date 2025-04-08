@@ -100,11 +100,15 @@
         <TicketTable
           :tickets="tickets"
           :isLoading="isLoading"
+          :tableType="activeTab"
           @viewTicket="handleViewTicket"
           @editTicket="handleEditTicket"
           @deleteTicket="handleDeleteTicket"
           @acceptTicket="handleAcceptTicket"
           @verifyTicket="handleVerifyTicket"
+          @approveTicket="handleApproveTicket"
+          @requestCorrection="handleRequestCorrection"
+          @rejectTicket="handleRejectTicket"
         />
       </div>
     </div>
@@ -194,6 +198,36 @@ const handleVerifyTicket = async (ticketId: number) => {
     fetchTickets(activeTab.value);
   } catch {
     toast.error('Erro ao enviar o ticket para revisão');
+  }
+};
+
+const handleApproveTicket = async (ticket: Ticket) => {
+  try {
+    await ticketService.update(ticket.id, { status: TicketStatus.Completed });
+    toast.success('Ticket aprovado com sucesso!');
+    fetchTickets(activeTab.value);
+  } catch {
+    toast.error('Erro ao aprovar ticket. Tente novamente.');
+  }
+};
+
+const handleRequestCorrection = async (ticket: Ticket) => {
+  try {
+    await ticketService.update(ticket.id, { status: TicketStatus.InProgress });
+    toast.success('Correção solicitada com sucesso!');
+    fetchTickets(activeTab.value);
+  } catch {
+    toast.error('Erro ao solicitar correção. Tente novamente.');
+  }
+};
+
+const handleRejectTicket = async (ticket: Ticket) => {
+  try {
+    await ticketService.update(ticket.id, { status: TicketStatus.Rejected });
+    toast.success('Ticket reprovado com sucesso!');
+    fetchTickets(activeTab.value);
+  } catch {
+    toast.error('Erro ao reprovar ticket. Tente novamente.');
   }
 };
 

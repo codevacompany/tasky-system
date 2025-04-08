@@ -26,7 +26,7 @@
             <td>{{ ticket.name }}</td>
             <td>{{ ticket.requester.firstName }}</td>
             <td>{{ ticket.department.name }}</td>
-            <td>{{ new Date(ticket.createdAt).toLocaleDateString() }}</td>
+            <td>{{ formatDate(ticket.createdAt) }}</td>
             <td>
               <span :class="['status-label', statusColor(ticket.status)]">{{ ticket.status.toUpperCase() }}</span>
             </td>
@@ -52,6 +52,16 @@ defineProps<{
   tickets: Ticket[];
   isLoading: boolean;
 }>();
+
+const formatDate = (date: string) => {
+  const d = new Date(date);
+  const day = d.getDate().toString().padStart(2, '0');
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const year = d.getFullYear().toString().slice(-2);
+  const hours = d.getHours().toString().padStart(2, '0');
+  const minutes = d.getMinutes().toString().padStart(2, '0');
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+};
 
 const statusColor = (status: TicketStatus) => {
   switch (status) {
@@ -90,10 +100,11 @@ const statusColor = (status: TicketStatus) => {
   padding: 0.75rem;
   text-align: center;
   border-bottom: 1px solid var(--border-color);
+  font-size: 0.85rem;
 }
 
 .data-table th {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-light);
   background-color: rgba(0, 0, 0, 0.02);
@@ -113,7 +124,7 @@ const statusColor = (status: TicketStatus) => {
   align-items: center;
   padding: 4px 8px;
   border-radius: 4px;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 500;
   gap: 0.5rem;
 }
