@@ -196,6 +196,7 @@ onMounted(fetchNotifications);
 .notifications-list {
   max-height: 400px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .notification-item {
