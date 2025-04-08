@@ -15,12 +15,16 @@
           Marcar todas como lidas
         </button>
 
-        <div class="notifications-list">
+        <div v-if="isLoading" class="loading-wrapper">
+          <LoadingSpinner />
+        </div>
+        <div v-else class="notifications-list">
           <div
             v-for="notification in sortedNotifications"
             :key="notification.id"
             class="notification-item"
             :class="{ unread: !notification.read }"
+            @click="fetchSelectedTicket(notification.resourceId)"
           >
             <div class="notification-icon">
               <font-awesome-icon
@@ -45,15 +49,21 @@
       </div>
     </div>
   </div>
+
+  <TicketDetailsModal :isOpen="openTicket" :ticket="selectedTicket" @close="openTicket = false" />
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { notificationService } from '@/services/notificationService';
-import type { Notification } from '@/models';
+import type { Notification, Ticket } from '@/models';
 import { NotificationType } from '@/models';
 import { toast } from 'vue3-toastify';
 import { formatRelativeTime } from '@/utils/date';
+import TicketDetailsModal from '../tickets/TicketDetailsModal.vue';
+import { ticketService } from '@/services/ticketService';
+import { useUserStore } from '@/stores/user';
+import LoadingSpinner from '../common/LoadingSpinner.vue';
 
 defineProps<{
   isOpen: boolean;
@@ -66,6 +76,11 @@ const emit = defineEmits<{
 
 const notifications = ref<Notification[]>([]);
 
+const openTicket = ref(false);
+const selectedTicket = ref<Ticket | null>(null);
+const isLoading = ref(false);
+const user = useUserStore().user;
+
 const sortedNotifications = computed(() => {
   return [...notifications.value].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
@@ -77,12 +92,25 @@ const closeModal = () => {
 };
 
 const fetchNotifications = async () => {
+  isLoading.value = true;
   try {
-    const response = await notificationService.fetch();
+    const response = await notificationService.getBytargetUser(user!.id);
     notifications.value = response.data;
     emit('notifications-read');
   } catch {
     toast.error('Erro ao carregar notificações. Tente novamente.');
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const fetchSelectedTicket = async (ticketId: number | null) => {
+  if (ticketId) {
+    try {
+      openTicket.value = true;
+      const response = await ticketService.getById(ticketId);
+      selectedTicket.value = response.data;
+    } catch {}
   }
 };
 
@@ -172,8 +200,14 @@ onMounted(fetchNotifications);
   line-height: 1;
 }
 
+.loading-wrapper {
+  width: 100%;
+  padding: 40px 0;
+}
+
 .notifications-content {
   padding: 0;
+  text-align: center;
 }
 
 .mark-all-btn {
