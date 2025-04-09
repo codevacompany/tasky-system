@@ -48,7 +48,7 @@
               </span>
             </td>
             <td>{{ formatDate(ticket.createdAt) }}</td>
-            <td>{{ formatDate(ticket.completionDate) }}</td>
+            <td v-if="ticket.completionDate">{{ formatDate(ticket.completionDate) }}</td>
             <td :class="calculateDeadline(ticket) === '—' ? '' : getDeadlineClass(ticket.completionDate)">
               {{ calculateDeadline(ticket) }}
               <font-awesome-icon
@@ -61,25 +61,25 @@
               <div class="action-buttons">
                 <!-- Botões para tabela de tickets recebidos -->
                 <template v-if="tableType === 'recebidos'">
-                  <button 
+                  <button
                     v-if="ticket.status === TicketStatus.Pending"
-                    class="action-btn accept" 
-                    @click.stop="$emit('acceptTicket', ticket)" 
+                    class="action-btn accept"
+                    @click.stop="$emit('acceptTicket', ticket)"
                     title="Aceitar"
                   >
                     <font-awesome-icon icon="check" />
                   </button>
-                  <button 
+                  <button
                     v-else-if="ticket.status === TicketStatus.InProgress"
-                    class="action-btn verify" 
-                    @click.stop="$emit('verifyTicket', ticket)" 
+                    class="action-btn verify"
+                    @click.stop="$emit('verifyTicket', ticket)"
                     title="Enviar para Verificação"
                   >
                     <font-awesome-icon icon="arrow-right" />
                   </button>
-                  <div 
+                  <div
                     v-else-if="ticket.status === TicketStatus.AwaitingVerification"
-                    class="action-btn waiting" 
+                    class="action-btn waiting"
                     title="Aguardando Verificação"
                   >
                     <font-awesome-icon icon="hourglass-half" spin />
@@ -88,52 +88,52 @@
 
                 <!-- Botões para tabela de tickets criados -->
                 <template v-else-if="tableType === 'criados'">
-                  <div 
+                  <div
                     v-if="ticket.status === TicketStatus.Pending"
-                    class="action-btn not-started" 
+                    class="action-btn not-started"
                     title="Não Iniciado"
                   >
                     <font-awesome-icon icon="clock" />
                   </div>
-                  <div 
+                  <div
                     v-else-if="ticket.status === TicketStatus.InProgress"
-                    class="action-btn doing" 
+                    class="action-btn doing"
                     title="Fazendo"
                   >
                     <font-awesome-icon icon="cog" />
                   </div>
-                  <div 
+                  <div
                     v-else-if="ticket.status === TicketStatus.Rejected"
-                    class="action-btn rejected" 
+                    class="action-btn rejected"
                     title="Reprovado"
                   >
                     <font-awesome-icon icon="xmark-circle" />
                   </div>
-                  <div 
+                  <div
                     v-else-if="ticket.status === TicketStatus.Completed"
-                    class="action-btn completed" 
+                    class="action-btn completed"
                     title="Finalizado"
                   >
                     <font-awesome-icon icon="check-circle" />
                   </div>
                   <div v-else-if="ticket.status === TicketStatus.AwaitingVerification" class="verification-actions">
-                    <button 
-                      class="action-btn approve" 
-                      @click.stop="$emit('approveTicket', ticket)" 
+                    <button
+                      class="action-btn approve"
+                      @click.stop="$emit('approveTicket', ticket)"
                       title="Aprovar"
                     >
                       <font-awesome-icon icon="check" />
                     </button>
-                    <button 
-                      class="action-btn request-correction" 
-                      @click.stop="$emit('requestCorrection', ticket)" 
+                    <button
+                      class="action-btn request-correction"
+                      @click.stop="$emit('requestCorrection', ticket)"
                       title="Solicitar Correção"
                     >
                       <font-awesome-icon icon="exclamation-circle" />
                     </button>
-                    <button 
-                      class="action-btn reject" 
-                      @click.stop="$emit('rejectTicket', ticket)" 
+                    <button
+                      class="action-btn reject"
+                      @click.stop="$emit('rejectTicket', ticket)"
                       title="Reprovar"
                     >
                       <font-awesome-icon icon="times" />
@@ -143,9 +143,9 @@
 
                 <!-- Botões para tabela de tickets do setor -->
                 <template v-else-if="tableType === 'setor'">
-                  <button 
-                    class="action-btn view" 
-                    @click.stop="openTicketDetails(ticket)" 
+                  <button
+                    class="action-btn view"
+                    @click.stop="openTicketDetails(ticket)"
                     title="Visualizar"
                   >
                     <font-awesome-icon icon="eye" />
@@ -181,8 +181,8 @@ import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { ticketService } from '@/services/ticketService';
 import { formatDate } from '@/utils/date';
 
-defineProps<{ 
-  tickets: Ticket[]; 
+defineProps<{
+  tickets: Ticket[];
   isLoading: boolean;
   tableType?: 'recebidos' | 'criados' | 'setor';
 }>();
@@ -207,56 +207,41 @@ const closeModal = () => {
 
 const calculateDeadline = (ticket: Ticket) => {
   if (!ticket.completionDate) return '—';
-  
+
   // Se o status não for Pendente ou Em Andamento, retorna traço
   if (ticket.status !== TicketStatus.Pending && ticket.status !== TicketStatus.InProgress) {
     return '—';
   }
-  
+
   const deadline = new Date(ticket.completionDate);
   const today = new Date();
-  
+
   // Reset hours to compare just dates
   deadline.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
-  
+
   const diffTime = deadline.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays < 0) {
     return 'Atrasado';
   }
-  
-  return `${diffDays} dias restantes`;
-};
 
-const isPastDeadline = (date?: string) => {
-  if (!date) return false;
-  const deadline = new Date(date);
-  const today = new Date();
-  
-  // Reset hours to compare just dates
-  deadline.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
-  
-  const diffTime = deadline.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-  return diffDays <= 3; // Retorna true se faltam 3 dias ou menos
+  return `${diffDays} dias restantes`;
 };
 
 const getDeadlineClass = (date?: string) => {
   if (!date) return '';
   const deadline = new Date(date);
   const today = new Date();
-  
+
   // Reset hours to compare just dates
   deadline.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
-  
+
   const diffTime = deadline.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays < 0) return 'deadline-danger';
   if (diffDays <= 3) return 'deadline-warning';
   return 'deadline-normal';
