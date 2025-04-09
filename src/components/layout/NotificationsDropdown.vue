@@ -21,7 +21,7 @@
               <span class="notification-time">{{ formatRelativeTime(notification.createdAt) }}</span>
             </div>
           </div>
-          
+
           <div v-if="sortedNotifications.length === 0" class="empty-notifications">
             <font-awesome-icon icon="bell-slash" size="lg" />
             <p>Nenhuma notificação</p>
@@ -39,7 +39,7 @@ import type { Notification } from '@/models';
 import { NotificationType } from '@/models';
 import { toast } from 'vue3-toastify';
 
-const props = defineProps<{
+defineProps<{
   isOpen: boolean;
 }>();
 
@@ -366,4 +366,4 @@ onMounted(fetchNotifications);
 :deep(body.dark-mode) .icon-comment {
   color: #22d3ee;
 }
-</style> 
+</style>
