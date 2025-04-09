@@ -50,10 +50,16 @@ import {
   faComments,
   faUserCircle,
   faAlignLeft,
-  faList
+  faList,
+  faEye,
+  faComment,
+  faSun,
+  faCog,
+  faBell,
+  faUser
 } from '@fortawesome/free-solid-svg-icons';
 
-import { faBell } from '@fortawesome/free-regular-svg-icons';
+import { faBell as faBellRegular } from '@fortawesome/free-regular-svg-icons';
 
 const icons = [
   faHome,
@@ -67,7 +73,11 @@ const icons = [
   faTag,
   faChartLine,
   faSignOutAlt,
+  faMoon,
+  faSun,
+  faCog,
   faBell,
+  faUser,
   faPlusCircle,
   faInbox,
   faPaperPlane,
@@ -75,7 +85,6 @@ const icons = [
   faChartBar,
   faPlus,
   faTachometerAltAverage,
-  faMoon,
   faTimes,
   faBellSlash,
   faClock,
@@ -107,7 +116,10 @@ const icons = [
   faComments,
   faUserCircle,
   faAlignLeft,
-  faList
+  faList,
+  faEye,
+  faComment,
+  faBellRegular
 ];
 
 library.add(...icons);

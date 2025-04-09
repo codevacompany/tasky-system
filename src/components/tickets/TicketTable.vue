@@ -10,8 +10,8 @@
             <th>Setor</th>
             <th>Prioridade</th>
             <th>Status</th>
-            <th>Data Criação</th>
-            <th>Conclusão</th>
+            <th>Criado em</th>
+            <th>Concluir até</th>
             <th>Prazo</th>
             <th>Ações</th>
           </tr>
@@ -29,15 +29,18 @@
               <p>Nenhum ticket encontrado</p>
             </td>
           </tr>
-          <tr v-else v-for="ticket in tickets" :key="ticket.id" @click="openTicketDetails(ticket)">
+          <tr v-for="ticket in tickets" :key="ticket.id" @click="openTicketDetails(ticket)">
             <td>{{ ticket.id }}</td>
             <td>{{ ticket.name }}</td>
             <td>{{ ticket.requester.firstName }} {{ ticket.requester.lastName }}</td>
             <td>{{ ticket.department.name }}</td>
             <td>
-              <span :class="['priority-label', priorityColor(ticket.priority)]">{{
-                ticket.priority
-              }}</span>
+              <div class="priority-wrapper">
+                <span :class="['priority-bars', priorityColor(ticket.priority)]">
+                  {{ getPriorityBars(ticket.priority) }}
+                </span>
+                <span class="priority-text">{{ ticket.priority }}</span>
+              </div>
             </td>
             <td>
               <span :class="['status-badge', getStatusClass(ticket.status)]">
@@ -45,40 +48,109 @@
               </span>
             </td>
             <td>{{ formatDate(ticket.createdAt) }}</td>
-            <td>{{ formatDate(ticket.completionDate) }}</td>
-            <td :class="getDeadlineClass(ticket.completionDate)">
+            <td v-if="ticket.completionDate">{{ formatDate(ticket.completionDate) }}</td>
+            <td :class="calculateDeadline(ticket) === '—' ? '' : getDeadlineClass(ticket.completionDate)">
               {{ calculateDeadline(ticket) }}
               <font-awesome-icon
-                v-if="isPastDeadline(ticket.completionDate)"
+                v-if="calculateDeadline(ticket) === 'Atrasado'"
                 icon="exclamation-triangle"
                 class="warning-icon"
               />
             </td>
             <td>
               <div class="action-buttons">
-                <button 
-                  v-if="ticket.status === TicketStatus.Pending"
-                  class="action-btn accept" 
-                  @click.stop="$emit('acceptTicket', ticket)" 
-                  title="Aceitar"
-                >
-                  <font-awesome-icon icon="check" />
-                </button>
-                <button 
-                  v-else-if="ticket.status === TicketStatus.InProgress"
-                  class="action-btn verify" 
-                  @click.stop="$emit('verifyTicket', ticket)" 
-                  title="Enviar para Verificação"
-                >
-                  <font-awesome-icon icon="arrow-right" />
-                </button>
-                <div 
-                  v-else-if="ticket.status === TicketStatus.AwaitingVerification"
-                  class="action-btn waiting" 
-                  title="Aguardando Verificação"
-                >
-                  <font-awesome-icon icon="hourglass-half" spin />
-                </div>
+                <!-- Botões para tabela de tickets recebidos -->
+                <template v-if="tableType === 'recebidos'">
+                  <button
+                    v-if="ticket.status === TicketStatus.Pending"
+                    class="action-btn accept"
+                    @click.stop="$emit('acceptTicket', ticket)"
+                    title="Aceitar"
+                  >
+                    <font-awesome-icon icon="check" />
+                  </button>
+                  <button
+                    v-else-if="ticket.status === TicketStatus.InProgress"
+                    class="action-btn verify"
+                    @click.stop="$emit('verifyTicket', ticket)"
+                    title="Enviar para Verificação"
+                  >
+                    <font-awesome-icon icon="arrow-right" />
+                  </button>
+                  <div
+                    v-else-if="ticket.status === TicketStatus.AwaitingVerification"
+                    class="action-btn waiting"
+                    title="Aguardando Verificação"
+                  >
+                    <font-awesome-icon icon="hourglass-half" spin />
+                  </div>
+                </template>
+
+                <!-- Botões para tabela de tickets criados -->
+                <template v-else-if="tableType === 'criados'">
+                  <div
+                    v-if="ticket.status === TicketStatus.Pending"
+                    class="action-btn not-started"
+                    title="Não Iniciado"
+                  >
+                    <font-awesome-icon icon="clock" />
+                  </div>
+                  <div
+                    v-else-if="ticket.status === TicketStatus.InProgress"
+                    class="action-btn doing"
+                    title="Fazendo"
+                  >
+                    <font-awesome-icon icon="cog" />
+                  </div>
+                  <div
+                    v-else-if="ticket.status === TicketStatus.Rejected"
+                    class="action-btn rejected"
+                    title="Reprovado"
+                  >
+                    <font-awesome-icon icon="xmark-circle" />
+                  </div>
+                  <div
+                    v-else-if="ticket.status === TicketStatus.Completed"
+                    class="action-btn completed"
+                    title="Finalizado"
+                  >
+                    <font-awesome-icon icon="check-circle" />
+                  </div>
+                  <div v-else-if="ticket.status === TicketStatus.AwaitingVerification" class="verification-actions">
+                    <button
+                      class="action-btn approve"
+                      @click.stop="$emit('approveTicket', ticket)"
+                      title="Aprovar"
+                    >
+                      <font-awesome-icon icon="check" />
+                    </button>
+                    <button
+                      class="action-btn request-correction"
+                      @click.stop="$emit('requestCorrection', ticket)"
+                      title="Solicitar Correção"
+                    >
+                      <font-awesome-icon icon="exclamation-circle" />
+                    </button>
+                    <button
+                      class="action-btn reject"
+                      @click.stop="$emit('rejectTicket', ticket)"
+                      title="Reprovar"
+                    >
+                      <font-awesome-icon icon="times" />
+                    </button>
+                  </div>
+                </template>
+
+                <!-- Botões para tabela de tickets do setor -->
+                <template v-else-if="tableType === 'setor'">
+                  <button
+                    class="action-btn view"
+                    @click.stop="openTicketDetails(ticket)"
+                    title="Visualizar"
+                  >
+                    <font-awesome-icon icon="eye" />
+                  </button>
+                </template>
               </div>
             </td>
           </tr>
@@ -107,8 +179,13 @@ import { TicketPriority, TicketStatus } from '@/models';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { ticketService } from '@/services/ticketService';
+import { formatDate } from '@/utils/date';
 
-defineProps<{ tickets: Ticket[]; isLoading: boolean }>();
+defineProps<{
+  tickets: Ticket[];
+  isLoading: boolean;
+  tableType?: 'recebidos' | 'criados' | 'setor';
+}>();
 const isModalOpen = ref(false);
 const selectedTicket = ref<Ticket | null>(null);
 
@@ -128,55 +205,45 @@ const closeModal = () => {
   selectedTicket.value = null;
 };
 
-const formatDate = (date?: string) => (date ? new Date(date).toLocaleDateString() : '—');
 const calculateDeadline = (ticket: Ticket) => {
   if (!ticket.completionDate) return '—';
-  
+
+  // Se o status não for Pendente ou Em Andamento, retorna traço
+  if (ticket.status !== TicketStatus.Pending && ticket.status !== TicketStatus.InProgress) {
+    return '—';
+  }
+
   const deadline = new Date(ticket.completionDate);
   const today = new Date();
-  
-  // Reset hours to compare just dates
-  deadline.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
-  
-  const diffTime = deadline.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-  if (diffDays < 0) {
-    return 'ATRASADO';
-  }
-  
-  return `${diffDays} dias restantes`;
-};
 
-const isPastDeadline = (date?: string) => {
-  if (!date) return false;
-  const deadline = new Date(date);
-  const today = new Date();
-  
   // Reset hours to compare just dates
   deadline.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
-  
+
   const diffTime = deadline.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-  return diffDays <= 3; // Retorna true se faltam 3 dias ou menos
+
+  if (diffDays < 0) {
+    return 'Atrasado';
+  }
+
+  return `${diffDays} dias restantes`;
 };
 
 const getDeadlineClass = (date?: string) => {
   if (!date) return '';
   const deadline = new Date(date);
   const today = new Date();
-  
+
   // Reset hours to compare just dates
   deadline.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
-  
+
   const diffTime = deadline.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-  if (diffDays <= 3) return 'deadline-danger';
+
+  if (diffDays < 0) return 'deadline-danger';
+  if (diffDays <= 3) return 'deadline-warning';
   return 'deadline-normal';
 };
 
@@ -207,6 +274,19 @@ const getStatusClass = (status: string) => {
       return 'status-rejected';
     case TicketStatus.Overdue:
       return 'status-overdue';
+    default:
+      return '';
+  }
+};
+
+const getPriorityBars = (priority: TicketPriority) => {
+  switch (priority) {
+    case TicketPriority.Low:
+      return '|';
+    case TicketPriority.Medium:
+      return '||';
+    case TicketPriority.High:
+      return '|||';
     default:
       return '';
   }
@@ -305,7 +385,7 @@ const getStatusClass = (status: string) => {
   align-items: center;
   padding: 4px 8px;
   border-radius: 4px;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 500;
   gap: 0.5rem;
 }
@@ -346,31 +426,38 @@ const getStatusClass = (status: string) => {
   border: 1px solid rgba(198, 40, 40, 0.3);
 }
 
-.priority-label {
-  padding: 0.1rem 0.5rem;
-  border-radius: 4px;
-  font-weight: 400;
-  text-align: center;
-  display: inline-block;
-  font-size: small;
+.priority-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
 }
 
-.priority-low {
-  background-color: #ecf8ec;
+.priority-bars {
+  font-weight: bold;
+  letter-spacing: -1px;
+}
+
+.priority-bars.priority-low {
   color: #63b900;
-  border: 1px solid rgba(139, 195, 74, 0.5);
 }
 
-.priority-medium {
-  background-color: #ffecb3;
-  color: #ffc107;
-  border: 1px solid rgba(255, 193, 7, 0.5);
+.priority-bars.priority-medium {
+  color: #f57c00;
 }
 
-.priority-high {
-  background-color: #ffcdd2;
-  color: #f44336;
-  border: 1px solid rgba(244, 67, 54, 0.5);
+.priority-bars.priority-high {
+  color: #dc2626;
+}
+
+.priority-text {
+  color: var(--text-light);
+  font-size: 0.85rem;
+}
+
+.deadline-warning {
+  color: #f57c00;
+  font-weight: bold;
 }
 
 .deadline-danger {
@@ -380,6 +467,10 @@ const getStatusClass = (status: string) => {
 
 .deadline-normal {
   color: #28a745;
+}
+
+td {
+  color: var(--text-color);
 }
 
 .warning-icon {
@@ -442,7 +533,7 @@ const getStatusClass = (status: string) => {
 
 .action-buttons {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem;
   justify-content: center;
 }
 
@@ -450,11 +541,11 @@ const getStatusClass = (status: string) => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
   border: none;
-  font-size: 1rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
   color: white;
@@ -480,5 +571,95 @@ const getStatusClass = (status: string) => {
   background-color: #7e22ce;
   color: white;
   cursor: default;
+}
+
+.verification-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.action-btn.approve {
+  background-color: #059669;
+  color: white;
+}
+
+.action-btn.approve:hover {
+  background-color: #047857;
+}
+
+.action-btn.request-correction {
+  background-color: #7b1fa2;
+  color: white;
+}
+
+.action-btn.request-correction:hover {
+  background-color: #6a1b9a;
+}
+
+.action-btn.reject {
+  background-color: #dc2626;
+  color: white;
+}
+
+.action-btn.reject:hover {
+  background-color: #b91c1c;
+}
+
+.action-btn.not-started {
+  background-color: #f57c00;
+  color: white;
+  cursor: default;
+}
+
+.action-btn.not-started svg {
+  color: white;
+}
+
+.action-btn.doing {
+  background-color: #1976d2;
+  color: white;
+  cursor: default;
+}
+
+.action-btn.doing svg {
+  color: white;
+}
+
+.action-btn.rejected {
+  background-color: #c62828;
+  color: white;
+  cursor: default;
+}
+
+.action-btn.rejected svg {
+  color: white;
+}
+
+.action-btn.completed {
+  background-color: #2e7d32;
+  color: white;
+  cursor: default;
+}
+
+.action-btn.completed svg {
+  color: white;
+}
+
+.action-btn.view {
+  background-color: #6366f1;
+  color: white;
+}
+
+.action-btn.view:hover {
+  background-color: #4f46e5;
+}
+
+.action-btn.comment {
+  background-color: #0ea5e9;
+  color: white;
+}
+
+.action-btn.comment:hover {
+  background-color: #0284c7;
 }
 </style>
