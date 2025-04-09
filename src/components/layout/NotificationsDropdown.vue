@@ -24,7 +24,7 @@
             :key="notification.id"
             class="notification-item"
             :class="{ unread: !notification.read }"
-            @click="fetchSelectedTicket(notification.resourceId)"
+            @click="fetchSelectedTicket(notification.resourceId, notification.id)"
           >
             <div class="notification-icon">
               <font-awesome-icon
@@ -104,13 +104,17 @@ const fetchNotifications = async () => {
   }
 };
 
-const fetchSelectedTicket = async (ticketId: number | null) => {
+const fetchSelectedTicket = async (ticketId: number | null, notificationId: number) => {
   if (ticketId) {
     try {
       openTicket.value = true;
       const response = await ticketService.getById(ticketId);
       selectedTicket.value = response.data;
-    } catch {}
+      notificationService.markAsRead(notificationId);
+      await fetchNotifications();
+    } catch {
+      toast.error('Erro ao carregar ticket.');
+    }
   }
 };
 
@@ -130,7 +134,7 @@ const getNotificationIcon = (type: NotificationType) => {
     case NotificationType.Open:
       return 'ticket';
     case NotificationType.Comment:
-      return 'comment';
+      return 'comments';
     default:
       return 'bell';
   }

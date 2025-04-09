@@ -1,5 +1,11 @@
 <template>
-  <BaseModal v-if="isOpen" :isOpen="isOpen" title="Detalhes do Ticket" :isLoading="loadedTicket ? false : true" @close="closeModal">
+  <BaseModal
+    v-if="isOpen"
+    :isOpen="isOpen"
+    title="Detalhes do Ticket"
+    :isLoading="loadedTicket ? false : true"
+    @close="closeModal"
+  >
     <div v-if="loadedTicket" class="content">
       <div class="ticket-details ticket-details-grid">
         <div class="details-row">
@@ -44,7 +50,10 @@
               <div class="detail-label">Prioridade</div>
               <div class="detail-value">
                 <span :class="['priority-label', getPriorityClass(loadedTicket.priority)]">
-                  <font-awesome-icon :icon="getPriorityIcon(loadedTicket.priority)" class="badge-icon" />
+                  <font-awesome-icon
+                    :icon="getPriorityIcon(loadedTicket.priority)"
+                    class="badge-icon"
+                  />
                   {{ ticket?.priority }}
                 </span>
               </div>
@@ -58,7 +67,10 @@
               <div class="detail-label">Status</div>
               <div class="detail-value">
                 <span :class="['status-label', getStatusClass(loadedTicket.status)]">
-                  <font-awesome-icon :icon="getStatusIcon(loadedTicket.status)" class="badge-icon" />
+                  <font-awesome-icon
+                    :icon="getStatusIcon(loadedTicket.status)"
+                    class="badge-icon"
+                  />
                   {{ ticket?.status.toUpperCase() }}
                 </span>
               </div>
@@ -415,12 +427,12 @@ const comment = async () => {
   }
 
   try {
-    const response = await ticketCommentService.create({
-      ticketId: props.ticket!.id,
+    await ticketCommentService.create({
+      ticketId: loadedTicket.value!.id,
       userId: userStore.user!.id,
       content: newComment.value,
     });
-    comments.value.push(response.data);
+    fetchComments();
     newComment.value = '';
     toast.success('Comentário adicionado com sucesso');
   } catch {
@@ -430,23 +442,25 @@ const comment = async () => {
 
 const fetchComments = async () => {
   try {
-    const response = await ticketCommentService.getByTicket(props.ticket!.id);
-    comments.value = response.data;
+    if (loadedTicket.value) {
+      const response = await ticketCommentService.getByTicket(loadedTicket.value.id);
+      comments.value = response.data;
+    }
   } catch {
     toast.error('Erro ao buscar comentários');
   }
 };
 
-const isTargetUser = computed(() => userStore.user?.id === props.ticket?.targetUser.id);
-const isRequester = computed(() => userStore.user?.id === props.ticket?.requester.id);
+const isTargetUser = computed(() => userStore.user?.id === loadedTicket.value?.targetUser.id);
+const isRequester = computed(() => userStore.user?.id === loadedTicket.value?.requester.id);
 
 const showActionButton = computed(() => {
   if (isTargetUser.value) {
     return true;
   } else if (isRequester.value) {
     return (
-      props.ticket?.status !== TicketStatus.Completed &&
-      props.ticket?.status !== TicketStatus.Rejected
+      loadedTicket.value?.status !== TicketStatus.Completed &&
+      loadedTicket.value?.status !== TicketStatus.Rejected
     );
   }
   return false;
@@ -496,6 +510,7 @@ watch(
   (newTicket) => {
     if (newTicket) {
       loadedTicket.value = newTicket;
+      fetchComments();
     }
   },
   { immediate: true },
@@ -505,10 +520,10 @@ watch(
   () => props.isOpen,
   (isOpen) => {
     if (!isOpen) {
-      loadedTicket.value = null
+      loadedTicket.value = null;
     }
-  }
-)
+  },
+);
 </script>
 
 <style scoped>
