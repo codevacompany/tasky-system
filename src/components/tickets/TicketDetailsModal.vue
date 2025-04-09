@@ -1,6 +1,12 @@
 <template>
-  <BaseModal v-if="isOpen" :isOpen="isOpen" title="Detalhes do Ticket" @close="closeModal">
-    <div class="content">
+  <BaseModal
+    v-if="isOpen"
+    :isOpen="isOpen"
+    title="Detalhes do Ticket"
+    :isLoading="loadedTicket ? false : true"
+    @close="closeModal"
+  >
+    <div v-if="loadedTicket" class="content">
       <div class="ticket-details ticket-details-grid">
         <div class="details-row">
           <div class="details-item">
@@ -9,7 +15,7 @@
             </div>
             <div class="detail-content">
               <div class="detail-label">ID</div>
-              <div class="detail-value">{{ ticket?.id }}</div>
+              <div class="detail-value">{{ loadedTicket.id }}</div>
             </div>
           </div>
           <div class="details-item">
@@ -18,7 +24,7 @@
             </div>
             <div class="detail-content">
               <div class="detail-label">Categoria</div>
-              <div class="detail-value">{{ ticket?.category?.name || '-' }}</div>
+              <div class="detail-value">{{ loadedTicket.category?.name || '-' }}</div>
             </div>
           </div>
         </div>
@@ -30,7 +36,7 @@
             </div>
             <div class="detail-content">
               <div class="detail-label">Assunto</div>
-              <div class="detail-value">{{ ticket?.name }}</div>
+              <div class="detail-value">{{ loadedTicket.name }}</div>
             </div>
           </div>
         </div>
@@ -43,8 +49,11 @@
             <div class="detail-content">
               <div class="detail-label">Prioridade</div>
               <div class="detail-value">
-                <span :class="['priority-label', getPriorityClass(ticket!.priority)]">
-                  <font-awesome-icon :icon="getPriorityIcon(ticket!.priority)" class="badge-icon" />
+                <span :class="['priority-label', getPriorityClass(loadedTicket.priority)]">
+                  <font-awesome-icon
+                    :icon="getPriorityIcon(loadedTicket.priority)"
+                    class="badge-icon"
+                  />
                   {{ ticket?.priority }}
                 </span>
               </div>
@@ -57,8 +66,11 @@
             <div class="detail-content">
               <div class="detail-label">Status</div>
               <div class="detail-value">
-                <span :class="['status-label', getStatusClass(ticket!.status)]">
-                  <font-awesome-icon :icon="getStatusIcon(ticket!.status)" class="badge-icon" />
+                <span :class="['status-label', getStatusClass(loadedTicket.status)]">
+                  <font-awesome-icon
+                    :icon="getStatusIcon(loadedTicket.status)"
+                    class="badge-icon"
+                  />
                   {{ ticket?.status.toUpperCase() }}
                 </span>
               </div>
@@ -73,7 +85,9 @@
             </div>
             <div class="detail-content">
               <div class="detail-label">Solicitante</div>
-              <div class="detail-value">{{ ticket?.requester.firstName }} {{ ticket?.requester.lastName }}</div>
+              <div class="detail-value">
+                {{ loadedTicket.requester.firstName }} {{ loadedTicket.requester.lastName }}
+              </div>
             </div>
           </div>
           <div class="details-item">
@@ -82,7 +96,7 @@
             </div>
             <div class="detail-content">
               <div class="detail-label">Setor</div>
-              <div class="detail-value">{{ ticket?.department.name }}</div>
+              <div class="detail-value">{{ loadedTicket.department.name }}</div>
             </div>
           </div>
         </div>
@@ -94,7 +108,7 @@
             </div>
             <div class="detail-content">
               <div class="detail-label">Data de Criação</div>
-              <div class="detail-value">{{ formatDate(ticket?.createdAt) }}</div>
+              <div class="detail-value">{{ formatDate(loadedTicket.createdAt) }}</div>
             </div>
           </div>
           <div class="details-item">
@@ -103,7 +117,7 @@
             </div>
             <div class="detail-content">
               <div class="detail-label">Data de Aceitação</div>
-              <div class="detail-value">{{ formatDate(ticket?.acceptanceDate) }}</div>
+              <div class="detail-value">{{ formatDate(loadedTicket.acceptanceDate) }}</div>
             </div>
           </div>
         </div>
@@ -115,7 +129,7 @@
             </div>
             <div class="detail-content">
               <div class="detail-label">Data de Conclusão</div>
-              <div class="detail-value">{{ formatDate(ticket?.completionDate) }}</div>
+              <div class="detail-value">{{ formatDate(loadedTicket.completionDate) }}</div>
             </div>
           </div>
           <div class="details-item" :class="getDeadlineClass(ticket?.completionDate)">
@@ -125,12 +139,12 @@
             <div class="detail-content">
               <div class="detail-label">Prazo</div>
               <div class="detail-value">
-                {{ calculateDeadline(ticket!) }}
-            <font-awesome-icon
-              v-if="isPastDeadline(ticket?.completionDate)"
-              icon="exclamation-triangle"
-              class="warning-icon"
-            />
+                {{ calculateDeadline(loadedTicket) }}
+                <font-awesome-icon
+                  v-if="isPastDeadline(loadedTicket.completionDate)"
+                  icon="exclamation-triangle"
+                  class="warning-icon"
+                />
               </div>
             </div>
           </div>
@@ -143,7 +157,7 @@
             </div>
             <div class="detail-content">
               <div class="detail-label">Descrição</div>
-              <div class="detail-value description-text">{{ ticket?.description }}</div>
+              <div class="detail-value description-text">{{ loadedTicket.description }}</div>
             </div>
           </div>
         </div>
@@ -159,52 +173,52 @@
           <button
             v-else-if="ticket?.status === TicketStatus.InProgress && isTargetUser"
             class="action-button verify"
-            @click="sendForReview(ticket?.id)"
+            @click="sendForReview(loadedTicket.id)"
           >
             <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
           </button>
           <div
-            v-else-if="ticket?.status === TicketStatus.AwaitingVerification && isTargetUser"
+            v-else-if="loadedTicket.status === TicketStatus.AwaitingVerification && isTargetUser"
             class="status-waiting"
           >
             <font-awesome-icon icon="hourglass-half" class="waiting-icon" /> AGUARDANDO VERIFICAÇÃO
           </div>
           <button
-            v-else-if="ticket?.status === TicketStatus.Completed && isTargetUser"
+            v-else-if="loadedTicket.status === TicketStatus.Completed && isTargetUser"
             class="btn btn-success disabled"
             disabled
           >
             <font-awesome-icon icon="check-circle" /> RESOLVIDO
           </button>
           <button
-            v-else-if="ticket?.status === TicketStatus.Rejected && isTargetUser"
+            v-else-if="loadedTicket.status === TicketStatus.Rejected && isTargetUser"
             class="btn btn-danger disabled"
             disabled
           >
             <font-awesome-icon icon="times-circle" /> REPROVADO
           </button>
           <button
-            v-else-if="ticket?.status === TicketStatus.Pending && isRequester"
+            v-else-if="loadedTicket.status === TicketStatus.Pending && isRequester"
             class="btn btn-primary disabled"
             disabled
           >
             <font-awesome-icon icon="clock" /> PENDENTE
           </button>
           <button
-            v-else-if="ticket?.status === TicketStatus.InProgress && isRequester"
+            v-else-if="loadedTicket.status === TicketStatus.InProgress && isRequester"
             class="btn btn-primary disabled"
             disabled
           >
             <font-awesome-icon icon="spinner" /> EM ANDAMENTO
           </button>
-          <div v-else-if="ticket?.status === TicketStatus.AwaitingVerification && isRequester">
-            <button class="btn btn-success" @click="approveTicket(ticket?.id)">
+          <div v-else-if="loadedTicket.status === TicketStatus.AwaitingVerification && isRequester">
+            <button class="btn btn-success" @click="approveTicket(loadedTicket.id)">
               <font-awesome-icon icon="check" /> Aprovar
             </button>
-            <button class="btn btn-warning" @click="requestCorrection(ticket?.id)">
+            <button class="btn btn-warning" @click="requestCorrection(loadedTicket.id)">
               <font-awesome-icon icon="edit" /> Solicitar Correção
             </button>
-            <button class="btn btn-danger" @click="rejectTicket(ticket?.id)">
+            <button class="btn btn-danger" @click="rejectTicket(loadedTicket.id)">
               <font-awesome-icon icon="times" /> Reprovar
             </button>
           </div>
@@ -217,11 +231,11 @@
           <h3>Comentários</h3>
         </div>
         <div class="comment-input">
-        <textarea
-          v-model="newComment"
-          placeholder="Digite seu comentário aqui..."
-          class="update-input"
-        ></textarea>
+          <textarea
+            v-model="newComment"
+            placeholder="Digite seu comentário aqui..."
+            class="update-input"
+          ></textarea>
           <button @click="comment()" class="btn btn-primary">
             <font-awesome-icon icon="paper-plane" /> Enviar
           </button>
@@ -235,8 +249,10 @@
           </div>
           <div class="comment-content">
             <div class="comment-header">
-              <span class="comment-author">{{ comment.user.firstName }} {{ comment.user.lastName }}</span>
-              <span class="comment-time">{{ formatTimeAgo(comment.createdAt) }}</span>
+              <span class="comment-author"
+                >{{ comment.user.firstName }} {{ comment.user.lastName }}</span
+              >
+              <span class="comment-time">{{ formatRelativeTime(comment.createdAt) }}</span>
             </div>
             <div class="comment-text">{{ comment.content }}</div>
           </div>
@@ -254,16 +270,18 @@ import { ticketCommentService } from '@/services/ticketCommentService';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from '@/stores/user';
 import { toast } from 'vue3-toastify';
+import { formatRelativeTime } from '@/utils/date';
 
 const props = defineProps<{
   isOpen: boolean;
-  ticket: Ticket;
+  ticket: Ticket | null;
 }>();
 
 const emit = defineEmits(['close', 'refresh']);
 const userStore = useUserStore();
 const newComment = ref('');
 const comments = ref<TicketComment[]>([]);
+const loadedTicket = ref<Ticket | null>(null);
 
 const closeModal = () => {
   emit('close');
@@ -303,21 +321,21 @@ const getStatusClass = (status: string) => {
 
 const calculateDeadline = (ticket: Ticket) => {
   if (!ticket.completionDate) return '—';
-  
+
   const deadline = new Date(ticket.completionDate);
   const today = new Date();
-  
+
   // Reset hours to compare just dates
   deadline.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
-  
+
   const diffTime = deadline.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays < 0) {
     return 'ATRASADO';
   }
-  
+
   return `${diffDays} dias restantes`;
 };
 
@@ -325,14 +343,14 @@ const isPastDeadline = (date?: string) => {
   if (!date) return false;
   const deadline = new Date(date);
   const today = new Date();
-  
+
   // Reset hours to compare just dates
   deadline.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
-  
+
   const diffTime = deadline.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   return diffDays <= 3; // Retorna true se faltam 3 dias ou menos
 };
 
@@ -340,14 +358,14 @@ const getDeadlineClass = (date?: string) => {
   if (!date) return '';
   const deadline = new Date(date);
   const today = new Date();
-  
+
   // Reset hours to compare just dates
   deadline.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
-  
+
   const diffTime = deadline.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays <= 3) return 'deadline-danger';
   return 'deadline-normal';
 };
@@ -409,12 +427,12 @@ const comment = async () => {
   }
 
   try {
-    const response = await ticketCommentService.create({
-      ticketId: props.ticket!.id,
+    await ticketCommentService.create({
+      ticketId: loadedTicket.value!.id,
       userId: userStore.user!.id,
       content: newComment.value,
     });
-    comments.value.push(response.data);
+    fetchComments();
     newComment.value = '';
     toast.success('Comentário adicionado com sucesso');
   } catch {
@@ -424,40 +442,25 @@ const comment = async () => {
 
 const fetchComments = async () => {
   try {
-    const response = await ticketCommentService.getByTicket(props.ticket!.id);
-    comments.value = response.data;
+    if (loadedTicket.value) {
+      const response = await ticketCommentService.getByTicket(loadedTicket.value.id);
+      comments.value = response.data;
+    }
   } catch {
     toast.error('Erro ao buscar comentários');
   }
 };
 
-const formatTimeAgo = (date: string) => {
-  const now = new Date();
-  const past = new Date(date);
-  const diff = now.getTime() - past.getTime();
-  const diffDays = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const diffHours = Math.floor(diff / (1000 * 60 * 60));
-  const diffMinutes = Math.floor(diff / (1000 * 60));
-
-  if (diffDays > 0) {
-    return `${diffDays}d ago`;
-  } else if (diffHours > 0) {
-    return `${diffHours}h ago`;
-  } else {
-    return `${diffMinutes}m ago`;
-  }
-};
-
-const isTargetUser = computed(() => userStore.user?.id === props.ticket?.targetUser.id);
-const isRequester = computed(() => userStore.user?.id === props.ticket?.requester.id);
+const isTargetUser = computed(() => userStore.user?.id === loadedTicket.value?.targetUser.id);
+const isRequester = computed(() => userStore.user?.id === loadedTicket.value?.requester.id);
 
 const showActionButton = computed(() => {
   if (isTargetUser.value) {
     return true;
   } else if (isRequester.value) {
     return (
-      props.ticket?.status !== TicketStatus.Completed &&
-      props.ticket?.status !== TicketStatus.Rejected
+      loadedTicket.value?.status !== TicketStatus.Completed &&
+      loadedTicket.value?.status !== TicketStatus.Rejected
     );
   }
   return false;
@@ -501,11 +504,32 @@ watch(
     }
   },
 );
+
+watch(
+  () => props.ticket,
+  (newTicket) => {
+    if (newTicket) {
+      loadedTicket.value = newTicket;
+      fetchComments();
+    }
+  },
+  { immediate: true },
+);
+
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    if (!isOpen) {
+      loadedTicket.value = null;
+    }
+  },
+);
 </script>
 
 <style scoped>
 .content {
   min-width: 800px;
+  min-height: 90vh;
   padding: 1.5rem;
 }
 

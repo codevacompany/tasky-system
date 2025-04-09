@@ -7,18 +7,37 @@
       </div>
 
       <div class="notifications-content">
-        <button v-if="notifications.some(n => !n.read)" class="mark-all-btn" @click="markAllAsRead">
+        <button
+          v-if="notifications.some((n) => !n.read)"
+          class="mark-all-btn"
+          @click="markAllAsRead"
+        >
           Marcar todas como lidas
         </button>
 
-        <div class="notifications-list">
-          <div v-for="notification in sortedNotifications" :key="notification.id" class="notification-item" :class="{ unread: !notification.read }">
+        <div v-if="isLoading" class="loading-wrapper">
+          <LoadingSpinner />
+        </div>
+        <div v-else class="notifications-list">
+          <div
+            v-for="notification in sortedNotifications"
+            :key="notification.id"
+            class="notification-item"
+            :class="{ unread: !notification.read }"
+            @click="fetchSelectedTicket(notification.resourceId, notification.id)"
+          >
             <div class="notification-icon">
-              <font-awesome-icon :icon="getNotificationIcon(notification.type)" :class="getNotificationIconClass(notification.type)" />
+              <font-awesome-icon
+                :icon="getNotificationIcon(notification.type)"
+                :class="getNotificationIconClass(notification.type)"
+              />
             </div>
             <div class="notification-details">
               <p class="notification-text">{{ notification.message }}</p>
-              <span class="notification-time">{{ formatRelativeTime(notification.createdAt) }}</span>
+              <span class="notification-time">
+                <font-awesome-icon :icon="['far', 'clock']" />
+                {{ formatRelativeTime(notification.createdAt) }}</span
+              >
             </div>
           </div>
 
@@ -30,14 +49,21 @@
       </div>
     </div>
   </div>
+
+  <TicketDetailsModal :isOpen="openTicket" :ticket="selectedTicket" @close="openTicket = false" />
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { notificationService } from '@/services/notificationService';
-import type { Notification } from '@/models';
+import type { Notification, Ticket } from '@/models';
 import { NotificationType } from '@/models';
 import { toast } from 'vue3-toastify';
+import { formatRelativeTime } from '@/utils/date';
+import TicketDetailsModal from '../tickets/TicketDetailsModal.vue';
+import { ticketService } from '@/services/ticketService';
+import { useUserStore } from '@/stores/user';
+import LoadingSpinner from '../common/LoadingSpinner.vue';
 
 defineProps<{
   isOpen: boolean;
@@ -45,54 +71,50 @@ defineProps<{
 
 const emit = defineEmits<{
   (e: 'close'): void;
+  (e: 'notifications-read'): void;
 }>();
 
 const notifications = ref<Notification[]>([]);
 
+const openTicket = ref(false);
+const selectedTicket = ref<Ticket | null>(null);
+const isLoading = ref(false);
+const user = useUserStore().user;
+
 const sortedNotifications = computed(() => {
-  return [...notifications.value]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  return [...notifications.value].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
 });
-
-const formatRelativeTime = (dateString: string) => {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  const diffInMinutes = Math.floor(diffInSeconds / 60);
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  const diffInDays = Math.floor(diffInHours / 24);
-  const diffInMonths = Math.floor(diffInDays / 30);
-  const diffInYears = Math.floor(diffInDays / 365);
-
-  if (diffInSeconds < 60) {
-    return 'Agora';
-  }
-
-  if (diffInMinutes < 60) {
-    return `Há ${diffInMinutes}min`;
-  }
-
-  if (diffInHours < 24) {
-    return `Há ${diffInHours}h`;
-  }
-
-  if (diffInMonths < 12) {
-    return `Há ${diffInMonths}m`;
-  }
-
-  return `Há ${diffInYears}a`;
-};
 
 const closeModal = () => {
   emit('close');
 };
 
 const fetchNotifications = async () => {
+  isLoading.value = true;
   try {
-    const response = await notificationService.fetch();
+    const response = await notificationService.getBytargetUser(user!.id);
     notifications.value = response.data;
+    emit('notifications-read');
   } catch {
     toast.error('Erro ao carregar notificações. Tente novamente.');
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const fetchSelectedTicket = async (ticketId: number | null, notificationId: number) => {
+  if (ticketId) {
+    try {
+      openTicket.value = true;
+      const response = await ticketService.getById(ticketId);
+      selectedTicket.value = response.data;
+      notificationService.markAsRead(notificationId);
+      await fetchNotifications();
+    } catch {
+      toast.error('Erro ao carregar ticket.');
+    }
   }
 };
 
@@ -100,6 +122,7 @@ const markAllAsRead = async () => {
   try {
     await notificationService.markAllAsRead();
     await fetchNotifications();
+
     toast.success('Notificações marcadas como lidas.');
   } catch {
     toast.error('Erro ao marcar notificações como lidas.');
@@ -111,7 +134,7 @@ const getNotificationIcon = (type: NotificationType) => {
     case NotificationType.Open:
       return 'ticket';
     case NotificationType.Comment:
-      return 'comment';
+      return 'comments';
     default:
       return 'bell';
   }
@@ -147,7 +170,7 @@ onMounted(fetchNotifications);
   position: fixed;
   top: calc(var(--header-height) + 4px);
   right: 20px;
-  width: 360px;
+  width: 420px;
   background-color: white;
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
@@ -165,7 +188,7 @@ onMounted(fetchNotifications);
 }
 
 .modal-header h2 {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: #212529;
   margin: 0;
@@ -181,8 +204,14 @@ onMounted(fetchNotifications);
   line-height: 1;
 }
 
+.loading-wrapper {
+  width: 100%;
+  padding: 40px 0;
+}
+
 .notifications-content {
   padding: 0;
+  text-align: center;
 }
 
 .mark-all-btn {
@@ -205,6 +234,7 @@ onMounted(fetchNotifications);
 .notifications-list {
   max-height: 400px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .notification-item {
@@ -214,7 +244,7 @@ onMounted(fetchNotifications);
   transition: all 0.2s ease;
   position: relative;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
 }
 
@@ -232,7 +262,8 @@ onMounted(fetchNotifications);
   transform: translateX(2px);
 }
 
-.close-btn, .mark-all-btn {
+.close-btn,
+.mark-all-btn {
   transition: all 0.2s ease;
 }
 
@@ -251,12 +282,14 @@ onMounted(fetchNotifications);
 }
 
 /* Melhorias de acessibilidade */
-.close-btn:focus, .mark-all-btn:focus {
+.close-btn:focus,
+.mark-all-btn:focus {
   outline: 2px solid #0d6efd;
   outline-offset: 2px;
 }
 
-.close-btn, .mark-all-btn {
+.close-btn,
+.mark-all-btn {
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -281,22 +314,21 @@ onMounted(fetchNotifications);
 }
 
 .notification-details {
-  flex: 1;
+  width: 100%;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   gap: 4px;
-  min-width: 0;
 }
 
 .notification-text {
-  font-size: 13px;
+  font-size: 14px;
   color: #212529;
   margin: 0;
   line-height: 1.4;
 }
 
 .notification-time {
-  font-size: 12px;
+  font-size: 11px;
   color: #6c757d;
 }
 

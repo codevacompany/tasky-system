@@ -1,7 +1,8 @@
 <template>
   <Teleport to="body">
-    <div v-if="isOpen" class="modal-backdrop" id="newTicketModal" @click.self="close" >
-      <div class="modal-content">
+    <div v-if="isOpen" class="modal-backdrop" id="newTicketModal" @click.self="close">
+      <LoadingSpinner v-if="isLoading" :size="50" :color="'white'"/>
+      <div v-else class="modal-content">
         <div class="modal-header">
           <slot name="header">
             <h2>{{ title }}</h2>
@@ -20,10 +21,12 @@
 
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue';
+import LoadingSpinner from './LoadingSpinner.vue';
 
 defineProps({
   isOpen: Boolean,
   title: { type: String, default: 'Modal Title' },
+  isLoading: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['close']);

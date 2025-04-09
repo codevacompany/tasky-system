@@ -18,7 +18,6 @@ export const authService = {
       const response = await apiClient.post('/auth/login', data);
 
       const userstore = useUserStore();
-      console.log(response.data);
       userstore.setUser(response.data.user);
       localStorageService.setUser(response.data.user);
       localStorageService.setAccessToken(response.data.token.accessToken);
