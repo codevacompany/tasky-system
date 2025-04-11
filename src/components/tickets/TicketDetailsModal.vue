@@ -434,7 +434,6 @@ const comment = async () => {
     });
     fetchComments();
     newComment.value = '';
-    toast.success('Comentário adicionado com sucesso');
   } catch {
     toast.error('Erro ao adicionar comentário');
   }
