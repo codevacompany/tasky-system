@@ -7,8 +7,8 @@ export const notificationService = {
     return apiClient.post<Notification>('/notifications', data);
   },
 
-  async fetch(): Promise<AxiosResponse<Notification[]>> {
-    return apiClient.get<Notification[]>('/notifications');
+  async count(userId: number) {
+    return apiClient.get(`/notifications/unread/count/${userId}`);
   },
 
   async getBytargetUser(targetUserId: number): Promise<AxiosResponse<Notification[]>> {

@@ -110,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import NewTicketModal from '@/components/layout/NewTicketModal.vue';
 import ProfileModal from '@/components/layout/ProfileModal.vue';
 import NotificationsDropdown from '@/components/layout/NotificationsDropdown.vue';
@@ -126,11 +126,12 @@ const isTicketModalOpen = ref(false);
 const showProfileModal = ref(false);
 const showNotificationsModal = ref(false);
 const unreadCount = ref(0);
+let source: EventSource | null = null;
 
 const fetchUnreadCount = async () => {
   try {
-    const response = await notificationService.fetch();
-    unreadCount.value = response.data.filter((notification) => !notification.read).length;
+    const response = await notificationService.count(user!.id);
+    unreadCount.value = response.data.count;
   } catch {
     toast.error('Erro ao carregar notificações. Tente novamente.');
   }
@@ -166,7 +167,27 @@ const userInitials = computed(() => {
   return '';
 });
 
+function playNotificationSound() {
+  const audio = new Audio('/sounds/notification.mp3');
+  audio.play().catch((err) => {
+    console.error('Failed to play notification sound:', err);
+  });
+}
+
 onMounted(fetchUnreadCount);
+
+onMounted(() => {
+  source = new EventSource(`${import.meta.env.VITE_API_BASE_URL}/notifications/stream/${user?.id}`);
+  source.onmessage = () => {
+    playNotificationSound();
+    fetchUnreadCount();
+    toast.info('Nova notificação recebida.');
+  };
+});
+
+onUnmounted(() => {
+  source?.close();
+});
 </script>
 
 <style scoped>
