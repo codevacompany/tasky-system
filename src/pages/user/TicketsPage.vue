@@ -193,7 +193,7 @@ const handleAcceptTicket = async (ticket: Ticket) => {
 
 const handleVerifyTicket = async (ticketId: number) => {
   try {
-    await ticketService.update(ticketId, { status: TicketStatus.AwaitingVerification });
+    await ticketService.updateStatus(ticketId, { status: TicketStatus.AwaitingVerification });
     toast.success('Ticket enviado para revisão');
     fetchTickets(activeTab.value);
   } catch {
@@ -203,7 +203,7 @@ const handleVerifyTicket = async (ticketId: number) => {
 
 const handleApproveTicket = async (ticket: Ticket) => {
   try {
-    await ticketService.update(ticket.id, { status: TicketStatus.Completed });
+    await ticketService.updateStatus(ticket.id, { status: TicketStatus.Completed });
     toast.success('Ticket aprovado com sucesso!');
     fetchTickets(activeTab.value);
   } catch {
@@ -213,7 +213,7 @@ const handleApproveTicket = async (ticket: Ticket) => {
 
 const handleRequestCorrection = async (ticket: Ticket) => {
   try {
-    await ticketService.update(ticket.id, { status: TicketStatus.InProgress });
+    await ticketService.updateStatus(ticket.id, { status: TicketStatus.InProgress });
     toast.success('Correção solicitada com sucesso!');
     fetchTickets(activeTab.value);
   } catch {
@@ -223,7 +223,7 @@ const handleRequestCorrection = async (ticket: Ticket) => {
 
 const handleRejectTicket = async (ticket: Ticket) => {
   try {
-    await ticketService.update(ticket.id, { status: TicketStatus.Rejected });
+    await ticketService.updateStatus(ticket.id, { status: TicketStatus.Rejected });
     toast.success('Ticket reprovado com sucesso!');
     fetchTickets(activeTab.value);
   } catch {

@@ -48,8 +48,8 @@
               </span>
             </td>
             <td>{{ formatDate(ticket.createdAt) }}</td>
-            <td v-if="ticket.completionDate">{{ formatDate(ticket.completionDate) }}</td>
-            <td :class="calculateDeadline(ticket) === '—' ? '' : getDeadlineClass(ticket.completionDate)">
+            <td>{{ ticket.dueAt ?formatDate(ticket.dueAt) : '—' }}</td>
+            <td :class="calculateDeadline(ticket) === '—' ? '' : getDeadlineClass(ticket.dueAt)">
               {{ calculateDeadline(ticket) }}
               <font-awesome-icon
                 v-if="calculateDeadline(ticket) === 'Atrasado'"
@@ -206,14 +206,14 @@ const closeModal = () => {
 };
 
 const calculateDeadline = (ticket: Ticket) => {
-  if (!ticket.completionDate) return '—';
+  if (!ticket.completedAt) return '—';
 
   // Se o status não for Pendente ou Em Andamento, retorna traço
   if (ticket.status !== TicketStatus.Pending && ticket.status !== TicketStatus.InProgress) {
     return '—';
   }
 
-  const deadline = new Date(ticket.completionDate);
+  const deadline = new Date(ticket.completedAt);
   const today = new Date();
 
   // Reset hours to compare just dates
@@ -272,8 +272,6 @@ const getStatusClass = (status: string) => {
       return 'status-completed';
     case TicketStatus.Rejected:
       return 'status-rejected';
-    case TicketStatus.Overdue:
-      return 'status-overdue';
     default:
       return '';
   }

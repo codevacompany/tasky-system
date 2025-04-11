@@ -62,8 +62,6 @@ const statusColor = (status: TicketStatus) => {
       return 'status-in-progress';
     case TicketStatus.AwaitingVerification:
       return 'status-awaiting-verification';
-    case TicketStatus.Overdue:
-      return 'status-overdue';
     case TicketStatus.Completed:
       return 'status-completed';
     case TicketStatus.Returned:
