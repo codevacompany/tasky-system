@@ -1,4 +1,4 @@
-import type { CreateTicketDto, Ticket, UpdateTicketDto } from "@/models";
+import type { CreateTicketDto, Ticket, UpdateTicketDto, UpdateTicketStatusDto } from "@/models";
 import apiClient from "@/utils/axiosInstance";
 import type { AxiosResponse } from "axios";
 
@@ -31,8 +31,16 @@ export const ticketService = {
     return apiClient.patch(`/tickets/${id}`, data);
   },
 
+  async updateStatus(id: number, data: UpdateTicketStatusDto): Promise<AxiosResponse<Ticket>> {
+    return apiClient.patch(`/tickets/${id}`, data);
+  },
+
   async accept(id: number): Promise<AxiosResponse<Ticket>> {
     return apiClient.post(`/tickets/${id}/accept`);
+  },
+
+  async approve(id: number): Promise<AxiosResponse<Ticket>> {
+    return apiClient.post(`/tickets/${id}/approve`);
   },
 
   async delete(id: number) {

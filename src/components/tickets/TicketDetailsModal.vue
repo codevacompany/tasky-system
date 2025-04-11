@@ -117,7 +117,7 @@
             </div>
             <div class="detail-content">
               <div class="detail-label">Data de Aceitação</div>
-              <div class="detail-value">{{ formatDate(loadedTicket.acceptanceDate) }}</div>
+              <div class="detail-value">{{ formatDate(loadedTicket.acceptedAt) }}</div>
             </div>
           </div>
         </div>
@@ -129,10 +129,10 @@
             </div>
             <div class="detail-content">
               <div class="detail-label">Data de Conclusão</div>
-              <div class="detail-value">{{ formatDate(loadedTicket.completionDate) }}</div>
+              <div class="detail-value">{{ formatDate(loadedTicket.completedAt) }}</div>
             </div>
           </div>
-          <div class="details-item" :class="getDeadlineClass(ticket?.completionDate)">
+          <div class="details-item" :class="getDeadlineClass(ticket?.completedAt)">
             <div class="detail-icon">
               <font-awesome-icon icon="hourglass-end" />
             </div>
@@ -141,7 +141,7 @@
               <div class="detail-value">
                 {{ calculateDeadline(loadedTicket) }}
                 <font-awesome-icon
-                  v-if="isPastDeadline(loadedTicket.completionDate)"
+                  v-if="isPastDeadline(loadedTicket.completedAt)"
                   icon="exclamation-triangle"
                   class="warning-icon"
                 />
@@ -320,9 +320,9 @@ const getStatusClass = (status: string) => {
 };
 
 const calculateDeadline = (ticket: Ticket) => {
-  if (!ticket.completionDate) return '—';
+  if (!ticket.completedAt) return '—';
 
-  const deadline = new Date(ticket.completionDate);
+  const deadline = new Date(ticket.completedAt);
   const today = new Date();
 
   // Reset hours to compare just dates
@@ -382,7 +382,7 @@ const acceptTicket = async (ticketId: number) => {
 
 const sendForReview = async (ticketId: number) => {
   try {
-    await ticketService.update(ticketId, { status: TicketStatus.AwaitingVerification });
+    await ticketService.updateStatus(ticketId, { status: TicketStatus.AwaitingVerification });
     toast.success('Ticket enviado para revisão');
     emit('refresh');
   } catch {
@@ -392,7 +392,7 @@ const sendForReview = async (ticketId: number) => {
 
 const approveTicket = async (ticketId: number) => {
   try {
-    await ticketService.update(ticketId, { status: TicketStatus.Completed });
+    await ticketService.approve(ticketId);
     toast.success('Ticket aprovado com sucesso');
     emit('refresh');
   } catch {
@@ -402,7 +402,7 @@ const approveTicket = async (ticketId: number) => {
 
 const requestCorrection = async (ticketId: number) => {
   try {
-    await ticketService.update(ticketId, { status: TicketStatus.InProgress });
+    await ticketService.updateStatus(ticketId, { status: TicketStatus.InProgress });
     toast.success('Correção solicitada com sucesso');
     emit('refresh');
   } catch {
@@ -412,7 +412,7 @@ const requestCorrection = async (ticketId: number) => {
 
 const rejectTicket = async (ticketId: number) => {
   try {
-    await ticketService.update(ticketId, { status: TicketStatus.Rejected });
+    await ticketService.updateStatus(ticketId, { status: TicketStatus.Rejected });
     toast.success('Ticket reprovado com sucesso');
     emit('refresh');
   } catch {

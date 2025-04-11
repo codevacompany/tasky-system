@@ -13,7 +13,7 @@ export enum TicketStatus {
   Pending = 'Pendente',
   InProgress = 'Em andamento',
   AwaitingVerification = 'Aguardando verificação',
-  Overdue = 'Atrasado',
+  UnderVerification = 'Em verificação',
   Completed = 'Finalizado',
   Returned = 'Devolvido',
   Rejected = 'Reprovado',
@@ -28,11 +28,13 @@ export interface Ticket {
   requester: User;
   targetUser: User;
   status: TicketStatus;
-  completionDate?: string;
-  acceptanceDate?: string;
+  completedAt?: string;
+  acceptedAt?: string;
+  dueAt?: string
   category?: Category;
   comments: TicketComment[];
   disapprovalReason?: string;
+  isPrivate: boolean;
   createdAt: string;
 }
 
@@ -51,10 +53,13 @@ export interface UpdateTicketDto {
   name?: string;
   priority?: TicketPriority;
   description?: string;
-  status?: TicketStatus;
   departmentId?: number;
   requesterId?: User;
   targetUserId?: User;
   categoryId?: number | null;
   completionDate?: string;
+}
+
+export interface UpdateTicketStatusDto {
+  status: TicketStatus;
 }
