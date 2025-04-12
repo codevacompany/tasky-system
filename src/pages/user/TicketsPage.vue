@@ -32,22 +32,23 @@
         <div class="ticket-filters">
           <div class="filter-group">
             <label for="statusFilter">Status:</label>
-            <select id="statusFilter">
-              <option value="all">Todos</option>
-              <option value="Pendente">Pendentes</option>
-              <option value="Em andamento">Em Andamento</option>
-              <option value="Finalizado">Resolvidos</option>
-              <option value="Cancelado">Cancelados</option>
+            <select id="statusFilter" v-model="statusFilter">
+              <option :value="null">Todos</option>
+              <option :value="TicketStatus.Pending">{{ TicketStatus.Pending }}</option>
+              <option :value="TicketStatus.InProgress">{{ TicketStatus.InProgress }}</option>
+              <option :value="TicketStatus.Completed">{{ TicketStatus.Completed }}</option>
+              <option :value="TicketStatus.AwaitingVerification">{{ TicketStatus.AwaitingVerification }}</option>
+              <option :value="TicketStatus.UnderVerification">{{ TicketStatus.UnderVerification }}</option>
             </select>
           </div>
 
           <div class="filter-group">
             <label for="priorityFilter">Prioridade:</label>
-            <select id="priorityFilter">
-              <option value="all">Todas</option>
-              <option value="baixa">Baixa</option>
-              <option value="media">Média</option>
-              <option value="alta">Alta</option>
+            <select id="priorityFilter" v-model="priorityFilter">
+              <option :value="null">Todas</option>
+              <option :value="TicketPriority.Low">{{ TicketPriority.Low }}</option>
+              <option :value="TicketPriority.Medium">{{ TicketPriority.Medium }}</option>
+              <option :value="TicketPriority.High">{{ TicketPriority.High }}</option>
             </select>
           </div>
 
@@ -127,7 +128,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from '@/stores/user';
 import type { Ticket } from '@/models';
-import { TicketStatus } from '@/models';
+import { TicketStatus, TicketPriority } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
 import { toast } from 'vue3-toastify';
 import { debounce } from '@/utils/debounce';
@@ -137,6 +138,8 @@ const activeTab = ref<'recebidos' | 'criados' | 'setor'>('recebidos');
 const tickets = ref<Ticket[]>([]);
 const isLoading = ref(false);
 const searchTerm = ref('');
+const statusFilter = ref<TicketStatus | null>(null);
+const priorityFilter = ref<TicketPriority | null>(null);
 
 const debouncedSearch = debounce(() => {
   fetchTickets(activeTab.value);
@@ -149,13 +152,17 @@ const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor') => {
   try {
     let response;
     const name = searchTerm.value.trim() || undefined;
+    const status = statusFilter.value || undefined;
+    const priority = priorityFilter.value || undefined;
+
+    const filters = { name, status, priority };
 
     if (tab === 'recebidos') {
-      response = await ticketService.getByTargetUser(user!.id, { name });
+      response = await ticketService.getByTargetUser(user!.id, filters);
     } else if (tab === 'criados') {
-      response = await ticketService.getByRequester(user!.id, { name });
+      response = await ticketService.getByRequester(user!.id, filters);
     } else {
-      response = await ticketService.getByDepartment(user!.department.id, { name });
+      response = await ticketService.getByDepartment(user!.department.id, filters);
       response.data = response.data.filter(
         (ticket) =>
           !ticket.isPrivate ||
@@ -258,6 +265,10 @@ onMounted(() => fetchTickets(activeTab.value));
 
 watch(searchTerm, () => {
   debouncedSearch();
+});
+
+watch([statusFilter, priorityFilter], () => {
+  fetchTickets(activeTab.value);
 });
 </script>
 
