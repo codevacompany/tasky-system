@@ -31,7 +31,15 @@
           </tr>
           <tr v-for="ticket in tickets" :key="ticket.id" @click="openTicketDetails(ticket)">
             <td>{{ ticket.id }}</td>
-            <td>{{ ticket.name }}</td>
+            <td>
+              {{ ticket.name }}
+              <font-awesome-icon
+                v-if="ticket.isPrivate"
+                icon="lock"
+                class="private-icon"
+                title="Ticket Privado"
+              />
+            </td>
             <td>{{ ticket.requester.firstName }} {{ ticket.requester.lastName }}</td>
             <td>{{ ticket.department.name }}</td>
             <td>
@@ -83,6 +91,20 @@
                     title="Aguardando Verificação"
                   >
                     <font-awesome-icon icon="hourglass-half" spin />
+                  </div>
+                  <div
+                    v-else-if="ticket.status === TicketStatus.Rejected"
+                    class="action-btn rejected"
+                    title="Reprovado"
+                  >
+                    <font-awesome-icon icon="xmark-circle" />
+                  </div>
+                  <div
+                    v-else-if="ticket.status === TicketStatus.Completed"
+                    class="action-btn completed"
+                    title="Finalizado"
+                  >
+                    <font-awesome-icon icon="check-circle" />
                   </div>
                 </template>
 
@@ -659,5 +681,11 @@ td {
 
 .action-btn.comment:hover {
   background-color: #0284c7;
+}
+
+.private-icon {
+  margin-left: 0.5rem;
+  color: var(--text-light);
+  font-size: 0.9rem;
 }
 </style>

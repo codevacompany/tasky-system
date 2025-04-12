@@ -91,7 +91,7 @@ const login = async () => {
 
 .login-container {
   width: 100%;
-  max-width: 440px;
+  max-width: 380px;
   background-color: #ffffff;
   border-radius: 8px;
   overflow: hidden;
@@ -100,7 +100,7 @@ const login = async () => {
 }
 
 .login-header {
-  height: 220px;
+  height: 160px;
   padding: 0.8rem 0;
   display: flex;
   justify-content: center;
@@ -111,7 +111,7 @@ const login = async () => {
 
 .login-logo {
   height: auto;
-  width: 170px;
+  width: 140px;
   margin: 0 auto;
   padding: 0.5rem 0;
   position: relative;
@@ -130,15 +130,15 @@ const login = async () => {
 }
 
 .login-form-container {
-  padding: 2rem 2rem 0 2rem;
+  padding: 1.5rem 1.5rem 0 1.5rem;
 }
 
 .login-form {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .login-form .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .login-form label {
@@ -241,7 +241,7 @@ const login = async () => {
 }
 
 .login-footer {
-  padding: 0 2rem 2rem;
+  padding: 0 1.5rem 1.5rem;
   text-align: center;
   color: #666666;
   font-size: 0.9rem;

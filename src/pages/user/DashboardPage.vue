@@ -4,14 +4,18 @@
 
     <!-- Primeira linha de estatísticas -->
     <div class="dashboard-stats">
-      <!-- Total de Tickets Recebidos -->
+      <!-- Total de Tickets -->
       <div class="stat-card">
         <div class="stat-icon teal">
           <font-awesome-icon icon="ticket" />
         </div>
         <div class="stat-info">
-          <span class="stat-label">Total de Tickets Recebidos</span>
-          <span class="stat-value">5</span>
+          <span class="stat-label">Total de Tickets</span>
+          <div class="stat-value">{{ totalTickets.total }}</div>
+          <div class="stat-details">
+            <span>Recebidos: {{ totalTickets.recebidos }}</span>
+            <span>Criados: {{ totalTickets.criados }}</span>
+          </div>
         </div>
       </div>
 
@@ -22,7 +26,11 @@
         </div>
         <div class="stat-info">
           <span class="stat-label">Pendentes</span>
-          <span class="stat-value">1</span>
+          <div class="stat-value">{{ ticketsPendentes.total }}</div>
+          <div class="stat-details">
+            <span>Recebidos: {{ ticketsPendentes.recebidos }}</span>
+            <span>Criados: {{ ticketsPendentes.criados }}</span>
+          </div>
         </div>
       </div>
 
@@ -33,7 +41,11 @@
         </div>
         <div class="stat-info">
           <span class="stat-label">Em Andamento</span>
-          <span class="stat-value">4</span>
+          <div class="stat-value">{{ ticketsEmAndamento.total }}</div>
+          <div class="stat-details">
+            <span>Recebidos: {{ ticketsEmAndamento.recebidos }}</span>
+            <span>Criados: {{ ticketsEmAndamento.criados }}</span>
+          </div>
         </div>
       </div>
 
@@ -44,7 +56,11 @@
         </div>
         <div class="stat-info">
           <span class="stat-label">Finalizados</span>
-          <span class="stat-value">0</span>
+          <div class="stat-value">{{ ticketsFinalizados.total }}</div>
+          <div class="stat-details">
+            <span>Recebidos: {{ ticketsFinalizados.recebidos }}</span>
+            <span>Criados: {{ ticketsFinalizados.criados }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -58,7 +74,7 @@
         </div>
         <div class="stat-info">
           <span class="stat-label">Taxa de Resolução</span>
-          <span class="stat-value">0%</span>
+          <span class="stat-value">{{ taxaResolucao }}</span>
         </div>
       </div>
 
@@ -69,7 +85,7 @@
         </div>
         <div class="stat-info">
           <span class="stat-label">Tempo Médio de Aceite</span>
-          <span class="stat-value">13.9h</span>
+          <span class="stat-value">{{ calcularTempoMedioAceite(ticketsRecebidos) }}</span>
         </div>
       </div>
 
@@ -80,7 +96,7 @@
         </div>
         <div class="stat-info">
           <span class="stat-label">Tempo Médio de Conclusão</span>
-          <span class="stat-value">N/A</span>
+          <span class="stat-value">{{ calcularTempoMedioConclusao(ticketsRecebidos) }}</span>
         </div>
       </div>
     </div>
@@ -109,23 +125,89 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import TicketTable from '@/components/tickets/TicketTable.vue';
 import { ticketService } from '@/services/ticketService';
+import { useUserStore } from '@/stores/user';
 import type { Ticket } from '@/models';
 import { toast } from 'vue3-toastify';
+import { TicketStatus } from '@/models';
 
+const userStore = useUserStore();
 const ticketsRecebidos = ref<Ticket[]>([]);
 const ticketsCriados = ref<Ticket[]>([]);
 const isLoading = ref(true);
 
+// Computed properties para estatísticas
+const totalTickets = computed(() => ({
+  total: ticketsRecebidos.value.length + ticketsCriados.value.length,
+  recebidos: ticketsRecebidos.value.length,
+  criados: ticketsCriados.value.length
+}));
+
+const ticketsPendentes = computed(() => ({
+  total: ticketsRecebidos.value.filter(t => t.status === TicketStatus.Pending).length + 
+         ticketsCriados.value.filter(t => t.status === TicketStatus.Pending).length,
+  recebidos: ticketsRecebidos.value.filter(t => t.status === TicketStatus.Pending).length,
+  criados: ticketsCriados.value.filter(t => t.status === TicketStatus.Pending).length
+}));
+
+const ticketsEmAndamento = computed(() => ({
+  total: ticketsRecebidos.value.filter(t => t.status === TicketStatus.InProgress).length + 
+         ticketsCriados.value.filter(t => t.status === TicketStatus.InProgress).length,
+  recebidos: ticketsRecebidos.value.filter(t => t.status === TicketStatus.InProgress).length,
+  criados: ticketsCriados.value.filter(t => t.status === TicketStatus.InProgress).length
+}));
+
+const ticketsFinalizados = computed(() => ({
+  total: ticketsRecebidos.value.filter(t => t.status === TicketStatus.Completed).length + 
+         ticketsCriados.value.filter(t => t.status === TicketStatus.Completed).length,
+  recebidos: ticketsRecebidos.value.filter(t => t.status === TicketStatus.Completed).length,
+  criados: ticketsCriados.value.filter(t => t.status === TicketStatus.Completed).length
+}));
+
+const taxaResolucao = computed(() => {
+  if (totalTickets.value.recebidos === 0) return '0%';
+  return `${Math.round((totalTickets.value.recebidos / totalTickets.value.total) * 100)}%`;
+});
+
+const calcularTempoMedioAceite = (tickets: Ticket[]) => {
+  const ticketsComAceite = tickets.filter(t => t.acceptedAt && t.createdAt);
+  if (ticketsComAceite.length === 0) return 'N/A';
+
+  const tempoTotal = ticketsComAceite.reduce((acc, ticket) => {
+    const aceite = new Date(ticket.acceptedAt!);
+    const criacao = new Date(ticket.createdAt);
+    return acc + (aceite.getTime() - criacao.getTime());
+  }, 0);
+
+  const mediaHoras = (tempoTotal / ticketsComAceite.length) / (1000 * 60 * 60);
+  return `${mediaHoras.toFixed(1)}h`;
+};
+
+const calcularTempoMedioConclusao = (tickets: Ticket[]) => {
+  const ticketsConcluidos = tickets.filter(t => t.completedAt && t.createdAt);
+  if (ticketsConcluidos.length === 0) return 'N/A';
+
+  const tempoTotal = ticketsConcluidos.reduce((acc, ticket) => {
+    const conclusao = new Date(ticket.completedAt!);
+    const criacao = new Date(ticket.createdAt);
+    return acc + (conclusao.getTime() - criacao.getTime());
+  }, 0);
+
+  const mediaDias = (tempoTotal / ticketsConcluidos.length) / (1000 * 60 * 60 * 24);
+  return `${mediaDias.toFixed(1)}d`;
+};
+
 const fetchDashboardData = async () => {
   try {
-    const response = await ticketService.fetch();
-    // Aqui você pode separar os tickets entre recebidos e criados
-    // baseado em alguma propriedade do ticket
-    ticketsRecebidos.value = response.data;
-    ticketsCriados.value = response.data;
+    const [recebidosResponse, criadosResponse] = await Promise.all([
+      ticketService.getByTargetUser(userStore.user!.id),
+      ticketService.getByRequester(userStore.user!.id)
+    ]);
+
+    ticketsRecebidos.value = recebidosResponse.data;
+    ticketsCriados.value = criadosResponse.data;
     isLoading.value = false;
   } catch {
     toast.error('Erro ao carregar dados do dashboard');
@@ -225,6 +307,19 @@ onMounted(fetchDashboardData);
   color: #1a2233;
 }
 
+.stat-details {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.stat-details span {
+  display: flex;
+  align-items: center;
+}
+
 .dashboard-tables {
   margin-top: 24px;
   width: 100%;
@@ -286,5 +381,9 @@ onMounted(fetchDashboardData);
 
 :deep(body.dark-mode) .ver-todos {
   color: #818cf8;
+}
+
+:deep(body.dark-mode) .stat-details {
+  color: #94a3b8;
 }
 </style> 

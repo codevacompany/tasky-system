@@ -3,101 +3,101 @@
     <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
 
     <!-- Cards de Métricas -->
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+    <div class="dashboard-stats">
       <!-- Card Clientes Ativos -->
-      <div class="bg-white p-4 rounded-lg shadow">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-sm text-gray-600">Clientes Ativos</h3>
-            <p class="text-2xl font-bold">{{ metrics.clientesAtivos.total }}</p>
+      <div class="stat-card">
+        <div class="stat-icon blue">
+          <font-awesome-icon icon="users" />
+        </div>
+        <div class="stat-info">
+          <div class="stat-header">
+            <h3>Clientes Ativos</h3>
+            <p>{{ metrics.clientesAtivos.total }}</p>
           </div>
-          <div class="text-blue-500">
-            <i class="fas fa-users text-xl"></i>
+          <div class="stat-details">
+            <span><font-awesome-icon icon="arrow-up" /> {{ metrics.clientesAtivos.crescimento }}% este mês</span>
           </div>
         </div>
-        <p class="text-sm text-green-500 mt-2">
-          <i class="fas fa-arrow-up"></i> {{ metrics.clientesAtivos.crescimento }}% este mês
-        </p>
       </div>
 
       <!-- Card Novos Clientes -->
-      <div class="bg-white p-4 rounded-lg shadow">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-sm text-gray-600">Novos Clientes</h3>
-            <p class="text-2xl font-bold">{{ metrics.novosClientes.total }}</p>
+      <div class="stat-card">
+        <div class="stat-icon green">
+          <font-awesome-icon icon="user-plus" />
+        </div>
+        <div class="stat-info">
+          <div class="stat-header">
+            <h3>Novos Clientes</h3>
+            <p>{{ metrics.novosClientes.total }}</p>
           </div>
-          <div class="text-green-500">
-            <i class="fas fa-user-plus text-xl"></i>
+          <div class="stat-details">
+            <span><font-awesome-icon icon="arrow-up" /> {{ metrics.novosClientes.crescimento }}% vs mês anterior</span>
           </div>
         </div>
-        <p class="text-sm text-green-500 mt-2">
-          <i class="fas fa-arrow-up"></i> {{ metrics.novosClientes.crescimento }}% vs mês anterior
-        </p>
       </div>
 
       <!-- Card Clientes Inativos -->
-      <div class="bg-white p-4 rounded-lg shadow">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-sm text-gray-600">Clientes Inativos</h3>
-            <p class="text-2xl font-bold">{{ metrics.clientesInativos.total }}</p>
+      <div class="stat-card">
+        <div class="stat-icon orange">
+          <font-awesome-icon icon="user-clock" />
+        </div>
+        <div class="stat-info">
+          <div class="stat-header">
+            <h3>Clientes Inativos</h3>
+            <p>{{ metrics.clientesInativos.total }}</p>
           </div>
-          <div class="text-yellow-500">
-            <i class="fas fa-user-clock text-xl"></i>
+          <div class="stat-details">
+            <span class="text-red-500"><font-awesome-icon icon="arrow-up" /> {{ metrics.clientesInativos.crescimento }}% este mês</span>
           </div>
         </div>
-        <p class="text-sm text-red-500 mt-2">
-          <i class="fas fa-arrow-up"></i> {{ metrics.clientesInativos.crescimento }}% este mês
-        </p>
       </div>
 
       <!-- Card Cancelamentos -->
-      <div class="bg-white p-4 rounded-lg shadow">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-sm text-gray-600">Cancelamentos</h3>
-            <p class="text-2xl font-bold">{{ metrics.cancelamentos.total }}</p>
+      <div class="stat-card">
+        <div class="stat-icon red">
+          <font-awesome-icon icon="user-minus" />
+        </div>
+        <div class="stat-info">
+          <div class="stat-header">
+            <h3>Cancelamentos</h3>
+            <p>{{ metrics.cancelamentos.total }}</p>
           </div>
-          <div class="text-red-500">
-            <i class="fas fa-user-minus text-xl"></i>
+          <div class="stat-details">
+            <span class="text-red-500"><font-awesome-icon icon="arrow-up" /> {{ metrics.cancelamentos.crescimento }}% este mês</span>
           </div>
         </div>
-        <p class="text-sm text-red-500 mt-2">
-          <i class="fas fa-arrow-up"></i> {{ metrics.cancelamentos.crescimento }}% este mês
-        </p>
       </div>
 
       <!-- Card Taxa de Churn -->
-      <div class="bg-white p-4 rounded-lg shadow">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-sm text-gray-600">Taxa de Churn</h3>
-            <p class="text-2xl font-bold">{{ metrics.taxaChurn.valor }}%</p>
+      <div class="stat-card">
+        <div class="stat-icon purple">
+          <font-awesome-icon icon="chart-line" />
+        </div>
+        <div class="stat-info">
+          <div class="stat-header">
+            <h3>Taxa de Churn</h3>
+            <p>{{ metrics.taxaChurn.valor }}%</p>
           </div>
-          <div class="text-purple-500">
-            <i class="fas fa-chart-line text-xl"></i>
+          <div class="stat-details">
+            <span><font-awesome-icon icon="arrow-down" /> {{ Math.abs(metrics.taxaChurn.crescimento) }}% vs mês anterior</span>
           </div>
         </div>
-        <p class="text-sm text-green-500 mt-2">
-          <i class="fas fa-arrow-down"></i> {{ Math.abs(metrics.taxaChurn.crescimento) }}% vs mês anterior
-        </p>
       </div>
 
       <!-- Card Receita Mensal -->
-      <div class="bg-white p-4 rounded-lg shadow">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-sm text-gray-600">Receita Mensal</h3>
-            <p class="text-2xl font-bold">R$ {{ formatCurrency(metrics.receitaMensal.valor) }}</p>
+      <div class="stat-card">
+        <div class="stat-icon teal">
+          <font-awesome-icon icon="dollar-sign" />
+        </div>
+        <div class="stat-info">
+          <div class="stat-header">
+            <h3>Receita Mensal</h3>
+            <p>R$ {{ formatCurrency(metrics.receitaMensal.valor) }}</p>
           </div>
-          <div class="text-green-500">
-            <i class="fas fa-dollar-sign text-xl"></i>
+          <div class="stat-details">
+            <span><font-awesome-icon icon="arrow-up" /> {{ metrics.receitaMensal.crescimento }}% vs mês anterior</span>
           </div>
         </div>
-        <p class="text-sm text-green-500 mt-2">
-          <i class="fas fa-arrow-up"></i> {{ metrics.receitaMensal.crescimento }}% vs mês anterior
-        </p>
       </div>
     </div>
 
@@ -245,5 +245,149 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Estilos específicos do componente, se necessário */
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stat-card {
+  text-align: left;
+  padding: 0.75rem;
+  display: flex;
+  gap: 0.75rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  align-items: center;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: white;
+  background-color: #4f46e5;
+}
+
+.stat-icon.blue {
+  background-color: #3b82f6;
+}
+
+.stat-icon.green {
+  background-color: #22c55e;
+}
+
+.stat-icon.orange {
+  background-color: #f97316;
+}
+
+.stat-icon.red {
+  background-color: #ef4444;
+}
+
+.stat-icon.purple {
+  background-color: #9333ea;
+}
+
+.stat-icon.teal {
+  background-color: #0d9488;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding-top: 8px;
+}
+
+.stat-info h3 {
+  margin: 0;
+  font-size: 1.000rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.stat-info p {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1;
+  color: #1a2233;
+}
+
+.stat-details {
+  display: flex;
+  gap: 12px;
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 4px;
+  justify-content: flex-end;
+}
+
+.stat-details span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-details .text-red-500 {
+  color: #ef4444;
+}
+
+/* Dark mode */
+:deep(body.dark-mode) .stat-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+:deep(body.dark-mode) .stat-card:hover {
+  border-color: #475569;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+:deep(body.dark-mode) .stat-details {
+  color: #94a3b8;
+}
+
+:deep(body.dark-mode) .stat-info h3 {
+  color: #94a3b8;
+}
+
+:deep(body.dark-mode) .stat-info p {
+  color: #e2e8f0;
+}
+
+/* Tabelas */
+.table-container {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-top: 1.5rem;
+}
+
+:deep(body.dark-mode) .table-container {
+  background: #1e293b;
+  border-color: #334155;
+}
 </style> 
