@@ -7,8 +7,21 @@
     @close="closeModal"
   >
     <div v-if="loadedTicket" class="content">
-      <div class="ticket-details ticket-details-grid">
-        <div class="details-row">
+      <!-- Assunto em largura total -->
+      <div class="details-item full-width-subject">
+        <div class="detail-icon">
+          <font-awesome-icon icon="file-alt" />
+        </div>
+        <div class="detail-content">
+          <div class="detail-label">Assunto</div>
+          <div class="detail-value">{{ loadedTicket.name }}</div>
+        </div>
+      </div>
+
+      <div class="ticket-details-container">
+        <!-- Coluna da Esquerda - Informações -->
+        <div class="left-column">
+          <!-- ID -->
           <div class="details-item">
             <div class="detail-icon">
               <font-awesome-icon icon="hashtag" />
@@ -18,30 +31,8 @@
               <div class="detail-value">{{ loadedTicket.id }}</div>
             </div>
           </div>
-          <div class="details-item">
-            <div class="detail-icon">
-              <font-awesome-icon icon="folder" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">Categoria</div>
-              <div class="detail-value">{{ loadedTicket.category?.name || '-' }}</div>
-            </div>
-          </div>
-        </div>
 
-        <div class="details-row full-width">
-          <div class="details-item">
-            <div class="detail-icon">
-              <font-awesome-icon icon="file-alt" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">Assunto</div>
-              <div class="detail-value">{{ loadedTicket.name }}</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="details-row">
+          <!-- Prioridade -->
           <div class="details-item">
             <div class="detail-icon">
               <font-awesome-icon icon="exclamation-circle" />
@@ -59,6 +50,8 @@
               </div>
             </div>
           </div>
+
+          <!-- Status -->
           <div class="details-item">
             <div class="detail-icon">
               <font-awesome-icon icon="clock" />
@@ -76,62 +69,45 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="details-row">
+          <!-- Solicitante e Setor -->
           <div class="details-item">
             <div class="detail-icon">
               <font-awesome-icon icon="user-tie" />
             </div>
             <div class="detail-content">
-              <div class="detail-label">Solicitante</div>
+              <div class="detail-label">Solicitante / Setor</div>
               <div class="detail-value">
-                {{ loadedTicket.requester.firstName }} {{ loadedTicket.requester.lastName }}
+                {{ loadedTicket.requester.firstName }} {{ loadedTicket.requester.lastName }} / {{ loadedTicket.department.name }}
               </div>
             </div>
           </div>
-          <div class="details-item">
-            <div class="detail-icon">
-              <font-awesome-icon icon="sitemap" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">Setor</div>
-              <div class="detail-value">{{ loadedTicket.department.name }}</div>
-            </div>
-          </div>
-        </div>
 
-        <div class="details-row">
+          <!-- Responsável -->
           <div class="details-item">
             <div class="detail-icon">
-              <font-awesome-icon icon="calendar-day" />
+              <font-awesome-icon icon="user" />
             </div>
             <div class="detail-content">
-              <div class="detail-label">Data de Criação</div>
-              <div class="detail-value">{{ formatDate(loadedTicket.createdAt) }}</div>
+              <div class="detail-label">Responsável</div>
+              <div class="detail-value">
+                {{ loadedTicket.targetUser.firstName }} {{ loadedTicket.targetUser.lastName }}
+              </div>
             </div>
           </div>
-          <div class="details-item">
-            <div class="detail-icon">
-              <font-awesome-icon icon="lock" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">Privacidade</div>
-              <div class="detail-value">{{ loadedTicket.isPrivate ? 'Privado' : 'Público' }}</div>
-            </div>
-          </div>
-        </div>
 
-        <div class="details-row">
+          <!-- Concluir até -->
           <div class="details-item">
             <div class="detail-icon">
-              <font-awesome-icon icon="user-check" />
+              <font-awesome-icon icon="calendar-check" />
             </div>
             <div class="detail-content">
-              <div class="detail-label">Data de Aceitação</div>
-              <div class="detail-value">{{ formatDate(loadedTicket.acceptedAt) }}</div>
+              <div class="detail-label">Concluir até</div>
+              <div class="detail-value">{{ formatDate(loadedTicket.dueAt) }}</div>
             </div>
           </div>
+
+          <!-- Prazo -->
           <div class="details-item" :class="getDeadlineClass(ticket?.completedAt)">
             <div class="detail-icon">
               <font-awesome-icon icon="hourglass-end" />
@@ -148,68 +124,112 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="details-row">
+          <!-- Privacidade -->
           <div class="details-item">
             <div class="detail-icon">
-              <font-awesome-icon icon="calendar-check" />
+              <font-awesome-icon icon="lock" />
             </div>
             <div class="detail-content">
-              <div class="detail-label">Data de Conclusão</div>
-              <div class="detail-value">{{ formatDate(loadedTicket.completedAt) }}</div>
+              <div class="detail-label">Privacidade</div>
+              <div class="detail-value">{{ loadedTicket.isPrivate ? 'Privado' : 'Público' }}</div>
+            </div>
+          </div>
+
+          <!-- Aceite em -->
+          <div class="details-item">
+            <div class="detail-icon">
+              <font-awesome-icon icon="user-check" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Aceite em</div>
+              <div class="detail-value">{{ formatDate(loadedTicket.acceptedAt) }}</div>
+            </div>
+          </div>
+
+          <!-- Categoria -->
+          <div class="details-item">
+            <div class="detail-icon">
+              <font-awesome-icon icon="folder" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Categoria</div>
+              <div class="detail-value">{{ loadedTicket.category?.name || '-' }}</div>
             </div>
           </div>
         </div>
 
-        <div class="details-row full-width">
-          <div class="details-item">
+        <!-- Coluna da Direita - Descrição -->
+        <div class="right-column">
+          <div class="description-header">
             <div class="detail-icon">
               <font-awesome-icon icon="file-alt" />
             </div>
-            <div class="detail-content">
-              <div class="detail-label">Descrição</div>
-              <div class="detail-value description-text">{{ loadedTicket.description }}</div>
-            </div>
+            <div class="detail-label">Descrição</div>
+          </div>
+          <div class="description-box">
+            <div class="description-text">{{ loadedTicket.description }}</div>
           </div>
         </div>
+      </div>
 
-        <div class="ticket-actions" v-if="isTargetUser">
-          <button
-            v-if="ticket?.status === TicketStatus.Pending"
-            class="action-button accept"
-            @click="acceptTicket(ticket?.id)"
-          >
-            <font-awesome-icon icon="check" /> Aceitar
-          </button>
-          <button
-            v-else-if="ticket?.status === TicketStatus.InProgress"
-            class="action-button verify"
-            @click="sendForReview(loadedTicket.id)"
-          >
-            <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
-          </button>
-          <div
-            v-else-if="loadedTicket.status === TicketStatus.AwaitingVerification"
-            class="status-waiting"
-          >
-            <font-awesome-icon icon="hourglass-half" class="waiting-icon" /> AGUARDANDO VERIFICAÇÃO
+      <div class="ticket-actions" v-if="isTargetUser || (isRequester && loadedTicket.status === TicketStatus.UnderVerification)">
+        <button
+          v-if="isTargetUser && ticket?.status === TicketStatus.Pending"
+          class="action-button accept"
+          @click="acceptTicket(ticket?.id)"
+        >
+          <font-awesome-icon icon="check" /> Aceitar
+        </button>
+        <button
+          v-if="isTargetUser && ticket?.status === TicketStatus.InProgress"
+          class="action-button verify"
+          @click="sendForReview(loadedTicket.id)"
+        >
+          <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
+        </button>
+        <div
+          v-else-if="loadedTicket.status === TicketStatus.UnderVerification"
+          class="verification-actions"
+        >
+          <div v-if="isTargetUser" class="status-waiting">
+            <font-awesome-icon icon="hourglass-half" class="waiting-icon" /> EM VERIFICAÇÃO
           </div>
-          <button
-            v-else-if="loadedTicket.status === TicketStatus.Completed"
-            class="btn btn-success disabled"
-            disabled
-          >
-            <font-awesome-icon icon="check-circle" /> RESOLVIDO
-          </button>
-          <button
-            v-else-if="loadedTicket.status === TicketStatus.Rejected"
-            class="btn btn-danger disabled"
-            disabled
-          >
-            <font-awesome-icon icon="times-circle" /> REPROVADO
-          </button>
+          <template v-if="isRequester">
+            <button
+              class="action-button approve"
+              @click="approveTicket(loadedTicket.id)"
+            >
+              <font-awesome-icon icon="check" /> Aprovar
+            </button>
+            <button
+              class="action-button request-correction"
+              @click="requestCorrection(loadedTicket.id)"
+            >
+              <font-awesome-icon icon="exclamation-circle" /> Solicitar Correção
+            </button>
+            <button
+              class="action-button reject"
+              @click="rejectTicket(loadedTicket.id)"
+            >
+              <font-awesome-icon icon="times" /> Reprovar
+            </button>
+          </template>
         </div>
+        <button
+          v-else-if="loadedTicket.status === TicketStatus.Completed"
+          class="btn btn-success disabled"
+          disabled
+        >
+          <font-awesome-icon icon="check-circle" /> RESOLVIDO
+        </button>
+        <button
+          v-else-if="loadedTicket.status === TicketStatus.Rejected"
+          class="btn btn-danger disabled"
+          disabled
+        >
+          <font-awesome-icon icon="times-circle" /> REPROVADO
+        </button>
       </div>
 
       <div class="comment-section">
@@ -251,6 +271,16 @@
       </div>
     </div>
   </BaseModal>
+
+  <ConfirmationModal
+    v-if="confirmationModal.isOpen"
+    :isOpen="confirmationModal.isOpen"
+    :title="confirmationModal.title"
+    :message="confirmationModal.message"
+    :isCorrection="confirmationModal.isCorrection"
+    @confirm="handleConfirm"
+    @cancel="handleCancel"
+  />
 </template>
 
 <script setup lang="ts">
@@ -262,6 +292,7 @@ import { ticketService } from '@/services/ticketService';
 import { useUserStore } from '@/stores/user';
 import { toast } from 'vue3-toastify';
 import { formatRelativeTime } from '@/utils/date';
+import ConfirmationModal from '../common/ConfirmationModal.vue';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -273,6 +304,14 @@ const userStore = useUserStore();
 const newComment = ref('');
 const comments = ref<TicketComment[]>([]);
 const loadedTicket = ref<Ticket | null>(null);
+
+const confirmationModal = ref({
+  isOpen: false,
+  title: '',
+  message: '',
+  action: null as (() => Promise<void>) | null,
+  isCorrection: false
+});
 
 const closeModal = () => {
   emit('close');
@@ -300,6 +339,8 @@ const getStatusClass = (status: string) => {
     case TicketStatus.InProgress:
       return 'status-em-andamento';
     case TicketStatus.AwaitingVerification:
+      return 'status-aguardando-verificacao';
+    case TicketStatus.UnderVerification:
       return 'status-em-verificacao';
     case TicketStatus.Completed:
       return 'status-resolvido';
@@ -361,54 +402,114 @@ const getDeadlineClass = (date?: string) => {
   return 'deadline-normal';
 };
 
-const acceptTicket = async (ticketId: number) => {
-  try {
-    await ticketService.accept(ticketId);
-    toast.success('Ticket aceito com sucesso');
-    emit('refresh');
-  } catch {
-    toast.error('Erro ao aceitar o ticket');
+const openConfirmationModal = (title: string, message: string, action: () => Promise<void>, isCorrection = false) => {
+  confirmationModal.value = {
+    isOpen: true,
+    title,
+    message,
+    action,
+    isCorrection
+  };
+};
+
+const closeConfirmationModal = () => {
+  confirmationModal.value.isOpen = false;
+  confirmationModal.value.action = null;
+};
+
+const handleConfirm = async (data?: any) => {
+  if (confirmationModal.value.action) {
+    if (data) {
+      console.log('Dados da correção:', data);
+    }
+    await confirmationModal.value.action();
   }
+  closeConfirmationModal();
+};
+
+const handleCancel = () => {
+  closeConfirmationModal();
+};
+
+const acceptTicket = async (ticketId: number) => {
+  openConfirmationModal(
+    'Aceitar Ticket',
+    'Tem certeza que deseja aceitar este ticket?',
+    async () => {
+      try {
+        await ticketService.accept(ticketId);
+        toast.success('Ticket aceito com sucesso');
+        emit('refresh');
+      } catch {
+        toast.error('Erro ao aceitar o ticket');
+      }
+    }
+  );
 };
 
 const sendForReview = async (ticketId: number) => {
-  try {
-    await ticketService.updateStatus(ticketId, { status: TicketStatus.AwaitingVerification });
-    toast.success('Ticket enviado para revisão');
-    emit('refresh');
-  } catch {
-    toast.error('Erro ao enviar o ticket para revisão');
-  }
+  openConfirmationModal(
+    'Enviar para Verificação',
+    'Tem certeza que deseja enviar este ticket para verificação?',
+    async () => {
+      try {
+        await ticketService.updateStatus(ticketId, { status: TicketStatus.AwaitingVerification });
+        toast.success('Ticket enviado para revisão');
+        emit('refresh');
+      } catch {
+        toast.error('Erro ao enviar o ticket para revisão');
+      }
+    }
+  );
 };
 
 const approveTicket = async (ticketId: number) => {
-  try {
-    await ticketService.approve(ticketId);
-    toast.success('Ticket aprovado com sucesso');
-    emit('refresh');
-  } catch {
-    toast.error('Erro ao aprovar o ticket');
-  }
+  openConfirmationModal(
+    'Aprovar Ticket',
+    'Tem certeza que deseja aprovar este ticket?',
+    async () => {
+      try {
+        await ticketService.approve(ticketId);
+        toast.success('Ticket aprovado com sucesso');
+        emit('refresh');
+      } catch {
+        toast.error('Erro ao aprovar o ticket');
+      }
+    }
+  );
 };
 
 const requestCorrection = async (ticketId: number) => {
-  try {
-    await ticketService.updateStatus(ticketId, { status: TicketStatus.InProgress });
-    toast.success('Correção solicitada com sucesso');
-    emit('refresh');
-  } catch {
-    toast.error('Erro ao solicitar correção');
-  }
+  openConfirmationModal(
+    'Solicitar Correção',
+    'Por favor, preencha os detalhes da correção necessária:',
+    async () => {
+      try {
+        await ticketService.updateStatus(ticketId, { status: TicketStatus.InProgress });
+        toast.success('Correção solicitada com sucesso');
+        emit('refresh');
+      } catch {
+        toast.error('Erro ao solicitar correção');
+      }
+    },
+    true // indica que é uma solicitação de correção
+  );
 };
 
 const rejectTicket = async (ticketId: number) => {
-  try {
-    await ticketService.updateStatus(ticketId, { status: TicketStatus.Rejected });
-    toast.success('Ticket reprovado com sucesso');
-    emit('refresh');
-  } catch {
-    toast.error('Erro ao reprovar o ticket');
-  }
+  openConfirmationModal(
+    'Reprovar Ticket',
+    'Tem certeza que deseja reprovar este ticket?',
+    async () => {
+      try {
+        await ticketService.updateStatus(ticketId, { status: TicketStatus.Rejected });
+        toast.success('Ticket reprovado com sucesso');
+        emit('refresh');
+      } catch {
+        toast.error('Erro ao reprovar o ticket');
+      }
+    }
+  );
 };
 
 const comment = async () => {
@@ -465,6 +566,8 @@ const getStatusIcon = (status: string) => {
       return 'spinner';
     case TicketStatus.AwaitingVerification:
       return 'hourglass-half';
+    case TicketStatus.UnderVerification:
+      return 'search';
     case TicketStatus.Completed:
       return 'check-circle';
     case TicketStatus.Rejected:
@@ -511,70 +614,110 @@ watch(
   padding: 1.5rem;
 }
 
-.ticket-details-grid {
+.full-width-subject {
+  margin-bottom: 1rem;
+  background: #f8f9fa;
+  padding: 0.75rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.ticket-details-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: start;
+}
+
+.left-column {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.details-row {
+.right-column {
+  height: 100%;
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.details-row.full-width {
-  flex-direction: column;
+.description-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 0.5rem;
+}
+
+.description-box {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 0.75rem;
+  flex: 1;
+  border: 1px solid #e2e8f0;
+}
+
+.description-text {
+  white-space: pre-wrap;
+  line-height: 1.5;
+  min-height: 200px;
+  font-size: 0.9rem;
+  color: #212529;
 }
 
 .details-item {
-  flex: 1;
   background: #f8f9fa;
-  padding: 1rem;
+  padding: 0.75rem;
   border-radius: 8px;
   display: flex;
-  align-items: flex-start;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.75rem;
   transition: all 0.3s ease;
+  margin-bottom: 0.5rem;
+  border: 1px solid #e2e8f0;
 }
 
 .details-item:hover {
   background: #f0f2f5;
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
 }
 
 .detail-icon {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
   background: #e9ecef;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #495057;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
 }
 
 .detail-content {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .detail-label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #6c757d;
-  margin-bottom: 0.25rem;
+  min-width: 85px;
 }
 
 .detail-value {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #212529;
-  font-weight: normal;
-}
-
-.description-text {
-  white-space: pre-wrap;
-  line-height: 1.5;
-  font-weight: normal;
+  flex: 1;
 }
 
 .priority-label,
@@ -619,10 +762,16 @@ watch(
   border: 1px solid rgba(25, 118, 210, 0.3);
 }
 
-.status-label.status-em-verificacao {
+.status-label.status-aguardando-verificacao {
   background-color: #f3e5f5;
   color: #7b1fa2;
   border: 1px solid rgba(123, 31, 162, 0.3);
+}
+
+.status-label.status-em-verificacao {
+  background-color: #e9d5ff;
+  color: #7e22ce;
+  border: 1px solid rgba(126, 34, 206, 0.3);
 }
 
 .status-label.status-resolvido {
@@ -674,6 +823,30 @@ watch(
 
 .action-button.verify:hover {
   background-color: #0369a1;
+}
+
+.action-button.approve {
+  background-color: #059669;
+}
+
+.action-button.approve:hover {
+  background-color: #047857;
+}
+
+.action-button.request-correction {
+  background-color: #7b1fa2;
+}
+
+.action-button.request-correction:hover {
+  background-color: #6a1b9a;
+}
+
+.action-button.reject {
+  background-color: #dc2626;
+}
+
+.action-button.reject:hover {
+  background-color: #b91c1c;
 }
 
 .status-waiting {
@@ -832,10 +1005,12 @@ watch(
 /* Dark mode */
 :deep(body.dark-mode) .details-item {
   background: #1a2233;
+  border-color: #2d3748;
 }
 
 :deep(body.dark-mode) .details-item:hover {
   background: #1e293b;
+  border-color: #374151;
 }
 
 :deep(body.dark-mode) .detail-icon {
@@ -886,5 +1061,11 @@ watch(
 :deep(body.dark-mode) .comment-disabled {
   background: #1a1a1a;
   color: #ef5350;
+}
+
+.verification-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
 }
 </style>

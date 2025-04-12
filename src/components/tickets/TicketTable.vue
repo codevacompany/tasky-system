@@ -72,7 +72,7 @@
                   <button
                     v-if="ticket.status === TicketStatus.Pending"
                     class="action-btn accept"
-                    @click.stop="$emit('acceptTicket', ticket)"
+                    @click.stop="handleAcceptTicket(ticket)"
                     title="Aceitar"
                   >
                     <font-awesome-icon icon="check" />
@@ -80,7 +80,7 @@
                   <button
                     v-else-if="ticket.status === TicketStatus.InProgress"
                     class="action-btn verify"
-                    @click.stop="$emit('verifyTicket', ticket)"
+                    @click.stop="handleVerifyTicket(ticket)"
                     title="Enviar para Verificação"
                   >
                     <font-awesome-icon icon="arrow-right" />
@@ -138,24 +138,32 @@
                   >
                     <font-awesome-icon icon="check-circle" />
                   </div>
-                  <div v-else-if="ticket.status === TicketStatus.AwaitingVerification" class="verification-actions">
+                  <button
+                    v-else-if="ticket.status === TicketStatus.AwaitingVerification"
+                    class="action-btn verify"
+                    @click.stop="handleStartVerification(ticket)"
+                    title="Verificar"
+                  >
+                    <font-awesome-icon icon="search" />
+                  </button>
+                  <div v-else-if="ticket.status === TicketStatus.UnderVerification && userStore.user?.id === ticket.requester.id" class="verification-actions">
                     <button
                       class="action-btn approve"
-                      @click.stop="$emit('approveTicket', ticket)"
+                      @click.stop="handleApproveTicket(ticket)"
                       title="Aprovar"
                     >
                       <font-awesome-icon icon="check" />
                     </button>
                     <button
                       class="action-btn request-correction"
-                      @click.stop="$emit('requestCorrection', ticket)"
+                      @click.stop="handleRequestCorrection(ticket)"
                       title="Solicitar Correção"
                     >
                       <font-awesome-icon icon="exclamation-circle" />
                     </button>
                     <button
                       class="action-btn reject"
-                      @click.stop="$emit('rejectTicket', ticket)"
+                      @click.stop="handleRejectTicket(ticket)"
                       title="Reprovar"
                     >
                       <font-awesome-icon icon="times" />
@@ -190,6 +198,43 @@
     </div>
 
     <TicketDetailsModal :isOpen="isModalOpen" :ticket="selectedTicket!" @close="closeModal" @refresh="refreshSelectedTicket" />
+    <ConfirmationModal 
+      v-if="confirmationModal.isOpen"
+      :isOpen="confirmationModal.isOpen"
+      :title="confirmationModal.title"
+      :message="confirmationModal.message"
+      :isCorrection="confirmationModal.isCorrection"
+      @confirm="handleConfirm"
+      @cancel="handleCancel"
+    />
+
+    <!-- Modal de Aviso de Verificação -->
+    <BaseModal
+      :isOpen="showVerificationAlert"
+      title="Ação Necessária"
+      @close="showVerificationAlert = false"
+    >
+      <div class="verification-alert">
+        <div class="alert-icon">
+          <font-awesome-icon icon="info-circle" />
+        </div>
+        <p>Para visualizar os detalhes deste ticket, você precisa iniciar a verificação clicando no botão "Verificar".</p>
+        <div class="alert-actions">
+          <button 
+            class="action-btn cancel"
+            @click="showVerificationAlert = false"
+          >
+            Cancelar
+          </button>
+          <button 
+            class="action-btn verify"
+            @click="handleAlertVerification"
+          >
+            Verificar
+          </button>
+        </div>
+      </div>
+    </BaseModal>
   </div>
 </template>
 
@@ -202,16 +247,41 @@ import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { ticketService } from '@/services/ticketService';
 import { formatDate } from '@/utils/date';
+import { toast } from 'vue3-toastify';
+import ConfirmationModal from '../common/ConfirmationModal.vue';
+import { useUserStore } from '@/stores/user';
+import BaseModal from '../common/BaseModal.vue';
 
-defineProps<{
+const props = defineProps<{
   tickets: Ticket[];
   isLoading: boolean;
   tableType?: 'recebidos' | 'criados' | 'setor';
 }>();
+
+const userStore = useUserStore();
 const isModalOpen = ref(false);
 const selectedTicket = ref<Ticket | null>(null);
+const showVerificationAlert = ref(false);
+const pendingVerificationTicket = ref<Ticket | null>(null);
+
+const confirmationModal = ref({
+  isOpen: false,
+  title: '',
+  message: '',
+  action: null as (() => Promise<void>) | null,
+  isCorrection: false
+});
 
 const openTicketDetails = (ticket: Ticket) => {
+  // Se for o solicitante e o ticket estiver aguardando verificação
+  if (props.tableType === 'criados' && 
+      ticket.status === TicketStatus.AwaitingVerification && 
+      userStore.user?.id === ticket.requester.id) {
+    pendingVerificationTicket.value = ticket;
+    showVerificationAlert.value = true;
+    return;
+  }
+
   selectedTicket.value = ticket;
   isModalOpen.value = true;
 };
@@ -290,6 +360,8 @@ const getStatusClass = (status: string) => {
       return 'status-in-progress';
     case TicketStatus.AwaitingVerification:
       return 'status-awaiting-verification';
+    case TicketStatus.UnderVerification:
+      return 'status-under-verification';
     case TicketStatus.Completed:
       return 'status-completed';
     case TicketStatus.Rejected:
@@ -309,6 +381,140 @@ const getPriorityBars = (priority: TicketPriority) => {
       return '|||';
     default:
       return '';
+  }
+};
+
+const openConfirmationModal = (title: string, message: string, action: () => Promise<void>, isCorrection = false) => {
+  confirmationModal.value = {
+    isOpen: true,
+    title,
+    message,
+    action,
+    isCorrection
+  };
+};
+
+const closeConfirmationModal = () => {
+  confirmationModal.value.isOpen = false;
+  confirmationModal.value.action = null;
+};
+
+const handleConfirm = async (data?: any) => {
+  if (confirmationModal.value.action) {
+    if (data) {
+      console.log('Dados da correção:', data);
+    }
+    await confirmationModal.value.action();
+  }
+  closeConfirmationModal();
+};
+
+const handleCancel = () => {
+  closeConfirmationModal();
+};
+
+const handleAcceptTicket = async (ticket: Ticket) => {
+  openConfirmationModal(
+    'Aceitar Ticket',
+    'Tem certeza que deseja aceitar este ticket?',
+    async () => {
+      try {
+        await ticketService.accept(ticket.id);
+        toast.success('Ticket aceito com sucesso');
+        emit('refresh');
+      } catch {
+        toast.error('Erro ao aceitar o ticket');
+      }
+    }
+  );
+};
+
+const handleVerifyTicket = async (ticket: Ticket) => {
+  openConfirmationModal(
+    'Enviar para Verificação',
+    'Tem certeza que deseja enviar este ticket para verificação?',
+    async () => {
+      try {
+        await ticketService.updateStatus(ticket.id, { status: TicketStatus.AwaitingVerification });
+        toast.success('Ticket enviado para revisão');
+        emit('refresh');
+      } catch {
+        toast.error('Erro ao enviar o ticket para revisão');
+      }
+    }
+  );
+};
+
+const handleApproveTicket = async (ticket: Ticket) => {
+  openConfirmationModal(
+    'Aprovar Ticket',
+    'Tem certeza que deseja aprovar este ticket?',
+    async () => {
+      try {
+        await ticketService.approve(ticket.id);
+        toast.success('Ticket aprovado com sucesso');
+        emit('refresh');
+      } catch {
+        toast.error('Erro ao aprovar o ticket');
+      }
+    }
+  );
+};
+
+const handleRequestCorrection = async (ticket: Ticket) => {
+  openConfirmationModal(
+    'Solicitar Correção',
+    'Por favor, preencha os detalhes da correção necessária:',
+    async () => {
+      try {
+        await ticketService.updateStatus(ticket.id, { status: TicketStatus.InProgress });
+        toast.success('Correção solicitada com sucesso');
+        emit('refresh');
+      } catch {
+        toast.error('Erro ao solicitar correção');
+      }
+    },
+    true // indica que é uma solicitação de correção
+  );
+};
+
+const handleRejectTicket = async (ticket: Ticket) => {
+  openConfirmationModal(
+    'Reprovar Ticket',
+    'Tem certeza que deseja reprovar este ticket?',
+    async () => {
+      try {
+        await ticketService.updateStatus(ticket.id, { status: TicketStatus.Rejected });
+        toast.success('Ticket reprovado com sucesso');
+        emit('refresh');
+      } catch {
+        toast.error('Erro ao reprovar o ticket');
+      }
+    }
+  );
+};
+
+const handleStartVerification = async (ticket: Ticket) => {
+  try {
+    // Atualiza o status
+    await ticketService.updateStatus(ticket.id, { status: TicketStatus.UnderVerification });
+    
+    // Abre o modal com o ticket
+    selectedTicket.value = ticket;
+    isModalOpen.value = true;
+    
+    // Atualiza a tabela
+    emit('refresh');
+  } catch {
+    toast.error('Erro ao iniciar verificação');
+  }
+};
+
+const handleAlertVerification = () => {
+  if (pendingVerificationTicket.value) {
+    handleStartVerification(pendingVerificationTicket.value);
+    showVerificationAlert.value = false;
+    pendingVerificationTicket.value = null;
   }
 };
 </script>
@@ -422,7 +628,8 @@ const getPriorityBars = (priority: TicketPriority) => {
   border: 1px solid rgba(25, 118, 210, 0.3);
 }
 
-.status-badge.status-awaiting-verification {
+.status-badge.status-awaiting-verification,
+.status-badge.status-under-verification {
   background-color: #f3e5f5;
   color: #7b1fa2;
   border: 1px solid rgba(123, 31, 162, 0.3);
@@ -580,11 +787,11 @@ td {
 }
 
 .action-btn.verify {
-  background-color: #0284c7;
+  background-color: #7e22ce;
 }
 
 .action-btn.verify:hover {
-  background-color: #0369a1;
+  background-color: #6b21a8;
 }
 
 .action-btn.waiting {
@@ -687,5 +894,69 @@ td {
   margin-left: 0.5rem;
   color: var(--text-light);
   font-size: 0.9rem;
+}
+
+.verification-alert {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.alert-icon {
+  font-size: 2rem;
+  color: #7e22ce;
+  margin-bottom: 1rem;
+}
+
+.verification-alert p {
+  color: #4a5568;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.alert-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.alert-actions .action-btn {
+  padding: 0.75rem 2rem;
+  min-width: 120px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  width: auto;
+  height: auto;
+}
+
+.alert-actions .action-btn.cancel {
+  background-color: #64748b;
+  color: white;
+}
+
+.alert-actions .action-btn.cancel:hover {
+  background-color: #475569;
+}
+
+.alert-actions .action-btn.verify {
+  background-color: #7e22ce;
+  color: white;
+}
+
+.alert-actions .action-btn.verify:hover {
+  background-color: #6b21a8;
+}
+
+/* Dark mode */
+:deep(body.dark-mode) .verification-alert p {
+  color: #e2e8f0;
+}
+
+:deep(body.dark-mode) .alert-icon {
+  color: #9333ea;
 }
 </style>
