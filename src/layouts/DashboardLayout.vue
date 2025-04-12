@@ -65,7 +65,7 @@
 
           <div class="notification-icon" @click="toggleNotificationsModal">
             <font-awesome-icon :icon="['far', 'bell']" />
-            <span v-if="unreadCount > 0" class="notification-badge">{{ unreadCount }}</span>
+            <span v-if="unreadCount && unreadCount > 0" class="notification-badge">{{ unreadCount }}</span>
           </div>
 
           <!-- Dark Mode Toggle Button -->
@@ -125,12 +125,16 @@ const route = useRoute();
 const isTicketModalOpen = ref(false);
 const showProfileModal = ref(false);
 const showNotificationsModal = ref(false);
-const unreadCount = ref(0);
-let source: EventSource | null = null;
+const unreadCount = ref<number | undefined>(undefined);
+let intervalId: number | null = null;
+// let source: EventSource | null = null;
 
 const fetchUnreadCount = async () => {
   try {
     const response = await notificationService.count(user!.id);
+    if (unreadCount.value !== undefined && response.data.count > unreadCount.value) {
+      playNotificationSound()
+    }
     unreadCount.value = response.data.count;
   } catch {
     toast.error('Erro ao carregar notificações. Tente novamente.');
@@ -177,16 +181,25 @@ function playNotificationSound() {
 onMounted(fetchUnreadCount);
 
 onMounted(() => {
-  source = new EventSource(`${import.meta.env.VITE_API_BASE_URL}/notifications/stream/${user?.id}`);
-  source.onmessage = () => {
-    playNotificationSound();
+  //let's use a polling strategy for now
+  intervalId = setInterval(() => {
     fetchUnreadCount();
-    toast.info('Nova notificação recebida.');
-  };
+  }, 60000);
+
+  // source = new EventSource(`${import.meta.env.VITE_API_BASE_URL}/notifications/stream/${user?.id}`);
+  // source.onmessage = () => {
+  //   playNotificationSound();
+  //   fetchUnreadCount();
+  //   toast.info('Nova notificação recebida.');
+  // };
 });
 
 onUnmounted(() => {
-  source?.close();
+  if (intervalId) {
+    clearInterval(intervalId);
+  }
+
+  // source?.close();
 });
 </script>
 

@@ -32,7 +32,7 @@ export const ticketService = {
   },
 
   async updateStatus(id: number, data: UpdateTicketStatusDto): Promise<AxiosResponse<Ticket>> {
-    return apiClient.patch(`/tickets/${id}`, data);
+    return apiClient.patch(`/tickets/${id}/status`, data);
   },
 
   async accept(id: number): Promise<AxiosResponse<Ticket>> {

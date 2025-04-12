@@ -3,6 +3,7 @@ import type { User } from "./user";
 export enum NotificationType {
   Open = 'Abertura',
   Comment = 'Comentário',
+  StatusUpdated = 'Atualização de Status',
 }
 
 export interface Notification {
