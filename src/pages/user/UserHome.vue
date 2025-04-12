@@ -160,21 +160,21 @@ const totalTickets = computed(() => ({
 }));
 
 const ticketsPendentes = computed(() => ({
-  total: latestReceivedTickets.value.filter(t => t.status === TicketStatus.Pending).length + 
+  total: latestReceivedTickets.value.filter(t => t.status === TicketStatus.Pending).length +
          latestCreatedTickets.value.filter(t => t.status === TicketStatus.Pending).length,
   recebidos: latestReceivedTickets.value.filter(t => t.status === TicketStatus.Pending).length,
   criados: latestCreatedTickets.value.filter(t => t.status === TicketStatus.Pending).length
 }));
 
 const ticketsEmAndamento = computed(() => ({
-  total: latestReceivedTickets.value.filter(t => t.status === TicketStatus.InProgress).length + 
+  total: latestReceivedTickets.value.filter(t => t.status === TicketStatus.InProgress).length +
          latestCreatedTickets.value.filter(t => t.status === TicketStatus.InProgress).length,
   recebidos: latestReceivedTickets.value.filter(t => t.status === TicketStatus.InProgress).length,
   criados: latestCreatedTickets.value.filter(t => t.status === TicketStatus.InProgress).length
 }));
 
 const ticketsFinalizados = computed(() => ({
-  total: latestReceivedTickets.value.filter(t => t.status === TicketStatus.Completed).length + 
+  total: latestReceivedTickets.value.filter(t => t.status === TicketStatus.Completed).length +
          latestCreatedTickets.value.filter(t => t.status === TicketStatus.Completed).length,
   recebidos: latestReceivedTickets.value.filter(t => t.status === TicketStatus.Completed).length,
   criados: latestCreatedTickets.value.filter(t => t.status === TicketStatus.Completed).length
@@ -194,7 +194,7 @@ const loadTickets = async () => {
     latestReceivedTickets.value = recebidosResponse.data
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 5);
-    
+
     latestCreatedTickets.value = criadosResponse.data
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 5);
@@ -202,7 +202,7 @@ const loadTickets = async () => {
     // Calculate resolution rate
     const resolvedCount = ticketsFinalizados.value.total;
     resolutionRate.value =
-      totalTickets.value > 0 ? Math.round((resolvedCount / totalTickets.value) * 100) : 0;
+      totalTickets.value.total > 0 ? Math.round((resolvedCount / totalTickets.value.total) * 100) : 0;
   } catch {
     toast.error('Erro ao carregar dados do dashboard');
   } finally {

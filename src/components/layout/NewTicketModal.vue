@@ -79,26 +79,26 @@
                 <input
                   type="radio"
                   v-model="formData.priority"
-                  value="Baixa"
+                  :value="TicketPriority.Low"
                   name="priority"
                   required
                 />
-                Baixa
+                {{ TicketPriority.Low }}
               </label>
               <label class="radio-label">
-                <input type="radio" v-model="formData.priority" value="Média" name="priority" />
-                Média
+                <input type="radio" v-model="formData.priority" :value="TicketPriority.Medium" name="priority" />
+                {{ TicketPriority.Medium }}
               </label>
               <label class="radio-label">
-                <input type="radio" v-model="formData.priority" value="Alta" name="priority" />
-                Alta
+                <input type="radio" v-model="formData.priority" :value="TicketPriority.High" name="priority" />
+                {{ TicketPriority.High }}
               </label>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="completionDate">Concluir até:</label>
-            <input type="datetime-local" id="completionDate" v-model="formData.completionDate" />
+            <label for="dueAt">Concluir até:</label>
+            <input type="datetime-local" id="dueAt" v-model="formData.dueAt" />
           </div>
 
           <div class="form-group full-width">
@@ -148,7 +148,7 @@ const formData = ref({
   description: '',
   departmentId: null as number | null,
   targetUserId: null as number | null,
-  completionDate: '',
+  dueAt: '',
   requesterId: useUserStore().user?.id || null,
   categoryId: null as number | null,
   isPrivate: false,
@@ -196,7 +196,7 @@ const resetForm = () => {
     description: '',
     departmentId: null,
     targetUserId: null,
-    completionDate: '',
+    dueAt: '',
     requesterId: useUserStore().user!.id,
     categoryId: null,
     isPrivate: false,

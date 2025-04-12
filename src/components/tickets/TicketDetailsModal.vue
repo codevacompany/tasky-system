@@ -141,7 +141,7 @@
               <div class="detail-value">
                 {{ calculateDeadline(loadedTicket) }}
                 <font-awesome-icon
-                  v-if="isPastDeadline(loadedTicket.completedAt)"
+                  v-if="isPastDeadline(loadedTicket.dueAt)"
                   icon="exclamation-triangle"
                   class="warning-icon"
                 />
@@ -158,22 +158,6 @@
             <div class="detail-content">
               <div class="detail-label">Data de Conclusão</div>
               <div class="detail-value">{{ formatDate(loadedTicket.completedAt) }}</div>
-            </div>
-          </div>
-          <div class="details-item" :class="getDeadlineClass(ticket?.completedAt)">
-            <div class="detail-icon">
-              <font-awesome-icon icon="hourglass-end" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">Prazo</div>
-              <div class="detail-value">
-                {{ calculateDeadline(loadedTicket) }}
-                <font-awesome-icon
-                  v-if="isPastDeadline(loadedTicket.completedAt)"
-                  icon="exclamation-triangle"
-                  class="warning-icon"
-                />
-              </div>
             </div>
           </div>
         </div>
