@@ -113,11 +113,39 @@
           </div>
           <div class="details-item">
             <div class="detail-icon">
+              <font-awesome-icon icon="lock" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Privacidade</div>
+              <div class="detail-value">{{ loadedTicket.isPrivate ? 'Privado' : 'Público' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="details-row">
+          <div class="details-item">
+            <div class="detail-icon">
               <font-awesome-icon icon="user-check" />
             </div>
             <div class="detail-content">
               <div class="detail-label">Data de Aceitação</div>
               <div class="detail-value">{{ formatDate(loadedTicket.acceptedAt) }}</div>
+            </div>
+          </div>
+          <div class="details-item" :class="getDeadlineClass(ticket?.completedAt)">
+            <div class="detail-icon">
+              <font-awesome-icon icon="hourglass-end" />
+            </div>
+            <div class="detail-content">
+              <div class="detail-label">Prazo</div>
+              <div class="detail-value">
+                {{ calculateDeadline(loadedTicket) }}
+                <font-awesome-icon
+                  v-if="isPastDeadline(loadedTicket.completedAt)"
+                  icon="exclamation-triangle"
+                  class="warning-icon"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -162,66 +190,41 @@
           </div>
         </div>
 
-        <div class="ticket-actions" v-if="showActionButton">
+        <div class="ticket-actions" v-if="isTargetUser">
           <button
-            v-if="ticket?.status === TicketStatus.Pending && isTargetUser"
+            v-if="ticket?.status === TicketStatus.Pending"
             class="action-button accept"
             @click="acceptTicket(ticket?.id)"
           >
             <font-awesome-icon icon="check" /> Aceitar
           </button>
           <button
-            v-else-if="ticket?.status === TicketStatus.InProgress && isTargetUser"
+            v-else-if="ticket?.status === TicketStatus.InProgress"
             class="action-button verify"
             @click="sendForReview(loadedTicket.id)"
           >
             <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
           </button>
           <div
-            v-else-if="loadedTicket.status === TicketStatus.AwaitingVerification && isTargetUser"
+            v-else-if="loadedTicket.status === TicketStatus.AwaitingVerification"
             class="status-waiting"
           >
             <font-awesome-icon icon="hourglass-half" class="waiting-icon" /> AGUARDANDO VERIFICAÇÃO
           </div>
           <button
-            v-else-if="loadedTicket.status === TicketStatus.Completed && isTargetUser"
+            v-else-if="loadedTicket.status === TicketStatus.Completed"
             class="btn btn-success disabled"
             disabled
           >
             <font-awesome-icon icon="check-circle" /> RESOLVIDO
           </button>
           <button
-            v-else-if="loadedTicket.status === TicketStatus.Rejected && isTargetUser"
+            v-else-if="loadedTicket.status === TicketStatus.Rejected"
             class="btn btn-danger disabled"
             disabled
           >
             <font-awesome-icon icon="times-circle" /> REPROVADO
           </button>
-          <button
-            v-else-if="loadedTicket.status === TicketStatus.Pending && isRequester"
-            class="btn btn-primary disabled"
-            disabled
-          >
-            <font-awesome-icon icon="clock" /> PENDENTE
-          </button>
-          <button
-            v-else-if="loadedTicket.status === TicketStatus.InProgress && isRequester"
-            class="btn btn-primary disabled"
-            disabled
-          >
-            <font-awesome-icon icon="spinner" /> EM ANDAMENTO
-          </button>
-          <div v-else-if="loadedTicket.status === TicketStatus.AwaitingVerification && isRequester">
-            <button class="btn btn-success" @click="approveTicket(loadedTicket.id)">
-              <font-awesome-icon icon="check" /> Aprovar
-            </button>
-            <button class="btn btn-warning" @click="requestCorrection(loadedTicket.id)">
-              <font-awesome-icon icon="edit" /> Solicitar Correção
-            </button>
-            <button class="btn btn-danger" @click="rejectTicket(loadedTicket.id)">
-              <font-awesome-icon icon="times" /> Reprovar
-            </button>
-          </div>
         </div>
       </div>
 
@@ -230,7 +233,7 @@
           <font-awesome-icon icon="comments" />
           <h3>Comentários</h3>
         </div>
-        <div class="comment-input">
+        <div v-if="loadedTicket?.status !== TicketStatus.Rejected" class="comment-input">
           <textarea
             v-model="newComment"
             placeholder="Digite seu comentário aqui..."
@@ -240,21 +243,25 @@
             <font-awesome-icon icon="paper-plane" /> Enviar
           </button>
         </div>
-      </div>
+        <div v-else class="comment-disabled">
+          <font-awesome-icon icon="ban" />
+          <p>Comentários desabilitados para tickets reprovados</p>
+        </div>
 
-      <div class="comments-list">
-        <div v-for="comment in comments" :key="comment.id" class="comment-item">
-          <div class="comment-avatar">
-            <font-awesome-icon icon="user-circle" />
-          </div>
-          <div class="comment-content">
-            <div class="comment-header">
-              <span class="comment-author"
-                >{{ comment.user.firstName }} {{ comment.user.lastName }}</span
-              >
-              <span class="comment-time">{{ formatRelativeTime(comment.createdAt) }}</span>
+        <div class="comments-list">
+          <div v-for="comment in comments" :key="comment.id" class="comment-item">
+            <div class="comment-avatar">
+              <font-awesome-icon icon="user-circle" />
             </div>
-            <div class="comment-text">{{ comment.content }}</div>
+            <div class="comment-content">
+              <div class="comment-header">
+                <span class="comment-author"
+                  >{{ comment.user.firstName }} {{ comment.user.lastName }}</span
+                >
+                <span class="comment-time">{{ formatRelativeTime(comment.createdAt) }}</span>
+              </div>
+              <div class="comment-text">{{ comment.content }}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -452,18 +459,6 @@ const fetchComments = async () => {
 
 const isTargetUser = computed(() => userStore.user?.id === loadedTicket.value?.targetUser.id);
 const isRequester = computed(() => userStore.user?.id === loadedTicket.value?.requester.id);
-
-const showActionButton = computed(() => {
-  if (isTargetUser.value) {
-    return true;
-  } else if (isRequester.value) {
-    return (
-      loadedTicket.value?.status !== TicketStatus.Completed &&
-      loadedTicket.value?.status !== TicketStatus.Rejected
-    );
-  }
-  return false;
-});
 
 const getPriorityIcon = (priority: string) => {
   switch (priority) {
@@ -830,6 +825,26 @@ watch(
   margin-left: 0.5rem;
 }
 
+.comment-disabled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: #ffebee;
+  border-radius: 8px;
+  color: #c62828;
+}
+
+.comment-disabled svg {
+  font-size: 1.2rem;
+}
+
+.comment-disabled p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
 /* Dark mode */
 :deep(body.dark-mode) .details-item {
   background: #1a2233;
@@ -882,5 +897,10 @@ watch(
 :deep(body.dark-mode) .update-input:focus {
   border-color: #818cf8;
   box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.1);
+}
+
+:deep(body.dark-mode) .comment-disabled {
+  background: #1a1a1a;
+  color: #ef5350;
 }
 </style>

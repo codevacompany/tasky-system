@@ -47,6 +47,7 @@ export interface CreateTicketDto {
   targetUserId: number | null;
   categoryId: number | null;
   completionDate?: string;
+  isPrivate: boolean;
 }
 
 export interface UpdateTicketDto {

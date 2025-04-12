@@ -140,6 +140,12 @@ const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor') => {
       response = await ticketService.getByRequester(user!.id);
     } else {
       response = await ticketService.getByDepartment(user!.department.id);
+      response.data = response.data.filter(
+        (ticket) => 
+          !ticket.isPrivate || 
+          ticket.requester.id === user!.id || 
+          ticket.targetUser.id === user!.id
+      );
     }
     tickets.value = response.data;
   } catch {

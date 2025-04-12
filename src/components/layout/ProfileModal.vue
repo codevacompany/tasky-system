@@ -9,9 +9,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h2>Meu Perfil</h2>
-          <button class="close-btn" @click="closeModal">
-            <font-awesome-icon icon="times" size="lg" />
-          </button>
+          <button class="close-btn" @click="closeModal">×</button>
         </div>
         <div class="modal-body">
           <div class="profile-header">
@@ -20,12 +18,16 @@
             </div>
             <div class="profile-info">
               <h3 class="user-name">{{ user?.firstName }} {{ user?.lastName }}</h3>
-              <p class="user-info">{{ user?.department.name }}</p>
               <p class="user-info">{{ user?.email }}</p>
+              <p class="user-info">{{ user?.department.name }}</p>
             </div>
           </div>
 
-          <div class="form-actions right-aligned">
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" @click="openSupport">
+              <font-awesome-icon icon="question-circle" />
+              Ajuda
+            </button>
             <button type="button" id="logoutBtn" class="btn btn-danger" @click="logout">
               <font-awesome-icon icon="sign-out-alt" />
               Sair
@@ -64,6 +66,11 @@ const logout = () => {
   router.push('/login');
 };
 
+const openSupport = () => {
+  // Implementar lógica de suporte/ajuda
+  console.log('Abrir suporte');
+};
+
 const userInitials = computed(() => {
   if (user?.firstName && user?.lastName) {
     return user.firstName.charAt(0) + user.lastName.charAt(0);
@@ -88,7 +95,7 @@ const userInitials = computed(() => {
   position: fixed;
   top: calc(var(--header-height) + 4px);
   right: 20px;
-  width: 360px;
+  width: 280px;
   background-color: var(--card-bg);
   border-radius: var(--radius);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -106,7 +113,7 @@ const userInitials = computed(() => {
 }
 
 .modal-header {
-  padding: 1rem;
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border-color);
   background-color: transparent;
   color: var(--text-color);
@@ -117,7 +124,7 @@ const userInitials = computed(() => {
 
 .modal-header h2 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 600;
 }
 
@@ -128,6 +135,8 @@ const userInitials = computed(() => {
   border: none;
   cursor: pointer;
   padding: 5px;
+  font-size: 1.5rem;
+  line-height: 1;
 }
 
 .profile-dropdown .modal-header .close-btn:hover {
@@ -135,9 +144,7 @@ const userInitials = computed(() => {
 }
 
 .profile-dropdown .modal-body {
-  padding: 1.5rem;
-  max-height: 80vh;
-  overflow-y: auto;
+  padding: 1rem;
 }
 
 /* Modo escuro para o dropdown de perfil */
@@ -154,22 +161,24 @@ body.dark-mode .profile-dropdown .modal-header {
 .profile-header {
   display: flex;
   align-items: center;
-  margin-bottom: 1.5rem;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .profile-avatar {
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   overflow: hidden;
-  margin-right: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--primary-color);
+  background-color: #8b8b8b;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 0;
 }
 
 .profile-avatar img {
@@ -178,24 +187,51 @@ body.dark-mode .profile-dropdown .modal-header {
   object-fit: cover;
 }
 
-.profile-info h3 {
-  margin: 0 0 5px 0;
-  font-size: 1.1rem;
+.profile-info {
+  flex: 1;
+  text-align: left;
 }
 
-.user-info {
-  font-size: 0.9rem;
+.profile-info h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.profile-info .user-info {
+  margin: 2px 0 0 0;
+  font-size: 0.8rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .btn {
-  padding: 0.6rem 1.5rem;
-  border-radius: var(--radius);
-  font-size: 0.9rem;
-  cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.875rem;
   border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
 }
 
 .btn-danger {
@@ -205,9 +241,5 @@ body.dark-mode .profile-dropdown .modal-header {
 
 .btn-danger:hover {
   background-color: #c82333;
-}
-
-.right-aligned {
-  text-align: right;
 }
 </style>

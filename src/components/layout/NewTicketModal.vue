@@ -14,25 +14,25 @@
           </div>
 
           <div class="form-group">
-            <label>Prioridade: <span class="required">*</span></label>
+            <label>É privado?</label>
             <div class="radio-group">
               <label class="radio-label">
                 <input
                   type="radio"
-                  v-model="formData.priority"
-                  value="Baixa"
-                  name="priority"
-                  required
+                  v-model="formData.isPrivate"
+                  :value="true"
+                  name="isPrivate"
                 />
-                Baixa
+                Sim
               </label>
               <label class="radio-label">
-                <input type="radio" v-model="formData.priority" value="Média" name="priority" />
-                Média
-              </label>
-              <label class="radio-label">
-                <input type="radio" v-model="formData.priority" value="Alta" name="priority" />
-                Alta
+                <input
+                  type="radio"
+                  v-model="formData.isPrivate"
+                  :value="false"
+                  name="isPrivate"
+                />
+                Não
               </label>
             </div>
           </div>
@@ -72,7 +72,31 @@
             </select>
           </div>
 
-          <div class="form-group span-2">
+          <div class="form-group">
+            <label>Prioridade: <span class="required">*</span></label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  v-model="formData.priority"
+                  value="Baixa"
+                  name="priority"
+                  required
+                />
+                Baixa
+              </label>
+              <label class="radio-label">
+                <input type="radio" v-model="formData.priority" value="Média" name="priority" />
+                Média
+              </label>
+              <label class="radio-label">
+                <input type="radio" v-model="formData.priority" value="Alta" name="priority" />
+                Alta
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
             <label for="completionDate">Concluir até:</label>
             <input type="datetime-local" id="completionDate" v-model="formData.completionDate" />
           </div>
@@ -127,6 +151,7 @@ const formData = ref({
   completionDate: '',
   requesterId: useUserStore().user?.id || null,
   categoryId: null as number | null,
+  isPrivate: false,
 });
 
 // Carregar departamentos
@@ -174,6 +199,7 @@ const resetForm = () => {
     completionDate: '',
     requesterId: useUserStore().user!.id,
     categoryId: null,
+    isPrivate: false,
   };
   selectedDepartment.value = null;
   selectedUser.value = null;
@@ -329,6 +355,30 @@ const handleSubmit = async () => {
 
 .form-group:has([type='datetime-local']) {
   grid-column: span 1;
+}
+
+/* Ajustes específicos para o novo layout */
+.form-grid > .form-group:nth-child(1) { /* Assunto */
+  grid-column: span 2;
+}
+
+.form-grid > .form-group:nth-child(2) { /* É privado */
+  grid-column: span 1;
+}
+
+.form-grid > .form-group:nth-child(3), /* Setor Destino */
+.form-grid > .form-group:nth-child(4), /* Usuário Destino */
+.form-grid > .form-group:nth-child(5) { /* Categoria */
+  grid-column: span 1;
+}
+
+.form-grid > .form-group:nth-child(6), /* Prioridade */
+.form-grid > .form-group:nth-child(7) { /* Concluir até */
+  grid-column: span 1;
+}
+
+.form-grid > .form-group:last-child { /* Descrição */
+  grid-column: 1 / -1;
 }
 
 .radio-group {
