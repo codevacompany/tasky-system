@@ -189,6 +189,7 @@ body.dark-mode .profile-dropdown .modal-header {
 
 .profile-info {
   flex: 1;
+  min-width: 0;
   text-align: left;
 }
 
@@ -204,6 +205,10 @@ body.dark-mode .profile-dropdown .modal-header {
   font-size: 0.8rem;
   color: #666;
   line-height: 1.4;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .form-actions {

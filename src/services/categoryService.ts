@@ -7,8 +7,8 @@ export const categoryService = {
     return apiClient.post<Category>('/categories', data);
   },
 
-  async fetch(): Promise<AxiosResponse<Category[]>> {
-    return apiClient.get<Category[]>('/categories');
+  async fetch(params?: { name?: string }): Promise<AxiosResponse<Category[]>> {
+    return apiClient.get<Category[]>('/categories', { params });
   },
 
   async getById(id: number): Promise<AxiosResponse<Category>> {

@@ -1,7 +1,8 @@
 <template>
   <section id="ticketsSection" class="section-content">
-    <h1>Tickets</h1>
-
+    <div class="section-header">
+      <h1>Tickets</h1>
+    </div>
     <div class="tab-container">
       <div class="tab-buttons">
         <button
@@ -150,11 +151,11 @@ const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor') => {
     const name = searchTerm.value.trim() || undefined;
 
     if (tab === 'recebidos') {
-      response = await ticketService.getByTargetUser(user!.id, name);
+      response = await ticketService.getByTargetUser(user!.id, { name });
     } else if (tab === 'criados') {
-      response = await ticketService.getByRequester(user!.id, name);
+      response = await ticketService.getByRequester(user!.id, { name });
     } else {
-      response = await ticketService.getByDepartment(user!.department.id, name);
+      response = await ticketService.getByDepartment(user!.department.id, { name });
       response.data = response.data.filter(
         (ticket) =>
           !ticket.isPrivate ||

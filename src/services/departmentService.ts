@@ -7,8 +7,8 @@ export const departmentService = {
     return apiClient.post<Department>('/departments', data);
   },
 
-  async fetch(): Promise<AxiosResponse<Department[]>> {
-    return apiClient.get<Department[]>('/departments');
+  async fetch(params?: { name?: string }): Promise<AxiosResponse<Department[]>> {
+    return apiClient.get<Department[]>('/departments', { params });
   },
 
   async getById(id: number): Promise<AxiosResponse<Department>> {

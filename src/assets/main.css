@@ -1466,14 +1466,6 @@ body {
   padding: 24px;
 }
 
-/* Título da Página */
-.section-content h1 {
-  font-size: 20px;
-  font-weight: 600;
-  color: #1a2233;
-  margin-bottom: 24px;
-}
-
 /* Cards de Estatísticas */
 .dashboard-stats {
   display: grid;
