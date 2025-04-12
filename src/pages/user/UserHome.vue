@@ -191,11 +191,11 @@ const loadTickets = async () => {
     ]);
 
     // Limitar a 5 tickets mais recentes
-    latestReceivedTickets.value = recebidosResponse.data
+    latestReceivedTickets.value = recebidosResponse.data.items
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 5);
 
-    latestCreatedTickets.value = criadosResponse.data
+    latestCreatedTickets.value = criadosResponse.data.items
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 5);
 

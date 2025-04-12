@@ -1,4 +1,5 @@
 import type { User, CreateUserDto, UpdateUserDto } from '@/models';
+import type { PaginatedResponse } from '@/types/http';
 import apiClient from '@/utils/axiosInstance';
 import type { AxiosResponse } from 'axios';
 
@@ -7,8 +8,12 @@ export const userService = {
     return apiClient.post<User>('/users', data);
   },
 
-  async fetch(params: { name?: string }): Promise<AxiosResponse<User[]>> {
-    return apiClient.get<User[]>('/users', { params });
+  async fetch(params: {
+    name?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<AxiosResponse<PaginatedResponse<User>>> {
+    return apiClient.get<PaginatedResponse<User>>('/users', { params });
   },
 
   async getByEmail(email: string): Promise<AxiosResponse<User>> {

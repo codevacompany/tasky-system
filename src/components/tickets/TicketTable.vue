@@ -193,21 +193,21 @@
         </tbody>
       </table>
     </div>
-    <div class="pagination">
+    <div v-if="currentPage" class="pagination">
       <button
         class="btn btn-icon"
-        :disabled="props.currentPage === 1"
-        @click="$emit('changePage', props.currentPage - 1)"
+        :disabled="currentPage === 1"
+        @click="$emit('changePage', currentPage - 1)"
       >
         <font-awesome-icon icon="chevron-left" />
       </button>
 
-      <span>Página {{ props.currentPage }} de {{ props.totalPages }}</span>
+      <span>Página {{ currentPage }} de {{ totalPages }}</span>
 
       <button
         class="btn btn-icon"
-        :disabled="props.currentPage === props.totalPages"
-        @click="$emit('changePage', props.currentPage + 1)"
+        :disabled="currentPage === totalPages"
+        @click="$emit('changePage', currentPage + 1)"
       >
         <font-awesome-icon icon="chevron-right" />
       </button>
@@ -269,8 +269,8 @@ import BaseModal from '../common/BaseModal.vue';
 const props = defineProps<{
   tickets: Ticket[];
   isLoading: boolean;
-  currentPage: number;
-  totalPages: number;
+  currentPage?: number;
+  totalPages?: number;
   tableType?: 'recebidos' | 'criados' | 'setor';
 }>();
 
