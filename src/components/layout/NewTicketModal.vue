@@ -17,21 +17,11 @@
             <label>É privado?</label>
             <div class="radio-group">
               <label class="radio-label">
-                <input
-                  type="radio"
-                  v-model="formData.isPrivate"
-                  :value="true"
-                  name="isPrivate"
-                />
+                <input type="radio" v-model="formData.isPrivate" :value="true" name="isPrivate" />
                 Sim
               </label>
               <label class="radio-label">
-                <input
-                  type="radio"
-                  v-model="formData.isPrivate"
-                  :value="false"
-                  name="isPrivate"
-                />
+                <input type="radio" v-model="formData.isPrivate" :value="false" name="isPrivate" />
                 Não
               </label>
             </div>
@@ -55,7 +45,7 @@
           <div class="form-group">
             <label for="targetUser">Usuário Destino:</label>
             <select id="targetUser" v-model="selectedUser" :disabled="!selectedDepartment">
-              <option :value=null>Selecione um setor primeiro</option>
+              <option :value="null">Selecione um setor primeiro</option>
               <option v-for="user in availableUsers" :key="user.id" :value="user.id">
                 {{ user.firstName }} {{ user.lastName }}
               </option>
@@ -65,7 +55,7 @@
           <div class="form-group">
             <label for="category">Categoria: <span class="required">*</span></label>
             <select id="category" v-model="selectedCategory" required>
-              <option :value=null>Selecione uma categoria</option>
+              <option :value="null">Selecione uma categoria</option>
               <option v-for="category in categories" :key="category.id" :value="category.id">
                 {{ category.name }}
               </option>
@@ -86,11 +76,21 @@
                 {{ TicketPriority.Low }}
               </label>
               <label class="radio-label">
-                <input type="radio" v-model="formData.priority" :value="TicketPriority.Medium" name="priority" />
+                <input
+                  type="radio"
+                  v-model="formData.priority"
+                  :value="TicketPriority.Medium"
+                  name="priority"
+                />
                 {{ TicketPriority.Medium }}
               </label>
               <label class="radio-label">
-                <input type="radio" v-model="formData.priority" :value="TicketPriority.High" name="priority" />
+                <input
+                  type="radio"
+                  v-model="formData.priority"
+                  :value="TicketPriority.High"
+                  name="priority"
+                />
                 {{ TicketPriority.High }}
               </label>
             </div>
@@ -157,8 +157,8 @@ const formData = ref({
 // Carregar departamentos
 const loadDepartments = async () => {
   try {
-    const { data } = await departmentService.fetch();
-    departments.value = data;
+    const { data } = await departmentService.fetch({ limit: 100 });
+    departments.value = data.items;
   } catch {
     toast.error('Erro ao carregar departamentos');
   }
@@ -167,8 +167,8 @@ const loadDepartments = async () => {
 // Carregar categorias
 const loadCategories = async () => {
   try {
-    const { data } = await categoryService.fetch();
-    categories.value = data;
+    const { data } = await categoryService.fetch({ limit: 100 });
+    categories.value = data.items;
   } catch {
     toast.error('Erro ao carregar categorias');
   }
@@ -358,26 +358,31 @@ const handleSubmit = async () => {
 }
 
 /* Ajustes específicos para o novo layout */
-.form-grid > .form-group:nth-child(1) { /* Assunto */
+.form-grid > .form-group:nth-child(1) {
+  /* Assunto */
   grid-column: span 2;
 }
 
-.form-grid > .form-group:nth-child(2) { /* É privado */
+.form-grid > .form-group:nth-child(2) {
+  /* É privado */
   grid-column: span 1;
 }
 
 .form-grid > .form-group:nth-child(3), /* Setor Destino */
 .form-grid > .form-group:nth-child(4), /* Usuário Destino */
-.form-grid > .form-group:nth-child(5) { /* Categoria */
+.form-grid > .form-group:nth-child(5) {
+  /* Categoria */
   grid-column: span 1;
 }
 
 .form-grid > .form-group:nth-child(6), /* Prioridade */
-.form-grid > .form-group:nth-child(7) { /* Concluir até */
+.form-grid > .form-group:nth-child(7) {
+  /* Concluir até */
   grid-column: span 1;
 }
 
-.form-grid > .form-group:last-child { /* Descrição */
+.form-grid > .form-group:last-child {
+  /* Descrição */
   grid-column: 1 / -1;
 }
 

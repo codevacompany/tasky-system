@@ -11,7 +11,12 @@
     <div class="search-group">
       <div class="search-input-wrapper">
         <font-awesome-icon icon="search" class="input-icon" />
-        <input type="text" id="searchTickets" placeholder="Buscar categorias" v-model="searchTerm" />
+        <input
+          type="text"
+          id="searchTickets"
+          placeholder="Buscar categorias"
+          v-model="searchTerm"
+        />
       </div>
     </div>
 
@@ -39,6 +44,18 @@
       </table>
     </div>
 
+    <div class="pagination">
+      <button class="btn btn-icon" :disabled="currentPage === 1" @click="currentPage--">
+        <font-awesome-icon icon="chevron-left" />
+      </button>
+
+      <span>Página {{ currentPage }} de {{ totalPages }}</span>
+
+      <button class="btn btn-icon" :disabled="currentPage === totalPages" @click="currentPage++">
+        <font-awesome-icon icon="chevron-right" />
+      </button>
+    </div>
+
     <!-- New Category Modal -->
     <NewCategoryModal :isOpen="isModalOpen" @close="closeModal" @categoryCreated="loadCategories" />
   </section>
@@ -57,6 +74,8 @@ const isLoading = ref(false);
 const categories = ref<Category[]>([]);
 const isModalOpen = ref(false);
 const searchTerm = ref('');
+const currentPage = ref(1);
+const totalPages = ref(1);
 
 const debouncedSearch = debounce(() => {
   loadCategories();
@@ -65,10 +84,12 @@ const debouncedSearch = debounce(() => {
 const loadCategories = async () => {
   isLoading.value = true;
   const name = searchTerm.value.trim() || undefined;
+  const filters = { name, page: currentPage.value };
 
   try {
-    const response = await categoryService.fetch({ name });
-    categories.value = response.data;
+    const response = await categoryService.fetch(filters);
+    categories.value = response.data.items;
+    totalPages.value = response.data.totalPages;
   } catch {
     toast.error('Erro ao carregar categorias. Tente novamente.');
   } finally {
@@ -88,6 +109,10 @@ onMounted(loadCategories);
 
 watch(searchTerm, () => {
   debouncedSearch();
+});
+
+watch(currentPage, () => {
+  loadCategories();
 });
 </script>
 
@@ -141,5 +166,43 @@ h3 {
   color: #aaa;
   pointer-events: none;
   height: 15px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.btn-icon:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.btn-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#paginationInfo {
+  font-size: 0.9rem;
+  color: var(--text-light);
 }
 </style>

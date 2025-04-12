@@ -103,6 +103,7 @@ const loadUsers = async () => {
   try {
     const response = await userService.fetch(filters);
     users.value = response.data.items;
+    totalPages.value = response.data.totalPages
   } catch {
     toast.error('Erro ao carregar usuários. Tente novamente.');
   } finally {
@@ -122,6 +123,10 @@ onMounted(loadUsers);
 
 watch(searchTerm, () => {
   debouncedSearch();
+});
+
+watch(currentPage, () => {
+  loadUsers();
 });
 </script>
 
