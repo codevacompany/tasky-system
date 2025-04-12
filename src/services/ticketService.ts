@@ -1,4 +1,12 @@
-import type { CreateTicketDto, Ticket, UpdateTicketDto, UpdateTicketStatusDto } from '@/models';
+import type {
+  CreateTicketDto,
+  Ticket,
+  TicketPriority,
+  TicketStatus,
+  UpdateTicketDto,
+  UpdateTicketStatusDto,
+} from '@/models';
+import type { PaginatedResponse } from '@/types/http';
 import apiClient from '@/utils/axiosInstance';
 import type { AxiosResponse } from 'axios';
 
@@ -15,19 +23,46 @@ export const ticketService = {
     return apiClient.get(`/tickets/${id}`);
   },
 
-  async getByDepartment(departmentId: number, params?: {name?: string}): Promise<AxiosResponse<Ticket[]>> {
+  async getByDepartment(
+    departmentId: number,
+    params?: {
+      name?: string;
+      status?: TicketStatus;
+      priority?: TicketPriority;
+      page?: number;
+      limit?: number;
+    },
+  ): Promise<AxiosResponse<{ items: Ticket[]; totalPages: number }>> {
     return apiClient.get(`/tickets/department/${departmentId}`, {
       params,
     });
   },
 
-  async getByRequester(requesterId: number, params?: {name?: string}): Promise<AxiosResponse<Ticket[]>> {
+  async getByRequester(
+    requesterId: number,
+    params?: {
+      name?: string;
+      status?: TicketStatus;
+      priority?: TicketPriority;
+      page?: number;
+      limit?: number;
+    },
+  ): Promise<AxiosResponse<{ items: Ticket[]; totalPages: number }>> {
     return apiClient.get(`/tickets/requester/${requesterId}`, {
       params,
     });
   },
 
-  async getByTargetUser(targetUserId: number, params?: {name?: string}): Promise<AxiosResponse<Ticket[]>> {
+  async getByTargetUser(
+    targetUserId: number,
+    params?: {
+      name?: string;
+      status?: TicketStatus;
+      priority?: TicketPriority;
+      page?: number;
+      limit?: number;
+    },
+  ): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
     return apiClient.get(`/tickets/target-user/${targetUserId}`, {
       params,
     });

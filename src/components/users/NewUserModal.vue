@@ -106,8 +106,8 @@ const selectedDepartment = ref<number | null>(null);
 
 const fetchDepartments = async () => {
   try {
-    const response = await departmentService.fetch();
-    departments.value = response.data;
+    const response = await departmentService.fetch({ limit: 100 });
+    departments.value = response.data.items;
   } catch {
     toast.error('Erro ao carregar setores.');
   }

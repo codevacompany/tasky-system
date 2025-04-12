@@ -1,4 +1,5 @@
 import type { Category, CreateCategoryDto, UpdateCategoryDto } from '@/models';
+import type { PaginatedResponse } from '@/types/http';
 import apiClient from '@/utils/axiosInstance';
 import type { AxiosResponse } from 'axios';
 
@@ -7,8 +8,12 @@ export const categoryService = {
     return apiClient.post<Category>('/categories', data);
   },
 
-  async fetch(params?: { name?: string }): Promise<AxiosResponse<Category[]>> {
-    return apiClient.get<Category[]>('/categories', { params });
+  async fetch(params?: {
+    name?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<AxiosResponse<PaginatedResponse<Category>>> {
+    return apiClient.get<PaginatedResponse<Category>>('/categories', { params });
   },
 
   async getById(id: number): Promise<AxiosResponse<Category>> {

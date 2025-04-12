@@ -146,21 +146,21 @@ const totalTickets = computed(() => ({
 }));
 
 const ticketsPendentes = computed(() => ({
-  total: ticketsRecebidos.value.filter(t => t.status === TicketStatus.Pending).length + 
+  total: ticketsRecebidos.value.filter(t => t.status === TicketStatus.Pending).length +
          ticketsCriados.value.filter(t => t.status === TicketStatus.Pending).length,
   recebidos: ticketsRecebidos.value.filter(t => t.status === TicketStatus.Pending).length,
   criados: ticketsCriados.value.filter(t => t.status === TicketStatus.Pending).length
 }));
 
 const ticketsEmAndamento = computed(() => ({
-  total: ticketsRecebidos.value.filter(t => t.status === TicketStatus.InProgress).length + 
+  total: ticketsRecebidos.value.filter(t => t.status === TicketStatus.InProgress).length +
          ticketsCriados.value.filter(t => t.status === TicketStatus.InProgress).length,
   recebidos: ticketsRecebidos.value.filter(t => t.status === TicketStatus.InProgress).length,
   criados: ticketsCriados.value.filter(t => t.status === TicketStatus.InProgress).length
 }));
 
 const ticketsFinalizados = computed(() => ({
-  total: ticketsRecebidos.value.filter(t => t.status === TicketStatus.Completed).length + 
+  total: ticketsRecebidos.value.filter(t => t.status === TicketStatus.Completed).length +
          ticketsCriados.value.filter(t => t.status === TicketStatus.Completed).length,
   recebidos: ticketsRecebidos.value.filter(t => t.status === TicketStatus.Completed).length,
   criados: ticketsCriados.value.filter(t => t.status === TicketStatus.Completed).length
@@ -206,8 +206,8 @@ const fetchDashboardData = async () => {
       ticketService.getByRequester(userStore.user!.id)
     ]);
 
-    ticketsRecebidos.value = recebidosResponse.data;
-    ticketsCriados.value = criadosResponse.data;
+    ticketsRecebidos.value = recebidosResponse.data.items;
+    ticketsCriados.value = criadosResponse.data.items;
     isLoading.value = false;
   } catch {
     toast.error('Erro ao carregar dados do dashboard');
@@ -386,4 +386,4 @@ onMounted(fetchDashboardData);
 :deep(body.dark-mode) .stat-details {
   color: #94a3b8;
 }
-</style> 
+</style>

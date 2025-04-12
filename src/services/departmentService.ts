@@ -1,4 +1,5 @@
 import type { Department, CreateDepartmentDto, UpdateDepartmentDto } from '@/models';
+import type { PaginatedResponse } from '@/types/http';
 import apiClient from '@/utils/axiosInstance';
 import type { AxiosResponse } from 'axios';
 
@@ -7,8 +8,12 @@ export const departmentService = {
     return apiClient.post<Department>('/departments', data);
   },
 
-  async fetch(params?: { name?: string }): Promise<AxiosResponse<Department[]>> {
-    return apiClient.get<Department[]>('/departments', { params });
+  async fetch(params?: {
+    name?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<AxiosResponse<PaginatedResponse<Department>>> {
+    return apiClient.get<PaginatedResponse<Department>>('/departments', { params });
   },
 
   async getById(id: number): Promise<AxiosResponse<Department>> {
