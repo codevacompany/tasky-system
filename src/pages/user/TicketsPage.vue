@@ -1,7 +1,8 @@
 <template>
   <section id="ticketsSection" class="section-content">
-    <h1>Tickets</h1>
-
+    <div class="section-header">
+      <h1>Tickets</h1>
+    </div>
     <div class="tab-container">
       <div class="tab-buttons">
         <button
