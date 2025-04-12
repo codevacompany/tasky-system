@@ -149,11 +149,11 @@ const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor') => {
     const name = searchTerm.value.trim() || undefined;
 
     if (tab === 'recebidos') {
-      response = await ticketService.getByTargetUser(user!.id, name);
+      response = await ticketService.getByTargetUser(user!.id, { name });
     } else if (tab === 'criados') {
-      response = await ticketService.getByRequester(user!.id, name);
+      response = await ticketService.getByRequester(user!.id, { name });
     } else {
-      response = await ticketService.getByDepartment(user!.department.id, name);
+      response = await ticketService.getByDepartment(user!.department.id, { name });
       response.data = response.data.filter(
         (ticket) =>
           !ticket.isPrivate ||

@@ -7,8 +7,8 @@ export const userService = {
     return apiClient.post<User>('/users', data);
   },
 
-  async fetch(): Promise<AxiosResponse<User[]>> {
-    return apiClient.get<User[]>('/users');
+  async fetch(params: { name?: string }): Promise<AxiosResponse<User[]>> {
+    return apiClient.get<User[]>('/users', { params });
   },
 
   async getByEmail(email: string): Promise<AxiosResponse<User>> {
