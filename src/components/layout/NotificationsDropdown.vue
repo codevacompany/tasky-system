@@ -325,6 +325,7 @@ onMounted(fetchNotifications);
   color: #212529;
   margin: 0;
   line-height: 1.4;
+  text-align: start;
 }
 
 .notification-time {
