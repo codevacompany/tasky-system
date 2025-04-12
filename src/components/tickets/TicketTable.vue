@@ -56,7 +56,7 @@
               </span>
             </td>
             <td>{{ formatDate(ticket.createdAt) }}</td>
-            <td>{{ ticket.dueAt ?formatDate(ticket.dueAt) : '—' }}</td>
+            <td>{{ ticket.dueAt ? formatDate(ticket.dueAt) : '—' }}</td>
             <td :class="calculateDeadline(ticket) === '—' ? '' : getDeadlineClass(ticket.dueAt)">
               {{ calculateDeadline(ticket) }}
               <font-awesome-icon
@@ -146,7 +146,13 @@
                   >
                     <font-awesome-icon icon="search" />
                   </button>
-                  <div v-else-if="ticket.status === TicketStatus.UnderVerification && userStore.user?.id === ticket.requester.id" class="verification-actions">
+                  <div
+                    v-else-if="
+                      ticket.status === TicketStatus.UnderVerification &&
+                      userStore.user?.id === ticket.requester.id
+                    "
+                    class="verification-actions"
+                  >
                     <button
                       class="action-btn approve"
                       @click.stop="handleApproveTicket(ticket)"
@@ -188,16 +194,31 @@
       </table>
     </div>
     <div class="pagination">
-      <button class="btn btn-icon" id="prevPageSetor">
+      <button
+        class="btn btn-icon"
+        :disabled="props.currentPage === 1"
+        @click="$emit('changePage', props.currentPage - 1)"
+      >
         <font-awesome-icon icon="chevron-left" />
       </button>
-      <span id="paginationInfoSetor">Página 1 de 1</span>
-      <button class="btn btn-icon" id="nextPageSetor">
+
+      <span>Página {{ props.currentPage }} de {{ props.totalPages }}</span>
+
+      <button
+        class="btn btn-icon"
+        :disabled="props.currentPage === props.totalPages"
+        @click="$emit('changePage', props.currentPage + 1)"
+      >
         <font-awesome-icon icon="chevron-right" />
       </button>
     </div>
 
-    <TicketDetailsModal :isOpen="isModalOpen" :ticket="selectedTicket!" @close="closeModal" @refresh="refreshSelectedTicket" />
+    <TicketDetailsModal
+      :isOpen="isModalOpen"
+      :ticket="selectedTicket!"
+      @close="closeModal"
+      @refresh="refreshSelectedTicket"
+    />
     <ConfirmationModal
       v-if="confirmationModal.isOpen"
       :isOpen="confirmationModal.isOpen"
@@ -218,20 +239,13 @@
         <div class="alert-icon">
           <font-awesome-icon icon="info-circle" />
         </div>
-        <p>Para visualizar os detalhes deste ticket, você precisa iniciar a verificação clicando no botão "Verificar".</p>
+        <p>
+          Para visualizar os detalhes deste ticket, você precisa iniciar a verificação clicando no
+          botão "Verificar".
+        </p>
         <div class="alert-actions">
-          <button
-            class="action-btn cancel"
-            @click="showVerificationAlert = false"
-          >
-            Cancelar
-          </button>
-          <button
-            class="action-btn verify"
-            @click="handleAlertVerification"
-          >
-            Verificar
-          </button>
+          <button class="action-btn cancel" @click="showVerificationAlert = false">Cancelar</button>
+          <button class="action-btn verify" @click="handleAlertVerification">Verificar</button>
         </div>
       </div>
     </BaseModal>
@@ -255,6 +269,8 @@ import BaseModal from '../common/BaseModal.vue';
 const props = defineProps<{
   tickets: Ticket[];
   isLoading: boolean;
+  currentPage: number;
+  totalPages: number;
   tableType?: 'recebidos' | 'criados' | 'setor';
 }>();
 
@@ -269,16 +285,18 @@ const confirmationModal = ref({
   title: '',
   message: '',
   action: null as (() => Promise<void>) | null,
-  isCorrection: false
+  isCorrection: false,
 });
 
-const emit = defineEmits(['refresh']);
+const emit = defineEmits(['refresh', 'changePage']);
 
 const openTicketDetails = (ticket: Ticket) => {
   // Se for o solicitante e o ticket estiver aguardando verificação
-  if (props.tableType === 'criados' &&
-      ticket.status === TicketStatus.AwaitingVerification &&
-      userStore.user?.id === ticket.requester.id) {
+  if (
+    props.tableType === 'criados' &&
+    ticket.status === TicketStatus.AwaitingVerification &&
+    userStore.user?.id === ticket.requester.id
+  ) {
     pendingVerificationTicket.value = ticket;
     showVerificationAlert.value = true;
     return;
@@ -386,13 +404,18 @@ const getPriorityBars = (priority: TicketPriority) => {
   }
 };
 
-const openConfirmationModal = (title: string, message: string, action: () => Promise<void>, isCorrection = false) => {
+const openConfirmationModal = (
+  title: string,
+  message: string,
+  action: () => Promise<void>,
+  isCorrection = false,
+) => {
   confirmationModal.value = {
     isOpen: true,
     title,
     message,
     action,
-    isCorrection
+    isCorrection,
   };
 };
 
@@ -424,7 +447,7 @@ const handleAcceptTicket = async (ticket: Ticket) => {
       } catch {
         toast.error('Erro ao aceitar o ticket');
       }
-    }
+    },
   );
 };
 
@@ -440,7 +463,7 @@ const handleVerifyTicket = async (ticket: Ticket) => {
       } catch {
         toast.error('Erro ao enviar o ticket para revisão');
       }
-    }
+    },
   );
 };
 
@@ -456,7 +479,7 @@ const handleApproveTicket = async (ticket: Ticket) => {
       } catch {
         toast.error('Erro ao aprovar o ticket');
       }
-    }
+    },
   );
 };
 
@@ -473,7 +496,7 @@ const handleRequestCorrection = async (ticket: Ticket) => {
         toast.error('Erro ao solicitar correção');
       }
     },
-    true // indica que é uma solicitação de correção
+    true, // indica que é uma solicitação de correção
   );
 };
 
@@ -489,14 +512,16 @@ const handleRejectTicket = async (ticket: Ticket) => {
       } catch {
         toast.error('Erro ao reprovar o ticket');
       }
-    }
+    },
   );
 };
 
 const handleStartVerification = async (ticket: Ticket) => {
   try {
     // Atualiza o status
-    const ticketResponse = await ticketService.updateStatus(ticket.id, { status: TicketStatus.UnderVerification });
+    const ticketResponse = await ticketService.updateStatus(ticket.id, {
+      status: TicketStatus.UnderVerification,
+    });
 
     // Abre o modal com o ticket
     selectedTicket.value = ticketResponse.data.ticketData;

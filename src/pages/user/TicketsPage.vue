@@ -37,8 +37,12 @@
               <option :value="TicketStatus.Pending">{{ TicketStatus.Pending }}</option>
               <option :value="TicketStatus.InProgress">{{ TicketStatus.InProgress }}</option>
               <option :value="TicketStatus.Completed">{{ TicketStatus.Completed }}</option>
-              <option :value="TicketStatus.AwaitingVerification">{{ TicketStatus.AwaitingVerification }}</option>
-              <option :value="TicketStatus.UnderVerification">{{ TicketStatus.UnderVerification }}</option>
+              <option :value="TicketStatus.AwaitingVerification">
+                {{ TicketStatus.AwaitingVerification }}
+              </option>
+              <option :value="TicketStatus.UnderVerification">
+                {{ TicketStatus.UnderVerification }}
+              </option>
             </select>
           </div>
 
@@ -108,6 +112,9 @@
           :tickets="tickets"
           :isLoading="isLoading"
           :tableType="activeTab"
+          :currentPage="currentPage"
+          :totalPages="totalPages"
+          @changePage="(page) => currentPage = page"
           @viewTicket="handleViewTicket"
           @editTicket="handleEditTicket"
           @deleteTicket="handleDeleteTicket"
@@ -140,6 +147,8 @@ const isLoading = ref(false);
 const searchTerm = ref('');
 const statusFilter = ref<TicketStatus | null>(null);
 const priorityFilter = ref<TicketPriority | null>(null);
+const currentPage = ref(1);
+const totalPages = ref(1);
 
 const debouncedSearch = debounce(() => {
   fetchTickets(activeTab.value);
@@ -155,7 +164,7 @@ const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor') => {
     const status = statusFilter.value || undefined;
     const priority = priorityFilter.value || undefined;
 
-    const filters = { name, status, priority };
+    const filters = { name, status, priority, page: currentPage.value };
 
     if (tab === 'recebidos') {
       response = await ticketService.getByTargetUser(user!.id, filters);
@@ -163,15 +172,10 @@ const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor') => {
       response = await ticketService.getByRequester(user!.id, filters);
     } else {
       response = await ticketService.getByDepartment(user!.department.id, filters);
-      response.data = response.data.filter(
-        (ticket) =>
-          !ticket.isPrivate ||
-          ticket.requester.id === user!.id ||
-          ticket.targetUser.id === user!.id,
-      );
     }
 
-    tickets.value = response.data;
+    tickets.value = response.data.items;
+    totalPages.value = response.data.totalPages;
   } catch {
     toast.error('Erro ao carregar tickets. Tente novamente.');
   } finally {
@@ -268,6 +272,10 @@ watch(searchTerm, () => {
 });
 
 watch([statusFilter, priorityFilter], () => {
+  fetchTickets(activeTab.value);
+});
+
+watch(currentPage, () => {
   fetchTickets(activeTab.value);
 });
 </script>

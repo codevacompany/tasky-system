@@ -15,19 +15,19 @@ export const ticketService = {
     return apiClient.get(`/tickets/${id}`);
   },
 
-  async getByDepartment(departmentId: number, params?: {name?: string}): Promise<AxiosResponse<Ticket[]>> {
+  async getByDepartment(departmentId: number, params?: {name?: string}): Promise<AxiosResponse<{items: Ticket[], totalPages: number}>> {
     return apiClient.get(`/tickets/department/${departmentId}`, {
       params,
     });
   },
 
-  async getByRequester(requesterId: number, params?: {name?: string}): Promise<AxiosResponse<Ticket[]>> {
+  async getByRequester(requesterId: number, params?: {name?: string}): Promise<AxiosResponse<{items: Ticket[], totalPages: number}>> {
     return apiClient.get(`/tickets/requester/${requesterId}`, {
       params,
     });
   },
 
-  async getByTargetUser(targetUserId: number, params?: {name?: string}): Promise<AxiosResponse<Ticket[]>> {
+  async getByTargetUser(targetUserId: number, params?: {name?: string}): Promise<AxiosResponse<{items: Ticket[], totalPages: number}>> {
     return apiClient.get(`/tickets/target-user/${targetUserId}`, {
       params,
     });
