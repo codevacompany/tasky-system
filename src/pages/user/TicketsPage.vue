@@ -51,10 +51,15 @@
           </div>
 
           <div class="search-group">
-            <input type="text" id="searchTickets" placeholder="Buscar tickets..." />
-            <button class="btn-icon">
-              <font-awesome-icon icon="search" />
-            </button>
+            <div class="search-input-wrapper">
+              <font-awesome-icon icon="search" class="input-icon" />
+              <input
+                type="text"
+                id="searchTickets"
+                placeholder="Buscar tickets..."
+                v-model="searchTerm"
+              />
+            </div>
           </div>
         </div>
 
@@ -116,37 +121,47 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from '@/stores/user';
 import type { Ticket } from '@/models';
 import { TicketStatus } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
 import { toast } from 'vue3-toastify';
+import { debounce } from '@/utils/debounce';
 
 const user = useUserStore().user;
 const activeTab = ref<'recebidos' | 'criados' | 'setor'>('recebidos');
 const tickets = ref<Ticket[]>([]);
 const isLoading = ref(false);
+const searchTerm = ref('');
+
+const debouncedSearch = debounce(() => {
+  fetchTickets(activeTab.value);
+}, 400);
 
 const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor') => {
   activeTab.value = tab;
   isLoading.value = true;
+
   try {
     let response;
+    const name = searchTerm.value.trim() || undefined;
+
     if (tab === 'recebidos') {
-      response = await ticketService.getByTargetUser(user!.id);
+      response = await ticketService.getByTargetUser(user!.id, name);
     } else if (tab === 'criados') {
-      response = await ticketService.getByRequester(user!.id);
+      response = await ticketService.getByRequester(user!.id, name);
     } else {
-      response = await ticketService.getByDepartment(user!.department.id);
+      response = await ticketService.getByDepartment(user!.department.id, name);
       response.data = response.data.filter(
-        (ticket) => 
-          !ticket.isPrivate || 
-          ticket.requester.id === user!.id || 
-          ticket.targetUser.id === user!.id
+        (ticket) =>
+          !ticket.isPrivate ||
+          ticket.requester.id === user!.id ||
+          ticket.targetUser.id === user!.id,
       );
     }
+
     tickets.value = response.data;
   } catch {
     toast.error('Erro ao carregar tickets. Tente novamente.');
@@ -238,6 +253,10 @@ const handleRejectTicket = async (ticket: Ticket) => {
 };
 
 onMounted(() => fetchTickets(activeTab.value));
+
+watch(searchTerm, () => {
+  debouncedSearch();
+});
 </script>
 
 <style scoped>
@@ -328,28 +347,28 @@ onMounted(() => fetchTickets(activeTab.value));
   margin-left: auto;
 }
 
-.search-group input {
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius) 0 0 var(--radius);
-  border: 1px solid var(--border-color);
-  border-right: none;
-  background-color: var(--card-bg);
-  color: var(--text-color);
-  font-size: 0.9rem;
-  width: 250px;
-  transition: var(--transition);
-}
-
 .search-group input:focus {
   outline: none;
   border-color: var(--primary-color);
 }
 
-.search-group .btn-icon {
-  border-radius: 0 var(--radius) var(--radius) 0;
-  border: 1px solid var(--border-color);
-  border-left: none;
-  height: 38px;
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-input-wrapper input {
+  padding-left: 2rem; /* space for the icon */
+}
+
+.input-icon {
+  position: absolute;
+  left: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #aaa;
+  pointer-events: none;
+  height: 15px;
 }
 
 /* Status e Prioridade */
