@@ -115,6 +115,7 @@
           @approveTicket="handleApproveTicket"
           @requestCorrection="handleRequestCorrection"
           @rejectTicket="handleRejectTicket"
+          @refresh="fetchTickets(activeTab)"
         />
       </div>
     </div>

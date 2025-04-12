@@ -33,11 +33,17 @@ export const ticketService = {
     });
   },
 
-  async update(id: number, data: UpdateTicketDto): Promise<AxiosResponse<Ticket>> {
+  async update(
+    id: number,
+    data: UpdateTicketDto,
+  ): Promise<AxiosResponse<{ message: string; ticketId: number }>> {
     return apiClient.patch(`/tickets/${id}`, data);
   },
 
-  async updateStatus(id: number, data: UpdateTicketStatusDto): Promise<AxiosResponse<Ticket>> {
+  async updateStatus(
+    id: number,
+    data: UpdateTicketStatusDto,
+  ): Promise<AxiosResponse<{ message: string; ticketData: Ticket }>> {
     return apiClient.patch(`/tickets/${id}/status`, data);
   },
 
