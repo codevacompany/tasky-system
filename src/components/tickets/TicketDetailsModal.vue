@@ -417,11 +417,8 @@ const closeConfirmationModal = () => {
   confirmationModal.value.action = null;
 };
 
-const handleConfirm = async (data?: any) => {
+const handleConfirm = async () => {
   if (confirmationModal.value.action) {
-    if (data) {
-      console.log('Dados da correção:', data);
-    }
     await confirmationModal.value.action();
   }
   closeConfirmationModal();

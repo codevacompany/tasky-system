@@ -198,7 +198,7 @@
     </div>
 
     <TicketDetailsModal :isOpen="isModalOpen" :ticket="selectedTicket!" @close="closeModal" @refresh="refreshSelectedTicket" />
-    <ConfirmationModal 
+    <ConfirmationModal
       v-if="confirmationModal.isOpen"
       :isOpen="confirmationModal.isOpen"
       :title="confirmationModal.title"
@@ -220,13 +220,13 @@
         </div>
         <p>Para visualizar os detalhes deste ticket, você precisa iniciar a verificação clicando no botão "Verificar".</p>
         <div class="alert-actions">
-          <button 
+          <button
             class="action-btn cancel"
             @click="showVerificationAlert = false"
           >
             Cancelar
           </button>
-          <button 
+          <button
             class="action-btn verify"
             @click="handleAlertVerification"
           >
@@ -272,10 +272,12 @@ const confirmationModal = ref({
   isCorrection: false
 });
 
+const emit = defineEmits(['refresh']);
+
 const openTicketDetails = (ticket: Ticket) => {
   // Se for o solicitante e o ticket estiver aguardando verificação
-  if (props.tableType === 'criados' && 
-      ticket.status === TicketStatus.AwaitingVerification && 
+  if (props.tableType === 'criados' &&
+      ticket.status === TicketStatus.AwaitingVerification &&
       userStore.user?.id === ticket.requester.id) {
     pendingVerificationTicket.value = ticket;
     showVerificationAlert.value = true;
@@ -399,11 +401,8 @@ const closeConfirmationModal = () => {
   confirmationModal.value.action = null;
 };
 
-const handleConfirm = async (data?: any) => {
+const handleConfirm = async () => {
   if (confirmationModal.value.action) {
-    if (data) {
-      console.log('Dados da correção:', data);
-    }
     await confirmationModal.value.action();
   }
   closeConfirmationModal();
@@ -497,12 +496,12 @@ const handleRejectTicket = async (ticket: Ticket) => {
 const handleStartVerification = async (ticket: Ticket) => {
   try {
     // Atualiza o status
-    await ticketService.updateStatus(ticket.id, { status: TicketStatus.UnderVerification });
-    
+    const ticketResponse = await ticketService.updateStatus(ticket.id, { status: TicketStatus.UnderVerification });
+
     // Abre o modal com o ticket
-    selectedTicket.value = ticket;
+    selectedTicket.value = ticketResponse.data.ticketData;
     isModalOpen.value = true;
-    
+
     // Atualiza a tabela
     emit('refresh');
   } catch {
