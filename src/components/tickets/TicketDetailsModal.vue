@@ -188,6 +188,13 @@
         >
           <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
         </button>
+        <button
+          v-if="isTargetUser && ticket?.status === TicketStatus.Returned"
+          class="action-button correct"
+          @click="correctTicket(loadedTicket.id)"
+        >
+          <font-awesome-icon icon="wrench" /> Corrigir
+        </button>
         <div
           v-else-if="loadedTicket.status === TicketStatus.UnderVerification"
           class="verification-actions"
@@ -221,7 +228,7 @@
           class="btn btn-success disabled"
           disabled
         >
-          <font-awesome-icon icon="check-circle" /> RESOLVIDO
+          <font-awesome-icon icon="check-circle" /> FINALIZADO
         </button>
         <button
           v-else-if="loadedTicket.status === TicketStatus.Rejected"
@@ -232,12 +239,22 @@
         </button>
       </div>
 
+      <!-- Nova div separada para o botão de cancelar -->
+      <div class="ticket-actions" v-if="isRequester && loadedTicket.status !== TicketStatus.Completed && loadedTicket.status !== TicketStatus.Rejected && loadedTicket.status !== TicketStatus.Cancelled">
+        <button
+          class="action-button cancel"
+          @click="cancelTicket(loadedTicket.id)"
+        >
+          <font-awesome-icon icon="ban" /> Cancelar
+        </button>
+      </div>
+
       <div class="comment-section">
         <div class="section-header">
           <font-awesome-icon icon="comments" />
           <h3>Comentários</h3>
         </div>
-        <div v-if="loadedTicket?.status !== TicketStatus.Rejected" class="comment-input">
+        <div v-if="loadedTicket?.status === TicketStatus.InProgress || loadedTicket?.status === TicketStatus.UnderVerification" class="comment-input">
           <textarea
             v-model="newComment"
             placeholder="Digite seu comentário aqui..."
@@ -249,7 +266,7 @@
         </div>
         <div v-else class="comment-disabled">
           <font-awesome-icon icon="ban" />
-          <p>Comentários desabilitados para tickets reprovados</p>
+          <p>Comentários permitidos apenas para tickets em andamento ou em verificação</p>
         </div>
 
         <div class="comments-list">
@@ -343,9 +360,11 @@ const getStatusClass = (status: string) => {
     case TicketStatus.UnderVerification:
       return 'status-em-verificacao';
     case TicketStatus.Completed:
-      return 'status-resolvido';
+      return 'status-finalizado';
     case TicketStatus.Rejected:
       return 'status-cancelado';
+    case TicketStatus.Returned:
+      return 'status-devolvido';
     default:
       return '';
   }
@@ -482,7 +501,7 @@ const requestCorrection = async (ticketId: number) => {
     'Por favor, preencha os detalhes da correção necessária:',
     async () => {
       try {
-        await ticketService.updateStatus(ticketId, { status: TicketStatus.InProgress });
+        await ticketService.updateStatus(ticketId, { status: TicketStatus.Returned });
         toast.success('Correção solicitada com sucesso');
         emit('refresh');
       } catch {
@@ -490,6 +509,22 @@ const requestCorrection = async (ticketId: number) => {
       }
     },
     true // indica que é uma solicitação de correção
+  );
+};
+
+const correctTicket = async (ticketId: number) => {
+  openConfirmationModal(
+    'Corrigir Ticket',
+    'Tem certeza que deseja iniciar as correções deste ticket?',
+    async () => {
+      try {
+        await ticketService.updateStatus(ticketId, { status: TicketStatus.InProgress });
+        toast.success('Ticket em correção');
+        emit('refresh');
+      } catch {
+        toast.error('Erro ao iniciar correção');
+      }
+    }
   );
 };
 
@@ -506,6 +541,25 @@ const rejectTicket = async (ticketId: number) => {
         toast.error('Erro ao reprovar o ticket');
       }
     }
+  );
+};
+
+const cancelTicket = async (ticketId: number) => {
+  openConfirmationModal(
+    'Cancelar Ticket',
+    'Por favor, informe o motivo do cancelamento:',
+    async () => {
+      try {
+        // Por enquanto usando o endpoint de delete
+        await ticketService.delete(ticketId);
+        toast.success('Ticket cancelado com sucesso');
+        emit('refresh');
+        emit('close');
+      } catch {
+        toast.error('Erro ao cancelar o ticket');
+      }
+    },
+    true // indica que precisa de campo de descrição
   );
 };
 
@@ -569,6 +623,8 @@ const getStatusIcon = (status: string) => {
       return 'check-circle';
     case TicketStatus.Rejected:
       return 'times-circle';
+    case TicketStatus.Returned:
+      return 'exclamation-circle';
     default:
       return 'question-circle';
   }
@@ -771,7 +827,7 @@ watch(
   border: 1px solid rgba(126, 34, 206, 0.3);
 }
 
-.status-label.status-resolvido {
+.status-label.status-finalizado {
   background-color: #e8f5e9;
   color: #2e7d32;
   border: 1px solid rgba(46, 125, 50, 0.3);
@@ -781,6 +837,12 @@ watch(
   background-color: #ffebee;
   color: #c62828;
   border: 1px solid rgba(198, 40, 40, 0.3);
+}
+
+.status-label.status-devolvido {
+  background-color: #fff3e0;
+  color: #f57c00;
+  border: 1px solid rgba(245, 124, 0, 0.3);
 }
 
 .ticket-actions {
@@ -838,11 +900,27 @@ watch(
   background-color: #6a1b9a;
 }
 
+.action-button.correct {
+  background-color: #ff5722;
+}
+
+.action-button.correct:hover {
+  background-color: #e64a19;
+}
+
 .action-button.reject {
   background-color: #dc2626;
 }
 
 .action-button.reject:hover {
+  background-color: #b91c1c;
+}
+
+.action-button.cancel {
+  background-color: #dc2626;
+}
+
+.action-button.cancel:hover {
   background-color: #b91c1c;
 }
 

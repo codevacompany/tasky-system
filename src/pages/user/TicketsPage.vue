@@ -6,25 +6,28 @@
     <div class="tab-container">
       <div class="tab-buttons">
         <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'recebidos' }"
+          :class="['tab-button', activeTab === 'recebidos' ? 'active' : '']"
           @click="fetchTickets('recebidos')"
         >
           Recebidos
         </button>
         <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'criados' }"
+          :class="['tab-button', activeTab === 'criados' ? 'active' : '']"
           @click="fetchTickets('criados')"
         >
           Criados por Mim
         </button>
         <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'setor' }"
+          :class="['tab-button', activeTab === 'setor' ? 'active' : '']"
           @click="fetchTickets('setor')"
         >
           Tickets do Setor
+        </button>
+        <button
+          :class="['tab-button', activeTab === 'arquivo' ? 'active' : '']"
+          @click="fetchTickets('arquivo')"
+        >
+          Arquivados
         </button>
       </div>
 
@@ -69,7 +72,8 @@
           </div>
         </div>
 
-        <div class="tickets-summary">
+        <!-- Dashboard de tickets (mostrar apenas quando não estiver na aba arquivo) -->
+        <div class="tickets-summary" v-if="activeTab !== 'arquivo'">
           <div class="summary-item">
             <div class="summary-item-content">
               <div class="stat-icon">
@@ -97,18 +101,32 @@
             </div>
             <span class="stat-number">{{ inProgressTickets }}</span>
           </div>
-          <div class="summary-item">
-            <div class="summary-item-content">
-              <div class="stat-icon green">
-                <font-awesome-icon icon="check-circle" />
-              </div>
-              <span class="summary-label">Resolvidos</span>
-            </div>
-            <span class="stat-number">{{ resolvedTickets }}</span>
+        </div>
+
+        <!-- Seções do Arquivo -->
+        <div v-if="activeTab === 'arquivo'" class="archive-sections">
+          <div class="archive-section">
+            <h2 class="archive-title">Tickets Recebidos Arquivados</h2>
+            <TicketTable
+              :tickets="archivedReceivedTickets"
+              :isLoading="isLoading"
+              :tableType="'arquivo'"
+            />
+          </div>
+
+          <div class="archive-section">
+            <h2 class="archive-title">Tickets Criados Arquivados</h2>
+            <TicketTable
+              :tickets="archivedCreatedTickets"
+              :isLoading="isLoading"
+              :tableType="'arquivo'"
+            />
           </div>
         </div>
 
+        <!-- Tabela principal (mostrar apenas quando não estiver na aba arquivo) -->
         <TicketTable
+          v-if="activeTab !== 'arquivo'"
           :tickets="tickets"
           :isLoading="isLoading"
           :tableType="activeTab"
@@ -127,6 +145,42 @@
         />
       </div>
     </div>
+
+    <!-- Modal de Correção -->
+    <div v-if="showCorrectionModal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Solicitar Correção</h3>
+          <button class="close-btn" @click="cancelCorrection">
+            <font-awesome-icon icon="times" />
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-4">Por favor, defina uma nova data de conclusão para o ticket:</p>
+          <div class="form-group">
+            <label for="newCompletionDate">Nova Data de Conclusão:</label>
+            <input
+              type="date"
+              id="newCompletionDate"
+              v-model="newCompletionDate"
+              class="form-control"
+              :min="new Date().toISOString().split('T')[0]"
+              required
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="cancelCorrection">Cancelar</button>
+          <button 
+            class="btn btn-primary" 
+            @click="confirmCorrection"
+            :disabled="!newCompletionDate"
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -141,7 +195,7 @@ import { toast } from 'vue3-toastify';
 import { debounce } from '@/utils/debounce';
 
 const user = useUserStore().user;
-const activeTab = ref<'recebidos' | 'criados' | 'setor'>('recebidos');
+const activeTab = ref<'recebidos' | 'criados' | 'setor' | 'arquivo'>('recebidos');
 const tickets = ref<Ticket[]>([]);
 const isLoading = ref(false);
 const searchTerm = ref('');
@@ -150,11 +204,20 @@ const priorityFilter = ref<TicketPriority | null>(null);
 const currentPage = ref(1);
 const totalPages = ref(1);
 
+// Refs para os tickets arquivados
+const archivedReceivedTickets = ref<Ticket[]>([]);
+const archivedCreatedTickets = ref<Ticket[]>([]);
+
+// Refs para o modal de correção
+const showCorrectionModal = ref(false);
+const selectedTicket = ref<Ticket | null>(null);
+const newCompletionDate = ref('');
+
 const debouncedSearch = debounce(() => {
   fetchTickets(activeTab.value);
 }, 400);
 
-const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor') => {
+const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor' | 'arquivo') => {
   activeTab.value = tab;
   isLoading.value = true;
 
@@ -167,15 +230,45 @@ const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor') => {
     const filters = { name, status, priority, page: currentPage.value };
 
     if (tab === 'recebidos') {
-      response = await ticketService.getByTargetUser(user!.id, filters);
+      response = await ticketService.getByTargetUser(user!.id, { 
+        ...filters, 
+        excludeStatuses: [TicketStatus.Completed, TicketStatus.Rejected] 
+      });
+      tickets.value = response.data.items;
     } else if (tab === 'criados') {
-      response = await ticketService.getByRequester(user!.id, filters);
-    } else {
+      response = await ticketService.getByRequester(user!.id, { 
+        ...filters,
+        excludeStatuses: [TicketStatus.Completed, TicketStatus.Rejected]
+      });
+      tickets.value = response.data.items;
+    } else if (tab === 'setor') {
       response = await ticketService.getByDepartment(user!.department.id, filters);
+      tickets.value = response.data.items;
+    } else if (tab === 'arquivo') {
+      // Buscar tickets recebidos arquivados
+      const receivedResponse = await ticketService.getByTargetUser(user!.id, {
+        ...filters,
+        status: undefined
+      });
+      archivedReceivedTickets.value = receivedResponse.data.items.filter(ticket => 
+        ticket.status === TicketStatus.Completed || 
+        ticket.status === TicketStatus.Rejected
+      );
+
+      // Buscar tickets criados arquivados
+      const createdResponse = await ticketService.getByRequester(user!.id, {
+        ...filters,
+        status: undefined
+      });
+      archivedCreatedTickets.value = createdResponse.data.items.filter(ticket => 
+        ticket.status === TicketStatus.Completed || 
+        ticket.status === TicketStatus.Rejected
+      );
     }
 
-    tickets.value = response.data.items;
-    totalPages.value = response.data.totalPages;
+    if (tab !== 'arquivo') {
+      totalPages.value = response.data.totalPages;
+    }
   } catch {
     toast.error('Erro ao carregar tickets. Tente novamente.');
   } finally {
@@ -189,9 +282,6 @@ const pendingTickets = computed(
 );
 const inProgressTickets = computed(
   () => tickets.value.filter((ticket) => ticket.status === TicketStatus.InProgress).length,
-);
-const resolvedTickets = computed(
-  () => tickets.value.filter((ticket) => ticket.status === TicketStatus.Completed).length,
 );
 
 const handleViewTicket = (ticket: Ticket) => {
@@ -246,13 +336,32 @@ const handleApproveTicket = async (ticket: Ticket) => {
 };
 
 const handleRequestCorrection = async (ticket: Ticket) => {
+  selectedTicket.value = ticket;
+  showCorrectionModal.value = true;
+};
+
+const confirmCorrection = async () => {
+  if (!selectedTicket.value || !newCompletionDate.value) return;
+
   try {
-    await ticketService.updateStatus(ticket.id, { status: TicketStatus.InProgress });
+    await ticketService.updateStatus(selectedTicket.value.id, { 
+      status: TicketStatus.InProgress,
+      completionDate: newCompletionDate.value
+    });
     toast.success('Correção solicitada com sucesso!');
+    showCorrectionModal.value = false;
+    selectedTicket.value = null;
+    newCompletionDate.value = '';
     fetchTickets(activeTab.value);
   } catch {
     toast.error('Erro ao solicitar correção. Tente novamente.');
   }
+};
+
+const cancelCorrection = () => {
+  showCorrectionModal.value = false;
+  selectedTicket.value = null;
+  newCompletionDate.value = '';
 };
 
 const handleRejectTicket = async (ticket: Ticket) => {
@@ -289,27 +398,43 @@ watch(currentPage, () => {
   display: flex;
   border-bottom: 1px solid var(--border-color);
   margin-bottom: 1.5rem;
+  gap: 1rem;
 }
 
-.tab-btn {
-  background: none;
+.tab-button {
+  padding: 0.75rem 1.5rem;
   border: none;
-  padding: 1rem 1.5rem;
-  font-size: 1rem;
+  background: none;
+  font-size: 0.9rem;
   font-weight: 500;
   color: var(--text-light);
-  border-bottom: 2px solid transparent;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
 }
 
-.tab-btn:hover {
+.tab-button:hover {
   color: var(--primary-color);
 }
 
-.tab-btn.active {
+.tab-button.active {
   color: var(--primary-color);
   border-bottom-color: var(--primary-color);
+}
+
+/* Dark mode */
+:deep(body.dark-mode) .tab-button {
+  color: #94a3b8;
+}
+
+:deep(body.dark-mode) .tab-button:hover {
+  color: #818cf8;
+}
+
+:deep(body.dark-mode) .tab-button.active {
+  color: #818cf8;
+  border-bottom-color: #818cf8;
 }
 
 .tab-content {
@@ -414,7 +539,7 @@ watch(currentPage, () => {
   color: var(--info-color);
 }
 
-.status-resolvido {
+.status-finalizado {
   background-color: rgba(16, 185, 129, 0.1);
   color: var(--success-color);
 }
@@ -577,5 +702,146 @@ watch(currentPage, () => {
   .tickets-table td {
     padding: 0.8rem;
   }
+}
+
+.archive-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.archive-section {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.archive-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.archive-title::before {
+  content: '';
+  width: 4px;
+  height: 1.1rem;
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+
+/* Dark mode */
+:deep(body.dark-mode) .archive-section {
+  background: var(--dark-card-bg);
+}
+
+:deep(body.dark-mode) .archive-title {
+  color: var(--dark-text-color);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text-color);
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  color: var(--text-color);
+  background-color: var(--input-bg);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
+}
+
+/* Dark mode */
+:deep(body.dark-mode) .modal-content {
+  background-color: var(--card-bg-dark);
+}
+
+:deep(body.dark-mode) .modal-header {
+  border-bottom-color: var(--border-color-dark);
+}
+
+:deep(body.dark-mode) .modal-footer {
+  border-top-color: var(--border-color-dark);
+}
+
+:deep(body.dark-mode) .modal-header h3 {
+  color: var(--text-color-dark);
+}
+
+:deep(body.dark-mode) .form-group label {
+  color: var(--text-color-dark);
+}
+
+:deep(body.dark-mode) .form-control {
+  background-color: var(--input-bg-dark);
+  border-color: var(--border-color-dark);
+  color: var(--text-color-dark);
 }
 </style>

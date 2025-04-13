@@ -85,6 +85,14 @@
                   >
                     <font-awesome-icon icon="arrow-right" />
                   </button>
+                  <button
+                    v-else-if="ticket.status === TicketStatus.Returned"
+                    class="action-btn correct"
+                    @click.stop="handleCorrectTicket(ticket)"
+                    title="Corrigir"
+                  >
+                    <font-awesome-icon icon="wrench" />
+                  </button>
                   <div
                     v-else-if="ticket.status === TicketStatus.AwaitingVerification"
                     class="action-btn waiting"
@@ -123,6 +131,13 @@
                     title="Fazendo"
                   >
                     <font-awesome-icon icon="cog" />
+                  </div>
+                  <div
+                    v-else-if="ticket.status === TicketStatus.Returned"
+                    class="action-btn not-started"
+                    title="Devolvido para Correção"
+                  >
+                    <font-awesome-icon icon="wrench" />
                   </div>
                   <div
                     v-else-if="ticket.status === TicketStatus.Rejected"
@@ -174,6 +189,24 @@
                     >
                       <font-awesome-icon icon="times" />
                     </button>
+                  </div>
+                </template>
+
+                <!-- Botões para tabela de tickets arquivados -->
+                <template v-else-if="tableType === 'arquivo'">
+                  <div
+                    v-if="ticket.status === TicketStatus.Completed"
+                    class="action-btn completed"
+                    title="Finalizado"
+                  >
+                    <font-awesome-icon icon="check-circle" />
+                  </div>
+                  <div
+                    v-else-if="ticket.status === TicketStatus.Rejected"
+                    class="action-btn rejected"
+                    title="Reprovado"
+                  >
+                    <font-awesome-icon icon="xmark-circle" />
                   </div>
                 </template>
 
@@ -271,7 +304,7 @@ const props = defineProps<{
   isLoading: boolean;
   currentPage?: number;
   totalPages?: number;
-  tableType?: 'recebidos' | 'criados' | 'setor';
+  tableType?: 'recebidos' | 'criados' | 'setor' | 'arquivo';
 }>();
 
 const userStore = useUserStore();
@@ -386,6 +419,10 @@ const getStatusClass = (status: string) => {
       return 'status-completed';
     case TicketStatus.Rejected:
       return 'status-rejected';
+    case TicketStatus.Returned:
+      return 'status-returned';
+    case TicketStatus.Cancelled:
+      return 'status-cancelled';
     default:
       return '';
   }
@@ -541,6 +578,22 @@ const handleAlertVerification = () => {
     pendingVerificationTicket.value = null;
   }
 };
+
+const handleCorrectTicket = async (ticket: Ticket) => {
+  openConfirmationModal(
+    'Corrigir Ticket',
+    'Tem certeza que deseja iniciar as correções deste ticket?',
+    async () => {
+      try {
+        await ticketService.updateStatus(ticket.id, { status: TicketStatus.InProgress });
+        toast.success('Ticket em correção');
+        emit('refresh');
+      } catch {
+        toast.error('Erro ao iniciar correção');
+      }
+    }
+  );
+};
 </script>
 
 <style scoped>
@@ -675,6 +728,18 @@ const handleAlertVerification = () => {
   background-color: #ffebee;
   color: #c62828;
   border: 1px solid rgba(198, 40, 40, 0.3);
+}
+
+.status-badge.status-returned {
+  background-color: #fff3e0;
+  color: #f57c00;
+  border: 1px solid rgba(245, 124, 0, 0.3);
+}
+
+.status-badge.status-cancelled {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid rgba(153, 27, 27, 0.3);
 }
 
 .priority-wrapper {
@@ -982,5 +1047,18 @@ td {
 
 :deep(body.dark-mode) .alert-icon {
   color: #9333ea;
+}
+
+.action-btn.rejected {
+  color: #dc2626;
+}
+
+.action-btn.correct {
+  background-color: #f57c00;
+  color: white;
+}
+
+.action-btn.correct svg {
+  color: white;
 }
 </style>

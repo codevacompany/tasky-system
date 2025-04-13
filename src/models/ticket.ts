@@ -17,6 +17,7 @@ export enum TicketStatus {
   Completed = 'Finalizado',
   Returned = 'Devolvido',
   Rejected = 'Reprovado',
+  Cancelled = 'Cancelado'
 }
 
 export interface Ticket {
