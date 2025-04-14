@@ -171,8 +171,8 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" @click="cancelCorrection">Cancelar</button>
-          <button 
-            class="btn btn-primary" 
+          <button
+            class="btn btn-primary"
             @click="confirmCorrection"
             :disabled="!newCompletionDate"
           >
@@ -230,15 +230,13 @@ const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor' | 'arquivo') 
     const filters = { name, status, priority, page: currentPage.value };
 
     if (tab === 'recebidos') {
-      response = await ticketService.getByTargetUser(user!.id, { 
-        ...filters, 
-        excludeStatuses: [TicketStatus.Completed, TicketStatus.Rejected] 
+      response = await ticketService.getByTargetUser(user!.id, {
+        ...filters,
       });
       tickets.value = response.data.items;
     } else if (tab === 'criados') {
-      response = await ticketService.getByRequester(user!.id, { 
+      response = await ticketService.getByRequester(user!.id, {
         ...filters,
-        excludeStatuses: [TicketStatus.Completed, TicketStatus.Rejected]
       });
       tickets.value = response.data.items;
     } else if (tab === 'setor') {
@@ -250,8 +248,8 @@ const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor' | 'arquivo') 
         ...filters,
         status: undefined
       });
-      archivedReceivedTickets.value = receivedResponse.data.items.filter(ticket => 
-        ticket.status === TicketStatus.Completed || 
+      archivedReceivedTickets.value = receivedResponse.data.items.filter(ticket =>
+        ticket.status === TicketStatus.Completed ||
         ticket.status === TicketStatus.Rejected
       );
 
@@ -260,14 +258,14 @@ const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor' | 'arquivo') 
         ...filters,
         status: undefined
       });
-      archivedCreatedTickets.value = createdResponse.data.items.filter(ticket => 
-        ticket.status === TicketStatus.Completed || 
+      archivedCreatedTickets.value = createdResponse.data.items.filter(ticket =>
+        ticket.status === TicketStatus.Completed ||
         ticket.status === TicketStatus.Rejected
       );
     }
 
     if (tab !== 'arquivo') {
-      totalPages.value = response.data.totalPages;
+      totalPages.value = response!.data.totalPages;
     }
   } catch {
     toast.error('Erro ao carregar tickets. Tente novamente.');
@@ -344,10 +342,11 @@ const confirmCorrection = async () => {
   if (!selectedTicket.value || !newCompletionDate.value) return;
 
   try {
-    await ticketService.updateStatus(selectedTicket.value.id, { 
+    await ticketService.updateStatus(selectedTicket.value.id, {
       status: TicketStatus.InProgress,
-      completionDate: newCompletionDate.value
     });
+
+    await ticketService.update(selectedTicket.value.id, { dueAt: newCompletionDate.value})
     toast.success('Correção solicitada com sucesso!');
     showCorrectionModal.value = false;
     selectedTicket.value = null;
