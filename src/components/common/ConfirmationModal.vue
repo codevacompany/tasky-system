@@ -13,38 +13,23 @@
         <!-- Campos adicionais para solicitação de correção -->
         <div v-if="isCorrection" class="correction-fields">
           <div class="form-group">
-            <label for="reason">Motivo*</label>
-            <select 
-              id="reason" 
-              v-model="correctionData.reason" 
-              class="form-control"
-              :class="{ 'error': showErrors && !correctionData.reason }"
-            >
-              <option value="">Selecione um motivo</option>
-              <option value="dados_incorretos">Dados Incorretos</option>
-              <option value="documentacao_incompleta">Documentação Incompleta</option>
-              <option value="informacoes_ausentes">Informações Ausentes</option>
-              <option value="erro_procedimento">Erro de Procedimento</option>
-              <option value="outros">Outros</option>
-            </select>
-            <span v-if="showErrors && !correctionData.reason" class="error-message">
-              Selecione um motivo
-            </span>
+            <label for="reason">Motivo:</label>
+            <input
+              type="text"
+              id="reason"
+              v-model="correctionReason"
+              placeholder="Informe o motivo"
+              required
+            />
           </div>
-          
           <div class="form-group">
-            <label for="details">Detalhes*</label>
-            <textarea 
-              id="details" 
-              v-model="correctionData.details" 
-              class="form-control"
-              :class="{ 'error': showErrors && !correctionData.details }"
-              placeholder="Descreva os detalhes da correção necessária..."
-              rows="4"
+            <label for="description">Descrição:</label>
+            <textarea
+              id="description"
+              v-model="correctionDescription"
+              placeholder="Descreva os detalhes"
+              required
             ></textarea>
-            <span v-if="showErrors && !correctionData.details" class="error-message">
-              Preencha os detalhes
-            </span>
           </div>
         </div>
       </div>
@@ -52,7 +37,11 @@
         <button class="action-btn reject" @click="handleCancel">
           <font-awesome-icon icon="times" /> Cancelar
         </button>
-        <button class="action-btn approve" @click="handleConfirm">
+        <button 
+          class="action-btn approve" 
+          @click="handleConfirm"
+          :disabled="isCorrection && (!correctionReason || !correctionDescription)"
+        >
           <font-awesome-icon icon="check" /> Confirmar
         </button>
       </div>
@@ -76,10 +65,8 @@ const emit = defineEmits<{
 }>();
 
 const showErrors = ref(false);
-const correctionData = ref({
-  reason: '',
-  details: ''
-});
+const correctionReason = ref('');
+const correctionDescription = ref('');
 
 // Resetar dados quando o modal é fechado ou aberto
 watch(() => props.isOpen, (newValue) => {
@@ -95,8 +82,8 @@ watch(() => props.isOpen, (newValue) => {
 const validateForm = (): boolean => {
   if (!props.isCorrection) return true;
   
-  const isValid = correctionData.value.reason.trim() !== '' && 
-                  correctionData.value.details.trim() !== '';
+  const isValid = correctionReason.value.trim() !== '' && 
+                  correctionDescription.value.trim() !== '';
   
   if (!isValid) {
     showErrors.value = true;
@@ -107,10 +94,8 @@ const validateForm = (): boolean => {
 
 const resetForm = () => {
   showErrors.value = false;
-  correctionData.value = {
-    reason: '',
-    details: ''
-  };
+  correctionReason.value = '';
+  correctionDescription.value = '';
 };
 
 const handleConfirm = () => {
@@ -118,8 +103,8 @@ const handleConfirm = () => {
   
   if (props.isCorrection) {
     emit('confirm', {
-      ...correctionData.value,
-      details: correctionData.value.details.trim()
+      reason: correctionReason.value,
+      description: correctionDescription.value
     });
   } else {
     emit('confirm');
@@ -210,35 +195,18 @@ const handleCancel = () => {
   color: #4a5568;
 }
 
-.form-control {
+.form-group input,
+.form-group textarea {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid #e2e8f0;
   border-radius: 4px;
   font-size: 0.875rem;
-  transition: all 0.2s ease;
 }
 
-.form-control:focus {
-  outline: none;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
-}
-
-.form-control.error {
-  border-color: #dc2626;
-}
-
-.error-message {
-  display: block;
-  color: #dc2626;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-}
-
-textarea.form-control {
-  resize: vertical;
+.form-group textarea {
   min-height: 100px;
+  resize: vertical;
 }
 
 .modal-footer {
@@ -311,13 +279,19 @@ textarea.form-control {
   color: #94a3b8;
 }
 
-:deep(body.dark-mode) .form-control {
+:deep(body.dark-mode) .form-group input,
+:deep(body.dark-mode) .form-group textarea {
   background: #1e293b;
   border-color: #2d3748;
   color: #e2e8f0;
 }
 
-:deep(body.dark-mode) .form-control:focus {
+:deep(body.dark-mode) .form-group textarea {
+  border-color: #2d3748;
+}
+
+:deep(body.dark-mode) .form-group input:focus,
+:deep(body.dark-mode) .form-group textarea:focus {
   border-color: #818cf8;
   box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.1);
 }

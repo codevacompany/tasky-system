@@ -149,9 +149,9 @@ const statusColor = (status: TicketStatus) => {
 }
 
 .status-returned {
-  background-color: #ffccbc;
-  color: #ff5722;
-  border: 1px solid rgba(255, 87, 34, 0.3);
+  background-color: #fff3e0;
+  color: #f57c00;
+  border: 1px solid rgba(245, 124, 0, 0.3);
 }
 
 .status-rejected {

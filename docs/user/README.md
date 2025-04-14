@@ -47,6 +47,13 @@
 2. O ticket será finalizado
 3. O receptor receberá uma notificação
 
+### Solicitando Correção
+1. Se necessário, clique em "CORRIGIR"
+2. Defina uma nova data de conclusão para o ticket
+3. Clique em "CONFIRMAR"
+4. O ticket voltará para o status "EM ANDAMENTO"
+5. O receptor receberá uma notificação
+
 ### Rejeitando um Ticket
 1. Se necessário, clique em "REJEITAR"
 2. Digite o motivo da rejeição
@@ -58,7 +65,6 @@
 - Total de tickets
 - Tickets pendentes
 - Tickets em andamento
-- Tickets resolvidos
 
 ### Filtros
 - Por status
@@ -74,6 +80,7 @@
 - Ticket enviado para verificação
 - Ticket aprovado/rejeitado
 - Ticket revisado
+- Correção solicitada
 
 ### Gerenciando Notificações
 1. Clique no ícone de sino
@@ -103,6 +110,11 @@
 2. Faça as correções necessárias
 3. Clique em "REVISAR"
 4. Envie para verificação novamente
+
+### O que fazer quando uma correção é solicitada?
+1. Verifique a nova data de conclusão definida
+2. Faça as correções necessárias
+3. Envie para verificação novamente antes da nova data
 
 ### Como saber o prazo de um ticket?
 - Verifique a data de conclusão no detalhe do ticket

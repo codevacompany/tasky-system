@@ -90,7 +90,7 @@ export const ticketService = {
     return apiClient.post(`/tickets/${id}/approve`);
   },
 
-  async delete(id: number) {
-    return apiClient.delete(`/tickets/${id}`);
+  async cancel(id: number) {
+    return apiClient.post(`/tickets/${id}/cancel`);
   },
 };

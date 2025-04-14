@@ -17,6 +17,7 @@ export enum TicketStatus {
   Completed = 'Finalizado',
   Returned = 'Devolvido',
   Rejected = 'Reprovado',
+  Cancelled = 'Cancelado'
 }
 
 export interface Ticket {
@@ -46,7 +47,7 @@ export interface CreateTicketDto {
   requesterId: number | null;
   targetUserId: number | null;
   categoryId: number | null;
-  completionDate?: string;
+  dueAt?: string;
   isPrivate: boolean;
 }
 
@@ -58,7 +59,7 @@ export interface UpdateTicketDto {
   requesterId?: User;
   targetUserId?: User;
   categoryId?: number | null;
-  completionDate?: string;
+  dueAt?: string;
 }
 
 export interface UpdateTicketStatusDto {

@@ -56,7 +56,9 @@ import {
   faSun,
   faCog,
   faBell,
-  faUser
+  faUser,
+  faWrench,
+  faBan
 } from '@fortawesome/free-solid-svg-icons';
 
 import { faBell as faBellRegular, faClock as faClockRegular } from '@fortawesome/free-regular-svg-icons';
@@ -122,6 +124,8 @@ const icons = [
   faComment,
   faBellRegular,
   faClockRegular,
+  faWrench,
+  faBan
 ];
 
 library.add(...icons);

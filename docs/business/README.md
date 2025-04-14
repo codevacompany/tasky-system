@@ -106,7 +106,7 @@
 
 ### Taxa de Resolução
 
-- Meta: 90% dos tickets resolvidos dentro do prazo
+- Meta: 90% dos tickets finalizados dentro do prazo
 - Monitoramento diário de tickets atrasados
 
 ### Satisfação do Usuário
