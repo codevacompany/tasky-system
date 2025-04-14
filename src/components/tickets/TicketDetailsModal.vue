@@ -551,7 +551,7 @@ const cancelTicket = async (ticketId: number) => {
     async () => {
       try {
         // Por enquanto usando o endpoint de delete
-        await ticketService.delete(ticketId);
+        await ticketService.cancel(ticketId);
         toast.success('Ticket cancelado com sucesso');
         emit('refresh');
         emit('close');

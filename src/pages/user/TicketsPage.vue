@@ -135,7 +135,7 @@
           @changePage="(page) => currentPage = page"
           @viewTicket="handleViewTicket"
           @editTicket="handleEditTicket"
-          @deleteTicket="handleDeleteTicket"
+          @cancelTicket="handleCancelTicket"
           @acceptTicket="handleAcceptTicket"
           @verifyTicket="handleVerifyTicket"
           @approveTicket="handleApproveTicket"
@@ -291,10 +291,10 @@ const handleEditTicket = (ticket: Ticket) => {
   // Implementar lógica de edição
 };
 
-const handleDeleteTicket = async (ticket: Ticket) => {
+const handleCancelTicket = async (ticket: Ticket) => {
   if (confirm('Tem certeza que deseja excluir este ticket?')) {
     try {
-      await ticketService.delete(ticket.id);
+      await ticketService.cancel(ticket.id);
       toast.success('Ticket excluído com sucesso!');
       fetchTickets(activeTab.value);
     } catch {
