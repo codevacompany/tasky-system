@@ -38,7 +38,7 @@
             <td>{{ user.id }}</td>
             <td>{{ user.firstName }} {{ user.lastName }}</td>
             <td>{{ user.department?.name || 'N/A' }}</td>
-            <td>{{ user.isAdmin ? 'Sim' : 'Não' }}</td>
+            <td>{{ user.isActive ? 'Sim' : 'Não' }}</td>
             <td>{{ user.email }}</td>
           </tr>
         </tbody>

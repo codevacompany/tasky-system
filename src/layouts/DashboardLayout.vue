@@ -54,7 +54,7 @@
                 </li>
               </router-link>
               <router-link to="/admin/clientes">
-                <li v-if="user?.isAdmin">
+                <li v-if="user?.role.name === RoleName.GlobalAdmin">
                   <div class="admin-menu-item" :class="{ active: isActive('/admin/clientes') }">
                     <font-awesome-icon icon="building" /> Clientes
                   </div>

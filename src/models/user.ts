@@ -9,6 +9,7 @@ export interface User {
   email: string;
   departmentId: number;
   department: Department;
+  isActive: boolean;
   role: Role;
 }
 
