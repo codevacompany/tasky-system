@@ -7,10 +7,10 @@
         <div class="header-actions">
           <div class="search-box">
             <font-awesome-icon icon="search" class="search-icon" />
-            <input 
-              type="text" 
-              v-model="searchTerm" 
-              placeholder="Buscar por nome, CNPJ ou plano..." 
+            <input
+              type="text"
+              v-model="searchTerm"
+              placeholder="Buscar por nome, CNPJ ou plano..."
             />
           </div>
           <button class="btn btn-primary" @click="showNewClientModal = true">
@@ -99,16 +99,16 @@
         </select>
 
         <div class="date-filter">
-          <input 
-            type="date" 
-            v-model="dateFilter.start" 
+          <input
+            type="date"
+            v-model="dateFilter.start"
             class="filter-date"
             placeholder="Data inicial"
           />
           <span>até</span>
-          <input 
-            type="date" 
-            v-model="dateFilter.end" 
+          <input
+            type="date"
+            v-model="dateFilter.end"
             class="filter-date"
             placeholder="Data final"
           />
@@ -138,58 +138,45 @@
         <thead>
           <tr>
             <th class="checkbox-column">
-              <input 
-                type="checkbox" 
-                :checked="isAllSelected"
-                @change="toggleAllSelection"
-              />
+              <input type="checkbox" :checked="isAllSelected" @change="toggleAllSelection" />
             </th>
             <th @click="sortBy('razaoSocial')">
               Cliente
-              <font-awesome-icon 
-                :icon="getSortIcon('razaoSocial')" 
+              <font-awesome-icon
+                :icon="getSortIcon('razaoSocial')"
                 v-if="sortField === 'razaoSocial'"
               />
             </th>
             <th @click="sortBy('cnpj')">
               CNPJ
-              <font-awesome-icon 
-                :icon="getSortIcon('cnpj')" 
-                v-if="sortField === 'cnpj'"
-              />
+              <font-awesome-icon :icon="getSortIcon('cnpj')" v-if="sortField === 'cnpj'" />
             </th>
             <th @click="sortBy('plano')">
               Plano
-              <font-awesome-icon 
-                :icon="getSortIcon('plano')" 
-                v-if="sortField === 'plano'"
-              />
+              <font-awesome-icon :icon="getSortIcon('plano')" v-if="sortField === 'plano'" />
             </th>
             <th @click="sortBy('status')">
               Status
-              <font-awesome-icon 
-                :icon="getSortIcon('status')" 
-                v-if="sortField === 'status'"
-              />
+              <font-awesome-icon :icon="getSortIcon('status')" v-if="sortField === 'status'" />
             </th>
             <th @click="sortBy('usuariosAtivos')">
               Usuários
-              <font-awesome-icon 
-                :icon="getSortIcon('usuariosAtivos')" 
+              <font-awesome-icon
+                :icon="getSortIcon('usuariosAtivos')"
                 v-if="sortField === 'usuariosAtivos'"
               />
             </th>
             <th @click="sortBy('ticketsMes')">
               Tickets/Mês
-              <font-awesome-icon 
-                :icon="getSortIcon('ticketsMes')" 
+              <font-awesome-icon
+                :icon="getSortIcon('ticketsMes')"
                 v-if="sortField === 'ticketsMes'"
               />
             </th>
             <th @click="sortBy('proximaFatura')">
               Próx. Fatura
-              <font-awesome-icon 
-                :icon="getSortIcon('proximaFatura')" 
+              <font-awesome-icon
+                :icon="getSortIcon('proximaFatura')"
                 v-if="sortField === 'proximaFatura'"
               />
             </th>
@@ -199,13 +186,13 @@
         <tbody>
           <template v-for="client in sortedClients" :key="client.id">
             <!-- Linha principal do cliente -->
-            <tr 
-              :class="{ 'expanded': expandedClient === client.id }"
+            <tr
+              :class="{ expanded: expandedClient === client.id }"
               @click="toggleClientExpansion(client.id)"
             >
               <td class="checkbox-column" @click.stop>
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   :checked="isSelected(client)"
                   @change="toggleSelection(client)"
                 />
@@ -232,10 +219,12 @@
                 <div class="usage-info">
                   {{ client.usuariosAtivos }}/{{ client.limiteUsuarios }}
                   <div class="progress-bar">
-                    <div 
-                      class="progress" 
-                      :style="{width: `${(client.usuariosAtivos/client.limiteUsuarios)*100}%`}"
-                      :class="{'warning': client.usuariosAtivos/client.limiteUsuarios > 0.8}"
+                    <div
+                      class="progress"
+                      :style="{
+                        width: `${(client.usuariosAtivos / client.limiteUsuarios) * 100}%`,
+                      }"
+                      :class="{ warning: client.usuariosAtivos / client.limiteUsuarios > 0.8 }"
                     ></div>
                   </div>
                 </div>
@@ -244,10 +233,10 @@
                 <div class="usage-info">
                   {{ client.ticketsMes }}/{{ client.limiteTickets }}
                   <div class="progress-bar">
-                    <div 
-                      class="progress" 
-                      :style="{width: `${(client.ticketsMes/client.limiteTickets)*100}%`}"
-                      :class="{'warning': client.ticketsMes/client.limiteTickets > 0.8}"
+                    <div
+                      class="progress"
+                      :style="{ width: `${(client.ticketsMes / client.limiteTickets) * 100}%` }"
+                      :class="{ warning: client.ticketsMes / client.limiteTickets > 0.8 }"
                     ></div>
                   </div>
                 </div>
@@ -268,7 +257,11 @@
                   <button class="btn-icon" title="Usuários" @click.stop="manageUsers(client)">
                     <font-awesome-icon icon="users" />
                   </button>
-                  <button class="btn-icon" title="Configurações" @click.stop="manageSettings(client)">
+                  <button
+                    class="btn-icon"
+                    title="Configurações"
+                    @click.stop="manageSettings(client)"
+                  >
                     <font-awesome-icon icon="cog" />
                   </button>
                   <button class="btn-icon" title="Mais opções" @click.stop="showOptions(client)">
@@ -318,16 +311,20 @@
                             <button class="btn-icon" title="Editar" @click="editUser(user)">
                               <font-awesome-icon icon="edit" />
                             </button>
-                            <button 
-                              class="btn-icon" 
-                              title="Alterar Status" 
+                            <button
+                              class="btn-icon"
+                              title="Alterar Status"
                               @click="toggleUserStatus(user)"
                             >
-                              <font-awesome-icon 
+                              <font-awesome-icon
                                 :icon="user.status === 'ATIVO' ? 'ban' : 'check'"
                               />
                             </button>
-                            <button class="btn-icon" title="Resetar Senha" @click="resetPassword(user)">
+                            <button
+                              class="btn-icon"
+                              title="Resetar Senha"
+                              @click="resetPassword(user)"
+                            >
                               <font-awesome-icon icon="key" />
                             </button>
                           </div>
@@ -345,19 +342,11 @@
 
     <!-- Paginação -->
     <div class="pagination">
-      <button 
-        class="btn btn-icon" 
-        :disabled="currentPage === 1"
-        @click="currentPage--"
-      >
+      <button class="btn btn-icon" :disabled="currentPage === 1" @click="currentPage--">
         <font-awesome-icon icon="chevron-left" />
       </button>
       <span>Página {{ currentPage }} de {{ totalPages }}</span>
-      <button 
-        class="btn btn-icon" 
-        :disabled="currentPage === totalPages"
-        @click="currentPage++"
-      >
+      <button class="btn btn-icon" :disabled="currentPage === totalPages" @click="currentPage++">
         <font-awesome-icon icon="chevron-right" />
       </button>
     </div>
@@ -401,12 +390,8 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" @click="showNewClientModal = false">
-            Cancelar
-          </button>
-          <button class="btn btn-primary" @click="saveNewClient">
-            Criar Cliente
-          </button>
+          <button class="btn btn-secondary" @click="showNewClientModal = false">Cancelar</button>
+          <button class="btn btn-primary" @click="saveNewClient">Criar Cliente</button>
         </div>
       </div>
     </div>
@@ -416,6 +401,19 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 
+type SortableClientField =
+  | 'razaoSocial'
+  | 'cnpj'
+  | 'plano'
+  | 'status'
+  | 'dominio'
+  | 'usuariosAtivos'
+  | 'limiteUsuarios'
+  | 'ticketsMes'
+  | 'limiteTickets'
+  | 'proximaFatura'
+  | 'statusPagamento';
+
 // Estados
 const searchTerm = ref('');
 const statusFilter = ref('');
@@ -424,12 +422,12 @@ const currentPage = ref(1);
 const showNewClientModal = ref(false);
 const expandedClient = ref<number | null>(null);
 const selectedClients = ref<number[]>([]);
-const sortField = ref<string>('razaoSocial');
+const sortField = ref<SortableClientField>('razaoSocial');
 const sortOrder = ref<'asc' | 'desc'>('asc');
 const pagamentoFilter = ref('');
 const dateFilter = ref({
   start: '',
-  end: ''
+  end: '',
 });
 
 // Novo cliente
@@ -438,7 +436,7 @@ const newClient = ref({
   cnpj: '',
   plano: 'BASICO',
   dominio: '',
-  adminEmail: ''
+  adminEmail: '',
 });
 
 // Dados mockados para exemplo
@@ -465,7 +463,7 @@ const clients = ref([
         departamento: 'TI',
         perfil: 'ADMIN',
         status: 'ATIVO',
-        ultimoAcesso: '2024-03-15T14:30:00'
+        ultimoAcesso: '2024-03-15T14:30:00',
       },
       {
         id: 2,
@@ -474,9 +472,9 @@ const clients = ref([
         departamento: 'Suporte',
         perfil: 'NORMAL',
         status: 'ATIVO',
-        ultimoAcesso: '2024-03-15T16:45:00'
-      }
-    ]
+        ultimoAcesso: '2024-03-15T16:45:00',
+      },
+    ],
   },
   {
     id: 2,
@@ -500,7 +498,7 @@ const clients = ref([
         departamento: 'Diretoria',
         perfil: 'ADMIN',
         status: 'ATIVO',
-        ultimoAcesso: '2024-03-16T09:15:00'
+        ultimoAcesso: '2024-03-16T09:15:00',
       },
       {
         id: 4,
@@ -509,7 +507,7 @@ const clients = ref([
         departamento: 'RH',
         perfil: 'NORMAL',
         status: 'ATIVO',
-        ultimoAcesso: '2024-03-16T11:20:00'
+        ultimoAcesso: '2024-03-16T11:20:00',
       },
       {
         id: 5,
@@ -518,9 +516,9 @@ const clients = ref([
         departamento: 'Suporte',
         perfil: 'NORMAL',
         status: 'SUSPENSO',
-        ultimoAcesso: '2024-03-14T16:30:00'
-      }
-    ]
+        ultimoAcesso: '2024-03-14T16:30:00',
+      },
+    ],
   },
   {
     id: 3,
@@ -544,7 +542,7 @@ const clients = ref([
         departamento: 'Operações',
         perfil: 'ADMIN',
         status: 'ATIVO',
-        ultimoAcesso: '2024-03-15T08:45:00'
+        ultimoAcesso: '2024-03-15T08:45:00',
       },
       {
         id: 7,
@@ -553,7 +551,7 @@ const clients = ref([
         departamento: 'Financeiro',
         perfil: 'NORMAL',
         status: 'ATIVO',
-        ultimoAcesso: '2024-03-15T10:30:00'
+        ultimoAcesso: '2024-03-15T10:30:00',
       },
       {
         id: 8,
@@ -562,7 +560,7 @@ const clients = ref([
         departamento: 'Produção',
         perfil: 'NORMAL',
         status: 'SUSPENSO',
-        ultimoAcesso: '2024-03-13T14:20:00'
+        ultimoAcesso: '2024-03-13T14:20:00',
       },
       {
         id: 9,
@@ -571,10 +569,10 @@ const clients = ref([
         departamento: 'Qualidade',
         perfil: 'NORMAL',
         status: 'ATIVO',
-        ultimoAcesso: '2024-03-16T09:10:00'
-      }
-    ]
-  }
+        ultimoAcesso: '2024-03-16T09:10:00',
+      },
+    ],
+  },
 ]);
 
 // Estatísticas mockadas
@@ -582,17 +580,18 @@ const stats = ref({
   clientesAtivos: 145,
   totalUsuarios: 2890,
   ticketsMes: 1234,
-  faturamentoMensal: 89500.00
+  faturamentoMensal: 89500.0,
 });
 
 // Computed properties
 const filteredClients = computed(() => {
-  return clients.value.filter(client => {
-    const matchSearch = !searchTerm.value || 
+  return clients.value.filter((client) => {
+    const matchSearch =
+      !searchTerm.value ||
       client.razaoSocial.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
       client.cnpj.includes(searchTerm.value) ||
       client.plano.toLowerCase().includes(searchTerm.value.toLowerCase());
-    
+
     const matchStatus = !statusFilter.value || client.status === statusFilter.value;
     const matchPlan = !planFilter.value || client.plano === planFilter.value;
 
@@ -603,15 +602,17 @@ const filteredClients = computed(() => {
 const totalPages = computed(() => Math.ceil(filteredClients.value.length / 10));
 
 const isAllSelected = computed(() => {
-  return filteredClients.value.length > 0 && 
-         selectedClients.value.length === filteredClients.value.length;
+  return (
+    filteredClients.value.length > 0 &&
+    selectedClients.value.length === filteredClients.value.length
+  );
 });
 
 const sortedClients = computed(() => {
   return [...filteredClients.value].sort((a, b) => {
     const aValue = a[sortField.value];
     const bValue = b[sortField.value];
-    
+
     if (aValue < bValue) return sortOrder.value === 'asc' ? -1 : 1;
     if (aValue > bValue) return sortOrder.value === 'asc' ? 1 : -1;
     return 0;
@@ -638,7 +639,7 @@ const formatDateTime = (datetime: string) => {
 const getUserInitials = (user: { nome: string }) => {
   return user.nome
     .split(' ')
-    .map(n => n[0])
+    .map((n) => n[0])
     .slice(0, 2)
     .join('')
     .toUpperCase();
@@ -688,7 +689,7 @@ const saveNewClient = () => {
 const formatCurrency = (value: number) => {
   return value.toLocaleString('pt-BR', {
     style: 'currency',
-    currency: 'BRL'
+    currency: 'BRL',
   });
 };
 
@@ -705,7 +706,7 @@ const toggleAllSelection = () => {
   if (isAllSelected.value) {
     selectedClients.value = [];
   } else {
-    selectedClients.value = filteredClients.value.map(client => client.id);
+    selectedClients.value = filteredClients.value.map((client) => client.id);
   }
 };
 
@@ -713,7 +714,7 @@ const isSelected = (client: any) => {
   return selectedClients.value.includes(client.id);
 };
 
-const sortBy = (field: string) => {
+const sortBy = (field: SortableClientField) => {
   if (sortField.value === field) {
     sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
   } else {
@@ -872,17 +873,44 @@ const exportSelected = () => {
   margin: 0 auto;
 }
 
-.plan-badge.basico { background: #E3F2FD; color: #1976D2; }
-.plan-badge.profissional { background: #E8F5E9; color: #388E3C; }
-.plan-badge.empresarial { background: #FFF3E0; color: #F57C00; }
-.plan-badge.personalizado { background: #F3E5F5; color: #7B1FA2; }
+.plan-badge.basico {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+.plan-badge.profissional {
+  background: #e8f5e9;
+  color: #388e3c;
+}
+.plan-badge.empresarial {
+  background: #fff3e0;
+  color: #f57c00;
+}
+.plan-badge.personalizado {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
 
-.status-badge.ativo { background: #E8F5E9; color: #388E3C; }
-.status-badge.suspenso { background: #FFF3E0; color: #F57C00; }
-.status-badge.cancelado { background: #FFEBEE; color: #D32F2F; }
+.status-badge.ativo {
+  background: #e8f5e9;
+  color: #388e3c;
+}
+.status-badge.suspenso {
+  background: #fff3e0;
+  color: #f57c00;
+}
+.status-badge.cancelado {
+  background: #ffebee;
+  color: #d32f2f;
+}
 
-.profile-badge.admin { background: #E3F2FD; color: #1976D2; }
-.profile-badge.normal { background: #FFF3E0; color: #F57C00; }
+.profile-badge.admin {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+.profile-badge.normal {
+  background: #fff3e0;
+  color: #f57c00;
+}
 
 .usage-info {
   font-size: 0.9rem;
@@ -1225,4 +1253,4 @@ th:hover {
 :deep(body.dark-mode) .bulk-actions {
   background: var(--background-dark);
 }
-</style> 
+</style>

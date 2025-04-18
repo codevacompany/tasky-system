@@ -67,8 +67,8 @@
         <h3>Notificações</h3>
         <div class="form-group">
           <label class="checkbox-label">
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               v-model="settings.notificacoes.emailNovoTicket"
             />
             Notificar por email ao receber novo ticket
@@ -76,8 +76,8 @@
         </div>
         <div class="form-group">
           <label class="checkbox-label">
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               v-model="settings.notificacoes.emailAtualizacaoTicket"
             />
             Notificar por email ao atualizar ticket
@@ -85,8 +85,8 @@
         </div>
         <div class="form-group">
           <label class="checkbox-label">
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               v-model="settings.notificacoes.emailFinalizacaoTicket"
             />
             Notificar por email ao finalizar ticket
@@ -113,9 +113,9 @@
         <div class="form-group">
           <label>Logo da Empresa</label>
           <div class="logo-upload">
-            <img 
-              v-if="settings.personalizacao.logo" 
-              :src="settings.personalizacao.logo" 
+            <img
+              v-if="settings.personalizacao.logo"
+              :src="settings.personalizacao.logo"
               alt="Logo da empresa"
             />
             <button class="btn btn-secondary">
@@ -125,8 +125,8 @@
         </div>
         <div class="form-group">
           <label>Mensagem de Boas-vindas</label>
-          <textarea 
-            v-model="settings.personalizacao.mensagemBoasVindas" 
+          <textarea
+            v-model="settings.personalizacao.mensagemBoasVindas"
             rows="3"
           ></textarea>
         </div>
@@ -144,8 +144,8 @@
                 <p>Receba notificações no Slack</p>
               </div>
             </div>
-            <button 
-              class="btn" 
+            <button
+              class="btn"
               :class="settings.integracoes.slack ? 'btn-danger' : 'btn-primary'"
               @click="toggleIntegration('slack')"
             >
@@ -161,8 +161,8 @@
                 <p>Integre com seus canais do Teams</p>
               </div>
             </div>
-            <button 
-              class="btn" 
+            <button
+              class="btn"
               :class="settings.integracoes.teams ? 'btn-danger' : 'btn-primary'"
               @click="toggleIntegration('teams')"
             >
@@ -178,8 +178,8 @@
                 <p>Sincronize tickets com o Jira</p>
               </div>
             </div>
-            <button 
-              class="btn" 
+            <button
+              class="btn"
               :class="settings.integracoes.jira ? 'btn-danger' : 'btn-primary'"
               @click="toggleIntegration('jira')"
             >
@@ -194,6 +194,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+
+type IntegrationKey = keyof typeof settings.value.integracoes;
 
 // Dados mockados do cliente
 const client = ref({
@@ -234,7 +236,7 @@ const saveSettings = () => {
   console.log('Salvando configurações:', settings.value);
 };
 
-const toggleIntegration = (integration: string) => {
+const toggleIntegration = (integration: IntegrationKey) => {
   settings.value.integracoes[integration] = !settings.value.integracoes[integration];
 };
 </script>
@@ -402,4 +404,4 @@ const toggleIntegration = (integration: string) => {
   border-color: var(--border-color-dark);
   color: var(--text-color-dark);
 }
-</style> 
+</style>
