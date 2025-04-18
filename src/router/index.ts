@@ -9,6 +9,9 @@ import DepartmentList from '@/pages/admin/DepartmentList.vue';
 import ReportsPage from '@/pages/admin/ReportsPage.vue';
 import CategoryList from '@/pages/admin/CategoryList.vue';
 import TicketsPage from '@/pages/user/TicketsPage.vue';
+import ClientManagement from '@/pages/admin/ClientManagement.vue';
+import ClientUsers from '@/pages/admin/ClientUsers.vue';
+import ClientSettings from '@/pages/admin/ClientSettings.vue';
 import { localStorageService } from '@/utils/localStorageService';
 
 const routes: RouteRecordRaw[] = [
@@ -40,6 +43,9 @@ const routes: RouteRecordRaw[] = [
       { path: 'usuarios', component: UserList },
       { path: 'setores', component: DepartmentList },
       { path: 'categorias', component: CategoryList },
+      { path: 'clientes', component: ClientManagement },
+      { path: 'clientes/:id/usuarios', component: ClientUsers },
+      { path: 'clientes/:id/configuracoes', component: ClientSettings },
     ],
     meta: { requiresAuth: true },
   },

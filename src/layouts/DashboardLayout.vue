@@ -53,6 +53,13 @@
                   </div>
                 </li>
               </router-link>
+              <router-link to="/admin/clientes">
+                <li v-if="user?.isAdmin">
+                  <div class="admin-menu-item" :class="{ active: isActive('/admin/clientes') }">
+                    <font-awesome-icon icon="building" /> Clientes
+                  </div>
+                </li>
+              </router-link>
             </ul>
           </nav>
         </div>
