@@ -1,27 +1,29 @@
 import type { Category } from './category';
 import type { Department } from './department';
 import type { TicketComment } from './ticketComment';
+import type { TicketUpdate } from './ticketUpdate';
 import type { User } from './user';
 
 export enum TicketPriority {
-  Low = 'Baixa',
-  Medium = 'Média',
-  High = 'Alta',
+  Low = 'baixa',
+  Medium = 'média',
+  High = 'alta',
 }
 
 export enum TicketStatus {
-  Pending = 'Pendente',
-  InProgress = 'Em andamento',
-  AwaitingVerification = 'Aguardando verificação',
-  UnderVerification = 'Em verificação',
-  Completed = 'Finalizado',
-  Returned = 'Devolvido',
-  Rejected = 'Reprovado',
-  Cancelled = 'Cancelado'
+  Pending = 'pendente',
+  InProgress = 'em_andamento',
+  AwaitingVerification = 'aguardando_verificação',
+  UnderVerification = 'em_verificação',
+  Completed = 'finalizado',
+  Canceled = 'cancelado',
+  Returned = 'devolvido',
+  Rejected = 'reprovado',
 }
 
 export interface Ticket {
   id: number;
+  customId: string;
   name: string;
   priority: TicketPriority;
   description: string;
@@ -31,9 +33,11 @@ export interface Ticket {
   status: TicketStatus;
   completedAt?: string;
   acceptedAt?: string;
-  dueAt?: string
+  dueAt?: string;
+  canceledAt?: string;
   category?: Category;
   comments: TicketComment[];
+  updates: TicketUpdate[];
   disapprovalReason?: string;
   isPrivate: boolean;
   createdAt: string;
@@ -48,6 +52,7 @@ export interface CreateTicketDto {
   targetUserId: number | null;
   categoryId: number | null;
   dueAt?: string;
+  canceledAt?: string;
   isPrivate: boolean;
 }
 

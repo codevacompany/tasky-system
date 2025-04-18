@@ -24,7 +24,7 @@
             :key="notification.id"
             class="notification-item"
             :class="{ unread: !notification.read }"
-            @click="fetchSelectedTicket(notification.resourceId, notification.id)"
+            @click="fetchSelectedTicket(notification)"
           >
             <div class="notification-icon">
               <font-awesome-icon
@@ -33,7 +33,7 @@
               />
             </div>
             <div class="notification-details">
-              <p class="notification-text">{{ notification.message }}</p>
+              <div v-html="formatNotificationMessage(notification)" class="notification-text"></div>
               <span class="notification-time">
                 <font-awesome-icon :icon="['far', 'clock']" />
                 {{ formatRelativeTime(notification.createdAt) }}</span
@@ -95,7 +95,7 @@ const fetchNotifications = async () => {
   isLoading.value = true;
   try {
     const response = await notificationService.getBytargetUser(user!.id);
-    notifications.value = response.data;
+    notifications.value = response.data.items;
     emit('notifications-read');
   } catch {
     toast.error('Erro ao carregar notificações. Tente novamente.');
@@ -104,15 +104,16 @@ const fetchNotifications = async () => {
   }
 };
 
-const fetchSelectedTicket = async (ticketId: number | null, notificationId: number) => {
-  if (ticketId) {
+const fetchSelectedTicket = async (notification: Notification) => {
+  if (notification.resourceCustomId) {
     try {
       openTicket.value = true;
-      const response = await ticketService.getById(ticketId);
+      const response = await ticketService.getById(notification.resourceCustomId);
       selectedTicket.value = response.data;
-      notificationService.markAsRead(notificationId);
+      notificationService.markAsRead(notification.id);
       await fetchNotifications();
-    } catch {
+    } catch(err) {
+      console.error(err)
       toast.error('Erro ao carregar ticket.');
     }
   }
@@ -148,6 +149,14 @@ const getNotificationIconClass = (type: NotificationType) => {
       return 'icon-comment';
     default:
       return '';
+  }
+};
+
+const formatNotificationMessage = (notification: Notification) => {
+  if (notification.resourceCustomId) {
+    return `${notification.message.replace('user', notification.createdBy.firstName).replace('resource', notification.resourceCustomId.toString())}`;
+  } else {
+    return `${notification.message.replace('user', notification.createdBy.firstName).replace('resource', notification.resourceId.toString())}`;
   }
 };
 
@@ -253,8 +262,9 @@ onMounted(fetchNotifications);
   border-left: 3px solid #0d6efd;
 }
 
-.notification-item.unread .notification-text {
-  font-weight: 500;
+span {
+  font-weight: 700;
+  color: red
 }
 
 .notification-item:hover {

@@ -11,12 +11,14 @@ export interface TicketComment {
 
 export interface CreateTicketCommentDto {
   ticketId: number;
+  ticketCustomId: string;
   userId: number;
   content: string;
 }
 
 export interface UpdateTicketCommentDto {
   ticketId?: number;
+  ticketCustomId?: string
   userId?: number;
   content?: string;
 }

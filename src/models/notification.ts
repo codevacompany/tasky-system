@@ -1,9 +1,11 @@
 import type { User } from "./user";
 
 export enum NotificationType {
-  Open = 'Abertura',
-  Comment = 'Comentário',
-  StatusUpdated = 'Atualização de Status',
+  Open = 'abertura',
+  Comment = 'comentário',
+  StatusUpdate = 'atualização_de_status',
+  TicketUpdate = 'atualização',
+  Cancellation = 'cancelamento',
 }
 
 export interface Notification {
@@ -11,9 +13,10 @@ export interface Notification {
   type: NotificationType;
   message: string;
   read: boolean;
-  createdBy?: User;
+  createdBy: User;
   targetUser: User;
-  resourceId: number | null;
+  resourceId: number;
+  resourceCustomId?: string
   createdAt: string;
 }
 

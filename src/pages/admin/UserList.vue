@@ -11,12 +11,7 @@
     <div class="search-group">
       <div class="search-input-wrapper">
         <font-awesome-icon icon="search" class="input-icon" />
-        <input
-          type="text"
-          id="searchTickets"
-          placeholder="Buscar usuários"
-          v-model="searchTerm"
-        />
+        <input type="text" id="searchTickets" placeholder="Buscar usuários" v-model="searchTerm" />
       </div>
     </div>
 
@@ -51,21 +46,13 @@
     </div>
 
     <div class="pagination">
-      <button
-        class="btn btn-icon"
-        :disabled="currentPage === 1"
-        @click="currentPage--"
-      >
+      <button class="btn btn-icon" :disabled="currentPage === 1" @click="currentPage--">
         <font-awesome-icon icon="chevron-left" />
       </button>
 
       <span>Página {{ currentPage }} de {{ totalPages }}</span>
 
-      <button
-        class="btn btn-icon"
-        :disabled="currentPage === totalPages"
-        @click="currentPage++"
-      >
+      <button class="btn btn-icon" :disabled="currentPage === totalPages" @click="currentPage++">
         <font-awesome-icon icon="chevron-right" />
       </button>
     </div>
@@ -81,7 +68,7 @@ import type { User } from '@/models';
 import NewUserModal from '@/components/users/NewUserModal.vue';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
-import { debounce } from '@/utils/debounce';
+import { debounce } from '@/utils/generic-helper';
 
 const users = ref<User[]>([]);
 const isModalOpen = ref(false);
@@ -103,7 +90,7 @@ const loadUsers = async () => {
   try {
     const response = await userService.fetch(filters);
     users.value = response.data.items;
-    totalPages.value = response.data.totalPages
+    totalPages.value = response.data.totalPages;
   } catch {
     toast.error('Erro ao carregar usuários. Tente novamente.');
   } finally {

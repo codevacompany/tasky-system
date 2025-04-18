@@ -28,7 +28,7 @@
             </div>
             <div class="detail-content">
               <div class="detail-label">ID</div>
-              <div class="detail-value">{{ loadedTicket.id }}</div>
+              <div class="detail-value">{{ loadedTicket.customId }}</div>
             </div>
           </div>
 
@@ -45,7 +45,7 @@
                     :icon="getPriorityIcon(loadedTicket.priority)"
                     class="badge-icon"
                   />
-                  {{ ticket?.priority }}
+                  {{ formatSnakeToNaturalCase(loadedTicket.priority) }}
                 </span>
               </div>
             </div>
@@ -64,7 +64,7 @@
                     :icon="getStatusIcon(loadedTicket.status)"
                     class="badge-icon"
                   />
-                  {{ ticket?.status.toUpperCase() }}
+                  {{ formatSnakeToNaturalCase(ticket?.status!).toUpperCase() }}
                 </span>
               </div>
             </div>
@@ -78,7 +78,8 @@
             <div class="detail-content">
               <div class="detail-label">Solicitante / Setor</div>
               <div class="detail-value">
-                {{ loadedTicket.requester.firstName }} {{ loadedTicket.requester.lastName }} / {{ loadedTicket.department.name }}
+                {{ loadedTicket.requester.firstName }} {{ loadedTicket.requester.lastName }} /
+                {{ loadedTicket.department.name }}
               </div>
             </div>
           </div>
@@ -173,25 +174,30 @@
         </div>
       </div>
 
-      <div class="ticket-actions" v-if="isTargetUser || (isRequester && loadedTicket.status === TicketStatus.UnderVerification)">
+      <div
+        class="ticket-actions"
+        v-if="
+          isTargetUser || (isRequester && loadedTicket.status === TicketStatus.UnderVerification)
+        "
+      >
         <button
           v-if="isTargetUser && ticket?.status === TicketStatus.Pending"
           class="action-button accept"
-          @click="acceptTicket(ticket?.id)"
+          @click="acceptTicket(ticket?.customId)"
         >
           <font-awesome-icon icon="check" /> Aceitar
         </button>
         <button
           v-if="isTargetUser && ticket?.status === TicketStatus.InProgress"
           class="action-button verify"
-          @click="sendForReview(loadedTicket.id)"
+          @click="sendForReview(loadedTicket.customId)"
         >
           <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
         </button>
         <button
           v-if="isTargetUser && ticket?.status === TicketStatus.Returned"
           class="action-button correct"
-          @click="correctTicket(loadedTicket.id)"
+          @click="correctTicket(loadedTicket.customId)"
         >
           <font-awesome-icon icon="wrench" /> Corrigir
         </button>
@@ -203,22 +209,16 @@
             <font-awesome-icon icon="hourglass-half" class="waiting-icon" /> EM VERIFICAÇÃO
           </div>
           <template v-if="isRequester">
-            <button
-              class="action-button approve"
-              @click="approveTicket(loadedTicket.id)"
-            >
+            <button class="action-button approve" @click="approveTicket(loadedTicket.customId)">
               <font-awesome-icon icon="check" /> Aprovar
             </button>
             <button
               class="action-button request-correction"
-              @click="requestCorrection(loadedTicket.id)"
+              @click="requestCorrection(loadedTicket.customId)"
             >
               <font-awesome-icon icon="exclamation-circle" /> Solicitar Correção
             </button>
-            <button
-              class="action-button reject"
-              @click="rejectTicket(loadedTicket.id)"
-            >
+            <button class="action-button reject" @click="rejectTicket(loadedTicket.customId)">
               <font-awesome-icon icon="times" /> Reprovar
             </button>
           </template>
@@ -240,11 +240,16 @@
       </div>
 
       <!-- Nova div separada para o botão de cancelar -->
-      <div class="ticket-actions" v-if="isRequester && loadedTicket.status !== TicketStatus.Completed && loadedTicket.status !== TicketStatus.Rejected && loadedTicket.status !== TicketStatus.Cancelled">
-        <button
-          class="action-button cancel"
-          @click="cancelTicket(loadedTicket.id)"
-        >
+      <div
+        class="ticket-actions"
+        v-if="
+          isRequester &&
+          loadedTicket.status !== TicketStatus.Completed &&
+          loadedTicket.status !== TicketStatus.Rejected &&
+          loadedTicket.status !== TicketStatus.Canceled
+        "
+      >
+        <button class="action-button cancel" @click="cancelTicket(loadedTicket.customId)">
           <font-awesome-icon icon="ban" /> Cancelar
         </button>
       </div>
@@ -254,7 +259,13 @@
           <font-awesome-icon icon="comments" />
           <h3>Comentários</h3>
         </div>
-        <div v-if="loadedTicket?.status === TicketStatus.InProgress || loadedTicket?.status === TicketStatus.UnderVerification" class="comment-input">
+        <div
+          v-if="
+            loadedTicket?.status === TicketStatus.InProgress ||
+            loadedTicket?.status === TicketStatus.UnderVerification
+          "
+          class="comment-input"
+        >
           <textarea
             v-model="newComment"
             placeholder="Digite seu comentário aqui..."
@@ -269,19 +280,36 @@
           <p>Comentários permitidos apenas para tickets em andamento ou em verificação</p>
         </div>
 
-        <div class="comments-list">
-          <div v-for="comment in comments" :key="comment.id" class="comment-item">
-            <div class="comment-avatar">
-              <font-awesome-icon icon="user-circle" />
-            </div>
-            <div class="comment-content">
-              <div class="comment-header">
-                <span class="comment-author"
-                  >{{ comment.user.firstName }} {{ comment.user.lastName }}</span
-                >
-                <span class="comment-time">{{ formatRelativeTime(comment.createdAt) }}</span>
+        <div class="event-list">
+          <div v-for="event in timeline" :key="event.data.id">
+            <div class="event-item" v-if="event.type === 'comment'">
+              <div class="comment-avatar">
+                <font-awesome-icon icon="user-circle" />
               </div>
-              <div class="comment-text">{{ comment.content }}</div>
+              <div class="comment-content">
+                <div class="comment-header">
+                  <span class="comment-author"
+                    >{{ event.data.user.firstName }} {{ event.data.user.lastName }}</span
+                  >
+                  <span class="comment-time">{{ formatRelativeTime(event.createdAt) }}</span>
+                </div>
+                <div class="comment-text">{{ event.data.content }}</div>
+              </div>
+            </div>
+
+            <div class="event-item" v-else>
+              <div class="comment-avatar">
+                <font-awesome-icon icon="user-circle" />
+              </div>
+              <div class="update-content">
+                <div class="update-description-header">
+                  <div
+                    class="ticket-update-description"
+                    v-html="formatUpdateDescription(event.data)"
+                  ></div>
+                  <span class="comment-time">{{ formatRelativeTime(event.createdAt) }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -310,6 +338,9 @@ import { useUserStore } from '@/stores/user';
 import { toast } from 'vue3-toastify';
 import { formatRelativeTime } from '@/utils/date';
 import ConfirmationModal from '../common/ConfirmationModal.vue';
+import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import type { TicketUpdate } from '@/models/ticketUpdate';
+import { TicketUpdateService } from '@/services/ticketUpdateService';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -320,6 +351,7 @@ const emit = defineEmits(['close', 'refresh']);
 const userStore = useUserStore();
 const newComment = ref('');
 const comments = ref<TicketComment[]>([]);
+const ticketUpdates = ref<TicketUpdate[]>([]);
 const loadedTicket = ref<Ticket | null>(null);
 
 const confirmationModal = ref({
@@ -327,7 +359,7 @@ const confirmationModal = ref({
   title: '',
   message: '',
   action: null as (() => Promise<void>) | null,
-  isCorrection: false
+  isCorrection: false,
 });
 
 const closeModal = () => {
@@ -338,11 +370,11 @@ const formatDate = (date?: string) => (date ? new Date(date).toLocaleDateString(
 
 const getPriorityClass = (priority: string) => {
   switch (priority) {
-    case 'Baixa':
+    case 'baixa':
       return 'priority-baixa';
-    case 'Média':
+    case 'média':
       return 'priority-media';
-    case 'Alta':
+    case 'alta':
       return 'priority-alta';
     default:
       return '';
@@ -421,13 +453,18 @@ const getDeadlineClass = (date?: string) => {
   return 'deadline-normal';
 };
 
-const openConfirmationModal = (title: string, message: string, action: () => Promise<void>, isCorrection = false) => {
+const openConfirmationModal = (
+  title: string,
+  message: string,
+  action: () => Promise<void>,
+  isCorrection = false,
+) => {
   confirmationModal.value = {
     isOpen: true,
     title,
     message,
     action,
-    isCorrection
+    isCorrection,
   };
 };
 
@@ -447,7 +484,7 @@ const handleCancel = () => {
   closeConfirmationModal();
 };
 
-const acceptTicket = async (ticketId: number) => {
+const acceptTicket = async (ticketId: string) => {
   openConfirmationModal(
     'Aceitar Ticket',
     'Tem certeza que deseja aceitar este ticket?',
@@ -459,11 +496,11 @@ const acceptTicket = async (ticketId: number) => {
       } catch {
         toast.error('Erro ao aceitar o ticket');
       }
-    }
+    },
   );
 };
 
-const sendForReview = async (ticketId: number) => {
+const sendForReview = async (ticketId: string) => {
   openConfirmationModal(
     'Enviar para Verificação',
     'Tem certeza que deseja enviar este ticket para verificação?',
@@ -475,11 +512,11 @@ const sendForReview = async (ticketId: number) => {
       } catch {
         toast.error('Erro ao enviar o ticket para revisão');
       }
-    }
+    },
   );
 };
 
-const approveTicket = async (ticketId: number) => {
+const approveTicket = async (ticketId: string) => {
   openConfirmationModal(
     'Aprovar Ticket',
     'Tem certeza que deseja aprovar este ticket?',
@@ -491,11 +528,11 @@ const approveTicket = async (ticketId: number) => {
       } catch {
         toast.error('Erro ao aprovar o ticket');
       }
-    }
+    },
   );
 };
 
-const requestCorrection = async (ticketId: number) => {
+const requestCorrection = async (ticketId: string) => {
   openConfirmationModal(
     'Solicitar Correção',
     'Por favor, preencha os detalhes da correção necessária:',
@@ -508,11 +545,11 @@ const requestCorrection = async (ticketId: number) => {
         toast.error('Erro ao solicitar correção');
       }
     },
-    true // indica que é uma solicitação de correção
+    true, // indica que é uma solicitação de correção
   );
 };
 
-const correctTicket = async (ticketId: number) => {
+const correctTicket = async (ticketId: string) => {
   openConfirmationModal(
     'Corrigir Ticket',
     'Tem certeza que deseja iniciar as correções deste ticket?',
@@ -524,11 +561,11 @@ const correctTicket = async (ticketId: number) => {
       } catch {
         toast.error('Erro ao iniciar correção');
       }
-    }
+    },
   );
 };
 
-const rejectTicket = async (ticketId: number) => {
+const rejectTicket = async (ticketId: string) => {
   openConfirmationModal(
     'Reprovar Ticket',
     'Tem certeza que deseja reprovar este ticket?',
@@ -540,11 +577,11 @@ const rejectTicket = async (ticketId: number) => {
       } catch {
         toast.error('Erro ao reprovar o ticket');
       }
-    }
+    },
   );
 };
 
-const cancelTicket = async (ticketId: number) => {
+const cancelTicket = async (ticketId: string) => {
   openConfirmationModal(
     'Cancelar Ticket',
     'Por favor, informe o motivo do cancelamento:',
@@ -559,7 +596,7 @@ const cancelTicket = async (ticketId: number) => {
         toast.error('Erro ao cancelar o ticket');
       }
     },
-    true // indica que precisa de campo de descrição
+    true, // indica que precisa de campo de descrição
   );
 };
 
@@ -572,6 +609,7 @@ const comment = async () => {
   try {
     await ticketCommentService.create({
       ticketId: loadedTicket.value!.id,
+      ticketCustomId: loadedTicket.value!.customId,
       userId: userStore.user!.id,
       content: newComment.value,
     });
@@ -585,7 +623,7 @@ const comment = async () => {
 const fetchComments = async () => {
   try {
     if (loadedTicket.value) {
-      const response = await ticketCommentService.getByTicket(loadedTicket.value.id);
+      const response = await ticketCommentService.getByTicket(loadedTicket.value.customId);
       comments.value = response.data;
     }
   } catch {
@@ -593,8 +631,43 @@ const fetchComments = async () => {
   }
 };
 
+const fetchTicketUpdates = async () => {
+  try {
+    if (loadedTicket.value) {
+      const response = await TicketUpdateService.getByTicket(loadedTicket.value.customId);
+      console.log(response.data);
+      ticketUpdates.value = response.data;
+    }
+  } catch (err) {
+    console.error(err);
+    toast.error('Erro ao buscar atualizações');
+  }
+};
+
+const timeline = computed(() => {
+  const commentEvents = comments.value.map((comment) => ({
+    type: 'comment' as const,
+    createdAt: comment.createdAt,
+    data: comment,
+  }));
+
+  const updateEvents = ticketUpdates.value.map((update) => ({
+    type: 'update' as const,
+    createdAt: update.createdAt,
+    data: update,
+  }));
+
+  return [...commentEvents, ...updateEvents].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+});
+
 const isTargetUser = computed(() => userStore.user?.id === loadedTicket.value?.targetUser.id);
 const isRequester = computed(() => userStore.user?.id === loadedTicket.value?.requester.id);
+
+const formatUpdateDescription = (ticketUpdate: TicketUpdate) => {
+  return `${ticketUpdate.description.replace('user', `${ticketUpdate.performedBy.firstName} ${ticketUpdate.performedBy.lastName}`)}`;
+};
 
 const getPriorityIcon = (priority: string) => {
   switch (priority) {
@@ -633,8 +706,9 @@ const getStatusIcon = (status: string) => {
 watch(
   () => props.isOpen,
   (isOpen) => {
-    if (isOpen && props.ticket?.id) {
+    if (isOpen && props.ticket?.customId) {
       fetchComments();
+      fetchTicketUpdates();
     }
   },
 );
@@ -645,6 +719,7 @@ watch(
     if (newTicket) {
       loadedTicket.value = newTicket;
       fetchComments();
+      fetchTicketUpdates();
     }
   },
   { immediate: true },
@@ -983,11 +1058,11 @@ watch(
   box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
 }
 
-.comments-list {
+.event-list {
   margin-top: 1.5rem;
 }
 
-.comment-item {
+.event-item {
   display: flex;
   gap: 1rem;
   padding: 1rem;
@@ -1018,6 +1093,18 @@ watch(
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
+}
+
+.update-description-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.update-content {
+  width: 100%;
+  display: flex;
 }
 
 .comment-author {
@@ -1105,7 +1192,7 @@ watch(
   background: #1a2233;
 }
 
-:deep(body.dark-mode) .comment-item {
+:deep(body.dark-mode) .event-item {
   background: #1e293b;
 }
 

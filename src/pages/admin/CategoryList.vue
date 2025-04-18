@@ -68,7 +68,7 @@ import type { Category } from '@/models';
 import NewCategoryModal from '@/components/categories/NewCategoryModal.vue';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
-import { debounce } from '@/utils/debounce';
+import { debounce } from '@/utils/generic-helper';
 
 const isLoading = ref(false);
 const categories = ref<Category[]>([]);

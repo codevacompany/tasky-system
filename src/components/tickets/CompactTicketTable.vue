@@ -28,7 +28,7 @@
             <td>{{ ticket.department.name }}</td>
             <td>{{ formatDate(ticket.createdAt) }}</td>
             <td>
-              <span :class="['status-label', statusColor(ticket.status)]">{{ ticket.status.toUpperCase() }}</span>
+              <span :class="['status-label', statusColor(ticket.status)]">{{ formatSnakeToNaturalCase(ticket.status).toUpperCase() }}</span>
             </td>
           </tr>
           <tr v-if="!isLoading && tickets.length === 0">
@@ -47,6 +47,7 @@ import { defineProps } from 'vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { TicketStatus, type Ticket } from '@/models';
 import { formatDate } from '@/utils/date';
+import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 
 defineProps<{
   title: string;
