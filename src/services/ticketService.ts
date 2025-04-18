@@ -19,7 +19,7 @@ export const ticketService = {
     return apiClient.get('/tickets');
   },
 
-  async getById(id: number): Promise<AxiosResponse<Ticket>> {
+  async getById(id: string): Promise<AxiosResponse<Ticket>> {
     return apiClient.get(`/tickets/${id}`);
   },
 
@@ -69,28 +69,28 @@ export const ticketService = {
   },
 
   async update(
-    id: number,
+    id: string,
     data: UpdateTicketDto,
   ): Promise<AxiosResponse<{ message: string; ticketId: number }>> {
     return apiClient.patch(`/tickets/${id}`, data);
   },
 
   async updateStatus(
-    id: number,
+    id: string,
     data: UpdateTicketStatusDto,
   ): Promise<AxiosResponse<{ message: string; ticketData: Ticket }>> {
     return apiClient.patch(`/tickets/${id}/status`, data);
   },
 
-  async accept(id: number): Promise<AxiosResponse<Ticket>> {
+  async accept(id: string): Promise<AxiosResponse<Ticket>> {
     return apiClient.post(`/tickets/${id}/accept`);
   },
 
-  async approve(id: number): Promise<AxiosResponse<Ticket>> {
+  async approve(id: string): Promise<AxiosResponse<Ticket>> {
     return apiClient.post(`/tickets/${id}/approve`);
   },
 
-  async cancel(id: number) {
+  async cancel(id: string) {
     return apiClient.post(`/tickets/${id}/cancel`);
   },
 };

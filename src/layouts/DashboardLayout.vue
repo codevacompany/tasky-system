@@ -24,7 +24,7 @@
                 </li>
               </router-link>
               <router-link to="/admin/relatorios">
-                <li v-if="user?.isAdmin">
+                <li v-if="user?.role.name === RoleName.GlobalAdmin || user?.role.name === RoleName.TenantAdmin">
                   <div class="admin-menu-item" :class="{ active: isActive('/admin/relatorios') }">
                     <font-awesome-icon icon="chart-line" />
                     Relatórios
@@ -33,28 +33,28 @@
               </router-link>
 
               <router-link to="/admin/usuarios">
-                <li v-if="user?.isAdmin">
+                <li v-if="user?.role.name === RoleName.GlobalAdmin || user?.role.name === RoleName.TenantAdmin">
                   <div class="admin-menu-item" :class="{ active: isActive('/admin/usuarios') }">
                     <font-awesome-icon icon="users" />Usuários
                   </div>
                 </li>
               </router-link>
               <router-link to="/admin/setores">
-                <li v-if="user?.isAdmin">
+                <li v-if="user?.role.name === RoleName.GlobalAdmin || user?.role.name === RoleName.TenantAdmin">
                   <div class="admin-menu-item" :class="{ active: isActive('/admin/setores') }">
                     <font-awesome-icon icon="building" /> Setores
                   </div>
                 </li>
               </router-link>
               <router-link to="/admin/categorias">
-                <li v-if="user?.isAdmin">
+                <li v-if="user?.role.name === RoleName.GlobalAdmin || user?.role.name === RoleName.TenantAdmin">
                   <div class="admin-menu-item" :class="{ active: isActive('/admin/categorias') }">
                     <font-awesome-icon icon="tag" /> Categorias
                   </div>
                 </li>
               </router-link>
               <router-link to="/admin/clientes">
-                <li v-if="user?.isAdmin">
+                <li v-if="user?.role.name === RoleName.GlobalAdmin">
                   <div class="admin-menu-item" :class="{ active: isActive('/admin/clientes') }">
                     <font-awesome-icon icon="building" /> Clientes
                   </div>
@@ -125,6 +125,7 @@ import { useUserStore } from '@/stores/user';
 import { useRoute } from 'vue-router';
 import { notificationService } from '@/services/notificationService';
 import { toast } from 'vue3-toastify';
+import { RoleName } from '@/models';
 
 const user = useUserStore().user;
 const route = useRoute();
@@ -138,7 +139,8 @@ let intervalId: number | null = null;
 
 const fetchUnreadCount = async () => {
   try {
-    const response = await notificationService.count(user!.id);
+    const response = await notificationService.count();
+
     if (unreadCount.value !== undefined && response.data.count > unreadCount.value) {
       playNotificationSound()
     }

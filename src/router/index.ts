@@ -68,7 +68,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  const loggedIn = localStorageService.getAccessToken();
+  const loggedIn = localStorageService.getAccessToken() && localStorageService.getUser()?.role;
 
   if (requiresAuth && !loggedIn) {
     return next('/login');
@@ -77,7 +77,7 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
     // Verificar autenticação
     // if (!isAuthenticated) return next('/login')
-    
+
     // Verificar permissões de admin
     // if (to.meta.isAdmin && !isAdmin) return next('/')
   }

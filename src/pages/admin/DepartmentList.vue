@@ -66,7 +66,7 @@ import type { Department } from '@/models';
 import NewDepartmentModal from '@/components/departments/NewDepartmentModal.vue';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
-import { debounce } from '@/utils/debounce';
+import { debounce } from '@/utils/generic-helper';
 
 const isLoading = ref(false);
 const departments = ref<Department[]>([]);

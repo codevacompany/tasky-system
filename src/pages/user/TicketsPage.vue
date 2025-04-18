@@ -37,14 +37,20 @@
             <label for="statusFilter">Status:</label>
             <select id="statusFilter" v-model="statusFilter">
               <option :value="null">Todos</option>
-              <option :value="TicketStatus.Pending">{{ TicketStatus.Pending }}</option>
-              <option :value="TicketStatus.InProgress">{{ TicketStatus.InProgress }}</option>
-              <option :value="TicketStatus.Completed">{{ TicketStatus.Completed }}</option>
+              <option :value="TicketStatus.Pending">
+                {{ formatSnakeToNaturalCase(TicketStatus.Pending) }}
+              </option>
+              <option :value="TicketStatus.InProgress">
+                {{ formatSnakeToNaturalCase(TicketStatus.InProgress) }}
+              </option>
+              <option :value="TicketStatus.Completed">
+                {{ formatSnakeToNaturalCase(TicketStatus.Completed) }}
+              </option>
               <option :value="TicketStatus.AwaitingVerification">
-                {{ TicketStatus.AwaitingVerification }}
+                {{ formatSnakeToNaturalCase(TicketStatus.AwaitingVerification) }}
               </option>
               <option :value="TicketStatus.UnderVerification">
-                {{ TicketStatus.UnderVerification }}
+                {{ formatSnakeToNaturalCase(TicketStatus.UnderVerification) }}
               </option>
             </select>
           </div>
@@ -53,9 +59,15 @@
             <label for="priorityFilter">Prioridade:</label>
             <select id="priorityFilter" v-model="priorityFilter">
               <option :value="null">Todas</option>
-              <option :value="TicketPriority.Low">{{ TicketPriority.Low }}</option>
-              <option :value="TicketPriority.Medium">{{ TicketPriority.Medium }}</option>
-              <option :value="TicketPriority.High">{{ TicketPriority.High }}</option>
+              <option :value="TicketPriority.Low">
+                {{ formatSnakeToNaturalCase(TicketPriority.Low) }}
+              </option>
+              <option :value="TicketPriority.Medium">
+                {{ formatSnakeToNaturalCase(TicketPriority.Medium) }}
+              </option>
+              <option :value="TicketPriority.High">
+                {{ formatSnakeToNaturalCase(TicketPriority.High) }}
+              </option>
             </select>
           </div>
 
@@ -132,7 +144,7 @@
           :tableType="activeTab"
           :currentPage="currentPage"
           :totalPages="totalPages"
-          @changePage="(page) => currentPage = page"
+          @changePage="(page) => (currentPage = page)"
           @viewTicket="handleViewTicket"
           @editTicket="handleEditTicket"
           @cancelTicket="handleCancelTicket"
@@ -171,11 +183,7 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" @click="cancelCorrection">Cancelar</button>
-          <button
-            class="btn btn-primary"
-            @click="confirmCorrection"
-            :disabled="!newCompletionDate"
-          >
+          <button class="btn btn-primary" @click="confirmCorrection" :disabled="!newCompletionDate">
             Confirmar
           </button>
         </div>
@@ -192,7 +200,7 @@ import type { Ticket } from '@/models';
 import { TicketStatus, TicketPriority } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
 import { toast } from 'vue3-toastify';
-import { debounce } from '@/utils/debounce';
+import { debounce, formatSnakeToNaturalCase } from '@/utils/generic-helper';
 
 const user = useUserStore().user;
 const activeTab = ref<'recebidos' | 'criados' | 'setor' | 'arquivo'>('recebidos');
@@ -246,21 +254,21 @@ const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor' | 'arquivo') 
       // Buscar tickets recebidos arquivados
       const receivedResponse = await ticketService.getByTargetUser(user!.id, {
         ...filters,
-        status: undefined
+        status: undefined,
       });
-      archivedReceivedTickets.value = receivedResponse.data.items.filter(ticket =>
-        ticket.status === TicketStatus.Completed ||
-        ticket.status === TicketStatus.Rejected
+      archivedReceivedTickets.value = receivedResponse.data.items.filter(
+        (ticket) =>
+          ticket.status === TicketStatus.Completed || ticket.status === TicketStatus.Rejected,
       );
 
       // Buscar tickets criados arquivados
       const createdResponse = await ticketService.getByRequester(user!.id, {
         ...filters,
-        status: undefined
+        status: undefined,
       });
-      archivedCreatedTickets.value = createdResponse.data.items.filter(ticket =>
-        ticket.status === TicketStatus.Completed ||
-        ticket.status === TicketStatus.Rejected
+      archivedCreatedTickets.value = createdResponse.data.items.filter(
+        (ticket) =>
+          ticket.status === TicketStatus.Completed || ticket.status === TicketStatus.Rejected,
       );
     }
 
@@ -294,7 +302,7 @@ const handleEditTicket = (ticket: Ticket) => {
 const handleCancelTicket = async (ticket: Ticket) => {
   if (confirm('Tem certeza que deseja excluir este ticket?')) {
     try {
-      await ticketService.cancel(ticket.id);
+      await ticketService.cancel(ticket.customId);
       toast.success('Ticket excluído com sucesso!');
       fetchTickets(activeTab.value);
     } catch {
@@ -305,7 +313,7 @@ const handleCancelTicket = async (ticket: Ticket) => {
 
 const handleAcceptTicket = async (ticket: Ticket) => {
   try {
-    await ticketService.accept(ticket.id);
+    await ticketService.accept(ticket.customId);
     toast.success('Ticket aceito com sucesso!');
     fetchTickets(activeTab.value);
   } catch {
@@ -313,7 +321,7 @@ const handleAcceptTicket = async (ticket: Ticket) => {
   }
 };
 
-const handleVerifyTicket = async (ticketId: number) => {
+const handleVerifyTicket = async (ticketId: string) => {
   try {
     await ticketService.updateStatus(ticketId, { status: TicketStatus.AwaitingVerification });
     toast.success('Ticket enviado para revisão');
@@ -325,7 +333,7 @@ const handleVerifyTicket = async (ticketId: number) => {
 
 const handleApproveTicket = async (ticket: Ticket) => {
   try {
-    await ticketService.updateStatus(ticket.id, { status: TicketStatus.Completed });
+    await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Completed });
     toast.success('Ticket aprovado com sucesso!');
     fetchTickets(activeTab.value);
   } catch {
@@ -342,11 +350,11 @@ const confirmCorrection = async () => {
   if (!selectedTicket.value || !newCompletionDate.value) return;
 
   try {
-    await ticketService.updateStatus(selectedTicket.value.id, {
+    await ticketService.updateStatus(selectedTicket.value.customId, {
       status: TicketStatus.InProgress,
     });
 
-    await ticketService.update(selectedTicket.value.id, { dueAt: newCompletionDate.value})
+    await ticketService.update(selectedTicket.value.customId, { dueAt: newCompletionDate.value });
     toast.success('Correção solicitada com sucesso!');
     showCorrectionModal.value = false;
     selectedTicket.value = null;
@@ -365,7 +373,7 @@ const cancelCorrection = () => {
 
 const handleRejectTicket = async (ticket: Ticket) => {
   try {
-    await ticketService.updateStatus(ticket.id, { status: TicketStatus.Rejected });
+    await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Rejected });
     toast.success('Ticket reprovado com sucesso!');
     fetchTickets(activeTab.value);
   } catch {

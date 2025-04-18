@@ -1,4 +1,5 @@
 import type { Notification, CreateNotificationDto, UpdateNotificationDto } from '@/models';
+import type { PaginatedResponse } from '@/types/http';
 import apiClient from '@/utils/axiosInstance';
 import type { AxiosResponse } from 'axios';
 
@@ -7,12 +8,12 @@ export const notificationService = {
     return apiClient.post<Notification>('/notifications', data);
   },
 
-  async count(userId: number) {
-    return apiClient.get(`/notifications/unread/count/${userId}`);
+  async count() {
+    return apiClient.get(`/notifications/unread/count`);
   },
 
-  async getBytargetUser(targetUserId: number): Promise<AxiosResponse<Notification[]>> {
-    return apiClient.get<Notification[]>(`/notifications/target-user/${targetUserId}`);
+  async getBytargetUser(targetUserId: number): Promise<AxiosResponse<PaginatedResponse<Notification>>> {
+    return apiClient.get(`/notifications/target-user/${targetUserId}`);
   },
 
   async update(id: number, data: UpdateNotificationDto): Promise<AxiosResponse<Notification>> {

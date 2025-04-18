@@ -15,7 +15,7 @@ export const ticketCommentService = {
     return apiClient.get<TicketComment>(`/ticket-comments/${id}`);
   },
 
-  async getByTicket(ticketId: number): Promise<AxiosResponse<TicketComment[]>> {
+  async getByTicket(ticketId: string): Promise<AxiosResponse<TicketComment[]>> {
     return apiClient.get<TicketComment[]>(`/ticket-comments/ticket/${ticketId}`);
   },
 

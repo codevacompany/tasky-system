@@ -73,7 +73,7 @@
                   name="priority"
                   required
                 />
-                {{ TicketPriority.Low }}
+                {{ formatSnakeToNaturalCase(TicketPriority.Low) }}
               </label>
               <label class="radio-label">
                 <input
@@ -82,7 +82,7 @@
                   :value="TicketPriority.Medium"
                   name="priority"
                 />
-                {{ TicketPriority.Medium }}
+                {{ formatSnakeToNaturalCase(TicketPriority.Medium) }}
               </label>
               <label class="radio-label">
                 <input
@@ -91,7 +91,7 @@
                   :value="TicketPriority.High"
                   name="priority"
                 />
-                {{ TicketPriority.High }}
+                {{ formatSnakeToNaturalCase(TicketPriority.High) }}
               </label>
             </div>
           </div>
@@ -125,6 +125,7 @@ import { categoryService } from '@/services/categoryService';
 import { toast } from 'vue3-toastify';
 import { TicketPriority, type Category, type Department, type User } from '@/models';
 import { useUserStore } from '@/stores/user';
+import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 
 defineProps<{
   isOpen: boolean;

@@ -1621,6 +1621,14 @@ body.dark-mode .nav-link.active {
   background: #1a2233;
 }
 
+.notification-text span {
+  font-weight: 600;
+}
+
+.ticket-update-description span {
+  font-weight: 500;
+}
+
 /* Ajustes adicionais para modo escuro */
 body.dark-mode .stat-icon {
   background-color: rgba(255, 255, 255, 0.1);

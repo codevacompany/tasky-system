@@ -29,8 +29,8 @@
               <p>Nenhum ticket encontrado</p>
             </td>
           </tr>
-          <tr v-for="ticket in tickets" :key="ticket.id" @click="openTicketDetails(ticket)">
-            <td>{{ ticket.id }}</td>
+          <tr v-for="ticket in tickets" :key="ticket.customId" @click="openTicketDetails(ticket)">
+            <td>{{ ticket.customId }}</td>
             <td>
               {{ ticket.name }}
               <font-awesome-icon
@@ -52,7 +52,7 @@
             </td>
             <td>
               <span :class="['status-badge', getStatusClass(ticket.status)]">
-                {{ ticket.status.toUpperCase() }}
+                {{ formatSnakeToNaturalCase(ticket.status).toUpperCase() }}
               </span>
             </td>
             <td>{{ formatDate(ticket.createdAt) }}</td>
@@ -298,6 +298,7 @@ import { toast } from 'vue3-toastify';
 import ConfirmationModal from '../common/ConfirmationModal.vue';
 import { useUserStore } from '@/stores/user';
 import BaseModal from '../common/BaseModal.vue';
+import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 
 const props = defineProps<{
   tickets: Ticket[];
@@ -340,8 +341,8 @@ const openTicketDetails = (ticket: Ticket) => {
 };
 
 const refreshSelectedTicket = async () => {
-  if (!selectedTicket.value?.id) return;
-  const response = await ticketService.getById(selectedTicket.value.id);
+  if (!selectedTicket.value?.customId) return;
+  const response = await ticketService.getById(selectedTicket.value.customId);
   selectedTicket.value = response.data;
 };
 
@@ -421,7 +422,7 @@ const getStatusClass = (status: string) => {
       return 'status-rejected';
     case TicketStatus.Returned:
       return 'status-returned';
-    case TicketStatus.Cancelled:
+    case TicketStatus.Canceled:
       return 'status-cancelled';
     default:
       return '';
@@ -478,7 +479,7 @@ const handleAcceptTicket = async (ticket: Ticket) => {
     'Tem certeza que deseja aceitar este ticket?',
     async () => {
       try {
-        await ticketService.accept(ticket.id);
+        await ticketService.accept(ticket.customId);
         toast.success('Ticket aceito com sucesso');
         emit('refresh');
       } catch {
@@ -494,7 +495,7 @@ const handleVerifyTicket = async (ticket: Ticket) => {
     'Tem certeza que deseja enviar este ticket para verificação?',
     async () => {
       try {
-        await ticketService.updateStatus(ticket.id, { status: TicketStatus.AwaitingVerification });
+        await ticketService.updateStatus(ticket.customId, { status: TicketStatus.AwaitingVerification });
         toast.success('Ticket enviado para revisão');
         emit('refresh');
       } catch {
@@ -510,7 +511,7 @@ const handleApproveTicket = async (ticket: Ticket) => {
     'Tem certeza que deseja aprovar este ticket?',
     async () => {
       try {
-        await ticketService.approve(ticket.id);
+        await ticketService.approve(ticket.customId);
         toast.success('Ticket aprovado com sucesso');
         emit('refresh');
       } catch {
@@ -526,7 +527,7 @@ const handleRequestCorrection = async (ticket: Ticket) => {
     'Por favor, preencha os detalhes da correção necessária:',
     async () => {
       try {
-        await ticketService.updateStatus(ticket.id, { status: TicketStatus.InProgress });
+        await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Returned });
         toast.success('Correção solicitada com sucesso');
         emit('refresh');
       } catch {
@@ -543,7 +544,7 @@ const handleRejectTicket = async (ticket: Ticket) => {
     'Tem certeza que deseja reprovar este ticket?',
     async () => {
       try {
-        await ticketService.updateStatus(ticket.id, { status: TicketStatus.Rejected });
+        await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Rejected });
         toast.success('Ticket reprovado com sucesso');
         emit('refresh');
       } catch {
@@ -556,7 +557,7 @@ const handleRejectTicket = async (ticket: Ticket) => {
 const handleStartVerification = async (ticket: Ticket) => {
   try {
     // Atualiza o status
-    const ticketResponse = await ticketService.updateStatus(ticket.id, {
+    const ticketResponse = await ticketService.updateStatus(ticket.customId, {
       status: TicketStatus.UnderVerification,
     });
 
@@ -585,7 +586,7 @@ const handleCorrectTicket = async (ticket: Ticket) => {
     'Tem certeza que deseja iniciar as correções deste ticket?',
     async () => {
       try {
-        await ticketService.updateStatus(ticket.id, { status: TicketStatus.InProgress });
+        await ticketService.updateStatus(ticket.customId, { status: TicketStatus.InProgress });
         toast.success('Ticket em correção');
         emit('refresh');
       } catch {
