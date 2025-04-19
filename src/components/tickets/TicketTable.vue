@@ -352,14 +352,14 @@ const closeModal = () => {
 };
 
 const calculateDeadline = (ticket: Ticket) => {
-  if (!ticket.completedAt) return '—';
+  if (!ticket.dueAt) return '—';
 
   // Se o status não for Pendente ou Em Andamento, retorna traço
   if (ticket.status !== TicketStatus.Pending && ticket.status !== TicketStatus.InProgress) {
     return '—';
   }
 
-  const deadline = new Date(ticket.completedAt);
+  const deadline = new Date(ticket.dueAt);
   const today = new Date();
 
   // Reset hours to compare just dates

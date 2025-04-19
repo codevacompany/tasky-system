@@ -1,4 +1,3 @@
-<!-- src/components/tickets/TicketTable.vue -->
 <template>
   <div class="dashboard-card">
     <div class="card-header">
@@ -78,6 +77,10 @@ const statusColor = (status: TicketStatus) => {
 <style scoped>
 .loading-cell {
   text-align: center;
+}
+
+.card-content {
+  padding: 0;
 }
 
 .data-table {

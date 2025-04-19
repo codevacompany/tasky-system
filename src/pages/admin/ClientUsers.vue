@@ -11,8 +11,8 @@
           <span class="usage-badge">
             {{ client.usuariosAtivos }}/{{ client.limiteUsuarios }} usuários
           </span>
-          <button 
-            class="btn btn-primary" 
+          <button
+            class="btn btn-primary"
             @click="showNewUserModal = true"
             :disabled="client.usuariosAtivos >= client.limiteUsuarios"
           >
@@ -23,10 +23,10 @@
       <div class="filters">
         <div class="search-box">
           <font-awesome-icon icon="search" class="search-icon" />
-          <input 
-            type="text" 
-            v-model="searchTerm" 
-            placeholder="Buscar por nome, email ou perfil..." 
+          <input
+            type="text"
+            v-model="searchTerm"
+            placeholder="Buscar por nome, email ou perfil..."
           />
         </div>
         <select v-model="statusFilter" class="filter-select">
@@ -89,8 +89,8 @@
                 <button class="btn-icon" title="Editar" @click="editUser(user)">
                   <font-awesome-icon icon="edit" />
                 </button>
-                <button 
-                  class="btn-icon" 
+                <button
+                  class="btn-icon"
                   :title="user.status === 'ATIVO' ? 'Desativar' : 'Ativar'"
                   @click="toggleUserStatus(user)"
                 >
@@ -193,11 +193,11 @@ const users = ref([
 // Computed properties
 const filteredUsers = computed(() => {
   return users.value.filter(user => {
-    const matchSearch = !searchTerm.value || 
+    const matchSearch = !searchTerm.value ||
       user.nome.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
       user.perfil.toLowerCase().includes(searchTerm.value.toLowerCase());
-    
+
     const matchStatus = !statusFilter.value || user.status === statusFilter.value;
     const matchRole = !roleFilter.value || user.perfil === roleFilter.value;
 
@@ -558,4 +558,4 @@ const saveNewUser = () => {
   background-color: var(--background-dark);
   color: var(--text-color-dark);
 }
-</style> 
+</style>
