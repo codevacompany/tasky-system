@@ -84,8 +84,10 @@
             <div class="profile-avatar">
               <span class="initials">{{ userInitials }}</span>
             </div>
-            <span class="user-name">{{ user?.firstName }}</span>
-            <font-awesome-icon icon="chevron-down" />
+            <div>
+              <span class="user-name">{{ user?.firstName }}</span>
+              <font-awesome-icon icon="chevron-down" />
+            </div>
           </div>
         </div>
       </header>
@@ -285,6 +287,7 @@ onUnmounted(() => {
   color: #1a2233;
   position: relative;
   cursor: pointer;
+  margin-left: 1.4rem;
 }
 
 .notification-icon i {
@@ -297,6 +300,7 @@ onUnmounted(() => {
   align-items: center;
   cursor: pointer;
   color: #1a2233;
+  margin-right: 1rem;
 }
 
 .user-profile .user-name {

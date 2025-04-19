@@ -109,7 +109,7 @@
           </div>
 
           <!-- Prazo -->
-          <div class="details-item" :class="getDeadlineClass(ticket?.completedAt)">
+          <div class="details-item" :class="getDeadlineClass(loadedTicket.dueAt)">
             <div class="detail-icon">
               <font-awesome-icon icon="hourglass-end" />
             </div>
@@ -403,9 +403,9 @@ const getStatusClass = (status: string) => {
 };
 
 const calculateDeadline = (ticket: Ticket) => {
-  if (!ticket.completedAt) return '—';
+  if (!ticket.dueAt) return '—';
 
-  const deadline = new Date(ticket.completedAt);
+  const deadline = new Date(ticket.dueAt);
   const today = new Date();
 
   // Reset hours to compare just dates
@@ -737,7 +737,7 @@ watch(
 
 <style scoped>
 .content {
-  min-width: 800px;
+  min-width: 900px;
   min-height: 90vh;
   padding: 1.5rem;
 }
@@ -755,7 +755,7 @@ watch(
 
 .ticket-details-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.5fr 2fr;
   gap: 1rem;
   margin-bottom: 2rem;
   align-items: start;

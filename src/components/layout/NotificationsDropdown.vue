@@ -154,9 +154,9 @@ const getNotificationIconClass = (type: NotificationType) => {
 
 const formatNotificationMessage = (notification: Notification) => {
   if (notification.resourceCustomId) {
-    return `${notification.message.replace('user', notification.createdBy.firstName).replace('resource', notification.resourceCustomId.toString())}`;
+    return `${notification.message.replace('user', `${notification.createdBy.firstName} ${notification.createdBy.lastName}`).replace('resource', notification.resourceCustomId.toString())}`;
   } else {
-    return `${notification.message.replace('user', notification.createdBy.firstName).replace('resource', notification.resourceId.toString())}`;
+    return `${notification.message.replace('user', `${notification.createdBy.firstName} ${notification.createdBy.lastName}`).replace('resource', notification.resourceId.toString())}`;
   }
 };
 

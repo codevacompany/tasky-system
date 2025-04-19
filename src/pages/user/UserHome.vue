@@ -217,7 +217,7 @@ onMounted(loadTickets);
 .dashboard-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 1.4rem;
 }
 
 .dashboard-stats {
