@@ -169,7 +169,7 @@
             <div class="detail-label">Descrição</div>
           </div>
           <div class="description-box">
-            <div class="description-text">{{ loadedTicket.description }}</div>
+            <div class="description-text" v-html="loadedTicket.description"></div>
           </div>
         </div>
       </div>
@@ -305,7 +305,7 @@
                 <div class="update-description-header">
                   <div
                     class="ticket-update-description"
-                    v-html="formatUpdateDescription(event.data)"
+                    v-html="formatTicketUpdateDescription(event.data)"
                   ></div>
                   <span class="comment-time">{{ formatRelativeTime(event.createdAt) }}</span>
                 </div>
@@ -635,7 +635,6 @@ const fetchTicketUpdates = async () => {
   try {
     if (loadedTicket.value) {
       const response = await TicketUpdateService.getByTicket(loadedTicket.value.customId);
-      console.log(response.data);
       ticketUpdates.value = response.data;
     }
   } catch (err) {
@@ -665,7 +664,7 @@ const timeline = computed(() => {
 const isTargetUser = computed(() => userStore.user?.id === loadedTicket.value?.targetUser.id);
 const isRequester = computed(() => userStore.user?.id === loadedTicket.value?.requester.id);
 
-const formatUpdateDescription = (ticketUpdate: TicketUpdate) => {
+const formatTicketUpdateDescription = (ticketUpdate: TicketUpdate) => {
   return `${ticketUpdate.description.replace('user', `${ticketUpdate.performedBy.firstName} ${ticketUpdate.performedBy.lastName}`)}`;
 };
 

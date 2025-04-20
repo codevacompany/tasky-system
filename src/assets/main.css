@@ -1629,6 +1629,25 @@ body.dark-mode .nav-link.active {
   font-weight: 500;
 }
 
+/* quill editor */
+.quill-editor-container {
+  border-radius: 0.2rem;
+  overflow: hidden;
+}
+.ql-toolbar.ql-snow {
+  border-top-left-radius: 0.2rem;
+  border-top-right-radius: 0.2rem;
+  border-color: #e5e7eb;
+}
+.ql-container.ql-snow {
+  border-bottom-left-radius: 0.2rem;
+  border-bottom-right-radius: 0.2rem;
+  border-color: #e5e7eb;
+  min-height: 100px;
+  font-family: 'Inter', 'Roboto';
+  font-size: 14px;
+}
+
 /* Ajustes adicionais para modo escuro */
 body.dark-mode .stat-icon {
   background-color: rgba(255, 255, 255, 0.1);
