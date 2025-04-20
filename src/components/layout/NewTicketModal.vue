@@ -103,7 +103,21 @@
 
           <div class="form-group full-width">
             <label for="description">Descrição: <span class="required">*</span></label>
-            <textarea id="description" v-model="formData.description" required rows="4"></textarea>
+            <div class="quill-wrapper">
+              <QuillEditor
+                v-model:content="formData.description"
+                contentType="html"
+                theme="snow"
+                :options="editorOptions"
+              />
+            </div>
+            <textarea
+              class="hidden"
+              id="description"
+              v-model="formData.description"
+              required
+              rows="4"
+            ></textarea>
           </div>
         </div>
 
@@ -126,6 +140,10 @@ import { toast } from 'vue3-toastify';
 import { TicketPriority, type Category, type Department, type User } from '@/models';
 import { useUserStore } from '@/stores/user';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import { QuillEditor } from '@vueup/vue-quill';
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import apiClient from '@/utils/axiosInstance';
+import axios from 'axios';
 
 defineProps<{
   isOpen: boolean;
@@ -142,6 +160,19 @@ const selectedDepartment = ref<number | null>(null);
 const selectedUser = ref<number | null>(null);
 const categories = ref<Category[]>([]);
 const selectedCategory = ref<number | null>(null);
+const editorOptions = {
+  modules: {
+    toolbar: [
+      [{ size: ['small', false, 'large', 'huge'] }],
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
+      [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
+      ['link', 'image', 'video'],
+    ],
+  },
+  placeholder: 'Adicione uma descrição aqui...',
+};
 
 const formData = ref({
   name: '',
@@ -183,7 +214,7 @@ const updateUsersList = async () => {
   }
   try {
     const response = await userService.getByDepartment(selectedDepartment.value);
-    availableUsers.value = response.data;
+    availableUsers.value = response.data.items;
   } catch {
     toast.error('Erro ao carregar usuários. Tente novamente.');
     availableUsers.value = [];
@@ -248,6 +279,39 @@ const closeModal = () => {
 
 const handleSubmit = async () => {
   if (!validateForm()) return;
+
+  // Step 1: Extract base64 images
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(formData.value.description, 'text/html');
+  const images = Array.from(doc.querySelectorAll('img'));
+
+  for (const img of images) {
+    const base64 = img.src;
+
+    if (!base64.startsWith('data:image/')) continue;
+
+    try {
+      const blob = await fetch(base64).then((res) => res.blob());
+      const ext = blob.type.split('/')[1];
+
+      const { data } = await apiClient.get(`/aws/upload-url?ext=.${ext}`);
+      const signedUrl = data.url;
+
+      await axios.put(signedUrl, blob, {
+        headers: {
+          'Content-Type': blob.type,
+        },
+      });
+
+      img.src = signedUrl.split('?')[0];
+    } catch (err) {
+      toast.error('Erro ao fazer upload de imagem');
+      console.error(err);
+      return;
+    }
+  }
+
+  formData.value.description = doc.body.innerHTML;
 
   formData.value.departmentId = selectedDepartment.value;
   formData.value.targetUserId = selectedUser.value;
@@ -442,6 +506,14 @@ textarea {
   gap: 12px;
   padding-top: 20px;
   border-top: 1px solid #e2e8f0;
+}
+
+.quill-wrapper {
+  margin-bottom: 50px;
+}
+
+.hidden {
+  display: none;
 }
 
 /* Dark mode */
