@@ -239,6 +239,26 @@
         </button>
       </div>
 
+      <div class="files-section-title">
+        <p class="files-label">Anexos</p>
+        <div class="files-count">{{ loadedTicket.files.length }}</div>
+      </div>
+      <div class="files-container">
+        <div
+          v-for="file in loadedTicket.files"
+          :key="file.id"
+          class="file-item"
+          @click="downloadFile(file)"
+        >
+          <div class="file-preview">
+            <font-awesome-icon icon="file" size="xl"/>
+          </div>
+          <div class="file-name-container">
+            <div class="file-name">{{ file.name }}</div>
+          </div>
+        </div>
+      </div>
+
       <!-- Nova div separada para o botão de cancelar -->
       <div
         class="ticket-actions"
@@ -341,6 +361,7 @@ import ConfirmationModal from '../common/ConfirmationModal.vue';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import type { TicketUpdate } from '@/models/ticketUpdate';
 import { TicketUpdateService } from '@/services/ticketUpdateService';
+import type { TicketFile } from '@/models/ticketFile';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -598,6 +619,16 @@ const cancelTicket = async (ticketId: string) => {
     },
     true, // indica que precisa de campo de descrição
   );
+};
+
+const downloadFile = (file: TicketFile) => {
+  const link = document.createElement('a');
+  link.href = file.url;
+  link.download = file.name;
+  link.target = '_blank';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
 
 const comment = async () => {
@@ -1161,6 +1192,76 @@ watch(
 .comment-disabled p {
   margin: 0;
   font-size: 0.9rem;
+}
+
+.files-container {
+  display: flex;
+  gap: 10px;
+}
+
+.files-section-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.files-label {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.files-count {
+  margin-left: 8px;
+  margin-top: 2px;
+  width: 22px;
+  height: 20px;
+  background-color: #f8f9fa;
+  border-radius: 50%;
+  font-size: 10px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.file-item {
+  width: 110px;
+  height: 90px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+
+.file-item:hover {
+  cursor: pointer;
+}
+
+.file-preview {
+  width: 100%;
+  height: 70%;
+  padding: 0 2px;
+  background-color: #f8f9fa;
+  border-radius: 6px 6px 0 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.file-name-container {
+  width: 100%;
+  height: 30%;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  background-color: white;
+  padding: 0 4px;
+  border-radius: 0 0 10px 10px;
+}
+
+.file-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  direction: rtl;
 }
 
 /* Dark mode */

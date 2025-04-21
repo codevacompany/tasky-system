@@ -1,6 +1,7 @@
 import type { Category } from './category';
 import type { Department } from './department';
 import type { TicketComment } from './ticketComment';
+import type { TicketFile } from './ticketFile';
 import type { TicketUpdate } from './ticketUpdate';
 import type { User } from './user';
 
@@ -40,6 +41,7 @@ export interface Ticket {
   updates: TicketUpdate[];
   disapprovalReason?: string;
   isPrivate: boolean;
+  files: TicketFile[];
   createdAt: string;
 }
 
@@ -54,6 +56,7 @@ export interface CreateTicketDto {
   dueAt?: string;
   canceledAt?: string;
   isPrivate: boolean;
+  files?: string[];
 }
 
 export interface UpdateTicketDto {

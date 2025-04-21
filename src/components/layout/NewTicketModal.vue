@@ -119,6 +119,18 @@
               rows="4"
             ></textarea>
           </div>
+          <div class="form-group full-width">
+            <label class="file-upload-label" for="fileUpload">
+              <font-awesome-icon icon="paperclip" /> Anexar Arquivos</label
+            >
+            <input class="hidden" type="file" id="fileUpload" multiple @change="handleFileChange" />
+            <ul v-if="selectedFiles.length">
+              <li v-for="(file, i) in selectedFiles" :key="i" style="display: flex; margin-bottom: 4px;">
+                <font-awesome-icon icon="file" style="margin-right: 5px" />
+                <p style="font-size: 14px;">{{ file.name }}</p>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div class="form-actions">
@@ -142,8 +154,8 @@ import { useUserStore } from '@/stores/user';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import apiClient from '@/utils/axiosInstance';
 import axios from 'axios';
+import { awsService } from '@/services/awsService';
 
 defineProps<{
   isOpen: boolean;
@@ -160,6 +172,8 @@ const selectedDepartment = ref<number | null>(null);
 const selectedUser = ref<number | null>(null);
 const categories = ref<Category[]>([]);
 const selectedCategory = ref<number | null>(null);
+const selectedFiles = ref<File[]>([]);
+
 const editorOptions = {
   modules: {
     toolbar: [
@@ -221,6 +235,13 @@ const updateUsersList = async () => {
   }
 };
 
+const handleFileChange = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  if (input?.files) {
+    selectedFiles.value = [...selectedFiles.value, ...Array.from(input.files)];
+  }
+};
+
 const resetForm = () => {
   formData.value = {
     name: '',
@@ -237,6 +258,7 @@ const resetForm = () => {
   selectedUser.value = null;
   availableUsers.value = [];
   selectedCategory.value = null;
+  selectedFiles.value = [];
 };
 
 onMounted(() => {
@@ -277,10 +299,32 @@ const closeModal = () => {
   emit('close');
 };
 
+const uploadFilesToS3 = async () => {
+  const uploadedUrls: string[] = [];
+
+  for (const file of selectedFiles.value) {
+    const ext = file.name.split('.').pop();
+
+    if (ext) {
+      const { data } = await awsService.getSignedUrl(ext);
+
+      await axios.put(data.url, file, {
+        headers: {
+          'Content-Type': file.type,
+        },
+      });
+
+      const fileUrl = data.url.split('?')[0];
+      uploadedUrls.push(fileUrl);
+    }
+  }
+
+  return uploadedUrls;
+};
+
 const handleSubmit = async () => {
   if (!validateForm()) return;
 
-  // Step 1: Extract base64 images
   const parser = new DOMParser();
   const doc = parser.parseFromString(formData.value.description, 'text/html');
   const images = Array.from(doc.querySelectorAll('img'));
@@ -294,7 +338,7 @@ const handleSubmit = async () => {
       const blob = await fetch(base64).then((res) => res.blob());
       const ext = blob.type.split('/')[1];
 
-      const { data } = await apiClient.get(`/aws/upload-url?ext=.${ext}`);
+      const { data } = await awsService.getSignedUrl(ext);
       const signedUrl = data.url;
 
       await axios.put(signedUrl, blob, {
@@ -318,7 +362,9 @@ const handleSubmit = async () => {
   formData.value.categoryId = selectedCategory.value;
 
   try {
-    await ticketService.create(formData.value);
+    const fileUrls = await uploadFilesToS3();
+
+    await ticketService.create({ ...formData.value, files: fileUrls });
     toast.success('Ticket criado com sucesso!');
     emit('ticketCreated');
     closeModal();
@@ -514,6 +560,19 @@ textarea {
 
 .hidden {
   display: none;
+}
+
+.file-upload-label {
+  width: 150px;
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  background-color: #02153b;
+  border-radius: 5px;
+  color: white;
+  margin-bottom: 6px;
 }
 
 /* Dark mode */
