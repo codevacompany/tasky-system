@@ -251,7 +251,7 @@
           @click="downloadFile(file)"
         >
           <div class="file-preview">
-            <font-awesome-icon icon="file" size="xl"/>
+            <font-awesome-icon icon="file" size="xl" />
           </div>
           <div class="file-name-container">
             <div class="file-name">{{ file.name }}</div>
@@ -302,13 +302,15 @@
 
         <div class="event-list">
           <div v-for="event in timeline" :key="event.data.id">
-            <div class="event-item" :class="{ 'system-event': event.type === 'update' }" v-if="event.type === 'comment'">
+            <div class="event-item" v-if="event.type === 'comment'">
               <div class="comment-avatar">
                 <font-awesome-icon icon="user-circle" />
               </div>
               <div class="comment-content">
                 <div class="comment-header">
-                  <span class="comment-author">{{ event.data.user.firstName }} {{ event.data.user.lastName }}</span>
+                  <span class="comment-author"
+                    >{{ event.data.user.firstName }} {{ event.data.user.lastName }}</span
+                  >
                   <span class="comment-time">{{ formatRelativeTime(event.createdAt) }}</span>
                 </div>
                 <div class="comment-text">{{ event.data.content }}</div>
@@ -321,7 +323,10 @@
               </div>
               <div class="update-content">
                 <div class="update-description-header">
-                  <div class="ticket-update-description" v-html="formatTicketUpdateDescription(event.data)"></div>
+                  <div
+                    class="ticket-update-description"
+                    v-html="formatTicketUpdateDescription(event.data)"
+                  ></div>
                   <span class="comment-time">{{ formatRelativeTime(event.createdAt) }}</span>
                 </div>
               </div>
@@ -357,7 +362,6 @@ import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import type { TicketUpdate } from '@/models/ticketUpdate';
 import { TicketUpdateService } from '@/services/ticketUpdateService';
 import type { TicketFile } from '@/models/ticketFile';
-import { TicketActionType } from '@/models/ticketUpdate';
 
 const props = defineProps<{
   isOpen: boolean;

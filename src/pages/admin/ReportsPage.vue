@@ -17,16 +17,14 @@
             <p class="error-title">Erro ao carregar dados</p>
             <p class="error-text">{{ error }}</p>
           </div>
-          <button @click="loadData" class="error-action">
-            Tentar Novamente
-          </button>
+          <button @click="loadData" class="error-action">Tentar Novamente</button>
         </div>
       </div>
     </div>
 
     <div v-if="!loading && !error">
       <!-- Cabeçalho -->
-    <div class="header">
+      <div class="header">
         <div class="breadcrumb">
           <span>Dashboard</span>
           <font-awesome-icon icon="chevron-right" class="breadcrumb-separator" />
@@ -48,7 +46,7 @@
             </button>
           </div>
         </div>
-    </div>
+      </div>
 
       <div class="content">
         <!-- Cards de Métricas -->
@@ -58,11 +56,11 @@
               <div class="metric-info">
                 <p class="metric-label">Total de Chamados</p>
                 <h3 class="metric-value">{{ statistics.totalTickets }}</h3>
-        </div>
+              </div>
               <div class="metric-icon blue">
                 <font-awesome-icon icon="ticket" />
-          </div>
-          </div>
+              </div>
+            </div>
           </div>
 
           <div class="metric-card yellow-border">
@@ -73,16 +71,16 @@
               </div>
               <div class="metric-icon yellow">
                 <font-awesome-icon icon="chart-line" />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
           <div class="metric-card green-border">
             <div class="metric-content">
               <div class="metric-info">
                 <p class="metric-label">Tempo Médio de Resolução</p>
                 <h3 class="metric-value">{{ statistics.averageResolutionTime }}</h3>
-        </div>
+              </div>
               <div class="metric-icon green">
                 <font-awesome-icon icon="clock" />
               </div>
@@ -136,9 +134,19 @@
                 <div class="created-vs-completed-content">
                   <div class="created-vs-completed-info">
                     <p class="info-title">Novos chamados criados vs concluídos</p>
-                    <p class="info-text">Você concluiu <span class="highlight">50 chamados</span> no total durante <span class="highlight">3 meses</span></p>
-                    <p class="info-text">Você criou <span class="highlight">75 chamados</span> no total durante <span class="highlight">3 meses</span></p>
-                    <p class="info-trend">Isso é <span class="trend-value">100% mais criados</span> e <span class="trend-value">100% mais concluídos</span> comparado a <span class="date-reference">16 de Janeiro, 2025</span></p>
+                    <p class="info-text">
+                      Você concluiu <span class="highlight">50 chamados</span> no total durante
+                      <span class="highlight">3 meses</span>
+                    </p>
+                    <p class="info-text">
+                      Você criou <span class="highlight">75 chamados</span> no total durante
+                      <span class="highlight">3 meses</span>
+                    </p>
+                    <p class="info-trend">
+                      Isso é <span class="trend-value">100% mais criados</span> e
+                      <span class="trend-value">100% mais concluídos</span> comparado a
+                      <span class="date-reference">16 de Janeiro, 2025</span>
+                    </p>
                   </div>
 
                   <div class="created-vs-completed-chart">
@@ -178,32 +186,34 @@
                     </div>
                   </div>
                   <div class="chart-container">
-        <div class="chart-wrapper">
-          <Pie
-            v-if="ticketsByStatus.labels.length"
+                    <div class="chart-wrapper">
+                      <Pie
+                        v-if="ticketsByStatus.labels.length"
                         :data="statusChartData"
-            :options="chartOptions"
-          />
+                        :options="chartOptions"
+                      />
                       <div v-else class="loading-state">
                         <font-awesome-icon icon="spinner" spin class="loading-icon" />
                         <p class="loading-text">Carregando dados...</p>
                       </div>
                     </div>
                     <div class="chart-legend">
-                      <div 
-                        v-for="(label, index) in ticketsByStatus.labels" 
+                      <div
+                        v-for="(label, index) in ticketsByStatus.labels"
                         :key="label"
                         class="legend-item"
                       >
-                        <div 
-                          class="legend-color" 
-                          :style="{ backgroundColor: statusChartData.datasets[0].backgroundColor[index] }"
+                        <div
+                          class="legend-color"
+                          :style="{
+                            backgroundColor: statusChartData.datasets[0].backgroundColor[index],
+                          }"
                         ></div>
                         <span>{{ label }}</span>
                       </div>
-          </div>
-        </div>
-      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <!-- Gráfico de Prioridade -->
                 <div class="chart-card">
@@ -211,40 +221,42 @@
                     <h2 class="chart-title">Distribuição por Prioridade</h2>
                     <div class="chart-icon">
                       <font-awesome-icon icon="chart-bar" />
-        </div>
+                    </div>
                   </div>
                   <div class="chart-container">
-        <div class="chart-wrapper">
-          <Bar
-            v-if="ticketsByPriority.labels.length"
+                    <div class="chart-wrapper">
+                      <Bar
+                        v-if="ticketsByPriority.labels.length"
                         :data="priorityChartData"
-            :options="chartOptions"
-          />
+                        :options="chartOptions"
+                      />
                       <div v-else class="loading-state">
                         <font-awesome-icon icon="spinner" spin class="loading-icon" />
                         <p class="loading-text">Carregando dados...</p>
                       </div>
                     </div>
                     <div class="chart-legend">
-                      <div 
-                        v-for="(label, index) in ticketsByPriority.labels" 
+                      <div
+                        v-for="(label, index) in ticketsByPriority.labels"
                         :key="label"
                         class="legend-item"
                       >
-                        <div 
-                          class="legend-color" 
-                          :style="{ backgroundColor: priorityChartData.datasets[0].backgroundColor[index] }"
+                        <div
+                          class="legend-color"
+                          :style="{
+                            backgroundColor: priorityChartData.datasets[0].backgroundColor[index],
+                          }"
                         ></div>
                         <span>{{ label }}</span>
                       </div>
-          </div>
-        </div>
-      </div>
-    </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <!-- Tabela -->
               <div class="table-container">
-      <div class="table-header">
+                <div class="table-header">
                   <div class="table-header-content">
                     <div>
                       <h2 class="table-title">Últimos Chamados</h2>
@@ -255,36 +267,36 @@
                       Exportar
                     </button>
                   </div>
-      </div>
-      <div class="table-wrapper">
+                </div>
+                <div class="table-wrapper">
                   <table class="table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Assunto</th>
-              <th>Status</th>
-              <th>Prioridade</th>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Assunto</th>
+                        <th>Status</th>
+                        <th>Prioridade</th>
                         <th>Data</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="ticket in recentTickets" :key="ticket.id">
-              <td>#{{ ticket.id }}</td>
-              <td>{{ ticket.name }}</td>
-              <td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="ticket in recentTickets" :key="ticket.id">
+                        <td>#{{ ticket.id }}</td>
+                        <td>{{ ticket.name }}</td>
+                        <td>
                           <span :class="['status-badge', getStatusClass(ticket.status)]">
-                  {{ ticket.status }}
-                </span>
-              </td>
-              <td>
+                            {{ ticket.status }}
+                          </span>
+                        </td>
+                        <td>
                           <span :class="['priority-badge', getPriorityClass(ticket.priority)]">
-                  {{ ticket.priority }}
-                </span>
-              </td>
-              <td>{{ formatDate(ticket.createdAt) }}</td>
-            </tr>
-          </tbody>
-        </table>
+                            {{ ticket.priority }}
+                          </span>
+                        </td>
+                        <td>{{ formatDate(ticket.createdAt) }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
@@ -324,7 +336,9 @@
                       </div>
                     </div>
 
-                    <p class="info-title mt-4">Tasks with the shortest cycle times by label were:</p>
+                    <p class="info-title mt-4">
+                      Tasks with the shortest cycle times by label were:
+                    </p>
                     <div class="info-list">
                       <div class="info-item">
                         <span class="label">No label</span>
@@ -382,9 +396,9 @@
 
               <!-- Existing department cards -->
               <div class="departments-grid">
-                <div 
-                  v-for="dept in departmentStats" 
-                  :key="dept.departmentId" 
+                <div
+                  v-for="dept in departmentStats"
+                  :key="dept.departmentId"
                   class="department-card"
                 >
                   <h4 class="department-title">{{ dept.departmentName }}</h4>
@@ -416,7 +430,7 @@
                 <div class="wip-header">
                   <h2 class="wip-title">EM ANDAMENTO</h2>
                 </div>
-                
+
                 <div class="task-list">
                   <div class="task-header">
                     <div class="task-column assignees">RESPONSÁVEL</div>
@@ -428,8 +442,15 @@
                   <div v-for="task in inProgressTasks" :key="task.id" class="task-row">
                     <div class="task-column assignees">
                       <div class="avatar-group">
-                        <img v-if="task.assignee?.avatar" :src="task.assignee.avatar" :alt="task.assignee.name" class="avatar">
-                        <div v-else class="avatar-placeholder">{{ task.assignee?.initials || '?' }}</div>
+                        <img
+                          v-if="task.assignee?.avatar"
+                          :src="task.assignee.avatar"
+                          :alt="task.assignee.name"
+                          class="avatar"
+                        />
+                        <div v-else class="avatar-placeholder">
+                          {{ task.assignee?.initials || '?' }}
+                        </div>
                       </div>
                     </div>
                     <div class="task-column task-name">
@@ -440,7 +461,11 @@
                     </div>
                     <div class="task-column time-progress">
                       <span class="time-badge">{{ task.timeInProgress }}</span>
-                      <font-awesome-icon v-if="task.isOverdue" icon="exclamation-circle" class="overdue-icon" />
+                      <font-awesome-icon
+                        v-if="task.isOverdue"
+                        icon="exclamation-circle"
+                        class="overdue-icon"
+                      />
                     </div>
                   </div>
                 </div>
@@ -518,9 +543,9 @@
                         <td>7h 36m</td>
                         <td>13h 23m</td>
                         <td>19h 12m</td>
-            </tr>
-          </tbody>
-        </table>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
 
                 <div class="pagination">
@@ -565,7 +590,9 @@
                       </div>
                     </div>
 
-                    <p class="info-title mt-4">Tasks with the shortest cycle times by label were:</p>
+                    <p class="info-title mt-4">
+                      Tasks with the shortest cycle times by label were:
+                    </p>
                     <div class="info-list">
                       <div class="info-item">
                         <span class="label">No label</span>
@@ -618,32 +645,34 @@
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <!-- Existing department cards -->
-                <div class="departments-grid">
-                  <div 
-                    v-for="dept in departmentStats" 
-                    :key="dept.departmentId" 
-                    class="department-card"
-                  >
-                    <h4 class="department-title">{{ dept.departmentName }}</h4>
-                    <div class="department-stats">
-                      <div class="stat-row">
-                        <span class="stat-label">Total de Chamados</span>
-                        <span class="stat-value">{{ dept.totalTickets }}</span>
-                      </div>
-                      <div class="stat-row">
-                        <span class="stat-label">Chamados Resolvidos</span>
-                        <span class="stat-value">{{ dept.resolvedTickets }}</span>
-                      </div>
-                      <div class="stat-row">
-                        <span class="stat-label">Taxa de Resolução</span>
-                        <span class="stat-value">{{ formatPercentage(dept.resolutionRate) }}</span>
-                      </div>
-                      <div class="stat-row">
-                        <span class="stat-label">Tempo Médio</span>
-                        <span class="stat-value">{{ dept.averageResolutionTime }}</span>
+                  <!-- Existing department cards -->
+                  <div class="departments-grid">
+                    <div
+                      v-for="dept in departmentStats"
+                      :key="dept.departmentId"
+                      class="department-card"
+                    >
+                      <h4 class="department-title">{{ dept.departmentName }}</h4>
+                      <div class="department-stats">
+                        <div class="stat-row">
+                          <span class="stat-label">Total de Chamados</span>
+                          <span class="stat-value">{{ dept.totalTickets }}</span>
+                        </div>
+                        <div class="stat-row">
+                          <span class="stat-label">Chamados Resolvidos</span>
+                          <span class="stat-value">{{ dept.resolvedTickets }}</span>
+                        </div>
+                        <div class="stat-row">
+                          <span class="stat-label">Taxa de Resolução</span>
+                          <span class="stat-value">{{
+                            formatPercentage(dept.resolutionRate)
+                          }}</span>
+                        </div>
+                        <div class="stat-row">
+                          <span class="stat-label">Tempo Médio</span>
+                          <span class="stat-value">{{ dept.averageResolutionTime }}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -668,9 +697,19 @@
                 <div class="created-vs-completed-content">
                   <div class="created-vs-completed-info">
                     <p class="info-title">Novos chamados criados vs concluídos</p>
-                    <p class="info-text">Você concluiu <span class="highlight">50 chamados</span> no total durante <span class="highlight">3 meses</span></p>
-                    <p class="info-text">Você criou <span class="highlight">75 chamados</span> no total durante <span class="highlight">3 meses</span></p>
-                    <p class="info-trend">Isso é <span class="trend-value">100% mais criados</span> e <span class="trend-value">100% mais concluídos</span> comparado a <span class="date-reference">16 de Janeiro, 2025</span></p>
+                    <p class="info-text">
+                      Você concluiu <span class="highlight">50 chamados</span> no total durante
+                      <span class="highlight">3 meses</span>
+                    </p>
+                    <p class="info-text">
+                      Você criou <span class="highlight">75 chamados</span> no total durante
+                      <span class="highlight">3 meses</span>
+                    </p>
+                    <p class="info-trend">
+                      Isso é <span class="trend-value">100% mais criados</span> e
+                      <span class="trend-value">100% mais concluídos</span> comparado a
+                      <span class="date-reference">16 de Janeiro, 2025</span>
+                    </p>
                   </div>
 
                   <div class="created-vs-completed-chart">
@@ -701,10 +740,10 @@
               </div>
 
               <div class="period-selector">
-                <button 
-                  v-for="period in ['daily', 'weekly', 'monthly']" 
+                <button
+                  v-for="period in ['daily', 'weekly', 'monthly']"
                   :key="period"
-                  @click="updateTrendPeriod(period)"
+                  @click="updateTrendPeriod(period as 'daily' | 'weekly' | 'monthly')"
                   :class="['period-button', { active: selectedTrendPeriod === period }]"
                 >
                   {{ period === 'daily' ? 'Diário' : period === 'weekly' ? 'Semanal' : 'Mensal' }}
@@ -714,7 +753,7 @@
               <div class="chart-card">
                 <div class="chart-wrapper">
                   <Line
-                    v-if="trendData"
+                    v-if="trendData && trendChartData"
                     :data="trendChartData"
                     :options="chartOptions"
                   />
@@ -742,7 +781,10 @@
                 </div>
 
                 <div class="cycle-time-info">
-                  <p>Seu tempo de ciclo foi <strong>1d 03h</strong> na semana anterior (isso é <span class="percentage-up">89.4% mais</span> que a semana anterior)</p>
+                  <p>
+                    Seu tempo de ciclo foi <strong>1d 03h</strong> na semana anterior (isso é
+                    <span class="percentage-up">89.4% mais</span> que a semana anterior)
+                  </p>
                   <p class="average-info">14 semanas de média semanal: <strong>3h 06m</strong></p>
                 </div>
 
@@ -810,7 +852,10 @@
 
                 <div class="workflow-analysis">
                   <div class="workflow-description">
-                    <p>Quanto tempo as tarefas permanecem em cada estado do workflow? Os estados em que as tarefas permaneceram mais tempo foram:</p>
+                    <p>
+                      Quanto tempo as tarefas permanecem em cada estado do workflow? Os estados em
+                      que as tarefas permaneceram mais tempo foram:
+                    </p>
                     <div class="workflow-state-list">
                       <div class="state-item">
                         <span class="state-name">Em Desenvolvimento</span>
@@ -821,7 +866,10 @@
                         <span class="state-time">12h 30m</span>
                       </div>
                     </div>
-                    <p class="workflow-note">Estas são médias para as tarefas concluídas nos últimos 3 meses. Os estados do workflow são baseados no seu mapeamento de fluxo.</p>
+                    <p class="workflow-note">
+                      Estas são médias para as tarefas concluídas nos últimos 3 meses. Os estados do
+                      workflow são baseados no seu mapeamento de fluxo.
+                    </p>
                   </div>
 
                   <div class="workflow-chart">
@@ -874,12 +922,19 @@
 
                 <div class="progress-analysis">
                   <div class="progress-info">
-                    <p>Seu tempo médio de <strong>cycle time</strong> foi de <strong>18h 29m</strong> para os <span class="highlight">50 tasks</span> completados durante os <span class="highlight">3 months</span>.</p>
+                    <p>
+                      Seu tempo médio de <strong>cycle time</strong> foi de
+                      <strong>18h 29m</strong> para os
+                      <span class="highlight">50 tasks</span> completados durante os
+                      <span class="highlight">3 months</span>.
+                    </p>
                     <p class="trend-info">
-                      Isso é <span class="percentage-up">100% mais</span> que em 16 de Janeiro, 2025 (aumento é considerado ruim).
+                      Isso é <span class="percentage-up">100% mais</span> que em 16 de Janeiro, 2025
+                      (aumento é considerado ruim).
                     </p>
                     <p class="note-info">
-                      Cycle time é o tempo gasto no status "Em Andamento", conforme especificado no mapeamento do workflow.
+                      Cycle time é o tempo gasto no status "Em Andamento", conforme especificado no
+                      mapeamento do workflow.
                     </p>
                   </div>
 
@@ -900,8 +955,10 @@
                     <div class="chart-area">
                       <div class="trend-line">
                         <svg class="line-chart" viewBox="0 0 800 200" preserveAspectRatio="none">
-                          <path d="M0,180 L100,175 L200,170 L300,165 L400,160 L500,140 L600,100 L700,50 L800,30" 
-                                class="trend-path" />
+                          <path
+                            d="M0,180 L100,175 L200,170 L300,165 L400,160 L500,140 L600,100 L700,50 L800,30"
+                            class="trend-path"
+                          />
                         </svg>
                       </div>
                       <div class="date-axis">
@@ -930,7 +987,6 @@
                   </div>
                 </div>
               </div>
-
             </div>
 
             <!-- Análise por Período -->
@@ -979,7 +1035,9 @@
               <div class="report-metrics">
                 <div class="metric-item">
                   <div class="metric-label">Taxa de Aceitação</div>
-                  <div class="metric-value">{{ formatPercentage(customStats.acceptanceRate) }}</div>
+                  <div class="metric-value">
+                    {{ formatPercentage(customStats?.acceptanceRate) }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1002,76 +1060,31 @@ import {
   LinearScale,
   BarElement,
   LineElement,
-  PointElement
+  PointElement,
 } from 'chart.js';
 import { Bar, Pie, Line } from 'vue-chartjs';
 import { formatDate } from '@/utils/date';
-import { reportService } from '@/services/reportService';
-import type { 
-  TicketStatistics, 
-  ChartData, 
-  DepartmentStats,
-  TimeSeriesData,
-  PerformanceMetrics
-} from '@/services/reportService';
+// Comment out reportService import since we're using mock data
+// import { reportService } from '@/services/reportService';
+import type { TicketStatistics, ChartData } from '@/services/reportService';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 
 // Chart.js setup
 ChartJS.register(
-  Title, 
-  Tooltip, 
-  Legend, 
-  ArcElement, 
-  CategoryScale, 
-  LinearScale, 
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  CategoryScale,
+  LinearScale,
   BarElement,
   LineElement,
-  PointElement
+  PointElement,
 );
 
-interface Department {
-  id: number;
-  name: string;
-}
-
-interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-}
-
-interface TicketComment {
-  id: number;
-  content: string;
-  createdAt: string;
-  user: User;
-}
-
-interface Category {
-  id: number;
-  name: string;
-}
-
-interface Ticket {
-  id: number;
-  name: string;
-  priority: TicketPriority;
-  description: string;
-  department: Department;
-  requester: User;
-  targetUser: User;
-  status: TicketStatus;
-  completionDate?: string;
-  acceptanceDate?: string;
-  category?: Category;
-  comments: TicketComment[];
-  disapprovalReason?: string;
-  createdAt: string;
-}
-
+// Local type definitions
 type TicketStatus = 'Em andamento' | 'Finalizado' | 'Atrasado' | 'Outro';
-
 type TicketPriority = 'Alta' | 'Média' | 'Baixa';
 
 const chartOptions = {
@@ -1084,9 +1097,9 @@ const chartOptions = {
         usePointStyle: true,
         padding: 20,
         font: {
-          size: 12
-        }
-      }
+          size: 12,
+        },
+      },
     },
     tooltip: {
       backgroundColor: 'white',
@@ -1098,40 +1111,40 @@ const chartOptions = {
       boxPadding: 6,
       usePointStyle: true,
       callbacks: {
-        label: (context: any) => {
+        label: (context: { raw: unknown }): string => {
           const value = context.raw;
           if (typeof value === 'number') {
             return ` ${value} chamados`;
           }
-          return value;
-        }
-      }
-    }
+          return String(value);
+        },
+      },
+    },
   },
   scales: {
     x: {
       grid: {
-        display: false
+        display: false,
       },
       ticks: {
         font: {
-          size: 12
-        }
-      }
+          size: 12,
+        },
+      },
     },
     y: {
       beginAtZero: true,
       grid: {
-        color: '#f3f4f6'
+        color: '#f3f4f6',
       },
       ticks: {
         font: {
-          size: 12
+          size: 12,
         },
-        stepSize: 1
-      }
-    }
-  }
+        stepSize: 1,
+      },
+    },
+  },
 };
 
 const statistics = ref<TicketStatistics>({
@@ -1146,8 +1159,8 @@ const statistics = ref<TicketStatistics>({
   ticketTrends: {
     daily: [],
     weekly: [],
-    monthly: []
-  }
+    monthly: [],
+  },
 });
 
 const loading = ref(true);
@@ -1163,7 +1176,9 @@ const ticketsByPriority = ref<ChartData>({
   data: [],
 });
 
-const recentTickets = ref<any[]>([]);
+const recentTickets = ref<
+  { id: number; name: string; status: string; priority: string; createdAt: string }[]
+>([]);
 
 const statusClassMap: Record<TicketStatus, string> = {
   'Em andamento': 'bg-yellow-100 text-yellow-800',
@@ -1172,8 +1187,8 @@ const statusClassMap: Record<TicketStatus, string> = {
   Outro: 'bg-gray-100 text-gray-800',
 };
 
-const getStatusClass = (status: TicketStatus): string => {
-  return statusClassMap[status];
+const getStatusClass = (status: string): string => {
+  return statusClassMap[status as TicketStatus] || 'bg-gray-100 text-gray-800';
 };
 
 const priorityClassMap: Record<TicketPriority, string> = {
@@ -1182,28 +1197,125 @@ const priorityClassMap: Record<TicketPriority, string> = {
   Baixa: 'bg-blue-100 text-blue-800',
 };
 
-const getPriorityClass = (priority: TicketPriority): string => {
-  return priorityClassMap[priority];
+const getPriorityClass = (priority: string): string => {
+  return priorityClassMap[priority as TicketPriority] || 'bg-blue-100 text-blue-800';
 };
 
 const loadData = async () => {
   loading.value = true;
   error.value = null;
-  
+
   try {
+    // Mock data for now - replace with actual API calls when ready
+    /*
     const [statsData, statusData, priorityData, ticketsData] = await Promise.all([
       reportService.getTicketStatistics(),
       reportService.getTicketsByStatus(),
       reportService.getTicketsByPriority(),
       reportService.getRecentTickets(10),
     ]);
+    */
+
+    // Mock statistics data
+    const statsData: TicketStatistics = {
+      totalTickets: 187,
+      openTickets: 42,
+      closedTickets: 145,
+      averageResolutionTime: '3.2 dias',
+      averageAcceptanceTime: '1.5 dias',
+      resolutionRate: 0.78,
+      acceptanceRate: 0.92,
+      ticketsByDepartment: [
+        {
+          departmentId: 1,
+          departmentName: 'TI',
+          totalTickets: 65,
+          resolvedTickets: 50,
+          averageResolutionTime: '2.5 dias',
+          resolutionRate: 0.77,
+        },
+        {
+          departmentId: 2,
+          departmentName: 'RH',
+          totalTickets: 42,
+          resolvedTickets: 35,
+          averageResolutionTime: '3.7 dias',
+          resolutionRate: 0.83,
+        },
+        {
+          departmentId: 3,
+          departmentName: 'Financeiro',
+          totalTickets: 38,
+          resolvedTickets: 28,
+          averageResolutionTime: '4.1 dias',
+          resolutionRate: 0.74,
+        },
+        {
+          departmentId: 4,
+          departmentName: 'Marketing',
+          totalTickets: 21,
+          resolvedTickets: 17,
+          averageResolutionTime: '2.9 dias',
+          resolutionRate: 0.81,
+        },
+        {
+          departmentId: 5,
+          departmentName: 'Operações',
+          totalTickets: 21,
+          resolvedTickets: 15,
+          averageResolutionTime: '3.4 dias',
+          resolutionRate: 0.71,
+        },
+      ],
+      ticketTrends: {
+        daily: Array.from({ length: 30 }, (_, i) => ({
+          date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString(),
+          total: Math.floor(Math.random() * 10) + 20,
+          resolved: Math.floor(Math.random() * 8) + 15,
+          created: Math.floor(Math.random() * 5) + 8,
+        })),
+        weekly: Array.from({ length: 12 }, (_, i) => ({
+          date: new Date(Date.now() - (11 - i) * 7 * 24 * 60 * 60 * 1000).toISOString(),
+          total: Math.floor(Math.random() * 20) + 40,
+          resolved: Math.floor(Math.random() * 15) + 30,
+          created: Math.floor(Math.random() * 10) + 20,
+        })),
+        monthly: Array.from({ length: 6 }, (_, i) => ({
+          date: new Date(Date.now() - (5 - i) * 30 * 24 * 60 * 60 * 1000).toISOString(),
+          total: Math.floor(Math.random() * 40) + 80,
+          resolved: Math.floor(Math.random() * 30) + 60,
+          created: Math.floor(Math.random() * 20) + 40,
+        })),
+      },
+    };
+
+    // Mock status data
+    const statusData: ChartData = {
+      labels: ['Em andamento', 'Finalizado', 'Atrasado', 'Outro'],
+      data: [42, 145, 15, 5],
+    };
+
+    // Mock priority data
+    const priorityData: ChartData = {
+      labels: ['Alta', 'Média', 'Baixa'],
+      data: [27, 95, 65],
+    };
+
+    // Mock recent tickets
+    const ticketsData = Array.from({ length: 10 }, (_, i) => ({
+      id: i + 1,
+      name: `Ticket #${i + 100} - ${['Instalação de software', 'Problemas com impressora', 'Configuração de email', 'Conexão VPN', 'Atualização de sistema'][i % 5]}`,
+      status: ['Em andamento', 'Finalizado', 'Atrasado'][i % 3] as string,
+      priority: ['Alta', 'Média', 'Baixa'][i % 3] as string,
+      createdAt: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
+    }));
 
     statistics.value = statsData;
     ticketsByStatus.value = statusData;
     ticketsByPriority.value = priorityData;
     recentTickets.value = ticketsData;
-  } catch (error) {
-    console.error('Erro ao carregar dados dos relatórios:', error);
+  } catch (err: unknown) {
+    console.error('Erro ao carregar dados dos relatórios:', err);
     error.value = 'Ocorreu um erro ao carregar os dados. Por favor, tente novamente.';
   } finally {
     loading.value = false;
@@ -1223,83 +1335,103 @@ const tabs = [
 ];
 
 const currentTab = ref('overview');
-const customStats = ref(null);
+const customStats = ref<TicketStatistics | null>(null);
 
 // Computed Properties para os Gráficos
 const statusChartData = computed(() => ({
   labels: ticketsByStatus.value.labels,
-  datasets: [{
-    data: ticketsByStatus.value.data,
-    backgroundColor: ['#2563eb', '#eab308', '#22c55e', '#9333ea'],
-    borderWidth: 0
-  }]
+  datasets: [
+    {
+      data: ticketsByStatus.value.data,
+      backgroundColor: ['#2563eb', '#eab308', '#22c55e', '#9333ea'],
+      borderWidth: 0,
+    },
+  ],
 }));
 
 const priorityChartData = computed(() => ({
   labels: ticketsByPriority.value.labels,
-  datasets: [{
-    data: ticketsByPriority.value.data,
-    backgroundColor: ['#ef4444', '#eab308', '#2563eb'],
-    borderWidth: 0
-  }]
+  datasets: [
+    {
+      data: ticketsByPriority.value.data,
+      backgroundColor: ['#ef4444', '#eab308', '#2563eb'],
+      borderWidth: 0,
+    },
+  ],
 }));
 
 const selectedTrendPeriod = ref<'daily' | 'weekly' | 'monthly'>('weekly');
 
 const trendChartData = computed(() => {
   if (!statistics.value.ticketTrends[selectedTrendPeriod.value]) return null;
-  
+
   const data = statistics.value.ticketTrends[selectedTrendPeriod.value];
   return {
-    labels: data.map(item => formatDate(item.date)),
+    labels: data.map((item) => formatDate(item.date)),
     datasets: [
       {
         label: 'Total de Chamados',
-        data: data.map(item => item.total),
+        data: data.map((item) => item.total),
         borderColor: '#2563eb',
         backgroundColor: 'rgba(37, 99, 235, 0.1)',
         fill: true,
-        tension: 0.4
+        tension: 0.4,
       },
       {
         label: 'Chamados Resolvidos',
-        data: data.map(item => item.resolved),
+        data: data.map((item) => item.resolved),
         borderColor: '#22c55e',
         backgroundColor: 'rgba(34, 197, 94, 0.1)',
         fill: true,
-        tension: 0.4
+        tension: 0.4,
       },
       {
         label: 'Novos Chamados',
-        data: data.map(item => item.created),
+        data: data.map((item) => item.created),
         borderColor: '#eab308',
         backgroundColor: 'rgba(234, 179, 8, 0.1)',
         fill: true,
-        tension: 0.4
-      }
-    ]
+        tension: 0.4,
+      },
+    ],
   };
 });
 
 // Funções Auxiliares
-const formatPercentage = (value: number) => {
+const formatPercentage = (value?: number) => {
+  if (value === undefined) return '0.0%';
   return `${(value * 100).toFixed(1)}%`;
+};
+
+const disabledDate = (date: Date) => {
+  return date > new Date() || date < new Date(2023, 0, 1);
 };
 
 const updateTrendPeriod = async (period: 'daily' | 'weekly' | 'monthly') => {
   selectedTrendPeriod.value = period;
+
   try {
+    // Mock data for now - replace with actual API call when ready
+    /*
     const data = await reportService.getTicketTrends(period);
     statistics.value.ticketTrends = data;
-  } catch (error) {
-    console.error('Erro ao carregar tendências:', error);
+    */
+
+    // We already have mock trend data in the statistics object, no need to fetch again
+    // Just update the UI by triggering reactivity
+    loading.value = true;
+    setTimeout(() => {
+      loading.value = false;
+    }, 300);
+  } catch (err: unknown) {
+    console.error('Erro ao carregar tendências:', err);
     error.value = 'Erro ao carregar dados de tendências. Por favor, tente novamente.';
   }
 };
 
 const dateRange = ref({
   start: '',
-  end: ''
+  end: '',
 });
 
 const fetchCustomDateStats = async () => {
@@ -1307,16 +1439,62 @@ const fetchCustomDateStats = async () => {
     error.value = 'Por favor, selecione um período válido.';
     return;
   }
-  
+
   try {
     loading.value = true;
+
+    // Mock data for now - replace with actual API call when ready
+    /*
     customStats.value = await reportService.getCustomDateRangeStats(
       dateRange.value.start,
-      dateRange.value.end
+      dateRange.value.end,
     );
-  } catch (error) {
-    console.error('Erro ao carregar estatísticas do período:', error);
-    error.value = 'Erro ao carregar estatísticas do período selecionado. Por favor, tente novamente.';
+    */
+
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    // Mock custom date range statistics
+    customStats.value = {
+      totalTickets: Math.floor(Math.random() * 50) + 30,
+      openTickets: Math.floor(Math.random() * 20) + 10,
+      closedTickets: Math.floor(Math.random() * 30) + 20,
+      averageResolutionTime: `${(Math.random() * 4 + 1).toFixed(1)} dias`,
+      averageAcceptanceTime: `${(Math.random() * 2 + 0.5).toFixed(1)} dias`,
+      resolutionRate: Math.random() * 0.3 + 0.6,
+      acceptanceRate: Math.random() * 0.2 + 0.7,
+      ticketsByDepartment: [
+        {
+          departmentId: 1,
+          departmentName: 'TI',
+          totalTickets: Math.floor(Math.random() * 20) + 10,
+          resolvedTickets: Math.floor(Math.random() * 15) + 5,
+          averageResolutionTime: `${(Math.random() * 3 + 1).toFixed(1)} dias`,
+          resolutionRate: Math.random() * 0.3 + 0.6,
+        },
+        {
+          departmentId: 2,
+          departmentName: 'RH',
+          totalTickets: Math.floor(Math.random() * 15) + 8,
+          resolvedTickets: Math.floor(Math.random() * 10) + 5,
+          averageResolutionTime: `${(Math.random() * 3 + 1).toFixed(1)} dias`,
+          resolutionRate: Math.random() * 0.3 + 0.6,
+        },
+        {
+          departmentId: 3,
+          departmentName: 'Financeiro',
+          totalTickets: Math.floor(Math.random() * 12) + 5,
+          resolvedTickets: Math.floor(Math.random() * 8) + 3,
+          averageResolutionTime: `${(Math.random() * 3 + 1).toFixed(1)} dias`,
+          resolutionRate: Math.random() * 0.3 + 0.6,
+        },
+      ],
+      ticketTrends: statistics.value.ticketTrends,
+    };
+  } catch (err: unknown) {
+    console.error('Erro ao carregar estatísticas do período:', err);
+    error.value =
+      'Erro ao carregar estatísticas do período selecionado. Por favor, tente novamente.';
   } finally {
     loading.value = false;
   }
@@ -1325,9 +1503,7 @@ const fetchCustomDateStats = async () => {
 // Computed Properties para Métricas
 const departmentStats = computed(() => statistics.value.ticketsByDepartment);
 
-const trendData = computed(() => 
-  statistics.value.ticketTrends[selectedTrendPeriod.value]
-);
+const trendData = computed(() => statistics.value.ticketTrends[selectedTrendPeriod.value]);
 
 const inProgressTasks = ref([
   {
@@ -1336,11 +1512,11 @@ const inProgressTasks = ref([
     assignee: {
       name: 'João Silva',
       initials: 'JS',
-      avatar: null
+      avatar: null,
     },
     status: 'Em Andamento',
     timeInProgress: '6d 01h',
-    isOverdue: true
+    isOverdue: true,
   },
   {
     id: 2,
@@ -1348,11 +1524,11 @@ const inProgressTasks = ref([
     assignee: {
       name: 'Maria Santos',
       initials: 'MS',
-      avatar: null
+      avatar: null,
     },
     status: 'Em Andamento',
     timeInProgress: '5d 20h',
-    isOverdue: true
+    isOverdue: true,
   },
   {
     id: 3,
@@ -1360,11 +1536,11 @@ const inProgressTasks = ref([
     assignee: {
       name: 'Pedro Costa',
       initials: 'PC',
-      avatar: null
+      avatar: null,
     },
     status: 'Em Andamento',
     timeInProgress: '2d 01h',
-    isOverdue: true
+    isOverdue: true,
   },
   {
     id: 4,
@@ -1372,11 +1548,11 @@ const inProgressTasks = ref([
     assignee: {
       name: 'Bruno Santos',
       initials: 'BS',
-      avatar: null
+      avatar: null,
     },
     status: 'Em Andamento',
     timeInProgress: '1d 18h',
-    isOverdue: true
+    isOverdue: true,
   },
   {
     id: 5,
@@ -1384,19 +1560,31 @@ const inProgressTasks = ref([
     assignee: {
       name: 'Ana Lima',
       initials: 'AL',
-      avatar: null
+      avatar: null,
     },
     status: 'Em Andamento',
     timeInProgress: '1d 16h',
-    isOverdue: true
-  }
+    isOverdue: true,
+  },
 ]);
 
 // Dados para o gráfico Created vs Completed
 const createdVsCompletedData = ref({
-  labels: ['Jan 16', 'Jan 27', 'Jan 28', 'Feb 5', 'Feb 15', 'Mar 2', 'Mar 17', 'Mar 27', 'Apr 6', 'Apr 11', 'Apr 16'],
+  labels: [
+    'Jan 16',
+    'Jan 27',
+    'Jan 28',
+    'Feb 5',
+    'Feb 15',
+    'Mar 2',
+    'Mar 17',
+    'Mar 27',
+    'Apr 6',
+    'Apr 11',
+    'Apr 16',
+  ],
   created: [10, 15, 20, 25, 30, 40, 45, 55, 65, 70, 75],
-  completed: [5, 10, 15, 20, 25, 30, 35, 40, 45, 48, 50]
+  completed: [5, 10, 15, 20, 25, 30, 35, 40, 45, 48, 50],
 });
 
 const createdVsCompletedChartData = computed(() => ({
@@ -1408,7 +1596,7 @@ const createdVsCompletedChartData = computed(() => ({
       borderColor: '#22c55e',
       backgroundColor: 'rgba(34, 197, 94, 0.1)',
       fill: true,
-      tension: 0.4
+      tension: 0.4,
     },
     {
       label: 'Criados (no período)',
@@ -1416,9 +1604,9 @@ const createdVsCompletedChartData = computed(() => ({
       borderColor: '#3b82f6',
       backgroundColor: 'rgba(59, 130, 246, 0.1)',
       fill: true,
-      tension: 0.4
-    }
-  ]
+      tension: 0.4,
+    },
+  ],
 }));
 </script>
 
@@ -2418,10 +2606,11 @@ const createdVsCompletedChartData = computed(() => ({
 }
 
 @media (max-width: 768px) {
-  .task-header, .task-row {
+  .task-header,
+  .task-row {
     grid-template-columns: 80px 1fr 120px;
   }
-  
+
   .time-progress {
     display: none;
   }
@@ -2615,7 +2804,7 @@ const createdVsCompletedChartData = computed(() => ({
 .chart-bar {
   flex: 1;
   height: 24px;
-  background-color: #10B981;
+  background-color: #10b981;
   color: white;
   border-radius: 4px;
   display: flex;
@@ -2665,12 +2854,12 @@ const createdVsCompletedChartData = computed(() => ({
 }
 
 .percentage-up {
-  color: #EF4444;
+  color: #ef4444;
   font-weight: 500;
 }
 
 .average-info {
-  color: #6B7280;
+  color: #6b7280;
   margin-top: 0.5rem;
 }
 
@@ -2686,9 +2875,9 @@ const createdVsCompletedChartData = computed(() => ({
   justify-content: space-between;
   padding: 1rem 0;
   margin-right: 1.5rem;
-  color: #6B7280;
+  color: #6b7280;
   font-size: 0.75rem;
-  border-right: 1px solid #E5E7EB;
+  border-right: 1px solid #e5e7eb;
   min-width: 60px;
 }
 
@@ -2697,7 +2886,7 @@ const createdVsCompletedChartData = computed(() => ({
   display: flex;
   justify-content: space-around;
   align-items: flex-end;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid #e5e7eb;
   padding: 0 1rem 1rem;
   position: relative;
 }
@@ -2711,8 +2900,8 @@ const createdVsCompletedChartData = computed(() => ({
   bottom: 0;
   background: repeating-linear-gradient(
     to bottom,
-    #F3F4F6 0%,
-    #F3F4F6 1px,
+    #f3f4f6 0%,
+    #f3f4f6 1px,
     transparent 1px,
     transparent 20%
   );
@@ -2729,7 +2918,7 @@ const createdVsCompletedChartData = computed(() => ({
 
 .bar {
   width: 40px;
-  background-color: #60A5FA;
+  background-color: #60a5fa;
   border-radius: 4px;
   position: relative;
   transition: all 0.3s ease;
@@ -2737,7 +2926,7 @@ const createdVsCompletedChartData = computed(() => ({
 }
 
 .bar:hover {
-  background-color: #3B82F6;
+  background-color: #3b82f6;
   width: 48px;
 }
 
@@ -2759,7 +2948,7 @@ const createdVsCompletedChartData = computed(() => ({
 .week-label {
   margin-top: 0.75rem;
   font-size: 0.75rem;
-  color: #6B7280;
+  color: #6b7280;
   font-weight: 500;
 }
 
@@ -2938,7 +3127,7 @@ const createdVsCompletedChartData = computed(() => ({
   margin: 1.5rem 0;
   display: flex;
   position: relative;
-  border-left: 1px solid #E5E7EB;
+  border-left: 1px solid #e5e7eb;
 }
 
 .trend-line {
@@ -2967,7 +3156,7 @@ const createdVsCompletedChartData = computed(() => ({
   padding-top: 0.5rem;
   color: #6b7280;
   font-size: 0.75rem;
-  border-top: 1px solid #E5E7EB;
+  border-top: 1px solid #e5e7eb;
 }
 
 .time-axis {
@@ -2975,7 +3164,7 @@ const createdVsCompletedChartData = computed(() => ({
   flex-direction: column;
   justify-content: space-between;
   padding: 1rem 0.5rem;
-  color: #6B7280;
+  color: #6b7280;
   font-size: 0.75rem;
   min-width: 60px;
   margin-right: 0.5rem;
