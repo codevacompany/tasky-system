@@ -251,7 +251,7 @@
           @click="downloadFile(file)"
         >
           <div class="file-preview">
-            <font-awesome-icon icon="file" size="xl"/>
+            <font-awesome-icon icon="file" size="xl" />
           </div>
           <div class="file-name-container">
             <div class="file-name">{{ file.name }}</div>
@@ -317,9 +317,9 @@
               </div>
             </div>
 
-            <div class="event-item" v-else>
-              <div class="comment-avatar">
-                <font-awesome-icon icon="user-circle" />
+            <div class="event-item system-event" v-else>
+              <div class="comment-avatar system-avatar">
+                <font-awesome-icon :icon="getEventIcon(event.data.description)" />
               </div>
               <div class="update-content">
                 <div class="update-description-header">
@@ -733,6 +733,18 @@ const getStatusIcon = (status: string) => {
   }
 };
 
+const getEventIcon = (description: string) => {
+  if (description.includes('criou')) return 'plus-circle';
+  if (description.includes('aceitou')) return 'check-circle';
+  if (description.includes('enviou para verificação')) return 'eye';
+  if (description.includes('aprovou')) return 'thumbs-up';
+  if (description.includes('rejeitou')) return 'thumbs-down';
+  if (description.includes('solicitou correção')) return 'undo';
+  if (description.includes('cancelou')) return 'ban';
+  if (description.includes('iniciou correção')) return 'wrench';
+  return 'info-circle'; // ícone padrão para outros casos
+};
+
 watch(
   () => props.isOpen,
   (isOpen) => {
@@ -1090,6 +1102,18 @@ watch(
 
 .event-list {
   margin-top: 1.5rem;
+  position: relative;
+}
+
+.event-list::before {
+  content: '';
+  position: absolute;
+  left: 1.25rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e2e8f0;
+  z-index: 0;
 }
 
 .event-item {
@@ -1100,6 +1124,26 @@ watch(
   border-radius: 8px;
   margin-bottom: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 1;
+}
+
+.event-item.system-event {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem;
+}
+
+.event-item.system-event .comment-avatar {
+  background: #e2e8f0;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.2rem;
+}
+
+.event-item.system-event .update-content {
+  font-size: 0.9rem;
+  color: #64748b;
 }
 
 .comment-avatar {
@@ -1112,6 +1156,8 @@ watch(
   justify-content: center;
   color: #495057;
   font-size: 1.5rem;
+  border: 2px solid white;
+  z-index: 2;
 }
 
 .comment-content {
@@ -1296,6 +1342,20 @@ watch(
   background: #1e293b;
 }
 
+:deep(body.dark-mode) .event-item.system-event {
+  background: #1a2233;
+  border-color: #2d3748;
+}
+
+:deep(body.dark-mode) .event-item.system-event .comment-avatar {
+  background: #2d3748;
+  color: #94a3b8;
+}
+
+:deep(body.dark-mode) .event-item.system-event .update-content {
+  color: #94a3b8;
+}
+
 :deep(body.dark-mode) .comment-avatar {
   background: #2d3748;
   color: #94a3b8;
@@ -1329,5 +1389,27 @@ watch(
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
+}
+
+:deep(body.dark-mode) .event-list::before {
+  background: #2d3748;
+}
+
+:deep(body.dark-mode) .comment-avatar {
+  border-color: #1e293b;
+}
+
+:deep(body.dark-mode) .event-item.system-event .comment-avatar {
+  border-color: #1a2233;
+}
+
+.system-avatar {
+  background: #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+:deep(body.dark-mode) .system-avatar {
+  background: #334155 !important;
+  color: #94a3b8 !important;
 }
 </style>
