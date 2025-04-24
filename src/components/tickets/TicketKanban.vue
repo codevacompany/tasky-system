@@ -288,10 +288,15 @@ const formatTimeAgo = (date: string | Date) => {
   flex: 1;
   min-width: 300px;
   width: 0;
-  background: var(--surface-section);
+  background: var(--surface-card);
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   position: relative;
+}
+
+:deep(body.dark-mode) .kanban-column {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background: var(--surface-section);
 }
 
 .kanban-column:not(:last-child)::after {
@@ -318,6 +323,10 @@ const formatTimeAgo = (date: string | Date) => {
   text-align: center;
 }
 
+:deep(body.dark-mode) .column-header {
+  background: var(--surface-card);
+}
+
 .column-title {
   margin: 0;
   display: inline-flex;
@@ -334,7 +343,7 @@ const formatTimeAgo = (date: string | Date) => {
 }
 
 .ticket-count {
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--surface-hover);
   padding: 0.25rem 0.5rem;
   border-radius: 12px;
   font-size: 0.75rem;
@@ -365,16 +374,16 @@ const formatTimeAgo = (date: string | Date) => {
 }
 
 .column-content::-webkit-scrollbar-thumb {
-  background: var(--surface-border);
+  background: var(--surface-hover);
   border-radius: 4px;
 }
 
 .column-content::-webkit-scrollbar-thumb:hover {
-  background: var(--surface-hover);
+  background: var(--surface-border);
 }
 
 .kanban-card {
-  background: white;
+  background: var(--surface-card);
   border-radius: 8px;
   padding: 1rem;
   cursor: pointer;
@@ -385,13 +394,18 @@ const formatTimeAgo = (date: string | Date) => {
 }
 
 :deep(body.dark-mode) .kanban-card {
-  background: var(--surface-card);
+  background: var(--surface-ground);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .kanban-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border-color: var(--primary-color);
+}
+
+:deep(body.dark-mode) .kanban-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .card-header {
@@ -484,8 +498,16 @@ const formatTimeAgo = (date: string | Date) => {
   white-space: nowrap;
 }
 
+:deep(body.dark-mode) .info-item {
+  color: var(--text-color);
+}
+
 .info-icon {
   flex-shrink: 0;
+}
+
+:deep(body.dark-mode) .info-icon {
+  opacity: 0.8;
 }
 
 .department {
@@ -539,8 +561,8 @@ const formatTimeAgo = (date: string | Date) => {
 }
 
 .deadline.normal {
-  background: rgba(100, 116, 139, 0.15);
-  color: #64748b;
+  background: var(--surface-hover);
+  color: var(--text-color);
 }
 
 .deadline.warning {
@@ -564,13 +586,28 @@ const formatTimeAgo = (date: string | Date) => {
 }
 
 :deep(body.dark-mode) .deadline.normal {
-  background: rgba(100, 116, 139, 0.25);
-  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
 }
 
 :deep(body.dark-mode) .deadline.warning {
-  background: rgba(245, 158, 11, 0.25);
+  background: rgba(245, 158, 11, 0.2);
   color: #fbbf24;
+}
+
+:deep(body.dark-mode) .deadline.urgent {
+  background: rgba(249, 115, 22, 0.9);
+  color: white;
+}
+
+:deep(body.dark-mode) .deadline.critical {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+}
+
+:deep(body.dark-mode) .deadline.overdue {
+  background: rgba(220, 38, 38, 0.9);
+  color: white;
 }
 
 .last-update {
