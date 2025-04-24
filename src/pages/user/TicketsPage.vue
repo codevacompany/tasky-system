@@ -1,7 +1,17 @@
 <template>
   <section id="ticketsSection" class="section-content">
     <div class="section-header">
-      <h1>Tickets</h1>
+      <div class="header-content">
+        <h1>Tickets</h1>
+        <button
+          class="view-toggle-btn"
+          @click="toggleView"
+          :title="isKanbanView ? 'Mudar para visualização em tabela' : 'Mudar para visualização Kanban'"
+        >
+          <font-awesome-icon :icon="isKanbanView ? 'table' : 'columns'" />
+          <span>{{ isKanbanView ? 'Visualização em Tabela' : 'Visualização Kanban' }}</span>
+        </button>
+      </div>
     </div>
     <div class="tab-container">
       <div class="tab-buttons">
@@ -137,24 +147,31 @@
         </div>
 
         <!-- Tabela principal (mostrar apenas quando não estiver na aba arquivo) -->
-        <TicketTable
-          v-if="activeTab !== 'arquivo'"
-          :tickets="tickets"
-          :isLoading="isLoading"
-          :tableType="activeTab"
-          :currentPage="currentPage"
-          :totalPages="totalPages"
-          @changePage="(page) => (currentPage = page)"
-          @viewTicket="handleViewTicket"
-          @editTicket="handleEditTicket"
-          @cancelTicket="handleCancelTicket"
-          @acceptTicket="handleAcceptTicket"
-          @verifyTicket="handleVerifyTicket"
-          @approveTicket="handleApproveTicket"
-          @requestCorrection="handleRequestCorrection"
-          @rejectTicket="handleRejectTicket"
-          @refresh="fetchTickets(activeTab)"
-        />
+        <template v-if="activeTab !== 'arquivo'">
+          <TicketTable
+            v-if="!isKanbanView"
+            :tickets="tickets"
+            :isLoading="isLoading"
+            :tableType="activeTab"
+            :currentPage="currentPage"
+            :totalPages="totalPages"
+            @changePage="(page) => (currentPage = page)"
+            @viewTicket="handleViewTicket"
+            @editTicket="handleEditTicket"
+            @cancelTicket="handleCancelTicket"
+            @acceptTicket="handleAcceptTicket"
+            @verifyTicket="handleVerifyTicket"
+            @approveTicket="handleApproveTicket"
+            @requestCorrection="handleRequestCorrection"
+            @rejectTicket="handleRejectTicket"
+            @refresh="fetchTickets(activeTab)"
+          />
+          <TicketKanban
+            v-else
+            :tickets="tickets"
+            @viewTicket="handleViewTicket"
+          />
+        </template>
       </div>
     </div>
 
@@ -199,6 +216,7 @@ import { useUserStore } from '@/stores/user';
 import type { Ticket } from '@/models';
 import { TicketStatus, TicketPriority } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
+import TicketKanban from '@/components/tickets/TicketKanban.vue';
 import { toast } from 'vue3-toastify';
 import { debounce, formatSnakeToNaturalCase } from '@/utils/generic-helper';
 
@@ -220,6 +238,8 @@ const archivedCreatedTickets = ref<Ticket[]>([]);
 const showCorrectionModal = ref(false);
 const selectedTicket = ref<Ticket | null>(null);
 const newCompletionDate = ref('');
+
+const isKanbanView = ref(false);
 
 const debouncedSearch = debounce(() => {
   fetchTickets(activeTab.value);
@@ -381,6 +401,10 @@ const handleRejectTicket = async (ticket: Ticket) => {
   }
 };
 
+const toggleView = () => {
+  isKanbanView.value = !isKanbanView.value;
+};
+
 onMounted(() => fetchTickets(activeTab.value));
 
 watch(searchTerm, () => {
@@ -497,7 +521,7 @@ watch(currentPage, () => {
 .search-group {
   display: flex;
   align-items: center;
-  margin-left: auto;
+  gap: 1rem;
 }
 
 .search-group input:focus {
@@ -850,5 +874,36 @@ watch(currentPage, () => {
   background-color: var(--input-bg-dark);
   border-color: var(--border-color-dark);
   color: var(--text-color-dark);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.view-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  background: var(--surface-card);
+  color: var(--text-color);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-toggle-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.view-toggle-btn svg {
+  width: 16px;
+  height: 16px;
 }
 </style>
