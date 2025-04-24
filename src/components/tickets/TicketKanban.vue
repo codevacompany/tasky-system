@@ -18,10 +18,10 @@
             <div class="card-title">{{ ticket.name }}</div>
             <div class="ticket-id">
               #{{ ticket.customId }}
-              <font-awesome-icon 
+              <font-awesome-icon
                 v-if="hasNotifications(ticket)"
-                icon="bell" 
-                class="notification-indicator" 
+                icon="bell"
+                class="notification-indicator"
               />
             </div>
           </div>
@@ -46,7 +46,7 @@
                 <font-awesome-icon icon="tag" class="info-icon" />
                 {{ ticket.category?.name || '—' }}
               </div>
-              <div :class="['info-item deadline', getDeadlineClass(ticket.dueAt)]" :title="'Prazo: ' + (ticket.dueAt ? formatDate(ticket.dueAt) : 'Não definido')">
+              <div v-if="ticket.dueAt" :class="['info-item deadline', getDeadlineClass(ticket.dueAt)]" :title="'Prazo: ' + (ticket.dueAt ? formatDate(ticket.dueAt) : 'Não definido')">
                 <font-awesome-icon :icon="getDeadlineIcon(ticket)" class="info-icon" />
                 {{ calculateDeadline(ticket) }}
               </div>
@@ -70,12 +70,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+// import { ref, onMounted, onUnmounted } from 'vue';
+import { ref } from 'vue';
 import type { Ticket } from '@/models';
 import { TicketStatus } from '@/models';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { formatDate } from '@/utils/date';
-import { notificationService } from '@/services/notificationService';
+// import { notificationService } from '@/services/notificationService';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 
 const props = defineProps<{
@@ -90,30 +91,30 @@ const statusColumns = [
 ];
 
 const ticketsWithNotifications = ref<Set<string>>(new Set());
-let notificationInterval: number | null = null;
+// let notificationInterval: number | null = null;
 
 const selectedTicket = ref<Ticket | null>(null);
 const isModalOpen = ref(false);
 
-const fetchNotificationsForTickets = async () => {
-  try {
-    const response = await notificationService.getUnreadByTickets(props.tickets.map(t => t.customId));
-    ticketsWithNotifications.value = new Set(response.data.map(n => n.resourceCustomId));
-  } catch (error) {
-    console.error('Erro ao buscar notificações:', error);
-  }
-};
+// const fetchNotificationsForTickets = async () => {
+//   try {
+//     const response = await notificationService.getUnreadByTickets(props.tickets.map(t => t.customId));
+//     ticketsWithNotifications.value = new Set(response.data.map(n => n.resourceCustomId));
+//   } catch (error) {
+//     console.error('Erro ao buscar notificações:', error);
+//   }
+// };
 
-onMounted(() => {
-  fetchNotificationsForTickets();
-  notificationInterval = setInterval(fetchNotificationsForTickets, 120000); // Atualiza a cada 2 minutos
-});
+// onMounted(() => {
+//   fetchNotificationsForTickets();
+//   notificationInterval = setInterval(fetchNotificationsForTickets, 120000); // Atualiza a cada 2 minutos
+// });
 
-onUnmounted(() => {
-  if (notificationInterval) {
-    clearInterval(notificationInterval);
-  }
-});
+// onUnmounted(() => {
+//   if (notificationInterval) {
+//     clearInterval(notificationInterval);
+//   }
+// });
 
 const hasNotifications = (ticket: Ticket) => {
   return ticketsWithNotifications.value.has(ticket.customId);
@@ -149,50 +150,50 @@ const priorityIcon = (priority: string) => {
   }
 };
 
-const getStatusClass = (status: string) => {
-  switch (status) {
-    case TicketStatus.Pending:
-      return 'status-pending';
-    case TicketStatus.InProgress:
-      return 'status-progress';
-    case TicketStatus.AwaitingVerification:
-      return 'status-awaiting';
-    case TicketStatus.UnderVerification:
-      return 'status-verification';
-    default:
-      return '';
-  }
-};
+// const getStatusClass = (status: string) => {
+//   switch (status) {
+//     case TicketStatus.Pending:
+//       return 'status-pending';
+//     case TicketStatus.InProgress:
+//       return 'status-progress';
+//     case TicketStatus.AwaitingVerification:
+//       return 'status-awaiting';
+//     case TicketStatus.UnderVerification:
+//       return 'status-verification';
+//     default:
+//       return '';
+//   }
+// };
 
 const calculateDeadline = (ticket: Ticket) => {
   if (!ticket.dueAt) return '—';
-  
+
   const now = new Date();
   const dueDate = new Date(ticket.dueAt);
-  
+
   if (dueDate < now) {
     return 'Atrasado';
   }
-  
+
   const diffTime = Math.abs(dueDate.getTime() - now.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   return `${diffDays}d`;
 };
 
 const getDeadlineClass = (dueDate: string | null) => {
   if (!dueDate) return 'normal';
-  
+
   const now = new Date();
   const due = new Date(dueDate);
-  
+
   if (due < now) {
     return 'overdue';
   }
-  
+
   const diffTime = Math.abs(due.getTime() - now.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays <= 1) {
     return 'critical';
   } else if (diffDays <= 3) {
@@ -200,29 +201,29 @@ const getDeadlineClass = (dueDate: string | null) => {
   } else if (diffDays <= 5) {
     return 'warning';
   }
-  
+
   return 'normal';
 };
 
 const getDeadlineIcon = (ticket: Ticket) => {
   if (!ticket.dueAt) return 'clock';
-  
+
   const now = new Date();
   const dueDate = new Date(ticket.dueAt);
-  
+
   if (dueDate < now) {
     return 'exclamation-circle';
   }
-  
+
   const diffTime = Math.abs(dueDate.getTime() - now.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays <= 2) {
     return 'exclamation-triangle';
   } else if (diffDays <= 5) {
     return 'clock';
   }
-  
+
   return 'calendar-day';
 };
 
@@ -635,4 +636,4 @@ const formatTimeAgo = (date: string | Date) => {
 .last-update .info-icon {
   opacity: 0.7;
 }
-</style> 
+</style>
