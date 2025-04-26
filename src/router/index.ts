@@ -12,10 +12,16 @@ import TicketsPage from '@/pages/user/TicketsPage.vue';
 import ClientManagement from '@/pages/admin/ClientManagement.vue';
 import ClientUsers from '@/pages/admin/ClientUsers.vue';
 import ClientSettings from '@/pages/admin/ClientSettings.vue';
+import HomePage from '@/pages/HomePage.vue';
 import { localStorageService } from '@/utils/localStorageService';
 
 const routes: RouteRecordRaw[] = [
   // Public Routes (No Layout)
+  {
+    path: '/',
+    component: HomePage,
+    meta: { requiresAuth: false },
+  },
   {
     path: '/login',
     component: LoginPage,
@@ -24,7 +30,7 @@ const routes: RouteRecordRaw[] = [
 
   // User Panel Routes
   {
-    path: '/',
+    path: '/dashboard',
     component: DashboardLayout,
     children: [
       { path: '', component: UserHome },
