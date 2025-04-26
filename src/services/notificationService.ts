@@ -16,6 +16,10 @@ export const notificationService = {
     return apiClient.get(`/notifications/target-user/${targetUserId}`);
   },
 
+  async getUnreadByTickets(ticketIds: string[]): Promise<AxiosResponse<Notification[]>> {
+    return apiClient.post<Notification[]>('/notifications/unread/tickets', { ticketIds });
+  },
+
   async update(id: number, data: UpdateNotificationDto): Promise<AxiosResponse<Notification>> {
     return apiClient.patch<Notification>(`/notifications/${id}`, data);
   },

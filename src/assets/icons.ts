@@ -60,7 +60,10 @@ import {
   faWrench,
   faBan,
   faFile,
-  faPaperclip
+  faPaperclip,
+  faTable,
+  faColumns,
+  faClockRotateLeft
 } from '@fortawesome/free-solid-svg-icons';
 
 import { faBell as faBellRegular, faClock as faClockRegular } from '@fortawesome/free-regular-svg-icons';
@@ -129,7 +132,10 @@ const icons = [
   faWrench,
   faBan,
   faFile,
-  faPaperclip
+  faPaperclip,
+  faTable,
+  faColumns,
+  faClockRotateLeft
 ];
 
 library.add(...icons);

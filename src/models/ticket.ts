@@ -43,6 +43,7 @@ export interface Ticket {
   isPrivate: boolean;
   files: TicketFile[];
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateTicketDto {
