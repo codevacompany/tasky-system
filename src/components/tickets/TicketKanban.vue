@@ -15,44 +15,49 @@
           @click="openTicketDetails(ticket)"
         >
           <div class="card-header">
-            <div class="card-title">{{ ticket.name }}</div>
-            <div class="ticket-id">
-              #{{ ticket.customId }}
-              <font-awesome-icon
+            <div class="header-left">
+              <div class="card-title">{{ ticket.name }}</div>
+            </div>
+            <div class="ticket-indicators">
+              <div class="indicator" title="Comentários">
+                <font-awesome-icon icon="comment" />
+                <span>{{ ticket.comments?.length || 0 }}</span>
+              </div>
+              <div class="indicator" title="Anexos">
+                <font-awesome-icon icon="paperclip" />
+                <span>{{ ticket.files?.length || 0 }}</span>
+              </div>
+              <font-awesome-icon 
                 v-if="hasNotifications(ticket)"
-                icon="bell"
-                class="notification-indicator"
+                icon="bell" 
+                class="notification-indicator" 
+                title="Ticket atualizado"
               />
             </div>
           </div>
           <div class="card-divider"></div>
           <div class="card-info">
-            <div class="info-row three-columns">
-              <div class="info-item requester" title="Solicitante">
-                <font-awesome-icon icon="user" class="info-icon" />
-                {{ ticket.requester.firstName }} {{ ticket.requester.lastName }}
-              </div>
-              <div class="info-item department" title="Setor">
-                <font-awesome-icon icon="building" class="info-icon" />
-                {{ ticket.department.name }}
-              </div>
-              <div class="info-item last-update" title="Última atualização">
-                <font-awesome-icon icon="clock-rotate-left" class="info-icon" />
-                {{ formatTimeAgo(ticket.updatedAt) }}
-              </div>
-            </div>
-            <div class="info-row three-columns">
-              <div class="info-item category" title="Categoria">
-                <font-awesome-icon icon="tag" class="info-icon" />
-                {{ ticket.category?.name || '—' }}
-              </div>
-              <div v-if="ticket.dueAt" :class="['info-item deadline', getDeadlineClass(ticket.dueAt)]" :title="'Prazo: ' + (ticket.dueAt ? formatDate(ticket.dueAt) : 'Não definido')">
-                <font-awesome-icon :icon="getDeadlineIcon(ticket)" class="info-icon" />
-                {{ calculateDeadline(ticket) }}
+            <div class="info-row">
+              <div class="requester-info">
+                {{ ticket.requester.firstName }} {{ ticket.requester.lastName }} / {{ ticket.department.name }}
               </div>
               <div class="priority-flag" :class="priorityColor(ticket.priority)" title="Prioridade">
                 <font-awesome-icon :icon="priorityIcon(ticket.priority)" class="priority-icon" />
                 {{ ticket.priority }}
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-item last-update" title="Última atualização">
+                <font-awesome-icon icon="clock-rotate-left" class="info-icon" />
+                {{ formatTimeAgo(ticket.updatedAt) }}
+              </div>
+              <div 
+                v-if="ticket.dueAt" 
+                :class="['info-item deadline', getDeadlineClass(ticket.dueAt)]" 
+                :title="'Prazo: ' + (ticket.dueAt ? formatDate(ticket.dueAt) : 'Não definido')"
+              >
+                <font-awesome-icon :icon="getDeadlineIcon(ticket)" class="info-icon" />
+                {{ calculateDeadline(ticket) }}
               </div>
             </div>
           </div>
@@ -70,13 +75,12 @@
 </template>
 
 <script setup lang="ts">
-// import { ref, onMounted, onUnmounted } from 'vue';
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import type { Ticket } from '@/models';
 import { TicketStatus } from '@/models';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { formatDate } from '@/utils/date';
-// import { notificationService } from '@/services/notificationService';
+import { notificationService } from '@/services/notificationService';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 
 const props = defineProps<{
@@ -91,30 +95,30 @@ const statusColumns = [
 ];
 
 const ticketsWithNotifications = ref<Set<string>>(new Set());
-// let notificationInterval: number | null = null;
+let notificationInterval: number | null = null;
 
 const selectedTicket = ref<Ticket | null>(null);
 const isModalOpen = ref(false);
 
-// const fetchNotificationsForTickets = async () => {
-//   try {
-//     const response = await notificationService.getUnreadByTickets(props.tickets.map(t => t.customId));
-//     ticketsWithNotifications.value = new Set(response.data.map(n => n.resourceCustomId));
-//   } catch (error) {
-//     console.error('Erro ao buscar notificações:', error);
-//   }
-// };
+const fetchNotificationsForTickets = async () => {
+  try {
+    const response = await notificationService.getUnreadByTickets(props.tickets.map(t => t.customId));
+    ticketsWithNotifications.value = new Set(response.data.map(n => n.resourceCustomId));
+  } catch (error) {
+    console.error('Erro ao buscar notificações:', error);
+  }
+};
 
-// onMounted(() => {
-//   fetchNotificationsForTickets();
-//   notificationInterval = setInterval(fetchNotificationsForTickets, 120000); // Atualiza a cada 2 minutos
-// });
+onMounted(() => {
+  fetchNotificationsForTickets();
+  notificationInterval = setInterval(fetchNotificationsForTickets, 120000); // Atualiza a cada 2 minutos
+});
 
-// onUnmounted(() => {
-//   if (notificationInterval) {
-//     clearInterval(notificationInterval);
-//   }
-// });
+onUnmounted(() => {
+  if (notificationInterval) {
+    clearInterval(notificationInterval);
+  }
+});
 
 const hasNotifications = (ticket: Ticket) => {
   return ticketsWithNotifications.value.has(ticket.customId);
@@ -150,80 +154,70 @@ const priorityIcon = (priority: string) => {
   }
 };
 
-// const getStatusClass = (status: string) => {
-//   switch (status) {
-//     case TicketStatus.Pending:
-//       return 'status-pending';
-//     case TicketStatus.InProgress:
-//       return 'status-progress';
-//     case TicketStatus.AwaitingVerification:
-//       return 'status-awaiting';
-//     case TicketStatus.UnderVerification:
-//       return 'status-verification';
-//     default:
-//       return '';
-//   }
-// };
-
 const calculateDeadline = (ticket: Ticket) => {
   if (!ticket.dueAt) return '—';
-
+  
   const now = new Date();
   const dueDate = new Date(ticket.dueAt);
-
+  
   if (dueDate < now) {
     return 'Atrasado';
   }
-
+  
   const diffTime = Math.abs(dueDate.getTime() - now.getTime());
+  const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+  
+  if (diffHours < 24) {
+    return diffHours === 1 ? '1 hora restante' : `${diffHours} horas restantes`;
+  }
+  
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  return `${diffDays}d`;
+  return diffDays === 1 ? '1 dia restante' : `${diffDays} dias restantes`;
 };
 
 const getDeadlineClass = (dueDate: string | null) => {
   if (!dueDate) return 'normal';
-
+  
   const now = new Date();
   const due = new Date(dueDate);
-
+  
   if (due < now) {
     return 'overdue';
   }
-
+  
   const diffTime = Math.abs(due.getTime() - now.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
+  
   if (diffDays <= 1) {
     return 'critical';
-  } else if (diffDays <= 3) {
+  } else if (diffDays <= 2) {
     return 'urgent';
-  } else if (diffDays <= 5) {
+  } else if (diffDays <= 3) {
     return 'warning';
   }
-
+  
   return 'normal';
 };
 
 const getDeadlineIcon = (ticket: Ticket) => {
   if (!ticket.dueAt) return 'clock';
-
+  
   const now = new Date();
   const dueDate = new Date(ticket.dueAt);
-
+  
   if (dueDate < now) {
     return 'exclamation-circle';
   }
-
+  
   const diffTime = Math.abs(dueDate.getTime() - now.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
+  
   if (diffDays <= 2) {
     return 'exclamation-triangle';
-  } else if (diffDays <= 5) {
+  } else if (diffDays <= 3) {
     return 'clock';
   }
-
+  
   return 'calendar-day';
 };
 
@@ -270,6 +264,10 @@ const formatTimeAgo = (date: string | Date) => {
   const years = Math.floor(months / 12);
   return `${years}a atrás`;
 };
+
+const getInitials = (user: { firstName: string; lastName: string }) => {
+  return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+};
 </script>
 
 <style scoped>
@@ -279,25 +277,28 @@ const formatTimeAgo = (date: string | Date) => {
   padding: 1.5rem;
   overflow-x: auto;
   min-height: 70vh;
-  background: var(--surface-ground);
+  background: #ffffff;
   border-radius: 8px;
   position: relative;
   width: 100%;
+}
+
+:deep(body.dark-mode) .kanban-board {
+  background: #111827;
 }
 
 .kanban-column {
   flex: 1;
   min-width: 300px;
   width: 0;
-  background: var(--surface-card);
+  background: #f0f2f5;
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   position: relative;
 }
 
 :deep(body.dark-mode) .kanban-column {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  background: var(--surface-section);
+  background: #1e293b;
 }
 
 .kanban-column:not(:last-child)::after {
@@ -384,186 +385,104 @@ const formatTimeAgo = (date: string | Date) => {
 }
 
 .kanban-card {
-  background: var(--surface-card);
+  background: #ffffff;
   border-radius: 8px;
-  padding: 1rem;
+  padding: 0.875rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid var(--surface-border);
+  border: 1px solid #e5e7eb;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  margin-bottom: 1rem;
+  margin-bottom: 0.875rem;
+  display: flex;
+  flex-direction: column;
 }
 
 :deep(body.dark-mode) .kanban-card {
-  background: var(--surface-ground);
+  background: #252f3f;
+  border-color: #374151;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .kanban-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #4b5563;
 }
 
 :deep(body.dark-mode) .kanban-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-color: #4b5563;
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  padding: 0;
+}
+
+.header-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
 }
 
 .card-title {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   line-height: 1.4;
   color: var(--text-color);
-  flex: 1;
-  word-break: break-word;
-}
-
-.ticket-id {
-  font-size: 0.75rem;
-  color: var(--text-color-secondary);
-  font-weight: 500;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  opacity: 0.8;
-}
-
-.notification-indicator {
-  color: #3b82f6;
-  font-size: 0.875rem;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-.card-divider {
-  height: 1px;
-  background: var(--surface-border);
-  margin: 0.75rem 0;
-  opacity: 0.7;
-}
-
-.card-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.info-row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.info-row.three-columns {
-  display: grid;
-  grid-template-columns: minmax(80px, 1fr) minmax(80px, 1fr) minmax(80px, 1fr);
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-  align-items: center;
-  text-align: center;
-}
-
-.info-row.three-columns:last-child {
-  margin-bottom: 0;
-}
-
-.info-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-  font-size: 0.75rem;
-  color: var(--text-color-secondary);
-  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  width: 100%;
 }
 
-:deep(body.dark-mode) .info-item {
-  color: var(--text-color);
-}
-
-.info-icon {
+.ticket-indicators {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
   flex-shrink: 0;
 }
 
-:deep(body.dark-mode) .info-icon {
+.indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
   opacity: 0.8;
 }
 
-.department {
-  text-align: right;
-}
-
-.priority-flag {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: white;
-  min-width: 0;
-}
-
-.priority-icon {
-  font-size: 0.75rem;
-}
-
-.priority-low {
-  background-color: #22c55e; /* Verde */
-}
-
-.priority-medium {
-  background-color: #f59e0b; /* Amarelo/Laranja */
-}
-
-.priority-high {
-  background-color: #ef4444; /* Vermelho */
+.indicator span {
+  font-size: 0.7rem;
+  min-width: 1rem;
 }
 
 .deadline {
   padding: 0.25rem 0.5rem;
-  border-radius: 12px;
+  border-radius: 4px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  gap: 0.25rem;
 }
 
 .deadline.normal {
-  background: var(--surface-hover);
-  color: var(--text-color);
+  background: #e5e7eb;
+  color: #4b5563;
 }
 
 .deadline.warning {
@@ -587,28 +506,72 @@ const formatTimeAgo = (date: string | Date) => {
 }
 
 :deep(body.dark-mode) .deadline.normal {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-color);
+  background: #374151;
+  color: #9ca3af;
 }
 
-:deep(body.dark-mode) .deadline.warning {
-  background: rgba(245, 158, 11, 0.2);
-  color: #fbbf24;
+.card-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 0.5rem 0;
+  opacity: 0.5;
 }
 
-:deep(body.dark-mode) .deadline.urgent {
-  background: rgba(249, 115, 22, 0.9);
+.card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+}
+
+.requester-info {
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+}
+
+.priority-flag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
   color: white;
 }
 
-:deep(body.dark-mode) .deadline.critical {
-  background: rgba(239, 68, 68, 0.9);
-  color: white;
+.priority-icon {
+  font-size: 0.75rem;
 }
 
-:deep(body.dark-mode) .deadline.overdue {
-  background: rgba(220, 38, 38, 0.9);
-  color: white;
+.priority-low {
+  background-color: #22c55e; /* Verde */
+}
+
+.priority-medium {
+  background-color: #f59e0b; /* Amarelo/Laranja */
+}
+
+.priority-high {
+  background-color: #ef4444; /* Vermelho */
 }
 
 .last-update {
@@ -635,5 +598,42 @@ const formatTimeAgo = (date: string | Date) => {
 
 .last-update .info-icon {
   opacity: 0.7;
+}
+
+.requester-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.notification-indicator {
+  color: #3b82f6;
+  font-size: 0.75rem;
+  animation: pulse 2s infinite;
+  margin-left: 0.25rem;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+:deep(body.dark-mode) .notification-indicator {
+  color: #60a5fa;
 }
 </style>
