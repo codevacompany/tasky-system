@@ -8,7 +8,17 @@
       <!-- Modal content -->
       <div class="modal-content">
         <div class="modal-header">
-          <h2>Meu Perfil</h2>
+          <h2 style="display: flex; align-items: center; gap: 8px;">
+            Meu Perfil
+            <router-link
+              to="/faq"
+              title="Acesse a Central de Ajuda (FAQ)"
+              style="color: #1976d2; display: flex; align-items: center; gap: 4px; font-weight: 500; text-decoration: none;"
+            >
+              <font-awesome-icon icon="question-circle" />
+              FAQ
+            </router-link>
+          </h2>
           <button class="close-btn" @click="closeModal">×</button>
         </div>
         <div class="modal-body">

@@ -1,5 +1,21 @@
 # Documentação de Negócio
 
+## 📊 Visão Geral do Mercado
+
+### Mercado Alvo
+- Empresas de médio e grande porte
+- Organizações com múltiplos departamentos
+- Empresas de TI e prestadoras de serviços
+- Setores que necessitam de controle de processos
+
+### Diferenciais Competitivos
+- Interface moderna e intuitiva
+- Fluxo de trabalho personalizável
+- Sistema de notificações em tempo real
+- Dashboard com KPIs relevantes
+- Controle granular de permissões
+- Integração com sistemas externos
+
 ## 📋 Fluxos de Trabalho
 
 ### 🎟️ Criação do Ticket
@@ -50,14 +66,91 @@
 ### ❌ Rejeição
 
 1. **Ação**: Solicitante clica em REJEITAR
-2. **Condição**: Solicitante precisa preencher um motivo da rejeição
-3. **Resultados**:
-   - Motivo é registrado nas atualizações do ticket
-   - Ticket volta a ficar disponível para o receptor
-   - Ampulheta some e botão REVISAR aparece
-4. **Ao clicar em REVISAR**:
-   - Status volta para EM ANDAMENTO
-   - Botão ENVIAR PARA VERIFICAÇÃO aparece novamente
+2. **Resultados**:
+   - Status volta para: EM ANDAMENTO
+   - Envia notificação ao receptor
+   - Receptor deve fazer as correções necessárias
+
+## 💼 Estratégia de Mercado
+
+### Modelo de Negócio
+- **SaaS (Software as a Service)**
+  - Planos mensais/anuais
+  - Preços baseados em número de usuários
+  - Funcionalidades por nível de plano
+
+### Planos de Preços
+1. **Básico**
+   - Até 10 usuários
+   - Funcionalidades essenciais
+   - Suporte por email
+
+2. **Profissional**
+   - Até 50 usuários
+   - Todas as funcionalidades
+   - Suporte prioritário
+   - API de integração
+
+3. **Enterprise**
+   - Usuários ilimitados
+   - Personalização avançada
+   - Suporte dedicado
+   - SLA garantido
+
+### Estratégia de Marketing
+- Marketing de conteúdo
+- SEO
+- Redes sociais
+- Parcerias estratégicas
+- Cases de sucesso
+
+### Métricas de Sucesso
+- Taxa de conversão
+- Churn rate
+- NPS (Net Promoter Score)
+- Tempo médio de resposta
+- Satisfação do cliente
+
+## 🔄 Processos de Negócio
+
+### Onboarding
+1. Cadastro inicial
+2. Configuração do ambiente
+3. Treinamento básico
+4. Acompanhamento inicial
+
+### Suporte
+- Central de ajuda
+- Documentação detalhada
+- Chat online
+- Tickets de suporte
+- FAQ
+
+### Atualizações
+- Release notes
+- Webinars
+- Treinamentos
+- Feedback contínuo
+
+## 📈 Roadmap de Negócio
+
+### Curto Prazo (3-6 meses)
+- Lançamento MVP
+- Coleta de feedback
+- Ajustes iniciais
+- Primeiros clientes
+
+### Médio Prazo (6-12 meses)
+- Novas funcionalidades
+- Expansão do mercado
+- Parcerias estratégicas
+- Otimização de processos
+
+### Longo Prazo (12+ meses)
+- Internacionalização
+- Módulos adicionais
+- Inteligência Artificial
+- Marketplace de integrações
 
 ## 📊 Regras de Negócio
 
