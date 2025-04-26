@@ -27,12 +27,6 @@
                 <font-awesome-icon icon="paperclip" />
                 <span>{{ ticket.files?.length || 0 }}</span>
               </div>
-              <font-awesome-icon 
-                v-if="hasNotifications(ticket)"
-                icon="bell" 
-                class="notification-indicator" 
-                title="Ticket atualizado"
-              />
             </div>
           </div>
           <div class="card-divider"></div>
@@ -49,11 +43,11 @@
             <div class="info-row">
               <div class="info-item last-update" title="Última atualização">
                 <font-awesome-icon icon="clock-rotate-left" class="info-icon" />
-                {{ formatTimeAgo(ticket.updatedAt) }}
+                {{ formatRelativeTime(ticket.updatedAt) }}
               </div>
-              <div 
-                v-if="ticket.dueAt" 
-                :class="['info-item deadline', getDeadlineClass(ticket.dueAt)]" 
+              <div
+                v-if="ticket.dueAt"
+                :class="['info-item deadline', getDeadlineClass(ticket.dueAt)]"
                 :title="'Prazo: ' + (ticket.dueAt ? formatDate(ticket.dueAt) : 'Não definido')"
               >
                 <font-awesome-icon :icon="getDeadlineIcon(ticket)" class="info-icon" />
@@ -75,12 +69,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref } from 'vue';
 import type { Ticket } from '@/models';
 import { TicketStatus } from '@/models';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
-import { formatDate } from '@/utils/date';
-import { notificationService } from '@/services/notificationService';
+import { formatDate, formatRelativeTime } from '@/utils/date';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 
 const props = defineProps<{
@@ -94,35 +87,8 @@ const statusColumns = [
   TicketStatus.UnderVerification,
 ];
 
-const ticketsWithNotifications = ref<Set<string>>(new Set());
-let notificationInterval: number | null = null;
-
 const selectedTicket = ref<Ticket | null>(null);
 const isModalOpen = ref(false);
-
-const fetchNotificationsForTickets = async () => {
-  try {
-    const response = await notificationService.getUnreadByTickets(props.tickets.map(t => t.customId));
-    ticketsWithNotifications.value = new Set(response.data.map(n => n.resourceCustomId));
-  } catch (error) {
-    console.error('Erro ao buscar notificações:', error);
-  }
-};
-
-onMounted(() => {
-  fetchNotificationsForTickets();
-  notificationInterval = setInterval(fetchNotificationsForTickets, 120000); // Atualiza a cada 2 minutos
-});
-
-onUnmounted(() => {
-  if (notificationInterval) {
-    clearInterval(notificationInterval);
-  }
-});
-
-const hasNotifications = (ticket: Ticket) => {
-  return ticketsWithNotifications.value.has(ticket.customId);
-};
 
 const getTicketsByStatus = (status: string) => {
   return props.tickets.filter(ticket => ticket.status === status);
@@ -156,38 +122,38 @@ const priorityIcon = (priority: string) => {
 
 const calculateDeadline = (ticket: Ticket) => {
   if (!ticket.dueAt) return '—';
-  
+
   const now = new Date();
   const dueDate = new Date(ticket.dueAt);
-  
+
   if (dueDate < now) {
     return 'Atrasado';
   }
-  
+
   const diffTime = Math.abs(dueDate.getTime() - now.getTime());
   const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-  
+
   if (diffHours < 24) {
     return diffHours === 1 ? '1 hora restante' : `${diffHours} horas restantes`;
   }
-  
+
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays === 1 ? '1 dia restante' : `${diffDays} dias restantes`;
 };
 
 const getDeadlineClass = (dueDate: string | null) => {
   if (!dueDate) return 'normal';
-  
+
   const now = new Date();
   const due = new Date(dueDate);
-  
+
   if (due < now) {
     return 'overdue';
   }
-  
+
   const diffTime = Math.abs(due.getTime() - now.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays <= 1) {
     return 'critical';
   } else if (diffDays <= 2) {
@@ -195,78 +161,35 @@ const getDeadlineClass = (dueDate: string | null) => {
   } else if (diffDays <= 3) {
     return 'warning';
   }
-  
+
   return 'normal';
 };
 
 const getDeadlineIcon = (ticket: Ticket) => {
   if (!ticket.dueAt) return 'clock';
-  
+
   const now = new Date();
   const dueDate = new Date(ticket.dueAt);
-  
+
   if (dueDate < now) {
     return 'exclamation-circle';
   }
-  
+
   const diffTime = Math.abs(dueDate.getTime() - now.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
+
   if (diffDays <= 2) {
     return 'exclamation-triangle';
   } else if (diffDays <= 3) {
     return 'clock';
   }
-  
+
   return 'calendar-day';
 };
 
 const openTicketDetails = (ticket: Ticket) => {
   selectedTicket.value = ticket;
   isModalOpen.value = true;
-};
-
-const formatTimeAgo = (date: string | Date) => {
-  const now = new Date();
-  const past = new Date(date);
-  const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
-
-  // Menos de 1 minuto
-  if (diffInSeconds < 60) {
-    return 'agora';
-  }
-
-  // Minutos (1-59)
-  const minutes = Math.floor(diffInSeconds / 60);
-  if (minutes < 60) {
-    return `${minutes}min atrás`;
-  }
-
-  // Horas (1-23)
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) {
-    return `${hours}h atrás`;
-  }
-
-  // Dias (1-30)
-  const days = Math.floor(hours / 24);
-  if (days < 30) {
-    return `${days}d atrás`;
-  }
-
-  // Meses (1-11)
-  const months = Math.floor(days / 30);
-  if (months < 12) {
-    return `${months}m atrás`;
-  }
-
-  // Anos
-  const years = Math.floor(months / 12);
-  return `${years}a atrás`;
-};
-
-const getInitials = (user: { firstName: string; lastName: string }) => {
-  return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
 };
 </script>
 

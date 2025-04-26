@@ -358,7 +358,7 @@ import { useUserStore } from '@/stores/user';
 import { toast } from 'vue3-toastify';
 import { formatRelativeTime } from '@/utils/date';
 import ConfirmationModal from '../common/ConfirmationModal.vue';
-import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import { calculateDeadline, formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import type { TicketUpdate } from '@/models/ticketUpdate';
 import { TicketUpdateService } from '@/services/ticketUpdateService';
 import type { TicketFile } from '@/models/ticketFile';
@@ -421,26 +421,6 @@ const getStatusClass = (status: string) => {
     default:
       return '';
   }
-};
-
-const calculateDeadline = (ticket: Ticket) => {
-  if (!ticket.dueAt) return '—';
-
-  const deadline = new Date(ticket.dueAt);
-  const today = new Date();
-
-  // Reset hours to compare just dates
-  deadline.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
-
-  const diffTime = deadline.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 0) {
-    return 'ATRASADO';
-  }
-
-  return `${diffDays} dias restantes`;
 };
 
 const isPastDeadline = (date?: string) => {
