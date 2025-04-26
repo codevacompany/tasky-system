@@ -12,6 +12,7 @@ import TicketsPage from '@/pages/user/TicketsPage.vue';
 import ClientManagement from '@/pages/admin/ClientManagement.vue';
 import ClientUsers from '@/pages/admin/ClientUsers.vue';
 import ClientSettings from '@/pages/admin/ClientSettings.vue';
+import SyncPage from '@/pages/user/SyncPage.vue';
 import { localStorageService } from '@/utils/localStorageService';
 
 const routes: RouteRecordRaw[] = [
@@ -58,6 +59,13 @@ const routes: RouteRecordRaw[] = [
       requiresAuth: true,
       isAdmin: true
     }
+  },
+
+  {
+    path: '/sync',
+    name: 'sync',
+    component: SyncPage,
+    meta: { requiresAuth: true }
   }
 ];
 

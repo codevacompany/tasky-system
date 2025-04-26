@@ -75,7 +75,13 @@
             <span v-if="unreadCount && unreadCount > 0" class="notification-badge">{{ unreadCount }}</span>
           </div>
 
-          <!-- Dark Mode Toggle Button -->
+          <router-link to="/sync" class="sync-icon">
+            <div class="sync-content">
+              <font-awesome-icon icon="comments" />
+              <span>Sync</span>
+            </div>
+          </router-link>
+
           <button class="dark-mode-toggle" @click="toggleDarkMode">
             <font-awesome-icon icon="moon" />
           </button>
@@ -392,5 +398,41 @@ body.dark-mode .header-logo .logo-text {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.sync-icon {
+  color: #64748b;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sync-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.sync-content span {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sync-icon:hover {
+  background-color: #f1f5f9;
+  color: #4361ee;
+}
+
+:deep(body.dark-mode) {
+  .sync-icon {
+    color: #94a3b8;
+  }
+
+  .sync-icon:hover {
+    background-color: #1e293b;
+    color: #4361ee;
+  }
 }
 </style>
