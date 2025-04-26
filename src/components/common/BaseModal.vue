@@ -55,7 +55,7 @@ const close = () => {
   border-radius: var(--radius);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   width: auto;
-  max-width: 85%;
+  max-width: 80%;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -78,20 +78,22 @@ const close = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.2rem 1.5rem;
+  padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
+  background-color: var(--secondary-dark);
+  color: white;
 }
 
 .modal-header h2 {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 600;
-  color: var(--text-color);
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: var(--text-light);
+  color: #ffffff;
+  opacity: 0.8;
   font-size: 1.2rem;
   cursor: pointer;
   padding: 0.5rem;
@@ -103,8 +105,7 @@ const close = () => {
 }
 
 .close-btn:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  color: var(--danger-color);
+  opacity: 1;
 }
 
 .modal-body {
