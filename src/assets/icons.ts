@@ -63,10 +63,13 @@ import {
   faPaperclip,
   faTable,
   faColumns,
-  faClockRotateLeft
+  faClockRotateLeft,
 } from '@fortawesome/free-solid-svg-icons';
 
-import { faBell as faBellRegular, faClock as faClockRegular } from '@fortawesome/free-regular-svg-icons';
+import {
+  faBell as faBellRegular,
+  faClock as faClockRegular,
+} from '@fortawesome/free-regular-svg-icons';
 
 const icons = [
   faHome,
@@ -135,7 +138,7 @@ const icons = [
   faPaperclip,
   faTable,
   faColumns,
-  faClockRotateLeft
+  faClockRotateLeft,
 ];
 
 library.add(...icons);

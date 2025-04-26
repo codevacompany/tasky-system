@@ -1,23 +1,11 @@
 <template>
   <Teleport to="body">
-    <!-- Backdrop -->
     <div v-if="showProfileModal" class="backdrop" @click="closeModal"></div>
-
-    <!-- Profile Modal/Dropdown -->
     <div v-if="showProfileModal" class="profile-dropdown" id="profileModal" @click.stop>
-      <!-- Modal content -->
       <div class="modal-content">
         <div class="modal-header">
-          <h2 style="display: flex; align-items: center; gap: 8px;">
+          <h2 style="display: flex; align-items: center; gap: 8px">
             Meu Perfil
-            <router-link
-              to="/faq"
-              title="Acesse a Central de Ajuda (FAQ)"
-              style="color: #1976d2; display: flex; align-items: center; gap: 4px; font-weight: 500; text-decoration: none;"
-            >
-              <font-awesome-icon icon="question-circle" />
-              FAQ
-            </router-link>
           </h2>
           <button class="close-btn" @click="closeModal">×</button>
         </div>
@@ -34,10 +22,14 @@
           </div>
 
           <div class="form-actions">
+            <router-link
+              to="/faq"
+            >
             <button type="button" class="btn btn-secondary" @click="openSupport">
               <font-awesome-icon icon="question-circle" />
               Ajuda
             </button>
+            </router-link>
             <button type="button" id="logoutBtn" class="btn btn-danger" @click="logout">
               <font-awesome-icon icon="sign-out-alt" />
               Sair
