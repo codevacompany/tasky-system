@@ -35,6 +35,7 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', component: UserHome },
       { path: 'meus-tickets', component: TicketsPage },
+      { path: 'faq', component: () => import('@/pages/user/FAQ.vue') },
     ],
     meta: { requiresAuth: true },
   },
