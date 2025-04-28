@@ -64,6 +64,11 @@ import {
   faTable,
   faColumns,
   faClockRotateLeft,
+  faTicketAlt,
+  faUsers as faUsersSolid,
+  faChartLine as faChartLineSolid,
+  faBell as faBellSolid,
+  faTasks
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -139,6 +144,11 @@ const icons = [
   faTable,
   faColumns,
   faClockRotateLeft,
+  faTicketAlt,
+  faUsersSolid,
+  faChartLineSolid,
+  faBellSolid,
+  faTasks
 ];
 
 library.add(...icons);

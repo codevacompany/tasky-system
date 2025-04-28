@@ -12,10 +12,16 @@ import TicketsPage from '@/pages/user/TicketsPage.vue';
 import ClientManagement from '@/pages/admin/ClientManagement.vue';
 import ClientUsers from '@/pages/admin/ClientUsers.vue';
 import ClientSettings from '@/pages/admin/ClientSettings.vue';
+import LandingPage from '@/pages/public/LandingPage.vue';
 import { localStorageService } from '@/utils/localStorageService';
 
 const routes: RouteRecordRaw[] = [
   // Public Routes (No Layout)
+  {
+    path: '/landing',
+    component: LandingPage,
+    meta: { requiresAuth: false },
+  },
   {
     path: '/login',
     component: LoginPage,
@@ -57,9 +63,9 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../pages/AdminDashboard.vue'),
     meta: {
       requiresAuth: true,
-      isAdmin: true
-    }
-  }
+      isAdmin: true,
+    },
+  },
 ];
 
 const router = createRouter({
@@ -68,7 +74,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
   const loggedIn = localStorageService.getAccessToken() && localStorageService.getUser()?.role;
 
   if (requiresAuth && !loggedIn) {
@@ -78,7 +84,6 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
     // Verificar autenticação
     // if (!isAuthenticated) return next('/login')
-
     // Verificar permissões de admin
     // if (to.meta.isAdmin && !isAdmin) return next('/')
   }

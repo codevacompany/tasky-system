@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div v-if="isOpen" class="modal-backdrop" id="newTicketModal" @click.self="close">
-      <LoadingSpinner v-if="isLoading" :size="50" :color="'white'"/>
+      <LoadingSpinner v-if="isLoading" :size="50" :color="'white'" />
       <div v-else class="modal-content">
         <div class="modal-header">
           <slot name="header">
@@ -80,7 +80,7 @@ const close = () => {
   justify-content: space-between;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border-color);
-  background-color: var(--secondary-dark);
+  background: var(--secondary-dark);
   color: white;
 }
 
