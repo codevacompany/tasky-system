@@ -1,0 +1,52 @@
+<svg width="500" height="350" viewBox="0 0 500 350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="500" height="350" rx="8" fill="#F8FAFF"/>
+  
+  <!-- Chat Window -->
+  <rect x="80" y="50" width="340" height="250" rx="6" fill="white" stroke="#E0E6FF" stroke-width="2"/>
+  
+  <!-- Header -->
+  <rect x="80" y="50" width="340" height="40" rx="6" fill="#4963EB"/>
+  <text x="100" y="75" font-family="Arial" font-size="14" font-weight="bold" fill="white">Equipe Marketing</text>
+  <circle cx="390" cy="70" r="8" fill="white" fill-opacity="0.3"/>
+  <circle cx="365" cy="70" r="8" fill="white" fill-opacity="0.3"/>
+  
+  <!-- Sidebar -->
+  <rect x="80" y="90" width="80" height="210" fill="#F0F4FF"/>
+  <circle cx="115" cy="115" r="15" fill="#6D83EB"/>
+  <text x="115" y="120" font-family="Arial" font-size="14" font-weight="bold" fill="white" text-anchor="middle">JD</text>
+  
+  <circle cx="115" cy="155" r="15" fill="#4963EB"/>
+  <text x="115" y="160" font-family="Arial" font-size="14" font-weight="bold" fill="white" text-anchor="middle">AC</text>
+  
+  <circle cx="115" cy="195" r="15" fill="#1FBB87"/>
+  <text x="115" y="200" font-family="Arial" font-size="14" font-weight="bold" fill="white" text-anchor="middle">MT</text>
+  
+  <circle cx="115" cy="235" r="15" fill="#F5A623"/>
+  <text x="115" y="240" font-family="Arial" font-size="14" font-weight="bold" fill="white" text-anchor="middle">PR</text>
+  
+  <circle cx="115" cy="275" r="15" fill="#E74C3C"/>
+  <text x="115" y="280" font-family="Arial" font-size="14" font-weight="bold" fill="white" text-anchor="middle">LS</text>
+  
+  <!-- Chat Messages -->
+  <rect x="175" y="105" width="160" height="40" rx="10" fill="#F0F4FF"/>
+  <text x="190" y="125" font-family="Arial" font-size="10" fill="#1A2233">Olá equipe, temos uma nova</text>
+  <text x="190" y="140" font-family="Arial" font-size="10" fill="#1A2233">campanha para planejar</text>
+  
+  <rect x="205" y="155" width="200" height="55" rx="10" fill="#F0F4FF"/>
+  <text x="220" y="175" font-family="Arial" font-size="10" fill="#1A2233">Precisamos definir o cronograma</text>
+  <text x="220" y="190" font-family="Arial" font-size="10" fill="#1A2233">e responsáveis pelas etapas até</text>
+  <text x="220" y="205" font-family="Arial" font-size="10" fill="#1A2233">o final da semana.</text>
+  
+  <rect x="260" y="220" width="145" height="25" rx="10" fill="#4963EB"/>
+  <text x="275" y="235" font-family="Arial" font-size="10" fill="white">Já criei um documento</text>
+  
+  <rect x="175" y="255" width="210" height="30" rx="10" fill="#F0F4FF"/>
+  <text x="190" y="275" font-family="Arial" font-size="10" fill="#1A2233">Vamos marcar uma reunião amanhã?</text>
+  
+  <!-- Chat Input -->
+  <rect x="165" y="295" width="245" height="30" rx="15" fill="#F7F9FF" stroke="#E0E6FF" stroke-width="1"/>
+  <text x="185" y="315" font-family="Arial" font-size="11" fill="#A3AED0">Digite sua mensagem...</text>
+  <circle cx="390" cy="310" r="10" fill="#4963EB"/>
+  <path d="M385 310L390 315L395 310" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg> 

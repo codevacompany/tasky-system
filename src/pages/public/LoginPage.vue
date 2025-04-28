@@ -2,7 +2,12 @@
   <section id="loginSection" class="login-section">
     <div class="login-container">
       <div class="login-header">
-        <img src="@/assets/images/tasky-white.png" alt="Tasky Logo" class="login-logo" id="loginLogo" />
+        <img
+          src="@/assets/images/tasky-white.png"
+          alt="Tasky Logo"
+          class="login-logo"
+          id="loginLogo"
+        />
       </div>
 
       <div class="login-form-container">
@@ -11,7 +16,13 @@
             <label for="loginEmail">E-mail</label>
             <div class="input-group">
               <font-awesome-icon class="input-icon" icon="envelope" />
-              <input type="email" id="loginEmail" placeholder="Seu e-mail" v-model="email" required />
+              <input
+                type="email"
+                id="loginEmail"
+                placeholder="Seu e-mail"
+                v-model="email"
+                required
+              />
             </div>
           </div>
 
@@ -19,7 +30,13 @@
             <label for="loginPassword">Senha</label>
             <div class="input-group">
               <font-awesome-icon class="input-icon" icon="lock" />
-              <input type="password" id="loginPassword" placeholder="Sua senha" v-model="password" required />
+              <input
+                type="password"
+                id="loginPassword"
+                placeholder="Sua senha"
+                v-model="password"
+                required
+              />
             </div>
           </div>
 
@@ -34,7 +51,7 @@
           </div>
 
           <button type="submit" class="btn btn-primary btn-block" :disabled="isLoading">
-            <LoadingSpinner v-if="isLoading" :size="22"/>
+            <LoadingSpinner v-if="isLoading" :size="22" />
             <span v-else>Entrar</span>
           </button>
         </form>
@@ -81,8 +98,11 @@ const login = async () => {
   justify-content: center;
   min-height: 100vh;
   background-color: #f5f7fa;
-  background-image:
-    linear-gradient(to bottom right, rgba(245, 247, 250, 0.95), rgba(245, 247, 250, 0.8));
+  background-image: linear-gradient(
+    to bottom right,
+    rgba(245, 247, 250, 0.95),
+    rgba(245, 247, 250, 0.8)
+  );
   background-size: cover;
   background-position: center;
   padding-top: 40px;
@@ -105,7 +125,7 @@ const login = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #1a2233;
+  background: var(--secondary-dark);
   position: relative;
 }
 
@@ -229,15 +249,10 @@ const login = async () => {
   height: 46px;
   border: none;
   border-radius: 4px;
-  background-color: #1a2233;
   color: white;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s;
-}
-
-.login-form .btn-primary:hover {
-  background-color: #333333;
 }
 
 .login-footer {

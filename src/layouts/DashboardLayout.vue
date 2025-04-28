@@ -3,10 +3,10 @@
     <div class="admin-layout">
       <header class="main-header">
         <div class="header-logo">
-          <img 
-            :src="darkMode ? taskyWhiteLogo : taskyLogo" 
-            alt="Tasky Logo" 
-            class="logo" 
+          <img
+            :src="darkMode ? taskyWhiteLogo : taskyLogo"
+            alt="Tasky Logo"
+            class="logo"
           />
         </div>
 
@@ -205,7 +205,7 @@ onMounted(() => {
   if (darkMode.value) {
     document.body.classList.add('dark-mode');
   }
-  
+
   //let's use a polling strategy for now
   intervalId = setInterval(() => {
     fetchUnreadCount();
@@ -288,7 +288,7 @@ body.dark-mode .main-header {
 
 .main-nav ul li div:hover,
 .main-nav ul li div.active {
-  background-color: var(--button-primary-color);
+  background: var(--button-primary-color);
   color: #f8f9fa;
 }
 
