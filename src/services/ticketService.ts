@@ -68,6 +68,10 @@ export const ticketService = {
     });
   },
 
+  async getTenantRecentTickets(limit: number = 10): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
+    return apiClient.get(`/tickets?limit=${limit}`);
+  },
+
   async update(
     id: string,
     data: UpdateTicketDto,

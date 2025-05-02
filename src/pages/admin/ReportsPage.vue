@@ -33,7 +33,7 @@
         <div class="header-content">
           <div>
             <h1 class="header-title">Relatórios do Sistema</h1>
-            <p class="header-subtitle">Acompanhe métricas e indicadores importantes dos chamados</p>
+            <p class="header-subtitle">Acompanhe métricas e indicadores importantes dos tickets</p>
           </div>
           <div class="header-actions">
             <button class="btn btn-outline secondary">
@@ -54,8 +54,8 @@
           <div class="metric-card blue-border">
             <div class="metric-content">
               <div class="metric-info">
-                <p class="metric-label">Total de Chamados</p>
-                <h3 class="metric-value">{{ statistics.totalTickets }}</h3>
+                <p class="metric-label">Total de Tickets</p>
+                <h3 class="metric-value">{{ statistics?.totalTickets }}</h3>
               </div>
               <div class="metric-icon blue">
                 <font-awesome-icon icon="ticket" />
@@ -67,7 +67,7 @@
             <div class="metric-content">
               <div class="metric-info">
                 <p class="metric-label">Taxa de Resolução</p>
-                <h3 class="metric-value">{{ formatPercentage(statistics.resolutionRate) }}</h3>
+                <h3 class="metric-value">{{ formatPercentage(statistics?.resolutionRate) }}</h3>
               </div>
               <div class="metric-icon yellow">
                 <font-awesome-icon icon="chart-line" />
@@ -79,7 +79,9 @@
             <div class="metric-content">
               <div class="metric-info">
                 <p class="metric-label">Tempo Médio de Resolução</p>
-                <h3 class="metric-value">{{ statistics.averageResolutionTime }}</h3>
+                <h3 class="metric-value">
+                  {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }}
+                </h3>
               </div>
               <div class="metric-icon green">
                 <font-awesome-icon icon="clock" />
@@ -90,8 +92,10 @@
           <div class="metric-card purple-border">
             <div class="metric-content">
               <div class="metric-info">
-                <p class="metric-label">Taxa de Aceitação</p>
-                <h3 class="metric-value">{{ formatPercentage(statistics.acceptanceRate) }}</h3>
+                <p class="metric-label">Tempo médio de Aceitação</p>
+                <h3 class="metric-value">
+                  {{ formatTimeInSeconds(statistics?.averageAcceptanceTimeSeconds) }}
+                </h3>
               </div>
               <div class="metric-icon purple">
                 <font-awesome-icon icon="thumbs-up" />
@@ -122,7 +126,7 @@
               <!-- Nova seção Created vs Completed -->
               <div class="created-vs-completed">
                 <div class="created-vs-completed-header">
-                  <h2>CRIADOS VS CONCLUÍDOS</h2>
+                  <h2>CRIADOS VS CONCLUÍDOS (Mocked)</h2>
                   <div class="period-selector">
                     <button class="btn btn-outline secondary">
                       3 meses
@@ -133,13 +137,13 @@
 
                 <div class="created-vs-completed-content">
                   <div class="created-vs-completed-info">
-                    <p class="info-title">Novos chamados criados vs concluídos</p>
+                    <p class="info-title">Novos tickets criados vs concluídos</p>
                     <p class="info-text">
-                      Você concluiu <span class="highlight">50 chamados</span> no total durante
+                      <span class="highlight">50 tickets</span> concluídos nos últimos
                       <span class="highlight">3 meses</span>
                     </p>
                     <p class="info-text">
-                      Você criou <span class="highlight">75 chamados</span> no total durante
+                      <span class="highlight">75 tickets</span> criados nos últimos
                       <span class="highlight">3 meses</span>
                     </p>
                     <p class="info-trend">
@@ -197,21 +201,6 @@
                         <p class="loading-text">Carregando dados...</p>
                       </div>
                     </div>
-                    <div class="chart-legend">
-                      <div
-                        v-for="(label, index) in ticketsByStatus.labels"
-                        :key="label"
-                        class="legend-item"
-                      >
-                        <div
-                          class="legend-color"
-                          :style="{
-                            backgroundColor: statusChartData.datasets[0].backgroundColor[index],
-                          }"
-                        ></div>
-                        <span>{{ label }}</span>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
@@ -235,7 +224,7 @@
                         <p class="loading-text">Carregando dados...</p>
                       </div>
                     </div>
-                    <div class="chart-legend">
+                    <!-- <div class="chart-legend">
                       <div
                         v-for="(label, index) in ticketsByPriority.labels"
                         :key="label"
@@ -249,7 +238,7 @@
                         ></div>
                         <span>{{ label }}</span>
                       </div>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
@@ -259,8 +248,8 @@
                 <div class="table-header">
                   <div class="table-header-content">
                     <div>
-                      <h2 class="table-title">Últimos Chamados</h2>
-                      <p class="table-subtitle">Acompanhe os chamados mais recentes do sistema</p>
+                      <h2 class="table-title">Últimos Tickets</h2>
+                      <p class="table-subtitle">Acompanhe os tickets mais recentes do sistema</p>
                     </div>
                     <button class="btn btn-outline primary">
                       <font-awesome-icon icon="download" />
@@ -280,8 +269,8 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="ticket in recentTickets" :key="ticket.id">
-                        <td>#{{ ticket.id }}</td>
+                      <tr v-for="ticket in recentTickets" :key="ticket.customId">
+                        <td>{{ ticket.customId }}</td>
                         <td>{{ ticket.name }}</td>
                         <td>
                           <span :class="['status-badge', getStatusClass(ticket.status)]">
@@ -290,7 +279,7 @@
                         </td>
                         <td>
                           <span :class="['priority-badge', getPriorityClass(ticket.priority)]">
-                            {{ ticket.priority }}
+                            {{ formatSnakeToNaturalCase(ticket.priority) }}
                           </span>
                         </td>
                         <td>{{ formatDate(ticket.createdAt) }}</td>
@@ -304,15 +293,18 @@
               <div class="cycle-time-section">
                 <div class="cycle-time-header">
                   <div class="cycle-time-title">
-                    <h2>CYCLE TIME PER SEGMENT</h2>
+                    <h3>Tempo de Resolução Por Segmento:</h3>
+                    <p>
+                      {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }} (média)
+                    </p>
                   </div>
                   <div class="cycle-time-filters">
                     <button class="btn btn-outline secondary">
-                      By Label
+                      Por Departamento
                       <font-awesome-icon icon="chevron-down" />
                     </button>
                     <button class="btn btn-outline secondary">
-                      3 months
+                      3 meses
                       <font-awesome-icon icon="chevron-down" />
                     </button>
                   </div>
@@ -320,75 +312,55 @@
 
                 <div class="cycle-time-content">
                   <div class="cycle-time-info">
-                    <p class="info-title">Tasks with the longest cycle times by label were:</p>
+                    <p class="info-title">Setores com maior tempo de resolução:</p>
                     <div class="info-list">
-                      <div class="info-item">
-                        <span class="label">Financeiro</span>
-                        <span class="time">1d 08h</span>
-                      </div>
-                      <div class="info-item">
-                        <span class="label">Média prioridade</span>
-                        <span class="time">1d 07h</span>
-                      </div>
-                      <div class="info-item">
-                        <span class="label">CS</span>
-                        <span class="time">23h 50m</span>
+                      <div
+                        v-for="dept in departmentsWithLongestResolutionTime"
+                        :key="dept.departmentId"
+                        class="info-item"
+                      >
+                        <span class="label">{{ dept.departmentName }}</span>
+                        <span class="time">{{
+                          formatTimeInSeconds(dept.averageResolutionTimeSeconds)
+                        }}</span>
                       </div>
                     </div>
 
-                    <p class="info-title mt-4">
-                      Tasks with the shortest cycle times by label were:
-                    </p>
+                    <p class="info-title mt-4">Setores com menor tempo de resolução:</p>
                     <div class="info-list">
-                      <div class="info-item">
-                        <span class="label">No label</span>
-                        <span class="time">2m 58s</span>
-                      </div>
-                      <div class="info-item">
-                        <span class="label">Marketing</span>
-                        <span class="time">5h 00m</span>
-                      </div>
-                      <div class="info-item">
-                        <span class="label">CX</span>
-                        <span class="time">11h 30m</span>
+                      <div
+                        v-for="dept in departmentsWithShortestResolutionTime"
+                        :key="dept.departmentId"
+                        class="info-item"
+                      >
+                        <span class="label">{{ dept.departmentName }}</span>
+                        <span class="time">{{
+                          formatTimeInSeconds(dept.averageResolutionTimeSeconds)
+                        }}</span>
                       </div>
                     </div>
                   </div>
 
                   <div class="cycle-time-chart">
                     <div class="chart-bars">
-                      <div class="chart-item">
-                        <span class="chart-label">Financeiro</span>
-                        <div class="chart-bar" style="width: 100%">1d 08h</div>
-                      </div>
-                      <div class="chart-item">
-                        <span class="chart-label">Média prioridade</span>
-                        <div class="chart-bar" style="width: 95%">1d 07h</div>
-                      </div>
-                      <div class="chart-item">
-                        <span class="chart-label">CS</span>
-                        <div class="chart-bar" style="width: 85%">23h 50m</div>
-                      </div>
-                      <div class="chart-item">
-                        <span class="chart-label">Normal prioridade</span>
-                        <div class="chart-bar" style="width: 75%">16h 28m</div>
-                      </div>
-                      <div class="chart-item">
-                        <span class="chart-label">Alta prioridade</span>
-                        <div class="chart-bar" style="width: 70%">15h 03m</div>
-                      </div>
-                      <div class="chart-item">
-                        <span class="chart-label">CX</span>
-                        <div class="chart-bar" style="width: 50%">11h 30m</div>
-                      </div>
-                      <div class="chart-item">
-                        <span class="chart-label">Marketing</span>
-                        <div class="chart-bar" style="width: 25%">5h</div>
-                      </div>
-                      <div class="chart-item">
-                        <span class="chart-label">No label</span>
-                        <div class="chart-bar" style="width: 10%">2m 58s</div>
-                      </div>
+                      <template v-if="sortedDepartmentsByResolutionTime.length">
+                        <div
+                          v-for="dept in sortedDepartmentsByResolutionTime"
+                          :key="dept.departmentId"
+                          class="chart-item"
+                        >
+                          <span class="chart-label">{{ dept.departmentName }}</span>
+                          <div
+                            v-if="dept.averageResolutionTimeSeconds > 0"
+                            class="chart-bar"
+                            :style="{
+                              width: `${(dept.averageResolutionTimeSeconds / sortedDepartmentsByResolutionTime[0].averageResolutionTimeSeconds) * 100}%`,
+                            }"
+                          >
+                            {{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}
+                          </div>
+                        </div>
+                      </template>
                     </div>
                   </div>
                 </div>
@@ -417,7 +389,9 @@
                     </div>
                     <div class="stat-row">
                       <span class="stat-label">Tempo Médio</span>
-                      <span class="stat-value">{{ dept.averageResolutionTime }}</span>
+                      <span class="stat-value">{{
+                        formatTimeInSeconds(dept.averageResolutionTimeSeconds)
+                      }}</span>
                     </div>
                   </div>
                 </div>
@@ -428,7 +402,7 @@
             <div v-if="currentTab === 'in-progress'" class="tab-panel">
               <div class="work-in-progress">
                 <div class="wip-header">
-                  <h2 class="wip-title">EM ANDAMENTO</h2>
+                  <h2 class="wip-title">EM ANDAMENTO (Mocked)</h2>
                 </div>
 
                 <div class="task-list">
@@ -477,7 +451,7 @@
               <!-- Timings by Segment -->
               <div class="timings-section">
                 <div class="timings-header">
-                  <h2 class="timings-title">TEMPOS POR SEGMENTO</h2>
+                  <h2 class="timings-title">TEMPOS POR SETOR</h2>
                   <div class="timings-actions">
                     <button class="btn btn-outline secondary">
                       Por Setor
@@ -496,53 +470,35 @@
                       <tr>
                         <th>SETOR</th>
                         <th>QUANTIDADE (CONCLUÍDOS)</th>
-                        <th>TEMPO DE REAÇÃO (TEMPO ANTES DO INÍCIO DO TRABALHO)</th>
-                        <th>TEMPO DE CICLO (TEMPO REAL DE TRABALHO)</th>
-                        <th>TEMPO TOTAL (DA CRIAÇÃO À CONCLUSÃO)</th>
+                        <th>TEMPO DE REAÇÃO (ACEITAÇÃO)</th>
+                        <th>TEMPO DE RESOLUÇÃO</th>
+                        <th>TEMPO TOTAL</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>CX</td>
-                        <td>25</td>
-                        <td>14h 39m</td>
-                        <td>11h 30m</td>
-                        <td>1d 02h</td>
+                      <tr v-for="dept in departmentStats" :key="dept.departmentId">
+                        <td>{{ dept.departmentName }}</td>
+                        <td>{{ dept.resolvedTickets }}</td>
+                        <td>{{ formatTimeInSeconds(dept.averageAcceptanceTimeSeconds) }}</td>
+                        <td>{{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}</td>
+                        <td>{{ formatTimeInSeconds(dept.averageTotalTimeSeconds) }}</td>
                       </tr>
-                      <tr>
-                        <td>CS</td>
-                        <td>22</td>
-                        <td>7h 00m</td>
-                        <td>23h 50m</td>
-                        <td>1d 06h</td>
-                      </tr>
-                      <tr>
-                        <td>Diretoria</td>
-                        <td>18</td>
-                        <td>4h 20m</td>
-                        <td>8h 45m</td>
-                        <td>13h 05m</td>
-                      </tr>
-                      <tr>
-                        <td>Marketing</td>
-                        <td>16</td>
-                        <td>6h 15m</td>
-                        <td>12h 30m</td>
-                        <td>18h 45m</td>
-                      </tr>
-                      <tr>
-                        <td>Vendas</td>
-                        <td>15</td>
-                        <td>5h 45m</td>
-                        <td>10h 20m</td>
-                        <td>16h 05m</td>
-                      </tr>
-                      <tr class="summary-row">
+                      <tr class="summary-row" v-if="departmentStatsSummary">
                         <td>Resumo</td>
-                        <td>96</td>
-                        <td>7h 36m</td>
-                        <td>13h 23m</td>
-                        <td>19h 12m</td>
+                        <td>{{ departmentStatsSummary.totalResolved }}</td>
+                        <td>
+                          {{
+                            formatTimeInSeconds(departmentStatsSummary.averageAcceptanceTimeSeconds)
+                          }}
+                        </td>
+                        <td>
+                          {{
+                            formatTimeInSeconds(departmentStatsSummary.averageResolutionTimeSeconds)
+                          }}
+                        </td>
+                        <td>
+                          {{ formatTimeInSeconds(departmentStatsSummary.averageTotalTimeSeconds) }}
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -558,13 +514,12 @@
               <div class="cycle-time-section">
                 <div class="cycle-time-header">
                   <div class="cycle-time-title">
-                    <h2>CYCLE TIME PER SEGMENT</h2>
+                    <h3>Tempo de resolução:</h3>
+                    <p>
+                      {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }} (média)
+                    </p>
                   </div>
                   <div class="cycle-time-filters">
-                    <button class="btn btn-outline secondary">
-                      By Label
-                      <font-awesome-icon icon="chevron-down" />
-                    </button>
                     <button class="btn btn-outline secondary">
                       3 months
                       <font-awesome-icon icon="chevron-down" />
@@ -574,75 +529,55 @@
 
                 <div class="cycle-time-content">
                   <div class="cycle-time-info">
-                    <p class="info-title">Tasks with the longest cycle times by label were:</p>
+                    <p class="info-title">Setores com maior tempo de resolução:</p>
                     <div class="info-list">
-                      <div class="info-item">
-                        <span class="label">Financeiro</span>
-                        <span class="time">1d 08h</span>
-                      </div>
-                      <div class="info-item">
-                        <span class="label">Média prioridade</span>
-                        <span class="time">1d 07h</span>
-                      </div>
-                      <div class="info-item">
-                        <span class="label">CS</span>
-                        <span class="time">23h 50m</span>
+                      <div
+                        v-for="dept in departmentsWithLongestResolutionTime"
+                        :key="dept.departmentId"
+                        class="info-item"
+                      >
+                        <span class="label">{{ dept.departmentName }}</span>
+                        <span class="time">{{
+                          formatTimeInSeconds(dept.averageResolutionTimeSeconds)
+                        }}</span>
                       </div>
                     </div>
 
-                    <p class="info-title mt-4">
-                      Tasks with the shortest cycle times by label were:
-                    </p>
+                    <p class="info-title mt-4">Setores com menor tempo de resolução:</p>
                     <div class="info-list">
-                      <div class="info-item">
-                        <span class="label">No label</span>
-                        <span class="time">2m 58s</span>
-                      </div>
-                      <div class="info-item">
-                        <span class="label">Marketing</span>
-                        <span class="time">5h 00m</span>
-                      </div>
-                      <div class="info-item">
-                        <span class="label">CX</span>
-                        <span class="time">11h 30m</span>
+                      <div
+                        v-for="dept in departmentsWithShortestResolutionTime"
+                        :key="dept.departmentId"
+                        class="info-item"
+                      >
+                        <span class="label">{{ dept.departmentName }}</span>
+                        <span class="time">{{
+                          formatTimeInSeconds(dept.averageResolutionTimeSeconds)
+                        }}</span>
                       </div>
                     </div>
                   </div>
 
                   <div class="cycle-time-chart">
                     <div class="chart-bars">
-                      <div class="chart-item">
-                        <span class="chart-label">Financeiro</span>
-                        <div class="chart-bar" style="width: 100%">1d 08h</div>
-                      </div>
-                      <div class="chart-item">
-                        <span class="chart-label">Média prioridade</span>
-                        <div class="chart-bar" style="width: 95%">1d 07h</div>
-                      </div>
-                      <div class="chart-item">
-                        <span class="chart-label">CS</span>
-                        <div class="chart-bar" style="width: 85%">23h 50m</div>
-                      </div>
-                      <div class="chart-item">
-                        <span class="chart-label">Normal prioridade</span>
-                        <div class="chart-bar" style="width: 75%">16h 28m</div>
-                      </div>
-                      <div class="chart-item">
-                        <span class="chart-label">Alta prioridade</span>
-                        <div class="chart-bar" style="width: 70%">15h 03m</div>
-                      </div>
-                      <div class="chart-item">
-                        <span class="chart-label">CX</span>
-                        <div class="chart-bar" style="width: 50%">11h 30m</div>
-                      </div>
-                      <div class="chart-item">
-                        <span class="chart-label">Marketing</span>
-                        <div class="chart-bar" style="width: 25%">5h</div>
-                      </div>
-                      <div class="chart-item">
-                        <span class="chart-label">No label</span>
-                        <div class="chart-bar" style="width: 10%">2m 58s</div>
-                      </div>
+                      <template v-if="sortedDepartmentsByResolutionTime.length">
+                        <div
+                          v-for="dept in sortedDepartmentsByResolutionTime"
+                          :key="dept.departmentId"
+                          class="chart-item"
+                        >
+                          <span class="chart-label">{{ dept.departmentName }}</span>
+                          <div
+                            v-if="dept.averageResolutionTimeSeconds > 0"
+                            class="chart-bar"
+                            :style="{
+                              width: `${(dept.averageResolutionTimeSeconds / sortedDepartmentsByResolutionTime[0].averageResolutionTimeSeconds) * 100}%`,
+                            }"
+                          >
+                            {{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}
+                          </div>
+                        </div>
+                      </template>
                     </div>
                   </div>
 
@@ -671,7 +606,9 @@
                         </div>
                         <div class="stat-row">
                           <span class="stat-label">Tempo Médio</span>
-                          <span class="stat-value">{{ dept.averageResolutionTime }}</span>
+                          <span class="stat-value">{{
+                            formatTimeInSeconds(dept.averageResolutionTimeSeconds)
+                          }}</span>
                         </div>
                       </div>
                     </div>
@@ -685,7 +622,7 @@
               <!-- Nova seção Created vs Completed em Tendências -->
               <div class="created-vs-completed">
                 <div class="created-vs-completed-header">
-                  <h2>CRIADOS VS CONCLUÍDOS</h2>
+                  <h2>CRIADOS VS CONCLUÍDOS (Mocked)</h2>
                   <div class="period-selector">
                     <button class="btn btn-outline secondary">
                       3 meses
@@ -696,13 +633,13 @@
 
                 <div class="created-vs-completed-content">
                   <div class="created-vs-completed-info">
-                    <p class="info-title">Novos chamados criados vs concluídos</p>
+                    <p class="info-title">Novos tickets criados vs concluídos</p>
                     <p class="info-text">
-                      Você concluiu <span class="highlight">50 chamados</span> no total durante
+                      <span class="highlight">50 tickets</span> concluídos nos últimos
                       <span class="highlight">3 meses</span>
                     </p>
                     <p class="info-text">
-                      Você criou <span class="highlight">75 chamados</span> no total durante
+                      <span class="highlight">75 tickets</span> criados nos últimos
                       <span class="highlight">3 meses</span>
                     </p>
                     <p class="info-trend">
@@ -767,7 +704,7 @@
               <!-- Nova seção de Cycle Time -->
               <div class="cycle-time-trend">
                 <div class="cycle-time-trend-header">
-                  <h2>TEMPO DE CICLO POR SEMANA/MÊS/TRIMESTRE</h2>
+                  <h2>TEMPO DE RESOLUÇÃO POR SEMANA/MÊS/TRIMESTRE (Mocked)</h2>
                   <div class="header-actions">
                     <button class="btn btn-outline secondary">
                       Por Semana
@@ -782,7 +719,7 @@
 
                 <div class="cycle-time-info">
                   <p>
-                    Seu tempo de ciclo foi <strong>1d 03h</strong> na semana anterior (isso é
+                    O tempo de resolução da sua empresa foi de <strong>1d 03h</strong> na semana anterior (isso é
                     <span class="percentage-up">89.4% mais</span> que a semana anterior)
                   </p>
                   <p class="average-info">14 semanas de média semanal: <strong>3h 06m</strong></p>
@@ -841,7 +778,7 @@
               <!-- Nova seção de Tempo de Ciclo por Estado do Workflow -->
               <div class="cycle-time-workflow">
                 <div class="cycle-time-workflow-header">
-                  <h2>TEMPO DE CICLO POR ESTADO DO WORKFLOW</h2>
+                  <h2>TEMPO DE DURAÇÃO POR STATUS (Mocked)</h2>
                   <div class="header-actions">
                     <button class="btn btn-outline secondary">
                       3 meses
@@ -853,7 +790,7 @@
                 <div class="workflow-analysis">
                   <div class="workflow-description">
                     <p>
-                      Quanto tempo as tarefas permanecem em cada estado do workflow? Os estados em
+                      Quanto tempo as tarefas permanecem em cada status? Os status em
                       que as tarefas permaneceram mais tempo foram:
                     </p>
                     <div class="workflow-state-list">
@@ -867,8 +804,7 @@
                       </div>
                     </div>
                     <p class="workflow-note">
-                      Estas são médias para as tarefas concluídas nos últimos 3 meses. Os estados do
-                      workflow são baseados no seu mapeamento de fluxo.
+                      Estas são médias para as tarefas concluídas nos últimos 3 meses.
                     </p>
                   </div>
 
@@ -911,7 +847,7 @@
               <!-- Seção de Ciclo de Tempo Em Andamento -->
               <div class="cycle-time-progress">
                 <div class="cycle-time-progress-header">
-                  <h2>CICLO DE TEMPO GASTO NO STATUS "EM ANDAMENTO"</h2>
+                  <h2>TEMPO GASTO NO STATUS "EM ANDAMENTO" (Mocked)</h2>
                   <div class="header-actions">
                     <button class="btn btn-outline secondary">
                       3 meses
@@ -923,18 +859,14 @@
                 <div class="progress-analysis">
                   <div class="progress-info">
                     <p>
-                      Seu tempo médio de <strong>cycle time</strong> foi de
+                      O tempo médio foi de
                       <strong>18h 29m</strong> para os
-                      <span class="highlight">50 tasks</span> completados durante os
-                      <span class="highlight">3 months</span>.
+                      <span class="highlight">50 tasks</span> completados durante os últimos
+                      <span class="highlight">3 meses</span>.
                     </p>
                     <p class="trend-info">
                       Isso é <span class="percentage-up">100% mais</span> que em 16 de Janeiro, 2025
                       (aumento é considerado ruim).
-                    </p>
-                    <p class="note-info">
-                      Cycle time é o tempo gasto no status "Em Andamento", conforme especificado no
-                      mapeamento do workflow.
                     </p>
                   </div>
 
@@ -1031,15 +963,6 @@
                   />
                 </div>
               </div>
-
-              <div class="report-metrics">
-                <div class="metric-item">
-                  <div class="metric-label">Taxa de Aceitação</div>
-                  <div class="metric-value">
-                    {{ formatPercentage(customStats?.acceptanceRate) }}
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -1061,14 +984,18 @@ import {
   BarElement,
   LineElement,
   PointElement,
+  RadialLinearScale,
+  Filler,
 } from 'chart.js';
-import { Bar, Pie, Line } from 'vue-chartjs';
+import { Line, Bar, Pie } from 'vue-chartjs';
 import { formatDate } from '@/utils/date';
-// Comment out reportService import since we're using mock data
-// import { reportService } from '@/services/reportService';
-import type { TicketStatistics, ChartData } from '@/services/reportService';
+import { reportService } from '@/services/reportService';
+import { ticketService } from '@/services/ticketService';
+import type { TicketStatistics } from '@/services/reportService';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
+import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
+//import type { TicketStatus, TicketPriority } from '@/models';
 
 // Chart.js setup
 ChartJS.register(
@@ -1081,11 +1008,18 @@ ChartJS.register(
   BarElement,
   LineElement,
   PointElement,
+  RadialLinearScale,
+  Filler,
 );
 
 // Local type definitions
 type TicketStatus = 'Em andamento' | 'Finalizado' | 'Atrasado' | 'Outro';
 type TicketPriority = 'Alta' | 'Média' | 'Baixa';
+
+interface ChartData {
+  labels: string[];
+  data: number[];
+}
 
 const chartOptions = {
   responsive: true,
@@ -1147,21 +1081,7 @@ const chartOptions = {
   },
 };
 
-const statistics = ref<TicketStatistics>({
-  totalTickets: 0,
-  openTickets: 0,
-  closedTickets: 0,
-  averageResolutionTime: '0 dias',
-  averageAcceptanceTime: '0 dias',
-  resolutionRate: 0,
-  acceptanceRate: 0,
-  ticketsByDepartment: [],
-  ticketTrends: {
-    daily: [],
-    weekly: [],
-    monthly: [],
-  },
-});
+const statistics = ref<TicketStatistics>();
 
 const loading = ref(true);
 const error = ref<string | null>(null);
@@ -1177,7 +1097,7 @@ const ticketsByPriority = ref<ChartData>({
 });
 
 const recentTickets = ref<
-  { id: number; name: string; status: string; priority: string; createdAt: string }[]
+  { customId: string; name: string; status: string; priority: string; createdAt: string }[]
 >([]);
 
 const statusClassMap: Record<TicketStatus, string> = {
@@ -1216,104 +1136,55 @@ const loadData = async () => {
     ]);
     */
 
-    // Mock statistics data
-    const statsData: TicketStatistics = {
-      totalTickets: 187,
-      openTickets: 42,
-      closedTickets: 145,
-      averageResolutionTime: '3.2 dias',
-      averageAcceptanceTime: '1.5 dias',
-      resolutionRate: 0.78,
-      acceptanceRate: 0.92,
-      ticketsByDepartment: [
-        {
-          departmentId: 1,
-          departmentName: 'TI',
-          totalTickets: 65,
-          resolvedTickets: 50,
-          averageResolutionTime: '2.5 dias',
-          resolutionRate: 0.77,
-        },
-        {
-          departmentId: 2,
-          departmentName: 'RH',
-          totalTickets: 42,
-          resolvedTickets: 35,
-          averageResolutionTime: '3.7 dias',
-          resolutionRate: 0.83,
-        },
-        {
-          departmentId: 3,
-          departmentName: 'Financeiro',
-          totalTickets: 38,
-          resolvedTickets: 28,
-          averageResolutionTime: '4.1 dias',
-          resolutionRate: 0.74,
-        },
-        {
-          departmentId: 4,
-          departmentName: 'Marketing',
-          totalTickets: 21,
-          resolvedTickets: 17,
-          averageResolutionTime: '2.9 dias',
-          resolutionRate: 0.81,
-        },
-        {
-          departmentId: 5,
-          departmentName: 'Operações',
-          totalTickets: 21,
-          resolvedTickets: 15,
-          averageResolutionTime: '3.4 dias',
-          resolutionRate: 0.71,
-        },
-      ],
-      ticketTrends: {
-        daily: Array.from({ length: 30 }, (_, i) => ({
-          date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000).toISOString(),
-          total: Math.floor(Math.random() * 10) + 20,
-          resolved: Math.floor(Math.random() * 8) + 15,
-          created: Math.floor(Math.random() * 5) + 8,
-        })),
-        weekly: Array.from({ length: 12 }, (_, i) => ({
-          date: new Date(Date.now() - (11 - i) * 7 * 24 * 60 * 60 * 1000).toISOString(),
-          total: Math.floor(Math.random() * 20) + 40,
-          resolved: Math.floor(Math.random() * 15) + 30,
-          created: Math.floor(Math.random() * 10) + 20,
-        })),
-        monthly: Array.from({ length: 6 }, (_, i) => ({
-          date: new Date(Date.now() - (5 - i) * 30 * 24 * 60 * 60 * 1000).toISOString(),
-          total: Math.floor(Math.random() * 40) + 80,
-          resolved: Math.floor(Math.random() * 30) + 60,
-          created: Math.floor(Math.random() * 20) + 40,
-        })),
-      },
+    const [statsData, trends, statusResult, priorityResult, recentTicketsResult] =
+      await Promise.all([
+        reportService.getTicketStatistics(),
+        reportService.getTicketTrends(selectedTrendPeriod.value),
+        reportService.getTicketsByStatus(),
+        reportService.getTicketsByPriority(),
+        ticketService.getTenantRecentTickets(10),
+      ]);
+
+    // Transform status data from API into ChartData format
+    ticketsByStatus.value = {
+      labels: statusResult.statusCounts.map((item) => {
+        // Map enum values to readable text
+        const statusLabels: Record<string, string> = {
+          pendente: 'Pendente',
+          em_andamento: 'Em andamento',
+          finalizado: 'Finalizado',
+          cancelado: 'Cancelado',
+          devolvido: 'Devolvido',
+          aguardando_verificação: 'Aguardando Verificação',
+          em_verificação: 'Em Verificação',
+          reprovado: 'Reprovado',
+        };
+        return statusLabels[item.status] || item.status;
+      }),
+      data: statusResult.statusCounts.map((item) => item.count),
     };
 
-    // Mock status data
-    const statusData: ChartData = {
-      labels: ['Em andamento', 'Finalizado', 'Atrasado', 'Outro'],
-      data: [42, 145, 15, 5],
-    };
-
-    // Mock priority data
-    const priorityData: ChartData = {
-      labels: ['Alta', 'Média', 'Baixa'],
-      data: [27, 95, 65],
+    // Transform priority data from API into ChartData format
+    ticketsByPriority.value = {
+      labels: priorityResult.priorityCounts.map((item) => {
+        // Map enum values to readable text
+        const priorityLabels: Record<string, string> = {
+          baixa: 'Baixa',
+          média: 'Média',
+          alta: 'Alta',
+        };
+        return priorityLabels[item.priority] || item.priority;
+      }),
+      data: priorityResult.priorityCounts.map((item) => item.count),
     };
 
     // Mock recent tickets
-    const ticketsData = Array.from({ length: 10 }, (_, i) => ({
-      id: i + 1,
-      name: `Ticket #${i + 100} - ${['Instalação de software', 'Problemas com impressora', 'Configuração de email', 'Conexão VPN', 'Atualização de sistema'][i % 5]}`,
-      status: ['Em andamento', 'Finalizado', 'Atrasado'][i % 3] as string,
-      priority: ['Alta', 'Média', 'Baixa'][i % 3] as string,
-      createdAt: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
-    }));
+
+    // Assign the mock tickets to the ref
+    recentTickets.value = recentTicketsResult.data.items;
 
     statistics.value = statsData;
-    ticketsByStatus.value = statusData;
-    ticketsByPriority.value = priorityData;
-    recentTickets.value = ticketsData;
+    statistics.value.ticketTrends = trends;
   } catch (err: unknown) {
     console.error('Erro ao carregar dados dos relatórios:', err);
     error.value = 'Ocorreu um erro ao carregar os dados. Por favor, tente novamente.';
@@ -1343,7 +1214,16 @@ const statusChartData = computed(() => ({
   datasets: [
     {
       data: ticketsByStatus.value.data,
-      backgroundColor: ['#2563eb', '#eab308', '#22c55e', '#9333ea'],
+      backgroundColor: [
+        '#2563eb',
+        '#eab308',
+        '#09f1f9',
+        '#9333ea',
+        '#22c55e',
+        '#f21010',
+        '#631818',
+        '#fc7405',
+      ],
       borderWidth: 0,
     },
   ],
@@ -1363,7 +1243,7 @@ const priorityChartData = computed(() => ({
 const selectedTrendPeriod = ref<'daily' | 'weekly' | 'monthly'>('weekly');
 
 const trendChartData = computed(() => {
-  if (!statistics.value.ticketTrends[selectedTrendPeriod.value]) return null;
+  if (!statistics.value?.ticketTrends[selectedTrendPeriod.value]) return null;
 
   const data = statistics.value.ticketTrends[selectedTrendPeriod.value];
   return {
@@ -1403,6 +1283,27 @@ const formatPercentage = (value?: number) => {
   return `${(value * 100).toFixed(1)}%`;
 };
 
+const formatTimeInSeconds = (seconds?: number) => {
+  if (seconds === undefined || seconds === null) return '0 segundos';
+
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  if (days > 0) {
+    const hourText = hours > 0 ? ` e ${hours} ${hours === 1 ? 'hora' : 'horas'}` : '';
+    return `${days} ${days === 1 ? 'dia' : 'dias'}${hourText}`;
+  } else if (hours > 0) {
+    const minuteText = minutes > 0 ? ` e ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}` : '';
+    return `${hours} ${hours === 1 ? 'hora' : 'horas'}${minuteText}`;
+  } else if (minutes > 0) {
+    return `${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`;
+  } else {
+    return `${secs} ${secs === 1 ? 'segundo' : 'segundos'}`;
+  }
+};
+
 const disabledDate = (date: Date) => {
   return date > new Date() || date < new Date(2023, 0, 1);
 };
@@ -1411,11 +1312,10 @@ const updateTrendPeriod = async (period: 'daily' | 'weekly' | 'monthly') => {
   selectedTrendPeriod.value = period;
 
   try {
-    // Mock data for now - replace with actual API call when ready
-    /*
     const data = await reportService.getTicketTrends(period);
-    statistics.value.ticketTrends = data;
-    */
+    if (statistics.value) {
+      statistics.value.ticketTrends = data;
+    }
 
     // We already have mock trend data in the statistics object, no need to fetch again
     // Just update the UI by triggering reactivity
@@ -1459,17 +1359,19 @@ const fetchCustomDateStats = async () => {
       totalTickets: Math.floor(Math.random() * 50) + 30,
       openTickets: Math.floor(Math.random() * 20) + 10,
       closedTickets: Math.floor(Math.random() * 30) + 20,
-      averageResolutionTime: `${(Math.random() * 4 + 1).toFixed(1)} dias`,
-      averageAcceptanceTime: `${(Math.random() * 2 + 0.5).toFixed(1)} dias`,
+      averageResolutionTimeSeconds: Math.random() * 4 + 1,
+      averageAcceptanceTimeSeconds: Math.random() * 2 + 0.5,
+      averageTotalTimeSeconds: Math.random() * 4 + 1,
       resolutionRate: Math.random() * 0.3 + 0.6,
-      acceptanceRate: Math.random() * 0.2 + 0.7,
       ticketsByDepartment: [
         {
           departmentId: 1,
           departmentName: 'TI',
           totalTickets: Math.floor(Math.random() * 20) + 10,
           resolvedTickets: Math.floor(Math.random() * 15) + 5,
-          averageResolutionTime: `${(Math.random() * 3 + 1).toFixed(1)} dias`,
+          averageResolutionTimeSeconds: Math.random() * 3 + 1,
+          averageAcceptanceTimeSeconds: Math.random() * 2 + 0.5,
+          averageTotalTimeSeconds: Math.random() * 4 + 1,
           resolutionRate: Math.random() * 0.3 + 0.6,
         },
         {
@@ -1477,7 +1379,9 @@ const fetchCustomDateStats = async () => {
           departmentName: 'RH',
           totalTickets: Math.floor(Math.random() * 15) + 8,
           resolvedTickets: Math.floor(Math.random() * 10) + 5,
-          averageResolutionTime: `${(Math.random() * 3 + 1).toFixed(1)} dias`,
+          averageResolutionTimeSeconds: Math.random() * 3 + 1,
+          averageAcceptanceTimeSeconds: Math.random() * 2 + 0.5,
+          averageTotalTimeSeconds: Math.random() * 4 + 1,
           resolutionRate: Math.random() * 0.3 + 0.6,
         },
         {
@@ -1485,11 +1389,13 @@ const fetchCustomDateStats = async () => {
           departmentName: 'Financeiro',
           totalTickets: Math.floor(Math.random() * 12) + 5,
           resolvedTickets: Math.floor(Math.random() * 8) + 3,
-          averageResolutionTime: `${(Math.random() * 3 + 1).toFixed(1)} dias`,
+          averageResolutionTimeSeconds: Math.random() * 3 + 1,
+          averageAcceptanceTimeSeconds: Math.random() * 2 + 0.5,
+          averageTotalTimeSeconds: Math.random() * 4 + 1,
           resolutionRate: Math.random() * 0.3 + 0.6,
         },
       ],
-      ticketTrends: statistics.value.ticketTrends,
+      ticketTrends: statistics.value!.ticketTrends,
     };
   } catch (err: unknown) {
     console.error('Erro ao carregar estatísticas do período:', err);
@@ -1501,9 +1407,28 @@ const fetchCustomDateStats = async () => {
 };
 
 // Computed Properties para Métricas
-const departmentStats = computed(() => statistics.value.ticketsByDepartment);
+const departmentStats = computed(() => statistics.value?.ticketsByDepartment);
 
-const trendData = computed(() => statistics.value.ticketTrends[selectedTrendPeriod.value]);
+const sortedDepartmentsByResolutionTime = computed(() => {
+  if (!departmentStats.value) return [];
+
+  return [...departmentStats.value].sort(
+    (a, b) => b.averageResolutionTimeSeconds - a.averageResolutionTimeSeconds,
+  );
+});
+
+const departmentsWithLongestResolutionTime = computed(() =>
+  sortedDepartmentsByResolutionTime.value.slice(0, 3),
+);
+
+const departmentsWithShortestResolutionTime = computed(() => {
+  if (!sortedDepartmentsByResolutionTime.value.length) return [];
+  return [...sortedDepartmentsByResolutionTime.value]
+    .sort((a, b) => a.averageResolutionTimeSeconds - b.averageResolutionTimeSeconds)
+    .slice(0, 3);
+});
+
+const trendData = computed(() => statistics.value?.ticketTrends[selectedTrendPeriod.value]);
 
 const inProgressTasks = ref([
   {
@@ -1608,6 +1533,36 @@ const createdVsCompletedChartData = computed(() => ({
     },
   ],
 }));
+
+// First, add a computed property for summarized department stats
+const departmentStatsSummary = computed(() => {
+  if (!departmentStats.value?.length) return null;
+
+  const totalTickets = departmentStats.value.reduce((sum, dept) => sum + dept.totalTickets, 0);
+  const totalResolved = departmentStats.value.reduce((sum, dept) => sum + dept.resolvedTickets, 0);
+
+  // Calculate weighted averages
+  const totalResolutionTime = departmentStats.value.reduce(
+    (sum, dept) => sum + dept.averageResolutionTimeSeconds * dept.resolvedTickets,
+    0,
+  );
+  const totalAcceptanceTime = departmentStats.value.reduce(
+    (sum, dept) => sum + dept.averageAcceptanceTimeSeconds * dept.resolvedTickets,
+    0,
+  );
+  const totalTotalTime = departmentStats.value.reduce(
+    (sum, dept) => sum + dept.averageTotalTimeSeconds * dept.resolvedTickets,
+    0,
+  );
+
+  return {
+    totalTickets,
+    totalResolved,
+    averageResolutionTimeSeconds: totalResolved ? totalResolutionTime / totalResolved : 0,
+    averageAcceptanceTimeSeconds: totalResolved ? totalAcceptanceTime / totalResolved : 0,
+    averageTotalTimeSeconds: totalResolved ? totalTotalTime / totalResolved : 0,
+  };
+});
 </script>
 
 <style scoped>
@@ -2802,7 +2757,6 @@ const createdVsCompletedChartData = computed(() => ({
 }
 
 .chart-bar {
-  flex: 1;
   height: 24px;
   background-color: #10b981;
   color: white;
