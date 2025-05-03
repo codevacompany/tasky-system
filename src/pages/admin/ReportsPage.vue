@@ -126,55 +126,88 @@
               <!-- Nova seção Created vs Completed -->
               <div class="created-vs-completed">
                 <div class="created-vs-completed-header">
-                  <h2>CRIADOS VS CONCLUÍDOS (Mocked)</h2>
-                  <div class="period-selector">
-                    <button class="btn btn-outline secondary">
-                      3 meses
-                      <font-awesome-icon icon="chevron-down" />
-                    </button>
-                  </div>
+                  <h2>CRIADOS VS CONCLUÍDOS</h2>
                 </div>
 
                 <div class="created-vs-completed-content">
                   <div class="created-vs-completed-info">
                     <p class="info-title">Novos tickets criados vs concluídos</p>
-                    <p class="info-text">
-                      <span class="highlight">50 tickets</span> concluídos nos últimos
-                      <span class="highlight">3 meses</span>
+                    <p class="info-text" v-if="trendData && trendData.length > 0">
+                      <span class="highlight">{{ getTotalResolved() }} tickets</span> concluídos no
+                      período selecionado
                     </p>
-                    <p class="info-text">
-                      <span class="highlight">75 tickets</span> criados nos últimos
-                      <span class="highlight">3 meses</span>
+                    <p class="info-text" v-if="trendData && trendData.length > 0">
+                      <span class="highlight">{{ getTotalCreated() }} tickets</span> criados no
+                      período selecionado
                     </p>
-                    <p class="info-trend">
-                      Isso é <span class="trend-value">100% mais criados</span> e
-                      <span class="trend-value">100% mais concluídos</span> comparado a
-                      <span class="date-reference">16 de Janeiro, 2025</span>
+                    <p class="info-trend" v-if="trendData && trendData.length > 1">
+                      Isso é
+                      <span
+                        v-if="createdTrendPercentage > 0"
+                        :class="createdTrendPercentage >= 0 ? 'trend-value' : 'trend-value-down'"
+                      >
+                        {{ createdTrendPercentage }}%
+                        {{ createdTrendPercentage >= 0 ? 'mais' : 'menos' }} criados
+                      </span>
+                      <span v-if="createdTrendPercentage > 0 && resolvedTrendPercentage > 0">
+                        e
+                      </span>
+                      <span
+                        v-if="resolvedTrendPercentage > 0"
+                        :class="resolvedTrendPercentage >= 0 ? 'trend-value' : 'trend-value-down'"
+                      >
+                        {{ resolvedTrendPercentage }}%
+                        {{ resolvedTrendPercentage >= 0 ? 'mais' : 'menos' }} concluídos
+                      </span>
+                      comparado a
+                      <span class="date-reference">{{ firstDate }}</span>
                     </p>
                   </div>
 
                   <div class="created-vs-completed-chart">
-                    <div class="chart-legend">
+                    <div class="period-selector">
+                      <button
+                        v-for="period in ['daily', 'weekly', 'monthly']"
+                        :key="period"
+                        @click="updateTrendPeriod(period as 'daily' | 'weekly' | 'monthly')"
+                        :class="['period-button', { active: selectedTrendPeriod === period }]"
+                      >
+                        {{
+                          period === 'daily' ? 'Diário' : period === 'weekly' ? 'Semanal' : 'Mensal'
+                        }}
+                      </button>
+                    </div>
+                    <div class="chart-legend" v-if="trendData && trendData.length > 0">
                       <div class="legend-item">
                         <span class="legend-color completed"></span>
                         <span>Concluídos (no período)</span>
-                        <span class="legend-value">50</span>
-                        <span class="legend-trend">↑ 100%</span>
+                        <span class="legend-value">{{ getTotalResolved() }}</span>
+                        <span v-if="resolvedTrendPercentage !== 0" class="legend-trend">
+                          {{ resolvedTrendPercentage >= 0 ? '↑' : '↓' }}
+                          {{ Math.abs(resolvedTrendPercentage) }}%
+                        </span>
                       </div>
                       <div class="legend-item">
                         <span class="legend-color created"></span>
                         <span>Criados (no período)</span>
-                        <span class="legend-value">75</span>
-                        <span class="legend-trend">↑ 100%</span>
+                        <span class="legend-value">{{ getTotalCreated() }}</span>
+                        <span v-if="createdTrendPercentage !== 0" class="legend-trend">
+                          {{ createdTrendPercentage >= 0 ? '↑' : '↓' }}
+                          {{ Math.abs(createdTrendPercentage) }}%
+                        </span>
                       </div>
                     </div>
 
                     <div class="chart-container">
                       <Line
-                        v-if="createdVsCompletedData"
+                        v-if="trendData && trendData.length > 0"
                         :data="createdVsCompletedChartData"
                         :options="chartOptions"
                       />
+                      <div v-else class="loading-state">
+                        <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                        <p class="loading-text">Carregando dados...</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -274,7 +307,7 @@
                         <td>{{ ticket.name }}</td>
                         <td>
                           <span :class="['status-badge', getStatusClass(ticket.status)]">
-                            {{ ticket.status }}
+                            {{ formatSnakeToNaturalCase(ticket.status) }}
                           </span>
                         </td>
                         <td>
@@ -301,10 +334,6 @@
                   <div class="cycle-time-filters">
                     <button class="btn btn-outline secondary">
                       Por Departamento
-                      <font-awesome-icon icon="chevron-down" />
-                    </button>
-                    <button class="btn btn-outline secondary">
-                      3 meses
                       <font-awesome-icon icon="chevron-down" />
                     </button>
                   </div>
@@ -457,10 +486,6 @@
                       Por Setor
                       <font-awesome-icon icon="chevron-down" />
                     </button>
-                    <button class="btn btn-outline secondary">
-                      3 meses
-                      <font-awesome-icon icon="chevron-down" />
-                    </button>
                   </div>
                 </div>
 
@@ -518,12 +543,6 @@
                     <p>
                       {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }} (média)
                     </p>
-                  </div>
-                  <div class="cycle-time-filters">
-                    <button class="btn btn-outline secondary">
-                      3 months
-                      <font-awesome-icon icon="chevron-down" />
-                    </button>
                   </div>
                 </div>
 
@@ -619,84 +638,109 @@
 
             <!-- Tendências -->
             <div v-if="currentTab === 'trends'" class="tab-panel">
+              <!-- Period Selector at the top of the tab -->
+              <div class="stats-period-selector">
+                <label for="statsPeriod" class="stats-period-label">Período de análise:</label>
+                <select
+                  id="statsPeriod"
+                  v-model="selectedStatsPeriod"
+                  class="stats-period-select"
+                  @change="handlePeriodChange"
+                >
+                  <option value="annual">12 meses</option>
+                  <option value="semestral">6 meses</option>
+                  <option value="trimestral">3 meses</option>
+                  <option value="monthly">Último mês</option>
+                  <option value="weekly">Última semana</option>
+                </select>
+              </div>
+
               <!-- Nova seção Created vs Completed em Tendências -->
               <div class="created-vs-completed">
                 <div class="created-vs-completed-header">
-                  <h2>CRIADOS VS CONCLUÍDOS (Mocked)</h2>
-                  <div class="period-selector">
-                    <button class="btn btn-outline secondary">
-                      3 meses
-                      <font-awesome-icon icon="chevron-down" />
-                    </button>
-                  </div>
+                  <h2>CRIADOS VS CONCLUÍDOS</h2>
                 </div>
 
                 <div class="created-vs-completed-content">
                   <div class="created-vs-completed-info">
                     <p class="info-title">Novos tickets criados vs concluídos</p>
-                    <p class="info-text">
-                      <span class="highlight">50 tickets</span> concluídos nos últimos
-                      <span class="highlight">3 meses</span>
+                    <p class="info-text" v-if="trendData && trendData.length > 0">
+                      <span class="highlight">{{ getTotalResolved() }} tickets</span> concluídos no
+                      período selecionado
                     </p>
-                    <p class="info-text">
-                      <span class="highlight">75 tickets</span> criados nos últimos
-                      <span class="highlight">3 meses</span>
+                    <p class="info-text" v-if="trendData && trendData.length > 0">
+                      <span class="highlight">{{ getTotalCreated() }} tickets</span> criados no
+                      período selecionado
                     </p>
-                    <p class="info-trend">
-                      Isso é <span class="trend-value">100% mais criados</span> e
-                      <span class="trend-value">100% mais concluídos</span> comparado a
-                      <span class="date-reference">16 de Janeiro, 2025</span>
+                    <p class="info-trend" v-if="trendData && trendData.length > 1">
+                      Isso é
+                      <span
+                        v-if="createdTrendPercentage > 0"
+                        :class="createdTrendPercentage >= 0 ? 'trend-value' : 'trend-value-down'"
+                      >
+                        {{ createdTrendPercentage }}%
+                        {{ createdTrendPercentage >= 0 ? 'mais' : 'menos' }} criados
+                      </span>
+                      <span v-if="createdTrendPercentage > 0 && resolvedTrendPercentage > 0">
+                        e
+                      </span>
+                      <span
+                        v-if="resolvedTrendPercentage > 0"
+                        :class="resolvedTrendPercentage >= 0 ? 'trend-value' : 'trend-value-down'"
+                      >
+                        {{ resolvedTrendPercentage }}%
+                        {{ resolvedTrendPercentage >= 0 ? 'mais' : 'menos' }} concluídos
+                      </span>
+                      comparado a
+                      <span class="date-reference">{{ firstDate }}</span>
                     </p>
                   </div>
 
                   <div class="created-vs-completed-chart">
-                    <div class="chart-legend">
+                    <div class="period-selector">
+                      <button
+                        v-for="period in ['daily', 'weekly', 'monthly']"
+                        :key="period"
+                        @click="updateTrendPeriod(period as 'daily' | 'weekly' | 'monthly')"
+                        :class="['period-button', { active: selectedTrendPeriod === period }]"
+                      >
+                        {{
+                          period === 'daily' ? 'Diário' : period === 'weekly' ? 'Semanal' : 'Mensal'
+                        }}
+                      </button>
+                    </div>
+                    <div class="chart-legend" v-if="trendData && trendData.length > 0">
                       <div class="legend-item">
                         <span class="legend-color completed"></span>
                         <span>Concluídos (no período)</span>
-                        <span class="legend-value">50</span>
-                        <span class="legend-trend">↑ 100%</span>
+                        <span class="legend-value">{{ getTotalResolved() }}</span>
+                        <span v-if="resolvedTrendPercentage !== 0" class="legend-trend">
+                          {{ resolvedTrendPercentage >= 0 ? '↑' : '↓' }}
+                          {{ Math.abs(resolvedTrendPercentage) }}%
+                        </span>
                       </div>
                       <div class="legend-item">
                         <span class="legend-color created"></span>
                         <span>Criados (no período)</span>
-                        <span class="legend-value">75</span>
-                        <span class="legend-trend">↑ 100%</span>
+                        <span class="legend-value">{{ getTotalCreated() }}</span>
+                        <span v-if="createdTrendPercentage !== 0" class="legend-trend">
+                          {{ createdTrendPercentage >= 0 ? '↑' : '↓' }}
+                          {{ Math.abs(createdTrendPercentage) }}%
+                        </span>
                       </div>
                     </div>
 
                     <div class="chart-container">
                       <Line
-                        v-if="createdVsCompletedData"
-                        :data="createdVsCompletedChartData"
+                        v-if="trendData && trendData.length > 0 && trendChartData"
+                        :data="trendChartData"
                         :options="chartOptions"
                       />
+                      <div v-else class="loading-state">
+                        <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                        <p class="loading-text">Carregando dados...</p>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="period-selector">
-                <button
-                  v-for="period in ['daily', 'weekly', 'monthly']"
-                  :key="period"
-                  @click="updateTrendPeriod(period as 'daily' | 'weekly' | 'monthly')"
-                  :class="['period-button', { active: selectedTrendPeriod === period }]"
-                >
-                  {{ period === 'daily' ? 'Diário' : period === 'weekly' ? 'Semanal' : 'Mensal' }}
-                </button>
-              </div>
-
-              <div class="chart-card">
-                <div class="chart-wrapper">
-                  <Line
-                    v-if="trendData && trendChartData"
-                    :data="trendChartData"
-                    :options="chartOptions"
-                  />
-                  <div v-else class="loading-state">
-                    <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                    <p class="loading-text">Carregando dados...</p>
                   </div>
                 </div>
               </div>
@@ -710,17 +754,14 @@
                       Por Semana
                       <font-awesome-icon icon="chevron-down" />
                     </button>
-                    <button class="btn btn-outline secondary">
-                      3 meses
-                      <font-awesome-icon icon="chevron-down" />
-                    </button>
                   </div>
                 </div>
 
                 <div class="cycle-time-info">
                   <p>
-                    O tempo de resolução da sua empresa foi de <strong>1d 03h</strong> na semana anterior (isso é
-                    <span class="percentage-up">89.4% mais</span> que a semana anterior)
+                    O tempo de resolução da sua empresa foi de <strong>1d 03h</strong> na semana
+                    anterior (isso é <span class="percentage-up">89.4% mais</span> que a semana
+                    anterior)
                   </p>
                   <p class="average-info">14 semanas de média semanal: <strong>3h 06m</strong></p>
                 </div>
@@ -778,29 +819,32 @@
               <!-- Nova seção de Tempo de Ciclo por Estado do Workflow -->
               <div class="cycle-time-workflow">
                 <div class="cycle-time-workflow-header">
-                  <h2>TEMPO DE DURAÇÃO POR STATUS (Mocked)</h2>
-                  <div class="header-actions">
-                    <button class="btn btn-outline secondary">
-                      3 meses
-                      <font-awesome-icon icon="chevron-down" />
-                    </button>
-                  </div>
+                  <h2>TEMPO DE DURAÇÃO POR STATUS</h2>
                 </div>
 
                 <div class="workflow-analysis">
                   <div class="workflow-description">
                     <p>
-                      Quanto tempo as tarefas permanecem em cada status? Os status em
-                      que as tarefas permaneceram mais tempo foram:
+                      Quanto tempo as tarefas permanecem em cada status? Os status em que as tarefas
+                      permaneceram mais tempo foram:
                     </p>
-                    <div class="workflow-state-list">
-                      <div class="state-item">
-                        <span class="state-name">Em Desenvolvimento</span>
-                        <span class="state-time">15h 45m</span>
+                    <div v-if="sortedStatusDurations.length" class="workflow-state-list">
+                      <div
+                        v-for="(duration, index) in sortedStatusDurations.slice(0, 2)"
+                        :key="index"
+                        class="state-item"
+                      >
+                        <span class="state-name">{{
+                          formatSnakeToNaturalCase(duration.status)
+                        }}</span>
+                        <span class="state-time">{{
+                          formatTimeInSeconds(duration.averageDurationSeconds)
+                        }}</span>
                       </div>
+                    </div>
+                    <div v-else class="workflow-state-list">
                       <div class="state-item">
-                        <span class="state-name">Em Análise</span>
-                        <span class="state-time">12h 30m</span>
+                        <span class="state-name">Carregando dados...</span>
                       </div>
                     </div>
                     <p class="workflow-note">
@@ -808,37 +852,28 @@
                     </p>
                   </div>
 
-                  <div class="workflow-chart">
-                    <div class="time-scale">
-                      <span>21h</span>
-                      <span>19h</span>
-                      <span>17h</span>
-                      <span>15h</span>
-                      <span>13h</span>
-                      <span>11h</span>
-                      <span>9h</span>
-                      <span>7h</span>
-                      <span>5h</span>
-                      <span>3h</span>
-                      <span>1h</span>
-                    </div>
+                  <div class="cycle-time-chart">
                     <div class="chart-bars">
-                      <div class="chart-bar">
-                        <div class="bar-label">Em Desenvolvimento</div>
-                        <div class="bar" style="width: 85%">15h 45m</div>
-                      </div>
-                      <div class="chart-bar">
-                        <div class="bar-label">Em Análise</div>
-                        <div class="bar" style="width: 65%">12h 30m</div>
-                      </div>
-                      <div class="chart-bar">
-                        <div class="bar-label">Em Teste</div>
-                        <div class="bar" style="width: 45%">8h 15m</div>
-                      </div>
-                      <div class="chart-bar">
-                        <div class="bar-label">Aguardando Aprovação</div>
-                        <div class="bar" style="width: 35%">6h 45m</div>
-                      </div>
+                      <template v-if="sortedDepartmentsByResolutionTime.length">
+                        <div
+                          v-for="(duration, index) in sortedStatusDurations"
+                          :key="index"
+                          class="chart-item"
+                        >
+                          <span class="chart-label">{{
+                            formatSnakeToNaturalCase(duration.status)
+                          }}</span>
+                          <div
+                            v-if="duration.averageDurationSeconds > 0"
+                            class="chart-bar"
+                            :style="{
+                              width: `${(duration.averageDurationSeconds / sortedStatusDurations[0].averageDurationSeconds) * 100}%`,
+                            }"
+                          >
+                            {{ formatTimeInSeconds(duration.averageDurationSeconds) }}
+                          </div>
+                        </div>
+                      </template>
                     </div>
                   </div>
                 </div>
@@ -848,12 +883,6 @@
               <div class="cycle-time-progress">
                 <div class="cycle-time-progress-header">
                   <h2>TEMPO GASTO NO STATUS "EM ANDAMENTO" (Mocked)</h2>
-                  <div class="header-actions">
-                    <button class="btn btn-outline secondary">
-                      3 meses
-                      <font-awesome-icon icon="chevron-down" />
-                    </button>
-                  </div>
                 </div>
 
                 <div class="progress-analysis">
@@ -907,14 +936,16 @@
                     </div>
                   </div>
 
-                  <div class="progress-stats">
+                  <div class="progress-stats" v-if="inProgressDuration">
                     <div class="stat-item">
-                      <span class="stat-value">18h 29m</span>
+                      <span class="stat-value">{{
+                        formatTimeInSeconds(inProgressDuration.averageDurationSeconds)
+                      }}</span>
                       <span class="stat-label">Média últimos 3 meses</span>
                     </div>
                     <div class="stat-item">
-                      <span class="stat-value">100%</span>
-                      <span class="stat-label">Aumento no período</span>
+                      <span class="stat-value">{{ inProgressDuration.count }}</span>
+                      <span class="stat-label">Número de tickets</span>
                     </div>
                   </div>
                 </div>
@@ -991,11 +1022,27 @@ import { Line, Bar, Pie } from 'vue-chartjs';
 import { formatDate } from '@/utils/date';
 import { reportService } from '@/services/reportService';
 import { ticketService } from '@/services/ticketService';
-import type { TicketStatistics } from '@/services/reportService';
+import type {
+  TenantStatistics,
+  StatusDurationDto,
+  StatusDurationResponseDto,
+} from '@/services/reportService';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 //import type { TicketStatus, TicketPriority } from '@/models';
+
+// Define the StatsPeriod enum
+enum StatsPeriod {
+  ANNUAL = 'annual',
+  SEMESTRAL = 'semestral',
+  TRIMESTRAL = 'trimestral',
+  MONTHLY = 'monthly',
+  WEEKLY = 'weekly',
+}
+
+// Default to 3 months period
+const selectedStatsPeriod = ref<string>(StatsPeriod.TRIMESTRAL);
 
 // Chart.js setup
 ChartJS.register(
@@ -1081,7 +1128,7 @@ const chartOptions = {
   },
 };
 
-const statistics = ref<TicketStatistics>();
+const statistics = ref<TenantStatistics>();
 
 const loading = ref(true);
 const error = ref<string | null>(null);
@@ -1121,6 +1168,9 @@ const getPriorityClass = (priority: string): string => {
   return priorityClassMap[priority as TicketPriority] || 'bg-blue-100 text-blue-800';
 };
 
+// Add ref for status durations
+const statusDurations = ref<StatusDurationDto[]>([]);
+
 const loadData = async () => {
   loading.value = true;
   error.value = null;
@@ -1129,21 +1179,34 @@ const loadData = async () => {
     // Mock data for now - replace with actual API calls when ready
     /*
     const [statsData, statusData, priorityData, ticketsData] = await Promise.all([
-      reportService.getTicketStatistics(),
+      reportService.getTenantStatistics(),
       reportService.getTicketsByStatus(),
       reportService.getTicketsByPriority(),
       reportService.getRecentTickets(10),
     ]);
     */
 
-    const [statsData, trends, statusResult, priorityResult, recentTicketsResult] =
-      await Promise.all([
-        reportService.getTicketStatistics(),
-        reportService.getTicketTrends(selectedTrendPeriod.value),
-        reportService.getTicketsByStatus(),
-        reportService.getTicketsByPriority(),
-        ticketService.getTenantRecentTickets(10),
-      ]);
+    const [
+      statsData,
+      trends,
+      statusResult,
+      priorityResult,
+      recentTicketsResult,
+      statusDurationsResult,
+    ] = await Promise.all([
+      reportService.getTenantStatistics(),
+      reportService.getTicketTrends(selectedTrendPeriod.value),
+      reportService.getTicketsByStatus(),
+      reportService.getTicketsByPriority(),
+      ticketService.getTenantRecentTickets(10),
+      reportService.getStatusDurations(selectedStatsPeriod.value),
+    ]);
+
+    // Initialize trendData with the current period data
+    trendData.value = trends[selectedTrendPeriod.value];
+
+    // Store status durations
+    statusDurations.value = (statusDurationsResult as StatusDurationResponseDto).statusDurations;
 
     // Transform status data from API into ChartData format
     ticketsByStatus.value = {
@@ -1206,7 +1269,7 @@ const tabs = [
 ];
 
 const currentTab = ref('overview');
-const customStats = ref<TicketStatistics | null>(null);
+const customStats = ref<TenantStatistics | null>(null);
 
 // Computed Properties para os Gráficos
 const statusChartData = computed(() => ({
@@ -1240,18 +1303,19 @@ const priorityChartData = computed(() => ({
   ],
 }));
 
+// Keep selectedTrendPeriod for chart trend data
 const selectedTrendPeriod = ref<'daily' | 'weekly' | 'monthly'>('weekly');
+const trendData = ref<{ date: string; total: number; resolved: number; created: number }[]>([]);
 
 const trendChartData = computed(() => {
-  if (!statistics.value?.ticketTrends[selectedTrendPeriod.value]) return null;
+  if (!trendData.value || trendData.value.length === 0) return null;
 
-  const data = statistics.value.ticketTrends[selectedTrendPeriod.value];
   return {
-    labels: data.map((item) => formatDate(item.date)),
+    labels: trendData.value.map((item) => formatDateToPortuguese(item.date)),
     datasets: [
       {
         label: 'Total de Chamados',
-        data: data.map((item) => item.total),
+        data: trendData.value.map((item) => item.total),
         borderColor: '#2563eb',
         backgroundColor: 'rgba(37, 99, 235, 0.1)',
         fill: true,
@@ -1259,7 +1323,7 @@ const trendChartData = computed(() => {
       },
       {
         label: 'Chamados Resolvidos',
-        data: data.map((item) => item.resolved),
+        data: trendData.value.map((item) => item.resolved),
         borderColor: '#22c55e',
         backgroundColor: 'rgba(34, 197, 94, 0.1)',
         fill: true,
@@ -1267,9 +1331,59 @@ const trendChartData = computed(() => {
       },
       {
         label: 'Novos Chamados',
-        data: data.map((item) => item.created),
+        data: trendData.value.map((item) => item.created),
         borderColor: '#eab308',
         backgroundColor: 'rgba(234, 179, 8, 0.1)',
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  };
+});
+
+// Dados para o gráfico Created vs Completed
+const createdVsCompletedChartData = computed(() => {
+  if (!trendData.value || trendData.value.length === 0) {
+    // Return an empty but valid chart data structure when there's no data
+    return {
+      labels: [],
+      datasets: [
+        {
+          label: 'Concluídos (no período)',
+          data: [],
+          borderColor: '#22c55e',
+          backgroundColor: 'rgba(34, 197, 94, 0.1)',
+          fill: true,
+          tension: 0.4,
+        },
+        {
+          label: 'Criados (no período)',
+          data: [],
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          fill: true,
+          tension: 0.4,
+        },
+      ],
+    };
+  }
+
+  return {
+    labels: trendData.value.map((item) => formatDateToPortuguese(item.date)),
+    datasets: [
+      {
+        label: 'Concluídos (no período)',
+        data: trendData.value.map((item) => item.resolved),
+        borderColor: '#22c55e',
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+        fill: true,
+        tension: 0.4,
+      },
+      {
+        label: 'Criados (no período)',
+        data: trendData.value.map((item) => item.created),
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
         fill: true,
         tension: 0.4,
       },
@@ -1281,6 +1395,32 @@ const trendChartData = computed(() => {
 const formatPercentage = (value?: number) => {
   if (value === undefined) return '0.0%';
   return `${(value * 100).toFixed(1)}%`;
+};
+
+// Format a date to Portuguese format like "9 de Fevereiro"
+const formatDateToPortuguese = (dateString: string): string => {
+  const date = new Date(dateString);
+
+  // Portuguese month names
+  const months = [
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro',
+  ];
+
+  const day = date.getDate();
+  const month = months[date.getMonth()];
+
+  return `${day} de ${month}`;
 };
 
 const formatTimeInSeconds = (seconds?: number) => {
@@ -1313,11 +1453,8 @@ const updateTrendPeriod = async (period: 'daily' | 'weekly' | 'monthly') => {
 
   try {
     const data = await reportService.getTicketTrends(period);
-    if (statistics.value) {
-      statistics.value.ticketTrends = data;
-    }
+    trendData.value = data[period];
 
-    // We already have mock trend data in the statistics object, no need to fetch again
     // Just update the UI by triggering reactivity
     loading.value = true;
     setTimeout(() => {
@@ -1428,8 +1565,6 @@ const departmentsWithShortestResolutionTime = computed(() => {
     .slice(0, 3);
 });
 
-const trendData = computed(() => statistics.value?.ticketTrends[selectedTrendPeriod.value]);
-
 const inProgressTasks = ref([
   {
     id: 1,
@@ -1493,47 +1628,6 @@ const inProgressTasks = ref([
   },
 ]);
 
-// Dados para o gráfico Created vs Completed
-const createdVsCompletedData = ref({
-  labels: [
-    'Jan 16',
-    'Jan 27',
-    'Jan 28',
-    'Feb 5',
-    'Feb 15',
-    'Mar 2',
-    'Mar 17',
-    'Mar 27',
-    'Apr 6',
-    'Apr 11',
-    'Apr 16',
-  ],
-  created: [10, 15, 20, 25, 30, 40, 45, 55, 65, 70, 75],
-  completed: [5, 10, 15, 20, 25, 30, 35, 40, 45, 48, 50],
-});
-
-const createdVsCompletedChartData = computed(() => ({
-  labels: createdVsCompletedData.value.labels,
-  datasets: [
-    {
-      label: 'Concluídos (no período)',
-      data: createdVsCompletedData.value.completed,
-      borderColor: '#22c55e',
-      backgroundColor: 'rgba(34, 197, 94, 0.1)',
-      fill: true,
-      tension: 0.4,
-    },
-    {
-      label: 'Criados (no período)',
-      data: createdVsCompletedData.value.created,
-      borderColor: '#3b82f6',
-      backgroundColor: 'rgba(59, 130, 246, 0.1)',
-      fill: true,
-      tension: 0.4,
-    },
-  ],
-}));
-
 // First, add a computed property for summarized department stats
 const departmentStatsSummary = computed(() => {
   if (!departmentStats.value?.length) return null;
@@ -1562,6 +1656,67 @@ const departmentStatsSummary = computed(() => {
     averageAcceptanceTimeSeconds: totalResolved ? totalAcceptanceTime / totalResolved : 0,
     averageTotalTimeSeconds: totalResolved ? totalTotalTime / totalResolved : 0,
   };
+});
+
+// Computed properties for status durations charts
+const sortedStatusDurations = computed(() => {
+  return [...statusDurations.value].sort(
+    (a, b) => b.averageDurationSeconds - a.averageDurationSeconds,
+  );
+});
+
+// Remove the timeScaleValues computed property that's no longer used
+const inProgressDuration = computed(() => {
+  return (
+    statusDurations.value.find((duration) => duration.status.toLowerCase() === 'em_andamento') ||
+    null
+  );
+});
+
+// After loadData function
+const handlePeriodChange = () => {
+  loadData();
+};
+
+const getTotalResolved = () => {
+  return trendData.value?.reduce((total, item) => total + item.resolved, 0) || 0;
+};
+
+const getTotalCreated = () => {
+  return trendData.value?.reduce((total, item) => total + item.created, 0) || 0;
+};
+
+const createdTrendPercentage = computed(() => {
+  if (!trendData.value || trendData.value.length < 2) return 0;
+
+  const firstItem = trendData.value[0];
+  const lastItem = trendData.value[trendData.value.length - 1];
+
+  if (firstItem.created === 0) {
+    return lastItem.created > 0 ? 100 : 0;
+  }
+
+  const percentage = ((lastItem.created - firstItem.created) / firstItem.created) * 100;
+  return Math.round(percentage);
+});
+
+const resolvedTrendPercentage = computed(() => {
+  if (!trendData.value || trendData.value.length < 2) return 0;
+
+  const firstItem = trendData.value[0];
+  const lastItem = trendData.value[trendData.value.length - 1];
+
+  if (firstItem.resolved === 0) {
+    return lastItem.resolved > 0 ? 100 : 0;
+  }
+
+  const percentage = ((lastItem.resolved - firstItem.resolved) / firstItem.resolved) * 100;
+  return Math.round(percentage);
+});
+
+const firstDate = computed(() => {
+  if (!trendData.value || trendData.value.length === 0) return '';
+  return formatDateToPortuguese(trendData.value[0].date);
 });
 </script>
 
@@ -2944,6 +3099,13 @@ const departmentStatsSummary = computed(() => {
   margin: 16px 0;
 }
 
+.status-chart-item {
+  background-color: blue;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .state-item {
   display: flex;
   justify-content: space-between;
@@ -3216,6 +3378,11 @@ const departmentStatsSummary = computed(() => {
   font-weight: 500;
 }
 
+.trend-value-down {
+  color: #ef4444;
+  font-weight: 500;
+}
+
 .date-reference {
   color: #6b7280;
   font-style: italic;
@@ -3281,5 +3448,46 @@ const departmentStatsSummary = computed(() => {
     padding-bottom: 1.5rem;
     margin-bottom: 1.5rem;
   }
+}
+
+.chart-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 200px;
+  color: #6b7280;
+  font-size: 0.875rem;
+  background-color: rgba(249, 250, 251, 0.5);
+}
+
+/* Stats Period Selector Styles */
+.stats-period-selector {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.stats-period-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-right: 0.5rem;
+}
+
+.stats-period-select {
+  padding: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  background-color: white;
+  color: #1f2937;
+  font-size: 0.875rem;
+  max-width: 150px;
+}
+
+.stats-period-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 </style>
