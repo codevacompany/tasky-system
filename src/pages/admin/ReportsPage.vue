@@ -140,7 +140,7 @@
                       <span class="highlight">{{ getTotalCreated() }} tickets</span> criados no
                       período selecionado
                     </p>
-                    <p class="info-trend" v-if="trendData && trendData.length > 1">
+                    <p class="info-trend" v-if="trendData && trendData.length > 1 && (createdTrendPercentage !== 0 || resolvedTrendPercentage !== 0)">
                       Isso é
                       <span
                         v-if="createdTrendPercentage > 0"
@@ -648,7 +648,7 @@
                       <span class="highlight">{{ getTotalResolved() }} tickets</span> concluídos no
                       período selecionado
                     </p>
-                    <p class="info-text" v-if="trendData && trendData.length > 0">
+                    <p class="info-text" v-if="trendData && trendData.length > 0 && (createdTrendPercentage !== 0 || resolvedTrendPercentage !== 0)">
                       <span class="highlight">{{ getTotalCreated() }} tickets</span> criados no
                       período selecionado
                     </p>
@@ -1339,6 +1339,14 @@ const trendChartData = computed(() => {
   return {
     labels: trendData.value.map((item) => formatDateToPortuguese(item.date)),
     datasets: [
+      {
+        label: 'Total de Chamados',
+        data: trendData.value.map((item) => item.total),
+        borderColor: '#2563eb',
+        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+        fill: true,
+        tension: 0.4,
+      },
       {
         label: 'Chamados Resolvidos',
         data: trendData.value.map((item) => item.resolved),
