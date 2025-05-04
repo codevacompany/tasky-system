@@ -81,8 +81,11 @@
             <p id="resolucaoPercentual">{{ resolutionRate }}%</p>
           </div>
           <div class="stat-details">
-            <span class="text-green-500">
+            <!-- <span class="text-green-500">
               <font-awesome-icon icon="arrow-up" /> 5% vs mês anterior
+            </span> -->
+            <span class="text-green-500" v-if="userStats && userStats.averageAcceptanceTimeSeconds">
+              <font-awesome-icon icon="clock" /> {{ userStats.resolvedTickets }} tickets resolvidos
             </span>
           </div>
         </div>
@@ -95,11 +98,14 @@
         <div class="stat-info">
           <div class="stat-header">
             <h3>Tempo Médio de Aceite</h3>
-            <p id="tempoMedioAceite">N/A</p>
+            <p id="tempoMedioAceite">
+              {{ userStats ? formatTimeInSeconds(userStats.averageAcceptanceTimeSeconds) : 'N/A' }}
+            </p>
           </div>
           <div class="stat-details">
-            <span class="text-red-500">
-              <font-awesome-icon icon="arrow-down" /> 2h vs mês anterior
+            <span class="text-green-500" v-if="userStats && userStats.averageAcceptanceTimeSeconds">
+              <!-- <font-awesome-icon icon="arrow-down" /> 2h vs mês anterior -->
+              <font-awesome-icon icon="clock" /> {{ userStats.totalTickets }} tickets analisados
             </span>
           </div>
         </div>
@@ -112,11 +118,15 @@
         <div class="stat-info">
           <div class="stat-header">
             <h3>Tempo Médio de Conclusão</h3>
-            <p id="tempoMedioConclusao">N/A</p>
+            <p id="tempoMedioConclusao">
+              {{ userStats ? formatTimeInSeconds(userStats.averageResolutionTimeSeconds) : 'N/A' }}
+            </p>
           </div>
           <div class="stat-details">
-            <span class="text-green-500">
-              <font-awesome-icon icon="arrow-up" /> 1d vs mês anterior
+            <span class="text-green-500" v-if="userStats && userStats.closedTickets">
+              <!-- <font-awesome-icon icon="arrow-up" /> 1d vs mês anterior -->
+              <font-awesome-icon icon="check-circle" /> {{ userStats.closedTickets }} tickets
+              concluídos
             </span>
           </div>
         </div>
@@ -142,53 +152,68 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { ticketService } from '@/services/ticketService';
+import { reportService, type UserStatistics } from '@/services/reportService';
 import { TicketStatus, type Ticket } from '@/models';
 import { useUserStore } from '@/stores/user';
 import { toast } from 'vue3-toastify';
 import CompactTicketTable from '@/components/tickets/CompactTicketTable.vue';
+import { formatTimeInSeconds } from '@/utils/generic-helper';
 
 const userStore = useUserStore();
 const latestReceivedTickets = ref<Ticket[]>([]);
 const latestCreatedTickets = ref<Ticket[]>([]);
 const isLoading = ref(true);
+const userStats = ref<UserStatistics | null>(null);
 
 // Computed properties para estatísticas
 const totalTickets = computed(() => ({
   total: latestReceivedTickets.value.length + latestCreatedTickets.value.length,
   recebidos: latestReceivedTickets.value.length,
-  criados: latestCreatedTickets.value.length
+  criados: latestCreatedTickets.value.length,
 }));
 
 const ticketsPendentes = computed(() => ({
-  total: latestReceivedTickets.value.filter(t => t.status === TicketStatus.Pending).length +
-         latestCreatedTickets.value.filter(t => t.status === TicketStatus.Pending).length,
-  recebidos: latestReceivedTickets.value.filter(t => t.status === TicketStatus.Pending).length,
-  criados: latestCreatedTickets.value.filter(t => t.status === TicketStatus.Pending).length
+  total:
+    latestReceivedTickets.value.filter((t) => t.status === TicketStatus.Pending).length +
+    latestCreatedTickets.value.filter((t) => t.status === TicketStatus.Pending).length,
+  recebidos: latestReceivedTickets.value.filter((t) => t.status === TicketStatus.Pending).length,
+  criados: latestCreatedTickets.value.filter((t) => t.status === TicketStatus.Pending).length,
 }));
 
 const ticketsEmAndamento = computed(() => ({
-  total: latestReceivedTickets.value.filter(t => t.status === TicketStatus.InProgress).length +
-         latestCreatedTickets.value.filter(t => t.status === TicketStatus.InProgress).length,
-  recebidos: latestReceivedTickets.value.filter(t => t.status === TicketStatus.InProgress).length,
-  criados: latestCreatedTickets.value.filter(t => t.status === TicketStatus.InProgress).length
+  total:
+    latestReceivedTickets.value.filter((t) => t.status === TicketStatus.InProgress).length +
+    latestCreatedTickets.value.filter((t) => t.status === TicketStatus.InProgress).length,
+  recebidos: latestReceivedTickets.value.filter((t) => t.status === TicketStatus.InProgress).length,
+  criados: latestCreatedTickets.value.filter((t) => t.status === TicketStatus.InProgress).length,
 }));
 
 const ticketsFinalizados = computed(() => ({
-  total: latestReceivedTickets.value.filter(t => t.status === TicketStatus.Completed).length +
-         latestCreatedTickets.value.filter(t => t.status === TicketStatus.Completed).length,
-  recebidos: latestReceivedTickets.value.filter(t => t.status === TicketStatus.Completed).length,
-  criados: latestCreatedTickets.value.filter(t => t.status === TicketStatus.Completed).length
+  total:
+    latestReceivedTickets.value.filter((t) => t.status === TicketStatus.Completed).length +
+    latestCreatedTickets.value.filter((t) => t.status === TicketStatus.Completed).length,
+  recebidos: latestReceivedTickets.value.filter((t) => t.status === TicketStatus.Completed).length,
+  criados: latestCreatedTickets.value.filter((t) => t.status === TicketStatus.Completed).length,
 }));
 
-const resolutionRate = ref(0);
+const resolutionRate = computed(() => {
+  if (userStats.value) {
+    return Math.round(userStats.value.resolutionRate * 100);
+  }
+  return 0;
+});
 
 const loadTickets = async () => {
   try {
     isLoading.value = true;
-    const [recebidosResponse, criadosResponse] = await Promise.all([
+    const [recebidosResponse, criadosResponse, userStatsResponse] = await Promise.all([
       ticketService.getByTargetUser(userStore.user!.id),
-      ticketService.getByRequester(userStore.user!.id)
+      ticketService.getByRequester(userStore.user!.id),
+      reportService.getUserStatistics(),
     ]);
+
+    // Store user statistics
+    userStats.value = userStatsResponse;
 
     // Limitar a 5 tickets mais recentes
     latestReceivedTickets.value = recebidosResponse.data.items
@@ -198,12 +223,8 @@ const loadTickets = async () => {
     latestCreatedTickets.value = criadosResponse.data.items
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 5);
-
-    // Calculate resolution rate
-    const resolvedCount = ticketsFinalizados.value.total;
-    resolutionRate.value =
-      totalTickets.value.total > 0 ? Math.round((resolvedCount / totalTickets.value.total) * 100) : 0;
-  } catch {
+  } catch (error) {
+    console.error('Erro ao carregar dados do dashboard:', error);
     toast.error('Erro ao carregar dados do dashboard');
   } finally {
     isLoading.value = false;

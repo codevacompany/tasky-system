@@ -42,3 +42,40 @@ export function calculateDeadline (ticket: Ticket) {
 
   return `${diffDays} dias restantes`;
 };
+
+export function formatTimeInSeconds (seconds?: number) {
+  if (seconds === undefined || seconds === null) return '0 segundos';
+
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  if (days > 0) {
+    const hourText = hours > 0 ? ` e ${hours} ${hours === 1 ? 'hora' : 'horas'}` : '';
+    return `${days} ${days === 1 ? 'dia' : 'dias'}${hourText}`;
+  } else if (hours > 0) {
+    const minuteText = minutes > 0 ? ` e ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}` : '';
+    return `${hours} ${hours === 1 ? 'hora' : 'horas'}${minuteText}`;
+  } else if (minutes > 0) {
+    return `${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`;
+  } else {
+    return `${secs} ${secs === 1 ? 'segundo' : 'segundos'}`;
+  }
+};
+
+export function formatTimeCompact (seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+
+  if (days > 0) {
+    return hours > 0 ? `${days}d ${hours}h` : `${days}d`;
+  } else if (hours > 0) {
+    return minutes > 0 ? `${hours}h ${minutes}min` : `${hours}h`;
+  } else {
+    return `${minutes}min`;
+  }
+};

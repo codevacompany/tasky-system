@@ -15,8 +15,14 @@ export const ticketService = {
     return apiClient.post('/tickets', data);
   },
 
-  async fetch(): Promise<AxiosResponse<Ticket[]>> {
-    return apiClient.get('/tickets');
+  async fetch(params?: {
+    name?: string;
+    status?: TicketStatus;
+    priority?: TicketPriority;
+    page?: number;
+    limit?: number;
+  }): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
+    return apiClient.get('/tickets', { params });
   },
 
   async getById(id: string): Promise<AxiosResponse<Ticket>> {
@@ -68,7 +74,9 @@ export const ticketService = {
     });
   },
 
-  async getTenantRecentTickets(limit: number = 10): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
+  async getTenantRecentTickets(
+    limit: number = 10,
+  ): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
     return apiClient.get(`/tickets?limit=${limit}`);
   },
 
