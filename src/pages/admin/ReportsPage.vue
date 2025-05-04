@@ -431,7 +431,7 @@
             <div v-if="currentTab === 'in-progress'" class="tab-panel">
               <div class="work-in-progress">
                 <div class="wip-header">
-                  <h2 class="wip-title">EM ANDAMENTO (Mocked)</h2>
+                  <h2 class="wip-title">EM ANDAMENTO</h2>
                 </div>
 
                 <div class="task-list">
@@ -445,13 +445,7 @@
                   <div v-for="task in inProgressTasks" :key="task.id" class="task-row">
                     <div class="task-column assignees">
                       <div class="avatar-group">
-                        <img
-                          v-if="task.assignee?.avatar"
-                          :src="task.assignee.avatar"
-                          :alt="task.assignee.name"
-                          class="avatar"
-                        />
-                        <div v-else class="avatar-placeholder">
+                        <div class="avatar-placeholder">
                           {{ task.assignee?.initials || '?' }}
                         </div>
                       </div>
@@ -468,6 +462,7 @@
                         v-if="task.isOverdue"
                         icon="exclamation-circle"
                         class="overdue-icon"
+                        :title="task.overdueReason || 'Ticket atrasado'"
                       />
                     </div>
                   </div>
@@ -1003,7 +998,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import {
   Chart as ChartJS,
   Title,
@@ -1019,7 +1014,7 @@ import {
   Filler,
 } from 'chart.js';
 import { Line, Bar, Pie } from 'vue-chartjs';
-import { formatDate } from '@/utils/date';
+import { formatDate, formatDateToPortuguese } from '@/utils/date';
 import { reportService } from '@/services/reportService';
 import { ticketService } from '@/services/ticketService';
 import type {
@@ -1027,9 +1022,14 @@ import type {
   StatusDurationDto,
   StatusDurationResponseDto,
 } from '@/services/reportService';
+import { TicketActionType, TicketStatus, type TicketUpdate } from '@/models';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
-import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import {
+  formatSnakeToNaturalCase,
+  formatTimeCompact,
+  formatTimeInSeconds,
+} from '@/utils/generic-helper';
 //import type { TicketStatus, TicketPriority } from '@/models';
 
 // Define the StatsPeriod enum
@@ -1060,7 +1060,7 @@ ChartJS.register(
 );
 
 // Local type definitions
-type TicketStatus = 'Em andamento' | 'Finalizado' | 'Atrasado' | 'Outro';
+type CustomTicketStatus = 'Em andamento' | 'Finalizado' | 'Atrasado' | 'Outro';
 type TicketPriority = 'Alta' | 'Média' | 'Baixa';
 
 interface ChartData {
@@ -1147,7 +1147,7 @@ const recentTickets = ref<
   { customId: string; name: string; status: string; priority: string; createdAt: string }[]
 >([]);
 
-const statusClassMap: Record<TicketStatus, string> = {
+const statusClassMap: Record<CustomTicketStatus, string> = {
   'Em andamento': 'bg-yellow-100 text-yellow-800',
   Finalizado: 'bg-green-100 text-green-800',
   Atrasado: 'bg-red-100 text-red-800',
@@ -1155,7 +1155,7 @@ const statusClassMap: Record<TicketStatus, string> = {
 };
 
 const getStatusClass = (status: string): string => {
-  return statusClassMap[status as TicketStatus] || 'bg-gray-100 text-gray-800';
+  return statusClassMap[status as CustomTicketStatus] || 'bg-gray-100 text-gray-800';
 };
 
 const priorityClassMap: Record<TicketPriority, string> = {
@@ -1258,6 +1258,11 @@ const loadData = async () => {
 
 onMounted(() => {
   loadData();
+
+  // If starting on the in-progress tab, load those tickets too
+  if (currentTab.value === 'in-progress') {
+    loadInProgressTasks();
+  }
 });
 
 const tabs = [
@@ -1270,6 +1275,13 @@ const tabs = [
 
 const currentTab = ref('overview');
 const customStats = ref<TenantStatistics | null>(null);
+
+// Watch for tab changes to load tab-specific data
+watch(currentTab, (newTab) => {
+  if (newTab === 'in-progress') {
+    loadInProgressTasks();
+  }
+});
 
 // Computed Properties para os Gráficos
 const statusChartData = computed(() => ({
@@ -1397,53 +1409,6 @@ const formatPercentage = (value?: number) => {
   return `${(value * 100).toFixed(1)}%`;
 };
 
-// Format a date to Portuguese format like "9 de Fevereiro"
-const formatDateToPortuguese = (dateString: string): string => {
-  const date = new Date(dateString);
-
-  // Portuguese month names
-  const months = [
-    'Janeiro',
-    'Fevereiro',
-    'Março',
-    'Abril',
-    'Maio',
-    'Junho',
-    'Julho',
-    'Agosto',
-    'Setembro',
-    'Outubro',
-    'Novembro',
-    'Dezembro',
-  ];
-
-  const day = date.getDate();
-  const month = months[date.getMonth()];
-
-  return `${day} de ${month}`;
-};
-
-const formatTimeInSeconds = (seconds?: number) => {
-  if (seconds === undefined || seconds === null) return '0 segundos';
-
-  const days = Math.floor(seconds / 86400);
-  const hours = Math.floor((seconds % 86400) / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-
-  if (days > 0) {
-    const hourText = hours > 0 ? ` e ${hours} ${hours === 1 ? 'hora' : 'horas'}` : '';
-    return `${days} ${days === 1 ? 'dia' : 'dias'}${hourText}`;
-  } else if (hours > 0) {
-    const minuteText = minutes > 0 ? ` e ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}` : '';
-    return `${hours} ${hours === 1 ? 'hora' : 'horas'}${minuteText}`;
-  } else if (minutes > 0) {
-    return `${minutes} ${minutes === 1 ? 'minuto' : 'minutos'}`;
-  } else {
-    return `${secs} ${secs === 1 ? 'segundo' : 'segundos'}`;
-  }
-};
-
 const disabledDate = (date: Date) => {
   return date > new Date() || date < new Date(2023, 0, 1);
 };
@@ -1565,77 +1530,140 @@ const departmentsWithShortestResolutionTime = computed(() => {
     .slice(0, 3);
 });
 
-const inProgressTasks = ref([
+const inProgressTasks = ref<
   {
-    id: 1,
-    name: 'Erro no sistema de impressão - Departamento Financeiro',
+    id: number;
+    customId: string;
+    name: string;
     assignee: {
-      name: 'João Silva',
-      initials: 'JS',
-      avatar: null,
-    },
-    status: 'Em Andamento',
-    timeInProgress: '6d 01h',
-    isOverdue: true,
-  },
-  {
-    id: 2,
-    name: 'Configuração de novo servidor de e-mail',
-    assignee: {
-      name: 'Maria Santos',
-      initials: 'MS',
-      avatar: null,
-    },
-    status: 'Em Andamento',
-    timeInProgress: '5d 20h',
-    isOverdue: true,
-  },
-  {
-    id: 3,
-    name: 'Atualização do sistema operacional - Estações RH',
-    assignee: {
-      name: 'Pedro Costa',
-      initials: 'PC',
-      avatar: null,
-    },
-    status: 'Em Andamento',
-    timeInProgress: '2d 01h',
-    isOverdue: true,
-  },
-  {
-    id: 4,
-    name: 'Problema de acesso ao sistema CRM',
-    assignee: {
-      name: 'Bruno Santos',
-      initials: 'BS',
-      avatar: null,
-    },
-    status: 'Em Andamento',
-    timeInProgress: '1d 18h',
-    isOverdue: true,
-  },
-  {
-    id: 5,
-    name: 'Instalação de novo software de segurança',
-    assignee: {
-      name: 'Ana Lima',
-      initials: 'AL',
-      avatar: null,
-    },
-    status: 'Em Andamento',
-    timeInProgress: '1d 16h',
-    isOverdue: true,
-  },
-]);
+      name: string;
+      initials: string;
+    };
+    status: string;
+    timeInProgress: string;
+    isOverdue: boolean;
+    overdueReason?: string;
+    timeInProgressSeconds: number;
+  }[]
+>([]);
 
-// First, add a computed property for summarized department stats
+// Function to load in-progress tickets
+const loadInProgressTasks = async () => {
+  try {
+    const response = await ticketService.fetch({
+      status: TicketStatus.InProgress, // Using type assertion for now
+      limit: 10,
+    });
+
+    if (!response.data || !Array.isArray(response.data.items)) {
+      console.error('Invalid response format for in-progress tickets');
+      return;
+    }
+
+    const transformedTasks = [];
+
+    for (const ticket of response.data.items) {
+      try {
+        // Find status updates in the ticket history
+        const statusUpdates =
+          ticket.updates?.filter(
+            (update: TicketUpdate) =>
+              update.action === TicketActionType.StatusUpdate &&
+              update.toStatus === TicketStatus.InProgress,
+          ) || [];
+
+        const lastStatusUpdate =
+          statusUpdates.length > 0
+            ? statusUpdates.sort(
+                (a: TicketUpdate, b: TicketUpdate) =>
+                  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+              )[0]
+            : null;
+
+        let timeInProgress = 'Desconhecido';
+        let isOverdue = false;
+        let overdueReason: string | undefined = undefined;
+        let diffInSeconds = 0;
+
+        if (lastStatusUpdate) {
+          const startDate = new Date(lastStatusUpdate.createdAt);
+          const now = new Date();
+          diffInSeconds = Math.floor((now.getTime() - startDate.getTime()) / 1000);
+
+          timeInProgress = formatTimeCompact(diffInSeconds);
+
+          if (ticket.dueAt) {
+            const dueDate = new Date(ticket.dueAt);
+            isOverdue = now > dueDate;
+            if (isOverdue) {
+              overdueReason = `Prazo de entrega expirado em ${formatDateToPortuguese(ticket.dueAt)}`;
+            }
+          } else {
+            // If no dueAt is set, consider it overdue if in progress for more than 5 days
+            // This is a fallback warning mechanism for tickets without explicit due dates
+            const FIVE_DAYS_IN_SECONDS = 5 * 24 * 60 * 60;
+            isOverdue = diffInSeconds > FIVE_DAYS_IN_SECONDS;
+            if (isOverdue) {
+              overdueReason = 'Em andamento por mais de 5 dias sem prazo definido';
+            }
+          }
+        }
+
+        // Get assignee info
+        let assignee = {
+          name: 'Não atribuído',
+          initials: 'NA',
+        };
+
+        if (ticket.targetUser) {
+          const name =
+            `${ticket.targetUser.firstName} ${ticket.targetUser.lastName}` ||
+            ticket.targetUser.email ||
+            'Anônimo';
+          const initials = name
+            .split(' ')
+            .map((n: string) => n[0])
+            .slice(0, 2)
+            .join('')
+            .toUpperCase();
+
+          assignee = {
+            name,
+            initials,
+          };
+        }
+
+        transformedTasks.push({
+          id: ticket.id,
+          customId: ticket.customId || `TK-${ticket.id}`,
+          name: ticket.name,
+          assignee,
+          status: formatSnakeToNaturalCase(ticket.status),
+          timeInProgress,
+          isOverdue,
+          overdueReason,
+          timeInProgressSeconds: diffInSeconds,
+        });
+      } catch (error) {
+        console.error('Error processing in-progress ticket:', error);
+      }
+    }
+
+    // Sort the tasks by time in progress (descending order)
+    transformedTasks.sort((a, b) => b.timeInProgressSeconds - a.timeInProgressSeconds);
+
+    inProgressTasks.value = transformedTasks;
+  } catch (err) {
+    console.error('Error loading in-progress tickets:', err);
+  }
+};
+
 const departmentStatsSummary = computed(() => {
   if (!departmentStats.value?.length) return null;
 
   const totalTickets = departmentStats.value.reduce((sum, dept) => sum + dept.totalTickets, 0);
   const totalResolved = departmentStats.value.reduce((sum, dept) => sum + dept.resolvedTickets, 0);
 
-  // Calculate weighted averages
   const totalResolutionTime = departmentStats.value.reduce(
     (sum, dept) => sum + dept.averageResolutionTimeSeconds * dept.resolvedTickets,
     0,
@@ -1658,14 +1686,12 @@ const departmentStatsSummary = computed(() => {
   };
 });
 
-// Computed properties for status durations charts
 const sortedStatusDurations = computed(() => {
   return [...statusDurations.value].sort(
     (a, b) => b.averageDurationSeconds - a.averageDurationSeconds,
   );
 });
 
-// Remove the timeScaleValues computed property that's no longer used
 const inProgressDuration = computed(() => {
   return (
     statusDurations.value.find((duration) => duration.status.toLowerCase() === 'em_andamento') ||
@@ -1673,7 +1699,6 @@ const inProgressDuration = computed(() => {
   );
 });
 
-// After loadData function
 const handlePeriodChange = () => {
   loadData();
 };
@@ -1726,7 +1751,6 @@ const firstDate = computed(() => {
   background-color: #f9fafb;
 }
 
-/* Loading State */
 .loading-overlay {
   position: fixed;
   inset: 0;

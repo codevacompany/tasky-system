@@ -42,3 +42,28 @@ export const formatRelativeTime = (dateString: string): string => {
 
   return `Há ${diffInYears}a`;
 };
+
+export const formatDateToPortuguese = (dateString: string): string => {
+  const date = new Date(dateString);
+
+  // Portuguese month names
+  const months = [
+    'Janeiro',
+    'Fevereiro',
+    'Março',
+    'Abril',
+    'Maio',
+    'Junho',
+    'Julho',
+    'Agosto',
+    'Setembro',
+    'Outubro',
+    'Novembro',
+    'Dezembro',
+  ];
+
+  const day = date.getDate();
+  const month = months[date.getMonth()];
+
+  return `${day} de ${month}`;
+};
