@@ -257,21 +257,6 @@
                         <p class="loading-text">Carregando dados...</p>
                       </div>
                     </div>
-                    <!-- <div class="chart-legend">
-                      <div
-                        v-for="(label, index) in ticketsByPriority.labels"
-                        :key="label"
-                        class="legend-item"
-                      >
-                        <div
-                          class="legend-color"
-                          :style="{
-                            backgroundColor: priorityChartData.datasets[0].backgroundColor[index],
-                          }"
-                        ></div>
-                        <span>{{ label }}</span>
-                      </div>
-                    </div> -->
                   </div>
                 </div>
               </div>
@@ -966,7 +951,6 @@
                     :placeholder-class="'placeholder-class'"
                     :clear-icon="false"
                     :confirm="false"
-                    @change="fetchCustomDateStats"
                   />
                 </div>
                 <div class="filter-group">
@@ -985,7 +969,6 @@
                     :placeholder-class="'placeholder-class'"
                     :clear-icon="false"
                     :confirm="false"
-                    @change="fetchCustomDateStats"
                   />
                 </div>
               </div>
@@ -998,7 +981,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import {
   Chart as ChartJS,
   Title,
@@ -1021,6 +1004,7 @@ import type {
   TenantStatistics,
   StatusDurationDto,
   StatusDurationResponseDto,
+  DepartmentStats,
 } from '@/services/reportService';
 import { TicketActionType, TicketStatus, type TicketUpdate } from '@/models';
 import DatePicker from 'vue-datepicker-next';
@@ -1095,7 +1079,7 @@ const chartOptions = {
         label: (context: { raw: unknown }): string => {
           const value = context.raw;
           if (typeof value === 'number') {
-            return ` ${value} chamados`;
+            return ` ${value} tickets`;
           }
           return String(value);
         },
@@ -1170,22 +1154,13 @@ const getPriorityClass = (priority: string): string => {
 
 // Add ref for status durations
 const statusDurations = ref<StatusDurationDto[]>([]);
+const departmentData = ref<DepartmentStats[]>([]);
 
 const loadData = async () => {
   loading.value = true;
   error.value = null;
 
   try {
-    // Mock data for now - replace with actual API calls when ready
-    /*
-    const [statsData, statusData, priorityData, ticketsData] = await Promise.all([
-      reportService.getTenantStatistics(),
-      reportService.getTicketsByStatus(),
-      reportService.getTicketsByPriority(),
-      reportService.getRecentTickets(10),
-    ]);
-    */
-
     const [
       statsData,
       trends,
@@ -1193,6 +1168,7 @@ const loadData = async () => {
       priorityResult,
       recentTicketsResult,
       statusDurationsResult,
+      departmentStatsResult,
     ] = await Promise.all([
       reportService.getTenantStatistics(),
       reportService.getTicketTrends(selectedTrendPeriod.value),
@@ -1200,6 +1176,7 @@ const loadData = async () => {
       reportService.getTicketsByPriority(),
       ticketService.getTenantRecentTickets(10),
       reportService.getStatusDurations(selectedStatsPeriod.value),
+      reportService.getTenantDepartmentsStatistics(),
     ]);
 
     // Initialize trendData with the current period data
@@ -1208,9 +1185,12 @@ const loadData = async () => {
     // Store status durations
     statusDurations.value = (statusDurationsResult as StatusDurationResponseDto).statusDurations;
 
+    // Store department data - directly from the API response
+    departmentData.value = departmentStatsResult;
+
     // Transform status data from API into ChartData format
     ticketsByStatus.value = {
-      labels: statusResult.statusCounts.map((item) => {
+      labels: statusResult.statusCounts.map((item: { status: string; count: number }) => {
         // Map enum values to readable text
         const statusLabels: Record<string, string> = {
           pendente: 'Pendente',
@@ -1224,12 +1204,12 @@ const loadData = async () => {
         };
         return statusLabels[item.status] || item.status;
       }),
-      data: statusResult.statusCounts.map((item) => item.count),
+      data: statusResult.statusCounts.map((item: { status: string; count: number }) => item.count),
     };
 
     // Transform priority data from API into ChartData format
     ticketsByPriority.value = {
-      labels: priorityResult.priorityCounts.map((item) => {
+      labels: priorityResult.priorityCounts.map((item: { priority: string; count: number }) => {
         // Map enum values to readable text
         const priorityLabels: Record<string, string> = {
           baixa: 'Baixa',
@@ -1238,7 +1218,9 @@ const loadData = async () => {
         };
         return priorityLabels[item.priority] || item.priority;
       }),
-      data: priorityResult.priorityCounts.map((item) => item.count),
+      data: priorityResult.priorityCounts.map(
+        (item: { priority: string; count: number }) => item.count,
+      ),
     };
 
     // Mock recent tickets
@@ -1247,7 +1229,9 @@ const loadData = async () => {
     recentTickets.value = recentTicketsResult.data.items;
 
     statistics.value = statsData;
-    statistics.value.ticketTrends = trends;
+    if (statistics.value) {
+      statistics.value.ticketTrends = trends;
+    }
   } catch (err: unknown) {
     console.error('Erro ao carregar dados dos relatórios:', err);
     error.value = 'Ocorreu um erro ao carregar os dados. Por favor, tente novamente.';
@@ -1274,13 +1258,42 @@ const tabs = [
 ];
 
 const currentTab = ref('overview');
-const customStats = ref<TenantStatistics | null>(null);
+const pollingInterval = ref<number | null>(null);
+
+// Function to start polling
+const startPolling = () => {
+  // Clear any existing interval first
+  stopPolling();
+
+  // Set up new polling interval - refresh every 60 seconds
+  pollingInterval.value = window.setInterval(() => {
+    if (currentTab.value === 'in-progress') {
+      loadInProgressTasks();
+    }
+  }, 60000); // 60 seconds
+};
+
+// Function to stop polling
+const stopPolling = () => {
+  if (pollingInterval.value !== null) {
+    clearInterval(pollingInterval.value);
+    pollingInterval.value = null;
+  }
+};
 
 // Watch for tab changes to load tab-specific data
 watch(currentTab, (newTab) => {
   if (newTab === 'in-progress') {
     loadInProgressTasks();
+    startPolling();
+  } else {
+    stopPolling();
   }
+});
+
+// Clean up on component unmount
+onUnmounted(() => {
+  stopPolling();
 });
 
 // Computed Properties para os Gráficos
@@ -1308,6 +1321,7 @@ const priorityChartData = computed(() => ({
   labels: ticketsByPriority.value.labels,
   datasets: [
     {
+      label: 'Quantidade de Tickets',
       data: ticketsByPriority.value.data,
       backgroundColor: ['#ef4444', '#eab308', '#2563eb'],
       borderWidth: 0,
@@ -1325,14 +1339,6 @@ const trendChartData = computed(() => {
   return {
     labels: trendData.value.map((item) => formatDateToPortuguese(item.date)),
     datasets: [
-      {
-        label: 'Total de Chamados',
-        data: trendData.value.map((item) => item.total),
-        borderColor: '#2563eb',
-        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-        fill: true,
-        tension: 0.4,
-      },
       {
         label: 'Chamados Resolvidos',
         data: trendData.value.map((item) => item.resolved),
@@ -1436,80 +1442,8 @@ const dateRange = ref({
   end: '',
 });
 
-const fetchCustomDateStats = async () => {
-  if (!dateRange.value.start || !dateRange.value.end) {
-    error.value = 'Por favor, selecione um período válido.';
-    return;
-  }
-
-  try {
-    loading.value = true;
-
-    // Mock data for now - replace with actual API call when ready
-    /*
-    customStats.value = await reportService.getCustomDateRangeStats(
-      dateRange.value.start,
-      dateRange.value.end,
-    );
-    */
-
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    // Mock custom date range statistics
-    customStats.value = {
-      totalTickets: Math.floor(Math.random() * 50) + 30,
-      openTickets: Math.floor(Math.random() * 20) + 10,
-      closedTickets: Math.floor(Math.random() * 30) + 20,
-      averageResolutionTimeSeconds: Math.random() * 4 + 1,
-      averageAcceptanceTimeSeconds: Math.random() * 2 + 0.5,
-      averageTotalTimeSeconds: Math.random() * 4 + 1,
-      resolutionRate: Math.random() * 0.3 + 0.6,
-      ticketsByDepartment: [
-        {
-          departmentId: 1,
-          departmentName: 'TI',
-          totalTickets: Math.floor(Math.random() * 20) + 10,
-          resolvedTickets: Math.floor(Math.random() * 15) + 5,
-          averageResolutionTimeSeconds: Math.random() * 3 + 1,
-          averageAcceptanceTimeSeconds: Math.random() * 2 + 0.5,
-          averageTotalTimeSeconds: Math.random() * 4 + 1,
-          resolutionRate: Math.random() * 0.3 + 0.6,
-        },
-        {
-          departmentId: 2,
-          departmentName: 'RH',
-          totalTickets: Math.floor(Math.random() * 15) + 8,
-          resolvedTickets: Math.floor(Math.random() * 10) + 5,
-          averageResolutionTimeSeconds: Math.random() * 3 + 1,
-          averageAcceptanceTimeSeconds: Math.random() * 2 + 0.5,
-          averageTotalTimeSeconds: Math.random() * 4 + 1,
-          resolutionRate: Math.random() * 0.3 + 0.6,
-        },
-        {
-          departmentId: 3,
-          departmentName: 'Financeiro',
-          totalTickets: Math.floor(Math.random() * 12) + 5,
-          resolvedTickets: Math.floor(Math.random() * 8) + 3,
-          averageResolutionTimeSeconds: Math.random() * 3 + 1,
-          averageAcceptanceTimeSeconds: Math.random() * 2 + 0.5,
-          averageTotalTimeSeconds: Math.random() * 4 + 1,
-          resolutionRate: Math.random() * 0.3 + 0.6,
-        },
-      ],
-      ticketTrends: statistics.value!.ticketTrends,
-    };
-  } catch (err: unknown) {
-    console.error('Erro ao carregar estatísticas do período:', err);
-    error.value =
-      'Erro ao carregar estatísticas do período selecionado. Por favor, tente novamente.';
-  } finally {
-    loading.value = false;
-  }
-};
-
 // Computed Properties para Métricas
-const departmentStats = computed(() => statistics.value?.ticketsByDepartment);
+const departmentStats = computed(() => departmentData.value);
 
 const sortedDepartmentsByResolutionTime = computed(() => {
   if (!departmentStats.value) return [];
@@ -1661,19 +1595,28 @@ const loadInProgressTasks = async () => {
 const departmentStatsSummary = computed(() => {
   if (!departmentStats.value?.length) return null;
 
-  const totalTickets = departmentStats.value.reduce((sum, dept) => sum + dept.totalTickets, 0);
-  const totalResolved = departmentStats.value.reduce((sum, dept) => sum + dept.resolvedTickets, 0);
+  const totalTickets = departmentStats.value.reduce(
+    (sum: number, dept: DepartmentStats) => sum + dept.totalTickets,
+    0,
+  );
+  const totalResolved = departmentStats.value.reduce(
+    (sum: number, dept: DepartmentStats) => sum + dept.resolvedTickets,
+    0,
+  );
 
   const totalResolutionTime = departmentStats.value.reduce(
-    (sum, dept) => sum + dept.averageResolutionTimeSeconds * dept.resolvedTickets,
+    (sum: number, dept: DepartmentStats) =>
+      sum + dept.averageResolutionTimeSeconds * dept.resolvedTickets,
     0,
   );
   const totalAcceptanceTime = departmentStats.value.reduce(
-    (sum, dept) => sum + dept.averageAcceptanceTimeSeconds * dept.resolvedTickets,
+    (sum: number, dept: DepartmentStats) =>
+      sum + dept.averageAcceptanceTimeSeconds * dept.resolvedTickets,
     0,
   );
   const totalTotalTime = departmentStats.value.reduce(
-    (sum, dept) => sum + dept.averageTotalTimeSeconds * dept.resolvedTickets,
+    (sum: number, dept: DepartmentStats) =>
+      sum + dept.averageTotalTimeSeconds * dept.resolvedTickets,
     0,
   );
 
