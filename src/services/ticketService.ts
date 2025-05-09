@@ -74,6 +74,15 @@ export const ticketService = {
     });
   },
 
+  async getArchived(params?: {
+    name?: string;
+    priority?: TicketPriority;
+    page?: number;
+    limit?: number;
+  }): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
+    return apiClient.get('/tickets/archived', { params });
+  },
+
   async getTenantRecentTickets(
     limit: number = 10,
   ): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
@@ -104,5 +113,9 @@ export const ticketService = {
 
   async cancel(id: string) {
     return apiClient.post(`/tickets/${id}/cancel`);
+  },
+
+  async addFiles(id: string, fileUrls: string[]): Promise<AxiosResponse<Ticket>> {
+    return apiClient.post(`/tickets/${id}/files`, { fileUrls });
   },
 };

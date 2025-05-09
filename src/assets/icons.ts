@@ -69,7 +69,8 @@ import {
   faChartLine as faChartLineSolid,
   faBell as faBellSolid,
   faTasks,
-  faThumbsUp
+  faThumbsUp,
+  faInfoCircle
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -150,7 +151,8 @@ const icons = [
   faChartLineSolid,
   faBellSolid,
   faTasks,
-  faThumbsUp
+  faThumbsUp,
+  faInfoCircle
 ];
 
 library.add(...icons);
