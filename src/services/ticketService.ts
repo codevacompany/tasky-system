@@ -105,4 +105,8 @@ export const ticketService = {
   async cancel(id: string) {
     return apiClient.post(`/tickets/${id}/cancel`);
   },
+
+  async addFiles(id: string, fileUrls: string[]): Promise<AxiosResponse<Ticket>> {
+    return apiClient.post(`/tickets/${id}/files`, { files: fileUrls });
+  },
 };

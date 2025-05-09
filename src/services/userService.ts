@@ -20,8 +20,15 @@ export const userService = {
     return apiClient.get<User>(`/users/${email}`);
   },
 
-  async getByDepartment(departmentId: number): Promise<AxiosResponse<PaginatedResponse<User>>> {
-    return apiClient.get(`/users/department/${departmentId}`);
+  async getByDepartment(
+    departmentId: number,
+    params?: {
+      name?: string;
+      page?: number;
+      limit?: number;
+    },
+  ): Promise<AxiosResponse<PaginatedResponse<User>>> {
+    return apiClient.get(`/users/department/${departmentId}`, { params });
   },
 
   async update(id: number, data: UpdateUserDto): Promise<AxiosResponse<User>> {

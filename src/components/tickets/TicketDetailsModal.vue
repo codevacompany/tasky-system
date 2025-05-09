@@ -242,6 +242,15 @@
       <div class="files-section-title">
         <p class="files-label">Anexos</p>
         <div class="files-count">{{ loadedTicket.files.length }}</div>
+        <button
+          v-if="canEditTicket"
+          class="btn add-file-button"
+          @click="openFileInput"
+          title="Adicionar anexos"
+        >
+          <font-awesome-icon icon="plus" />
+        </button>
+        <input class="hidden" type="file" ref="fileInput" multiple @change="handleFileChange" />
       </div>
       <div class="files-container">
         <div
@@ -255,6 +264,17 @@
           </div>
           <div class="file-name-container">
             <div class="file-name">{{ file.name }}</div>
+          </div>
+        </div>
+        <div v-for="(file, i) in selectedFiles" :key="`new-${i}`" class="file-item pending">
+          <div class="file-preview">
+            <font-awesome-icon icon="file-upload" size="xl" />
+          </div>
+          <div class="file-name-container">
+            <div class="file-name">{{ file.name }}</div>
+          </div>
+          <div class="file-uploading">
+            <font-awesome-icon icon="spinner" spin />
           </div>
         </div>
       </div>
@@ -362,6 +382,8 @@ import { calculateDeadline, formatSnakeToNaturalCase } from '@/utils/generic-hel
 import type { TicketUpdate } from '@/models/ticketUpdate';
 import { TicketUpdateService } from '@/services/ticketUpdateService';
 import type { TicketFile } from '@/models/ticketFile';
+import { awsService } from '@/services/awsService';
+import axios from 'axios';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -374,6 +396,9 @@ const newComment = ref('');
 const comments = ref<TicketComment[]>([]);
 const ticketUpdates = ref<TicketUpdate[]>([]);
 const loadedTicket = ref<Ticket | null>(null);
+const selectedFiles = ref<File[]>([]);
+const fileInput = ref<HTMLInputElement | null>(null);
+const isUploading = ref(false);
 
 const confirmationModal = ref({
   isOpen: false,
@@ -722,7 +747,7 @@ const getEventIcon = (description: string) => {
   if (description.includes('solicitou correção')) return 'undo';
   if (description.includes('cancelou')) return 'ban';
   if (description.includes('iniciou correção')) return 'wrench';
-  return 'info-circle'; // ícone padrão para outros casos
+  return 'info-circle';
 };
 
 watch(
@@ -755,6 +780,79 @@ watch(
     }
   },
 );
+
+const openFileInput = () => {
+  if (fileInput.value) {
+    fileInput.value.click();
+  }
+};
+
+const handleFileChange = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (!target || !target.files || !loadedTicket.value) return;
+
+  const files = Array.from(target.files);
+  selectedFiles.value = files;
+
+  isUploading.value = true;
+
+  try {
+    const uploadedUrls: string[] = [];
+
+    for (const file of files) {
+      const ext = file.name.split('.').pop();
+
+      if (ext) {
+        const { data } = await awsService.getSignedUrl(ext);
+
+        await axios.put(data.url, file, {
+          headers: {
+            'Content-Type': file.type,
+          },
+        });
+
+        const fileUrl = data.url.split('?')[0];
+        uploadedUrls.push(fileUrl);
+      }
+    }
+
+    if (uploadedUrls.length > 0) {
+      const response = await ticketService.addFiles(loadedTicket.value.customId, uploadedUrls);
+
+      if (response && response.data) {
+        loadedTicket.value = response.data;
+      }
+
+      toast.success('Arquivos anexados com sucesso!');
+      emit('refresh');
+    }
+  } catch (error) {
+    console.error('Erro ao fazer upload:', error);
+    toast.error('Erro ao anexar arquivos');
+  } finally {
+    selectedFiles.value = [];
+    isUploading.value = false;
+
+    if (fileInput.value) {
+      fileInput.value.value = '';
+    }
+  }
+};
+
+const canEditTicket = computed(() => {
+  if (!loadedTicket.value) return false;
+
+  const isUserInvolved =
+    userStore.user?.id === loadedTicket.value.requester.id ||
+    userStore.user?.id === loadedTicket.value.targetUser.id;
+
+  const isTicketActive =
+    loadedTicket.value.status !== TicketStatus.Completed &&
+    loadedTicket.value.status !== TicketStatus.Rejected &&
+    loadedTicket.value.status !== TicketStatus.Canceled;
+
+  return isUserInvolved && isTicketActive;
+});
 </script>
 
 <style scoped>
@@ -1391,5 +1489,49 @@ watch(
 :deep(body.dark-mode) .system-avatar {
   background: #334155 !important;
   color: #94a3b8 !important;
+}
+
+.add-file-button {
+  width: 26px;
+  height: 24px;
+  margin-left: 18px;
+  padding: 0;
+}
+
+.add-file-button:hover {
+  background-color: #e2e3e7;
+}
+
+.hidden {
+  display: none;
+}
+
+.file-item.pending {
+  position: relative;
+  border: 1px dashed #0284c7;
+  background-color: rgba(2, 132, 199, 0.05);
+}
+
+.file-item.pending .file-preview {
+  color: #0284c7;
+}
+
+.file-uploading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  color: #0284c7;
+  border-radius: 6px;
+}
+
+.upload-actions {
+  display: none;
 }
 </style>

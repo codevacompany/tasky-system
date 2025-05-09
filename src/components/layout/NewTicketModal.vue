@@ -225,7 +225,9 @@ const updateUsersList = async () => {
     return;
   }
   try {
-    const response = await userService.getByDepartment(selectedDepartment.value);
+    const response = await userService.getByDepartment(selectedDepartment.value, {
+      limit: 100,
+    });
     availableUsers.value = response.data.items;
   } catch {
     toast.error('Erro ao carregar usuários. Tente novamente.');
@@ -511,6 +513,10 @@ textarea {
   border-radius: 5px;
   color: white;
   margin-bottom: 6px;
+}
+
+.file-upload-label:hover {
+  cursor: pointer;
 }
 
 /* Dark mode */
