@@ -70,7 +70,8 @@ import {
   faBell as faBellSolid,
   faTasks,
   faThumbsUp,
-  faInfoCircle
+  faInfoCircle,
+  faSmile,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -152,7 +153,8 @@ const icons = [
   faBellSolid,
   faTasks,
   faThumbsUp,
-  faInfoCircle
+  faInfoCircle,
+  faSmile,
 ];
 
 library.add(...icons);

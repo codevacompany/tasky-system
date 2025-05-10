@@ -12,6 +12,7 @@ import TicketsPage from '@/pages/user/TicketsPage.vue';
 import ClientManagement from '@/pages/admin/ClientManagement.vue';
 import ClientUsers from '@/pages/admin/ClientUsers.vue';
 import ClientSettings from '@/pages/admin/ClientSettings.vue';
+import SyncPage from '@/pages/user/SyncPage.vue';
 import LandingPage from '@/pages/public/LandingPage.vue';
 import { localStorageService } from '@/utils/localStorageService';
 
@@ -36,6 +37,7 @@ const routes: RouteRecordRaw[] = [
       { path: '', component: UserHome },
       { path: 'meus-tickets', component: TicketsPage },
       { path: 'faq', component: () => import('@/pages/user/FAQ.vue') },
+      { path: 'sync', component: SyncPage },
     ],
     meta: { requiresAuth: true },
   },
