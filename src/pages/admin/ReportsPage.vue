@@ -209,7 +209,7 @@
                       <Line
                         v-if="trendData && trendData.length > 0"
                         :data="createdVsCompletedChartData"
-                        :options="chartOptions"
+                        :options="createdVsCompletedChartOptions"
                       />
                       <div v-else class="loading-state">
                         <font-awesome-icon icon="spinner" spin class="loading-icon" />
@@ -222,46 +222,62 @@
 
               <div class="charts-grid">
                 <!-- Gráfico de Status -->
-                <div class="chart-card">
+                <div class="chart-card status-chart-flex">
                   <div class="chart-header">
                     <h2 class="chart-title">Distribuição por Status</h2>
                     <div class="chart-icon">
                       <font-awesome-icon icon="chart-pie" />
                     </div>
                   </div>
-                  <div class="chart-container">
-                    <div class="chart-wrapper">
-                      <Pie
-                        v-if="ticketsByStatus.labels.length"
-                        :data="statusChartData"
-                        :options="chartOptions"
-                      />
-                      <div v-else class="loading-state">
-                        <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                        <p class="loading-text">Carregando dados...</p>
+                  <div class="status-chart-row">
+                    <div class="chart-container">
+                      <div class="chart-wrapper">
+                        <Doughnut
+                          v-if="ticketsByStatus.labels.length"
+                          :data="statusChartData"
+                          :options="chartOptions"
+                        />
+                        <div v-else class="loading-state">
+                          <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                          <p class="loading-text">Carregando dados...</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="status-custom-legend">
+                      <div v-for="(label, idx) in statusChartData.labels" :key="label" class="legend-item">
+                        <span class="legend-color" :style="{ backgroundColor: statusChartData.datasets[0].backgroundColor[idx] }"></span>
+                        <span class="legend-label">{{ label }}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <!-- Gráfico de Prioridade -->
-                <div class="chart-card">
+                <div class="chart-card status-chart-flex">
                   <div class="chart-header">
                     <h2 class="chart-title">Distribuição por Prioridade</h2>
                     <div class="chart-icon">
                       <font-awesome-icon icon="chart-bar" />
                     </div>
                   </div>
-                  <div class="chart-container">
-                    <div class="chart-wrapper">
-                      <Bar
-                        v-if="ticketsByPriority.labels.length"
-                        :data="priorityChartData"
-                        :options="chartOptions"
-                      />
-                      <div v-else class="loading-state">
-                        <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                        <p class="loading-text">Carregando dados...</p>
+                  <div class="status-chart-row">
+                    <div class="chart-container">
+                      <div class="chart-wrapper">
+                        <Doughnut
+                          v-if="ticketsByPriority.labels.length"
+                          :data="priorityChartData"
+                          :options="chartOptions"
+                        />
+                        <div v-else class="loading-state">
+                          <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                          <p class="loading-text">Carregando dados...</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="status-custom-legend">
+                      <div v-for="(label, idx) in priorityChartData.labels" :key="label" class="legend-item">
+                        <span class="legend-color" :style="{ backgroundColor: priorityChartData.datasets[0].backgroundColor[idx] }"></span>
+                        <span class="legend-label">{{ label }}</span>
                       </div>
                     </div>
                   </div>
@@ -392,16 +408,21 @@
                 <div
                   v-for="dept in departmentStats"
                   :key="dept.departmentId"
-                  class="department-card"
+                  class="department-card department-card-modern"
                 >
-                  <h4 class="department-title">{{ dept.departmentName }}</h4>
+                  <div class="department-card-header">
+                    <div class="department-icon" :style="{ background: '#2563eb20', color: '#2563eb' }">
+                      <font-awesome-icon icon="building" />
+                    </div>
+                    <h4 class="department-title">{{ dept.departmentName }}</h4>
+                  </div>
                   <div class="department-stats">
                     <div class="stat-row">
                       <span class="stat-label">Total de Chamados</span>
                       <span class="stat-value">{{ dept.totalTickets }}</span>
                     </div>
                     <div class="stat-row">
-                      <span class="stat-label">Chamados Resolvidos</span>
+                      <span class="stat-label">Resolvidos</span>
                       <span class="stat-value">{{ dept.resolvedTickets }}</span>
                     </div>
                     <div class="stat-row">
@@ -410,9 +431,14 @@
                     </div>
                     <div class="stat-row">
                       <span class="stat-label">Tempo Médio</span>
-                      <span class="stat-value">{{
-                        formatTimeInSeconds(dept.averageResolutionTimeSeconds)
-                      }}</span>
+                      <span class="stat-value">{{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}</span>
+                    </div>
+                    <div class="stat-row progress-row">
+                      <span class="stat-label">Progresso</span>
+                      <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" :style="{ width: (dept.resolutionRate * 100) + '%', background: dept.resolutionRate > 0.7 ? '#22c55e' : dept.resolutionRate > 0.4 ? '#eab308' : '#ef4444' }"></div>
+                      </div>
+                      <span class="progress-value">{{ formatPercentage(dept.resolutionRate) }}</span>
                     </div>
                   </div>
                 </div>
@@ -592,29 +618,37 @@
                     <div
                       v-for="dept in departmentStats"
                       :key="dept.departmentId"
-                      class="department-card"
+                      class="department-card department-card-modern"
                     >
-                      <h4 class="department-title">{{ dept.departmentName }}</h4>
+                      <div class="department-card-header">
+                        <div class="department-icon" :style="{ background: '#2563eb20', color: '#2563eb' }">
+                          <font-awesome-icon icon="building" />
+                        </div>
+                        <h4 class="department-title">{{ dept.departmentName }}</h4>
+                      </div>
                       <div class="department-stats">
                         <div class="stat-row">
                           <span class="stat-label">Total de Chamados</span>
                           <span class="stat-value">{{ dept.totalTickets }}</span>
                         </div>
                         <div class="stat-row">
-                          <span class="stat-label">Chamados Resolvidos</span>
+                          <span class="stat-label">Resolvidos</span>
                           <span class="stat-value">{{ dept.resolvedTickets }}</span>
                         </div>
                         <div class="stat-row">
                           <span class="stat-label">Taxa de Resolução</span>
-                          <span class="stat-value">{{
-                            formatPercentage(dept.resolutionRate)
-                          }}</span>
+                          <span class="stat-value">{{ formatPercentage(dept.resolutionRate) }}</span>
                         </div>
                         <div class="stat-row">
                           <span class="stat-label">Tempo Médio</span>
-                          <span class="stat-value">{{
-                            formatTimeInSeconds(dept.averageResolutionTimeSeconds)
-                          }}</span>
+                          <span class="stat-value">{{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}</span>
+                        </div>
+                        <div class="stat-row progress-row">
+                          <span class="stat-label">Progresso</span>
+                          <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" :style="{ width: (dept.resolutionRate * 100) + '%', background: dept.resolutionRate > 0.7 ? '#22c55e' : dept.resolutionRate > 0.4 ? '#eab308' : '#ef4444' }"></div>
+                          </div>
+                          <span class="progress-value">{{ formatPercentage(dept.resolutionRate) }}</span>
                         </div>
                       </div>
                     </div>
@@ -728,7 +762,7 @@
                       <Line
                         v-if="trendData && trendData.length > 0 && trendChartData"
                         :data="trendChartData"
-                        :options="chartOptions"
+                        :options="trendChartOptions"
                       />
                       <div v-else class="loading-state">
                         <font-awesome-icon icon="spinner" spin class="loading-icon" />
@@ -1010,7 +1044,7 @@ import {
   RadialLinearScale,
   Filler,
 } from 'chart.js';
-import { Line, Bar, Pie } from 'vue-chartjs';
+import { Line, Doughnut } from 'vue-chartjs';
 import { formatDate, formatDateToPortuguese } from '@/utils/date';
 import { reportService } from '@/services/reportService';
 import { ticketService } from '@/services/ticketService';
@@ -1028,6 +1062,8 @@ import {
   formatTimeCompact,
   formatTimeInSeconds,
 } from '@/utils/generic-helper';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+ChartJS.register(ChartDataLabels);
 //import type { TicketStatus, TicketPriority } from '@/models';
 
 // Define the StatsPeriod enum
@@ -1071,7 +1107,8 @@ const chartOptions = {
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      position: 'bottom' as const,
+      display: false,
+      position: 'bottom',
       labels: {
         usePointStyle: true,
         padding: 20,
@@ -1099,11 +1136,49 @@ const chartOptions = {
         },
       },
     },
+    datalabels: {
+      color: '#fff',
+      font: {
+        weight: 'bold',
+        size: 14,
+      },
+      formatter: (value, context) => {
+        const data = context.chart.data.datasets[0].data;
+        const total = data.reduce((a, b) => a + b, 0);
+        const percent = ((value / total) * 100).toFixed(0);
+        return percent > 0 ? percent + '%' : '';
+      },
+    },
   },
   scales: {
     x: {
-      grid: {
-        display: false,
+      display: false, // Mantém os eixos ocultos nos outros gráficos
+    },
+    y: {
+      display: false,
+    },
+  },
+};
+
+// Opções específicas para o gráfico Criados vs Concluídos
+const createdVsCompletedChartOptions = {
+  ...chartOptions,
+  plugins: {
+    ...chartOptions.plugins,
+    datalabels: {
+      display: false, // Não exibe percentuais neste gráfico
+    },
+  },
+  scales: {
+    x: {
+      display: true,
+      title: {
+        display: true,
+        text: 'Período',
+        font: {
+          size: 14,
+          weight: 'bold',
+        },
       },
       ticks: {
         font: {
@@ -1112,15 +1187,68 @@ const chartOptions = {
       },
     },
     y: {
+      display: true,
+      title: {
+        display: true,
+        text: 'Quantidade de Tickets',
+        font: {
+          size: 14,
+          weight: 'bold',
+        },
+      },
       beginAtZero: true,
-      grid: {
-        color: '#f3f4f6',
+      ticks: {
+        stepSize: 1,
+        font: {
+          size: 12,
+        },
+      },
+    },
+  },
+};
+
+// Opções específicas para o gráfico de Tendências
+const trendChartOptions = {
+  ...chartOptions,
+  plugins: {
+    ...chartOptions.plugins,
+    datalabels: {
+      display: false, // Não exibe percentuais neste gráfico
+    },
+  },
+  scales: {
+    x: {
+      display: true,
+      title: {
+        display: true,
+        text: 'Período',
+        font: {
+          size: 14,
+          weight: 'bold',
+        },
       },
       ticks: {
         font: {
           size: 12,
         },
+      },
+    },
+    y: {
+      display: true,
+      title: {
+        display: true,
+        text: 'Quantidade de Tickets',
+        font: {
+          size: 14,
+          weight: 'bold',
+        },
+      },
+      beginAtZero: true,
+      ticks: {
         stepSize: 1,
+        font: {
+          size: 12,
+        },
       },
     },
   },
@@ -1204,21 +1332,44 @@ const loadData = async () => {
 
     // Transform status data from API into ChartData format
     ticketsByStatus.value = {
-      labels: statusResult.statusCounts.map((item: { status: string; count: number }) => {
-        // Map enum values to readable text
-        const statusLabels: Record<string, string> = {
-          pendente: 'Pendente',
-          em_andamento: 'Em andamento',
-          finalizado: 'Finalizado',
-          cancelado: 'Cancelado',
-          devolvido: 'Devolvido',
-          aguardando_verificação: 'Aguardando Verificação',
-          em_verificação: 'Em Verificação',
-          reprovado: 'Reprovado',
-        };
-        return statusLabels[item.status] || item.status;
-      }),
-      data: statusResult.statusCounts.map((item: { status: string; count: number }) => item.count),
+      labels: statusResult.statusCounts
+        .filter((item: { status: string }) =>
+          [
+            'pendente',
+            'em_andamento',
+            'aguardando_verificação',
+            'em_verificação',
+            'finalizado',
+            'cancelado',
+            'reprovado',
+          ].includes(item.status),
+        )
+        .map((item: { status: string }) => {
+          // Map enum values to readable text
+          const statusLabels: Record<string, string> = {
+            pendente: 'Pendente',
+            em_andamento: 'Em andamento',
+            aguardando_verificação: 'Aguardando Verificação',
+            em_verificação: 'Em Verificação',
+            finalizado: 'Finalizado',
+            cancelado: 'Cancelado',
+            reprovado: 'Reprovado',
+          };
+          return statusLabels[item.status] || item.status;
+        }),
+      data: statusResult.statusCounts
+        .filter((item: { status: string }) =>
+          [
+            'pendente',
+            'em_andamento',
+            'aguardando_verificação',
+            'em_verificação',
+            'finalizado',
+            'cancelado',
+            'reprovado',
+          ].includes(item.status),
+        )
+        .map((item: { status: string; count: number }) => item.count),
     };
 
     // Transform priority data from API into ChartData format
@@ -1317,14 +1468,13 @@ const statusChartData = computed(() => ({
     {
       data: ticketsByStatus.value.data,
       backgroundColor: [
-        '#2563eb',
-        '#eab308',
-        '#09f1f9',
-        '#9333ea',
-        '#22c55e',
-        '#f21010',
-        '#631818',
-        '#fc7405',
+        '#eab308', // Pendente (amarelo)
+        '#2563eb', // Em andamento (azul)
+        '#d8b4fe', // Aguardando Verificação (roxo claro)
+        '#9333ea', // Em Verificação (roxo escuro)
+        '#2ecc71', // Finalizado (verde)
+        '#f87171', // Cancelado (vermelho claro)
+        '#c62828', // Reprovado (vermelho escuro)
       ],
       borderWidth: 0,
     },
@@ -1337,7 +1487,11 @@ const priorityChartData = computed(() => ({
     {
       label: 'Quantidade de Tickets',
       data: ticketsByPriority.value.data,
-      backgroundColor: ['#ef4444', '#eab308', '#2563eb'],
+      backgroundColor: [
+        '#22c55e', // Baixa (verde)
+        '#eab308', // Média (amarelo)
+        '#ef4444', // Alta (vermelho)
+      ],
       borderWidth: 0,
     },
   ],
@@ -1351,7 +1505,7 @@ const trendChartData = computed(() => {
   if (!trendData.value || trendData.value.length === 0) return null;
 
   return {
-    labels: trendData.value.map((item) => formatDateToPortuguese(item.date)),
+    labels: trendData.value.map((item) => formatDateDDMM(item.date)),
     datasets: [
       {
         label: 'Total de Chamados',
@@ -1409,7 +1563,7 @@ const createdVsCompletedChartData = computed(() => {
   }
 
   return {
-    labels: trendData.value.map((item) => formatDateToPortuguese(item.date)),
+    labels: trendData.value.map((item) => formatDateDDMM(item.date)),
     datasets: [
       {
         label: 'Concluídos (no período)',
@@ -1708,6 +1862,14 @@ const firstDate = computed(() => {
   if (!trendData.value || trendData.value.length === 0) return '';
   return formatDateToPortuguese(trendData.value[0].date);
 });
+
+// Função utilitária para formatar data como DD/MM
+function formatDateDDMM(dateStr: string) {
+  const date = new Date(dateStr);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}`;
+}
 </script>
 
 <style scoped>
@@ -3478,5 +3640,95 @@ const firstDate = computed(() => {
   outline: none;
   border-color: #2563eb;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.status-chart-flex {
+  display: flex;
+  flex-direction: column;
+}
+.status-chart-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center; /* Centraliza horizontalmente o conteúdo (gráfico + legenda) */
+}
+.status-custom-legend {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 2rem;
+  min-width: 140px;
+}
+.status-custom-legend .legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.95em;
+}
+.status-custom-legend .legend-color {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+.status-custom-legend .legend-label {
+  color: #374151;
+  font-weight: 500;
+}
+
+.department-card-modern {
+  box-shadow: 0 2px 8px 0 rgba(37,99,235,0.07);
+  border: 1px solid #e5e7eb;
+  transition: box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+  padding-top: 1.25rem;
+}
+.department-card-modern:hover {
+  box-shadow: 0 4px 16px 0 rgba(37,99,235,0.13);
+}
+.department-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.department-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background: #2563eb20;
+  color: #2563eb;
+}
+.progress-row {
+  align-items: center;
+  gap: 0.5rem;
+}
+.progress-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  margin: 0 0.5rem;
+  overflow: hidden;
+  min-width: 60px;
+  max-width: 120px;
+  display: inline-block;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s;
+}
+.progress-value {
+  font-size: 0.85em;
+  color: #374151;
+  min-width: 40px;
+  text-align: right;
 }
 </style>

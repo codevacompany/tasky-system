@@ -6,7 +6,8 @@
           <tr>
             <th>ID</th>
             <th>Título</th>
-            <th>Solicitante</th>
+            <th v-if="tableType === 'criados'">Destino</th>
+            <th v-else>Solicitante</th>
             <th>Setor</th>
             <th>Prioridade</th>
             <th>Status</th>
@@ -40,7 +41,12 @@
                 title="Ticket Privado"
               />
             </td>
-            <td>{{ ticket.requester.firstName }} {{ ticket.requester.lastName }}</td>
+            <td v-if="tableType === 'criados'">
+              {{ ticket.targetUser ? ticket.targetUser.firstName + ' ' + ticket.targetUser.lastName : '-' }}
+            </td>
+            <td v-else>
+              {{ ticket.requester.firstName }} {{ ticket.requester.lastName }}
+            </td>
             <td>{{ ticket.department.name }}</td>
             <td>
               <div class="priority-wrapper">
@@ -388,9 +394,8 @@ const getStatusClass = (status: string) => {
     case TicketStatus.InProgress:
       return 'status-in-progress';
     case TicketStatus.AwaitingVerification:
-      return 'status-awaiting-verification';
     case TicketStatus.UnderVerification:
-      return 'status-under-verification';
+      return 'status-awaiting-verification';
     case TicketStatus.Completed:
       return 'status-completed';
     case TicketStatus.Rejected:
