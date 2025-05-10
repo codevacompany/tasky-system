@@ -1,0 +1,58 @@
+<svg width="500" height="350" viewBox="0 0 500 350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="500" height="350" rx="8" fill="#F8FAFF"/>
+  
+  <!-- Stats Dashboard -->
+  <rect x="50" y="40" width="400" height="270" rx="6" fill="white" stroke="#E0E6FF" stroke-width="2"/>
+  
+  <!-- Header -->
+  <rect x="50" y="40" width="400" height="40" rx="6" fill="#4963EB"/>
+  <text x="70" y="65" font-family="Arial" font-size="14" font-weight="bold" fill="white">Dashboard de Métricas</text>
+  <circle cx="430" cy="60" r="8" fill="white" fill-opacity="0.3"/>
+  <circle cx="405" cy="60" r="8" fill="white" fill-opacity="0.3"/>
+  
+  <!-- Stat Cards -->
+  <rect x="65" y="95" width="110" height="70" rx="4" fill="#F0F4FF"/>
+  <text x="80" y="115" font-family="Arial" font-size="10" fill="#6B7280">Tarefas Concluídas</text>
+  <text x="80" y="145" font-family="Arial" font-size="24" font-weight="bold" fill="#4963EB">127</text>
+  <text x="110" y="155" font-family="Arial" font-size="10" fill="#1FBB87">+12% ↑</text>
+  
+  <rect x="190" y="95" width="110" height="70" rx="4" fill="#F0F4FF"/>
+  <text x="205" y="115" font-family="Arial" font-size="10" fill="#6B7280">Produtividade</text>
+  <text x="205" y="145" font-family="Arial" font-size="24" font-weight="bold" fill="#4963EB">89%</text>
+  <text x="235" y="155" font-family="Arial" font-size="10" fill="#1FBB87">+5% ↑</text>
+  
+  <rect x="315" y="95" width="110" height="70" rx="4" fill="#F0F4FF"/>
+  <text x="330" y="115" font-family="Arial" font-size="10" fill="#6B7280">Tempo Médio</text>
+  <text x="330" y="145" font-family="Arial" font-size="24" font-weight="bold" fill="#4963EB">3.2h</text>
+  <text x="360" y="155" font-family="Arial" font-size="10" fill="#E74C3C">+0.5h ↑</text>
+  
+  <!-- Chart Headers -->
+  <text x="70" y="190" font-family="Arial" font-size="12" font-weight="bold" fill="#1A2233">Produtividade por Equipe</text>
+  
+  <!-- Chart -->
+  <rect x="65" y="200" width="370" height="90" rx="4" fill="#F7F9FF" stroke="#E0E6FF" stroke-width="1"/>
+  
+  <!-- Horizontal Lines -->
+  <line x1="65" y1="225" x2="435" y2="225" stroke="#E0E6FF" stroke-width="1"/>
+  <line x1="65" y1="250" x2="435" y2="250" stroke="#E0E6FF" stroke-width="1"/>
+  <line x1="65" y1="275" x2="435" y2="275" stroke="#E0E6FF" stroke-width="1"/>
+  
+  <!-- Bars -->
+  <rect x="90" y="210" width="30" height="80" rx="2" fill="#4963EB" fill-opacity="0.7"/>
+  <rect x="140" y="230" width="30" height="60" rx="2" fill="#4963EB" fill-opacity="0.7"/>
+  <rect x="190" y="240" width="30" height="50" rx="2" fill="#4963EB" fill-opacity="0.7"/>
+  <rect x="240" y="220" width="30" height="70" rx="2" fill="#4963EB" fill-opacity="0.7"/>
+  <rect x="290" y="200" width="30" height="90" rx="2" fill="#4963EB" fill-opacity="0.7"/>
+  <rect x="340" y="225" width="30" height="65" rx="2" fill="#4963EB" fill-opacity="0.7"/>
+  <rect x="390" y="245" width="30" height="45" rx="2" fill="#4963EB" fill-opacity="0.7"/>
+  
+  <!-- X-Axis Labels -->
+  <text x="105" y="295" font-family="Arial" font-size="8" fill="#6B7280" text-anchor="middle">SEG</text>
+  <text x="155" y="295" font-family="Arial" font-size="8" fill="#6B7280" text-anchor="middle">TER</text>
+  <text x="205" y="295" font-family="Arial" font-size="8" fill="#6B7280" text-anchor="middle">QUA</text>
+  <text x="255" y="295" font-family="Arial" font-size="8" fill="#6B7280" text-anchor="middle">QUI</text>
+  <text x="305" y="295" font-family="Arial" font-size="8" fill="#6B7280" text-anchor="middle">SEX</text>
+  <text x="355" y="295" font-family="Arial" font-size="8" fill="#6B7280" text-anchor="middle">SAB</text>
+  <text x="405" y="295" font-family="Arial" font-size="8" fill="#6B7280" text-anchor="middle">DOM</text>
+</svg> 

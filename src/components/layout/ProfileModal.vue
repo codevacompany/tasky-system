@@ -1,14 +1,12 @@
 <template>
   <Teleport to="body">
-    <!-- Backdrop -->
     <div v-if="showProfileModal" class="backdrop" @click="closeModal"></div>
-
-    <!-- Profile Modal/Dropdown -->
     <div v-if="showProfileModal" class="profile-dropdown" id="profileModal" @click.stop>
-      <!-- Modal content -->
       <div class="modal-content">
         <div class="modal-header">
-          <h2>Meu Perfil</h2>
+          <h2 style="display: flex; align-items: center; gap: 8px">
+            Meu Perfil
+          </h2>
           <button class="close-btn" @click="closeModal">×</button>
         </div>
         <div class="modal-body">
@@ -24,10 +22,14 @@
           </div>
 
           <div class="form-actions">
+            <router-link
+              to="/faq"
+            >
             <button type="button" class="btn btn-secondary" @click="openSupport">
               <font-awesome-icon icon="question-circle" />
               Ajuda
             </button>
+            </router-link>
             <button type="button" id="logoutBtn" class="btn btn-danger" @click="logout">
               <font-awesome-icon icon="sign-out-alt" />
               Sair

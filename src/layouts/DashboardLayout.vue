@@ -3,7 +3,11 @@
     <div class="admin-layout">
       <header class="main-header">
         <div class="header-logo">
-          <img src="@/assets/images/tasky.png" alt="Tasky Logo" class="logo" />
+          <img
+            :src="darkMode ? taskyWhiteLogo : taskyLogo"
+            alt="Tasky Logo"
+            class="logo"
+          />
         </div>
 
         <div class="header-nav">
@@ -134,6 +138,8 @@ import { useRoute } from 'vue-router';
 import { notificationService } from '@/services/notificationService';
 import { toast } from 'vue3-toastify';
 import { RoleName } from '@/models';
+import taskyLogo from '@/assets/images/tasky.png';
+import taskyWhiteLogo from '@/assets/images/tasky-white-large.png';
 
 const user = useUserStore().user;
 const route = useRoute();
@@ -144,6 +150,8 @@ const showNotificationsModal = ref(false);
 const unreadCount = ref<number | undefined>(undefined);
 let intervalId: number | null = null;
 // let source: EventSource | null = null;
+
+const darkMode = ref(localStorage.getItem('theme') === 'dark');
 
 const fetchUnreadCount = async () => {
   try {
@@ -175,8 +183,9 @@ const toggleNotificationsModal = () => {
 };
 
 const toggleDarkMode = () => {
-  const isDarkMode = document.body.classList.toggle('dark-mode');
-  localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  darkMode.value = !darkMode.value;
+  document.body.classList.toggle('dark-mode', darkMode.value);
+  localStorage.setItem('theme', darkMode.value ? 'dark' : 'light');
 };
 
 const isActive = (path: string) => route.path === path;
@@ -198,6 +207,11 @@ function playNotificationSound() {
 onMounted(fetchUnreadCount);
 
 onMounted(() => {
+  // Sincroniza o estado inicial do modo escuro
+  if (darkMode.value) {
+    document.body.classList.add('dark-mode');
+  }
+
   //let's use a polling strategy for now
   intervalId = setInterval(() => {
     fetchUnreadCount();
@@ -254,6 +268,11 @@ onUnmounted(() => {
   z-index: 100;
 }
 
+body.dark-mode .main-header {
+  background-color: #1a2233;
+  border-bottom: 1px solid #2d3446;
+}
+
 .header-nav {
   flex: 1;
   margin-left: 1rem;
@@ -275,7 +294,7 @@ onUnmounted(() => {
 
 .main-nav ul li div:hover,
 .main-nav ul li div.active {
-  background-color: var(--button-primary-color);
+  background: var(--button-primary-color);
   color: #f8f9fa;
 }
 
@@ -357,12 +376,17 @@ body.dark-mode .theme-toggle {
 }
 
 .header-logo .logo {
+  width: 70px;
   height: 70px;
-  width: auto;
   display: block;
   margin: 0 auto;
   position: relative;
   top: 7px;
+  object-fit: contain;
+}
+
+body.dark-mode .header-logo {
+  background-color: #111827;
 }
 
 .header-logo .logo-text {
@@ -372,10 +396,6 @@ body.dark-mode .theme-toggle {
 }
 
 /* Cores inversas para o modo escuro */
-body.dark-mode .header-logo {
-  background-color: #2d3446;
-}
-
 body.dark-mode .header-logo .logo-text {
   color: #f8f9fa;
 }

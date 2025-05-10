@@ -1,0 +1,61 @@
+<svg width="500" height="350" viewBox="0 0 500 350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="500" height="350" rx="8" fill="#F8FAFF"/>
+  
+  <!-- Collaboration Board -->
+  <rect x="65" y="50" width="370" height="250" rx="6" fill="white" stroke="#E0E6FF" stroke-width="2"/>
+  
+  <!-- Header -->
+  <rect x="65" y="50" width="370" height="40" rx="6" fill="#4963EB"/>
+  <text x="85" y="75" font-family="Arial" font-size="14" font-weight="bold" fill="white">Colaboração em Tempo Real</text>
+  <circle cx="415" cy="70" r="8" fill="white" fill-opacity="0.3"/>
+  <circle cx="390" cy="70" r="8" fill="white" fill-opacity="0.3"/>
+  
+  <!-- Document Section -->
+  <rect x="80" y="105" width="340" height="90" rx="4" fill="#F7F9FF"/>
+  <text x="95" y="130" font-family="Arial" font-size="12" font-weight="bold" fill="#1A2233">Planejamento Estratégico Q3</text>
+  
+  <rect x="95" y="145" width="310" height="40" rx="2" fill="#F0F4FF"/>
+  <text x="105" y="165" font-family="Arial" font-size="10" fill="#1A2233">Atualização dos objetivos da equipe para o próximo trimestre.</text>
+  <text x="105" y="180" font-family="Arial" font-size="10" fill="#1A2233">Incluir métricas de performance e distribuição de tarefas.</text>
+  
+  <!-- Comments Section -->
+  <rect x="80" y="200" width="340" height="85" rx="4" fill="#F7F9FF"/>
+  <text x="95" y="220" font-family="Arial" font-size="10" fill="#6B7280">Comentários</text>
+  
+  <rect x="95" y="230" width="250" height="45" rx="4" fill="#E9F3FF" stroke="#C9DEFF" stroke-width="1"/>
+  
+  <!-- Avatar -->
+  <circle cx="115" cy="245" r="12" fill="#6D83EB"/>
+  <text x="115" y="249" font-family="Arial" font-size="10" font-weight="bold" fill="white" text-anchor="middle">MR</text>
+  
+  <!-- Comment Content -->
+  <text x="135" y="245" font-family="Arial" font-size="10" font-weight="bold" fill="#1A2233">Maria Rodrigues</text>
+  <text x="220" y="245" font-family="Arial" font-size="8" fill="#6B7280">Há 2 horas</text>
+  <text x="135" y="260" font-family="Arial" font-size="10" fill="#1A2233">Sugiro incluirmos uma análise dos resultados do Q2</text>
+  <text x="135" y="270" font-family="Arial" font-size="10" fill="#1A2233">para comparar a evolução das métricas.</text>
+  
+  <!-- User Activity -->
+  <rect x="80" y="290" width="340" height="30" rx="4" fill="#F0F4FF"/>
+  <text x="95" y="310" font-family="Arial" font-size="10" fill="#6B7280">Colaboradores ativos:</text>
+  
+  <!-- User Avatars -->
+  <circle cx="210" cy="305" r="10" fill="#4963EB"/>
+  <text x="210" y="309" font-family="Arial" font-size="9" font-weight="bold" fill="white" text-anchor="middle">AR</text>
+  
+  <circle cx="230" cy="305" r="10" fill="#1FBB87"/>
+  <text x="230" y="309" font-family="Arial" font-size="9" font-weight="bold" fill="white" text-anchor="middle">JL</text>
+  
+  <circle cx="250" cy="305" r="10" fill="#F5A623"/>
+  <text x="250" y="309" font-family="Arial" font-size="9" font-weight="bold" fill="white" text-anchor="middle">CS</text>
+  
+  <circle cx="270" cy="305" r="10" fill="#6D83EB"/>
+  <text x="270" y="309" font-family="Arial" font-size="9" font-weight="bold" fill="white" text-anchor="middle">MR</text>
+  
+  <circle cx="290" cy="305" r="10" fill="#E74C3C"/>
+  <text x="290" y="309" font-family="Arial" font-size="9" font-weight="bold" fill="white" text-anchor="middle">PG</text>
+  
+  <!-- Add Button -->
+  <rect x="380" y="230" width="30" height="30" rx="15" fill="#4963EB"/>
+  <text x="395" y="245" font-family="Arial" font-size="16" font-weight="bold" fill="white" text-anchor="middle">+</text>
+</svg> 

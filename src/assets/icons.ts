@@ -60,10 +60,23 @@ import {
   faWrench,
   faBan,
   faFile,
-  faPaperclip
+  faPaperclip,
+  faTable,
+  faColumns,
+  faClockRotateLeft,
+  faTicketAlt,
+  faUsers as faUsersSolid,
+  faChartLine as faChartLineSolid,
+  faBell as faBellSolid,
+  faTasks,
+  faThumbsUp,
+  faInfoCircle
 } from '@fortawesome/free-solid-svg-icons';
 
-import { faBell as faBellRegular, faClock as faClockRegular } from '@fortawesome/free-regular-svg-icons';
+import {
+  faBell as faBellRegular,
+  faClock as faClockRegular,
+} from '@fortawesome/free-regular-svg-icons';
 
 const icons = [
   faHome,
@@ -129,7 +142,17 @@ const icons = [
   faWrench,
   faBan,
   faFile,
-  faPaperclip
+  faPaperclip,
+  faTable,
+  faColumns,
+  faClockRotateLeft,
+  faTicketAlt,
+  faUsersSolid,
+  faChartLineSolid,
+  faBellSolid,
+  faTasks,
+  faThumbsUp,
+  faInfoCircle
 ];
 
 library.add(...icons);

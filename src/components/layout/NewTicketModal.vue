@@ -1,145 +1,142 @@
 <template>
-  <div class="modal-overlay" v-if="isOpen" @click="closeModal">
-    <div class="modal-content" @click.stop>
-      <div class="modal-header">
-        <h2>Novo Ticket</h2>
-        <button class="close-btn" @click="closeModal">×</button>
+  <BaseModal :isOpen="isOpen" title="Novo Ticket" @close="closeModal">
+    <form @submit.prevent="handleSubmit" class="ticket-form">
+      <div class="form-grid">
+        <div class="form-group span-2">
+          <label for="title">Assunto: <span class="required">*</span></label>
+          <input type="text" id="title" v-model="formData.name" required />
+        </div>
+
+        <div class="form-group">
+          <label>É privado?</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" v-model="formData.isPrivate" :value="true" name="isPrivate" />
+              Sim
+            </label>
+            <label class="radio-label">
+              <input type="radio" v-model="formData.isPrivate" :value="false" name="isPrivate" />
+              Não
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="targetDepartment">Setor Destino: <span class="required">*</span></label>
+          <select
+            id="targetDepartment"
+            v-model="selectedDepartment"
+            required
+            @change="updateUsersList"
+          >
+            <option :value="null">Selecione um setor</option>
+            <option v-for="department in departments" :key="department.id" :value="department.id">
+              {{ department.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="targetUser">Usuário Destino:</label>
+          <select id="targetUser" v-model="selectedUser" :disabled="!selectedDepartment">
+            <option :value="null">Selecione um setor primeiro</option>
+            <option v-for="user in availableUsers" :key="user.id" :value="user.id">
+              {{ user.firstName }} {{ user.lastName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Categoria: <span class="required">*</span></label>
+          <select id="category" v-model="selectedCategory" required>
+            <option :value="null">Selecione uma categoria</option>
+            <option v-for="category in categories" :key="category.id" :value="category.id">
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Prioridade: <span class="required">*</span></label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input
+                type="radio"
+                v-model="formData.priority"
+                :value="TicketPriority.Low"
+                name="priority"
+                required
+              />
+              {{ formatSnakeToNaturalCase(TicketPriority.Low) }}
+            </label>
+            <label class="radio-label">
+              <input
+                type="radio"
+                v-model="formData.priority"
+                :value="TicketPriority.Medium"
+                name="priority"
+              />
+              {{ formatSnakeToNaturalCase(TicketPriority.Medium) }}
+            </label>
+            <label class="radio-label">
+              <input
+                type="radio"
+                v-model="formData.priority"
+                :value="TicketPriority.High"
+                name="priority"
+              />
+              {{ formatSnakeToNaturalCase(TicketPriority.High) }}
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="dueAt">Concluir até:</label>
+          <input type="datetime-local" id="dueAt" v-model="formData.dueAt" />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="description">Descrição: <span class="required">*</span></label>
+          <div class="quill-wrapper">
+            <QuillEditor
+              v-model:content="formData.description"
+              contentType="html"
+              theme="snow"
+              :options="editorOptions"
+            />
+          </div>
+          <textarea
+            class="hidden"
+            id="description"
+            v-model="formData.description"
+            required
+            rows="4"
+          ></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label class="file-upload-label" for="fileUpload">
+            <font-awesome-icon icon="paperclip" /> Anexar Arquivos</label
+          >
+          <input class="hidden" type="file" id="fileUpload" multiple @change="handleFileChange" />
+          <ul v-if="selectedFiles.length">
+            <li
+              v-for="(file, i) in selectedFiles"
+              :key="i"
+              style="display: flex; margin-bottom: 4px"
+            >
+              <font-awesome-icon icon="file" style="margin-right: 5px" />
+              <p style="font-size: 14px">{{ file.name }}</p>
+            </li>
+          </ul>
+        </div>
       </div>
 
-      <form @submit.prevent="handleSubmit" class="ticket-form">
-        <div class="form-grid">
-          <div class="form-group span-2">
-            <label for="title">Assunto: <span class="required">*</span></label>
-            <input type="text" id="title" v-model="formData.name" required />
-          </div>
-
-          <div class="form-group">
-            <label>É privado?</label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" v-model="formData.isPrivate" :value="true" name="isPrivate" />
-                Sim
-              </label>
-              <label class="radio-label">
-                <input type="radio" v-model="formData.isPrivate" :value="false" name="isPrivate" />
-                Não
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="targetDepartment">Setor Destino: <span class="required">*</span></label>
-            <select
-              id="targetDepartment"
-              v-model="selectedDepartment"
-              required
-              @change="updateUsersList"
-            >
-              <option :value="null">Selecione um setor</option>
-              <option v-for="department in departments" :key="department.id" :value="department.id">
-                {{ department.name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="targetUser">Usuário Destino:</label>
-            <select id="targetUser" v-model="selectedUser" :disabled="!selectedDepartment">
-              <option :value="null">Selecione um setor primeiro</option>
-              <option v-for="user in availableUsers" :key="user.id" :value="user.id">
-                {{ user.firstName }} {{ user.lastName }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="category">Categoria: <span class="required">*</span></label>
-            <select id="category" v-model="selectedCategory" required>
-              <option :value="null">Selecione uma categoria</option>
-              <option v-for="category in categories" :key="category.id" :value="category.id">
-                {{ category.name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Prioridade: <span class="required">*</span></label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input
-                  type="radio"
-                  v-model="formData.priority"
-                  :value="TicketPriority.Low"
-                  name="priority"
-                  required
-                />
-                {{ formatSnakeToNaturalCase(TicketPriority.Low) }}
-              </label>
-              <label class="radio-label">
-                <input
-                  type="radio"
-                  v-model="formData.priority"
-                  :value="TicketPriority.Medium"
-                  name="priority"
-                />
-                {{ formatSnakeToNaturalCase(TicketPriority.Medium) }}
-              </label>
-              <label class="radio-label">
-                <input
-                  type="radio"
-                  v-model="formData.priority"
-                  :value="TicketPriority.High"
-                  name="priority"
-                />
-                {{ formatSnakeToNaturalCase(TicketPriority.High) }}
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="dueAt">Concluir até:</label>
-            <input type="datetime-local" id="dueAt" v-model="formData.dueAt" />
-          </div>
-
-          <div class="form-group full-width">
-            <label for="description">Descrição: <span class="required">*</span></label>
-            <div class="quill-wrapper">
-              <QuillEditor
-                v-model:content="formData.description"
-                contentType="html"
-                theme="snow"
-                :options="editorOptions"
-              />
-            </div>
-            <textarea
-              class="hidden"
-              id="description"
-              v-model="formData.description"
-              required
-              rows="4"
-            ></textarea>
-          </div>
-          <div class="form-group full-width">
-            <label class="file-upload-label" for="fileUpload">
-              <font-awesome-icon icon="paperclip" /> Anexar Arquivos</label
-            >
-            <input class="hidden" type="file" id="fileUpload" multiple @change="handleFileChange" />
-            <ul v-if="selectedFiles.length">
-              <li v-for="(file, i) in selectedFiles" :key="i" style="display: flex; margin-bottom: 4px;">
-                <font-awesome-icon icon="file" style="margin-right: 5px" />
-                <p style="font-size: 14px;">{{ file.name }}</p>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="form-actions">
-          <button type="button" class="btn btn-secondary" @click="resetForm">Limpar</button>
-          <button type="submit" class="btn btn-primary">Criar Ticket</button>
-        </div>
-      </form>
-    </div>
-  </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" @click="resetForm">Limpar</button>
+        <button type="submit" class="btn btn-primary">Criar Ticket</button>
+      </div>
+    </form>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
@@ -156,6 +153,7 @@ import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import axios from 'axios';
 import { awsService } from '@/services/awsService';
+import BaseModal from '@/components/common/BaseModal.vue';
 
 defineProps<{
   isOpen: boolean;
@@ -227,7 +225,9 @@ const updateUsersList = async () => {
     return;
   }
   try {
-    const response = await userService.getByDepartment(selectedDepartment.value);
+    const response = await userService.getByDepartment(selectedDepartment.value, {
+      limit: 100,
+    });
     availableUsers.value = response.data.items;
   } catch {
     toast.error('Erro ao carregar usuários. Tente novamente.');
@@ -375,68 +375,8 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: #fff;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 900px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background: #1a2233;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-}
-
-.modal-header h2 {
-  font-size: 16px;
-  font-weight: 500;
-  color: #ffffff;
-  margin: 0;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  color: #ffffff;
-  cursor: pointer;
-  font-size: 24px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-}
-
-.close-btn:hover {
-  opacity: 1;
-}
-
 .ticket-form {
-  padding: 24px;
+  width: 100%;
 }
 
 .form-grid {
@@ -575,15 +515,11 @@ textarea {
   margin-bottom: 6px;
 }
 
+.file-upload-label:hover {
+  cursor: pointer;
+}
+
 /* Dark mode */
-:deep(body.dark-mode) .modal-content {
-  background: #141b2a;
-}
-
-:deep(body.dark-mode) .modal-header {
-  background: #1a2233;
-}
-
 :deep(body.dark-mode) label {
   color: #e2e8f0;
 }

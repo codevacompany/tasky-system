@@ -298,7 +298,7 @@ import { toast } from 'vue3-toastify';
 import ConfirmationModal from '../common/ConfirmationModal.vue';
 import { useUserStore } from '@/stores/user';
 import BaseModal from '../common/BaseModal.vue';
-import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import { calculateDeadline, formatSnakeToNaturalCase } from '@/utils/generic-helper';
 
 const props = defineProps<{
   tickets: Ticket[];
@@ -349,31 +349,6 @@ const refreshSelectedTicket = async () => {
 const closeModal = () => {
   isModalOpen.value = false;
   selectedTicket.value = null;
-};
-
-const calculateDeadline = (ticket: Ticket) => {
-  if (!ticket.dueAt) return '—';
-
-  // Se o status não for Pendente ou Em Andamento, retorna traço
-  if (ticket.status !== TicketStatus.Pending && ticket.status !== TicketStatus.InProgress) {
-    return '—';
-  }
-
-  const deadline = new Date(ticket.dueAt);
-  const today = new Date();
-
-  // Reset hours to compare just dates
-  deadline.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
-
-  const diffTime = deadline.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 0) {
-    return 'Atrasado';
-  }
-
-  return `${diffDays} dias restantes`;
 };
 
 const getDeadlineClass = (date?: string) => {

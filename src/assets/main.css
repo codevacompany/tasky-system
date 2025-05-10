@@ -17,6 +17,12 @@
   --primary-color: rgb(var(--primary-rgb));
   --primary-dark: rgb(51, 78, 194);
   --primary-light: rgb(108, 134, 242);
+  --secondary-dark-color: #00143b; /* Solid color for backgrounds */
+  --secondary-dark: linear-gradient(
+    135deg,
+    #00143b 0%,
+    #142046 100%
+  ); /* Gradient for backgrounds */
 
   --success-color: rgb(var(--success-rgb));
   --info-color: rgb(var(--info-rgb));
@@ -51,7 +57,7 @@
   --disabled-bg: #f8f9fa;
 
   /* Cores dos botões */
-  --button-primary-color: #02153b;
+  --button-primary-color: var(--secondary-dark);
   --button-secondary-color: #f5f7fa;
 
   /* Box shadows */
@@ -833,7 +839,9 @@ body.dark-mode .section-content h1 {
   padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .summary-item:hover {
@@ -1191,7 +1199,7 @@ body.dark-mode .section-header h1 {
   grid-template-columns: repeat(2, 1fr);
   gap: 15px;
 }
- .form-group {
+.form-group {
   margin-bottom: 16px;
 }
 
@@ -1325,7 +1333,7 @@ body.dark-mode label {
 }
 
 .btn-primary {
-  background-color: var(--button-primary-color);
+  background: var(--button-primary-color);
   color: #ffffff;
 }
 
@@ -1755,8 +1763,8 @@ body.dark-mode select option {
 }
 
 /* Ajustes para o campo de busca no modo escuro */
-body.dark-mode input[type="text"],
-body.dark-mode input[type="search"] {
+body.dark-mode input[type='text'],
+body.dark-mode input[type='search'] {
   background-color: #1e293b;
   border-color: #334155;
   color: #e2e8f0;
