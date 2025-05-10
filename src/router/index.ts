@@ -37,6 +37,7 @@ const routes: RouteRecordRaw[] = [
       { path: '', component: UserHome },
       { path: 'meus-tickets', component: TicketsPage },
       { path: 'faq', component: () => import('@/pages/user/FAQ.vue') },
+      { path: 'sync', component: SyncPage },
     ],
     meta: { requiresAuth: true },
   },
@@ -64,16 +65,9 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../pages/AdminDashboard.vue'),
     meta: {
       requiresAuth: true,
-      isAdmin: true
-    }
+      isAdmin: true,
+    },
   },
-
-  {
-    path: '/sync',
-    name: 'sync',
-    component: SyncPage,
-    meta: { requiresAuth: true }
-  }
 ];
 
 const router = createRouter({

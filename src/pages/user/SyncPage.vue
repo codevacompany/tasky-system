@@ -1,40 +1,13 @@
 <template>
   <div class="sync-page">
     <div class="page-content">
-      <div class="page-header">
-        <div class="header-content">
-          <div class="header-titles">
-            <div class="title-with-back">
-              <router-link to="/" class="back-button">
-                <font-awesome-icon icon="arrow-left" />
-                <span>Voltar</span>
-              </router-link>
-              <div>
-                <h1 class="header-title">Sync</h1>
-                <p class="header-subtitle">Canal de comunicação interna</p>
-              </div>
-            </div>
-          </div>
-          <div class="search-container">
-            <div class="search-box">
-              <font-awesome-icon icon="search" class="search-icon" />
-              <input
-                type="text"
-                v-model="searchTerm"
-                placeholder="Buscar mensagens..."
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Main Content -->
       <div class="sync-container">
         <!-- Sidebar -->
         <div class="sync-sidebar">
           <div class="channels">
-            <div 
-              class="channel-item" 
+            <div
+              class="channel-item"
               :class="{ active: currentChannel === 'geral' }"
               @click="currentChannel = 'geral'"
             >
@@ -44,8 +17,8 @@
                 {{ getUnreadCount('geral') }}
               </span>
             </div>
-            <div 
-              class="channel-item" 
+            <div
+              class="channel-item"
               :class="{ active: currentChannel === 'setor' }"
               @click="currentChannel = 'setor'"
             >
@@ -55,8 +28,8 @@
                 {{ getUnreadCount('setor') }}
               </span>
             </div>
-            <div 
-              class="channel-item" 
+            <div
+              class="channel-item"
               :class="{ active: currentChannel === 'individual' }"
               @click="currentChannel = 'individual'"
             >
@@ -73,16 +46,12 @@
             <div class="users-list-header">
               <h3>Usuários</h3>
               <div class="user-search">
-                <input 
-                  type="text" 
-                  v-model="userSearchTerm" 
-                  placeholder="Buscar usuário..."
-                />
+                <input type="text" v-model="userSearchTerm" placeholder="Buscar usuário..." />
               </div>
             </div>
             <div class="users-list-content">
-              <div 
-                v-for="user in filteredUsers" 
+              <div
+                v-for="user in filteredUsers"
                 :key="user.id"
                 class="user-item"
                 :class="{ active: selectedUser?.id === user.id }"
@@ -104,11 +73,11 @@
         <!-- Messages Area -->
         <div class="messages-area">
           <div class="messages-list" ref="messagesList">
-            <div 
-              v-for="message in filteredMessages" 
+            <div
+              v-for="message in filteredMessages"
               :key="message.id"
               class="message-item"
-              :class="{ 'unread': !message.read }"
+              :class="{ unread: !message.read }"
             >
               <div class="message-avatar">
                 <span class="initials">{{ getInitials(message.sender) }}</span>
@@ -116,22 +85,24 @@
               <div class="message-content">
                 <div class="message-header">
                   <div class="message-info">
-                    <span class="sender-name">{{ message.sender.firstName }} {{ message.sender.lastName }}</span>
+                    <span class="sender-name"
+                      >{{ message.sender.firstName }} {{ message.sender.lastName }}</span
+                    >
                     <span class="sender-department">{{ message.sender.department.name }}</span>
                   </div>
                   <span class="message-time">{{ formatTime(message.createdAt) }}</span>
                 </div>
                 <div class="message-text">{{ message.content }}</div>
                 <div class="message-actions">
-                  <button 
-                    v-for="reaction in message.reactions" 
+                  <button
+                    v-for="reaction in message.reactions"
                     :key="reaction.type"
                     class="reaction-btn"
-                    :class="{ 'active': reaction.active }"
+                    :class="{ active: reaction.active }"
                   >
                     {{ reaction.type }} {{ reaction.count }}
                   </button>
-                  <button class="reaction-btn add-reaction" @click="showEmojiPicker = true">
+                  <button class="reaction-btn add-reaction">
                     <font-awesome-icon icon="smile" />
                   </button>
                 </div>
@@ -170,7 +141,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useUserStore } from '@/stores/user';
-import { useRoute } from 'vue-router';
+import type { User } from '@/models';
 import { RoleName } from '@/models';
 
 // Dados mockados
@@ -179,74 +150,102 @@ const mockMessages = [
     id: '1',
     content: 'Bom dia a todos! Como estão?',
     sender: {
-      id: '1',
+      id: 1,
+      tenantId: 1,
       firstName: 'João',
       lastName: 'Silva',
-      department: { id: '1', name: 'TI' }
+      email: 'joao@example.com',
+      departmentId: 1,
+      department: { id: 1, name: 'TI', createdAt: new Date().toISOString() },
+      isActive: true,
+      role: { id: 1, name: RoleName.User, createdAt: new Date().toISOString() },
     },
     createdAt: new Date('2024-03-20T09:00:00'),
     isGeneral: true,
     read: true,
     reactions: [
       { type: '👍', count: 3, active: true },
-      { type: '❤️', count: 1, active: false }
-    ]
+      { type: '❤️', count: 1, active: false },
+    ],
   },
   {
     id: '2',
     content: 'Alguém pode me ajudar com o relatório mensal?',
     sender: {
-      id: '2',
+      id: 2,
+      tenantId: 1,
       firstName: 'Maria',
       lastName: 'Santos',
-      department: { id: '2', name: 'Financeiro' }
+      email: 'maria@example.com',
+      departmentId: 2,
+      department: { id: 2, name: 'Financeiro', createdAt: new Date().toISOString() },
+      isActive: true,
+      role: { id: 1, name: RoleName.User, createdAt: new Date().toISOString() },
     },
     createdAt: new Date('2024-03-20T09:15:00'),
     isGeneral: true,
     read: false,
-    reactions: []
+    reactions: [],
   },
   {
     id: '3',
     content: 'Reunião de equipe amanhã às 10h',
     sender: {
-      id: '3',
+      id: 3,
+      tenantId: 1,
       firstName: 'Pedro',
       lastName: 'Oliveira',
-      department: { id: '1', name: 'TI' }
+      email: 'pedro@example.com',
+      departmentId: 1,
+      department: { id: 1, name: 'TI', createdAt: new Date().toISOString() },
+      isActive: true,
+      role: { id: 1, name: RoleName.User, createdAt: new Date().toISOString() },
     },
     createdAt: new Date('2024-03-20T09:30:00'),
     isGeneral: false,
     read: false,
-    reactions: [
-      { type: '👍', count: 2, active: false }
-    ]
-  }
+    reactions: [{ type: '👍', count: 2, active: false }],
+  },
 ];
 
 // Dados mockados de usuários
 const mockUsers = [
   {
-    id: '1',
+    id: 1,
+    tenantId: 1,
     firstName: 'João',
     lastName: 'Silva',
-    department: { id: '1', name: 'TI' },
-    status: 'online'
+    email: 'joao@example.com',
+    departmentId: 1,
+    department: { id: 1, name: 'TI', createdAt: new Date().toISOString() },
+    isActive: true,
+    role: { id: 1, name: RoleName.User, createdAt: new Date().toISOString() },
+    status: 'online',
   },
   {
-    id: '2',
+    id: 2,
+    tenantId: 1,
     firstName: 'Maria',
     lastName: 'Santos',
-    department: { id: '2', name: 'Financeiro' },
-    status: 'offline'
+    email: 'maria@example.com',
+    departmentId: 2,
+    department: { id: 2, name: 'Financeiro', createdAt: new Date().toISOString() },
+    isActive: true,
+    role: { id: 1, name: RoleName.User, createdAt: new Date().toISOString() },
+    status: 'offline',
   },
   {
-    id: '3',
+    id: 3,
+    tenantId: 1,
     firstName: 'Pedro',
     lastName: 'Oliveira',
-    department: { id: '1', name: 'TI' },
-    status: 'away'
-  }
+    email: 'pedro@example.com',
+    departmentId: 1,
+    department: { id: 1, name: 'TI', createdAt: new Date().toISOString() },
+    isActive: true,
+    role: { id: 1, name: RoleName.User, createdAt: new Date().toISOString() },
+    status: 'away',
+  },
 ];
 
 const userStore = useUserStore();
@@ -256,25 +255,12 @@ const newMessage = ref('');
 const messages = ref(mockMessages);
 const messageInput = ref<HTMLTextAreaElement | null>(null);
 const userSearchTerm = ref('');
-const selectedUser = ref(null);
+const selectedUser = ref<User | null>(null);
 const users = ref(mockUsers);
-
-const route = useRoute();
-const user = useUserStore().user;
-const unreadCount = ref(0);
-
-const isActive = (path: string) => route.path === path;
-
-const userInitials = computed(() => {
-  if (user?.firstName && user?.lastName) {
-    return user.firstName.charAt(0) + user.lastName.charAt(0);
-  }
-  return '';
-});
 
 const filteredMessages = computed(() => {
   return messages.value
-    .filter(msg => {
+    .filter((msg) => {
       const isChannelMatch = currentChannel.value === 'geral' ? msg.isGeneral : !msg.isGeneral;
       const isSearchMatch = msg.content.toLowerCase().includes(searchTerm.value.toLowerCase());
       return isChannelMatch && isSearchMatch;
@@ -283,13 +269,13 @@ const filteredMessages = computed(() => {
 });
 
 const getUnreadCount = (channel: string) => {
-  return messages.value.filter(msg => {
+  return messages.value.filter((msg) => {
     const isChannelMatch = channel === 'geral' ? msg.isGeneral : !msg.isGeneral;
     return isChannelMatch && !msg.read;
   }).length;
 };
 
-const getInitials = (user: any) => {
+const getInitials = (user: User) => {
   return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
 };
 
@@ -305,7 +291,7 @@ const autoGrow = () => {
 };
 
 const sendMessage = () => {
-  if (!newMessage.value.trim()) return;
+  if (!newMessage.value.trim() || !userStore.user) return;
 
   const newMsg = {
     id: Date.now().toString(),
@@ -314,12 +300,12 @@ const sendMessage = () => {
     createdAt: new Date(),
     isGeneral: currentChannel.value === 'geral',
     read: false,
-    reactions: []
+    reactions: [],
   };
 
   messages.value.push(newMsg);
   newMessage.value = '';
-  
+
   if (messageInput.value) {
     messageInput.value.style.height = 'auto';
   }
@@ -334,7 +320,7 @@ const sendMessage = () => {
 };
 
 const filteredUsers = computed(() => {
-  return users.value.filter(user => {
+  return users.value.filter((user) => {
     const searchTerm = userSearchTerm.value.toLowerCase();
     const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
     const department = user.department.name.toLowerCase();
@@ -342,25 +328,8 @@ const filteredUsers = computed(() => {
   });
 });
 
-const selectUser = (user: any) => {
+const selectUser = (user: User) => {
   selectedUser.value = user;
-};
-
-const toggleDarkMode = () => {
-  const isDarkMode = document.body.classList.toggle('dark-mode');
-  localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-};
-
-const toggleNotificationsModal = () => {
-  // Implementar lógica de notificações
-};
-
-const toggleProfileModal = () => {
-  // Implementar lógica do modal de perfil
-};
-
-const openTicketModal = () => {
-  // Implementar lógica do modal de ticket
 };
 
 onMounted(() => {
@@ -374,101 +343,27 @@ onMounted(() => {
 
 <style scoped>
 .sync-page {
-  height: 100vh;
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
   background-color: var(--body-bg);
 }
 
 .page-content {
-  padding: 1.5rem;
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  height: 100%;
-}
-
-.page-header {
-  margin-bottom: 0.5rem;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.header-titles {
-  display: flex;
-  flex-direction: column;
-}
-
-.title-with-back {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.back-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #64748b;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-decoration: none;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.back-button:hover {
-  color: #4361ee;
-}
-
-.header-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-color);
-  margin: 0;
-}
-
-.header-subtitle {
-  color: var(--text-light);
-  margin: 0.25rem 0 0 0;
-  font-size: 0.875rem;
-}
-
-.search-container {
-  margin: 0;
-}
-
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 300px;
-  border: none;
-  background: none;
-}
-
-.search-box input {
-  width: 100%;
-  padding: 0.5rem;
-  border: none;
-  background: none;
-  outline: none;
-  color: var(--text-color);
-  font-size: 0.875rem;
-}
-
-.search-box .search-icon {
-  color: #64748b;
+  overflow: hidden;
 }
 
 .sync-container {
-  display: flex;
   flex: 1;
+  display: flex;
   gap: 1.5rem;
   background-color: var(--card-bg);
   border-radius: var(--radius);
@@ -479,6 +374,9 @@ onMounted(() => {
   width: 250px;
   border-right: 1px solid var(--border-color);
   background-color: var(--card-bg);
+  display: flex;
+  flex-direction: column;
+  padding-top: 0.8rem;
 }
 
 .channels {
@@ -486,6 +384,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  overflow-y: auto;
 }
 
 .channel-item {
@@ -645,6 +544,7 @@ onMounted(() => {
   display: flex;
   gap: 1rem;
   align-items: flex-end;
+  flex-shrink: 0;
 }
 
 .input-actions {
@@ -908,4 +808,4 @@ onMounted(() => {
     color: #4361ee;
   }
 }
-</style> 
+</style>

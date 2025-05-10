@@ -3,11 +3,7 @@
     <div class="admin-layout">
       <header class="main-header">
         <div class="header-logo">
-          <img
-            :src="darkMode ? taskyWhiteLogo : taskyLogo"
-            alt="Tasky Logo"
-            class="logo"
-          />
+          <img :src="darkMode ? taskyWhiteLogo : taskyLogo" alt="Tasky Logo" class="logo" />
         </div>
 
         <div class="header-nav">
@@ -28,7 +24,12 @@
                 </li>
               </router-link>
               <router-link to="/admin/relatorios">
-                <li v-if="user?.role.name === RoleName.GlobalAdmin || user?.role.name === RoleName.TenantAdmin">
+                <li
+                  v-if="
+                    user?.role.name === RoleName.GlobalAdmin ||
+                    user?.role.name === RoleName.TenantAdmin
+                  "
+                >
                   <div class="admin-menu-item" :class="{ active: isActive('/admin/relatorios') }">
                     <font-awesome-icon icon="chart-line" />
                     Relatórios
@@ -36,34 +37,63 @@
                 </li>
               </router-link>
 
-              <router-link to="/admin/usuarios">
-                <li v-if="user?.role.name === RoleName.GlobalAdmin || user?.role.name === RoleName.TenantAdmin">
-                  <div class="admin-menu-item" :class="{ active: isActive('/admin/usuarios') }">
-                    <font-awesome-icon icon="users" />Usuários
-                  </div>
-                </li>
-              </router-link>
-              <router-link to="/admin/setores">
-                <li v-if="user?.role.name === RoleName.GlobalAdmin || user?.role.name === RoleName.TenantAdmin">
-                  <div class="admin-menu-item" :class="{ active: isActive('/admin/setores') }">
-                    <font-awesome-icon icon="building" /> Setores
-                  </div>
-                </li>
-              </router-link>
-              <router-link to="/admin/categorias">
-                <li v-if="user?.role.name === RoleName.GlobalAdmin || user?.role.name === RoleName.TenantAdmin">
-                  <div class="admin-menu-item" :class="{ active: isActive('/admin/categorias') }">
-                    <font-awesome-icon icon="tag" /> Categorias
-                  </div>
-                </li>
-              </router-link>
-              <router-link to="/admin/clientes">
-                <li v-if="user?.role.name === RoleName.GlobalAdmin">
-                  <div class="admin-menu-item" :class="{ active: isActive('/admin/clientes') }">
-                    <font-awesome-icon icon="building" /> Clientes
-                  </div>
-                </li>
-              </router-link>
+              <li
+                v-if="
+                  user?.role.name === RoleName.GlobalAdmin ||
+                  user?.role.name === RoleName.TenantAdmin
+                "
+                class="dropdown"
+              >
+                <div
+                  class="admin-menu-item"
+                  :class="{
+                    active:
+                      isActive('/admin/usuarios') ||
+                      isActive('/admin/setores') ||
+                      isActive('/admin/categorias') ||
+                      isActive('/admin/clientes'),
+                  }"
+                  @click="toggleAdminDropdown"
+                >
+                  <font-awesome-icon icon="cog" />
+                  Administração
+                  <font-awesome-icon
+                    icon="chevron-down"
+                    class="dropdown-icon"
+                    :class="{ rotate: showAdminDropdown }"
+                  />
+                </div>
+                <div class="dropdown-menu" v-show="showAdminDropdown">
+                  <router-link to="/admin/usuarios" @click="showAdminDropdown = false">
+                    <div class="dropdown-item" :class="{ active: isActive('/admin/usuarios') }">
+                      <font-awesome-icon icon="users" />
+                      Usuários
+                    </div>
+                  </router-link>
+                  <router-link to="/admin/setores" @click="showAdminDropdown = false">
+                    <div class="dropdown-item" :class="{ active: isActive('/admin/setores') }">
+                      <font-awesome-icon icon="building" />
+                      Setores
+                    </div>
+                  </router-link>
+                  <router-link to="/admin/categorias" @click="showAdminDropdown = false">
+                    <div class="dropdown-item" :class="{ active: isActive('/admin/categorias') }">
+                      <font-awesome-icon icon="tag" />
+                      Categorias
+                    </div>
+                  </router-link>
+                  <router-link
+                    to="/admin/clientes"
+                    @click="showAdminDropdown = false"
+                    v-if="user?.role.name === RoleName.GlobalAdmin"
+                  >
+                    <div class="dropdown-item" :class="{ active: isActive('/admin/clientes') }">
+                      <font-awesome-icon icon="building" />
+                      Clientes
+                    </div>
+                  </router-link>
+                </div>
+              </li>
             </ul>
           </nav>
         </div>
@@ -76,7 +106,9 @@
 
           <div class="notification-icon" @click="toggleNotificationsModal">
             <font-awesome-icon :icon="['far', 'bell']" />
-            <span v-if="unreadCount && unreadCount > 0" class="notification-badge">{{ unreadCount }}</span>
+            <span v-if="unreadCount && unreadCount > 0" class="notification-badge">{{
+              unreadCount
+            }}</span>
           </div>
 
           <router-link to="/sync" class="sync-icon">
@@ -153,12 +185,14 @@ let intervalId: number | null = null;
 
 const darkMode = ref(localStorage.getItem('theme') === 'dark');
 
+const showAdminDropdown = ref(false);
+
 const fetchUnreadCount = async () => {
   try {
     const response = await notificationService.count();
 
     if (unreadCount.value !== undefined && response.data.count > unreadCount.value) {
-      playNotificationSound()
+      playNotificationSound();
     }
     unreadCount.value = response.data.count;
   } catch {
@@ -188,6 +222,10 @@ const toggleDarkMode = () => {
   localStorage.setItem('theme', darkMode.value ? 'dark' : 'light');
 };
 
+const toggleAdminDropdown = () => {
+  showAdminDropdown.value = !showAdminDropdown.value;
+};
+
 const isActive = (path: string) => route.path === path;
 
 const userInitials = computed(() => {
@@ -203,6 +241,14 @@ function playNotificationSound() {
     console.error('Failed to play notification sound:', err);
   });
 }
+
+// Close dropdown when clicking outside
+const handleClickOutside = (event: MouseEvent) => {
+  const dropdown = document.querySelector('.dropdown');
+  if (dropdown && !dropdown.contains(event.target as Node)) {
+    showAdminDropdown.value = false;
+  }
+};
 
 onMounted(fetchUnreadCount);
 
@@ -223,6 +269,8 @@ onMounted(() => {
   //   fetchUnreadCount();
   //   toast.info('Nova notificação recebida.');
   // };
+
+  document.addEventListener('click', handleClickOutside);
 });
 
 onUnmounted(() => {
@@ -231,6 +279,7 @@ onUnmounted(() => {
   }
 
   // source?.close();
+  document.removeEventListener('click', handleClickOutside);
 });
 </script>
 
@@ -292,8 +341,8 @@ body.dark-mode .main-header {
   gap: 8px;
 }
 
-.main-nav ul li div:hover,
-.main-nav ul li div.active {
+.main-nav ul li div:hover:not(.dropdown-menu *):not(.dropdown-menu),
+.main-nav ul li div.active:not(.dropdown-menu *):not(.dropdown-menu) {
   background: var(--button-primary-color);
   color: #f8f9fa;
 }
@@ -454,5 +503,81 @@ body.dark-mode .header-logo .logo-text {
     background-color: #1e293b;
     color: #4361ee;
   }
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown .admin-menu-item {
+  cursor: pointer;
+}
+
+.dropdown-icon {
+  margin-left: 8px;
+  transition: transform 0.2s ease;
+}
+
+.dropdown-icon.rotate {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  z-index: 1000;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-menu a {
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.dropdown-menu a:hover {
+  background-color: transparent;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.75rem 1rem;
+  color: var(--text-color);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  color: var(--primary-color);
+}
+
+.dropdown-item.active {
+  color: var(--primary-color);
+}
+
+body.dark-mode .dropdown-menu {
+  background-color: var(--card-bg-dark);
+  border-color: var(--border-color-dark);
+}
+
+body.dark-mode .dropdown-item {
+  color: var(--text-color-dark);
+}
+
+body.dark-mode .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--primary-color);
 }
 </style>
