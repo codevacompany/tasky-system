@@ -1,5 +1,5 @@
-import type { Department } from "./department";
-import type { Role } from "./role";
+import type { Department } from './department';
+import type { Role } from './role';
 
 export interface User {
   id: number;
@@ -14,7 +14,7 @@ export interface User {
 }
 
 export interface CreateUserDto {
-  tenantId?: number
+  tenantId?: number;
   firstName: string;
   lastName: string;
   email: string;

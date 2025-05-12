@@ -111,8 +111,16 @@ export const ticketService = {
     return apiClient.post(`/tickets/${id}/approve`);
   },
 
-  async cancel(id: string) {
-    return apiClient.post(`/tickets/${id}/cancel`);
+  async cancel(id: string, data?: { reason: string; details: string }) {
+    return apiClient.post(`/tickets/${id}/cancel`, data);
+  },
+
+  async reject(id: string, data?: { reason: string; details: string }) {
+    return apiClient.post(`/tickets/${id}/reject`, data);
+  },
+
+  async requestCorrection(id: string, data?: { reason: string; details: string }) {
+    return apiClient.post(`/tickets/${id}/request-correction`, data);
   },
 
   async addFiles(id: string, fileUrls: string[]): Promise<AxiosResponse<Ticket>> {
