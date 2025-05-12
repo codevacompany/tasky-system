@@ -257,7 +257,8 @@
       :isOpen="confirmationModal.isOpen"
       :title="confirmationModal.title"
       :message="confirmationModal.message"
-      :isCorrection="confirmationModal.isCorrection"
+      :hasInput="confirmationModal.hasInput"
+      :reasonOptions="confirmationModal.reasonOptions"
       @confirm="handleConfirm"
       @cancel="handleCancel"
     />
@@ -289,7 +290,7 @@
 import { ref } from 'vue';
 import type { Ticket } from '@/models';
 import { defineProps } from 'vue';
-import { TicketPriority, TicketStatus } from '@/models';
+import { TicketPriority, TicketStatus, DisapprovalReason, CorrectionReason } from '@/models';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { ticketService } from '@/services/ticketService';
@@ -298,7 +299,7 @@ import { toast } from 'vue3-toastify';
 import ConfirmationModal from '../common/ConfirmationModal.vue';
 import { useUserStore } from '@/stores/user';
 import BaseModal from '../common/BaseModal.vue';
-import { calculateDeadline, formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import { calculateDeadline, formatSnakeToNaturalCase, enumToOptions } from '@/utils/generic-helper';
 
 const props = defineProps<{
   tickets: Ticket[];
@@ -318,8 +319,9 @@ const confirmationModal = ref({
   isOpen: false,
   title: '',
   message: '',
-  action: null as (() => Promise<void>) | null,
-  isCorrection: false,
+  action: null as ((data?: { reason: string; description: string }) => Promise<void>) | null,
+  hasInput: false,
+  reasonOptions: [] as { value: string; label: string }[],
 });
 
 const emit = defineEmits(['refresh', 'changePage']);
@@ -420,15 +422,17 @@ const getPriorityBars = (priority: TicketPriority) => {
 const openConfirmationModal = (
   title: string,
   message: string,
-  action: () => Promise<void>,
-  isCorrection = false,
+  action: (data?: { reason: string; description: string }) => Promise<void>,
+  hasInput = false,
+  reasonOptions: { value: string; label: string }[] = [],
 ) => {
   confirmationModal.value = {
     isOpen: true,
     title,
     message,
     action,
-    isCorrection,
+    hasInput,
+    reasonOptions,
   };
 };
 
@@ -437,9 +441,9 @@ const closeConfirmationModal = () => {
   confirmationModal.value.action = null;
 };
 
-const handleConfirm = async () => {
+const handleConfirm = async (data?: { reason: string; description: string }) => {
   if (confirmationModal.value.action) {
-    await confirmationModal.value.action();
+    await confirmationModal.value.action(data);
   }
   closeConfirmationModal();
 };
@@ -470,7 +474,9 @@ const handleVerifyTicket = async (ticket: Ticket) => {
     'Tem certeza que deseja enviar este ticket para verificação?',
     async () => {
       try {
-        await ticketService.updateStatus(ticket.customId, { status: TicketStatus.AwaitingVerification });
+        await ticketService.updateStatus(ticket.customId, {
+          status: TicketStatus.AwaitingVerification,
+        });
         toast.success('Ticket enviado para revisão');
         emit('refresh');
       } catch {
@@ -497,35 +503,56 @@ const handleApproveTicket = async (ticket: Ticket) => {
 };
 
 const handleRequestCorrection = async (ticket: Ticket) => {
+  const reasonOptions = enumToOptions(CorrectionReason);
   openConfirmationModal(
     'Solicitar Correção',
     'Por favor, preencha os detalhes da correção necessária:',
-    async () => {
+    async (data?: { reason: string; description: string }) => {
       try {
-        await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Returned });
+        if (data?.reason && data?.description) {
+          await ticketService.requestCorrection(ticket.customId, {
+            reason: data.reason,
+            details: data.description,
+          });
+        } else {
+          await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Returned });
+        }
+
         toast.success('Correção solicitada com sucesso');
         emit('refresh');
       } catch {
         toast.error('Erro ao solicitar correção');
       }
     },
-    true, // indica que é uma solicitação de correção
+    true,
+    reasonOptions,
   );
 };
 
 const handleRejectTicket = async (ticket: Ticket) => {
+  const reasonOptions = enumToOptions(DisapprovalReason);
   openConfirmationModal(
     'Reprovar Ticket',
-    'Tem certeza que deseja reprovar este ticket?',
-    async () => {
+    'Por favor, informe o motivo da reprovação:',
+    async (data?: { reason: string; description: string }) => {
       try {
-        await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Rejected });
+        if (data?.reason && data?.description) {
+          await ticketService.reject(ticket.customId, {
+            reason: data.reason,
+            details: data.description,
+          });
+        } else {
+          await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Rejected });
+        }
+
         toast.success('Ticket reprovado com sucesso');
         emit('refresh');
       } catch {
         toast.error('Erro ao reprovar o ticket');
       }
     },
+    true, // indicates that input fields are needed
+    reasonOptions,
   );
 };
 
@@ -567,7 +594,7 @@ const handleCorrectTicket = async (ticket: Ticket) => {
       } catch {
         toast.error('Erro ao iniciar correção');
       }
-    }
+    },
   );
 };
 </script>

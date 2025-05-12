@@ -58,7 +58,7 @@
                 @click="selectUser(user)"
               >
                 <div class="user-avatar">
-                  <span class="initials">{{ getInitials(user) }}</span>
+                  <span class="initials">{{ getUserInitials(user) }}</span>
                 </div>
                 <div class="user-info">
                   <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
@@ -80,7 +80,7 @@
               :class="{ unread: !message.read }"
             >
               <div class="message-avatar">
-                <span class="initials">{{ getInitials(message.sender) }}</span>
+                <span class="initials">{{ getUserInitials(message.sender) }}</span>
               </div>
               <div class="message-content">
                 <div class="message-header">
@@ -143,6 +143,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useUserStore } from '@/stores/user';
 import type { User } from '@/models';
 import { RoleName } from '@/models';
+import { getUserInitials } from '@/utils/generic-helper';
 
 // Dados mockados
 const mockMessages = [
@@ -273,10 +274,6 @@ const getUnreadCount = (channel: string) => {
     const isChannelMatch = channel === 'geral' ? msg.isGeneral : !msg.isGeneral;
     return isChannelMatch && !msg.read;
   }).length;
-};
-
-const getInitials = (user: User) => {
-  return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
 };
 
 const formatTime = (date: Date) => {
