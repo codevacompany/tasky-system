@@ -14,7 +14,7 @@ export interface MessageViewConfirmation {
 export interface Message {
   id: number;
   content: string;
-  channel: 'geral' | 'setor' | 'individual';
+  channel: 'geral' | 'setor' | 'individual' | 'inicio';
   sender: User;
   targetUserId?: number;
   createdAt: string;
@@ -36,7 +36,7 @@ export interface MessageReaction {
 
 export interface CreateMessageDto {
   content: string;
-  channel: 'geral' | 'setor' | 'individual';
+  channel: 'geral' | 'setor' | 'individual' | 'inicio';
   targetUserId?: number;
   requiresConfirmation?: boolean;
   parentMessageId?: number;

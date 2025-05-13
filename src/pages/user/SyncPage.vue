@@ -242,7 +242,8 @@
 import { ref, computed, onMounted, watch, onBeforeUnmount, nextTick } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { useMessageStore } from '@/stores/messageStore';
-import type { User, Message, Mention } from '@/models';
+import type { User } from '@/models';
+import type { Message, MessageReaction, MessageViewConfirmation, Mention } from '@/models/message';
 import { RoleName } from '@/models';
 import { messageService } from '@/services/messageService';
 import { userService } from '@/services/userService';
@@ -282,9 +283,9 @@ const messages = computed(() => messageStore.filteredMessages);
 const isLoading = computed(() => messageStore.isLoading);
 const hasMore = computed(() => messageStore.hasMore);
 
-const getUnreadCount = (channel: 'geral' | 'setor' | 'individual') => {
+const getUnreadCount = (channel: 'geral' | 'setor' | 'individual' | 'inicio') => {
   return messages.value.filter(
-    (message) => message.channel === channel && !message.read && message.sender.id !== userStore.user!.id
+    (message: Message) => message.channel === channel && !message.read && message.sender.id !== userStore.user!.id
   ).length;
 };
 
@@ -313,7 +314,10 @@ const fetchMessages = async () => {
 
 const fetchUsers = async () => {
   try {
-    const response = await userService.fetch();
+    const response = await userService.fetch({
+      page: 1,
+      limit: 100
+    });
     users.value = response.data.items;
   } catch (error) {
     toast.error('Erro ao carregar usuários');
@@ -449,7 +453,7 @@ const sendMessage = async () => {
     const parentMessageId = replyingTo.value?.id;
     
     // Limpar campos imediatamente para melhor UX
-  newMessage.value = '';
+    newMessage.value = '';
     currentMentions.value = [];
     requiresConfirmation.value = false;
     replyingTo.value = null;
@@ -480,16 +484,14 @@ const scrollToBottom = () => {
 
 const handleReaction = async (message: Message, reactionType: string) => {
   try {
-    const existingReaction = message.reactions.find((r) => r.type === reactionType);
-    if (existingReaction?.active) {
-      const response = await messageService.removeReaction(message.id, reactionType);
-      messageStore.updateMessage(response.data);
+    const existingReaction = message.reactions.find((r: MessageReaction) => r.type === reactionType);
+    if (existingReaction) {
+      await messageService.removeReaction(message.id, reactionType);
     } else {
-      const response = await messageService.addReaction(message.id, reactionType);
-      messageStore.updateMessage(response.data);
+      await messageService.addReaction(message.id, reactionType);
     }
   } catch (error) {
-    toast.error('Erro ao adicionar reação');
+    toast.error('Erro ao processar reação');
   }
 };
 
@@ -500,11 +502,11 @@ const handleKeyDown = (event: KeyboardEvent) => {
 };
 
 const hasConfirmedView = (message: Message) => {
-  return message.viewConfirmations.some(conf => conf.userId === userStore.user?.id);
+  return message.viewConfirmations.some((conf: MessageViewConfirmation) => conf.userId === userStore.user?.id);
 };
 
 const getUserConfirmation = (message: Message) => {
-  return message.viewConfirmations.find(conf => conf.userId === userStore.user?.id);
+  return message.viewConfirmations.find((conf: MessageViewConfirmation) => conf.userId === userStore.user?.id);
 };
 
 const confirmView = async (message: Message) => {
@@ -565,10 +567,10 @@ const cancelReply = () => {
 };
 
 // Agrupar mensagens por thread
-const rootMessages = computed(() => messages.value.filter(m => !m.parentMessageId));
+const rootMessages = computed(() => messages.value.filter((m: Message) => !m.parentMessageId));
 const repliesMap = computed(() => {
   const map: Record<number, Message[]> = {};
-  messages.value.forEach(m => {
+  messages.value.forEach((m: Message) => {
     if (m.parentMessageId) {
       if (!map[m.parentMessageId]) map[m.parentMessageId] = [];
       map[m.parentMessageId].push(m);

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { Message } from '@/models';
+import type { Message } from '@/models/message';
 import { messageService } from '@/services/messageService';
 import type { PaginatedResponse } from '@/types/http';
 import { useUserStore } from './user';
@@ -11,7 +11,7 @@ interface MessageState {
   totalItems: number;
   isLoading: boolean;
   hasMore: boolean;
-  channel: 'geral' | 'setor' | 'individual';
+  channel: 'geral' | 'setor' | 'individual' | 'inicio';
   targetUserId?: number;
   messageCache: Map<string, Message[]>;
   lastFetchTime: number;
@@ -41,7 +41,7 @@ export const useMessageStore = defineStore('message', {
       
       if (!currentUser) return state.messages;
 
-      return state.messages.filter(message => {
+      return state.messages.filter((message: Message) => {
         // Canal geral: todas as mensagens são visíveis
         if (state.channel === 'geral') return true;
         
@@ -116,7 +116,7 @@ export const useMessageStore = defineStore('message', {
 
         this.currentPage = page;
         this.totalPages = data.totalPages;
-        this.totalItems = data.totalItems;
+        this.totalItems = data.total;
         this.hasMore = page < data.totalPages;
 
         return data;
@@ -132,7 +132,7 @@ export const useMessageStore = defineStore('message', {
       await this.fetchMessages(this.currentPage + 1);
     },
 
-    setChannel(channel: 'geral' | 'setor' | 'individual') {
+    setChannel(channel: 'geral' | 'setor' | 'individual' | 'inicio') {
       this.channel = channel;
       this.reset();
     },
@@ -185,7 +185,7 @@ export const useMessageStore = defineStore('message', {
     },
 
     updateMessage(message: Message) {
-      const index = this.messages.findIndex(m => m.id === message.id);
+      const index = this.messages.findIndex((m: Message) => m.id === message.id);
       if (index !== -1) {
         this.messages[index] = message;
         
@@ -193,7 +193,7 @@ export const useMessageStore = defineStore('message', {
         const cacheKey = this.cacheKey;
         const cachedMessages = this.messageCache.get(cacheKey);
         if (cachedMessages) {
-          const cacheIndex = cachedMessages.findIndex(m => m.id === message.id);
+          const cacheIndex = cachedMessages.findIndex((m: Message) => m.id === message.id);
           if (cacheIndex !== -1) {
             cachedMessages[cacheIndex] = message;
             this.messageCache.set(cacheKey, cachedMessages);
@@ -203,7 +203,7 @@ export const useMessageStore = defineStore('message', {
     },
 
     markMessagesAsRead(messageIds: number[]) {
-      this.messages = this.messages.map(message => {
+      this.messages = this.messages.map((message: Message) => {
         if (messageIds.includes(message.id)) {
           return { ...message, read: true };
         }
@@ -214,7 +214,7 @@ export const useMessageStore = defineStore('message', {
       const cacheKey = this.cacheKey;
       const cachedMessages = this.messageCache.get(cacheKey);
       if (cachedMessages) {
-        const updatedCache = cachedMessages.map(message => {
+        const updatedCache = cachedMessages.map((message: Message) => {
           if (messageIds.includes(message.id)) {
             return { ...message, read: true };
           }

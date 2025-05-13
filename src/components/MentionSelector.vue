@@ -2,7 +2,7 @@
   <div v-if="show" class="mention-selector" :style="position">
     <div class="mention-list">
       <div
-        v-for="user in filteredUsers"
+        v-for="(user, index) in filteredUsers"
         :key="user.id"
         class="mention-item"
         :class="{ active: selectedIndex === index }"

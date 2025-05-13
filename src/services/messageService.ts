@@ -1,13 +1,13 @@
-import type { Message, CreateMessageDto, UpdateMessageDto, MessageReaction, Mention } from '@/models';
+import type { Message, CreateMessageDto, UpdateMessageDto, MessageReaction, Mention } from '@/models/message';
 import type { PaginatedResponse } from '@/types/http';
 import apiClient from '@/utils/axiosInstance';
 import type { AxiosResponse } from 'axios';
 
 interface CreateMessageData {
   content: string;
-  channel: 'geral' | 'setor' | 'individual';
+  channel: 'geral' | 'setor' | 'individual' | 'inicio';
   targetUserId?: number;
-  mentions?: Mention[];
+  mentions: Mention[];
   requiresConfirmation?: boolean;
   parentMessageId?: number;
 }
@@ -18,7 +18,7 @@ export const messageService = {
   },
 
   async fetch(params?: {
-    channel?: 'geral' | 'setor' | 'individual';
+    channel?: 'geral' | 'setor' | 'individual' | 'inicio';
     targetUserId?: number;
     page?: number;
     limit?: number;
@@ -42,7 +42,7 @@ export const messageService = {
     return apiClient.post<Message>(`/messages/${id}/read`);
   },
 
-  async markAllAsRead(channel?: 'geral' | 'setor' | 'individual'): Promise<AxiosResponse<Message>> {
+  async markAllAsRead(channel?: 'geral' | 'setor' | 'individual' | 'inicio'): Promise<AxiosResponse<Message>> {
     return apiClient.post<Message>('/messages/mark-all-as-read', { channel });
   },
 
