@@ -1040,7 +1040,7 @@ import type {
   StatusDurationResponseDto,
   DepartmentStats,
 } from '@/services/reportService';
-import { TicketActionType, TicketStatus, type TicketUpdate } from '@/models';
+import { TicketActionType, TicketStatus, type TicketUpdate, type TicketPriority } from '@/models';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import {
@@ -1050,7 +1050,6 @@ import {
 } from '@/utils/generic-helper';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 ChartJS.register(ChartDataLabels);
-//import type { TicketStatus, TicketPriority } from '@/models';
 
 // Define the StatsPeriod enum
 enum StatsPeriod {
@@ -1080,15 +1079,88 @@ ChartJS.register(
 );
 
 // Local type definitions
-type CustomTicketStatus = 'Em andamento' | 'Finalizado' | 'Atrasado' | 'Outro';
-type TicketPriority = 'Alta' | 'Média' | 'Baixa';
-
 interface ChartData {
   labels: string[];
-  data: number[];
+  datasets: {
+    label: string;
+    data: number[];
+    borderColor?: string | string[];
+    backgroundColor?: string | string[];
+    fill?: boolean;
+    borderWidth?: number;
+  }[];
 }
 
-const chartOptions = {
+type CustomTicketStatus = 'pendente' | 'em_andamento' | 'aguardando_verificação' | 'em_verificação' | 'finalizado' | 'cancelado' | 'reprovado';
+
+interface ChartOptions {
+  responsive: boolean;
+  maintainAspectRatio: boolean;
+  plugins: {
+    legend: {
+      display: boolean;
+      position: 'bottom' | 'top' | 'left' | 'right';
+      labels: {
+        usePointStyle: boolean;
+        padding: number;
+        font: {
+          size: number;
+        };
+      };
+    };
+    tooltip: {
+      backgroundColor: string;
+      padding: number;
+      titleFont: {
+        size: number;
+      };
+      bodyFont: {
+        size: number;
+      };
+      callbacks?: {
+        label?: (context: any) => string;
+      };
+    };
+    datalabels: {
+      display: boolean;
+      formatter?: (value: number, context: any) => string;
+      color?: string;
+      font?: {
+        weight: 'bold' | 'normal' | 'bolder' | 'lighter' | number;
+        size: number;
+      };
+    };
+  };
+  scales?: {
+    y: {
+      beginAtZero: boolean;
+      ticks: {
+        precision: number;
+      };
+    };
+  };
+}
+
+// Ordem e cores fixas para status
+const statusOrder = [
+  { key: 'pendente', label: 'Pendente', color: '#eab308' },
+  { key: 'em_andamento', label: 'Em andamento', color: '#2563eb' },
+  { key: 'aguardando_verificacao', label: 'Aguardando verificação', color: '#d8b4fe' },
+  { key: 'em_verificacao', label: 'Em verificação', color: '#9333ea' },
+  { key: 'finalizado', label: 'Finalizado', color: '#2ecc71' },
+  { key: 'cancelado', label: 'Cancelado', color: '#f87171' },
+  { key: 'reprovado', label: 'Reprovado', color: '#c62828' }
+];
+
+// Ordem e cores fixas para prioridade
+const priorityOrder = [
+  { key: 'baixa', label: 'Baixa', color: '#22c55e' },
+  { key: 'media', label: 'Média', color: '#eab308' },
+  { key: 'alta', label: 'Alta', color: '#ef4444' }
+];
+
+// Chart options - garantir percentuais
+const chartOptions = ref<ChartOptions>({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -1104,155 +1176,139 @@ const chartOptions = {
       },
     },
     tooltip: {
-      backgroundColor: 'white',
-      titleColor: '#1f2937',
-      bodyColor: '#4b5563',
-      borderColor: '#e5e7eb',
-      borderWidth: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
       padding: 12,
-      boxPadding: 6,
-      usePointStyle: true,
-      callbacks: {
-        label: (context: { raw: unknown }): string => {
-          const value = context.raw;
-          if (typeof value === 'number') {
-            return ` ${value} tickets`;
-          }
-          return String(value);
-        },
+      titleFont: {
+        size: 14,
+      },
+      bodyFont: {
+        size: 13,
       },
     },
     datalabels: {
+      display: true,
+      formatter: (value: number, context: any) => {
+        const data = context.dataset.data;
+        const total = data.reduce((a: number, b: number) => a + b, 0);
+        const percent = Math.round((value / total) * 100);
+        return percent > 0 ? `${percent}%` : '';
+      },
       color: '#fff',
       font: {
         weight: 'bold',
-        size: 14,
-      },
-      formatter: (value, context) => {
-        const data = context.chart.data.datasets[0].data;
-        const total = data.reduce((a, b) => a + b, 0);
-        const percent = ((value / total) * 100).toFixed(0);
-        return percent > 0 ? percent + '%' : '';
-      },
+        size: 14
+      }
     },
   },
-  scales: {
-    x: {
-      display: false, // Mantém os eixos ocultos nos outros gráficos
+});
+
+const trendChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: true,
+      position: 'bottom' as const,
+      labels: {
+        usePointStyle: true,
+        padding: 20,
+        font: { size: 12 }
+      }
     },
+    tooltip: {
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      padding: 12,
+      titleFont: { size: 14 },
+      bodyFont: { size: 13 },
+      callbacks: {
+        label: (context: any) => `${context.dataset.label}: ${context.parsed.y}`
+      }
+    }
+  },
+  scales: {
     y: {
+      beginAtZero: true,
+      ticks: { precision: 0 }
+    }
+  }
+};
+
+const createdVsCompletedChartOptions = ref<ChartOptions>({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: true,
+      position: 'bottom',
+      labels: {
+        usePointStyle: true,
+        padding: 20,
+        font: {
+          size: 12,
+        },
+      },
+    },
+    tooltip: {
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      padding: 12,
+      titleFont: {
+        size: 14,
+      },
+      bodyFont: {
+        size: 13,
+      },
+    },
+    datalabels: {
       display: false,
     },
   },
-};
-
-// Opções específicas para o gráfico Criados vs Concluídos
-const createdVsCompletedChartOptions = {
-  ...chartOptions,
-  plugins: {
-    ...chartOptions.plugins,
-    datalabels: {
-      display: false, // Não exibe percentuais neste gráfico
-    },
-  },
   scales: {
-    x: {
-      display: true,
-      title: {
-        display: true,
-        text: 'Período',
-        font: {
-          size: 14,
-          weight: 'bold',
-        },
-      },
-      ticks: {
-        font: {
-          size: 12,
-        },
-      },
-    },
     y: {
-      display: true,
-      title: {
-        display: true,
-        text: 'Quantidade de Tickets',
-        font: {
-          size: 14,
-          weight: 'bold',
-        },
-      },
       beginAtZero: true,
       ticks: {
-        stepSize: 1,
-        font: {
-          size: 12,
-        },
+        precision: 0,
       },
     },
   },
-};
+});
 
-// Opções específicas para o gráfico de Tendências
-const trendChartOptions = {
-  ...chartOptions,
-  plugins: {
-    ...chartOptions.plugins,
-    datalabels: {
-      display: false, // Não exibe percentuais neste gráfico
-    },
-  },
-  scales: {
-    x: {
-      display: true,
-      title: {
-        display: true,
-        text: 'Período',
-        font: {
-          size: 14,
-          weight: 'bold',
-        },
-      },
-      ticks: {
-        font: {
-          size: 12,
-        },
-      },
-    },
-    y: {
-      display: true,
-      title: {
-        display: true,
-        text: 'Quantidade de Tickets',
-        font: {
-          size: 14,
-          weight: 'bold',
-        },
-      },
-      beginAtZero: true,
-      ticks: {
-        stepSize: 1,
-        font: {
-          size: 12,
-        },
-      },
-    },
-  },
-};
-
-const statistics = ref<TenantStatistics>();
+const statistics = ref<TenantStatistics | null>(null);
 
 const loading = ref(true);
 const error = ref<string | null>(null);
 
 const ticketsByStatus = ref<ChartData>({
   labels: [],
-  data: [],
+  datasets: [
+    {
+      label: 'Status',
+      data: [],
+      backgroundColor: [
+        '#eab308', // Pendente (amarelo)
+        '#2563eb', // Em andamento (azul)
+        '#d8b4fe', // Aguardando Verificação (roxo claro)
+        '#9333ea', // Em Verificação (roxo escuro)
+        '#2ecc71', // Finalizado (verde)
+        '#f87171', // Cancelado (vermelho claro)
+        '#c62828', // Reprovado (vermelho escuro)
+      ] as string[],
+    },
+  ],
 });
 
 const ticketsByPriority = ref<ChartData>({
   labels: [],
-  data: [],
+  datasets: [
+    {
+      label: 'Quantidade de Tickets',
+      data: [],
+      backgroundColor: [
+        '#22c55e', // Baixa (verde)
+        '#eab308', // Média (amarelo)
+        '#ef4444', // Alta (vermelho)
+      ] as string[],
+    },
+  ],
 });
 
 const recentTickets = ref<
@@ -1260,24 +1316,27 @@ const recentTickets = ref<
 >([]);
 
 const statusClassMap: Record<CustomTicketStatus, string> = {
-  'Em andamento': 'bg-yellow-100 text-yellow-800',
-  Finalizado: 'bg-green-100 text-green-800',
-  Atrasado: 'bg-red-100 text-red-800',
-  Outro: 'bg-gray-100 text-gray-800',
+  'pendente': 'bg-yellow-100 text-yellow-800',
+  'em_andamento': 'bg-blue-100 text-blue-800',
+  'aguardando_verificação': 'bg-purple-100 text-purple-800',
+  'em_verificação': 'bg-indigo-100 text-indigo-800',
+  'finalizado': 'bg-green-100 text-green-800',
+  'cancelado': 'bg-red-100 text-red-800',
+  'reprovado': 'bg-red-100 text-red-800'
 };
 
 const getStatusClass = (status: string): string => {
   return statusClassMap[status as CustomTicketStatus] || 'bg-gray-100 text-gray-800';
 };
 
-const priorityClassMap: Record<TicketPriority, string> = {
-  Alta: 'bg-red-100 text-red-800',
-  Média: 'bg-yellow-100 text-yellow-800',
-  Baixa: 'bg-blue-100 text-blue-800',
+const priorityClassMap: Record<string, string> = {
+  'baixa': 'bg-green-100 text-green-800',
+  'média': 'bg-yellow-100 text-yellow-800',
+  'alta': 'bg-red-100 text-red-800'
 };
 
 const getPriorityClass = (priority: string): string => {
-  return priorityClassMap[priority as TicketPriority] || 'bg-blue-100 text-blue-800';
+  return priorityClassMap[priority] || 'bg-blue-100 text-blue-800';
 };
 
 // Add ref for status durations
@@ -1311,67 +1370,52 @@ const loadData = async () => {
     trendData.value = trends[selectedTrendPeriod.value];
 
     // Store status durations
-    statusDurations.value = (statusDurationsResult as StatusDurationResponseDto).statusDurations;
+    statusDurations.value = statusDurationsResult.statusDurations.map(duration => ({
+      ...duration,
+      averageDuration: duration.averageDurationSeconds / 3600, // Converter segundos para horas
+    }));
 
     // Store department data - directly from the API response
-    departmentData.value = departmentStatsResult;
+    departmentData.value = departmentStatsResult.map(dept => ({
+      ...dept,
+      departmentId: dept.departmentId, // manter como number
+      totalTickets: dept.totalTickets || 0,
+      resolvedTickets: dept.resolvedTickets || 0,
+      resolutionRate: dept.resolutionRate || 0,
+      averageAcceptanceTimeSeconds: dept.averageAcceptanceTimeSeconds || 0,
+      averageTotalTimeSeconds: dept.averageTotalTimeSeconds || 0,
+    }));
 
-    // Transform status data from API into ChartData format
+    // Distribuição por Status
+    const statusCounts = statusOrder.map(status => {
+      const found = statusResult.statusCounts.find((item: any) => item.status === status.key);
+      return found ? found.count : 0;
+    });
     ticketsByStatus.value = {
-      labels: statusResult.statusCounts
-        .filter((item: { status: string }) =>
-          [
-            'pendente',
-            'em_andamento',
-            'aguardando_verificação',
-            'em_verificação',
-            'finalizado',
-            'cancelado',
-            'reprovado',
-          ].includes(item.status),
-        )
-        .map((item: { status: string }) => {
-          // Map enum values to readable text
-          const statusLabels: Record<string, string> = {
-            pendente: 'Pendente',
-            em_andamento: 'Em andamento',
-            aguardando_verificação: 'Aguardando Verificação',
-            em_verificação: 'Em Verificação',
-            finalizado: 'Finalizado',
-            cancelado: 'Cancelado',
-            reprovado: 'Reprovado',
-          };
-          return statusLabels[item.status] || item.status;
-        }),
-      data: statusResult.statusCounts
-        .filter((item: { status: string }) =>
-          [
-            'pendente',
-            'em_andamento',
-            'aguardando_verificação',
-            'em_verificação',
-            'finalizado',
-            'cancelado',
-            'reprovado',
-          ].includes(item.status),
-        )
-        .map((item: { status: string; count: number }) => item.count),
+      labels: statusOrder.map(s => s.label),
+      datasets: [
+        {
+          label: 'Status',
+          data: statusCounts,
+          backgroundColor: statusOrder.map(s => s.color),
+        },
+      ],
     };
 
-    // Transform priority data from API into ChartData format
+    // Distribuição por Prioridade
+    const priorityCounts = priorityOrder.map(priority => {
+      const found = priorityResult.priorityCounts.find((item: any) => item.priority === priority.key);
+      return found ? found.count : 0;
+    });
     ticketsByPriority.value = {
-      labels: priorityResult.priorityCounts.map((item: { priority: string; count: number }) => {
-        // Map enum values to readable text
-        const priorityLabels: Record<string, string> = {
-          baixa: 'Baixa',
-          média: 'Média',
-          alta: 'Alta',
-        };
-        return priorityLabels[item.priority] || item.priority;
-      }),
-      data: priorityResult.priorityCounts.map(
-        (item: { priority: string; count: number }) => item.count,
-      ),
+      labels: priorityOrder.map(p => p.label),
+      datasets: [
+        {
+          label: 'Quantidade de Tickets',
+          data: priorityCounts,
+          backgroundColor: priorityOrder.map(p => p.color),
+        },
+      ],
     };
 
     // Mock recent tickets
@@ -1452,7 +1496,7 @@ const statusChartData = computed(() => ({
   labels: ticketsByStatus.value.labels,
   datasets: [
     {
-      data: ticketsByStatus.value.data,
+      data: ticketsByStatus.value.datasets[0].data,
       backgroundColor: [
         '#eab308', // Pendente (amarelo)
         '#2563eb', // Em andamento (azul)
@@ -1461,8 +1505,7 @@ const statusChartData = computed(() => ({
         '#2ecc71', // Finalizado (verde)
         '#f87171', // Cancelado (vermelho claro)
         '#c62828', // Reprovado (vermelho escuro)
-      ],
-      borderWidth: 0,
+      ] as string[],
     },
   ],
 }));
@@ -1472,13 +1515,12 @@ const priorityChartData = computed(() => ({
   datasets: [
     {
       label: 'Quantidade de Tickets',
-      data: ticketsByPriority.value.data,
+      data: ticketsByPriority.value.datasets[0].data,
       backgroundColor: [
         '#22c55e', // Baixa (verde)
         '#eab308', // Média (amarelo)
         '#ef4444', // Alta (vermelho)
-      ],
-      borderWidth: 0,
+      ] as string[],
     },
   ],
 }));
@@ -1489,7 +1531,6 @@ const trendData = ref<{ date: string; total: number; resolved: number; created: 
 
 const trendChartData = computed(() => {
   if (!trendData.value || trendData.value.length === 0) return null;
-
   return {
     labels: trendData.value.map((item) => formatDateDDMM(item.date)),
     datasets: [
@@ -1500,6 +1541,7 @@ const trendChartData = computed(() => {
         backgroundColor: 'rgba(37, 99, 235, 0.1)',
         fill: true,
         tension: 0.4,
+        pointRadius: 3,
       },
       {
         label: 'Chamados Resolvidos',
@@ -1508,6 +1550,7 @@ const trendChartData = computed(() => {
         backgroundColor: 'rgba(34, 197, 94, 0.1)',
         fill: true,
         tension: 0.4,
+        pointRadius: 3,
       },
       {
         label: 'Novos Chamados',
@@ -1516,6 +1559,7 @@ const trendChartData = computed(() => {
         backgroundColor: 'rgba(234, 179, 8, 0.1)',
         fill: true,
         tension: 0.4,
+        pointRadius: 3,
       },
     ],
   };
@@ -1524,48 +1568,28 @@ const trendChartData = computed(() => {
 // Dados para o gráfico Created vs Completed
 const createdVsCompletedChartData = computed(() => {
   if (!trendData.value || trendData.value.length === 0) {
-    // Return an empty but valid chart data structure when there's no data
-    return {
-      labels: [],
-      datasets: [
-        {
-          label: 'Concluídos (no período)',
-          data: [],
-          borderColor: '#22c55e',
-          backgroundColor: 'rgba(34, 197, 94, 0.1)',
-          fill: true,
-          tension: 0.4,
-        },
-        {
-          label: 'Criados (no período)',
-          data: [],
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          fill: true,
-          tension: 0.4,
-        },
-      ],
-    };
+    return { labels: [], datasets: [] };
   }
-
   return {
     labels: trendData.value.map((item) => formatDateDDMM(item.date)),
     datasets: [
       {
-        label: 'Concluídos (no período)',
+        label: 'Criados',
+        data: trendData.value.map((item) => item.created),
+        borderColor: '#2563eb',
+        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+      },
+      {
+        label: 'Concluídos',
         data: trendData.value.map((item) => item.resolved),
         borderColor: '#22c55e',
         backgroundColor: 'rgba(34, 197, 94, 0.1)',
         fill: true,
         tension: 0.4,
-      },
-      {
-        label: 'Criados (no período)',
-        data: trendData.value.map((item) => item.created),
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        fill: true,
-        tension: 0.4,
+        pointRadius: 3,
       },
     ],
   };
@@ -1809,11 +1833,11 @@ const handlePeriodChange = () => {
 };
 
 const getTotalResolved = () => {
-  return trendData.value?.reduce((total, item) => total + item.resolved, 0) || 0;
+  return trendData.value?.reduce((total, item) => total + (item.resolved || 0), 0) || 0;
 };
 
 const getTotalCreated = () => {
-  return trendData.value?.reduce((total, item) => total + item.created, 0) || 0;
+  return trendData.value?.reduce((total, item) => total + (item.created || 0), 0) || 0;
 };
 
 const createdTrendPercentage = computed(() => {
