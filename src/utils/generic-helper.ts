@@ -17,7 +17,11 @@ export function formatSnakeToCamelCase(str: string): string {
 }
 
 export function formatSnakeToNaturalCase(str: string): string {
-  return str.replace('_', ' ').replace(/[a-z]/, (firstLetter) => firstLetter.toUpperCase());
+  // Replace all underscores with spaces and capitalize each word
+  return str
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 export function calculateDeadline(ticket: Ticket) {
