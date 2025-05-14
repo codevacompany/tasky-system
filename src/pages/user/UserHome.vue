@@ -135,37 +135,29 @@
 
     <!-- Últimos Tickets Recebidos e Criados -->
     <div class="dashboard-row">
-      <CompactTicketTable
-        title="Últimos Tickets Recebidos"
-        :tickets="latestReceivedTickets"
-        :isLoading="isLoading"
-      />
-      <CompactTicketTable
-        title="Últimos Tickets Criados"
-        :tickets="latestCreatedTickets"
-        :isLoading="isLoading"
-      />
+      <CompactTicketTable title="Últimos Tickets Recebidos" type="received" />
+      <CompactTicketTable title="Últimos Tickets Criados" type="created" />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { ticketService } from '@/services/ticketService';
 import { reportService, type UserStatistics } from '@/services/reportService';
-import { TicketStatus, type Ticket } from '@/models';
+import { TicketStatus } from '@/models';
 import { useUserStore } from '@/stores/user';
+import { useTicketsStore } from '@/stores/tickets';
 import { toast } from 'vue3-toastify';
 import CompactTicketTable from '@/components/tickets/CompactTicketTable.vue';
 import { formatTimeInSeconds } from '@/utils/generic-helper';
 
 const userStore = useUserStore();
-const latestReceivedTickets = ref<Ticket[]>([]);
-const latestCreatedTickets = ref<Ticket[]>([]);
+const ticketsStore = useTicketsStore();
 const isLoading = ref(true);
 const userStats = ref<UserStatistics | null>(null);
+const latestReceivedTickets = computed(() => ticketsStore.getRecentReceivedTickets);
+const latestCreatedTickets = computed(() => ticketsStore.getRecentMyTickets);
 
-// Computed properties para estatísticas
 const totalTickets = computed(() => ({
   total: latestReceivedTickets.value.length + latestCreatedTickets.value.length,
   recebidos: latestReceivedTickets.value.length,
@@ -203,35 +195,22 @@ const resolutionRate = computed(() => {
   return 0;
 });
 
-const loadTickets = async () => {
+onMounted(async () => {
+  isLoading.value = true;
   try {
-    isLoading.value = true;
-    const [recebidosResponse, criadosResponse, userStatsResponse] = await Promise.all([
-      ticketService.getByTargetUser(userStore.user!.id),
-      ticketService.getByRequester(userStore.user!.id),
-      reportService.getUserStatistics(),
-    ]);
+    await Promise.all([ticketsStore.fetchReceivedTickets(1, 5), ticketsStore.fetchMyTickets(1, 5)]);
 
-    // Store user statistics
-    userStats.value = userStatsResponse;
-
-    // Limitar a 5 tickets mais recentes
-    latestReceivedTickets.value = recebidosResponse.data.items
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 5);
-
-    latestCreatedTickets.value = criadosResponse.data.items
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 5);
+    if (userStore.user?.id) {
+      const userStatsResponse = await reportService.getUserStatistics();
+      userStats.value = userStatsResponse;
+    }
   } catch (error) {
-    console.error('Erro ao carregar dados do dashboard:', error);
+    console.error('Error loading dashboard data:', error);
     toast.error('Erro ao carregar dados do dashboard');
   } finally {
     isLoading.value = false;
   }
-};
-
-onMounted(loadTickets);
+});
 </script>
 
 <style scoped>

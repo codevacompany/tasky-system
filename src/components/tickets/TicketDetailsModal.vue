@@ -64,7 +64,7 @@
                     :icon="getStatusIcon(loadedTicket.status)"
                     class="badge-icon"
                   />
-                  {{ formatSnakeToNaturalCase(ticket?.status!).toUpperCase() }}
+                  {{ formatSnakeToNaturalCase(loadedTicket?.status!).toUpperCase() }}
                 </span>
               </div>
             </div>
@@ -181,21 +181,21 @@
         "
       >
         <button
-          v-if="isTargetUser && ticket?.status === TicketStatus.Pending"
+          v-if="isTargetUser && loadedTicket?.status === TicketStatus.Pending"
           class="action-button accept"
-          @click="acceptTicket(ticket?.customId)"
+          @click="acceptTicket(loadedTicket?.customId)"
         >
           <font-awesome-icon icon="check" /> Aceitar
         </button>
         <button
-          v-if="isTargetUser && ticket?.status === TicketStatus.InProgress"
+          v-if="isTargetUser && loadedTicket?.status === TicketStatus.InProgress"
           class="action-button verify"
           @click="sendForReview(loadedTicket.customId)"
         >
           <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
         </button>
         <button
-          v-if="isTargetUser && ticket?.status === TicketStatus.Returned"
+          v-if="isTargetUser && loadedTicket?.status === TicketStatus.Returned"
           class="action-button correct"
           @click="correctTicket(loadedTicket.customId)"
         >
@@ -390,28 +390,27 @@
 
 <script setup lang="ts">
 import BaseModal from '../common/BaseModal.vue';
-import { TicketStatus, type Ticket, type TicketComment } from '@/models';
+import { CancellationReason, TicketStatus, type Ticket, type TicketComment } from '@/models';
 import { ref, computed, watch } from 'vue';
 import { ticketCommentService } from '@/services/ticketCommentService';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from '@/stores/user';
+import { useTicketsStore } from '@/stores/tickets';
 import { toast } from 'vue3-toastify';
 import { formatRelativeTime } from '@/utils/date';
 import ConfirmationModal from '../common/ConfirmationModal.vue';
 import {
   calculateDeadline,
   formatSnakeToNaturalCase,
-  enumToOptions,
   getUserInitials,
+  enumToOptions,
 } from '@/utils/generic-helper';
 import type { TicketUpdate } from '@/models/ticketUpdate';
 import { TicketUpdateService } from '@/services/ticketUpdateService';
 import type { TicketFile } from '@/models/ticketFile';
 import { awsService } from '@/services/awsService';
 import axios from 'axios';
-import { DisapprovalReason } from '@/models/ticketDisapprovalReason';
-import { CancellationReason } from '@/models/ticketCancellationReason';
-import { CorrectionReason } from '@/models/correctionRequest';
+import { CorrectionReason, DisapprovalReason } from '@/models';
 
 interface SpecialUpdateEvent {
   data?: {
@@ -428,6 +427,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['close', 'refresh']);
 const userStore = useUserStore();
+const ticketsStore = useTicketsStore();
 const newComment = ref('');
 const comments = ref<TicketComment[]>([]);
 const ticketUpdates = ref<TicketUpdate[]>([]);
@@ -560,7 +560,8 @@ const acceptTicket = async (ticketId: string) => {
       try {
         await ticketService.accept(ticketId);
         toast.success('Ticket aceito com sucesso');
-        emit('refresh');
+
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao aceitar o ticket');
       }
@@ -570,13 +571,14 @@ const acceptTicket = async (ticketId: string) => {
 
 const sendForReview = async (ticketId: string) => {
   openConfirmationModal(
-    'Enviar para Verificação',
-    'Tem certeza que deseja enviar este ticket para verificação?',
+    'Enviar Para Revisão',
+    'Tem certeza que deseja enviar este ticket para revisão?',
     async () => {
       try {
         await ticketService.updateStatus(ticketId, { status: TicketStatus.AwaitingVerification });
         toast.success('Ticket enviado para revisão');
-        emit('refresh');
+
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao enviar o ticket para revisão');
       }
@@ -592,7 +594,12 @@ const approveTicket = async (ticketId: string) => {
       try {
         await ticketService.approve(ticketId);
         toast.success('Ticket aprovado com sucesso');
-        emit('refresh');
+
+        if (props.ticket) {
+          refreshSelectedTicket();
+        } else {
+          await ticketsStore.fetchTicketDetails(ticketId);
+        }
       } catch {
         toast.error('Erro ao aprovar o ticket');
       }
@@ -613,7 +620,8 @@ const requestCorrection = async (ticketId: string) => {
         });
 
         toast.success('Correção solicitada com sucesso');
-        emit('refresh');
+
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao solicitar correção');
       }
@@ -647,12 +655,13 @@ const rejectTicket = async (ticketId: string) => {
     async (data?: { reason: string; description: string }) => {
       try {
         await ticketService.reject(ticketId, {
-          reason: data?.reason || '',
-          details: data?.description || '',
+          reason: data?.reason ?? '',
+          details: data?.description ?? '',
         });
 
         toast.success('Ticket reprovado com sucesso');
-        emit('refresh');
+
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao reprovar o ticket');
       }
@@ -675,7 +684,9 @@ const cancelTicket = async (ticketId: string) => {
         });
 
         toast.success('Ticket cancelado com sucesso');
-        emit('refresh');
+
+        refreshSelectedTicket();
+
         emit('close');
       } catch {
         toast.error('Erro ao cancelar o ticket');
@@ -709,7 +720,13 @@ const comment = async () => {
       userId: userStore.user!.id,
       content: newComment.value,
     });
+
     fetchComments();
+
+    if (loadedTicket.value?.customId) {
+      await ticketsStore.fetchTicketDetails(loadedTicket.value.customId);
+    }
+
     newComment.value = '';
   } catch {
     toast.error('Erro ao adicionar comentário');
@@ -980,6 +997,16 @@ const canEditTicket = computed(() => {
 
   return isUserInvolved && isTicketActive;
 });
+
+const refreshSelectedTicket = async () => {
+  if (!props.ticket?.customId) return;
+  try {
+    const updatedTicket = await ticketsStore.fetchTicketDetails(props.ticket.customId);
+    loadedTicket.value = updatedTicket;
+  } catch (error) {
+    console.error('Error refreshing ticket:', error);
+  }
+};
 </script>
 
 <style scoped>
