@@ -24,7 +24,7 @@
 
     <div v-if="!loading && !error">
       <!-- Cabeçalho -->
-      <div class="header">
+    <div class="header">
         <div class="breadcrumb">
           <span>Dashboard</span>
           <font-awesome-icon icon="chevron-right" class="breadcrumb-separator" />
@@ -46,7 +46,7 @@
             </button>
           </div>
         </div>
-      </div>
+    </div>
 
       <div class="content">
         <!-- Cards de Métricas -->
@@ -56,11 +56,11 @@
               <div class="metric-info">
                 <p class="metric-label">Total de Tickets</p>
                 <h3 class="metric-value">{{ statistics?.totalTickets }}</h3>
-              </div>
+        </div>
               <div class="metric-icon blue">
                 <font-awesome-icon icon="ticket" />
-              </div>
-            </div>
+          </div>
+          </div>
           </div>
 
           <div class="metric-card yellow-border">
@@ -71,9 +71,9 @@
               </div>
               <div class="metric-icon yellow">
                 <font-awesome-icon icon="chart-line" />
-              </div>
-            </div>
           </div>
+        </div>
+      </div>
 
           <div class="metric-card green-border">
             <div class="metric-content">
@@ -82,7 +82,7 @@
                 <h3 class="metric-value">
                   {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }}
                 </h3>
-              </div>
+        </div>
               <div class="metric-icon green">
                 <font-awesome-icon icon="clock" />
               </div>
@@ -230,19 +230,19 @@
                     </div>
                   </div>
                   <div class="chart-container">
-                    <div class="chart-wrapper">
-                      <Pie
-                        v-if="ticketsByStatus.labels.length"
+        <div class="chart-wrapper">
+          <Pie
+            v-if="ticketsByStatus.labels.length"
                         :data="statusChartData"
-                        :options="chartOptions"
-                      />
+            :options="chartOptions"
+          />
                       <div v-else class="loading-state">
                         <font-awesome-icon icon="spinner" spin class="loading-icon" />
                         <p class="loading-text">Carregando dados...</p>
                       </div>
-                    </div>
-                  </div>
-                </div>
+          </div>
+        </div>
+      </div>
 
                 <!-- Gráfico de Prioridade -->
                 <div class="chart-card">
@@ -250,27 +250,27 @@
                     <h2 class="chart-title">Distribuição por Prioridade</h2>
                     <div class="chart-icon">
                       <font-awesome-icon icon="chart-bar" />
-                    </div>
+        </div>
                   </div>
                   <div class="chart-container">
-                    <div class="chart-wrapper">
-                      <Bar
-                        v-if="ticketsByPriority.labels.length"
+        <div class="chart-wrapper">
+          <Bar
+            v-if="ticketsByPriority.labels.length"
                         :data="priorityChartData"
-                        :options="chartOptions"
-                      />
+            :options="chartOptions"
+          />
                       <div v-else class="loading-state">
                         <font-awesome-icon icon="spinner" spin class="loading-icon" />
                         <p class="loading-text">Carregando dados...</p>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
               <!-- Tabela -->
               <div class="table-container">
-                <div class="table-header">
+      <div class="table-header">
                   <div class="table-header-content">
                     <div>
                       <h2 class="table-title">Últimos Tickets</h2>
@@ -281,36 +281,36 @@
                       Exportar
                     </button>
                   </div>
-                </div>
-                <div class="table-wrapper">
+      </div>
+      <div class="table-wrapper">
                   <table class="table">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Assunto</th>
-                        <th>Status</th>
-                        <th>Prioridade</th>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Assunto</th>
+              <th>Status</th>
+              <th>Prioridade</th>
                         <th>Data</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+            </tr>
+          </thead>
+          <tbody>
                       <tr v-for="ticket in recentTickets" :key="ticket.customId">
                         <td>{{ ticket.customId }}</td>
-                        <td>{{ ticket.name }}</td>
-                        <td>
+              <td>{{ ticket.name }}</td>
+              <td>
                           <span :class="['status-badge', getStatusClass(ticket.status)]">
                             {{ formatSnakeToNaturalCase(ticket.status) }}
-                          </span>
-                        </td>
-                        <td>
+                </span>
+              </td>
+              <td>
                           <span :class="['priority-badge', getPriorityClass(ticket.priority)]">
                             {{ formatSnakeToNaturalCase(ticket.priority) }}
-                          </span>
-                        </td>
-                        <td>{{ formatDate(ticket.createdAt) }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                </span>
+              </td>
+              <td>{{ formatDate(ticket.createdAt) }}</td>
+            </tr>
+          </tbody>
+        </table>
                 </div>
               </div>
 
@@ -379,11 +379,11 @@
                             }"
                           >
                             {{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}
-                          </div>
-                        </div>
+                      </div>
+                      </div>
                       </template>
-                    </div>
-                  </div>
+                      </div>
+                      </div>
                 </div>
               </div>
 
@@ -511,9 +511,9 @@
                         <td>
                           {{ formatTimeInSeconds(departmentStatsSummary.averageTotalTimeSeconds) }}
                         </td>
-                      </tr>
-                    </tbody>
-                  </table>
+            </tr>
+          </tbody>
+        </table>
                 </div>
 
                 <div class="pagination">
@@ -581,37 +581,37 @@
                             }"
                           >
                             {{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}
-                          </div>
-                        </div>
+                      </div>
+                      </div>
                       </template>
-                    </div>
                   </div>
+                </div>
 
-                  <!-- Existing department cards -->
-                  <div class="departments-grid">
-                    <div
-                      v-for="dept in departmentStats"
-                      :key="dept.departmentId"
-                      class="department-card"
-                    >
-                      <h4 class="department-title">{{ dept.departmentName }}</h4>
-                      <div class="department-stats">
-                        <div class="stat-row">
-                          <span class="stat-label">Total de Chamados</span>
-                          <span class="stat-value">{{ dept.totalTickets }}</span>
-                        </div>
-                        <div class="stat-row">
-                          <span class="stat-label">Chamados Resolvidos</span>
-                          <span class="stat-value">{{ dept.resolvedTickets }}</span>
-                        </div>
-                        <div class="stat-row">
-                          <span class="stat-label">Taxa de Resolução</span>
+                <!-- Existing department cards -->
+                <div class="departments-grid">
+                  <div
+                    v-for="dept in departmentStats"
+                    :key="dept.departmentId"
+                    class="department-card"
+                  >
+                    <h4 class="department-title">{{ dept.departmentName }}</h4>
+                    <div class="department-stats">
+                      <div class="stat-row">
+                        <span class="stat-label">Total de Chamados</span>
+                        <span class="stat-value">{{ dept.totalTickets }}</span>
+                      </div>
+                      <div class="stat-row">
+                        <span class="stat-label">Chamados Resolvidos</span>
+                        <span class="stat-value">{{ dept.resolvedTickets }}</span>
+                      </div>
+                      <div class="stat-row">
+                        <span class="stat-label">Taxa de Resolução</span>
                           <span class="stat-value">{{
                             formatPercentage(dept.resolutionRate)
                           }}</span>
-                        </div>
-                        <div class="stat-row">
-                          <span class="stat-label">Tempo Médio</span>
+                      </div>
+                      <div class="stat-row">
+                        <span class="stat-label">Tempo Médio</span>
                           <span class="stat-value">{{
                             formatTimeInSeconds(dept.averageResolutionTimeSeconds)
                           }}</span>
@@ -727,12 +727,12 @@
                     <div class="chart-container">
                       <Line
                         v-if="trendData && trendData.length > 0 && trendChartData"
-                        :data="trendChartData"
-                        :options="chartOptions"
-                      />
-                      <div v-else class="loading-state">
-                        <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                        <p class="loading-text">Carregando dados...</p>
+                    :data="trendChartData"
+                    :options="chartOptions"
+                  />
+                  <div v-else class="loading-state">
+                    <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                    <p class="loading-text">Carregando dados...</p>
                       </div>
                     </div>
                   </div>
@@ -865,8 +865,8 @@
                             }"
                           >
                             {{ formatTimeInSeconds(duration.averageDurationSeconds) }}
-                          </div>
-                        </div>
+                      </div>
+                      </div>
                       </template>
                     </div>
                   </div>
@@ -1315,7 +1315,7 @@ const statusChartData = computed(() => ({
   labels: ticketsByStatus.value.labels,
   datasets: [
     {
-      data: ticketsByStatus.value.data,
+    data: ticketsByStatus.value.data,
       backgroundColor: [
         '#2563eb',
         '#eab308',
@@ -1336,8 +1336,8 @@ const priorityChartData = computed(() => ({
   datasets: [
     {
       label: 'Quantidade de Tickets',
-      data: ticketsByPriority.value.data,
-      backgroundColor: ['#ef4444', '#eab308', '#2563eb'],
+    data: ticketsByPriority.value.data,
+    backgroundColor: ['#ef4444', '#eab308', '#2563eb'],
       borderWidth: 0,
     },
   ],
@@ -1513,8 +1513,8 @@ const loadInProgressTasks = async () => {
 
     if (!response.data || !Array.isArray(response.data.items)) {
       console.error('Invalid response format for in-progress tickets');
-      return;
-    }
+    return;
+  }
 
     const transformedTasks = [];
 
@@ -1600,7 +1600,7 @@ const loadInProgressTasks = async () => {
           overdueReason,
           timeInProgressSeconds: diffInSeconds,
         });
-      } catch (error) {
+  } catch (error) {
         console.error('Error processing in-progress ticket:', error);
       }
     }

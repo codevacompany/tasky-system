@@ -24,12 +24,16 @@
               </div>
             </td>
           </tr>
-          <tr v-else-if="!tickets || tickets.length === 0">
+          <tr v-else-if="!displayedTickets || displayedTickets.length === 0">
             <td colspan="10" class="empty-state">
               <p>Nenhum ticket encontrado</p>
             </td>
           </tr>
-          <tr v-for="ticket in tickets" :key="ticket.customId" @click="openTicketDetails(ticket)">
+          <tr
+            v-for="ticket in displayedTickets"
+            :key="ticket.customId"
+            @click="openTicketDetails(ticket)"
+          >
             <td>{{ ticket.customId }}</td>
             <td>
               {{ ticket.name }}
@@ -226,11 +230,11 @@
         </tbody>
       </table>
     </div>
-    <div v-if="currentPage" class="pagination">
+    <div v-if="pagination" class="pagination">
       <button
         class="btn btn-icon"
         :disabled="currentPage === 1"
-        @click="$emit('changePage', currentPage - 1)"
+        @click="changePage(currentPage - 1)"
       >
         <font-awesome-icon icon="chevron-left" />
       </button>
@@ -240,7 +244,7 @@
       <button
         class="btn btn-icon"
         :disabled="currentPage === totalPages"
-        @click="$emit('changePage', currentPage + 1)"
+        @click="changePage(currentPage + 1)"
       >
         <font-awesome-icon icon="chevron-right" />
       </button>
@@ -287,9 +291,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 import type { Ticket } from '@/models';
-import { defineProps } from 'vue';
 import { TicketPriority, TicketStatus, DisapprovalReason, CorrectionReason } from '@/models';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
@@ -298,22 +301,26 @@ import { formatDate } from '@/utils/date';
 import { toast } from 'vue3-toastify';
 import ConfirmationModal from '../common/ConfirmationModal.vue';
 import { useUserStore } from '@/stores/user';
+import { useTicketsStore } from '@/stores/tickets';
 import BaseModal from '../common/BaseModal.vue';
 import { calculateDeadline, formatSnakeToNaturalCase, enumToOptions } from '@/utils/generic-helper';
 
 const props = defineProps<{
-  tickets: Ticket[];
-  isLoading: boolean;
-  currentPage?: number;
-  totalPages?: number;
-  tableType?: 'recebidos' | 'criados' | 'setor' | 'arquivo';
+  tableType: 'recebidos' | 'criados' | 'setor' | 'arquivo';
+  pagination?: boolean;
+  currentPage: number;
 }>();
 
+const emit = defineEmits(['changePage']);
+
 const userStore = useUserStore();
+const ticketsStore = useTicketsStore();
+
 const isModalOpen = ref(false);
 const selectedTicket = ref<Ticket | null>(null);
 const showVerificationAlert = ref(false);
 const pendingVerificationTicket = ref<Ticket | null>(null);
+const currentPage = ref(props.currentPage);
 
 const confirmationModal = ref({
   isOpen: false,
@@ -324,7 +331,65 @@ const confirmationModal = ref({
   reasonOptions: [] as { value: string; label: string }[],
 });
 
-const emit = defineEmits(['refresh', 'changePage']);
+const displayedTickets = computed(() => {
+  switch (props.tableType) {
+    case 'recebidos':
+      return ticketsStore.receivedTickets.data;
+    case 'criados':
+      return ticketsStore.myTickets.data;
+    case 'setor':
+      return ticketsStore.departmentTickets.data;
+    case 'arquivo':
+      return ticketsStore.archivedTickets.data;
+    default:
+      return [];
+  }
+});
+
+const isLoading = computed(() => {
+  switch (props.tableType) {
+    case 'recebidos':
+      return ticketsStore.receivedTickets.isLoading;
+    case 'criados':
+      return ticketsStore.myTickets.isLoading;
+    case 'setor':
+      return ticketsStore.departmentTickets.isLoading;
+    case 'arquivo':
+      return ticketsStore.archivedTickets.isLoading;
+    default:
+      return false;
+  }
+});
+
+const totalPages = computed(() => {
+  let totalCount = 0;
+  switch (props.tableType) {
+    case 'recebidos':
+      totalCount = ticketsStore.receivedTickets.totalCount;
+      break;
+    case 'criados':
+      totalCount = ticketsStore.myTickets.totalCount;
+      break;
+    case 'setor':
+      totalCount = ticketsStore.departmentTickets.totalCount;
+      break;
+    case 'arquivo':
+      totalCount = ticketsStore.archivedTickets.totalCount;
+      break;
+  }
+  return Math.ceil(totalCount / 10);
+});
+
+watch(
+  () => props.currentPage,
+  (newPage) => {
+    currentPage.value = newPage;
+  },
+);
+
+function changePage(page: number) {
+  emit('changePage', page);
+}
 
 const openTicketDetails = (ticket: Ticket) => {
   // Se for o solicitante e o ticket estiver aguardando verificação
@@ -342,15 +407,37 @@ const openTicketDetails = (ticket: Ticket) => {
   isModalOpen.value = true;
 };
 
-const refreshSelectedTicket = async () => {
-  if (!selectedTicket.value?.customId) return;
-  const response = await ticketService.getById(selectedTicket.value.customId);
-  selectedTicket.value = response.data;
-};
-
 const closeModal = () => {
   isModalOpen.value = false;
   selectedTicket.value = null;
+};
+
+const refreshTickets = async () => {
+  switch (props.tableType) {
+    case 'recebidos':
+      await ticketsStore.fetchReceivedTickets(currentPage.value);
+      break;
+    case 'criados':
+      await ticketsStore.fetchMyTickets(currentPage.value);
+      break;
+    case 'setor':
+      await ticketsStore.fetchDepartmentTickets(currentPage.value);
+      break;
+    case 'arquivo':
+      await ticketsStore.fetchArchivedTickets(currentPage.value);
+      break;
+  }
+};
+
+const refreshSelectedTicket = async () => {
+  if (!selectedTicket.value?.customId) return;
+
+  try {
+    const updatedTicket = await ticketsStore.fetchTicketDetails(selectedTicket.value.customId);
+    selectedTicket.value = updatedTicket;
+  } catch {
+    toast.error('Erro ao atualizar o ticket');
+  }
 };
 
 const getDeadlineClass = (date?: string) => {
@@ -460,7 +547,10 @@ const handleAcceptTicket = async (ticket: Ticket) => {
       try {
         await ticketService.accept(ticket.customId);
         toast.success('Ticket aceito com sucesso');
-        emit('refresh');
+
+        await refreshTickets();
+
+        await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
         toast.error('Erro ao aceitar o ticket');
       }
@@ -478,7 +568,12 @@ const handleVerifyTicket = async (ticket: Ticket) => {
           status: TicketStatus.AwaitingVerification,
         });
         toast.success('Ticket enviado para revisão');
-        emit('refresh');
+
+        await refreshTickets();
+
+        if (selectedTicket.value?.customId === ticket.customId) {
+          await ticketsStore.fetchTicketDetails(ticket.customId);
+        }
       } catch {
         toast.error('Erro ao enviar o ticket para revisão');
       }
@@ -494,7 +589,10 @@ const handleApproveTicket = async (ticket: Ticket) => {
       try {
         await ticketService.approve(ticket.customId);
         toast.success('Ticket aprovado com sucesso');
-        emit('refresh');
+
+        if (selectedTicket.value?.customId === ticket.customId) {
+          await ticketsStore.fetchTicketDetails(ticket.customId);
+        }
       } catch {
         toast.error('Erro ao aprovar o ticket');
       }
@@ -519,7 +617,10 @@ const handleRequestCorrection = async (ticket: Ticket) => {
         }
 
         toast.success('Correção solicitada com sucesso');
-        emit('refresh');
+
+        if (selectedTicket.value?.customId === ticket.customId) {
+          await ticketsStore.fetchTicketDetails(ticket.customId);
+        }
       } catch {
         toast.error('Erro ao solicitar correção');
       }
@@ -546,29 +647,31 @@ const handleRejectTicket = async (ticket: Ticket) => {
         }
 
         toast.success('Ticket reprovado com sucesso');
-        emit('refresh');
+
+        if (selectedTicket.value?.customId === ticket.customId) {
+          await ticketsStore.fetchTicketDetails(ticket.customId);
+        }
       } catch {
         toast.error('Erro ao reprovar o ticket');
       }
     },
-    true, // indicates that input fields are needed
+    true,
     reasonOptions,
   );
 };
 
 const handleStartVerification = async (ticket: Ticket) => {
   try {
-    // Atualiza o status
     const ticketResponse = await ticketService.updateStatus(ticket.customId, {
       status: TicketStatus.UnderVerification,
     });
 
-    // Abre o modal com o ticket
     selectedTicket.value = ticketResponse.data.ticketData;
     isModalOpen.value = true;
 
-    // Atualiza a tabela
-    emit('refresh');
+    if (selectedTicket.value?.customId === ticket.customId) {
+      await ticketsStore.fetchTicketDetails(ticket.customId);
+    }
   } catch {
     toast.error('Erro ao iniciar verificação');
   }
@@ -590,7 +693,10 @@ const handleCorrectTicket = async (ticket: Ticket) => {
       try {
         await ticketService.updateStatus(ticket.customId, { status: TicketStatus.InProgress });
         toast.success('Ticket em correção');
-        emit('refresh');
+
+        if (selectedTicket.value?.customId === ticket.customId) {
+          await ticketsStore.fetchTicketDetails(ticket.customId);
+        }
       } catch {
         toast.error('Erro ao iniciar correção');
       }

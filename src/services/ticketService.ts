@@ -38,7 +38,7 @@ export const ticketService = {
       page?: number;
       limit?: number;
     },
-  ): Promise<AxiosResponse<{ items: Ticket[]; totalPages: number }>> {
+  ): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
     return apiClient.get(`/tickets/department/${departmentId}`, {
       params,
     });
@@ -53,7 +53,7 @@ export const ticketService = {
       page?: number;
       limit?: number;
     },
-  ): Promise<AxiosResponse<{ items: Ticket[]; totalPages: number }>> {
+  ): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
     return apiClient.get(`/tickets/requester/${requesterId}`, {
       params,
     });

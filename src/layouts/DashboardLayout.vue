@@ -166,6 +166,7 @@ import NewTicketModal from '@/components/layout/NewTicketModal.vue';
 import ProfileModal from '@/components/layout/ProfileModal.vue';
 import NotificationsDropdown from '@/components/layout/NotificationsDropdown.vue';
 import { useUserStore } from '@/stores/user';
+import { useTicketsStore } from '@/stores/tickets';
 import { useRoute } from 'vue-router';
 import { notificationService } from '@/services/notificationService';
 import { toast } from 'vue3-toastify';
@@ -174,13 +175,14 @@ import taskyLogo from '@/assets/images/tasky.png';
 import taskyWhiteLogo from '@/assets/images/tasky-white-large.png';
 
 const user = useUserStore().user;
+const ticketsStore = useTicketsStore();
 const route = useRoute();
 
 const isTicketModalOpen = ref(false);
 const showProfileModal = ref(false);
 const showNotificationsModal = ref(false);
 const unreadCount = ref<number | undefined>(undefined);
-let intervalId: number | null = null;
+let notificationsIntervalId: number | null = null;
 // let source: EventSource | null = null;
 
 const darkMode = ref(localStorage.getItem('theme') === 'dark');
@@ -250,7 +252,9 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 };
 
-onMounted(fetchUnreadCount);
+const initializeTicketPolling = () => {
+  ticketsStore.startPolling();
+};
 
 onMounted(() => {
   // Sincroniza o estado inicial do modo escuro
@@ -258,10 +262,12 @@ onMounted(() => {
     document.body.classList.add('dark-mode');
   }
 
+  initializeTicketPolling();
+
   //let's use a polling strategy for now
-  intervalId = setInterval(() => {
+  notificationsIntervalId = setInterval(() => {
     fetchUnreadCount();
-  }, 60000);
+  }, 90000);
 
   // source = new EventSource(`${import.meta.env.VITE_API_BASE_URL}/notifications/stream/${user?.id}`);
   // source.onmessage = () => {
@@ -274,9 +280,11 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if (intervalId) {
-    clearInterval(intervalId);
+  if (notificationsIntervalId) {
+    clearInterval(notificationsIntervalId);
   }
+
+  ticketsStore.stopPolling();
 
   // source?.close();
   document.removeEventListener('click', handleClickOutside);
