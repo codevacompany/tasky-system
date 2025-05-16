@@ -104,6 +104,7 @@
             :tableType="activeTab"
             :currentPage="currentPage"
             :totalPages="totalPages"
+            :pagination="true"
             @changePage="(page) => (currentPage = page)"
             @viewTicket="handleViewTicket"
             @refresh="fetchTicketsWithFilters"
@@ -149,6 +150,7 @@
             :tableType="activeTab"
             :currentPage="currentPage"
             :totalPages="totalPages"
+            :pagination="true"
             @changePage="(page) => (currentPage = page)"
             @viewTicket="handleViewTicket"
             @editTicket="handleEditTicket"
@@ -200,7 +202,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { ticketService } from '@/services/ticketService';
 import { useTicketsStore } from '@/stores/tickets';
 import type { Ticket } from '@/models';
@@ -290,7 +292,7 @@ const fetchTicketsWithFilters = async () => {
   };
 
   const storeType = typeMap[activeTab.value];
-  await ticketsStore.fetchTickets(storeType, currentPage.value, 10);
+  await ticketsStore.setCurrentPage(storeType, currentPage.value);
 };
 
 const totalTickets = computed(() => tickets.value.length);
@@ -395,15 +397,6 @@ const handleRejectTicket = async (ticket: Ticket) => {
 const toggleView = () => {
   isKanbanView.value = !isKanbanView.value;
 };
-
-onMounted(() => {
-  Promise.all([
-    ticketsStore.fetchReceivedTickets(),
-    ticketsStore.fetchMyTickets(),
-    ticketsStore.fetchDepartmentTickets(),
-    ticketsStore.fetchArchivedTickets(),
-  ]);
-});
 
 watch(searchTerm, () => {
   debouncedSearch();

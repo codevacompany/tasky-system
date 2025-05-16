@@ -155,8 +155,8 @@ const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
 const isLoading = ref(true);
 const userStats = ref<UserStatistics | null>(null);
-const latestReceivedTickets = computed(() => ticketsStore.getRecentReceivedTickets);
-const latestCreatedTickets = computed(() => ticketsStore.getRecentMyTickets);
+const latestReceivedTickets = computed(() => ticketsStore.recentReceivedTickets);
+const latestCreatedTickets = computed(() => ticketsStore.recentCreatedTickets);
 
 const totalTickets = computed(() => ({
   total: latestReceivedTickets.value.length + latestCreatedTickets.value.length,
@@ -197,9 +197,16 @@ const resolutionRate = computed(() => {
 
 onMounted(async () => {
   isLoading.value = true;
-  try {
-    await Promise.all([ticketsStore.fetchReceivedTickets(1, 5), ticketsStore.fetchMyTickets(1, 5)]);
 
+  if (ticketsStore.receivedTickets.currentPage !== 1) {
+    await ticketsStore.fetchReceivedTickets(1);
+  }
+
+  if (ticketsStore.myTickets.currentPage !== 1) {
+    await ticketsStore.fetchMyTickets(1);
+  }
+
+  try {
     if (userStore.user?.id) {
       const userStatsResponse = await reportService.getUserStatistics();
       userStats.value = userStatsResponse;

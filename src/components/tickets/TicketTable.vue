@@ -308,7 +308,10 @@ import { calculateDeadline, formatSnakeToNaturalCase, enumToOptions } from '@/ut
 const props = defineProps<{
   tableType: 'recebidos' | 'criados' | 'setor' | 'arquivo';
   pagination?: boolean;
+  currentPage: number;
 }>();
+
+const emit = defineEmits(['changePage']);
 
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
@@ -317,7 +320,7 @@ const isModalOpen = ref(false);
 const selectedTicket = ref<Ticket | null>(null);
 const showVerificationAlert = ref(false);
 const pendingVerificationTicket = ref<Ticket | null>(null);
-const currentPage = ref(1);
+const currentPage = ref(props.currentPage);
 
 const confirmationModal = ref({
   isOpen: false,
@@ -377,29 +380,15 @@ const totalPages = computed(() => {
   return Math.ceil(totalCount / 10);
 });
 
-watch(currentPage, () => {
-  fetchTickets();
-});
-
-function fetchTickets() {
-  switch (props.tableType) {
-    case 'recebidos':
-      ticketsStore.fetchReceivedTickets(currentPage.value);
-      break;
-    case 'criados':
-      ticketsStore.fetchMyTickets(currentPage.value);
-      break;
-    case 'setor':
-      ticketsStore.fetchDepartmentTickets(currentPage.value);
-      break;
-    case 'arquivo':
-      ticketsStore.fetchArchivedTickets(currentPage.value);
-      break;
-  }
-}
+watch(
+  () => props.currentPage,
+  (newPage) => {
+    currentPage.value = newPage;
+  },
+);
 
 function changePage(page: number) {
-  currentPage.value = page;
+  emit('changePage', page);
 }
 
 const openTicketDetails = (ticket: Ticket) => {

@@ -74,11 +74,11 @@ const linkDestination = computed(() => {
 const tickets = computed(() => {
   switch (props.type) {
     case 'received':
-      return ticketsStore.getRecentReceivedTickets;
+      return ticketsStore.recentReceivedTickets;
     case 'created':
-      return ticketsStore.getRecentMyTickets;
+      return ticketsStore.recentCreatedTickets;
     case 'department':
-      return ticketsStore.getRecentDepartmentTickets;
+      return ticketsStore.departmentTickets.data.slice(0, 5);
     default:
       return [];
   }

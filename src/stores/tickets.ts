@@ -11,6 +11,7 @@ interface TicketsState {
     error: string | null;
     totalCount: number;
     lastFetched: Date | null;
+    currentPage: number;
   };
   receivedTickets: {
     data: Ticket[];
@@ -18,6 +19,7 @@ interface TicketsState {
     error: string | null;
     totalCount: number;
     lastFetched: Date | null;
+    currentPage: number;
   };
   departmentTickets: {
     data: Ticket[];
@@ -25,6 +27,7 @@ interface TicketsState {
     error: string | null;
     totalCount: number;
     lastFetched: Date | null;
+    currentPage: number;
   };
   archivedTickets: {
     data: Ticket[];
@@ -32,7 +35,10 @@ interface TicketsState {
     error: string | null;
     totalCount: number;
     lastFetched: Date | null;
+    currentPage: number;
   };
+  recentReceivedTickets: Ticket[];
+  recentCreatedTickets: Ticket[];
   selectedTicket: Ticket | null;
   globalRefreshInterval: number;
   isPollingActive: boolean;
@@ -46,6 +52,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     error: null,
     totalCount: 0,
     lastFetched: null,
+    currentPage: 1,
   });
 
   const receivedTickets = ref<TicketsState['receivedTickets']>({
@@ -54,6 +61,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     error: null,
     totalCount: 0,
     lastFetched: null,
+    currentPage: 1,
   });
 
   const departmentTickets = ref<TicketsState['departmentTickets']>({
@@ -62,6 +70,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     error: null,
     totalCount: 0,
     lastFetched: null,
+    currentPage: 1,
   });
 
   const archivedTickets = ref<TicketsState['archivedTickets']>({
@@ -70,10 +79,13 @@ export const useTicketsStore = defineStore('tickets', () => {
     error: null,
     totalCount: 0,
     lastFetched: null,
+    currentPage: 1,
   });
 
+  const recentReceivedTickets = ref<Ticket[]>([]);
+  const recentCreatedTickets = ref<Ticket[]>([]);
   const selectedTicket = ref<Ticket | null>(null);
-  const globalRefreshInterval = ref<number>(90000);  // 1 minute default
+  const globalRefreshInterval = ref<number>(90000); // 1 minute default
   const isPollingActive = ref<boolean>(false);
   let pollingTimerId: number | null = null;
 
@@ -91,19 +103,6 @@ export const useTicketsStore = defineStore('tickets', () => {
     };
   });
 
-  // Recent tickets for dashboard
-  const getRecentMyTickets = computed(() => {
-    return myTickets.value.data.slice(0, 5);
-  });
-
-  const getRecentReceivedTickets = computed(() => {
-    return receivedTickets.value.data.slice(0, 5);
-  });
-
-  const getRecentDepartmentTickets = computed(() => {
-    return departmentTickets.value.data.slice(0, 5);
-  });
-
   // Actions
   async function fetchMyTickets(page = 1, limit = 10) {
     const userStore = useUserStore();
@@ -113,6 +112,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       myTickets.value.isLoading = true;
     }
 
+    myTickets.value.currentPage = page;
     myTickets.value.error = null;
 
     try {
@@ -120,6 +120,10 @@ export const useTicketsStore = defineStore('tickets', () => {
       myTickets.value.data = response.data.items;
       myTickets.value.totalCount = response.data.total;
       myTickets.value.lastFetched = new Date();
+
+      if (page === 1) {
+        recentCreatedTickets.value = response.data.items.slice(0, 5);
+      }
     } catch (error) {
       myTickets.value.error = 'Failed to fetch your tickets';
       console.error('Error fetching my tickets:', error);
@@ -136,6 +140,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       receivedTickets.value.isLoading = true;
     }
 
+    receivedTickets.value.currentPage = page;
     receivedTickets.value.error = null;
 
     try {
@@ -143,6 +148,10 @@ export const useTicketsStore = defineStore('tickets', () => {
       receivedTickets.value.data = response.data.items;
       receivedTickets.value.totalCount = response.data.total;
       receivedTickets.value.lastFetched = new Date();
+
+      if (page === 1) {
+        recentReceivedTickets.value = response.data.items.slice(0, 5);
+      }
     } catch (error) {
       receivedTickets.value.error = 'Failed to fetch received tickets';
       console.error('Error fetching received tickets:', error);
@@ -159,6 +168,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       departmentTickets.value.isLoading = true;
     }
 
+    departmentTickets.value.currentPage = page;
     departmentTickets.value.error = null;
 
     try {
@@ -182,6 +192,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       archivedTickets.value.isLoading = true;
     }
 
+    archivedTickets.value.currentPage = page;
     archivedTickets.value.error = null;
 
     try {
@@ -240,21 +251,10 @@ export const useTicketsStore = defineStore('tickets', () => {
     const userStore = useUserStore();
     if (!userStore.user) return;
 
-    if (myTickets.value.lastFetched) {
-      await fetchMyTickets();
-    }
-
-    if (receivedTickets.value.lastFetched) {
-      await fetchReceivedTickets();
-    }
-
-    if (departmentTickets.value.lastFetched && userStore.user.departmentId) {
-      await fetchDepartmentTickets();
-    }
-
-    if (archivedTickets.value.lastFetched) {
-      await fetchArchivedTickets();
-    }
+    await fetchMyTickets(myTickets.value.currentPage);
+    await fetchReceivedTickets(receivedTickets.value.currentPage);
+    await fetchDepartmentTickets(departmentTickets.value.currentPage);
+    await fetchArchivedTickets(archivedTickets.value.currentPage);
   }
 
   function startPolling() {
@@ -310,6 +310,42 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
   }
 
+  function setMyTicketsPage(page: number) {
+    myTickets.value.currentPage = page;
+    return fetchMyTickets(page);
+  }
+
+  function setReceivedTicketsPage(page: number) {
+    receivedTickets.value.currentPage = page;
+    return fetchReceivedTickets(page);
+  }
+
+  function setDepartmentTicketsPage(page: number) {
+    departmentTickets.value.currentPage = page;
+    return fetchDepartmentTickets(page);
+  }
+
+  function setArchivedTicketsPage(page: number) {
+    archivedTickets.value.currentPage = page;
+    return fetchArchivedTickets(page);
+  }
+
+  function setCurrentPage(
+    type: 'createdByMe' | 'received' | 'department' | 'archived',
+    page: number,
+  ) {
+    switch (type) {
+      case 'createdByMe':
+        return setMyTicketsPage(page);
+      case 'received':
+        return setReceivedTicketsPage(page);
+      case 'department':
+        return setDepartmentTicketsPage(page);
+      case 'archived':
+        return setArchivedTicketsPage(page);
+    }
+  }
+
   return {
     // State
     myTickets,
@@ -320,11 +356,12 @@ export const useTicketsStore = defineStore('tickets', () => {
     globalRefreshInterval,
     isPollingActive,
 
+    // Recent tickets
+    recentReceivedTickets,
+    recentCreatedTickets,
+
     // Getters
     getTicketById,
-    getRecentMyTickets,
-    getRecentReceivedTickets,
-    getRecentDepartmentTickets,
 
     // Actions
     fetchMyTickets,
@@ -340,5 +377,12 @@ export const useTicketsStore = defineStore('tickets', () => {
     setRefreshInterval,
     fetchTickets,
     $dispose,
+
+    // Pagination control
+    setCurrentPage,
+    setMyTicketsPage,
+    setReceivedTicketsPage,
+    setDepartmentTicketsPage,
+    setArchivedTicketsPage,
   };
 });
