@@ -24,7 +24,7 @@
 
     <div v-if="!loading && !error">
       <!-- Cabeçalho -->
-    <div class="header">
+      <div class="header">
         <div class="breadcrumb">
           <span>Dashboard</span>
           <font-awesome-icon icon="chevron-right" class="breadcrumb-separator" />
@@ -46,7 +46,7 @@
             </button>
           </div>
         </div>
-    </div>
+      </div>
 
       <div class="content">
         <!-- Cards de Métricas -->
@@ -56,11 +56,11 @@
               <div class="metric-info">
                 <p class="metric-label">Total de Tickets</p>
                 <h3 class="metric-value">{{ statistics?.totalTickets }}</h3>
-        </div>
+              </div>
               <div class="metric-icon blue">
                 <font-awesome-icon icon="ticket" />
-          </div>
-          </div>
+              </div>
+            </div>
           </div>
 
           <div class="metric-card yellow-border">
@@ -71,9 +71,9 @@
               </div>
               <div class="metric-icon yellow">
                 <font-awesome-icon icon="chart-line" />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
           <div class="metric-card green-border">
             <div class="metric-content">
@@ -82,7 +82,7 @@
                 <h3 class="metric-value">
                   {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }}
                 </h3>
-        </div>
+              </div>
               <div class="metric-icon green">
                 <font-awesome-icon icon="clock" />
               </div>
@@ -209,7 +209,7 @@
                       <Line
                         v-if="trendData && trendData.length > 0"
                         :data="createdVsCompletedChartData"
-                        :options="chartOptions"
+                        :options="createdVsCompletedChartOptions"
                       />
                       <div v-else class="loading-state">
                         <font-awesome-icon icon="spinner" spin class="loading-icon" />
@@ -222,55 +222,89 @@
 
               <div class="charts-grid">
                 <!-- Gráfico de Status -->
-                <div class="chart-card">
+                <div class="chart-card status-chart-flex">
                   <div class="chart-header">
                     <h2 class="chart-title">Distribuição por Status</h2>
                     <div class="chart-icon">
                       <font-awesome-icon icon="chart-pie" />
                     </div>
                   </div>
-                  <div class="chart-container">
-        <div class="chart-wrapper">
-          <Pie
-            v-if="ticketsByStatus.labels.length"
-                        :data="statusChartData"
-            :options="chartOptions"
-          />
-                      <div v-else class="loading-state">
-                        <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                        <p class="loading-text">Carregando dados...</p>
+                  <div class="status-chart-row">
+                    <div class="chart-container">
+                      <div class="chart-wrapper">
+                        <Doughnut
+                          v-if="ticketsByStatus.labels.length"
+                          :data="statusChartData"
+                          :options="chartOptions"
+                        />
+                        <div v-else class="loading-state">
+                          <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                          <p class="loading-text">Carregando dados...</p>
+                        </div>
                       </div>
-          </div>
-        </div>
-      </div>
+                    </div>
+                    <div class="status-custom-legend">
+                      <div
+                        v-for="(label, idx) in statusChartData.labels"
+                        :key="label"
+                        class="legend-item"
+                      >
+                        <span
+                          class="legend-color"
+                          :style="{
+                            backgroundColor: statusChartData.datasets[0].backgroundColor[idx],
+                          }"
+                        ></span>
+                        <span class="legend-label">{{ label }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <!-- Gráfico de Prioridade -->
-                <div class="chart-card">
+                <div class="chart-card status-chart-flex">
                   <div class="chart-header">
                     <h2 class="chart-title">Distribuição por Prioridade</h2>
                     <div class="chart-icon">
                       <font-awesome-icon icon="chart-bar" />
-        </div>
+                    </div>
                   </div>
-                  <div class="chart-container">
-        <div class="chart-wrapper">
-          <Bar
-            v-if="ticketsByPriority.labels.length"
-                        :data="priorityChartData"
-            :options="chartOptions"
-          />
-                      <div v-else class="loading-state">
-                        <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                        <p class="loading-text">Carregando dados...</p>
+                  <div class="status-chart-row">
+                    <div class="chart-container">
+                      <div class="chart-wrapper">
+                        <Doughnut
+                          v-if="ticketsByPriority.labels.length"
+                          :data="priorityChartData"
+                          :options="chartOptions"
+                        />
+                        <div v-else class="loading-state">
+                          <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                          <p class="loading-text">Carregando dados...</p>
+                        </div>
                       </div>
-          </div>
-        </div>
-      </div>
-    </div>
+                    </div>
+                    <div class="status-custom-legend">
+                      <div
+                        v-for="(label, idx) in priorityChartData.labels"
+                        :key="label"
+                        class="legend-item"
+                      >
+                        <span
+                          class="legend-color"
+                          :style="{
+                            backgroundColor: priorityChartData.datasets[0].backgroundColor[idx],
+                          }"
+                        ></span>
+                        <span class="legend-label">{{ label }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <!-- Tabela -->
               <div class="table-container">
-      <div class="table-header">
+                <div class="table-header">
                   <div class="table-header-content">
                     <div>
                       <h2 class="table-title">Últimos Tickets</h2>
@@ -281,36 +315,36 @@
                       Exportar
                     </button>
                   </div>
-      </div>
-      <div class="table-wrapper">
+                </div>
+                <div class="table-wrapper">
                   <table class="table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Assunto</th>
-              <th>Status</th>
-              <th>Prioridade</th>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Assunto</th>
+                        <th>Status</th>
+                        <th>Prioridade</th>
                         <th>Data</th>
-            </tr>
-          </thead>
-          <tbody>
+                      </tr>
+                    </thead>
+                    <tbody>
                       <tr v-for="ticket in recentTickets" :key="ticket.customId">
                         <td>{{ ticket.customId }}</td>
-              <td>{{ ticket.name }}</td>
-              <td>
+                        <td>{{ ticket.name }}</td>
+                        <td>
                           <span :class="['status-badge', getStatusClass(ticket.status)]">
                             {{ formatSnakeToNaturalCase(ticket.status) }}
-                </span>
-              </td>
-              <td>
+                          </span>
+                        </td>
+                        <td>
                           <span :class="['priority-badge', getPriorityClass(ticket.priority)]">
                             {{ formatSnakeToNaturalCase(ticket.priority) }}
-                </span>
-              </td>
-              <td>{{ formatDate(ticket.createdAt) }}</td>
-            </tr>
-          </tbody>
-        </table>
+                          </span>
+                        </td>
+                        <td>{{ formatDate(ticket.createdAt) }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
@@ -379,11 +413,11 @@
                             }"
                           >
                             {{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}
-                      </div>
-                      </div>
+                          </div>
+                        </div>
                       </template>
-                      </div>
-                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -392,16 +426,24 @@
                 <div
                   v-for="dept in departmentStats"
                   :key="dept.departmentId"
-                  class="department-card"
+                  class="department-card department-card-modern"
                 >
-                  <h4 class="department-title">{{ dept.departmentName }}</h4>
+                  <div class="department-card-header">
+                    <div
+                      class="department-icon"
+                      :style="{ background: '#2563eb20', color: '#2563eb' }"
+                    >
+                      <font-awesome-icon icon="building" />
+                    </div>
+                    <h4 class="department-title">{{ dept.departmentName }}</h4>
+                  </div>
                   <div class="department-stats">
                     <div class="stat-row">
                       <span class="stat-label">Total de Chamados</span>
                       <span class="stat-value">{{ dept.totalTickets }}</span>
                     </div>
                     <div class="stat-row">
-                      <span class="stat-label">Chamados Resolvidos</span>
+                      <span class="stat-label">Resolvidos</span>
                       <span class="stat-value">{{ dept.resolvedTickets }}</span>
                     </div>
                     <div class="stat-row">
@@ -412,6 +454,26 @@
                       <span class="stat-label">Tempo Médio</span>
                       <span class="stat-value">{{
                         formatTimeInSeconds(dept.averageResolutionTimeSeconds)
+                      }}</span>
+                    </div>
+                    <div class="stat-row progress-row">
+                      <span class="stat-label">Progresso</span>
+                      <div class="progress-bar-bg">
+                        <div
+                          class="progress-bar-fill"
+                          :style="{
+                            width: dept.resolutionRate * 100 + '%',
+                            background:
+                              dept.resolutionRate > 0.7
+                                ? '#22c55e'
+                                : dept.resolutionRate > 0.4
+                                  ? '#eab308'
+                                  : '#ef4444',
+                          }"
+                        ></div>
+                      </div>
+                      <span class="progress-value">{{
+                        formatPercentage(dept.resolutionRate)
                       }}</span>
                     </div>
                   </div>
@@ -511,9 +573,9 @@
                         <td>
                           {{ formatTimeInSeconds(departmentStatsSummary.averageTotalTimeSeconds) }}
                         </td>
-            </tr>
-          </tbody>
-        </table>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
 
                 <div class="pagination">
@@ -581,42 +643,67 @@
                             }"
                           >
                             {{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}
-                      </div>
-                      </div>
+                          </div>
+                        </div>
                       </template>
+                    </div>
                   </div>
                 </div>
-
-                <!-- Existing department cards -->
-                <div class="departments-grid">
-                  <div
-                    v-for="dept in departmentStats"
-                    :key="dept.departmentId"
-                    class="department-card"
-                  >
+              </div>
+              <!-- Existing department cards -->
+              <div class="departments-grid">
+                <div
+                  v-for="dept in departmentStats"
+                  :key="dept.departmentId"
+                  class="department-card department-card-modern"
+                >
+                  <div class="department-card-header">
+                    <div
+                      class="department-icon"
+                      :style="{ background: '#2563eb20', color: '#2563eb' }"
+                    >
+                      <font-awesome-icon icon="building" />
+                    </div>
                     <h4 class="department-title">{{ dept.departmentName }}</h4>
-                    <div class="department-stats">
-                      <div class="stat-row">
-                        <span class="stat-label">Total de Chamados</span>
-                        <span class="stat-value">{{ dept.totalTickets }}</span>
+                  </div>
+                  <div class="department-stats">
+                    <div class="stat-row">
+                      <span class="stat-label">Total de Chamados</span>
+                      <span class="stat-value">{{ dept.totalTickets }}</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">Resolvidos</span>
+                      <span class="stat-value">{{ dept.resolvedTickets }}</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">Taxa de Resolução</span>
+                      <span class="stat-value">{{ formatPercentage(dept.resolutionRate) }}</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">Tempo Médio</span>
+                      <span class="stat-value">{{
+                        formatTimeInSeconds(dept.averageResolutionTimeSeconds)
+                      }}</span>
+                    </div>
+                    <div class="stat-row progress-row">
+                      <span class="stat-label">Progresso</span>
+                      <div class="progress-bar-bg">
+                        <div
+                          class="progress-bar-fill"
+                          :style="{
+                            width: dept.resolutionRate * 100 + '%',
+                            background:
+                              dept.resolutionRate > 0.7
+                                ? '#22c55e'
+                                : dept.resolutionRate > 0.4
+                                  ? '#eab308'
+                                  : '#ef4444',
+                          }"
+                        ></div>
                       </div>
-                      <div class="stat-row">
-                        <span class="stat-label">Chamados Resolvidos</span>
-                        <span class="stat-value">{{ dept.resolvedTickets }}</span>
-                      </div>
-                      <div class="stat-row">
-                        <span class="stat-label">Taxa de Resolução</span>
-                          <span class="stat-value">{{
-                            formatPercentage(dept.resolutionRate)
-                          }}</span>
-                      </div>
-                      <div class="stat-row">
-                        <span class="stat-label">Tempo Médio</span>
-                          <span class="stat-value">{{
-                            formatTimeInSeconds(dept.averageResolutionTimeSeconds)
-                          }}</span>
-                        </div>
-                      </div>
+                      <span class="progress-value">{{
+                        formatPercentage(dept.resolutionRate)
+                      }}</span>
                     </div>
                   </div>
                 </div>
@@ -727,12 +814,12 @@
                     <div class="chart-container">
                       <Line
                         v-if="trendData && trendData.length > 0 && trendChartData"
-                    :data="trendChartData"
-                    :options="chartOptions"
-                  />
-                  <div v-else class="loading-state">
-                    <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                    <p class="loading-text">Carregando dados...</p>
+                        :data="trendChartData"
+                        :options="trendChartOptions"
+                      />
+                      <div v-else class="loading-state">
+                        <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                        <p class="loading-text">Carregando dados...</p>
                       </div>
                     </div>
                   </div>
@@ -865,8 +952,8 @@
                             }"
                           >
                             {{ formatTimeInSeconds(duration.averageDurationSeconds) }}
-                      </div>
-                      </div>
+                          </div>
+                        </div>
                       </template>
                     </div>
                   </div>
@@ -1010,14 +1097,13 @@ import {
   RadialLinearScale,
   Filler,
 } from 'chart.js';
-import { Line, Bar, Pie } from 'vue-chartjs';
+import { Line, Doughnut } from 'vue-chartjs';
 import { formatDate, formatDateToPortuguese } from '@/utils/date';
 import { reportService } from '@/services/reportService';
 import { ticketService } from '@/services/ticketService';
 import type {
   TenantStatistics,
   StatusDurationDto,
-  StatusDurationResponseDto,
   DepartmentStats,
 } from '@/services/reportService';
 import { TicketActionType, TicketStatus, type TicketUpdate } from '@/models';
@@ -1028,7 +1114,8 @@ import {
   formatTimeCompact,
   formatTimeInSeconds,
 } from '@/utils/generic-helper';
-//import type { TicketStatus, TicketPriority } from '@/models';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+ChartJS.register(ChartDataLabels);
 
 // Define the StatsPeriod enum
 enum StatsPeriod {
@@ -1058,20 +1145,101 @@ ChartJS.register(
 );
 
 // Local type definitions
-type CustomTicketStatus = 'Em andamento' | 'Finalizado' | 'Atrasado' | 'Outro';
-type TicketPriority = 'Alta' | 'Média' | 'Baixa';
-
 interface ChartData {
   labels: string[];
-  data: number[];
+  datasets: {
+    label: string;
+    data: number[];
+    borderColor?: string | string[];
+    backgroundColor?: string | string[];
+    fill?: boolean;
+    borderWidth?: number;
+  }[];
 }
 
-const chartOptions = {
+type CustomTicketStatus =
+  | 'pendente'
+  | 'em_andamento'
+  | 'aguardando_verificação'
+  | 'em_verificação'
+  | 'finalizado'
+  | 'cancelado'
+  | 'reprovado';
+
+interface ChartOptions {
+  responsive: boolean;
+  maintainAspectRatio: boolean;
+  plugins: {
+    legend: {
+      display: boolean;
+      position: 'bottom' | 'top' | 'left' | 'right';
+      labels: {
+        usePointStyle: boolean;
+        padding: number;
+        font: {
+          size: number;
+        };
+      };
+    };
+    tooltip: {
+      backgroundColor: string;
+      padding: number;
+      titleFont: {
+        size: number;
+      };
+      bodyFont: {
+        size: number;
+      };
+      callbacks?: {
+        label?: (context: any) => string;
+      };
+    };
+    datalabels: {
+      display: boolean;
+      formatter?: (value: number, context: any) => string;
+      color?: string;
+      font?: {
+        weight: 'bold' | 'normal' | 'bolder' | 'lighter' | number;
+        size: number;
+      };
+    };
+  };
+  scales?: {
+    y: {
+      beginAtZero: boolean;
+      ticks: {
+        precision: number;
+      };
+    };
+  };
+}
+
+// Ordem e cores fixas para status
+const statusOrder = [
+  { key: 'pendente', label: 'Pendente', color: '#eab308' },
+  { key: 'em_andamento', label: 'Em andamento', color: '#2563eb' },
+  { key: 'aguardando_verificacao', label: 'Aguardando verificação', color: '#d8b4fe' },
+  { key: 'em_verificacao', label: 'Em verificação', color: '#9333ea' },
+  { key: 'finalizado', label: 'Finalizado', color: '#2ecc71' },
+  { key: 'cancelado', label: 'Cancelado', color: '#f87171' },
+  { key: 'reprovado', label: 'Reprovado', color: '#c62828' },
+];
+
+// Ordem e cores fixas para prioridade
+const priorityOrder = [
+  { key: 'baixa', label: 'Baixa', color: '#22c55e' },
+  { key: 'media', label: 'Média', color: '#eab308' },
+  { key: 'alta', label: 'Alta', color: '#ef4444' },
+];
+
+// Chart options - garantir percentuais
+const chartOptions = ref<ChartOptions>({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      position: 'bottom' as const,
+      display: false,
+      position: 'bottom',
       labels: {
         usePointStyle: true,
         padding: 20,
@@ -1081,64 +1249,139 @@ const chartOptions = {
       },
     },
     tooltip: {
-      backgroundColor: 'white',
-      titleColor: '#1f2937',
-      bodyColor: '#4b5563',
-      borderColor: '#e5e7eb',
-      borderWidth: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
       padding: 12,
-      boxPadding: 6,
-      usePointStyle: true,
+      titleFont: {
+        size: 14,
+      },
+      bodyFont: {
+        size: 13,
+      },
+    },
+    datalabels: {
+      display: true,
+      formatter: (value: number, context: any) => {
+        const data = context.dataset.data;
+        const total = data.reduce((a: number, b: number) => a + b, 0);
+        const percent = Math.round((value / total) * 100);
+        return percent > 0 ? `${percent}%` : '';
+      },
+      color: '#fff',
+      font: {
+        weight: 'bold',
+        size: 14,
+      },
+    },
+  },
+});
+
+const trendChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: true,
+      position: 'bottom' as const,
+      labels: {
+        usePointStyle: true,
+        padding: 20,
+        font: { size: 12 },
+      },
+    },
+    tooltip: {
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      padding: 12,
+      titleFont: { size: 14 },
+      bodyFont: { size: 13 },
       callbacks: {
-        label: (context: { raw: unknown }): string => {
-          const value = context.raw;
-          if (typeof value === 'number') {
-            return ` ${value} tickets`;
-          }
-          return String(value);
-        },
+        label: (context: any) => `${context.dataset.label}: ${context.parsed.y}`,
       },
     },
   },
   scales: {
-    x: {
-      grid: {
-        display: false,
-      },
-      ticks: {
-        font: {
-          size: 12,
-        },
-      },
-    },
     y: {
       beginAtZero: true,
-      grid: {
-        color: '#f3f4f6',
-      },
-      ticks: {
-        font: {
-          size: 12,
-        },
-        stepSize: 1,
-      },
+      ticks: { precision: 0 },
     },
   },
 };
 
-const statistics = ref<TenantStatistics>();
+const createdVsCompletedChartOptions = ref<ChartOptions>({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: true,
+      position: 'bottom',
+      labels: {
+        usePointStyle: true,
+        padding: 20,
+        font: {
+          size: 12,
+        },
+      },
+    },
+    tooltip: {
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      padding: 12,
+      titleFont: {
+        size: 14,
+      },
+      bodyFont: {
+        size: 13,
+      },
+    },
+    datalabels: {
+      display: false,
+    },
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      ticks: {
+        precision: 0,
+      },
+    },
+  },
+});
+
+const statistics = ref<TenantStatistics | null>(null);
 
 const loading = ref(true);
 const error = ref<string | null>(null);
 
 const ticketsByStatus = ref<ChartData>({
   labels: [],
-  data: [],
+  datasets: [
+    {
+      label: 'Status',
+      data: [],
+      backgroundColor: [
+        '#eab308', // Pendente (amarelo)
+        '#2563eb', // Em andamento (azul)
+        '#d8b4fe', // Aguardando Verificação (roxo claro)
+        '#9333ea', // Em Verificação (roxo escuro)
+        '#2ecc71', // Finalizado (verde)
+        '#f87171', // Cancelado (vermelho claro)
+        '#c62828', // Reprovado (vermelho escuro)
+      ] as string[],
+    },
+  ],
 });
 
 const ticketsByPriority = ref<ChartData>({
   labels: [],
-  data: [],
+  datasets: [
+    {
+      label: 'Quantidade de Tickets',
+      data: [],
+      backgroundColor: [
+        '#22c55e', // Baixa (verde)
+        '#eab308', // Média (amarelo)
+        '#ef4444', // Alta (vermelho)
+      ] as string[],
+    },
+  ],
 });
 
 const recentTickets = ref<
@@ -1146,24 +1389,27 @@ const recentTickets = ref<
 >([]);
 
 const statusClassMap: Record<CustomTicketStatus, string> = {
-  'Em andamento': 'bg-yellow-100 text-yellow-800',
-  Finalizado: 'bg-green-100 text-green-800',
-  Atrasado: 'bg-red-100 text-red-800',
-  Outro: 'bg-gray-100 text-gray-800',
+  pendente: 'bg-yellow-100 text-yellow-800',
+  em_andamento: 'bg-blue-100 text-blue-800',
+  aguardando_verificação: 'bg-purple-100 text-purple-800',
+  em_verificação: 'bg-indigo-100 text-indigo-800',
+  finalizado: 'bg-green-100 text-green-800',
+  cancelado: 'bg-red-100 text-red-800',
+  reprovado: 'bg-red-100 text-red-800',
 };
 
 const getStatusClass = (status: string): string => {
   return statusClassMap[status as CustomTicketStatus] || 'bg-gray-100 text-gray-800';
 };
 
-const priorityClassMap: Record<TicketPriority, string> = {
-  Alta: 'bg-red-100 text-red-800',
-  Média: 'bg-yellow-100 text-yellow-800',
-  Baixa: 'bg-blue-100 text-blue-800',
+const priorityClassMap: Record<string, string> = {
+  baixa: 'bg-green-100 text-green-800',
+  média: 'bg-yellow-100 text-yellow-800',
+  alta: 'bg-red-100 text-red-800',
 };
 
 const getPriorityClass = (priority: string): string => {
-  return priorityClassMap[priority as TicketPriority] || 'bg-blue-100 text-blue-800';
+  return priorityClassMap[priority] || 'bg-blue-100 text-blue-800';
 };
 
 // Add ref for status durations
@@ -1197,44 +1443,54 @@ const loadData = async () => {
     trendData.value = trends[selectedTrendPeriod.value];
 
     // Store status durations
-    statusDurations.value = (statusDurationsResult as StatusDurationResponseDto).statusDurations;
+    statusDurations.value = statusDurationsResult.statusDurations.map((duration) => ({
+      ...duration,
+      averageDuration: duration.averageDurationSeconds / 3600, // Converter segundos para horas
+    }));
 
     // Store department data - directly from the API response
-    departmentData.value = departmentStatsResult;
+    departmentData.value = departmentStatsResult.map((dept) => ({
+      ...dept,
+      departmentId: dept.departmentId, // manter como number
+      totalTickets: dept.totalTickets || 0,
+      resolvedTickets: dept.resolvedTickets || 0,
+      resolutionRate: dept.resolutionRate || 0,
+      averageAcceptanceTimeSeconds: dept.averageAcceptanceTimeSeconds || 0,
+      averageTotalTimeSeconds: dept.averageTotalTimeSeconds || 0,
+    }));
 
-    // Transform status data from API into ChartData format
+    // Distribuição por Status
+    const statusCounts = statusOrder.map((status) => {
+      const found = statusResult.statusCounts.find((item: any) => item.status === status.key);
+      return found ? found.count : 0;
+    });
     ticketsByStatus.value = {
-      labels: statusResult.statusCounts.map((item: { status: string; count: number }) => {
-        // Map enum values to readable text
-        const statusLabels: Record<string, string> = {
-          pendente: 'Pendente',
-          em_andamento: 'Em andamento',
-          finalizado: 'Finalizado',
-          cancelado: 'Cancelado',
-          devolvido: 'Devolvido',
-          aguardando_verificação: 'Aguardando Verificação',
-          em_verificação: 'Em Verificação',
-          reprovado: 'Reprovado',
-        };
-        return statusLabels[item.status] || item.status;
-      }),
-      data: statusResult.statusCounts.map((item: { status: string; count: number }) => item.count),
+      labels: statusOrder.map((s) => s.label),
+      datasets: [
+        {
+          label: 'Status',
+          data: statusCounts,
+          backgroundColor: statusOrder.map((s) => s.color),
+        },
+      ],
     };
 
-    // Transform priority data from API into ChartData format
+    // Distribuição por Prioridade
+    const priorityCounts = priorityOrder.map((priority) => {
+      const found = priorityResult.priorityCounts.find(
+        (item: any) => item.priority === priority.key,
+      );
+      return found ? found.count : 0;
+    });
     ticketsByPriority.value = {
-      labels: priorityResult.priorityCounts.map((item: { priority: string; count: number }) => {
-        // Map enum values to readable text
-        const priorityLabels: Record<string, string> = {
-          baixa: 'Baixa',
-          média: 'Média',
-          alta: 'Alta',
-        };
-        return priorityLabels[item.priority] || item.priority;
-      }),
-      data: priorityResult.priorityCounts.map(
-        (item: { priority: string; count: number }) => item.count,
-      ),
+      labels: priorityOrder.map((p) => p.label),
+      datasets: [
+        {
+          label: 'Quantidade de Tickets',
+          data: priorityCounts,
+          backgroundColor: priorityOrder.map((p) => p.color),
+        },
+      ],
     };
 
     // Mock recent tickets
@@ -1315,18 +1571,16 @@ const statusChartData = computed(() => ({
   labels: ticketsByStatus.value.labels,
   datasets: [
     {
-    data: ticketsByStatus.value.data,
+      data: ticketsByStatus.value.datasets[0].data,
       backgroundColor: [
-        '#2563eb',
-        '#eab308',
-        '#09f1f9',
-        '#9333ea',
-        '#22c55e',
-        '#f21010',
-        '#631818',
-        '#fc7405',
-      ],
-      borderWidth: 0,
+        '#eab308', // Pendente (amarelo)
+        '#2563eb', // Em andamento (azul)
+        '#d8b4fe', // Aguardando Verificação (roxo claro)
+        '#9333ea', // Em Verificação (roxo escuro)
+        '#2ecc71', // Finalizado (verde)
+        '#f87171', // Cancelado (vermelho claro)
+        '#c62828', // Reprovado (vermelho escuro)
+      ] as string[],
     },
   ],
 }));
@@ -1336,9 +1590,12 @@ const priorityChartData = computed(() => ({
   datasets: [
     {
       label: 'Quantidade de Tickets',
-    data: ticketsByPriority.value.data,
-    backgroundColor: ['#ef4444', '#eab308', '#2563eb'],
-      borderWidth: 0,
+      data: ticketsByPriority.value.datasets[0].data,
+      backgroundColor: [
+        '#22c55e', // Baixa (verde)
+        '#eab308', // Média (amarelo)
+        '#ef4444', // Alta (vermelho)
+      ] as string[],
     },
   ],
 }));
@@ -1349,9 +1606,8 @@ const trendData = ref<{ date: string; total: number; resolved: number; created: 
 
 const trendChartData = computed(() => {
   if (!trendData.value || trendData.value.length === 0) return null;
-
   return {
-    labels: trendData.value.map((item) => formatDateToPortuguese(item.date)),
+    labels: trendData.value.map((item) => formatDateDDMM(item.date)),
     datasets: [
       {
         label: 'Total de Chamados',
@@ -1360,6 +1616,7 @@ const trendChartData = computed(() => {
         backgroundColor: 'rgba(37, 99, 235, 0.1)',
         fill: true,
         tension: 0.4,
+        pointRadius: 3,
       },
       {
         label: 'Chamados Resolvidos',
@@ -1368,6 +1625,7 @@ const trendChartData = computed(() => {
         backgroundColor: 'rgba(34, 197, 94, 0.1)',
         fill: true,
         tension: 0.4,
+        pointRadius: 3,
       },
       {
         label: 'Novos Chamados',
@@ -1376,6 +1634,7 @@ const trendChartData = computed(() => {
         backgroundColor: 'rgba(234, 179, 8, 0.1)',
         fill: true,
         tension: 0.4,
+        pointRadius: 3,
       },
     ],
   };
@@ -1384,48 +1643,28 @@ const trendChartData = computed(() => {
 // Dados para o gráfico Created vs Completed
 const createdVsCompletedChartData = computed(() => {
   if (!trendData.value || trendData.value.length === 0) {
-    // Return an empty but valid chart data structure when there's no data
-    return {
-      labels: [],
-      datasets: [
-        {
-          label: 'Concluídos (no período)',
-          data: [],
-          borderColor: '#22c55e',
-          backgroundColor: 'rgba(34, 197, 94, 0.1)',
-          fill: true,
-          tension: 0.4,
-        },
-        {
-          label: 'Criados (no período)',
-          data: [],
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          fill: true,
-          tension: 0.4,
-        },
-      ],
-    };
+    return { labels: [], datasets: [] };
   }
-
   return {
-    labels: trendData.value.map((item) => formatDateToPortuguese(item.date)),
+    labels: trendData.value.map((item) => formatDateDDMM(item.date)),
     datasets: [
       {
-        label: 'Concluídos (no período)',
+        label: 'Criados',
+        data: trendData.value.map((item) => item.created),
+        borderColor: '#2563eb',
+        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+      },
+      {
+        label: 'Concluídos',
         data: trendData.value.map((item) => item.resolved),
         borderColor: '#22c55e',
         backgroundColor: 'rgba(34, 197, 94, 0.1)',
         fill: true,
         tension: 0.4,
-      },
-      {
-        label: 'Criados (no período)',
-        data: trendData.value.map((item) => item.created),
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        fill: true,
-        tension: 0.4,
+        pointRadius: 3,
       },
     ],
   };
@@ -1513,8 +1752,8 @@ const loadInProgressTasks = async () => {
 
     if (!response.data || !Array.isArray(response.data.items)) {
       console.error('Invalid response format for in-progress tickets');
-    return;
-  }
+      return;
+    }
 
     const transformedTasks = [];
 
@@ -1600,7 +1839,7 @@ const loadInProgressTasks = async () => {
           overdueReason,
           timeInProgressSeconds: diffInSeconds,
         });
-  } catch (error) {
+      } catch (error) {
         console.error('Error processing in-progress ticket:', error);
       }
     }
@@ -1669,11 +1908,11 @@ const handlePeriodChange = () => {
 };
 
 const getTotalResolved = () => {
-  return trendData.value?.reduce((total, item) => total + item.resolved, 0) || 0;
+  return trendData.value?.reduce((total, item) => total + (item.resolved || 0), 0) || 0;
 };
 
 const getTotalCreated = () => {
-  return trendData.value?.reduce((total, item) => total + item.created, 0) || 0;
+  return trendData.value?.reduce((total, item) => total + (item.created || 0), 0) || 0;
 };
 
 const createdTrendPercentage = computed(() => {
@@ -1708,6 +1947,14 @@ const firstDate = computed(() => {
   if (!trendData.value || trendData.value.length === 0) return '';
   return formatDateToPortuguese(trendData.value[0].date);
 });
+
+// Função utilitária para formatar data como DD/MM
+function formatDateDDMM(dateStr: string) {
+  const date = new Date(dateStr);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}`;
+}
 </script>
 
 <style scoped>
@@ -2213,6 +2460,7 @@ const firstDate = computed(() => {
 
 /* Departments */
 .departments-grid {
+  margin-top: 1rem;
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
@@ -3478,5 +3726,95 @@ const firstDate = computed(() => {
   outline: none;
   border-color: #2563eb;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.status-chart-flex {
+  display: flex;
+  flex-direction: column;
+}
+.status-chart-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center; /* Centraliza horizontalmente o conteúdo (gráfico + legenda) */
+}
+.status-custom-legend {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 2rem;
+  min-width: 140px;
+}
+.status-custom-legend .legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.95em;
+}
+.status-custom-legend .legend-color {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+.status-custom-legend .legend-label {
+  color: #374151;
+  font-weight: 500;
+}
+
+.department-card-modern {
+  box-shadow: 0 2px 8px 0 rgba(37, 99, 235, 0.07);
+  border: 1px solid #e5e7eb;
+  transition: box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+  padding-top: 1.25rem;
+}
+.department-card-modern:hover {
+  box-shadow: 0 4px 16px 0 rgba(37, 99, 235, 0.13);
+}
+.department-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.department-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background: #2563eb20;
+  color: #2563eb;
+}
+.progress-row {
+  align-items: center;
+  gap: 0.5rem;
+}
+.progress-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  margin: 0 0.5rem;
+  overflow: hidden;
+  min-width: 60px;
+  max-width: 120px;
+  display: inline-block;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s;
+}
+.progress-value {
+  font-size: 0.85em;
+  color: #374151;
+  min-width: 40px;
+  text-align: right;
 }
 </style>

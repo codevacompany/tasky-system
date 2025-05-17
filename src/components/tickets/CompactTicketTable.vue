@@ -2,30 +2,37 @@
   <div class="dashboard-card">
     <div class="card-header">
       <h2>{{ title }}</h2>
-      <router-link :to="linkDestination" class="card-action">Ver todos</router-link>
+      <router-link to="/meus-tickets" class="card-action">Ver todos</router-link>
     </div>
     <div class="card-content">
       <table class="data-table">
         <thead>
           <tr>
             <th>Assunto</th>
-            <th>Solicitante</th>
-            <th>Setor</th>
-            <th>Data</th>
+            <th v-if="title !== 'Últimos Tickets Criados'">Solicitante</th>
+            <th>{{ title === 'Últimos Tickets Criados' ? 'Destino' : 'Setor' }}</th>
+            <th>Prazo</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="isLoading">
-            <td colspan="5" class="loading-cell">
+            <td :colspan="title === 'Últimos Tickets Criados' ? 4 : 5" class="loading-cell">
               <LoadingSpinner :size="28" />
             </td>
           </tr>
           <tr v-else v-for="ticket in tickets" :key="ticket.id">
-            <td>{{ ticket.name }}</td>
-            <td>{{ ticket.requester.firstName }}</td>
+            <td class="assunto-col" :title="ticket.name">{{ ticket.name }}</td>
+            <td v-if="title !== 'Últimos Tickets Criados'">{{ ticket.requester.firstName }}</td>
             <td>{{ ticket.department.name }}</td>
-            <td>{{ formatDate(ticket.createdAt) }}</td>
+            <td>
+              <template v-if="title === 'Últimos Tickets Criados' || title === 'Últimos Tickets Recebidos'">
+                {{ calculateDeadlineCompact(ticket) }}
+              </template>
+              <template v-else>
+                {{ formatDate(ticket.createdAt) }}
+              </template>
+            </td>
             <td>
               <span :class="['status-label', statusColor(ticket.status)]">{{
                 formatSnakeToNaturalCase(ticket.status).toUpperCase()
@@ -33,7 +40,7 @@
             </td>
           </tr>
           <tr v-if="!isLoading && tickets.length === 0">
-            <td colspan="5" class="empty-state">
+            <td :colspan="title === 'Últimos Tickets Criados' ? 4 : 5" class="empty-state">
               <font-awesome-icon icon="inbox" /> Nenhum ticket encontrado
             </td>
           </tr>
@@ -46,7 +53,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
-import { TicketStatus } from '@/models';
+import { TicketStatus, type Ticket } from '@/models';
 import { formatDate } from '@/utils/date';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { useTicketsStore } from '@/stores/tickets';
@@ -57,19 +64,6 @@ const props = defineProps<{
 }>();
 
 const ticketsStore = useTicketsStore();
-
-const linkDestination = computed(() => {
-  switch (props.type) {
-    case 'received':
-      return '/tickets-recebidos';
-    case 'created':
-      return '/meus-tickets';
-    case 'department':
-      return '/tickets-setor';
-    default:
-      return '/meus-tickets';
-  }
-});
 
 const tickets = computed(() => {
   switch (props.type) {
@@ -104,6 +98,7 @@ const statusColor = (status: TicketStatus) => {
     case TicketStatus.InProgress:
       return 'status-in-progress';
     case TicketStatus.AwaitingVerification:
+    case TicketStatus.UnderVerification:
       return 'status-awaiting-verification';
     case TicketStatus.Completed:
       return 'status-completed';
@@ -115,6 +110,29 @@ const statusColor = (status: TicketStatus) => {
       return '';
   }
 };
+
+function calculateDeadlineCompact(ticket: Ticket) {
+  if (!ticket.dueAt) return '—';
+  if (ticket.status !== TicketStatus.Pending && ticket.status !== TicketStatus.InProgress) {
+    return '—';
+  }
+  const deadline = new Date(ticket.dueAt);
+  const today = new Date();
+  deadline.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+  const diffTime = deadline.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  if (diffDays < 0) {
+    return 'Atrasado';
+  }
+  // Se faltar menos de 1 dia, mostrar em horas
+  if (diffDays === 0) {
+    const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+    if (diffHours > 0) return `${diffHours}h`;
+    return 'Hoje';
+  }
+  return `${diffDays}d`;
+}
 </script>
 
 <style scoped>
@@ -163,6 +181,7 @@ const statusColor = (status: TicketStatus) => {
   font-size: 0.75rem;
   font-weight: 500;
   gap: 0.5rem;
+  white-space: nowrap;
 }
 
 .status-pending {
@@ -205,5 +224,12 @@ const statusColor = (status: TicketStatus) => {
   background-color: #ffebee;
   color: #c62828;
   border: 1px solid rgba(198, 40, 40, 0.3);
+}
+
+.data-table td.assunto-col {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
 }
 </style>
