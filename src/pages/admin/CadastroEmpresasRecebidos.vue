@@ -92,8 +92,27 @@ import { ref, computed } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { useRoute } from 'vue-router';
 
-// Exemplo de dados mockados (substitua por fetch da API futuramente)
-const cadastros = ref([
+interface CadastroEmpresa {
+  id: number;
+  nomeEmpresa: string;
+  cnpj: string;
+  emailEmpresa: string;
+  telefoneEmpresa: string;
+  cidade: string;
+  rua: string;
+  numero: string;
+  estado: string;
+  cep: string;
+  nomeResponsavel: string;
+  cpfResponsavel: string;
+  emailResponsavel: string;
+  telefoneResponsavel: string;
+  dataCadastro: Date;
+}
+
+const searchTerm = ref('');
+
+const cadastros = ref<CadastroEmpresa[]>([
   {
     id: 1,
     nomeEmpresa: 'Empresa Exemplo',
@@ -147,8 +166,6 @@ const cadastros = ref([
   },
 ]);
 
-const searchTerm = ref('');
-
 const filteredCadastros = computed(() => {
   if (!searchTerm.value) return cadastros.value;
   const term = searchTerm.value.toLowerCase();
@@ -165,16 +182,16 @@ function formatDate(date: Date) {
   return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
-function enviarBoasVindas(cadastro) {
+function enviarBoasVindas(cadastro: CadastroEmpresa) {
   alert(`E-mail de boas-vindas enviado para ${cadastro.emailEmpresa}`);
 }
-function enviarDefinicaoSenha(cadastro) {
+function enviarDefinicaoSenha(cadastro: CadastroEmpresa) {
   alert(`E-mail para definição de senha enviado para ${cadastro.emailEmpresa}`);
 }
-function confirmarCadastro(cadastro) {
+function confirmarCadastro(cadastro: CadastroEmpresa) {
   alert(`Cadastro de ${cadastro.nomeEmpresa} confirmado!`);
 }
-function rejeitarCadastro(cadastro) {
+function rejeitarCadastro(cadastro: CadastroEmpresa) {
   alert(`Cadastro de ${cadastro.nomeEmpresa} rejeitado.`);
 }
 
