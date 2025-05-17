@@ -11,6 +11,7 @@ export interface User {
   department: Department;
   isActive: boolean;
   role: Role;
+  status?: 'online' | 'offline' | 'away';
 }
 
 export interface CreateUserDto {
