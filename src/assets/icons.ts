@@ -72,6 +72,8 @@ import {
   faThumbsUp,
   faInfoCircle,
   faSmile,
+  faEnvelopeOpenText,
+  faKey,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -155,6 +157,8 @@ const icons = [
   faThumbsUp,
   faInfoCircle,
   faSmile,
+  faEnvelopeOpenText,
+  faKey,
 ];
 
 library.add(...icons);

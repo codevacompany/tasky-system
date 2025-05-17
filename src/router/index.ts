@@ -28,6 +28,11 @@ const routes: RouteRecordRaw[] = [
     component: LoginPage,
     meta: { requiresAuth: false },
   },
+  {
+    path: '/cadastro-empresa',
+    component: () => import('@/pages/public/CadastroEmpresaPage.vue'),
+    meta: { requiresAuth: false },
+  },
 
   // User Panel Routes
   {
@@ -67,6 +72,12 @@ const routes: RouteRecordRaw[] = [
       requiresAuth: true,
       isAdmin: true,
     },
+  },
+
+  {
+    path: '/cadastros-empresas',
+    component: () => import('@/pages/admin/CadastroEmpresasRecebidos.vue'),
+    meta: { requiresAuth: true },
   },
 ];
 
