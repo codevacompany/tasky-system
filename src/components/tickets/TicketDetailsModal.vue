@@ -64,7 +64,7 @@
                     :icon="getStatusIcon(loadedTicket.status)"
                     class="badge-icon"
                   />
-                  {{ formatSnakeToNaturalCase(ticket?.status!).toUpperCase() }}
+                  {{ formatSnakeToNaturalCase(loadedTicket?.status!).toUpperCase() }}
                 </span>
               </div>
             </div>
@@ -181,21 +181,21 @@
         "
       >
         <button
-          v-if="isTargetUser && ticket?.status === TicketStatus.Pending"
+          v-if="isTargetUser && loadedTicket?.status === TicketStatus.Pending"
           class="action-button accept"
-          @click="acceptTicket(ticket?.customId)"
+          @click="acceptTicket(loadedTicket?.customId)"
         >
           <font-awesome-icon icon="check" /> Aceitar
         </button>
         <button
-          v-if="isTargetUser && ticket?.status === TicketStatus.InProgress"
+          v-if="isTargetUser && loadedTicket?.status === TicketStatus.InProgress"
           class="action-button verify"
           @click="sendForReview(loadedTicket.customId)"
         >
           <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
         </button>
         <button
-          v-if="isTargetUser && ticket?.status === TicketStatus.Returned"
+          v-if="isTargetUser && loadedTicket?.status === TicketStatus.Returned"
           class="action-button correct"
           @click="correctTicket(loadedTicket.customId)"
         >
@@ -242,6 +242,15 @@
       <div class="files-section-title">
         <p class="files-label">Anexos</p>
         <div class="files-count">{{ loadedTicket.files.length }}</div>
+        <button
+          v-if="canEditTicket"
+          class="btn add-file-button"
+          @click="openFileInput"
+          title="Adicionar anexos"
+        >
+          <font-awesome-icon icon="plus" />
+        </button>
+        <input class="hidden" type="file" ref="fileInput" multiple @change="handleFileChange" />
       </div>
       <div class="files-container">
         <div
@@ -255,6 +264,17 @@
           </div>
           <div class="file-name-container">
             <div class="file-name">{{ file.name }}</div>
+          </div>
+        </div>
+        <div v-for="(file, i) in selectedFiles" :key="`new-${i}`" class="file-item pending">
+          <div class="file-preview">
+            <font-awesome-icon icon="file-upload" size="xl" />
+          </div>
+          <div class="file-name-container">
+            <div class="file-name">{{ file.name }}</div>
+          </div>
+          <div class="file-uploading">
+            <font-awesome-icon icon="spinner" spin />
           </div>
         </div>
       </div>
@@ -317,6 +337,25 @@
               </div>
             </div>
 
+            <div
+              class="event-item special-update"
+              v-else-if="event.type === 'specialUpdate'"
+              :class="event.subType"
+            >
+              <div class="comment-avatar special-avatar" :class="event.subType">
+                <span class="user-initials">{{ getUserInitials(loadedTicket?.requester) }}</span>
+              </div>
+              <div class="comment-content">
+                <div class="comment-header">
+                  <span class="comment-author special-title" :class="event.subType">{{
+                    getSpecialUpdateTitle(event.subType, event)
+                  }}</span>
+                  <span class="comment-time">{{ formatRelativeTime(event.createdAt) }}</span>
+                </div>
+                <div class="comment-text">{{ event.data.content }}</div>
+              </div>
+            </div>
+
             <div class="event-item system-event" v-else>
               <div class="comment-avatar system-avatar">
                 <font-awesome-icon :icon="getEventIcon(event.data.description)" />
@@ -342,7 +381,8 @@
     :isOpen="confirmationModal.isOpen"
     :title="confirmationModal.title"
     :message="confirmationModal.message"
-    :isCorrection="confirmationModal.isCorrection"
+    :hasInput="confirmationModal.hasInput"
+    :reasonOptions="confirmationModal.reasonOptions"
     @confirm="handleConfirm"
     @cancel="handleCancel"
   />
@@ -350,18 +390,35 @@
 
 <script setup lang="ts">
 import BaseModal from '../common/BaseModal.vue';
-import { TicketStatus, type Ticket, type TicketComment } from '@/models';
+import { CancellationReason, TicketStatus, type Ticket, type TicketComment } from '@/models';
 import { ref, computed, watch } from 'vue';
 import { ticketCommentService } from '@/services/ticketCommentService';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from '@/stores/user';
+import { useTicketsStore } from '@/stores/tickets';
 import { toast } from 'vue3-toastify';
 import { formatRelativeTime } from '@/utils/date';
 import ConfirmationModal from '../common/ConfirmationModal.vue';
-import { calculateDeadline, formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import {
+  calculateDeadline,
+  formatSnakeToNaturalCase,
+  getUserInitials,
+  enumToOptions,
+} from '@/utils/generic-helper';
 import type { TicketUpdate } from '@/models/ticketUpdate';
 import { TicketUpdateService } from '@/services/ticketUpdateService';
 import type { TicketFile } from '@/models/ticketFile';
+import { awsService } from '@/services/awsService';
+import axios from 'axios';
+import { CorrectionReason, DisapprovalReason } from '@/models';
+
+interface SpecialUpdateEvent {
+  data?: {
+    reason?: string;
+    content?: string;
+    id?: string | number;
+  };
+}
 
 const props = defineProps<{
   isOpen: boolean;
@@ -370,17 +427,22 @@ const props = defineProps<{
 
 const emit = defineEmits(['close', 'refresh']);
 const userStore = useUserStore();
+const ticketsStore = useTicketsStore();
 const newComment = ref('');
 const comments = ref<TicketComment[]>([]);
 const ticketUpdates = ref<TicketUpdate[]>([]);
 const loadedTicket = ref<Ticket | null>(null);
+const selectedFiles = ref<File[]>([]);
+const fileInput = ref<HTMLInputElement | null>(null);
+const isUploading = ref(false);
 
 const confirmationModal = ref({
   isOpen: false,
   title: '',
   message: '',
-  action: null as (() => Promise<void>) | null,
-  isCorrection: false,
+  action: null as ((data?: { reason: string; description: string }) => Promise<void>) | null,
+  hasInput: false,
+  reasonOptions: [] as { value: string; label: string }[],
 });
 
 const closeModal = () => {
@@ -435,7 +497,7 @@ const isPastDeadline = (date?: string) => {
   const diffTime = deadline.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  return diffDays <= 3; // Retorna true se faltam 3 dias ou menos
+  return diffDays <= 3;
 };
 
 const getDeadlineClass = (date?: string) => {
@@ -443,7 +505,6 @@ const getDeadlineClass = (date?: string) => {
   const deadline = new Date(date);
   const today = new Date();
 
-  // Reset hours to compare just dates
   deadline.setHours(0, 0, 0, 0);
   today.setHours(0, 0, 0, 0);
 
@@ -457,15 +518,17 @@ const getDeadlineClass = (date?: string) => {
 const openConfirmationModal = (
   title: string,
   message: string,
-  action: () => Promise<void>,
-  isCorrection = false,
+  action: (data?: { reason: string; description: string }) => Promise<void>,
+  hasInput = false,
+  reasonOptions: { value: string; label: string }[] = [],
 ) => {
   confirmationModal.value = {
     isOpen: true,
     title,
     message,
     action,
-    isCorrection,
+    hasInput,
+    reasonOptions,
   };
 };
 
@@ -474,9 +537,13 @@ const closeConfirmationModal = () => {
   confirmationModal.value.action = null;
 };
 
-const handleConfirm = async () => {
+const handleConfirm = async (data?: { reason: string; description: string }) => {
   if (confirmationModal.value.action) {
-    await confirmationModal.value.action();
+    if (data) {
+      await confirmationModal.value.action(data);
+    } else {
+      await confirmationModal.value.action();
+    }
   }
   closeConfirmationModal();
 };
@@ -493,7 +560,8 @@ const acceptTicket = async (ticketId: string) => {
       try {
         await ticketService.accept(ticketId);
         toast.success('Ticket aceito com sucesso');
-        emit('refresh');
+
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao aceitar o ticket');
       }
@@ -503,13 +571,14 @@ const acceptTicket = async (ticketId: string) => {
 
 const sendForReview = async (ticketId: string) => {
   openConfirmationModal(
-    'Enviar para Verificação',
-    'Tem certeza que deseja enviar este ticket para verificação?',
+    'Enviar Para Revisão',
+    'Tem certeza que deseja enviar este ticket para revisão?',
     async () => {
       try {
         await ticketService.updateStatus(ticketId, { status: TicketStatus.AwaitingVerification });
         toast.success('Ticket enviado para revisão');
-        emit('refresh');
+
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao enviar o ticket para revisão');
       }
@@ -525,7 +594,12 @@ const approveTicket = async (ticketId: string) => {
       try {
         await ticketService.approve(ticketId);
         toast.success('Ticket aprovado com sucesso');
-        emit('refresh');
+
+        if (props.ticket) {
+          refreshSelectedTicket();
+        } else {
+          await ticketsStore.fetchTicketDetails(ticketId);
+        }
       } catch {
         toast.error('Erro ao aprovar o ticket');
       }
@@ -534,19 +608,26 @@ const approveTicket = async (ticketId: string) => {
 };
 
 const requestCorrection = async (ticketId: string) => {
+  const reasonOptions = enumToOptions(CorrectionReason);
   openConfirmationModal(
     'Solicitar Correção',
     'Por favor, preencha os detalhes da correção necessária:',
-    async () => {
+    async (data?: { reason: string; description: string }) => {
       try {
-        await ticketService.updateStatus(ticketId, { status: TicketStatus.Returned });
+        await ticketService.requestCorrection(ticketId, {
+          reason: data?.reason ?? '',
+          details: data?.description ?? '',
+        });
+
         toast.success('Correção solicitada com sucesso');
-        emit('refresh');
+
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao solicitar correção');
       }
     },
-    true, // indica que é uma solicitação de correção
+    true,
+    reasonOptions,
   );
 };
 
@@ -567,37 +648,52 @@ const correctTicket = async (ticketId: string) => {
 };
 
 const rejectTicket = async (ticketId: string) => {
+  const reasonOptions = enumToOptions(DisapprovalReason);
   openConfirmationModal(
     'Reprovar Ticket',
-    'Tem certeza que deseja reprovar este ticket?',
-    async () => {
+    'Por favor, informe o motivo da reprovação:',
+    async (data?: { reason: string; description: string }) => {
       try {
-        await ticketService.updateStatus(ticketId, { status: TicketStatus.Rejected });
+        await ticketService.reject(ticketId, {
+          reason: data?.reason ?? '',
+          details: data?.description ?? '',
+        });
+
         toast.success('Ticket reprovado com sucesso');
-        emit('refresh');
+
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao reprovar o ticket');
       }
     },
+    true,
+    reasonOptions,
   );
 };
 
 const cancelTicket = async (ticketId: string) => {
+  const reasonOptions = enumToOptions(CancellationReason);
   openConfirmationModal(
     'Cancelar Ticket',
     'Por favor, informe o motivo do cancelamento:',
-    async () => {
+    async (data?: { reason: string; description: string }) => {
       try {
-        // Por enquanto usando o endpoint de delete
-        await ticketService.cancel(ticketId);
+        await ticketService.cancel(ticketId, {
+          reason: data?.reason ?? '',
+          details: data?.description ?? '',
+        });
+
         toast.success('Ticket cancelado com sucesso');
-        emit('refresh');
+
+        refreshSelectedTicket();
+
         emit('close');
       } catch {
         toast.error('Erro ao cancelar o ticket');
       }
     },
-    true, // indica que precisa de campo de descrição
+    true,
+    reasonOptions,
   );
 };
 
@@ -624,7 +720,13 @@ const comment = async () => {
       userId: userStore.user!.id,
       content: newComment.value,
     });
+
     fetchComments();
+
+    if (loadedTicket.value?.customId) {
+      await ticketsStore.fetchTicketDetails(loadedTicket.value.customId);
+    }
+
     newComment.value = '';
   } catch {
     toast.error('Erro ao adicionar comentário');
@@ -667,7 +769,53 @@ const timeline = computed(() => {
     data: update,
   }));
 
-  return [...commentEvents, ...updateEvents].sort(
+  const specialUpdateEvents = [];
+
+  if (loadedTicket.value?.disapprovalReason) {
+    specialUpdateEvents.push({
+      type: 'specialUpdate' as const,
+      subType: 'disapproval',
+      createdAt: loadedTicket.value.disapprovalReason.createdAt,
+      data: {
+        id: `disapproval-${loadedTicket.value.id}`,
+        content: loadedTicket.value.disapprovalReason.details,
+        reason: loadedTicket.value.disapprovalReason.reason,
+      },
+    });
+  }
+
+  if (loadedTicket.value?.cancellationReason) {
+    specialUpdateEvents.push({
+      type: 'specialUpdate' as const,
+      subType: 'cancellation',
+      createdAt: loadedTicket.value.cancellationReason.createdAt,
+      data: {
+        id: `cancellation-${loadedTicket.value.id}`,
+        content: loadedTicket.value.cancellationReason.details,
+        reason: loadedTicket.value.cancellationReason.reason,
+      },
+    });
+  }
+
+  if (
+    loadedTicket.value?.correctionRequests &&
+    Array.isArray(loadedTicket.value.correctionRequests)
+  ) {
+    loadedTicket.value.correctionRequests.forEach((correctionRequest, index) => {
+      specialUpdateEvents.push({
+        type: 'specialUpdate' as const,
+        subType: 'correction',
+        createdAt: correctionRequest.createdAt,
+        data: {
+          id: `correction-${loadedTicket.value!.id}-${index}`,
+          content: correctionRequest.details,
+          reason: correctionRequest.reason,
+        },
+      });
+    });
+  }
+
+  return [...commentEvents, ...updateEvents, ...specialUpdateEvents].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 });
@@ -722,7 +870,28 @@ const getEventIcon = (description: string) => {
   if (description.includes('solicitou correção')) return 'undo';
   if (description.includes('cancelou')) return 'ban';
   if (description.includes('iniciou correção')) return 'wrench';
-  return 'info-circle'; // ícone padrão para outros casos
+  return 'info-circle';
+};
+
+const getSpecialUpdateTitle = (subType: string, event?: SpecialUpdateEvent) => {
+  const baseTitle = (() => {
+    switch (subType) {
+      case 'disapproval':
+        return 'Ticket Reprovado';
+      case 'cancellation':
+        return 'Ticket Cancelado';
+      case 'correction':
+        return 'Solicitação de Correção';
+      default:
+        return 'Atualização';
+    }
+  })();
+
+  if (event?.data?.reason) {
+    return `${baseTitle} - ${formatSnakeToNaturalCase(event.data.reason)}`;
+  }
+
+  return baseTitle;
 };
 
 watch(
@@ -755,6 +924,89 @@ watch(
     }
   },
 );
+
+const openFileInput = () => {
+  if (fileInput.value) {
+    fileInput.value.click();
+  }
+};
+
+const handleFileChange = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (!target || !target.files || !loadedTicket.value) return;
+
+  const files = Array.from(target.files);
+  selectedFiles.value = files;
+
+  isUploading.value = true;
+
+  try {
+    const uploadedUrls: string[] = [];
+
+    for (const file of files) {
+      const ext = file.name.split('.').pop();
+
+      if (ext) {
+        const { data } = await awsService.getSignedUrl(ext);
+
+        await axios.put(data.url, file, {
+          headers: {
+            'Content-Type': file.type,
+          },
+        });
+
+        const fileUrl = data.url.split('?')[0];
+        uploadedUrls.push(fileUrl);
+      }
+    }
+
+    if (uploadedUrls.length > 0) {
+      const response = await ticketService.addFiles(loadedTicket.value.customId, uploadedUrls);
+
+      if (response && response.data) {
+        loadedTicket.value = response.data;
+      }
+
+      toast.success('Arquivos anexados com sucesso!');
+      emit('refresh');
+    }
+  } catch (error) {
+    console.error('Erro ao fazer upload:', error);
+    toast.error('Erro ao anexar arquivos');
+  } finally {
+    selectedFiles.value = [];
+    isUploading.value = false;
+
+    if (fileInput.value) {
+      fileInput.value.value = '';
+    }
+  }
+};
+
+const canEditTicket = computed(() => {
+  if (!loadedTicket.value) return false;
+
+  const isUserInvolved =
+    userStore.user?.id === loadedTicket.value.requester.id ||
+    userStore.user?.id === loadedTicket.value.targetUser.id;
+
+  const isTicketActive =
+    loadedTicket.value.status !== TicketStatus.Completed &&
+    loadedTicket.value.status !== TicketStatus.Rejected &&
+    loadedTicket.value.status !== TicketStatus.Canceled;
+
+  return isUserInvolved && isTicketActive;
+});
+
+const refreshSelectedTicket = async () => {
+  if (!props.ticket?.customId) return;
+  try {
+    const updatedTicket = await ticketsStore.fetchTicketDetails(props.ticket.customId);
+    loadedTicket.value = updatedTicket;
+  } catch (error) {
+    console.error('Error refreshing ticket:', error);
+  }
+};
 </script>
 
 <style scoped>
@@ -1391,5 +1643,187 @@ watch(
 :deep(body.dark-mode) .system-avatar {
   background: #334155 !important;
   color: #94a3b8 !important;
+}
+
+.special-update {
+  border-left: 3px solid #f59e0b;
+  background: #fffbeb !important;
+}
+
+.special-update .comment-text {
+  font-style: italic;
+  padding: 0.5rem;
+  background: rgba(245, 158, 11, 0.05);
+  border-radius: 0.375rem;
+}
+
+.special-avatar {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+}
+
+.user-initials {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Disapproval - Red styling */
+.special-update.disapproval {
+  border-left: 3px solid #ef4444;
+  background: #fee2e2 !important;
+}
+
+.special-update.disapproval .comment-text {
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.special-avatar.disapproval {
+  background: #fecaca !important;
+  color: #b91c1c !important;
+}
+
+.special-title.disapproval {
+  color: #b91c1c;
+}
+
+/* Cancellation - Gray styling */
+.special-update.cancellation {
+  border-left: 3px solid #6b7280;
+  background: #f3f4f6 !important;
+}
+
+.special-update.cancellation .comment-text {
+  background: rgba(107, 114, 128, 0.05);
+}
+
+.special-avatar.cancellation {
+  background: #e5e7eb !important;
+  color: #4b5563 !important;
+}
+
+.special-title.cancellation {
+  color: #4b5563;
+}
+
+/* Correction - Purple styling */
+.special-update.correction {
+  border-left: 3px solid #8b5cf6;
+  background: #f5f3ff !important;
+}
+
+.special-update.correction .comment-text {
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.special-avatar.correction {
+  background: #ede9fe !important;
+  color: #6d28d9 !important;
+}
+
+.special-title.correction {
+  color: #6d28d9;
+}
+
+:deep(body.dark-mode) .special-update {
+  background: #292524 !important;
+  border-left: 3px solid #d97706;
+}
+
+:deep(body.dark-mode) .special-update .comment-text {
+  background: rgba(217, 119, 6, 0.1);
+}
+
+:deep(body.dark-mode) .special-avatar {
+  background: #422006 !important;
+  color: #f59e0b !important;
+}
+
+/* Dark mode disapproval */
+:deep(body.dark-mode) .special-update.disapproval {
+  background: #1c1917 !important;
+  border-left: 3px solid #dc2626;
+}
+
+:deep(body.dark-mode) .special-update.disapproval .comment-text {
+  background: rgba(220, 38, 38, 0.1);
+}
+
+:deep(body.dark-mode) .special-avatar.disapproval {
+  background: #3f0f0f !important;
+  color: #ef4444 !important;
+}
+
+/* Dark mode cancellation */
+:deep(body.dark-mode) .special-update.cancellation {
+  background: #1a1d23 !important;
+  border-left: 3px solid #9ca3af;
+}
+
+:deep(body.dark-mode) .special-update.cancellation .comment-text {
+  background: rgba(156, 163, 175, 0.1);
+}
+
+:deep(body.dark-mode) .special-avatar.cancellation {
+  background: #272a35 !important;
+  color: #d1d5db !important;
+}
+
+/* Dark mode correction */
+:deep(body.dark-mode) .special-update.correction {
+  background: #1e1b4b !important;
+  border-left: 3px solid #8b5cf6;
+}
+
+:deep(body.dark-mode) .special-update.correction .comment-text {
+  background: rgba(139, 92, 246, 0.1);
+}
+
+:deep(body.dark-mode) .special-avatar.correction {
+  background: #2e1065 !important;
+  color: #a78bfa !important;
+}
+
+.add-file-button {
+  width: 26px;
+  height: 24px;
+  margin-left: 18px;
+  padding: 0;
+}
+
+.add-file-button:hover {
+  background-color: #e2e3e7;
+}
+
+.hidden {
+  display: none;
+}
+
+.file-item.pending {
+  position: relative;
+  border: 1px dashed #0284c7;
+  background-color: rgba(2, 132, 199, 0.05);
+}
+
+.file-item.pending .file-preview {
+  color: #0284c7;
+}
+
+.file-uploading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  color: #0284c7;
+  border-radius: 6px;
+}
+
+.upload-actions {
+  display: none;
 }
 </style>

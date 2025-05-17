@@ -148,6 +148,7 @@ import { categoryService } from '@/services/categoryService';
 import { toast } from 'vue3-toastify';
 import { TicketPriority, type Category, type Department, type User } from '@/models';
 import { useUserStore } from '@/stores/user';
+import { useTicketsStore } from '@/stores/tickets';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
@@ -164,6 +165,7 @@ const emit = defineEmits<{
   (e: 'ticketCreated'): void;
 }>();
 
+const ticketsStore = useTicketsStore();
 const departments = ref<Department[]>([]);
 const availableUsers = ref<User[]>([]);
 const selectedDepartment = ref<number | null>(null);
@@ -198,7 +200,6 @@ const formData = ref({
   isPrivate: false,
 });
 
-// Carregar departamentos
 const loadDepartments = async () => {
   try {
     const { data } = await departmentService.fetch({ limit: 100 });
@@ -208,7 +209,6 @@ const loadDepartments = async () => {
   }
 };
 
-// Carregar categorias
 const loadCategories = async () => {
   try {
     const { data } = await categoryService.fetch({ limit: 100 });
@@ -225,7 +225,9 @@ const updateUsersList = async () => {
     return;
   }
   try {
-    const response = await userService.getByDepartment(selectedDepartment.value);
+    const response = await userService.getByDepartment(selectedDepartment.value, {
+      limit: 100,
+    });
     availableUsers.value = response.data.items;
   } catch {
     toast.error('Erro ao carregar usuários. Tente novamente.');
@@ -363,6 +365,8 @@ const handleSubmit = async () => {
     const fileUrls = await uploadFilesToS3();
 
     await ticketService.create({ ...formData.value, files: fileUrls });
+    await Promise.all([ticketsStore.fetchMyTickets(), ticketsStore.fetchDepartmentTickets()]);
+
     toast.success('Ticket criado com sucesso!');
     emit('ticketCreated');
     closeModal();
@@ -511,6 +515,10 @@ textarea {
   border-radius: 5px;
   color: white;
   margin-bottom: 6px;
+}
+
+.file-upload-label:hover {
+  cursor: pointer;
 }
 
 /* Dark mode */

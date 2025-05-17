@@ -34,7 +34,9 @@
               </template>
             </td>
             <td>
-              <span :class="['status-label', statusColor(ticket.status)]">{{ formatSnakeToNaturalCase(ticket.status).toUpperCase() }}</span>
+              <span :class="['status-label', statusColor(ticket.status)]">{{
+                formatSnakeToNaturalCase(ticket.status).toUpperCase()
+              }}</span>
             </td>
           </tr>
           <tr v-if="!isLoading && tickets.length === 0">
@@ -49,17 +51,45 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { computed } from 'vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { TicketStatus, type Ticket } from '@/models';
 import { formatDate } from '@/utils/date';
-import { formatSnakeToNaturalCase, calculateDeadline, formatTimeCompact } from '@/utils/generic-helper';
+import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import { useTicketsStore } from '@/stores/tickets';
 
-defineProps<{
+const props = defineProps<{
   title: string;
-  tickets: Ticket[];
-  isLoading: boolean;
+  type: 'received' | 'created' | 'department';
 }>();
+
+const ticketsStore = useTicketsStore();
+
+const tickets = computed(() => {
+  switch (props.type) {
+    case 'received':
+      return ticketsStore.recentReceivedTickets;
+    case 'created':
+      return ticketsStore.recentCreatedTickets;
+    case 'department':
+      return ticketsStore.departmentTickets.data.slice(0, 5);
+    default:
+      return [];
+  }
+});
+
+const isLoading = computed(() => {
+  switch (props.type) {
+    case 'received':
+      return ticketsStore.receivedTickets.isLoading;
+    case 'created':
+      return ticketsStore.myTickets.isLoading;
+    case 'department':
+      return ticketsStore.departmentTickets.isLoading;
+    default:
+      return false;
+  }
+});
 
 const statusColor = (status: TicketStatus) => {
   switch (status) {

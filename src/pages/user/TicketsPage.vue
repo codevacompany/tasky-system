@@ -6,7 +6,9 @@
         <button
           class="view-toggle-btn"
           @click="toggleView"
-          :title="isKanbanView ? 'Mudar para visualização em tabela' : 'Mudar para visualização Kanban'"
+          :title="
+            isKanbanView ? 'Mudar para visualização em tabela' : 'Mudar para visualização Kanban'
+          "
         >
           <font-awesome-icon :icon="isKanbanView ? 'table' : 'columns'" />
           <span>{{ isKanbanView ? 'Visualização em Tabela' : 'Visualização Kanban' }}</span>
@@ -17,25 +19,25 @@
       <div class="tab-buttons">
         <button
           :class="['tab-button', activeTab === 'recebidos' ? 'active' : '']"
-          @click="fetchTickets('recebidos')"
+          @click="switchTab('recebidos')"
         >
           Recebidos
         </button>
         <button
           :class="['tab-button', activeTab === 'criados' ? 'active' : '']"
-          @click="fetchTickets('criados')"
+          @click="switchTab('criados')"
         >
           Criados por Mim
         </button>
         <button
           :class="['tab-button', activeTab === 'setor' ? 'active' : '']"
-          @click="fetchTickets('setor')"
+          @click="switchTab('setor')"
         >
           Tickets do Setor
         </button>
         <button
           :class="['tab-button', activeTab === 'arquivo' ? 'active' : '']"
-          @click="fetchTickets('arquivo')"
+          @click="switchTab('arquivo')"
         >
           Arquivados
         </button>
@@ -94,60 +96,53 @@
           </div>
         </div>
 
-        <!-- Dashboard de tickets (mostrar apenas quando não estiver na aba arquivo) -->
-        <div class="tickets-summary" v-if="activeTab !== 'arquivo'">
-          <div class="summary-item">
-            <div class="summary-item-content">
-              <div class="stat-icon">
-                <font-awesome-icon icon="ticket" />
-              </div>
-              <span class="summary-label">Total</span>
-            </div>
-            <span class="stat-number">{{ totalTickets }}</span>
-          </div>
-          <div class="summary-item">
-            <div class="summary-item-content">
-              <div class="stat-icon orange">
-                <font-awesome-icon icon="clock" />
-              </div>
-              <span class="summary-label">Pendentes</span>
-            </div>
-            <span class="stat-number">{{ pendingTickets }}</span>
-          </div>
-          <div class="summary-item">
-            <div class="summary-item-content">
-              <div class="stat-icon blue">
-                <font-awesome-icon icon="spinner" />
-              </div>
-              <span class="summary-label">Em Andamento</span>
-            </div>
-            <span class="stat-number">{{ inProgressTickets }}</span>
-          </div>
-        </div>
-
-        <!-- Seções do Arquivo -->
+        <!-- Tab Content -->
         <div v-if="activeTab === 'arquivo'" class="archive-sections">
-          <div class="archive-section">
-            <h2 class="archive-title">Tickets Recebidos Arquivados</h2>
-            <TicketTable
-              :tickets="archivedReceivedTickets"
-              :isLoading="isLoading"
-              :tableType="'arquivo'"
-            />
-          </div>
-
-          <div class="archive-section">
-            <h2 class="archive-title">Tickets Criados Arquivados</h2>
-            <TicketTable
-              :tickets="archivedCreatedTickets"
-              :isLoading="isLoading"
-              :tableType="'arquivo'"
-            />
-          </div>
+          <TicketTable
+            :tickets="tickets"
+            :isLoading="isLoading"
+            :tableType="activeTab"
+            :currentPage="currentPage"
+            :totalPages="totalPages"
+            :pagination="true"
+            @changePage="(page) => (currentPage = page)"
+            @viewTicket="handleViewTicket"
+            @refresh="fetchTicketsWithFilters"
+          />
         </div>
 
-        <!-- Tabela principal (mostrar apenas quando não estiver na aba arquivo) -->
-        <template v-if="activeTab !== 'arquivo'">
+        <div v-else>
+          <div class="tickets-summary">
+            <div class="summary-item">
+              <div class="summary-item-content">
+                <div class="stat-icon">
+                  <font-awesome-icon icon="ticket" />
+                </div>
+                <span class="summary-label">Total</span>
+              </div>
+              <span class="stat-number">{{ totalTickets }}</span>
+            </div>
+            <div class="summary-item">
+              <div class="summary-item-content">
+                <div class="stat-icon orange">
+                  <font-awesome-icon icon="clock" />
+                </div>
+                <span class="summary-label">Pendentes</span>
+              </div>
+              <span class="stat-number">{{ pendingTickets }}</span>
+            </div>
+            <div class="summary-item">
+              <div class="summary-item-content">
+                <div class="stat-icon blue">
+                  <font-awesome-icon icon="spinner" />
+                </div>
+                <span class="summary-label">Em Andamento</span>
+              </div>
+              <span class="stat-number">{{ inProgressTickets }}</span>
+            </div>
+          </div>
+
+          <!-- Tabela principal para tabs não-arquivo -->
           <TicketTable
             v-if="!isKanbanView"
             :tickets="tickets"
@@ -155,6 +150,7 @@
             :tableType="activeTab"
             :currentPage="currentPage"
             :totalPages="totalPages"
+            :pagination="true"
             @changePage="(page) => (currentPage = page)"
             @viewTicket="handleViewTicket"
             @editTicket="handleEditTicket"
@@ -164,14 +160,10 @@
             @approveTicket="handleApproveTicket"
             @requestCorrection="handleRequestCorrection"
             @rejectTicket="handleRejectTicket"
-            @refresh="fetchTickets(activeTab)"
+            @refresh="fetchTicketsWithFilters"
           />
-          <TicketKanban
-            v-else
-            :tickets="tickets"
-            @viewTicket="handleViewTicket"
-          />
-        </template>
+          <TicketKanban v-else :tickets="tickets" @viewTicket="handleViewTicket" />
+        </div>
       </div>
     </div>
 
@@ -210,9 +202,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { ticketService } from '@/services/ticketService';
-import { useUserStore } from '@/stores/user';
+import { useTicketsStore } from '@/stores/tickets';
 import type { Ticket } from '@/models';
 import { TicketStatus, TicketPriority } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
@@ -220,21 +212,13 @@ import TicketKanban from '@/components/tickets/TicketKanban.vue';
 import { toast } from 'vue3-toastify';
 import { debounce, formatSnakeToNaturalCase } from '@/utils/generic-helper';
 
-const user = useUserStore().user;
+const ticketsStore = useTicketsStore();
 const activeTab = ref<'recebidos' | 'criados' | 'setor' | 'arquivo'>('recebidos');
-const tickets = ref<Ticket[]>([]);
-const isLoading = ref(false);
 const searchTerm = ref('');
 const statusFilter = ref<TicketStatus | null>(null);
 const priorityFilter = ref<TicketPriority | null>(null);
 const currentPage = ref(1);
-const totalPages = ref(1);
 
-// Refs para os tickets arquivados
-const archivedReceivedTickets = ref<Ticket[]>([]);
-const archivedCreatedTickets = ref<Ticket[]>([]);
-
-// Refs para o modal de correção
 const showCorrectionModal = ref(false);
 const selectedTicket = ref<Ticket | null>(null);
 const newCompletionDate = ref('');
@@ -242,64 +226,73 @@ const newCompletionDate = ref('');
 const isKanbanView = ref(false);
 
 const debouncedSearch = debounce(() => {
-  fetchTickets(activeTab.value);
+  fetchTicketsWithFilters();
 }, 400);
 
-const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor' | 'arquivo') => {
-  activeTab.value = tab;
-  isLoading.value = true;
-
-  try {
-    let response;
-    const name = searchTerm.value.trim() || undefined;
-    const status = statusFilter.value || undefined;
-    const priority = priorityFilter.value || undefined;
-
-    const filters = { name, status, priority, page: currentPage.value };
-
-    if (tab === 'recebidos') {
-      response = await ticketService.getByTargetUser(user!.id, {
-        ...filters,
-      });
-      tickets.value = response.data.items;
-    } else if (tab === 'criados') {
-      response = await ticketService.getByRequester(user!.id, {
-        ...filters,
-      });
-      tickets.value = response.data.items;
-    } else if (tab === 'setor') {
-      response = await ticketService.getByDepartment(user!.department.id, filters);
-      tickets.value = response.data.items;
-    } else if (tab === 'arquivo') {
-      // Buscar tickets recebidos arquivados
-      const receivedResponse = await ticketService.getByTargetUser(user!.id, {
-        ...filters,
-        status: undefined,
-      });
-      archivedReceivedTickets.value = receivedResponse.data.items.filter(
-        (ticket) =>
-          ticket.status === TicketStatus.Completed || ticket.status === TicketStatus.Rejected,
-      );
-
-      // Buscar tickets criados arquivados
-      const createdResponse = await ticketService.getByRequester(user!.id, {
-        ...filters,
-        status: undefined,
-      });
-      archivedCreatedTickets.value = createdResponse.data.items.filter(
-        (ticket) =>
-          ticket.status === TicketStatus.Completed || ticket.status === TicketStatus.Rejected,
-      );
-    }
-
-    if (tab !== 'arquivo') {
-      totalPages.value = response!.data.totalPages;
-    }
-  } catch {
-    toast.error('Erro ao carregar tickets. Tente novamente.');
-  } finally {
-    isLoading.value = false;
+// Get tickets from the store based on active tab
+const tickets = computed(() => {
+  switch (activeTab.value) {
+    case 'recebidos':
+      return ticketsStore.receivedTickets.data;
+    case 'criados':
+      return ticketsStore.myTickets.data;
+    case 'setor':
+      return ticketsStore.departmentTickets.data;
+    case 'arquivo':
+      return ticketsStore.archivedTickets.data;
+    default:
+      return [];
   }
+});
+
+// Get loading state from the store
+const isLoading = computed(() => {
+  switch (activeTab.value) {
+    case 'recebidos':
+      return ticketsStore.receivedTickets.isLoading;
+    case 'criados':
+      return ticketsStore.myTickets.isLoading;
+    case 'setor':
+      return ticketsStore.departmentTickets.isLoading;
+    case 'arquivo':
+      return ticketsStore.archivedTickets.isLoading;
+    default:
+      return false;
+  }
+});
+
+// Get total pages from the store
+const totalPages = computed(() => {
+  switch (activeTab.value) {
+    case 'recebidos':
+      return Math.ceil(ticketsStore.receivedTickets.totalCount / 10);
+    case 'criados':
+      return Math.ceil(ticketsStore.myTickets.totalCount / 10);
+    case 'setor':
+      return Math.ceil(ticketsStore.departmentTickets.totalCount / 10);
+    case 'arquivo':
+      return Math.ceil(ticketsStore.archivedTickets.totalCount / 10);
+    default:
+      return 1;
+  }
+});
+
+// Switch tabs without refetching data
+const switchTab = (tab: 'recebidos' | 'criados' | 'setor' | 'arquivo') => {
+  activeTab.value = tab;
+  currentPage.value = 1;
+};
+
+const fetchTicketsWithFilters = async () => {
+  const typeMap: Record<string, 'received' | 'createdByMe' | 'department' | 'archived'> = {
+    recebidos: 'received',
+    criados: 'createdByMe',
+    setor: 'department',
+    arquivo: 'archived',
+  };
+
+  const storeType = typeMap[activeTab.value];
+  await ticketsStore.setCurrentPage(storeType, currentPage.value);
 };
 
 const totalTickets = computed(() => tickets.value.length);
@@ -324,7 +317,7 @@ const handleCancelTicket = async (ticket: Ticket) => {
     try {
       await ticketService.cancel(ticket.customId);
       toast.success('Ticket excluído com sucesso!');
-      fetchTickets(activeTab.value);
+      fetchTicketsWithFilters();
     } catch {
       toast.error('Erro ao excluir ticket. Tente novamente.');
     }
@@ -335,7 +328,7 @@ const handleAcceptTicket = async (ticket: Ticket) => {
   try {
     await ticketService.accept(ticket.customId);
     toast.success('Ticket aceito com sucesso!');
-    fetchTickets(activeTab.value);
+    fetchTicketsWithFilters();
   } catch {
     toast.error('Erro ao aceitar ticket. Tente novamente.');
   }
@@ -345,7 +338,7 @@ const handleVerifyTicket = async (ticketId: string) => {
   try {
     await ticketService.updateStatus(ticketId, { status: TicketStatus.AwaitingVerification });
     toast.success('Ticket enviado para revisão');
-    fetchTickets(activeTab.value);
+    fetchTicketsWithFilters();
   } catch {
     toast.error('Erro ao enviar o ticket para revisão');
   }
@@ -355,7 +348,7 @@ const handleApproveTicket = async (ticket: Ticket) => {
   try {
     await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Completed });
     toast.success('Ticket aprovado com sucesso!');
-    fetchTickets(activeTab.value);
+    fetchTicketsWithFilters();
   } catch {
     toast.error('Erro ao aprovar ticket. Tente novamente.');
   }
@@ -379,7 +372,7 @@ const confirmCorrection = async () => {
     showCorrectionModal.value = false;
     selectedTicket.value = null;
     newCompletionDate.value = '';
-    fetchTickets(activeTab.value);
+    fetchTicketsWithFilters();
   } catch {
     toast.error('Erro ao solicitar correção. Tente novamente.');
   }
@@ -395,7 +388,7 @@ const handleRejectTicket = async (ticket: Ticket) => {
   try {
     await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Rejected });
     toast.success('Ticket reprovado com sucesso!');
-    fetchTickets(activeTab.value);
+    fetchTicketsWithFilters();
   } catch {
     toast.error('Erro ao reprovar ticket. Tente novamente.');
   }
@@ -405,18 +398,16 @@ const toggleView = () => {
   isKanbanView.value = !isKanbanView.value;
 };
 
-onMounted(() => fetchTickets(activeTab.value));
-
 watch(searchTerm, () => {
   debouncedSearch();
 });
 
 watch([statusFilter, priorityFilter], () => {
-  fetchTickets(activeTab.value);
+  fetchTicketsWithFilters();
 });
 
 watch(currentPage, () => {
-  fetchTickets(activeTab.value);
+  fetchTicketsWithFilters();
 });
 </script>
 

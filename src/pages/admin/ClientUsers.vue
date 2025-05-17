@@ -60,10 +60,10 @@
           <tr v-for="user in filteredUsers" :key="user.id">
             <td class="user-info">
               <div class="user-avatar">
-                {{ getInitials(user.nome) }}
+                {{ getUserInitials(user) }}
               </div>
               <div class="user-details">
-                <span class="user-name">{{ user.nome }}</span>
+                <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
                 <span class="user-department">{{ user.departamento }}</span>
               </div>
             </td>
@@ -119,7 +119,8 @@
           <form @submit.prevent="saveNewUser">
             <div class="form-group">
               <label>Nome Completo</label>
-              <input type="text" v-model="newUser.nome" required />
+              <input type="text" v-model="newUser.firstName" required />
+              <input type="text" v-model="newUser.lastName" required />
             </div>
             <div class="form-group">
               <label>Email</label>
@@ -140,12 +141,8 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" @click="showNewUserModal = false">
-            Cancelar
-          </button>
-          <button class="btn btn-primary" @click="saveNewUser">
-            Criar Usuário
-          </button>
+          <button class="btn btn-secondary" @click="showNewUserModal = false">Cancelar</button>
+          <button class="btn btn-primary" @click="saveNewUser">Criar Usuário</button>
         </div>
       </div>
     </div>
@@ -154,6 +151,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { getUserInitials } from '@/utils/generic-helper';
 
 // Estados
 const searchTerm = ref('');
@@ -163,10 +161,11 @@ const showNewUserModal = ref(false);
 
 // Novo usuário
 const newUser = ref({
-  nome: '',
+  firstName: '',
+  lastName: '',
   email: '',
   departamento: '',
-  perfil: 'USUARIO'
+  perfil: 'USUARIO',
 });
 
 // Dados mockados
@@ -174,27 +173,30 @@ const client = ref({
   id: 1,
   razaoSocial: 'Empresa ABC Ltda',
   usuariosAtivos: 15,
-  limiteUsuarios: 20
+  limiteUsuarios: 20,
 });
 
 const users = ref([
   {
     id: 1,
-    nome: 'João Silva',
+    firstName: 'João',
+    lastName: 'Silva',
     email: 'joao.silva@empresa.com',
     departamento: 'TI',
     perfil: 'ADMIN',
     status: 'ATIVO',
-    ultimoAcesso: '2024-03-20T14:30:00'
+    ultimoAcesso: '2024-03-20T14:30:00',
   },
   // Adicione mais usuários mockados aqui
 ]);
 
 // Computed properties
 const filteredUsers = computed(() => {
-  return users.value.filter(user => {
-    const matchSearch = !searchTerm.value ||
-      user.nome.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+  return users.value.filter((user) => {
+    const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+    const matchSearch =
+      !searchTerm.value ||
+      fullName.includes(searchTerm.value.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
       user.perfil.toLowerCase().includes(searchTerm.value.toLowerCase());
 
@@ -206,15 +208,6 @@ const filteredUsers = computed(() => {
 });
 
 // Métodos
-const getInitials = (name: string) => {
-  return name
-    .split(' ')
-    .map(n => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
-};
-
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString('pt-BR');
 };
@@ -222,7 +215,7 @@ const formatDate = (date: string) => {
 const formatTime = (date: string) => {
   return new Date(date).toLocaleTimeString('pt-BR', {
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   });
 };
 

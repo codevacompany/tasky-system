@@ -1,6 +1,9 @@
 import type { Category } from './category';
+import type { CorrectionRequest } from './correctionRequest';
 import type { Department } from './department';
+import type { TicketCancellationReason } from './ticketCancellationReason';
 import type { TicketComment } from './ticketComment';
+import type { TicketDisapprovalReason } from './ticketDisapprovalReason';
 import type { TicketFile } from './ticketFile';
 import type { TicketUpdate } from './ticketUpdate';
 import type { User } from './user';
@@ -39,7 +42,9 @@ export interface Ticket {
   category?: Category;
   comments: TicketComment[];
   updates: TicketUpdate[];
-  disapprovalReason?: string;
+  disapprovalReason?: TicketDisapprovalReason;
+  correctionRequests?: CorrectionRequest[];
+  cancellationReason?: TicketCancellationReason;
   isPrivate: boolean;
   files: TicketFile[];
   createdAt: string;

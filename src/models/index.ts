@@ -7,3 +7,6 @@ export * from './ticketComment';
 export * from './ticketUpdate';
 export * from './tenant';
 export * from './role';
+export * from './correctionRequest';
+export * from './ticketCancellationReason';
+export * from './ticketDisapprovalReason';
