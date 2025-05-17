@@ -140,7 +140,14 @@
                       <span class="highlight">{{ getTotalCreated() }} tickets</span> criados no
                       período selecionado
                     </p>
-                    <p class="info-trend" v-if="trendData && trendData.length > 1 && (createdTrendPercentage !== 0 || resolvedTrendPercentage !== 0)">
+                    <p
+                      class="info-trend"
+                      v-if="
+                        trendData &&
+                        trendData.length > 1 &&
+                        (createdTrendPercentage !== 0 || resolvedTrendPercentage !== 0)
+                      "
+                    >
                       Isso é
                       <span
                         v-if="createdTrendPercentage > 0"
@@ -237,8 +244,17 @@
                       </div>
                     </div>
                     <div class="status-custom-legend">
-                      <div v-for="(label, idx) in statusChartData.labels" :key="label" class="legend-item">
-                        <span class="legend-color" :style="{ backgroundColor: statusChartData.datasets[0].backgroundColor[idx] }"></span>
+                      <div
+                        v-for="(label, idx) in statusChartData.labels"
+                        :key="label"
+                        class="legend-item"
+                      >
+                        <span
+                          class="legend-color"
+                          :style="{
+                            backgroundColor: statusChartData.datasets[0].backgroundColor[idx],
+                          }"
+                        ></span>
                         <span class="legend-label">{{ label }}</span>
                       </div>
                     </div>
@@ -268,8 +284,17 @@
                       </div>
                     </div>
                     <div class="status-custom-legend">
-                      <div v-for="(label, idx) in priorityChartData.labels" :key="label" class="legend-item">
-                        <span class="legend-color" :style="{ backgroundColor: priorityChartData.datasets[0].backgroundColor[idx] }"></span>
+                      <div
+                        v-for="(label, idx) in priorityChartData.labels"
+                        :key="label"
+                        class="legend-item"
+                      >
+                        <span
+                          class="legend-color"
+                          :style="{
+                            backgroundColor: priorityChartData.datasets[0].backgroundColor[idx],
+                          }"
+                        ></span>
                         <span class="legend-label">{{ label }}</span>
                       </div>
                     </div>
@@ -404,7 +429,10 @@
                   class="department-card department-card-modern"
                 >
                   <div class="department-card-header">
-                    <div class="department-icon" :style="{ background: '#2563eb20', color: '#2563eb' }">
+                    <div
+                      class="department-icon"
+                      :style="{ background: '#2563eb20', color: '#2563eb' }"
+                    >
                       <font-awesome-icon icon="building" />
                     </div>
                     <h4 class="department-title">{{ dept.departmentName }}</h4>
@@ -424,14 +452,29 @@
                     </div>
                     <div class="stat-row">
                       <span class="stat-label">Tempo Médio</span>
-                      <span class="stat-value">{{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}</span>
+                      <span class="stat-value">{{
+                        formatTimeInSeconds(dept.averageResolutionTimeSeconds)
+                      }}</span>
                     </div>
                     <div class="stat-row progress-row">
                       <span class="stat-label">Progresso</span>
                       <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" :style="{ width: (dept.resolutionRate * 100) + '%', background: dept.resolutionRate > 0.7 ? '#22c55e' : dept.resolutionRate > 0.4 ? '#eab308' : '#ef4444' }"></div>
+                        <div
+                          class="progress-bar-fill"
+                          :style="{
+                            width: dept.resolutionRate * 100 + '%',
+                            background:
+                              dept.resolutionRate > 0.7
+                                ? '#22c55e'
+                                : dept.resolutionRate > 0.4
+                                  ? '#eab308'
+                                  : '#ef4444',
+                          }"
+                        ></div>
                       </div>
-                      <span class="progress-value">{{ formatPercentage(dept.resolutionRate) }}</span>
+                      <span class="progress-value">{{
+                        formatPercentage(dept.resolutionRate)
+                      }}</span>
                     </div>
                   </div>
                 </div>
@@ -605,45 +648,62 @@
                       </template>
                     </div>
                   </div>
-
-                  <!-- Existing department cards -->
-                  <div class="departments-grid">
+                </div>
+              </div>
+              <!-- Existing department cards -->
+              <div class="departments-grid">
+                <div
+                  v-for="dept in departmentStats"
+                  :key="dept.departmentId"
+                  class="department-card department-card-modern"
+                >
+                  <div class="department-card-header">
                     <div
-                      v-for="dept in departmentStats"
-                      :key="dept.departmentId"
-                      class="department-card department-card-modern"
+                      class="department-icon"
+                      :style="{ background: '#2563eb20', color: '#2563eb' }"
                     >
-                      <div class="department-card-header">
-                        <div class="department-icon" :style="{ background: '#2563eb20', color: '#2563eb' }">
-                          <font-awesome-icon icon="building" />
-                        </div>
-                        <h4 class="department-title">{{ dept.departmentName }}</h4>
+                      <font-awesome-icon icon="building" />
+                    </div>
+                    <h4 class="department-title">{{ dept.departmentName }}</h4>
+                  </div>
+                  <div class="department-stats">
+                    <div class="stat-row">
+                      <span class="stat-label">Total de Chamados</span>
+                      <span class="stat-value">{{ dept.totalTickets }}</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">Resolvidos</span>
+                      <span class="stat-value">{{ dept.resolvedTickets }}</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">Taxa de Resolução</span>
+                      <span class="stat-value">{{ formatPercentage(dept.resolutionRate) }}</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">Tempo Médio</span>
+                      <span class="stat-value">{{
+                        formatTimeInSeconds(dept.averageResolutionTimeSeconds)
+                      }}</span>
+                    </div>
+                    <div class="stat-row progress-row">
+                      <span class="stat-label">Progresso</span>
+                      <div class="progress-bar-bg">
+                        <div
+                          class="progress-bar-fill"
+                          :style="{
+                            width: dept.resolutionRate * 100 + '%',
+                            background:
+                              dept.resolutionRate > 0.7
+                                ? '#22c55e'
+                                : dept.resolutionRate > 0.4
+                                  ? '#eab308'
+                                  : '#ef4444',
+                          }"
+                        ></div>
                       </div>
-                      <div class="department-stats">
-                        <div class="stat-row">
-                          <span class="stat-label">Total de Chamados</span>
-                          <span class="stat-value">{{ dept.totalTickets }}</span>
-                        </div>
-                        <div class="stat-row">
-                          <span class="stat-label">Resolvidos</span>
-                          <span class="stat-value">{{ dept.resolvedTickets }}</span>
-                        </div>
-                        <div class="stat-row">
-                          <span class="stat-label">Taxa de Resolução</span>
-                          <span class="stat-value">{{ formatPercentage(dept.resolutionRate) }}</span>
-                        </div>
-                        <div class="stat-row">
-                          <span class="stat-label">Tempo Médio</span>
-                          <span class="stat-value">{{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}</span>
-                        </div>
-                        <div class="stat-row progress-row">
-                          <span class="stat-label">Progresso</span>
-                          <div class="progress-bar-bg">
-                            <div class="progress-bar-fill" :style="{ width: (dept.resolutionRate * 100) + '%', background: dept.resolutionRate > 0.7 ? '#22c55e' : dept.resolutionRate > 0.4 ? '#eab308' : '#ef4444' }"></div>
-                          </div>
-                          <span class="progress-value">{{ formatPercentage(dept.resolutionRate) }}</span>
-                        </div>
-                      </div>
+                      <span class="progress-value">{{
+                        formatPercentage(dept.resolutionRate)
+                      }}</span>
                     </div>
                   </div>
                 </div>
@@ -682,7 +742,14 @@
                       <span class="highlight">{{ getTotalResolved() }} tickets</span> concluídos no
                       período selecionado
                     </p>
-                    <p class="info-text" v-if="trendData && trendData.length > 0 && (createdTrendPercentage !== 0 || resolvedTrendPercentage !== 0)">
+                    <p
+                      class="info-text"
+                      v-if="
+                        trendData &&
+                        trendData.length > 0 &&
+                        (createdTrendPercentage !== 0 || resolvedTrendPercentage !== 0)
+                      "
+                    >
                       <span class="highlight">{{ getTotalCreated() }} tickets</span> criados no
                       período selecionado
                     </p>
@@ -1037,10 +1104,9 @@ import { ticketService } from '@/services/ticketService';
 import type {
   TenantStatistics,
   StatusDurationDto,
-  StatusDurationResponseDto,
   DepartmentStats,
 } from '@/services/reportService';
-import { TicketActionType, TicketStatus, type TicketUpdate, type TicketPriority } from '@/models';
+import { TicketActionType, TicketStatus, type TicketUpdate } from '@/models';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import {
@@ -1091,7 +1157,14 @@ interface ChartData {
   }[];
 }
 
-type CustomTicketStatus = 'pendente' | 'em_andamento' | 'aguardando_verificação' | 'em_verificação' | 'finalizado' | 'cancelado' | 'reprovado';
+type CustomTicketStatus =
+  | 'pendente'
+  | 'em_andamento'
+  | 'aguardando_verificação'
+  | 'em_verificação'
+  | 'finalizado'
+  | 'cancelado'
+  | 'reprovado';
 
 interface ChartOptions {
   responsive: boolean;
@@ -1149,14 +1222,14 @@ const statusOrder = [
   { key: 'em_verificacao', label: 'Em verificação', color: '#9333ea' },
   { key: 'finalizado', label: 'Finalizado', color: '#2ecc71' },
   { key: 'cancelado', label: 'Cancelado', color: '#f87171' },
-  { key: 'reprovado', label: 'Reprovado', color: '#c62828' }
+  { key: 'reprovado', label: 'Reprovado', color: '#c62828' },
 ];
 
 // Ordem e cores fixas para prioridade
 const priorityOrder = [
   { key: 'baixa', label: 'Baixa', color: '#22c55e' },
   { key: 'media', label: 'Média', color: '#eab308' },
-  { key: 'alta', label: 'Alta', color: '#ef4444' }
+  { key: 'alta', label: 'Alta', color: '#ef4444' },
 ];
 
 // Chart options - garantir percentuais
@@ -1196,8 +1269,8 @@ const chartOptions = ref<ChartOptions>({
       color: '#fff',
       font: {
         weight: 'bold',
-        size: 14
-      }
+        size: 14,
+      },
     },
   },
 });
@@ -1212,8 +1285,8 @@ const trendChartOptions = {
       labels: {
         usePointStyle: true,
         padding: 20,
-        font: { size: 12 }
-      }
+        font: { size: 12 },
+      },
     },
     tooltip: {
       backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -1221,16 +1294,16 @@ const trendChartOptions = {
       titleFont: { size: 14 },
       bodyFont: { size: 13 },
       callbacks: {
-        label: (context: any) => `${context.dataset.label}: ${context.parsed.y}`
-      }
-    }
+        label: (context: any) => `${context.dataset.label}: ${context.parsed.y}`,
+      },
+    },
   },
   scales: {
     y: {
       beginAtZero: true,
-      ticks: { precision: 0 }
-    }
-  }
+      ticks: { precision: 0 },
+    },
+  },
 };
 
 const createdVsCompletedChartOptions = ref<ChartOptions>({
@@ -1316,13 +1389,13 @@ const recentTickets = ref<
 >([]);
 
 const statusClassMap: Record<CustomTicketStatus, string> = {
-  'pendente': 'bg-yellow-100 text-yellow-800',
-  'em_andamento': 'bg-blue-100 text-blue-800',
-  'aguardando_verificação': 'bg-purple-100 text-purple-800',
-  'em_verificação': 'bg-indigo-100 text-indigo-800',
-  'finalizado': 'bg-green-100 text-green-800',
-  'cancelado': 'bg-red-100 text-red-800',
-  'reprovado': 'bg-red-100 text-red-800'
+  pendente: 'bg-yellow-100 text-yellow-800',
+  em_andamento: 'bg-blue-100 text-blue-800',
+  aguardando_verificação: 'bg-purple-100 text-purple-800',
+  em_verificação: 'bg-indigo-100 text-indigo-800',
+  finalizado: 'bg-green-100 text-green-800',
+  cancelado: 'bg-red-100 text-red-800',
+  reprovado: 'bg-red-100 text-red-800',
 };
 
 const getStatusClass = (status: string): string => {
@@ -1330,9 +1403,9 @@ const getStatusClass = (status: string): string => {
 };
 
 const priorityClassMap: Record<string, string> = {
-  'baixa': 'bg-green-100 text-green-800',
-  'média': 'bg-yellow-100 text-yellow-800',
-  'alta': 'bg-red-100 text-red-800'
+  baixa: 'bg-green-100 text-green-800',
+  média: 'bg-yellow-100 text-yellow-800',
+  alta: 'bg-red-100 text-red-800',
 };
 
 const getPriorityClass = (priority: string): string => {
@@ -1370,13 +1443,13 @@ const loadData = async () => {
     trendData.value = trends[selectedTrendPeriod.value];
 
     // Store status durations
-    statusDurations.value = statusDurationsResult.statusDurations.map(duration => ({
+    statusDurations.value = statusDurationsResult.statusDurations.map((duration) => ({
       ...duration,
       averageDuration: duration.averageDurationSeconds / 3600, // Converter segundos para horas
     }));
 
     // Store department data - directly from the API response
-    departmentData.value = departmentStatsResult.map(dept => ({
+    departmentData.value = departmentStatsResult.map((dept) => ({
       ...dept,
       departmentId: dept.departmentId, // manter como number
       totalTickets: dept.totalTickets || 0,
@@ -1387,33 +1460,35 @@ const loadData = async () => {
     }));
 
     // Distribuição por Status
-    const statusCounts = statusOrder.map(status => {
+    const statusCounts = statusOrder.map((status) => {
       const found = statusResult.statusCounts.find((item: any) => item.status === status.key);
       return found ? found.count : 0;
     });
     ticketsByStatus.value = {
-      labels: statusOrder.map(s => s.label),
+      labels: statusOrder.map((s) => s.label),
       datasets: [
         {
           label: 'Status',
           data: statusCounts,
-          backgroundColor: statusOrder.map(s => s.color),
+          backgroundColor: statusOrder.map((s) => s.color),
         },
       ],
     };
 
     // Distribuição por Prioridade
-    const priorityCounts = priorityOrder.map(priority => {
-      const found = priorityResult.priorityCounts.find((item: any) => item.priority === priority.key);
+    const priorityCounts = priorityOrder.map((priority) => {
+      const found = priorityResult.priorityCounts.find(
+        (item: any) => item.priority === priority.key,
+      );
       return found ? found.count : 0;
     });
     ticketsByPriority.value = {
-      labels: priorityOrder.map(p => p.label),
+      labels: priorityOrder.map((p) => p.label),
       datasets: [
         {
           label: 'Quantidade de Tickets',
           data: priorityCounts,
-          backgroundColor: priorityOrder.map(p => p.color),
+          backgroundColor: priorityOrder.map((p) => p.color),
         },
       ],
     };
@@ -2385,6 +2460,7 @@ function formatDateDDMM(dateStr: string) {
 
 /* Departments */
 .departments-grid {
+  margin-top: 1rem;
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
@@ -3688,7 +3764,7 @@ function formatDateDDMM(dateStr: string) {
 }
 
 .department-card-modern {
-  box-shadow: 0 2px 8px 0 rgba(37,99,235,0.07);
+  box-shadow: 0 2px 8px 0 rgba(37, 99, 235, 0.07);
   border: 1px solid #e5e7eb;
   transition: box-shadow 0.2s;
   position: relative;
@@ -3696,7 +3772,7 @@ function formatDateDDMM(dateStr: string) {
   padding-top: 1.25rem;
 }
 .department-card-modern:hover {
-  box-shadow: 0 4px 16px 0 rgba(37,99,235,0.13);
+  box-shadow: 0 4px 16px 0 rgba(37, 99, 235, 0.13);
 }
 .department-card-header {
   display: flex;
