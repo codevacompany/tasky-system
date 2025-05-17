@@ -291,7 +291,7 @@
                       <tr v-for="user in client.users" :key="user.id">
                         <td class="user-info">
                           <div class="user-avatar">{{ getUserInitials(user) }}</div>
-                          <span>{{ user.nome }}</span>
+                          <span>{{ user.firstName }} {{ user.lastName }}</span>
                         </td>
                         <td>{{ user.email }}</td>
                         <td>{{ user.departamento }}</td>
@@ -400,6 +400,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { getUserInitials } from '@/utils/generic-helper';
 
 type SortableClientField =
   | 'razaoSocial'
@@ -458,7 +459,8 @@ const clients = ref([
     users: [
       {
         id: 1,
-        nome: 'João Silva',
+        firstName: 'João',
+        lastName: 'Silva',
         email: 'joao.silva@empresa-abc.com',
         departamento: 'TI',
         perfil: 'ADMIN',
@@ -467,7 +469,8 @@ const clients = ref([
       },
       {
         id: 2,
-        nome: 'Maria Santos',
+        firstName: 'Maria',
+        lastName: 'Santos',
         email: 'maria.santos@empresa-abc.com',
         departamento: 'Suporte',
         perfil: 'NORMAL',
@@ -493,7 +496,8 @@ const clients = ref([
     users: [
       {
         id: 3,
-        nome: 'Pedro Oliveira',
+        firstName: 'Pedro',
+        lastName: 'Oliveira',
         email: 'pedro.oliveira@techsolutions.com',
         departamento: 'Diretoria',
         perfil: 'ADMIN',
@@ -502,7 +506,8 @@ const clients = ref([
       },
       {
         id: 4,
-        nome: 'Ana Costa',
+        firstName: 'Ana',
+        lastName: 'Costa',
         email: 'ana.costa@techsolutions.com',
         departamento: 'RH',
         perfil: 'NORMAL',
@@ -511,7 +516,8 @@ const clients = ref([
       },
       {
         id: 5,
-        nome: 'Lucas Mendes',
+        firstName: 'Lucas',
+        lastName: 'Mendes',
         email: 'lucas.mendes@techsolutions.com',
         departamento: 'Suporte',
         perfil: 'NORMAL',
@@ -537,7 +543,8 @@ const clients = ref([
     users: [
       {
         id: 6,
-        nome: 'Roberto Almeida',
+        firstName: 'Roberto',
+        lastName: 'Almeida',
         email: 'roberto.almeida@xyz.com',
         departamento: 'Operações',
         perfil: 'ADMIN',
@@ -546,7 +553,8 @@ const clients = ref([
       },
       {
         id: 7,
-        nome: 'Carla Santos',
+        firstName: 'Carla',
+        lastName: 'Santos',
         email: 'carla.santos@xyz.com',
         departamento: 'Financeiro',
         perfil: 'NORMAL',
@@ -555,7 +563,8 @@ const clients = ref([
       },
       {
         id: 8,
-        nome: 'Fernando Lima',
+        firstName: 'Fernando',
+        lastName: 'Lima',
         email: 'fernando.lima@xyz.com',
         departamento: 'Produção',
         perfil: 'NORMAL',
@@ -564,7 +573,8 @@ const clients = ref([
       },
       {
         id: 9,
-        nome: 'Patricia Silva',
+        firstName: 'Patricia',
+        lastName: 'Silva',
         email: 'patricia.silva@xyz.com',
         departamento: 'Qualidade',
         perfil: 'NORMAL',
@@ -634,15 +644,6 @@ const formatDate = (date: string) => {
 
 const formatDateTime = (datetime: string) => {
   return new Date(datetime).toLocaleString('pt-BR');
-};
-
-const getUserInitials = (user: { nome: string }) => {
-  return user.nome
-    .split(' ')
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
 };
 
 const editClient = (client: any) => {

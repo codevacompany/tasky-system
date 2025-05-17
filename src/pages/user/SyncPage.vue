@@ -66,7 +66,7 @@
                 @click="selectUser(user)"
               >
                 <div class="user-avatar">
-                  <span class="initials">{{ getInitials(user) }}</span>
+                  <span class="initials">{{ getUserInitials(user) }}</span>
                 </div>
                 <div class="user-info">
                   <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
@@ -117,7 +117,7 @@
               :class="{ unread: !message.read }"
             >
               <div class="message-avatar">
-                <span class="initials">{{ getInitials(message.sender) }}</span>
+                <span class="initials">{{ getUserInitials(message.sender) }}</span>
               </div>
               <div class="message-content">
                 <div class="message-header">
@@ -199,8 +199,8 @@
               <button class="action-btn" title="Inserir emoji">
                 <font-awesome-icon icon="smile" />
               </button>
-              <button 
-                class="action-btn" 
+              <button
+                class="action-btn"
                 :class="{ active: requiresConfirmation }"
                 title="Requer confirmação de visualização"
                 @click="requiresConfirmation = !requiresConfirmation"
@@ -244,7 +244,7 @@ import { useUserStore } from '@/stores/user';
 import { useMessageStore } from '@/stores/messageStore';
 import type { User } from '@/models';
 import type { Message, MessageReaction, MessageViewConfirmation, Mention } from '@/models/message';
-import { RoleName } from '@/models';
+import { getUserInitials } from '@/utils/generic-helper';
 import { messageService } from '@/services/messageService';
 import { userService } from '@/services/userService';
 import { toast } from 'vue3-toastify';
@@ -337,20 +337,20 @@ const handleInput = (event: Event) => {
   const textarea = event.target as HTMLTextAreaElement;
   const text = textarea.value;
   const cursorPosition = textarea.selectionStart;
-  
+
   const lastAtSymbol = text.lastIndexOf('@', cursorPosition);
   if (lastAtSymbol !== -1) {
     const textAfterAt = text.slice(lastAtSymbol + 1, cursorPosition);
     if (!textAfterAt.includes(' ')) {
       mentionSearchTerm.value = textAfterAt;
       showMentionSelector.value = true;
-      
+
       // Calcular posição do seletor
       const textBeforeCursor = text.slice(0, cursorPosition);
       const lines = textBeforeCursor.split('\n');
       const currentLine = lines[lines.length - 1];
       const lineHeight = 20;
-      
+
       mentionSelectorPosition.value = {
         top: `${(lines.length - 1) * lineHeight}px`,
         left: `${currentLine.length * 8}px`
@@ -358,7 +358,7 @@ const handleInput = (event: Event) => {
       return;
     }
   }
-  
+
   showMentionSelector.value = false;
 };
 
@@ -370,14 +370,14 @@ const autoGrow = (textarea: HTMLTextAreaElement) => {
 // Virtualização para melhor performance com muitas mensagens
 const visibleMessages = computed(() => {
   if (!messagesList.value) return messages.value;
-  
+
   const containerHeight = messagesList.value.clientHeight;
   const scrollTop = messagesList.value.scrollTop;
   const itemHeight = 100; // Altura aproximada de cada mensagem
-  
+
   const startIndex = Math.floor(scrollTop / itemHeight);
   const endIndex = Math.ceil((scrollTop + containerHeight) / itemHeight);
-  
+
   return messages.value.slice(
     Math.max(0, startIndex - 5),
     Math.min(messages.value.length, endIndex + 5)
@@ -390,12 +390,12 @@ const handleScroll = () => {
   if (scrollTimeout) {
     window.cancelAnimationFrame(scrollTimeout);
   }
-  
+
   scrollTimeout = window.requestAnimationFrame(() => {
     if (!messagesList.value) return;
-    
-    const { scrollTop, scrollHeight, clientHeight } = messagesList.value;
-    
+
+    const { scrollTop } = messagesList.value;
+
     // Carregar mais mensagens quando estiver próximo do topo
     if (scrollTop < 100 && hasMore.value && !isLoading.value) {
       messageStore.loadMore();
@@ -406,9 +406,9 @@ const handleScroll = () => {
 // Otimização do setup do infinite scroll
 const setupInfiniteScroll = () => {
   if (!messagesList.value) return;
-  
+
   messagesList.value.addEventListener('scroll', handleScroll);
-  
+
   const options = {
     root: messagesList.value,
     rootMargin: '0px',
@@ -451,13 +451,13 @@ const sendMessage = async () => {
     const messageMentions = [...currentMentions.value];
     const messageRequiresConfirmation = requiresConfirmation.value;
     const parentMessageId = replyingTo.value?.id;
-    
+
     // Limpar campos imediatamente para melhor UX
     newMessage.value = '';
     currentMentions.value = [];
     requiresConfirmation.value = false;
     replyingTo.value = null;
-    
+
     const data = {
       content: messageContent,
       channel: currentChannel.value,
@@ -521,25 +521,25 @@ const confirmView = async (message: Message) => {
 const handleMentionSelect = (user: User) => {
   const textarea = messageInput.value;
   if (!textarea) return;
-  
+
   const text = textarea.value;
   const cursorPosition = textarea.selectionStart;
   const lastAtSymbol = text.lastIndexOf('@', cursorPosition);
-  
+
   if (lastAtSymbol !== -1) {
     const beforeMention = text.slice(0, lastAtSymbol);
     const afterMention = text.slice(cursorPosition);
     const mentionText = `@${user.firstName} ${user.lastName}`;
-    
+
     newMessage.value = beforeMention + mentionText + ' ' + afterMention;
-    
+
     // Adicionar menção à lista
     currentMentions.value.push({
       userId: user.id,
       position: lastAtSymbol,
       length: mentionText.length
     });
-    
+
     // Focar no textarea após a menção
   setTimeout(() => {
       if (textarea) {
@@ -600,14 +600,12 @@ onMounted(() => {
 
 .page-content {
   flex: 1;
-  padding: 20px;
-  overflow: hidden;
+ overflow: hidden;
 }
 
 .sync-container {
   height: 100%;
   display: flex;
-  gap: 20px;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -919,9 +917,6 @@ onMounted(() => {
 .input-container {
   position: relative;
   flex: 1;
-  background-color: white;
-  border-radius: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 textarea {
@@ -936,7 +931,7 @@ textarea {
   font-size: 0.95rem;
   line-height: 1.4;
   overflow-y: auto;
-  background-color: transparent;
+  background-color: white;
 }
 
 textarea:focus {

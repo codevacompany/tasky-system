@@ -1,110 +1,117 @@
 <template>
-  <div v-if="isOpen" class="modal-overlay">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="header-icon">
-          <font-awesome-icon icon="question-circle" />
+  <BaseModal v-if="isOpen" :isOpen="isOpen" :title="title" @close="handleCancel">
+    <div class="confirmation-content">
+      <p>{{ message }}</p>
+
+      <!-- Campos adicionais para entrada de dados -->
+      <div v-if="hasInput" class="input-fields">
+        <div class="form-group">
+          <label for="reason">Motivo:</label>
+          <select
+            v-if="reasonOptions && reasonOptions.length > 0"
+            id="reason"
+            v-model="inputReason"
+            required
+            class="select-input"
+          >
+            <option value="" disabled selected>Selecione um motivo</option>
+            <option v-for="option in reasonOptions" :key="option.value" :value="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+          <input
+            v-else
+            type="text"
+            id="reason"
+            v-model="inputReason"
+            placeholder="Informe o motivo"
+            required
+          />
         </div>
-        <h3>{{ title }}</h3>
-      </div>
-      <div class="modal-body">
-        <p>{{ message }}</p>
-        
-        <!-- Campos adicionais para solicitação de correção -->
-        <div v-if="isCorrection" class="correction-fields">
-          <div class="form-group">
-            <label for="reason">Motivo:</label>
-            <input
-              type="text"
-              id="reason"
-              v-model="correctionReason"
-              placeholder="Informe o motivo"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label for="description">Descrição:</label>
-            <textarea
-              id="description"
-              v-model="correctionDescription"
-              placeholder="Descreva os detalhes"
-              required
-            ></textarea>
-          </div>
+        <div class="form-group">
+          <label for="description">Descrição:</label>
+          <textarea
+            id="description"
+            v-model="inputDescription"
+            placeholder="Descreva os detalhes"
+            required
+          ></textarea>
         </div>
       </div>
-      <div class="modal-footer">
+
+      <div class="confirmation-actions">
         <button class="action-btn reject" @click="handleCancel">
           <font-awesome-icon icon="times" /> Cancelar
         </button>
-        <button 
-          class="action-btn approve" 
+        <button
+          class="action-btn approve"
           @click="handleConfirm"
-          :disabled="isCorrection && (!correctionReason || !correctionDescription)"
+          :disabled="hasInput && (!inputReason || !inputDescription)"
         >
           <font-awesome-icon icon="check" /> Confirmar
         </button>
       </div>
     </div>
-  </div>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import BaseModal from './BaseModal.vue';
 
 const props = defineProps<{
   isOpen: boolean;
   title: string;
   message: string;
-  isCorrection?: boolean;
+  hasInput?: boolean;
+  reasonOptions?: { value: string; label: string }[];
 }>();
 
 const emit = defineEmits<{
-  (e: 'confirm', data?: any): void;
+  (e: 'confirm', data?: { reason: string; description: string }): void;
   (e: 'cancel'): void;
 }>();
 
 const showErrors = ref(false);
-const correctionReason = ref('');
-const correctionDescription = ref('');
+const inputReason = ref('');
+const inputDescription = ref('');
 
-// Resetar dados quando o modal é fechado ou aberto
-watch(() => props.isOpen, (newValue) => {
-  if (!newValue) {
-    // Quando o modal é fechado
-    resetForm();
-  } else {
-    // Quando o modal é aberto
-    showErrors.value = false;
-  }
-});
+watch(
+  () => props.isOpen,
+  (newValue) => {
+    if (!newValue) {
+      resetForm();
+    } else {
+      showErrors.value = false;
+    }
+  },
+);
 
 const validateForm = (): boolean => {
-  if (!props.isCorrection) return true;
-  
-  const isValid = correctionReason.value.trim() !== '' && 
-                  correctionDescription.value.trim() !== '';
-  
+  if (!props.hasInput) return true;
+
+  const isValid = inputReason.value.trim() !== '';
+
   if (!isValid) {
     showErrors.value = true;
   }
-  
+
   return isValid;
 };
 
 const resetForm = () => {
   showErrors.value = false;
-  correctionReason.value = '';
-  correctionDescription.value = '';
+  inputReason.value = '';
+  inputDescription.value = '';
 };
 
 const handleConfirm = () => {
   if (!validateForm()) return;
-  
-  if (props.isCorrection) {
+
+  if (props.hasInput) {
     emit('confirm', {
-      reason: correctionReason.value,
-      description: correctionDescription.value
+      reason: inputReason.value,
+      description: inputDescription.value,
     });
   } else {
     emit('confirm');
@@ -119,67 +126,19 @@ const handleCancel = () => {
 </script>
 
 <style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
+.confirmation-content {
+  min-width: 500px;
+  max-width: 100%;
 }
 
-.modal-content {
-  background: white;
-  border-radius: 8px;
-  width: 500px;
-  max-width: 90%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.modal-header {
-  padding: 1rem;
-  border-bottom: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.header-icon {
-  width: 2rem;
-  height: 2rem;
-  min-width: 2rem;
-  background: #e9ecef;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #495057;
-  font-size: 1rem;
-}
-
-.modal-header h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: #1a2233;
-  font-weight: 500;
-}
-
-.modal-body {
-  padding: 1.5rem 1rem;
-}
-
-.modal-body p {
+.confirmation-content p {
   margin: 0 0 1rem 0;
-  color: #4a5568;
+  color: var(--text-color);
   font-size: 1rem;
   line-height: 1.5;
 }
 
-.correction-fields {
+.input-fields {
   margin-top: 1.5rem;
 }
 
@@ -192,16 +151,18 @@ const handleCancel = () => {
   margin-bottom: 0.5rem;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #4a5568;
+  color: var(--text-color);
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 0.875rem;
+  background-color: var(--input-bg);
+  color: var(--text-color);
 }
 
 .form-group textarea {
@@ -209,12 +170,13 @@ const handleCancel = () => {
   resize: vertical;
 }
 
-.modal-footer {
-  padding: 1rem;
-  border-top: 1px solid #e2e8f0;
+.confirmation-actions {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
 }
 
 .action-btn {
@@ -249,50 +211,14 @@ const handleCancel = () => {
   background-color: #475569;
 }
 
-/* Dark mode */
-:deep(body.dark-mode) .modal-content {
-  background: #1a2233;
+.select-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  appearance: auto;
 }
-
-:deep(body.dark-mode) .modal-header {
-  border-color: #2d3748;
-}
-
-:deep(body.dark-mode) .header-icon {
-  background: #2d3748;
-  color: #94a3b8;
-}
-
-:deep(body.dark-mode) .modal-header h3 {
-  color: #e2e8f0;
-}
-
-:deep(body.dark-mode) .modal-body p {
-  color: #94a3b8;
-}
-
-:deep(body.dark-mode) .modal-footer {
-  border-color: #2d3748;
-}
-
-:deep(body.dark-mode) .form-group label {
-  color: #94a3b8;
-}
-
-:deep(body.dark-mode) .form-group input,
-:deep(body.dark-mode) .form-group textarea {
-  background: #1e293b;
-  border-color: #2d3748;
-  color: #e2e8f0;
-}
-
-:deep(body.dark-mode) .form-group textarea {
-  border-color: #2d3748;
-}
-
-:deep(body.dark-mode) .form-group input:focus,
-:deep(body.dark-mode) .form-group textarea:focus {
-  border-color: #818cf8;
-  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.1);
-}
-</style> 
+</style>

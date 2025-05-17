@@ -1,4 +1,4 @@
-import { TicketStatus, type Ticket } from "@/models";
+import { TicketStatus, type Ticket } from '@/models';
 
 export function debounce<T extends (...args: unknown[]) => void>(func: T, wait: number) {
   let timeout: ReturnType<typeof setTimeout>;
@@ -17,10 +17,14 @@ export function formatSnakeToCamelCase(str: string): string {
 }
 
 export function formatSnakeToNaturalCase(str: string): string {
-  return str.replace('_', ' ').replace(/[a-z]/, (firstLetter) => firstLetter.toUpperCase());
+  // Replace all underscores with spaces and capitalize each word
+  return str
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
-export function calculateDeadline (ticket: Ticket) {
+export function calculateDeadline(ticket: Ticket) {
   if (!ticket.dueAt) return '—';
 
   if (ticket.status !== TicketStatus.Pending && ticket.status !== TicketStatus.InProgress) {
@@ -41,9 +45,9 @@ export function calculateDeadline (ticket: Ticket) {
   }
 
   return `${diffDays} dias restantes`;
-};
+}
 
-export function formatTimeInSeconds (seconds?: number) {
+export function formatTimeInSeconds(seconds?: number) {
   if (seconds === undefined || seconds === null) return '0 segundos';
 
   const days = Math.floor(seconds / 86400);
@@ -62,9 +66,9 @@ export function formatTimeInSeconds (seconds?: number) {
   } else {
     return `${secs} ${secs === 1 ? 'segundo' : 'segundos'}`;
   }
-};
+}
 
-export function formatTimeCompact (seconds: number): string {
+export function formatTimeCompact(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
 
   const days = Math.floor(seconds / 86400);
@@ -78,4 +82,41 @@ export function formatTimeCompact (seconds: number): string {
   } else {
     return `${minutes}min`;
   }
-};
+}
+
+export function enumToOptions(enumObj: object): { value: string; label: string }[] {
+  const filteredEntries = Object.entries(enumObj).filter(([key]) => isNaN(Number(key)));
+
+  const options = filteredEntries.map((entry) => {
+    const value = entry[1] as string;
+    return {
+      value: value,
+      label: formatSnakeToNaturalCase(value),
+    };
+  });
+
+  return options;
+}
+
+export function getUserInitials(
+  input?: { firstName?: string; lastName?: string } | string,
+): string {
+  if (!input) return '??';
+
+  if (typeof input === 'string') {
+    return input
+      .split(' ')
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
+  }
+
+  if ('firstName' in input && 'lastName' in input) {
+    const firstInitial = input.firstName?.charAt(0) || '';
+    const lastInitial = input.lastName?.charAt(0) || '';
+    return (firstInitial + lastInitial).toUpperCase();
+  }
+
+  return '??';
+}
