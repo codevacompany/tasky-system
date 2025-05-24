@@ -15,6 +15,7 @@ import ClientSettings from '@/pages/admin/ClientSettings.vue';
 import SyncPage from '@/pages/user/SyncPage.vue';
 import LandingPage from '@/pages/public/LandingPage.vue';
 import { localStorageService } from '@/utils/localStorageService';
+import SignUpManagement from '@/pages/admin/SignUpManagement.vue';
 
 const routes: RouteRecordRaw[] = [
   // Public Routes (No Layout)
@@ -29,8 +30,13 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: false },
   },
   {
-    path: '/cadastro-empresa',
-    component: () => import('@/pages/public/CadastroEmpresaPage.vue'),
+    path: '/cadastrar',
+    component: () => import('@/pages/public/SignUpPage.vue'),
+    meta: { requiresAuth: false },
+  },
+  {
+    path: '/completar-cadastro/:token',
+    component: () => import('@/pages/public/CompleteRegistration.vue'),
     meta: { requiresAuth: false },
   },
 
@@ -60,6 +66,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'clientes', component: ClientManagement },
       { path: 'clientes/:id/usuarios', component: ClientUsers },
       { path: 'clientes/:id/configuracoes', component: ClientSettings },
+      { path: 'cadastros', component: SignUpManagement },
     ],
     meta: { requiresAuth: true },
   },
@@ -70,14 +77,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../pages/AdminDashboard.vue'),
     meta: {
       requiresAuth: true,
-      isAdmin: true,
+      adminOnly: true,
     },
-  },
-
-  {
-    path: '/cadastros-empresas',
-    component: () => import('@/pages/admin/CadastroEmpresasRecebidos.vue'),
-    meta: { requiresAuth: true },
   },
 ];
 
@@ -92,13 +93,6 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAuth && !loggedIn) {
     return next('/login');
-  }
-
-  if (to.meta.requiresAuth) {
-    // Verificar autenticação
-    // if (!isAuthenticated) return next('/login')
-    // Verificar permissões de admin
-    // if (to.meta.isAdmin && !isAdmin) return next('/')
   }
 
   next();

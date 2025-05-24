@@ -5,6 +5,7 @@ import type { User } from '@/models';
 
 export const useUserStore = defineStore('auth', () => {
   const user = ref<User | null>(localStorageService.getUser());
+  const isNewUser = ref(false);
 
   const setUser = (userData: User | null) => {
     user.value = userData;
@@ -14,5 +15,9 @@ export const useUserStore = defineStore('auth', () => {
     }
   };
 
-  return { user, setUser };
+  const setIsNewUser = (isNew: boolean) => {
+    isNewUser.value = isNew;
+  };
+
+  return { user, setUser, isNewUser, setIsNewUser };
 });
