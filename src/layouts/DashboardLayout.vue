@@ -51,7 +51,8 @@
                       isActive('/admin/usuarios') ||
                       isActive('/admin/setores') ||
                       isActive('/admin/categorias') ||
-                      isActive('/admin/clientes'),
+                      isActive('/admin/clientes') ||
+                      isActive('/admin/cadastros'),
                   }"
                   @click="toggleAdminDropdown"
                 >
@@ -90,6 +91,16 @@
                     <div class="dropdown-item" :class="{ active: isActive('/admin/clientes') }">
                       <font-awesome-icon icon="building" />
                       Clientes
+                    </div>
+                  </router-link>
+                  <router-link
+                    to="/admin/cadastros"
+                    @click="showAdminDropdown = false"
+                    v-if="user?.role.name === RoleName.GlobalAdmin"
+                  >
+                    <div class="dropdown-item" :class="{ active: isActive('/admin/cadastros') }">
+                      <font-awesome-icon icon="user-plus" />
+                      Cadastros
                     </div>
                   </router-link>
                 </div>
@@ -169,7 +180,6 @@ import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import { useRoute } from 'vue-router';
 import { notificationService } from '@/services/notificationService';
-import { toast } from 'vue3-toastify';
 import { RoleName } from '@/models';
 import taskyLogo from '@/assets/images/tasky.png';
 import taskyWhiteLogo from '@/assets/images/tasky-white-large.png';
@@ -198,7 +208,7 @@ const fetchUnreadCount = async () => {
     }
     unreadCount.value = response.data.count;
   } catch {
-    toast.error('Erro ao carregar notificações. Tente novamente.');
+    console.error('Error fetching unread count.');
   }
 };
 
@@ -233,6 +243,8 @@ const isActive = (path: string) => route.path === path;
 const userInitials = computed(() => {
   if (user?.firstName && user?.lastName) {
     return user.firstName.charAt(0) + user.lastName.charAt(0);
+  } else if (user?.firstName) {
+    return user.firstName.substring(0, 2).toUpperCase();
   }
   return '';
 });
@@ -257,6 +269,8 @@ const initializeTicketPolling = () => {
 };
 
 onMounted(() => {
+  fetchUnreadCount();
+
   // Sincroniza o estado inicial do modo escuro
   if (darkMode.value) {
     document.body.classList.add('dark-mode');

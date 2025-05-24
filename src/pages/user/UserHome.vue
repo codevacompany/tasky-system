@@ -2,6 +2,12 @@
   <section id="dashboardSection" class="section-content active">
     <h1>Dashboard</h1>
 
+    <WelcomeModal
+      :isOpen="showWelcomeModal"
+      @close="closeWelcomeModal"
+      @openGuide="openUserGuide"
+    />
+
     <!-- Estatísticas -->
     <div class="dashboard-stats">
       <div class="stat-card">
@@ -150,9 +156,12 @@ import { useTicketsStore } from '@/stores/tickets';
 import { toast } from 'vue3-toastify';
 import CompactTicketTable from '@/components/tickets/CompactTicketTable.vue';
 import { formatTimeInSeconds } from '@/utils/generic-helper';
+import WelcomeModal from '@/components/common/WelcomeModal.vue';
+import { useRouter } from 'vue-router';
 
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
+const router = useRouter();
 const isLoading = ref(true);
 const userStats = ref<UserStatistics | null>(null);
 const latestReceivedTickets = computed(() => ticketsStore.recentReceivedTickets);
@@ -194,6 +203,18 @@ const resolutionRate = computed(() => {
   }
   return 0;
 });
+
+const showWelcomeModal = ref(userStore.isNewUser);
+
+const closeWelcomeModal = () => {
+  showWelcomeModal.value = false;
+  userStore.setIsNewUser(false);
+};
+
+const openUserGuide = () => {
+  userStore.setIsNewUser(false);
+  router.push('/faq');
+};
 
 onMounted(async () => {
   isLoading.value = true;

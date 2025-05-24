@@ -83,7 +83,9 @@
           <div v-if="currentChannel === 'inicio'" class="inicio-panel">
             <h2>Bem-vindo ao Sync!</h2>
             <ul class="instructions-list">
-              <li>Selecione um canal para conversar com todos, com seu setor ou individualmente.</li>
+              <li>
+                Selecione um canal para conversar com todos, com seu setor ou individualmente.
+              </li>
               <li>Use <b>@nome</b> para mencionar alguém em uma mensagem.</li>
               <li>Responda mensagens usando o botão <b>Responder</b> para criar threads.</li>
               <li>Marque mensagens importantes para confirmação de leitura/aceite.</li>
@@ -93,12 +95,15 @@
             </ul>
             <div class="inicio-dica">
               <font-awesome-icon icon="info-circle" />
-              Dica: Use o Sync para centralizar a comunicação e garantir o registro das interações importantes!
+              Dica: Use o Sync para centralizar a comunicação e garantir o registro das interações
+              importantes!
             </div>
           </div>
           <div v-if="replyingTo" class="reply-banner">
             <span>Respondendo a: {{ replyingTo.content.slice(0, 60) }}...</span>
-            <button @click="cancelReply" class="cancel-reply-btn"><font-awesome-icon icon="times" /></button>
+            <button @click="cancelReply" class="cancel-reply-btn">
+              <font-awesome-icon icon="times" />
+            </button>
           </div>
           <div class="messages-list" ref="messagesList">
             <div v-if="isLoading && messages.length === 0" class="loading-messages">
@@ -112,24 +117,27 @@
               </div>
               <div
                 v-for="message in rootMessages"
-              :key="message.id"
-              class="message-item"
-              :class="{ unread: !message.read }"
-            >
-              <div class="message-avatar">
-                <span class="initials">{{ getUserInitials(message.sender) }}</span>
-              </div>
-              <div class="message-content">
-                <div class="message-header">
-                  <div class="message-info">
-                    <span class="sender-name"
-                      >{{ message.sender.firstName }} {{ message.sender.lastName }}</span
-                    >
-                    <span class="sender-department">{{ message.sender.department.name }}</span>
-                  </div>
-                  <span class="message-time">{{ formatTime(message.createdAt) }}</span>
+                :key="message.id"
+                class="message-item"
+                :class="{ unread: !message.read }"
+              >
+                <div class="message-avatar">
+                  <span class="initials">{{ getUserInitials(message.sender) }}</span>
                 </div>
-                  <div v-if="message.requiresConfirmation && !hasConfirmedView(message)" class="message-confirmation">
+                <div class="message-content">
+                  <div class="message-header">
+                    <div class="message-info">
+                      <span class="sender-name"
+                        >{{ message.sender.firstName }} {{ message.sender.lastName }}</span
+                      >
+                      <span class="sender-department">{{ message.sender.department.name }}</span>
+                    </div>
+                    <span class="message-time">{{ formatTime(message.createdAt) }}</span>
+                  </div>
+                  <div
+                    v-if="message.requiresConfirmation && !hasConfirmedView(message)"
+                    class="message-confirmation"
+                  >
                     <div class="confirmation-placeholder">
                       <font-awesome-icon icon="eye" />
                       <span>Esta mensagem requer confirmação de visualização</span>
@@ -142,27 +150,30 @@
                     {{ message.content }}
                     <div v-if="message.requiresConfirmation" class="confirmation-status">
                       <font-awesome-icon icon="check-circle" />
-                      <span>Visualizado em {{ formatTime(getUserConfirmation(message)?.viewedAt || '') }}</span>
+                      <span
+                        >Visualizado em
+                        {{ formatTime(getUserConfirmation(message)?.viewedAt || '') }}</span
+                      >
                     </div>
                   </div>
-                <div class="message-actions">
-                  <button
-                    v-for="reaction in message.reactions"
-                    :key="reaction.type"
-                    class="reaction-btn"
-                    :class="{ active: reaction.active }"
+                  <div class="message-actions">
+                    <button
+                      v-for="reaction in message.reactions"
+                      :key="reaction.type"
+                      class="reaction-btn"
+                      :class="{ active: reaction.active }"
                       @click="handleReaction(message, reaction.type)"
-                  >
-                    {{ reaction.type }} {{ reaction.count }}
-                  </button>
-                  <button class="reaction-btn add-reaction">
-                    <font-awesome-icon icon="smile" />
-                  </button>
+                    >
+                      {{ reaction.type }} {{ reaction.count }}
+                    </button>
+                    <button class="reaction-btn add-reaction">
+                      <font-awesome-icon icon="smile" />
+                    </button>
                     <button class="reaction-btn reply-btn" @click="setReply(message)">
                       <font-awesome-icon icon="reply" /> Responder
                     </button>
+                  </div>
                 </div>
-              </div>
                 <!-- Respostas (threads) -->
                 <div v-if="repliesMap[message.id]" class="thread-replies">
                   <div
@@ -173,11 +184,13 @@
                   >
                     <div class="message-avatar">
                       <span class="initials">{{ getInitials(reply.sender) }}</span>
-            </div>
+                    </div>
                     <div class="message-content">
                       <div class="message-header">
                         <div class="message-info">
-                          <span class="sender-name">{{ reply.sender.firstName }} {{ reply.sender.lastName }}</span>
+                          <span class="sender-name"
+                            >{{ reply.sender.firstName }} {{ reply.sender.lastName }}</span
+                          >
                           <span class="sender-department">{{ reply.sender.department.name }}</span>
                         </div>
                         <span class="message-time">{{ formatTime(reply.createdAt) }}</span>
@@ -209,15 +222,15 @@
               </button>
             </div>
             <div class="input-container">
-            <textarea
-              v-model="newMessage"
+              <textarea
+                v-model="newMessage"
                 placeholder="Digite sua mensagem... (use @ para mencionar)"
-              @keydown.enter.prevent="sendMessage"
+                @keydown.enter.prevent="sendMessage"
                 @input="handleInput"
                 @keydown="handleKeyDown"
-              rows="1"
-              ref="messageInput"
-            ></textarea>
+                rows="1"
+                ref="messageInput"
+              ></textarea>
               <MentionSelector
                 v-if="showMentionSelector"
                 :show="showMentionSelector"
@@ -275,7 +288,7 @@ const filteredUsers = computed(() => {
     (user) =>
       user.firstName.toLowerCase().includes(searchTerm) ||
       user.lastName.toLowerCase().includes(searchTerm) ||
-      user.email.toLowerCase().includes(searchTerm)
+      user.email.toLowerCase().includes(searchTerm),
   );
 });
 
@@ -285,7 +298,8 @@ const hasMore = computed(() => messageStore.hasMore);
 
 const getUnreadCount = (channel: 'geral' | 'setor' | 'individual' | 'inicio') => {
   return messages.value.filter(
-    (message: Message) => message.channel === channel && !message.read && message.sender.id !== userStore.user!.id
+    (message: Message) =>
+      message.channel === channel && !message.read && message.sender.id !== userStore.user!.id,
   ).length;
 };
 
@@ -316,7 +330,7 @@ const fetchUsers = async () => {
   try {
     const response = await userService.fetch({
       page: 1,
-      limit: 100
+      limit: 100,
     });
     users.value = response.data.items;
   } catch (error) {
@@ -327,7 +341,7 @@ const fetchUsers = async () => {
 // Função debounce nativa
 function debounce<T extends (...args: any[]) => void>(func: T, wait: number) {
   let timeout: ReturnType<typeof setTimeout> | null = null;
-  return function(this: any, ...args: Parameters<T>) {
+  return function (this: any, ...args: Parameters<T>) {
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(() => func.apply(this, args), wait);
   };
@@ -353,7 +367,7 @@ const handleInput = (event: Event) => {
 
       mentionSelectorPosition.value = {
         top: `${(lines.length - 1) * lineHeight}px`,
-        left: `${currentLine.length * 8}px`
+        left: `${currentLine.length * 8}px`,
       };
       return;
     }
@@ -380,7 +394,7 @@ const visibleMessages = computed(() => {
 
   return messages.value.slice(
     Math.max(0, startIndex - 5),
-    Math.min(messages.value.length, endIndex + 5)
+    Math.min(messages.value.length, endIndex + 5),
   );
 });
 
@@ -412,7 +426,7 @@ const setupInfiniteScroll = () => {
   const options = {
     root: messagesList.value,
     rootMargin: '0px',
-    threshold: 0.1
+    threshold: 0.1,
   };
 
   observer.value = new IntersectionObserver((entries) => {
@@ -464,7 +478,7 @@ const sendMessage = async () => {
       targetUserId: currentChannel.value === 'individual' ? selectedUser.value?.id : undefined,
       mentions: messageMentions,
       requiresConfirmation: messageRequiresConfirmation,
-      parentMessageId
+      parentMessageId,
     };
 
     const response = await messageService.create(data);
@@ -484,7 +498,9 @@ const scrollToBottom = () => {
 
 const handleReaction = async (message: Message, reactionType: string) => {
   try {
-    const existingReaction = message.reactions.find((r: MessageReaction) => r.type === reactionType);
+    const existingReaction = message.reactions.find(
+      (r: MessageReaction) => r.type === reactionType,
+    );
     if (existingReaction) {
       await messageService.removeReaction(message.id, reactionType);
     } else {
@@ -502,11 +518,15 @@ const handleKeyDown = (event: KeyboardEvent) => {
 };
 
 const hasConfirmedView = (message: Message) => {
-  return message.viewConfirmations.some((conf: MessageViewConfirmation) => conf.userId === userStore.user?.id);
+  return message.viewConfirmations.some(
+    (conf: MessageViewConfirmation) => conf.userId === userStore.user?.id,
+  );
 };
 
 const getUserConfirmation = (message: Message) => {
-  return message.viewConfirmations.find((conf: MessageViewConfirmation) => conf.userId === userStore.user?.id);
+  return message.viewConfirmations.find(
+    (conf: MessageViewConfirmation) => conf.userId === userStore.user?.id,
+  );
 };
 
 const confirmView = async (message: Message) => {
@@ -537,11 +557,11 @@ const handleMentionSelect = (user: User) => {
     currentMentions.value.push({
       userId: user.id,
       position: lastAtSymbol,
-      length: mentionText.length
+      length: mentionText.length,
     });
 
     // Focar no textarea após a menção
-  setTimeout(() => {
+    setTimeout(() => {
       if (textarea) {
         const newPosition = lastAtSymbol + mentionText.length + 1;
         textarea.focus();
@@ -600,7 +620,7 @@ onMounted(() => {
 
 .page-content {
   flex: 1;
- overflow: hidden;
+  overflow: hidden;
 }
 
 .sync-container {
@@ -1105,7 +1125,7 @@ textarea:focus {
   margin: 0 auto;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   text-align: left;
 }
 .inicio-panel h2 {

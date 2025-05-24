@@ -1177,7 +1177,7 @@ body.dark-mode .section-header h1 {
 }
 
 .action-btn:hover {
-  transform: translateY(-2px);
+  opacity: 0.9;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -1338,7 +1338,8 @@ body.dark-mode label {
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
+  /* transform: translateY(-2px); */
+  opacity: 0.9;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
@@ -1349,7 +1350,7 @@ body.dark-mode label {
 
 .btn-secondary:hover {
   background-color: #e8eaed;
-  transform: translateY(-2px);
+  /* transform: translateY(-2px); */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 

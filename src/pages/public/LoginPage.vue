@@ -58,7 +58,7 @@
       </div>
 
       <div class="login-footer">
-        <p>Não tem uma conta? <a href="#" id="registerLink">Cadastre-se</a></p>
+        <p>Não tem uma conta? <router-link to="/cadastrar">Cadastre-se</router-link></p>
       </div>
     </div>
   </section>

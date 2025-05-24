@@ -15,7 +15,7 @@
         </div>
         <div class="auth-links">
           <router-link to="/login" class="login-btn">Entrar</router-link>
-          <router-link to="/login" class="btn btn-primary hero-button">AGENDE UMA DEMO</router-link>
+          <router-link to="/cadastrar" class="btn btn-primary hero-button">AGENDE UMA DEMO</router-link>
         </div>
       </nav>
 
@@ -26,7 +26,7 @@
             Aumente a produtividade, simplifique a comunicação e organize sua equipe.
           </p>
           <div class="hero-buttons">
-            <router-link to="/login" class="btn btn-primary hero-button">COMECE GRÁTIS</router-link>
+            <router-link to="/cadastrar" class="btn btn-primary hero-button">COMECE GRÁTIS</router-link>
             <a href="#contact" class="btn btn-outline hero-button">AGENDE UMA DEMO</a>
           </div>
         </div>
