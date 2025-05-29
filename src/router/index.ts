@@ -16,6 +16,7 @@ import SyncPage from '@/pages/user/SyncPage.vue';
 import LandingPage from '@/pages/public/LandingPage.vue';
 import { localStorageService } from '@/utils/localStorageService';
 import SignUpManagement from '@/pages/admin/SignUpManagement.vue';
+import { RoleName } from '@/models';
 
 const routes: RouteRecordRaw[] = [
   // Public Routes (No Layout)
@@ -59,14 +60,46 @@ const routes: RouteRecordRaw[] = [
     component: DashboardLayout,
     children: [
       { path: '', component: UserHome },
-      { path: 'relatorios', component: ReportsPage },
-      { path: 'usuarios', component: UserList },
-      { path: 'setores', component: DepartmentList },
-      { path: 'categorias', component: CategoryList },
-      { path: 'clientes', component: ClientManagement },
-      { path: 'clientes/:id/usuarios', component: ClientUsers },
-      { path: 'clientes/:id/configuracoes', component: ClientSettings },
-      { path: 'cadastros', component: SignUpManagement },
+      {
+        path: 'relatorios',
+        component: ReportsPage,
+        meta: { roles: [RoleName.TenantAdmin] },
+      },
+      {
+        path: 'usuarios',
+        component: UserList,
+        meta: { roles: [RoleName.TenantAdmin] },
+      },
+      {
+        path: 'setores',
+        component: DepartmentList,
+        meta: { roles: [RoleName.TenantAdmin] },
+      },
+      {
+        path: 'categorias',
+        component: CategoryList,
+        meta: { roles: [RoleName.TenantAdmin] },
+      },
+      {
+        path: 'clientes',
+        component: ClientManagement,
+        meta: { roles: [RoleName.GlobalAdmin] },
+      },
+      {
+        path: 'clientes/:id/usuarios',
+        component: ClientUsers,
+        meta: { roles: [RoleName.GlobalAdmin] },
+      },
+      {
+        path: 'clientes/:id/configuracoes',
+        component: ClientSettings,
+        meta: { roles: [RoleName.GlobalAdmin] },
+      },
+      {
+        path: 'cadastros',
+        component: SignUpManagement,
+        meta: { roles: [RoleName.GlobalAdmin] },
+      },
     ],
     meta: { requiresAuth: true },
   },
@@ -77,8 +110,14 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../pages/AdminDashboard.vue'),
     meta: {
       requiresAuth: true,
-      adminOnly: true,
+      roles: [RoleName.GlobalAdmin, RoleName.TenantAdmin],
     },
+  },
+
+  // Not Found Route
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/',
   },
 ];
 
@@ -93,6 +132,20 @@ router.beforeEach((to, from, next) => {
 
   if (requiresAuth && !loggedIn) {
     return next('/login');
+  }
+
+  const hasRequiredRole = to.matched.every((record) => {
+    if (!record.meta.roles) return true;
+
+    const userRole = localStorageService.getUser()?.role.name;
+
+    return Array.isArray(record.meta.roles) && userRole
+      ? record.meta.roles.includes(userRole)
+      : true;
+  });
+
+  if (requiresAuth && !hasRequiredRole) {
+    return next('/');
   }
 
   next();
