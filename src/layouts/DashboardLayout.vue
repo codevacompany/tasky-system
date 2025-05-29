@@ -16,20 +16,15 @@
                   </div>
                 </li>
               </router-link>
-              <router-link to="/meus-tickets">
+              <router-link v-if="user?.role.name !== RoleName.GlobalAdmin" to="/meus-tickets">
                 <li>
                   <div :class="{ active: isActive('/meus-tickets') }">
                     <font-awesome-icon icon="ticket" />Tickets
                   </div>
                 </li>
               </router-link>
-              <router-link to="/admin/relatorios">
-                <li
-                  v-if="
-                    user?.role.name === RoleName.GlobalAdmin ||
-                    user?.role.name === RoleName.TenantAdmin
-                  "
-                >
+              <router-link v-if="user?.role.name === RoleName.TenantAdmin" to="/admin/relatorios">
+                <li>
                   <div class="admin-menu-item" :class="{ active: isActive('/admin/relatorios') }">
                     <font-awesome-icon icon="chart-line" />
                     Relatórios
@@ -65,19 +60,31 @@
                   />
                 </div>
                 <div class="dropdown-menu" v-show="showAdminDropdown">
-                  <router-link to="/admin/usuarios" @click="showAdminDropdown = false">
+                  <router-link
+                    v-if="user?.role.name === RoleName.TenantAdmin"
+                    to="/admin/usuarios"
+                    @click="showAdminDropdown = false"
+                  >
                     <div class="dropdown-item" :class="{ active: isActive('/admin/usuarios') }">
                       <font-awesome-icon icon="users" />
                       Usuários
                     </div>
                   </router-link>
-                  <router-link to="/admin/setores" @click="showAdminDropdown = false">
+                  <router-link
+                    v-if="user?.role.name === RoleName.TenantAdmin"
+                    to="/admin/setores"
+                    @click="showAdminDropdown = false"
+                  >
                     <div class="dropdown-item" :class="{ active: isActive('/admin/setores') }">
                       <font-awesome-icon icon="building" />
                       Setores
                     </div>
                   </router-link>
-                  <router-link to="/admin/categorias" @click="showAdminDropdown = false">
+                  <router-link
+                    v-if="user?.role.name === RoleName.TenantAdmin"
+                    to="/admin/categorias"
+                    @click="showAdminDropdown = false"
+                  >
                     <div class="dropdown-item" :class="{ active: isActive('/admin/categorias') }">
                       <font-awesome-icon icon="tag" />
                       Categorias

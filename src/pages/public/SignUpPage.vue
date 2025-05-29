@@ -1,134 +1,143 @@
 <template>
   <div class="cadastro-empresa-wrapper">
     <div class="cadastro-empresa-left">
-      <div class="progress-bar">
-        <div class="progress" :style="{ width: progressWidth }"></div>
-      </div>
-      <h2 v-if="step === 1">Vamos começar!</h2>
-      <h2 v-else-if="step === 2">Estamos quase lá</h2>
-      <h1 v-if="step === 1">Informações da empresa</h1>
-      <h1 v-else-if="step === 2">Informações do Responsável</h1>
-      <form v-if="step === 1" @submit.prevent="nextStep" class="cadastro-form">
-        <div class="form-group">
-          <input v-model="form.companyName" type="text" required placeholder="Nome da empresa" />
+      <div class="form-container">
+        <div class="progress-bar">
+          <div class="progress" :style="{ width: progressWidth }"></div>
         </div>
-        <div class="form-row">
+        <h2 v-if="step === 1">Vamos começar!</h2>
+        <h2 v-else-if="step === 2">Estamos quase lá</h2>
+        <h1 v-if="step === 1">Informações da empresa</h1>
+        <h1 v-else-if="step === 2">Informações do Responsável</h1>
+        <form v-if="step === 1" @submit.prevent="nextStep" class="cadastro-form">
+          <div class="form-group">
+            <input v-model="form.companyName" type="text" required placeholder="Nome da empresa" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <input
+                v-model="form.cnpj"
+                type="text"
+                required
+                maxlength="18"
+                placeholder="CNPJ (12.345.678/0001-99)"
+                @input="form.cnpj = maskCNPJ(form.cnpj)"
+                @blur="cnpjTouched = true"
+              />
+              <span v-if="cnpjTouched && cnpjError" class="input-error">{{ cnpjError }}</span>
+            </div>
+            <div class="form-group">
+              <input
+                v-model="form.companyPhone"
+                type="tel"
+                required
+                placeholder="Telefone ((11) 91234-5678)"
+                @input="form.companyPhone = maskPhone(form.companyPhone)"
+                maxlength="15"
+              />
+            </div>
+          </div>
           <div class="form-group">
             <input
-              v-model="form.cnpj"
+              v-model="form.companyEmail"
+              type="email"
+              required
+              placeholder="E-mail (empresa@email.com)"
+              @input="form.companyEmail = maskEmail(form.companyEmail)"
+              @blur="companyEmailTouched = true"
+            />
+            <span v-if="companyEmailTouched && companyEmailError" class="input-error">{{
+              companyEmailError
+            }}</span>
+          </div>
+          <button type="submit" class="btn btn-primary">Avançar</button>
+        </form>
+        <form v-else-if="step === 2" @submit.prevent="submitSignUp" class="cadastro-form">
+          <div class="form-group">
+            <input
+              v-model="form.contactName"
               type="text"
               required
-              maxlength="18"
-              placeholder="CNPJ (12.345.678/0001-99)"
-              @input="form.cnpj = maskCNPJ(form.cnpj)"
+              placeholder="Nome do responsável"
             />
           </div>
           <div class="form-group">
             <input
-              v-model="form.companyPhone"
+              v-model="form.contactCpf"
+              type="text"
+              required
+              maxlength="14"
+              placeholder="CPF (123.456.789-00)"
+              @input="form.contactCpf = maskCPF(form.contactCpf)"
+              @blur="contactCpfTouched = true"
+            />
+            <span v-if="contactCpfTouched && contactCpfError" class="input-error">{{
+              contactCpfError
+            }}</span>
+          </div>
+          <div class="form-group">
+            <input
+              v-model="form.contactEmail"
+              type="email"
+              required
+              placeholder="E-mail (nome@email.com)"
+              @input="form.contactEmail = maskEmail(form.contactEmail)"
+              @blur="contactEmailTouched = true"
+            />
+            <span v-if="contactEmailTouched && contactEmailError" class="input-error">{{
+              contactEmailError
+            }}</span>
+          </div>
+          <div class="form-group">
+            <input
+              v-model="form.contactPhone"
               type="tel"
               required
               placeholder="Telefone ((11) 91234-5678)"
-              @input="form.companyPhone = maskPhone(form.companyPhone)"
+              @input="form.contactPhone = maskPhone(form.contactPhone)"
               maxlength="15"
             />
           </div>
-        </div>
-        <div class="form-group">
-          <input
-            v-model="form.companyEmail"
-            type="email"
-            required
-            placeholder="E-mail (empresa@email.com)"
-            @input="form.companyEmail = maskEmail(form.companyEmail)"
-            @blur="companyEmailTouched = true"
-          />
-          <span v-if="companyEmailTouched && companyEmailError" class="input-error">{{
-            companyEmailError
-          }}</span>
-        </div>
-        <button type="submit" class="btn btn-primary">Avançar</button>
-      </form>
-      <form v-else-if="step === 2" @submit.prevent="submitSignUp" class="cadastro-form">
-        <div class="form-group">
-          <input
-            v-model="form.contactName"
-            type="text"
-            required
-            placeholder="Nome do responsável"
-          />
-        </div>
-        <div class="form-group">
-          <input
-            v-model="form.contactCpf"
-            type="text"
-            required
-            placeholder="CPF (123.456.789-00)"
-            @input="form.contactCpf = maskCPF(form.contactCpf)"
-          />
-        </div>
-        <div class="form-group">
-          <input
-            v-model="form.contactEmail"
-            type="email"
-            required
-            placeholder="E-mail (nome@email.com)"
-            @input="form.contactEmail = maskEmail(form.contactEmail)"
-            @blur="contactEmailTouched = true"
-          />
-          <span v-if="contactEmailTouched && contactEmailError" class="input-error">{{
-            contactEmailError
-          }}</span>
-        </div>
-        <div class="form-group">
-          <input
-            v-model="form.contactPhone"
-            type="tel"
-            required
-            placeholder="Telefone ((11) 91234-5678)"
-            @input="form.contactPhone = maskPhone(form.contactPhone)"
-            maxlength="15"
-          />
-        </div>
 
-        <button type="button" class="btn btn-secondary" @click="prevStep">Voltar</button>
-        <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
-          <span v-if="isSubmitting">Enviando...</span>
-          <span v-else>Concluir Cadastro</span>
-        </button>
-      </form>
-      <div v-else class="cadastro-confirmacao">
-        <div class="confirmacao-content">
-          <svg
-            width="60"
-            height="60"
-            viewBox="0 0 60 60"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            style="margin-bottom: 1.2rem"
-          >
-            <circle cx="30" cy="30" r="30" fill="#e6f4ea" />
-            <path
-              d="M18 32.5L27 41.5L43 23.5"
-              stroke="#25D366"
-              stroke-width="3.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-          <h2>Cadastro realizado com sucesso!</h2>
-          <p class="confirmacao-msg">
-            Obrigado por se cadastrar.<br />Em breve entraremos em contato com você.
-          </p>
-          <div class="confirmacao-actions">
-            <button class="btn btn-secondary" @click="goToLanding">Página Inicial</button>
-            <button class="btn btn-primary" @click="goToLogin">Fazer Login</button>
+          <button type="button" class="btn btn-secondary" @click="prevStep">Voltar</button>
+          <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
+            <span v-if="isSubmitting">Enviando...</span>
+            <span v-else>Concluir Cadastro</span>
+          </button>
+        </form>
+        <div v-else class="cadastro-confirmacao">
+          <div class="confirmacao-content">
+            <svg
+              width="60"
+              height="60"
+              viewBox="0 0 60 60"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              style="margin-bottom: 1.2rem"
+            >
+              <circle cx="30" cy="30" r="30" fill="#e6f4ea" />
+              <path
+                d="M18 32.5L27 41.5L43 23.5"
+                stroke="#25D366"
+                stroke-width="3.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <h2>Cadastro realizado com sucesso!</h2>
+            <p class="confirmacao-msg">
+              Obrigado por se cadastrar.<br />Em breve entraremos em contato com você.
+            </p>
+            <div class="confirmacao-actions">
+              <button class="btn btn-secondary" @click="goToLanding">Página Inicial</button>
+              <button class="btn btn-primary" @click="goToLogin">Fazer Login</button>
+            </div>
           </div>
         </div>
+        <p class="termos" v-if="step < 3">
+          Ao cadastrar, você concorda com nossa Política de Privacidade e Termos de Uso.
+        </p>
       </div>
-      <p class="termos" v-if="step < 3">
-        Ao cadastrar, você concorda com nossa Política de Privacidade e Termos de Uso.
-      </p>
     </div>
     <div class="cadastro-empresa-right">
       <div class="visual-content">
@@ -173,6 +182,16 @@ import { ref, reactive, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { signupService } from '@/services/signupService';
 import { toast } from 'vue3-toastify';
+import {
+  maskCPF,
+  maskCNPJ,
+  maskPhone,
+  maskEmail,
+  validateEmail,
+  validateCPF,
+  validateCNPJ,
+} from '@/utils/form-helpers';
+import { AxiosError } from 'axios';
 
 const router = useRouter();
 const step = ref(1);
@@ -194,38 +213,12 @@ const companyEmailError = ref('');
 const contactEmailError = ref('');
 const companyEmailTouched = ref(false);
 const contactEmailTouched = ref(false);
+const contactCpfError = ref('');
+const contactCpfTouched = ref(false);
+const cnpjError = ref('');
+const cnpjTouched = ref(false);
 
 const isSubmitting = ref(false);
-
-function maskCPF(value: string) {
-  return value
-    .replace(/\D/g, '')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-}
-function maskCNPJ(value: string) {
-  return value
-    .replace(/\D/g, '')
-    .replace(/(\d{2})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1.$2')
-    .replace(/(\d{3})(\d)/, '$1/$2')
-    .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
-}
-function maskPhone(value: string) {
-  return value
-    .replace(/\D/g, '')
-    .slice(0, 11)
-    .replace(/(\d{2})(\d)/, '($1) $2')
-    .replace(/(\d{5})(\d{1,4})$/, '$1-$2');
-}
-function maskEmail(value: string) {
-  return value.toLowerCase();
-}
-
-function validateEmail(email: string) {
-  return /^[\w-.]+@[\w-]+\.[a-zA-Z]{2,}$/.test(email);
-}
 
 watch(
   () => form.companyEmail,
@@ -249,6 +242,30 @@ watch(
   },
 );
 
+watch(
+  () => form.contactCpf,
+  (val) => {
+    if (!val) {
+      contactCpfError.value = '';
+    } else {
+      const isValid = validateCPF(val);
+      contactCpfError.value = isValid ? '' : 'CPF inválido';
+    }
+  },
+);
+
+watch(
+  () => form.cnpj,
+  (val) => {
+    if (!val) {
+      cnpjError.value = '';
+    } else {
+      const isValid = validateCNPJ(val);
+      cnpjError.value = isValid ? '' : 'CNPJ inválido';
+    }
+  },
+);
+
 const progressWidth = computed(() => {
   if (step.value === 1) return '50%';
   if (step.value === 2) return '100%';
@@ -256,10 +273,15 @@ const progressWidth = computed(() => {
 });
 
 function nextStep() {
+  if (form.cnpj && !validateCNPJ(form.cnpj)) {
+    cnpjTouched.value = true;
+    cnpjError.value = 'CNPJ inválido';
+    return;
+  }
+
   if (step.value < 2) {
     step.value++;
   } else if (step.value === 2) {
-    // Aqui você pode enviar os dados para a API se desejar
     step.value = 3;
   }
 }
@@ -278,28 +300,37 @@ function goToLogin() {
 async function submitSignUp() {
   if (isSubmitting.value) return;
 
+  if (!validateCPF(form.contactCpf)) {
+    contactCpfTouched.value = true;
+    contactCpfError.value = 'CPF inválido';
+    return;
+  }
+
   isSubmitting.value = true;
   try {
-    // Convert form data to API expected format
     const payload = {
       companyName: form.companyName,
       email: form.companyEmail,
-      cnpj: form.cnpj.replace(/[^\d]/g, ''), // Remove non-digits
+      cnpj: form.cnpj.replace(/[^\d]/g, ''),
       contactName: form.contactName,
-      contactCpf: form.contactCpf.replace(/[^\d]/g, ''), // Remove non-digits
+      contactCpf: form.contactCpf.replace(/[^\d]/g, ''),
       contactEmail: form.contactEmail,
-      contactPhone: form.contactPhone.replace(/[^\d]/g, ''), // Remove non-digits
-      termsAccepted: true, // Always send true
-      privacyPolicyAccepted: true, // Always send true
+      contactPhone: form.contactPhone.replace(/[^\d]/g, ''),
+      termsAccepted: true,
+      privacyPolicyAccepted: true,
       termsVersion: '1.0',
       privacyPolicyVersion: '1.0',
     };
 
     await signupService.createSignUp(payload);
-    step.value = 3; // Move to success step
-  } catch (error) {
-    console.error('Error submitting signup:', error);
-    toast.error('Ocorreu um erro ao enviar seu cadastro. Por favor, tente novamente.');
+    step.value = 3;
+  } catch (error: unknown) {
+    if (error instanceof AxiosError && error.response?.status === 409) {
+      toast.error('Empresa já cadastrada. Por favor, faça login.');
+    } else {
+      toast.error('Ocorreu um erro ao enviar seu cadastro. Por favor, tente novamente.');
+    }
+    console.error('Signup error:', error);
   } finally {
     isSubmitting.value = false;
   }
@@ -312,17 +343,19 @@ async function submitSignUp() {
   min-height: 100vh;
   background: #f8fafc;
 }
+
 .cadastro-empresa-left {
   flex: 2;
   max-width: none;
   background: #fff;
-  padding: 0rem 2rem 5rem 2rem;
+  padding: 0rem 2rem 0rem 2rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
   box-shadow: 2px 0 16px rgba(0, 0, 0, 0.04);
 }
+
 .cadastro-empresa-right {
   flex: 2;
   background: #f6f9ff;
@@ -330,17 +363,32 @@ async function submitSignUp() {
   align-items: center;
   justify-content: center;
 }
+
+.form-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  min-height: 100vh;
+  padding: 4.2rem 0rem 0rem 0rem;
+}
+
 .visual-content {
   text-align: center;
   max-width: 520px;
   margin: 0 auto;
 }
+
 .visual-content h2 {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 0.7rem;
   white-space: nowrap;
 }
+
 .visual-content p {
   font-size: 1rem;
   margin-bottom: 1.2rem;
@@ -351,48 +399,49 @@ async function submitSignUp() {
   border-radius: 10px;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
 }
-.progress-bar {
-  width: 100%;
-  height: 6px;
-  background: #f3f3f3;
-  border-radius: 4px;
-  margin-bottom: 3.5rem;
-  overflow: hidden;
-  position: relative;
-}
+
 .progress {
-  height: 100%;
+  height: 6px;
   background: var(--primary-color);
   border-radius: 4px;
   transition: width 0.3s;
+  position: absolute;
+  top: 50px;
+  left: 0;
 }
+
 .cadastro-empresa-left h2 {
   color: var(--primary-color);
   font-size: 1rem;
   margin-bottom: 0.3rem;
   font-weight: 600;
 }
+
 .cadastro-empresa-left h1 {
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 1.2rem;
 }
+
 .cadastro-form {
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
   width: 100%;
-  max-width: 520px;
+  max-width: 560px;
 }
+
 .form-row {
   display: flex;
   gap: 0.7rem;
 }
+
 .form-group {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
+
 .form-group input {
   padding: 0.85rem;
   border: 1px solid #d1d5db;
@@ -402,11 +451,13 @@ async function submitSignUp() {
   width: 100%;
   min-width: 0;
 }
+
 .form-group input::placeholder {
   color: #495057;
   opacity: 1;
   font-size: 0.92rem;
 }
+
 .btn-primary {
   width: 100%;
   padding: 0.8rem;
@@ -420,9 +471,11 @@ async function submitSignUp() {
   margin-top: 0.7rem;
   transition: background 0.2s;
 }
+
 .btn-primary:hover {
   background: var(--primary-dark);
 }
+
 .btn-secondary {
   width: 100%;
   padding: 0.8rem;
@@ -436,15 +489,19 @@ async function submitSignUp() {
   margin-top: 0.7rem;
   transition: background 0.2s;
 }
+
 .btn-secondary:hover {
   background: #e5e7eb;
 }
+
 .termos {
   font-size: 0.8rem;
   color: #64748b;
   margin-top: 1rem;
+  margin-bottom: 3rem;
   text-align: center;
 }
+
 .voltar-bottom-btn {
   position: fixed;
   left: 32px;

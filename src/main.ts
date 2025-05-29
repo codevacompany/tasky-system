@@ -17,7 +17,7 @@ app.use(
   Vue3Toastify,
   {
     autoClose: 3000,
-    theme: 'colored'
+    theme: 'light'
   } as ToastContainerOptions,
 );
 
