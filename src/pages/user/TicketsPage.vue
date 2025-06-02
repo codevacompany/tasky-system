@@ -202,7 +202,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { ticketService } from '@/services/ticketService';
 import { useTicketsStore } from '@/stores/tickets';
 import type { Ticket } from '@/models';
@@ -211,6 +211,7 @@ import TicketTable from '@/components/tickets/TicketTable.vue';
 import TicketKanban from '@/components/tickets/TicketKanban.vue';
 import { toast } from 'vue3-toastify';
 import { debounce, formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import { localStorageService } from '@/utils/localStorageService';
 
 const ticketsStore = useTicketsStore();
 const activeTab = ref<'recebidos' | 'criados' | 'setor' | 'arquivo'>('recebidos');
@@ -224,6 +225,12 @@ const selectedTicket = ref<Ticket | null>(null);
 const newCompletionDate = ref('');
 
 const isKanbanView = ref(false);
+
+// Load view preference from localStorage on component mount
+onMounted(() => {
+  const savedView = localStorageService.getTicketsViewPreference();
+  isKanbanView.value = savedView === 'kanban';
+});
 
 const debouncedSearch = debounce(() => {
   fetchTicketsWithFilters();
@@ -396,6 +403,8 @@ const handleRejectTicket = async (ticket: Ticket) => {
 
 const toggleView = () => {
   isKanbanView.value = !isKanbanView.value;
+  // Save the preference using localStorageService
+  localStorageService.setTicketsViewPreference(isKanbanView.value ? 'kanban' : 'table');
 };
 
 watch(searchTerm, () => {

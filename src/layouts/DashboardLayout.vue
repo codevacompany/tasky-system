@@ -136,8 +136,12 @@
             </div>
           </router-link>
 
-          <button class="dark-mode-toggle" @click="toggleDarkMode">
-            <font-awesome-icon icon="moon" />
+          <button
+            class="dark-mode-toggle"
+            @click="toggleDarkMode"
+            :title="darkMode ? 'Mudar para modo claro' : 'Mudar para modo escuro'"
+          >
+            <font-awesome-icon :icon="darkMode ? 'sun' : 'moon'" />
           </button>
 
           <div class="user-profile" @click="toggleProfileModal">
@@ -190,6 +194,7 @@ import { notificationService } from '@/services/notificationService';
 import { RoleName } from '@/models';
 import taskyLogo from '@/assets/images/tasky.png';
 import taskyWhiteLogo from '@/assets/images/tasky-white-large.png';
+import { localStorageService } from '@/utils/localStorageService';
 
 const user = useUserStore().user;
 const ticketsStore = useTicketsStore();
@@ -202,7 +207,7 @@ const unreadCount = ref<number | undefined>(undefined);
 let notificationsIntervalId: number | null = null;
 // let source: EventSource | null = null;
 
-const darkMode = ref(localStorage.getItem('theme') === 'dark');
+const darkMode = ref(localStorageService.isDarkMode());
 
 const showAdminDropdown = ref(false);
 
@@ -238,7 +243,7 @@ const toggleNotificationsModal = () => {
 const toggleDarkMode = () => {
   darkMode.value = !darkMode.value;
   document.body.classList.toggle('dark-mode', darkMode.value);
-  localStorage.setItem('theme', darkMode.value ? 'dark' : 'light');
+  localStorageService.setTheme(darkMode.value ? 'dark' : 'light');
 };
 
 const toggleAdminDropdown = () => {
