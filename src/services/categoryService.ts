@@ -23,4 +23,8 @@ export const categoryService = {
   async update(id: number, data: UpdateCategoryDto): Promise<AxiosResponse<Category>> {
     return apiClient.patch<Category>(`/categories/${id}`, data);
   },
+
+  async delete(id: number): Promise<AxiosResponse<void>> {
+    return apiClient.delete(`/categories/${id}`);
+  },
 };

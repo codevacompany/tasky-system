@@ -23,4 +23,8 @@ export const departmentService = {
   async update(id: number, data: UpdateDepartmentDto): Promise<AxiosResponse<Department>> {
     return apiClient.patch<Department>(`/departments/${id}`, data);
   },
+
+  async delete(id: number): Promise<AxiosResponse<void>> {
+    return apiClient.delete(`/departments/${id}`);
+  },
 };

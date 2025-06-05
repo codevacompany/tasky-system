@@ -1,8 +1,8 @@
 <template>
-  <BaseModal :isOpen="isOpen" title="Nova Categoria" @close="closeModal">
+  <BaseModal :isOpen="isOpen" title="Editar Categoria" @close="closeModal">
     <div class="modal-body">
       <div class="category-form-container">
-        <form id="cadastroCategoriaForm" class="form-grid" @submit.prevent="createCategory">
+        <form id="editCategoriaForm" class="form-grid" @submit.prevent="updateCategory">
           <div class="form-group">
             <label for="nomeCategoria">Nome</label>
             <input
@@ -18,7 +18,7 @@
             <button type="button" class="btn btn-secondary" @click="closeModal">Cancelar</button>
             <button type="submit" class="btn btn-primary">
               <LoadingSpinner v-if="isLoading" :size="22" />
-              <p v-else>Cadastrar</p>
+              <p v-else>Salvar</p>
             </button>
           </div>
         </form>
@@ -28,17 +28,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import BaseModal from '../common/BaseModal.vue';
 import { categoryService } from '@/services/categoryService';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
+import type { Category } from '@/models';
 
-defineProps({
-  isOpen: Boolean,
-});
+const props = defineProps<{
+  isOpen: boolean;
+  category: Category | null;
+}>();
 
-const emit = defineEmits(['close', 'categoryCreated']);
+const emit = defineEmits(['close', 'categoryUpdated']);
 
 const categoryData = ref({
   name: '',
@@ -46,26 +48,31 @@ const categoryData = ref({
 
 const isLoading = ref(false);
 
-const resetForm = () => {
-  categoryData.value = {
-    name: '',
-  };
-};
+watch(
+  () => props.category,
+  (newCategory) => {
+    if (newCategory) {
+      categoryData.value.name = newCategory.name;
+    }
+  },
+  { immediate: true },
+);
 
 const closeModal = () => {
-  resetForm();
   emit('close');
 };
 
-const createCategory = async () => {
+const updateCategory = async () => {
+  if (!props.category) return;
+
   isLoading.value = true;
   try {
-    await categoryService.create(categoryData.value);
-    emit('categoryCreated');
-    toast.success('Categoria criada com sucesso');
+    await categoryService.update(props.category.id, categoryData.value);
+    emit('categoryUpdated');
+    toast.success('Categoria atualizada com sucesso');
     closeModal();
   } catch {
-    toast.error('Erro ao criar categoria');
+    toast.error('Erro ao atualizar categoria');
   } finally {
     isLoading.value = false;
   }

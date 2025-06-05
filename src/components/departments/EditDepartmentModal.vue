@@ -1,15 +1,15 @@
 <template>
-  <BaseModal :isOpen="isOpen" title="Nova Categoria" @close="closeModal">
+  <BaseModal :isOpen="isOpen" title="Editar Setor" @close="closeModal">
     <div class="modal-body">
-      <div class="category-form-container">
-        <form id="cadastroCategoriaForm" class="form-grid" @submit.prevent="createCategory">
+      <div class="department-form-container">
+        <form id="editSetorForm" @submit.prevent="updateDepartment">
           <div class="form-group">
-            <label for="nomeCategoria">Nome</label>
+            <label for="nomeSetor">Nome</label>
             <input
               type="text"
-              id="nomeCategoria"
-              v-model="categoryData.name"
-              placeholder="Digite o nome da categoria"
+              id="nomeSetor"
+              v-model="departmentData.name"
+              placeholder="Digite o nome do setor"
               required
             />
           </div>
@@ -18,7 +18,7 @@
             <button type="button" class="btn btn-secondary" @click="closeModal">Cancelar</button>
             <button type="submit" class="btn btn-primary">
               <LoadingSpinner v-if="isLoading" :size="22" />
-              <p v-else>Cadastrar</p>
+              <p v-else>Salvar</p>
             </button>
           </div>
         </form>
@@ -28,44 +28,51 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import BaseModal from '../common/BaseModal.vue';
-import { categoryService } from '@/services/categoryService';
+import { departmentService } from '@/services/departmentService';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
+import type { Department } from '@/models';
 
-defineProps({
-  isOpen: Boolean,
-});
+const props = defineProps<{
+  isOpen: boolean;
+  department: Department | null;
+}>();
 
-const emit = defineEmits(['close', 'categoryCreated']);
+const emit = defineEmits(['close', 'departmentUpdated']);
 
-const categoryData = ref({
+const departmentData = ref({
   name: '',
 });
 
 const isLoading = ref(false);
 
-const resetForm = () => {
-  categoryData.value = {
-    name: '',
-  };
-};
+watch(
+  () => props.department,
+  (newDepartment) => {
+    if (newDepartment) {
+      departmentData.value.name = newDepartment.name;
+    }
+  },
+  { immediate: true },
+);
 
 const closeModal = () => {
-  resetForm();
   emit('close');
 };
 
-const createCategory = async () => {
+const updateDepartment = async () => {
+  if (!props.department) return;
+
   isLoading.value = true;
   try {
-    await categoryService.create(categoryData.value);
-    emit('categoryCreated');
-    toast.success('Categoria criada com sucesso');
+    await departmentService.update(props.department.id, departmentData.value);
+    emit('departmentUpdated');
+    toast.success('Setor atualizado com sucesso');
     closeModal();
   } catch {
-    toast.error('Erro ao criar categoria');
+    toast.error('Erro ao atualizar setor');
   } finally {
     isLoading.value = false;
   }
@@ -86,7 +93,7 @@ const createCategory = async () => {
   gap: 1rem;
 }
 
-.category-form-container {
+.department-form-container {
   flex: 1;
   min-width: 300px;
   max-width: 600px;

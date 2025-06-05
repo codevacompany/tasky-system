@@ -205,6 +205,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { ticketService } from '@/services/ticketService';
 import { useTicketsStore } from '@/stores/tickets';
+import { useUserStore } from '@/stores/user';
 import type { Ticket } from '@/models';
 import { TicketStatus, TicketPriority } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
@@ -226,17 +227,17 @@ const newCompletionDate = ref('');
 
 const isKanbanView = ref(false);
 
-// Load view preference from localStorage on component mount
-onMounted(() => {
+onMounted(async () => {
   const savedView = localStorageService.getTicketsViewPreference();
   isKanbanView.value = savedView === 'kanban';
+
+  await fetchTicketsWithFilters();
 });
 
 const debouncedSearch = debounce(() => {
   fetchTicketsWithFilters();
 }, 400);
 
-// Get tickets from the store based on active tab
 const tickets = computed(() => {
   switch (activeTab.value) {
     case 'recebidos':
@@ -286,6 +287,10 @@ const totalPages = computed(() => {
 
 // Switch tabs without refetching data
 const switchTab = (tab: 'recebidos' | 'criados' | 'setor' | 'arquivo') => {
+  statusFilter.value = null;
+  priorityFilter.value = null;
+  searchTerm.value = '';
+
   activeTab.value = tab;
   currentPage.value = 1;
 };
@@ -299,7 +304,26 @@ const fetchTicketsWithFilters = async () => {
   };
 
   const storeType = typeMap[activeTab.value];
-  await ticketsStore.setCurrentPage(storeType, currentPage.value);
+
+  const filters: {
+    priority?: TicketPriority | null;
+    status?: TicketStatus | null;
+    name?: string;
+  } = {};
+
+  if (priorityFilter.value !== null) {
+    filters.priority = priorityFilter.value;
+  }
+
+  if (statusFilter.value !== null) {
+    filters.status = statusFilter.value;
+  }
+
+  if (searchTerm.value) {
+    filters.name = searchTerm.value;
+  }
+
+  await ticketsStore.setCurrentPage(storeType, currentPage.value, filters);
 };
 
 const totalTickets = computed(() => tickets.value.length);
@@ -403,7 +427,6 @@ const handleRejectTicket = async (ticket: Ticket) => {
 
 const toggleView = () => {
   isKanbanView.value = !isKanbanView.value;
-  // Save the preference using localStorageService
   localStorageService.setTicketsViewPreference(isKanbanView.value ? 'kanban' : 'table');
 };
 
@@ -416,6 +439,10 @@ watch([statusFilter, priorityFilter], () => {
 });
 
 watch(currentPage, () => {
+  fetchTicketsWithFilters();
+});
+
+watch(activeTab, () => {
   fetchTicketsWithFilters();
 });
 </script>

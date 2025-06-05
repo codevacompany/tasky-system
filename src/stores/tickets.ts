@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed, type Ref } from 'vue';
-import type { Ticket } from '@/models';
+import type { Ticket, TicketStatus, TicketPriority } from '@/models';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from './user';
 
@@ -104,7 +104,15 @@ export const useTicketsStore = defineStore('tickets', () => {
   });
 
   // Actions
-  async function fetchMyTickets(page = 1, limit = 10) {
+  async function fetchMyTickets(
+    page = 1,
+    limit = 10,
+    filters?: {
+      status?: TicketStatus | null;
+      priority?: TicketPriority | null;
+      name?: string;
+    },
+  ) {
     const userStore = useUserStore();
     if (!userStore.user) return;
 
@@ -116,7 +124,21 @@ export const useTicketsStore = defineStore('tickets', () => {
     myTickets.value.error = null;
 
     try {
-      const response = await ticketService.getByRequester(userStore.user.id, { page, limit });
+      const params: any = { page, limit };
+
+      if (filters) {
+        if (filters.status !== undefined && filters.status !== null) {
+          params.status = filters.status;
+        }
+        if (filters.priority !== undefined && filters.priority !== null) {
+          params.priority = filters.priority;
+        }
+        if (filters.name) {
+          params.name = filters.name;
+        }
+      }
+
+      const response = await ticketService.getByRequester(userStore.user.id, params);
       myTickets.value.data = response.data.items;
       myTickets.value.totalCount = response.data.total;
       myTickets.value.lastFetched = new Date();
@@ -132,7 +154,15 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
   }
 
-  async function fetchReceivedTickets(page = 1, limit = 10) {
+  async function fetchReceivedTickets(
+    page = 1,
+    limit = 10,
+    filters?: {
+      status?: TicketStatus | null;
+      priority?: TicketPriority | null;
+      name?: string;
+    },
+  ) {
     const userStore = useUserStore();
     if (!userStore.user) return;
 
@@ -144,7 +174,21 @@ export const useTicketsStore = defineStore('tickets', () => {
     receivedTickets.value.error = null;
 
     try {
-      const response = await ticketService.getByTargetUser(userStore.user.id, { page, limit });
+      const params: any = { page, limit };
+
+      if (filters) {
+        if (filters.status !== undefined && filters.status !== null) {
+          params.status = filters.status;
+        }
+        if (filters.priority !== undefined && filters.priority !== null) {
+          params.priority = filters.priority;
+        }
+        if (filters.name) {
+          params.name = filters.name;
+        }
+      }
+
+      const response = await ticketService.getByTargetUser(userStore.user.id, params);
       receivedTickets.value.data = response.data.items;
       receivedTickets.value.totalCount = response.data.total;
       receivedTickets.value.lastFetched = new Date();
@@ -160,7 +204,15 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
   }
 
-  async function fetchDepartmentTickets(page = 1, limit = 10) {
+  async function fetchDepartmentTickets(
+    page = 1,
+    limit = 10,
+    filters?: {
+      status?: TicketStatus | null;
+      priority?: TicketPriority | null;
+      name?: string;
+    },
+  ) {
     const userStore = useUserStore();
     if (!userStore.user?.departmentId) return;
 
@@ -172,10 +224,21 @@ export const useTicketsStore = defineStore('tickets', () => {
     departmentTickets.value.error = null;
 
     try {
-      const response = await ticketService.getByDepartment(userStore.user.departmentId, {
-        page,
-        limit,
-      });
+      const params: any = { page, limit };
+
+      if (filters) {
+        if (filters.status !== undefined && filters.status !== null) {
+          params.status = filters.status;
+        }
+        if (filters.priority !== undefined && filters.priority !== null) {
+          params.priority = filters.priority;
+        }
+        if (filters.name) {
+          params.name = filters.name;
+        }
+      }
+
+      const response = await ticketService.getByDepartment(userStore.user.departmentId, params);
       departmentTickets.value.data = response.data.items;
       departmentTickets.value.totalCount = response.data.total;
       departmentTickets.value.lastFetched = new Date();
@@ -187,7 +250,14 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
   }
 
-  async function fetchArchivedTickets(page = 1, limit = 10) {
+  async function fetchArchivedTickets(
+    page = 1,
+    limit = 10,
+    filters?: {
+      priority?: TicketPriority | null;
+      name?: string;
+    },
+  ) {
     if (!isPollingActive.value) {
       archivedTickets.value.isLoading = true;
     }
@@ -196,7 +266,18 @@ export const useTicketsStore = defineStore('tickets', () => {
     archivedTickets.value.error = null;
 
     try {
-      const response = await ticketService.getArchived({ page, limit });
+      const params: any = { page, limit };
+
+      if (filters) {
+        if (filters.priority !== undefined && filters.priority !== null) {
+          params.priority = filters.priority;
+        }
+        if (filters.name) {
+          params.name = filters.name;
+        }
+      }
+
+      const response = await ticketService.getArchived(params);
       archivedTickets.value.data = response.data.items;
       archivedTickets.value.totalCount = response.data.total;
       archivedTickets.value.lastFetched = new Date();
@@ -293,56 +374,93 @@ export const useTicketsStore = defineStore('tickets', () => {
     type: 'createdByMe' | 'received' | 'department' | 'archived' = 'createdByMe',
     page = 1,
     limit = 10,
+    filters?: {
+      status?: TicketStatus | null;
+      priority?: TicketPriority | null;
+      name?: string;
+    },
   ) {
     switch (type) {
       case 'createdByMe':
-        await fetchMyTickets(page, limit);
+        await fetchMyTickets(page, limit, filters);
         break;
       case 'received':
-        await fetchReceivedTickets(page, limit);
+        await fetchReceivedTickets(page, limit, filters);
         break;
       case 'department':
-        await fetchDepartmentTickets(page, limit);
+        await fetchDepartmentTickets(page, limit, filters);
         break;
       case 'archived':
-        await fetchArchivedTickets(page, limit);
+        await fetchArchivedTickets(page, limit, filters);
         break;
     }
   }
 
-  function setMyTicketsPage(page: number) {
+  function setMyTicketsPage(
+    page: number,
+    filters?: {
+      status?: TicketStatus | null;
+      priority?: TicketPriority | null;
+      name?: string;
+    },
+  ) {
     myTickets.value.currentPage = page;
-    return fetchMyTickets(page);
+    return fetchMyTickets(page, 10, filters);
   }
 
-  function setReceivedTicketsPage(page: number) {
+  function setReceivedTicketsPage(
+    page: number,
+    filters?: {
+      status?: TicketStatus | null;
+      priority?: TicketPriority | null;
+      name?: string;
+    },
+  ) {
     receivedTickets.value.currentPage = page;
-    return fetchReceivedTickets(page);
+    return fetchReceivedTickets(page, 10, filters);
   }
 
-  function setDepartmentTicketsPage(page: number) {
+  function setDepartmentTicketsPage(
+    page: number,
+    filters?: {
+      status?: TicketStatus | null;
+      priority?: TicketPriority | null;
+      name?: string;
+    },
+  ) {
     departmentTickets.value.currentPage = page;
-    return fetchDepartmentTickets(page);
+    return fetchDepartmentTickets(page, 10, filters);
   }
 
-  function setArchivedTicketsPage(page: number) {
+  function setArchivedTicketsPage(
+    page: number,
+    filters?: {
+      priority?: TicketPriority | null;
+      name?: string;
+    },
+  ) {
     archivedTickets.value.currentPage = page;
-    return fetchArchivedTickets(page);
+    return fetchArchivedTickets(page, 10, filters);
   }
 
   function setCurrentPage(
     type: 'createdByMe' | 'received' | 'department' | 'archived',
     page: number,
+    filters?: {
+      status?: TicketStatus | null;
+      priority?: TicketPriority | null;
+      name?: string;
+    },
   ) {
     switch (type) {
       case 'createdByMe':
-        return setMyTicketsPage(page);
+        return setMyTicketsPage(page, filters);
       case 'received':
-        return setReceivedTicketsPage(page);
+        return setReceivedTicketsPage(page, filters);
       case 'department':
-        return setDepartmentTicketsPage(page);
+        return setDepartmentTicketsPage(page, filters);
       case 'archived':
-        return setArchivedTicketsPage(page);
+        return setArchivedTicketsPage(page, filters);
     }
   }
 
