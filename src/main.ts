@@ -1,3 +1,4 @@
+import './index.css';
 import './assets/main.css';
 
 import { createApp } from 'vue';
@@ -13,13 +14,10 @@ const app = createApp(App);
 
 app.component('font-awesome-icon', FontAwesomeIcon);
 
-app.use(
-  Vue3Toastify,
-  {
-    autoClose: 3000,
-    theme: 'light'
-  } as ToastContainerOptions,
-);
+app.use(Vue3Toastify, {
+  autoClose: 3000,
+  theme: 'light',
+} as ToastContainerOptions);
 
 app.use(createPinia());
 app.use(router);
