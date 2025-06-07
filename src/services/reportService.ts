@@ -80,6 +80,28 @@ export interface StatusDurationResponseDto {
   statusDurations: StatusDurationDto[];
 }
 
+export interface ResolutionTimePointDto {
+  label: string;
+  value: number;
+}
+
+export interface ResolutionTimeDataDto {
+  week: ResolutionTimePointDto[];
+  month: ResolutionTimePointDto[];
+  quarter: ResolutionTimePointDto[];
+}
+
+export interface ResolutionTimeAverageDto {
+  week: number;
+  month: number;
+  quarter: number;
+}
+
+export interface ResolutionTimeResponseDto {
+  data: ResolutionTimeDataDto;
+  average: ResolutionTimeAverageDto;
+}
+
 export const reportService = {
   async getTenantStatistics(): Promise<TenantStatistics> {
     const response = await apiClient.get('/stats/by-tenant');
@@ -124,6 +146,11 @@ export const reportService = {
     const response = await apiClient.get('/stats/status-durations', {
       params: period ? { period } : undefined,
     });
+    return response.data;
+  },
+
+  async getResolutionTimeData(): Promise<ResolutionTimeResponseDto> {
+    const response = await apiClient.get('/stats/resolution-time');
     return response.data;
   },
 };

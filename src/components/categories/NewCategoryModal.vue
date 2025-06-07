@@ -1,28 +1,35 @@
 <template>
-  <BaseModal :isOpen="isOpen" title="Nova Categoria" @close="closeModal">
-    <div class="modal-body">
-      <div class="category-form-container">
-        <form id="cadastroCategoriaForm" class="form-grid" @submit.prevent="createCategory">
-          <div class="form-group">
-            <label for="nomeCategoria">Nome</label>
-            <input
-              type="text"
-              id="nomeCategoria"
-              v-model="categoryData.name"
-              placeholder="Digite o nome da categoria"
-              required
-            />
-          </div>
+  <BaseModal
+    :isOpen="isOpen"
+    title="Nova Categoria"
+    @close="closeModal"
+    @cancel="closeModal"
+    @confirm="createCategory"
+    :confirmButtonText="isLoading ? '' : 'Cadastrar'"
+    :cancelButtonText="'Cancelar'"
+  >
+    <div>
+      <form id="cadastroCategoriaForm" @submit.prevent="createCategory">
+        <div class="mb-4">
+          <label
+            for="nomeCategoria"
+            class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-200"
+            >Nome</label
+          >
+          <input
+            type="text"
+            id="nomeCategoria"
+            v-model="categoryData.name"
+            placeholder="Digite o nome da categoria"
+            required
+            class="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          />
+        </div>
 
-          <div class="form-actions">
-            <button type="button" class="btn btn-secondary" @click="closeModal">Cancelar</button>
-            <button type="submit" class="btn btn-primary">
-              <LoadingSpinner v-if="isLoading" :size="22" />
-              <p v-else>Cadastrar</p>
-            </button>
-          </div>
-        </form>
-      </div>
+        <div v-if="isLoading" class="flex justify-center my-2">
+          <LoadingSpinner :size="22" />
+        </div>
+      </form>
     </div>
   </BaseModal>
 </template>
@@ -107,24 +114,6 @@ const createCategory = async () => {
   font-weight: 500;
 }
 
-.form-group input {
-  width: 100%;
-  padding: 10px 15px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 14px;
-  color: #1e293b;
-  transition:
-    border-color 0.3s,
-    box-shadow 0.3s;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -163,4 +152,3 @@ const createCategory = async () => {
   background-color: #cbd5e1;
 }
 </style>
-

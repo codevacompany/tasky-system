@@ -26,11 +26,12 @@
           <tr>
             <th>ID</th>
             <th>Nome</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="isLoading">
-            <td colspan="2" class="loading-cell">
+            <td colspan="3" class="loading-cell">
               <div class="loading-wrapper">
                 <LoadingSpinner :size="28" />
               </div>
@@ -39,6 +40,16 @@
           <tr v-else v-for="category in categories" :key="category.id">
             <td>{{ category.id }}</td>
             <td>{{ category.name }}</td>
+            <td>
+              <div class="actions-container">
+                <button class="action-button edit" @click="openEditModal(category)">
+                  <font-awesome-icon icon="edit" />
+                </button>
+                <button class="action-button delete" @click="confirmDelete(category)">
+                  <font-awesome-icon icon="trash" />
+                </button>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -56,8 +67,22 @@
       </button>
     </div>
 
-    <!-- New Category Modal -->
     <NewCategoryModal :isOpen="isModalOpen" @close="closeModal" @categoryCreated="loadCategories" />
+
+    <EditCategoryModal
+      :isOpen="isEditModalOpen"
+      :category="categoryToEdit"
+      @close="closeEditModal"
+      @categoryUpdated="loadCategories"
+    />
+
+    <ConfirmationModal
+      :isOpen="showDeleteConfirmation"
+      title="Excluir Categoria"
+      :message="`Tem certeza que deseja excluir a categoria '${categoryToDelete?.name}'?`"
+      @confirm="deleteCategory"
+      @cancel="cancelDelete"
+    />
   </section>
 </template>
 
@@ -66,16 +91,23 @@ import { ref, onMounted, watch } from 'vue';
 import { categoryService } from '@/services/categoryService';
 import type { Category } from '@/models';
 import NewCategoryModal from '@/components/categories/NewCategoryModal.vue';
+import EditCategoryModal from '@/components/categories/EditCategoryModal.vue';
+import ConfirmationModal from '@/components/common/ConfirmationModal.vue';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { debounce } from '@/utils/generic-helper';
+import { AxiosError } from 'axios';
 
 const isLoading = ref(false);
 const categories = ref<Category[]>([]);
 const isModalOpen = ref(false);
+const isEditModalOpen = ref(false);
 const searchTerm = ref('');
 const currentPage = ref(1);
 const totalPages = ref(1);
+const showDeleteConfirmation = ref(false);
+const categoryToDelete = ref<Category | null>(null);
+const categoryToEdit = ref<Category | null>(null);
 
 const debouncedSearch = debounce(() => {
   loadCategories();
@@ -103,6 +135,45 @@ const openModal = () => {
 
 const closeModal = () => {
   isModalOpen.value = false;
+};
+
+const openEditModal = (category: Category) => {
+  categoryToEdit.value = category;
+  isEditModalOpen.value = true;
+};
+
+const closeEditModal = () => {
+  isEditModalOpen.value = false;
+  categoryToEdit.value = null;
+};
+
+const confirmDelete = (category: Category) => {
+  categoryToDelete.value = category;
+  showDeleteConfirmation.value = true;
+};
+
+const cancelDelete = () => {
+  showDeleteConfirmation.value = false;
+  categoryToDelete.value = null;
+};
+
+const deleteCategory = async () => {
+  if (!categoryToDelete.value) return;
+
+  try {
+    await categoryService.delete(categoryToDelete.value.id);
+    toast.success('Categoria excluída com sucesso!');
+    loadCategories();
+  } catch (error) {
+    if (error instanceof AxiosError && error.response?.status === 400) {
+      toast.error('Já existem tickets com essa categoria e por isso não pode ser excluída.');
+    } else {
+      toast.error('Erro ao excluir categoria. Tente novamente.');
+    }
+  } finally {
+    showDeleteConfirmation.value = false;
+    categoryToDelete.value = null;
+  }
 };
 
 onMounted(loadCategories);
@@ -204,5 +275,43 @@ h3 {
 #paginationInfo {
   font-size: 0.9rem;
   color: var(--text-light);
+}
+
+.actions-container {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.action-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-button.edit {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.action-button.edit:hover {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.action-button.delete {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.action-button.delete:hover {
+  background-color: #ef4444;
+  color: white;
 }
 </style>

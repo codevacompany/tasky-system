@@ -1,5 +1,15 @@
 <template>
-  <BaseModal v-if="isOpen" :isOpen="isOpen" :title="title" @close="handleCancel">
+  <BaseModal
+    v-if="isOpen"
+    :isOpen="isOpen"
+    :title="title"
+    @close="handleCancel"
+    @cancel="handleCancel"
+    @confirm="handleConfirm"
+    :confirmButtonText="'Confirmar'"
+    :cancelButtonText="'Cancelar'"
+    :showFooter="false"
+  >
     <div class="confirmation-content">
       <p>{{ message }}</p>
 

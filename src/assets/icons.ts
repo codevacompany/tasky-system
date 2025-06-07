@@ -77,6 +77,7 @@ import {
   faSortUp,
   faEdit,
   faEllipsisV,
+  faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -164,7 +165,8 @@ const icons = [
   faKey,
   faSortUp,
   faEdit,
-  faEllipsisV
+  faEllipsisV,
+  faTrash,
 ];
 
 library.add(...icons);

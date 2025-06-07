@@ -51,7 +51,7 @@
       <div class="content">
         <!-- Cards de Métricas -->
         <div class="metrics-grid">
-          <div class="metric-card blue-border">
+          <div class="reports-card blue-border">
             <div class="metric-content">
               <div class="metric-info">
                 <p class="metric-label">Total de Tickets</p>
@@ -63,7 +63,7 @@
             </div>
           </div>
 
-          <div class="metric-card yellow-border">
+          <div class="reports-card yellow-border">
             <div class="metric-content">
               <div class="metric-info">
                 <p class="metric-label">Taxa de Resolução</p>
@@ -75,7 +75,7 @@
             </div>
           </div>
 
-          <div class="metric-card green-border">
+          <div class="reports-card green-border">
             <div class="metric-content">
               <div class="metric-info">
                 <p class="metric-label">Tempo Médio de Resolução</p>
@@ -89,7 +89,7 @@
             </div>
           </div>
 
-          <div class="metric-card purple-border">
+          <div class="reports-card purple-border">
             <div class="metric-content">
               <div class="metric-info">
                 <p class="metric-label">Tempo médio de Aceitação</p>
@@ -124,7 +124,7 @@
             <!-- Visão Geral -->
             <div v-if="currentTab === 'overview'" class="tab-panel">
               <!-- Nova seção Created vs Completed -->
-              <div class="created-vs-completed">
+              <div class="reports-card created-vs-completed">
                 <div class="created-vs-completed-header">
                   <h2>CRIADOS VS CONCLUÍDOS</h2>
                 </div>
@@ -222,7 +222,7 @@
 
               <div class="charts-grid">
                 <!-- Gráfico de Status -->
-                <div class="chart-card status-chart-flex">
+                <div class="reports-card status-chart-flex">
                   <div class="chart-header">
                     <h2 class="chart-title">Distribuição por Status</h2>
                     <div class="chart-icon">
@@ -262,7 +262,7 @@
                 </div>
 
                 <!-- Gráfico de Prioridade -->
-                <div class="chart-card status-chart-flex">
+                <div class="reports-card status-chart-flex">
                   <div class="chart-header">
                     <h2 class="chart-title">Distribuição por Prioridade</h2>
                     <div class="chart-icon">
@@ -303,7 +303,7 @@
               </div>
 
               <!-- Tabela -->
-              <div class="table-container">
+              <div class="reports-card reports-table-container">
                 <div class="table-header">
                   <div class="table-header-content">
                     <div>
@@ -349,7 +349,7 @@
               </div>
 
               <!-- Cycle Time per Segment -->
-              <div class="cycle-time-section">
+              <div class="reports-card cycle-time-section">
                 <div class="cycle-time-header">
                   <div class="cycle-time-title">
                     <h3>Tempo de Resolução Por Segmento:</h3>
@@ -426,7 +426,7 @@
                 <div
                   v-for="dept in departmentStats"
                   :key="dept.departmentId"
-                  class="department-card department-card-modern"
+                  class="reports-card department-card-modern"
                 >
                   <div class="department-card-header">
                     <div
@@ -585,7 +585,7 @@
               </div>
 
               <!-- Cycle Time per Segment -->
-              <div class="cycle-time-section">
+              <div class="reports-card cycle-time-section">
                 <div class="cycle-time-header">
                   <div class="cycle-time-title">
                     <h3>Tempo de resolução:</h3>
@@ -655,7 +655,7 @@
                 <div
                   v-for="dept in departmentStats"
                   :key="dept.departmentId"
-                  class="department-card department-card-modern"
+                  class="reports-card department-card-modern"
                 >
                   <div class="department-card-header">
                     <div
@@ -730,7 +730,7 @@
               </div>
 
               <!-- Nova seção Created vs Completed em Tendências -->
-              <div class="created-vs-completed">
+              <div class="reports-card created-vs-completed">
                 <div class="created-vs-completed-header">
                   <h2>CRIADOS VS CONCLUÍDOS</h2>
                 </div>
@@ -827,78 +827,70 @@
               </div>
 
               <!-- Nova seção de Cycle Time -->
-              <div class="cycle-time-trend">
+              <div class="reports-card cycle-time-trend">
                 <div class="cycle-time-trend-header">
-                  <h2>TEMPO DE RESOLUÇÃO POR SEMANA/MÊS/TRIMESTRE (Mocked)</h2>
+                  <h2>TEMPO DE RESOLUÇÃO POR PERÍODO</h2>
                   <div class="header-actions">
-                    <button class="btn btn-outline secondary">
-                      Por Semana
-                      <font-awesome-icon icon="chevron-down" />
-                    </button>
+                    <select
+                      v-model="selectedCycleTimePeriod"
+                      class="period-select"
+                      @change="handleCycleTimePeriodChange"
+                    >
+                      <option value="week">Por Semana</option>
+                      <option value="month">Por Mês</option>
+                      <option value="quarter">Por Trimestre</option>
+                    </select>
                   </div>
                 </div>
 
                 <div class="cycle-time-info">
-                  <p>
-                    O tempo de resolução da sua empresa foi de <strong>1d 03h</strong> na semana
-                    anterior (isso é <span class="percentage-up">89.4% mais</span> que a semana
-                    anterior)
+                  <p v-if="getLatestResolutionTime() > 0">
+                    O tempo médio de resolução da sua empresa foi de
+                    <strong>{{ formatTimeInSeconds(getLatestResolutionTime() * 3600) }}</strong>
+                    {{ periodTextMap[selectedCycleTimePeriod] }} {{ getPeriodName() }}.
                   </p>
-                  <p class="average-info">14 semanas de média semanal: <strong>3h 06m</strong></p>
+                  <p
+                    v-if="getLatestResolutionTime() > 0 && hasPreviousPeriodData()"
+                    class="comparison-text"
+                  >
+                    Isso é
+                    <span
+                      :class="getResolutionTimeTrend() > 0 ? 'percentage-up' : 'percentage-down'"
+                    >
+                      {{ getResolutionTimeTrend() > 0 ? '+' : '' }}{{ getResolutionTimeTrend() }}%
+                      {{ getResolutionTimeTrend() > 0 ? 'mais' : 'menos' }}
+                    </span>
+                    que {{ getPreviousPeriodLabel() }}
+                  </p>
+                  <p v-else-if="getLatestResolutionTime() === 0" class="no-data-message">
+                    Não houveram tickets resolvidos
+                    <span v-if="selectedCycleTimePeriod === 'week'">na última semana</span>
+                    <span v-else-if="selectedCycleTimePeriod === 'month'">no último mês</span>
+                    <span v-else>no último trimestre</span>
+                  </p>
+                  <p class="average-info" v-if="getAverageResolutionTime() > 0">
+                    Média:
+                    <strong>{{ formatTimeInSeconds(getAverageResolutionTime() * 3600) }}</strong>
+                  </p>
                 </div>
 
                 <div class="cycle-time-chart">
-                  <div class="time-axis">
-                    <span>2d 00h</span>
-                    <span>1d 12h</span>
-                    <span>1d 00h</span>
-                    <span>12h</span>
-                    <span>6h</span>
-                    <span>0h</span>
+                  <div v-if="cycleTimeChartLoading" class="chart-loading-state">
+                    <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                    <p class="loading-text">Atualizando gráfico...</p>
                   </div>
-                  <div class="chart-area">
-                    <div class="bar-container">
-                      <div class="bar" style="height: 85%">
-                        <span class="bar-label">1d 18h</span>
-                      </div>
-                      <span class="week-label">Semana 11</span>
-                    </div>
-                    <div class="bar-container">
-                      <div class="bar" style="height: 65%">
-                        <span class="bar-label">1d 03h</span>
-                      </div>
-                      <span class="week-label">Semana 12</span>
-                    </div>
-                    <div class="bar-container">
-                      <div class="bar" style="height: 45%">
-                        <span class="bar-label">16h 30m</span>
-                      </div>
-                      <span class="week-label">Semana 13</span>
-                    </div>
-                    <div class="bar-container">
-                      <div class="bar" style="height: 75%">
-                        <span class="bar-label">1d 12h</span>
-                      </div>
-                      <span class="week-label">Semana 14</span>
-                    </div>
-                    <div class="bar-container">
-                      <div class="bar" style="height: 35%">
-                        <span class="bar-label">14h 22m</span>
-                      </div>
-                      <span class="week-label">Semana 15</span>
-                    </div>
-                    <div class="bar-container">
-                      <div class="bar" style="height: 25%">
-                        <span class="bar-label">11h 48m</span>
-                      </div>
-                      <span class="week-label">Semana 16</span>
-                    </div>
-                  </div>
+                  <Bar
+                    v-else
+                    :data="cycleTimeBarData"
+                    :options="cycleTimeBarOptions"
+                    height="300"
+                    :key="`cycle-time-chart-${chartRenderKey}`"
+                  />
                 </div>
               </div>
 
               <!-- Nova seção de Tempo de Ciclo por Estado do Workflow -->
-              <div class="cycle-time-workflow">
+              <div class="reports-card cycle-time-workflow">
                 <div class="cycle-time-workflow-header">
                   <h2>TEMPO DE DURAÇÃO POR STATUS</h2>
                 </div>
@@ -961,7 +953,7 @@
               </div>
 
               <!-- Seção de Ciclo de Tempo Em Andamento -->
-              <div class="cycle-time-progress">
+              <div class="reports-card cycle-time-progress">
                 <div class="cycle-time-progress-header">
                   <h2>TEMPO GASTO NO STATUS "EM ANDAMENTO" (Mocked)</h2>
                 </div>
@@ -1097,7 +1089,7 @@ import {
   RadialLinearScale,
   Filler,
 } from 'chart.js';
-import { Line, Doughnut } from 'vue-chartjs';
+import { Line, Doughnut, Bar } from 'vue-chartjs';
 import { formatDate, formatDateToPortuguese } from '@/utils/date';
 import { reportService } from '@/services/reportService';
 import { ticketService } from '@/services/ticketService';
@@ -1105,6 +1097,9 @@ import type {
   TenantStatistics,
   StatusDurationDto,
   DepartmentStats,
+  ResolutionTimeResponseDto,
+  ResolutionTimeDataDto,
+  ResolutionTimeAverageDto,
 } from '@/services/reportService';
 import { TicketActionType, TicketStatus, type TicketUpdate } from '@/models';
 import DatePicker from 'vue-datepicker-next';
@@ -1429,6 +1424,7 @@ const loadData = async () => {
       recentTicketsResult,
       statusDurationsResult,
       departmentStatsResult,
+      resolutionTimeResult, // Add this new result
     ] = await Promise.all([
       reportService.getTenantStatistics(),
       reportService.getTicketTrends(selectedTrendPeriod.value),
@@ -1437,6 +1433,7 @@ const loadData = async () => {
       ticketService.getTenantRecentTickets(10),
       reportService.getStatusDurations(selectedStatsPeriod.value),
       reportService.getTenantDepartmentsStatistics(),
+      reportService.getResolutionTimeData(), // Add this new API call
     ]);
 
     // Initialize trendData with the current period data
@@ -1493,15 +1490,15 @@ const loadData = async () => {
       ],
     };
 
-    // Mock recent tickets
-
-    // Assign the mock tickets to the ref
     recentTickets.value = recentTicketsResult.data.items;
 
     statistics.value = statsData;
     if (statistics.value) {
       statistics.value.ticketTrends = trends;
     }
+
+    cycleTimeData.value = resolutionTimeResult.data;
+    cycleTimeAverage.value = resolutionTimeResult.average;
   } catch (err: unknown) {
     console.error('Erro ao carregar dados dos relatórios:', err);
     error.value = 'Ocorreu um erro ao carregar os dados. Por favor, tente novamente.';
@@ -1955,12 +1952,195 @@ function formatDateDDMM(dateStr: string) {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   return `${day}/${month}`;
 }
+
+// Add new reactive state for cycle time period selection
+const selectedCycleTimePeriod = ref<'week' | 'month' | 'quarter'>('week');
+
+// Period text mapping for UI
+const periodTextMap: Record<'week' | 'month' | 'quarter', string> = {
+  week: 'na semana',
+  month: 'no mês',
+  quarter: 'no trimestre',
+};
+
+const cycleTimeData = ref<ResolutionTimeDataDto | null>(null);
+const cycleTimeAverage = ref<ResolutionTimeAverageDto | null>(null);
+
+const getLatestResolutionTime = () => {
+  if (!cycleTimeData.value) return 0;
+
+  const period = selectedCycleTimePeriod.value;
+  const data = cycleTimeData.value[period];
+
+  if (!data || data.length === 0) return 0;
+  return data[data.length - 1].value;
+};
+
+const getAverageResolutionTime = () => {
+  if (!cycleTimeAverage.value) return 0;
+
+  const period = selectedCycleTimePeriod.value;
+  return cycleTimeAverage.value[period];
+};
+
+const getResolutionTimeTrend = () => {
+  if (!cycleTimeData.value) return 0;
+
+  const period = selectedCycleTimePeriod.value;
+  const data = cycleTimeData.value[period];
+
+  if (!data || data.length < 2) return 0;
+
+  const current = data[data.length - 1].value;
+  const previous = data[data.length - 2].value;
+
+  if (previous === 0) return 0;
+
+  const change = ((current - previous) / previous) * 100;
+  return Math.round(change);
+};
+
+const getPeriodName = () => {
+  if (!cycleTimeData.value) return '';
+
+  const period = selectedCycleTimePeriod.value;
+  const data = cycleTimeData.value[period];
+
+  if (!data || data.length === 0) return '';
+  return data[data.length - 1].label;
+};
+
+const getPreviousPeriodName = () => {
+  if (!cycleTimeData.value) return '';
+
+  const period = selectedCycleTimePeriod.value;
+  const data = cycleTimeData.value[period];
+
+  if (!data || data.length < 2) return '';
+  return data[data.length - 2].label;
+};
+
+const cycleTimeBarData = computed(() => {
+  if (!cycleTimeData.value) return { labels: [], datasets: [{ label: '', data: [] }] };
+
+  const period = selectedCycleTimePeriod.value;
+  const data = cycleTimeData.value[period];
+
+  return {
+    labels: data.map((item) => item.label),
+    datasets: [
+      {
+        label: 'Tempo de Resolução',
+        data: data.map((item) => item.value),
+        backgroundColor: '#60a5fa',
+        borderColor: '#3b82f6',
+        borderWidth: 1,
+        borderRadius: 4,
+        maxBarThickness: 40,
+      },
+    ],
+  };
+});
+
+const cycleTimeBarOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: false,
+    },
+    tooltip: {
+      callbacks: {
+        label: function (tooltipItem: any) {
+          // Converter horas para formato dias/horas
+          const hours = tooltipItem.raw as number;
+          const days = Math.floor(hours / 24);
+          const remainingHours = Math.floor(hours % 24);
+
+          if (days > 0) {
+            return `${days}d ${remainingHours}h`;
+          } else {
+            return `${remainingHours}h ${Math.floor((hours - remainingHours) * 60)}m`;
+          }
+        },
+      },
+    },
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      title: {
+        display: true,
+        text: 'Tempo (horas)',
+      },
+      ticks: {
+        callback: function (value: any) {
+          const numValue = value as number;
+          if (numValue >= 24) {
+            const days = Math.floor(numValue / 24);
+            const hours = numValue % 24;
+            return `${days}d ${hours}h`;
+          }
+          return `${numValue}h`;
+        },
+      },
+    },
+  },
+};
+
+// Add a reactive state for chart rendering
+const chartRenderKey = ref(0);
+const cycleTimeChartLoading = ref(false);
+
+// Function to handle period change with forced re-render
+const handleCycleTimePeriodChange = () => {
+  // Show loading state
+  cycleTimeChartLoading.value = true;
+
+  // Force re-render after a short delay
+  setTimeout(() => {
+    chartRenderKey.value++;
+    cycleTimeChartLoading.value = false;
+  }, 300);
+};
+
+// Add function to check if previous period data exists
+const hasPreviousPeriodData = () => {
+  if (!cycleTimeData.value) return false;
+
+  const period = selectedCycleTimePeriod.value;
+  const data = cycleTimeData.value[period];
+
+  return data && data.length >= 2 && getPreviousPeriodValue() > 0;
+};
+
+// Add function to get previous period value
+const getPreviousPeriodValue = () => {
+  if (!cycleTimeData.value) return 0;
+
+  const period = selectedCycleTimePeriod.value;
+  const data = cycleTimeData.value[period];
+
+  if (!data || data.length < 2) return 0;
+  return data[data.length - 2].value;
+};
+
+// Get formatted previous period label
+const getPreviousPeriodLabel = () => {
+  if (!cycleTimeData.value) return '';
+
+  const period = selectedCycleTimePeriod.value;
+  const label = period === 'week' ? 'a semana' : period === 'month' ? 'o mês' : 'o trimestre';
+
+  return `${label} anterior (${getPreviousPeriodName()})`;
+};
 </script>
 
 <style scoped>
 .reports-container {
   min-height: 100vh;
   background-color: #f9fafb;
+  padding-bottom: 2rem;
 }
 
 .loading-overlay {
@@ -2151,14 +2331,6 @@ function formatDateDDMM(dateStr: string) {
   }
 }
 
-.metric-card {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-  border-left-width: 4px;
-}
-
 .metric-content {
   display: flex;
   align-items: center;
@@ -2222,16 +2394,11 @@ function formatDateDDMM(dateStr: string) {
 }
 
 /* Tabs */
-.tabs-container {
-  margin-bottom: 1.5rem;
-  background-color: white;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
 .tabs-header {
   padding: 0.5rem;
   border-bottom: 1px solid #f3f4f6;
+  background-color: white;
+  border-radius: 0.5rem;
 }
 
 .tabs-nav {
@@ -2301,9 +2468,8 @@ function formatDateDDMM(dateStr: string) {
 }
 
 .tab-content {
-  background-color: white;
-  padding: 1.5rem;
-  border-radius: 0 0 0.75rem 0.75rem;
+  background-color: #f9fafb;
+  margin-top: 0.5rem;
 }
 
 .tab-panel {
@@ -2334,10 +2500,10 @@ function formatDateDDMM(dateStr: string) {
   }
 }
 
-.chart-card {
+.reports-card {
   background-color: white;
   border-radius: 0.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
 }
 
@@ -2385,10 +2551,8 @@ function formatDateDDMM(dateStr: string) {
 }
 
 /* Table */
-.table-container {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+.reports-table-container {
+  margin-top: 1.5rem;
 }
 
 .table-header {
@@ -2476,13 +2640,6 @@ function formatDateDDMM(dateStr: string) {
   .departments-grid {
     grid-template-columns: repeat(3, 1fr);
   }
-}
-
-.department-card {
-  background-color: white;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .department-title {
@@ -2600,10 +2757,6 @@ function formatDateDDMM(dateStr: string) {
 
 /* Report Cards */
 .report-card {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
@@ -2968,7 +3121,7 @@ function formatDateDDMM(dateStr: string) {
   background: white;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .timings-header {
@@ -3060,11 +3213,7 @@ function formatDateDDMM(dateStr: string) {
 
 /* Cycle Time Section */
 .cycle-time-section {
-  background: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-top: 2rem;
-  padding: 1.5rem;
+  margin-top: 1rem;
 }
 
 .cycle-time-header {
@@ -3163,11 +3312,7 @@ function formatDateDDMM(dateStr: string) {
 
 /* Cycle Time Trend Styles */
 .cycle-time-trend {
-  background: white;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
   margin-top: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .cycle-time-trend-header {
@@ -3300,11 +3445,7 @@ function formatDateDDMM(dateStr: string) {
 
 /* Cycle Time Workflow Styles */
 .cycle-time-workflow {
-  background: white;
-  border-radius: 8px;
-  padding: 24px;
-  margin-top: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-top: 1.5rem;
 }
 
 .cycle-time-workflow-header {
@@ -3411,11 +3552,7 @@ function formatDateDDMM(dateStr: string) {
 
 /* Cycle Time Progress Styles */
 .cycle-time-progress {
-  background: white;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  margin-top: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-top: 1.5rem;
   display: block; /* Garantir que a seção seja exibida como bloco */
 }
 
@@ -3552,11 +3689,8 @@ function formatDateDDMM(dateStr: string) {
 
 /* Created vs Completed Styles */
 .created-vs-completed {
-  background: white;
   border-radius: 0.5rem;
-  padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .created-vs-completed-header {
@@ -3764,7 +3898,6 @@ function formatDateDDMM(dateStr: string) {
 }
 
 .department-card-modern {
-  box-shadow: 0 2px 8px 0 rgba(37, 99, 235, 0.07);
   border: 1px solid #e5e7eb;
   transition: box-shadow 0.2s;
   position: relative;
@@ -3816,5 +3949,42 @@ function formatDateDDMM(dateStr: string) {
   color: #374151;
   min-width: 40px;
   text-align: right;
+}
+
+.chart-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 0.5rem;
+}
+
+.chart-loading-state .loading-icon {
+  font-size: 2rem;
+  color: #2563eb;
+  margin-bottom: 0.5rem;
+}
+
+.chart-loading-state .loading-text {
+  color: #4b5563;
+  font-size: 0.875rem;
+}
+
+.percentage-down {
+  color: #22c55e;
+  font-weight: 500;
+}
+
+.no-data-message {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.comparison-text {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
 }
 </style>

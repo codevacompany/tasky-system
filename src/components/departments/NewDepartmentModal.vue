@@ -1,29 +1,34 @@
 <template>
-  <BaseModal :isOpen="isOpen" title="Novo Setor" @close="closeModal">
-    <div class="modal-body">
-      <div class="department-form-container">
-        <form id="cadastroSetorForm" @submit.prevent="createDepartment">
-          <div class="form-group">
-            <label for="nomeSetor">Nome</label>
-            <input
-              type="text"
-              id="nomeSetor"
-              v-model="departmentData.name"
-              placeholder="Digite o nome do setor"
-              required
-            />
-          </div>
-
-          <div class="form-actions">
-            <button type="button" class="btn btn-secondary" @click="closeModal">Cancelar</button>
-            <button type="submit" class="btn btn-primary">
-              <LoadingSpinner v-if="isLoading" :size="22" />
-              <p v-else>Cadastrar</p>
-            </button>
-          </div>
-        </form>
+  <BaseModal
+    :isOpen="isOpen"
+    title="Novo Setor"
+    @close="closeModal"
+    @cancel="closeModal"
+    @confirm="createDepartment"
+    :confirmButtonText="isLoading ? '' : 'Cadastrar'"
+    :cancelButtonText="'Cancelar'"
+  >
+    <form id="cadastroSetorForm" @submit.prevent="createDepartment">
+      <div class="mb-5">
+        <label
+          for="nomeSetor"
+          class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
+          >Nome</label
+        >
+        <input
+          type="text"
+          id="nomeSetor"
+          v-model="departmentData.name"
+          placeholder="Digite o nome do setor"
+          required
+          class="w-full px-[15px] py-[10px] border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+        />
       </div>
-    </div>
+
+      <div v-if="isLoading" class="flex justify-center my-2">
+        <LoadingSpinner :size="22" />
+      </div>
+    </form>
   </BaseModal>
 </template>
 
@@ -71,76 +76,3 @@ const createDepartment = async () => {
   }
 };
 </script>
-
-<style scoped>
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.modal-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.department-form-container {
-  flex: 1;
-  min-width: 300px;
-  max-width: 1000px;
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-.form-group {
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #1e293b;
-  font-weight: 500;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 14px;
-  color: #1e293b;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* Buttons */
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 1rem;
-}
-
-.btn {
-  width: 116px;
-  height: 36px;
-  padding: 0 16px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition:
-    background 0.3s ease,
-    transform 0.2s ease;
-}
-</style>
