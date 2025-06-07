@@ -8,34 +8,61 @@
     :confirmButtonText="'Criar Ticket'"
     :cancelButtonText="'Limpar'"
   >
-    <form @submit.prevent="handleSubmit" class="ticket-form">
-      <div class="form-grid">
-        <div class="form-group span-2">
-          <label for="title">Assunto: <span class="required">*</span></label>
-          <input type="text" id="title" v-model="formData.name" required />
+    <form @submit.prevent="handleSubmit" class="w-full">
+      <div class="grid grid-cols-3 gap-5 mb-6">
+        <div class="col-span-2 flex flex-col gap-1.5">
+          <label for="title" class="text-sm text-gray-800 dark:text-gray-200"
+            >Assunto: <span class="text-red-500">*</span></label
+          >
+          <input
+            type="text"
+            id="title"
+            v-model="formData.name"
+            required
+            class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          />
         </div>
 
-        <div class="form-group">
-          <label>É privado?</label>
-          <div class="radio-group">
-            <label class="radio-label">
-              <input type="radio" v-model="formData.isPrivate" :value="true" name="isPrivate" />
+        <div class="col-span-1 flex flex-col gap-1.5">
+          <label class="text-sm text-gray-800 dark:text-gray-200">É privado?</label>
+          <div class="flex gap-4 pt-1">
+            <label
+              class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200 cursor-pointer"
+            >
+              <input
+                type="radio"
+                v-model="formData.isPrivate"
+                :value="true"
+                name="isPrivate"
+                class="cursor-pointer"
+              />
               Sim
             </label>
-            <label class="radio-label">
-              <input type="radio" v-model="formData.isPrivate" :value="false" name="isPrivate" />
+            <label
+              class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200 cursor-pointer"
+            >
+              <input
+                type="radio"
+                v-model="formData.isPrivate"
+                :value="false"
+                name="isPrivate"
+                class="cursor-pointer"
+              />
               Não
             </label>
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="targetDepartment">Setor Destino: <span class="required">*</span></label>
+        <div class="col-span-1 flex flex-col gap-1.5">
+          <label for="targetDepartment" class="text-sm text-gray-800 dark:text-gray-200"
+            >Setor Destino: <span class="text-red-500">*</span></label
+          >
           <select
             id="targetDepartment"
             v-model="selectedDepartment"
             required
             @change="updateUsersList"
+            class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
           >
             <option :value="null">Selecione um setor</option>
             <option v-for="department in departments" :key="department.id" :value="department.id">
@@ -44,9 +71,16 @@
           </select>
         </div>
 
-        <div class="form-group">
-          <label for="targetUser">Usuário Destino:</label>
-          <select id="targetUser" v-model="selectedUser" :disabled="!selectedDepartment">
+        <div class="col-span-1 flex flex-col gap-1.5">
+          <label for="targetUser" class="text-sm text-gray-800 dark:text-gray-200"
+            >Usuário Destino:</label
+          >
+          <select
+            id="targetUser"
+            v-model="selectedUser"
+            :disabled="!selectedDepartment"
+            class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white disabled:opacity-60 disabled:cursor-not-allowed"
+          >
             <option :value="null">Selecione um setor primeiro</option>
             <option v-for="user in availableUsers" :key="user.id" :value="user.id">
               {{ user.firstName }} {{ user.lastName }}
@@ -54,9 +88,16 @@
           </select>
         </div>
 
-        <div class="form-group">
-          <label for="category">Categoria: <span class="required">*</span></label>
-          <select id="category" v-model="selectedCategory" required>
+        <div class="col-span-1 flex flex-col gap-1.5">
+          <label for="category" class="text-sm text-gray-800 dark:text-gray-200"
+            >Categoria: <span class="text-red-500">*</span></label
+          >
+          <select
+            id="category"
+            v-model="selectedCategory"
+            required
+            class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          >
             <option :value="null">Selecione uma categoria</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
               {{ category.name }}
@@ -64,47 +105,65 @@
           </select>
         </div>
 
-        <div class="form-group">
-          <label>Prioridade: <span class="required">*</span></label>
-          <div class="radio-group">
-            <label class="radio-label">
+        <div class="col-span-1 flex flex-col gap-1.5">
+          <label class="text-sm text-gray-800 dark:text-gray-200"
+            >Prioridade: <span class="text-red-500">*</span></label
+          >
+          <div class="flex gap-4 pt-1">
+            <label
+              class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200 cursor-pointer"
+            >
               <input
                 type="radio"
                 v-model="formData.priority"
                 :value="TicketPriority.Low"
                 name="priority"
                 required
+                class="cursor-pointer"
               />
               {{ formatSnakeToNaturalCase(TicketPriority.Low) }}
             </label>
-            <label class="radio-label">
+            <label
+              class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200 cursor-pointer"
+            >
               <input
                 type="radio"
                 v-model="formData.priority"
                 :value="TicketPriority.Medium"
                 name="priority"
+                class="cursor-pointer"
               />
               {{ formatSnakeToNaturalCase(TicketPriority.Medium) }}
             </label>
-            <label class="radio-label">
+            <label
+              class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200 cursor-pointer"
+            >
               <input
                 type="radio"
                 v-model="formData.priority"
                 :value="TicketPriority.High"
                 name="priority"
+                class="cursor-pointer"
               />
               {{ formatSnakeToNaturalCase(TicketPriority.High) }}
             </label>
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="dueAt">Concluir até:</label>
-          <input type="datetime-local" id="dueAt" v-model="formData.dueAt" />
+        <div class="col-span-1 flex flex-col gap-1.5">
+          <label for="dueAt" class="text-sm text-gray-800 dark:text-gray-200">Concluir até:</label>
+          <input
+            type="datetime-local"
+            id="dueAt"
+            v-model="formData.dueAt"
+            class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          />
         </div>
 
-        <div class="form-group full-width">
-          <label for="description">Descrição: <span class="required">*</span></label>
+        <div class="col-span-3 flex flex-col gap-1.5">
+          <label for="description" class="text-sm text-gray-800 dark:text-gray-200"
+            >Descrição: <span class="text-red-500">*</span></label
+          >
           <div class="quill-wrapper">
             <QuillEditor
               v-model:content="formData.description"
@@ -121,19 +180,21 @@
             rows="4"
           ></textarea>
         </div>
-        <div class="form-group full-width">
-          <label class="file-upload-label" for="fileUpload">
-            <font-awesome-icon icon="paperclip" /> Anexar Arquivos</label
-          >
+        <div class="col-span-3 flex flex-col gap-1.5">
+          <div class="flex">
+            <label
+              class="primary-gradient text-white flex justify-center items-center gap-[5px] rounded cursor-pointer mb-1.5 py-2 px-4"
+              for="fileUpload"
+            >
+              <font-awesome-icon icon="paperclip" /> Anexar Arquivos
+            </label>
+          </div>
+
           <input class="hidden" type="file" id="fileUpload" multiple @change="handleFileChange" />
           <ul v-if="selectedFiles.length">
-            <li
-              v-for="(file, i) in selectedFiles"
-              :key="i"
-              style="display: flex; margin-bottom: 4px"
-            >
-              <font-awesome-icon icon="file" style="margin-right: 5px" />
-              <p style="font-size: 14px">{{ file.name }}</p>
+            <li v-for="(file, i) in selectedFiles" :key="i" class="flex mb-1">
+              <font-awesome-icon icon="file" class="mr-[5px]" />
+              <p class="text-sm">{{ file.name }}</p>
             </li>
           </ul>
         </div>
@@ -380,188 +441,8 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.ticket-form {
-  width: 100%;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 24px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.form-group.span-2 {
-  grid-column: span 2;
-}
-
-.form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.form-group:has(.radio-group) {
-  grid-column: span 1;
-}
-
-.form-group:has([type='datetime-local']) {
-  grid-column: span 1;
-}
-
-/* Ajustes específicos para o novo layout */
-.form-grid > .form-group:nth-child(1) {
-  /* Assunto */
-  grid-column: span 2;
-}
-
-.form-grid > .form-group:nth-child(2) {
-  /* É privado */
-  grid-column: span 1;
-}
-
-.form-grid > .form-group:nth-child(3), /* Setor Destino */
-.form-grid > .form-group:nth-child(4), /* Usuário Destino */
-.form-grid > .form-group:nth-child(5) {
-  /* Categoria */
-  grid-column: span 1;
-}
-
-.form-grid > .form-group:nth-child(6), /* Prioridade */
-.form-grid > .form-group:nth-child(7) {
-  /* Concluir até */
-  grid-column: span 1;
-}
-
-.form-grid > .form-group:last-child {
-  /* Descrição */
-  grid-column: 1 / -1;
-}
-
-.radio-group {
-  display: flex;
-  gap: 16px;
-  padding-top: 4px;
-}
-
-.radio-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  color: #1a2233;
-  cursor: pointer;
-}
-
-label {
-  font-size: 14px;
-  color: #1a2233;
-}
-
-input[type='radio'] {
-  margin: 0;
-  cursor: pointer;
-}
-
-input,
-select,
-textarea {
-  padding: 10px 14px;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #1a2233;
-  background: #fff;
-  width: 100%;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
-}
-
-textarea {
-  min-height: 120px;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding-top: 20px;
-  border-top: 1px solid #e2e8f0;
-}
-
+/* Keep only essential styles that might not be covered by Tailwind */
 .quill-wrapper {
   margin-bottom: 50px;
-}
-
-.hidden {
-  display: none;
-}
-
-.file-upload-label {
-  width: 150px;
-  padding: 8px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-  background-color: #02153b;
-  border-radius: 5px;
-  color: white;
-  margin-bottom: 6px;
-}
-
-.file-upload-label:hover {
-  cursor: pointer;
-}
-
-/* Dark mode */
-:deep(body.dark-mode) label {
-  color: #e2e8f0;
-}
-
-:deep(body.dark-mode) .radio-label {
-  color: #e2e8f0;
-}
-
-:deep(body.dark-mode) input,
-:deep(body.dark-mode) select,
-:deep(body.dark-mode) textarea {
-  background: #1a2233;
-  border-color: #2d3748;
-  color: #e2e8f0;
-}
-
-:deep(body.dark-mode) input:focus,
-:deep(body.dark-mode) select:focus,
-:deep(body.dark-mode) textarea:focus {
-  border-color: #818cf8;
-  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.1);
-}
-
-:deep(body.dark-mode) .form-actions {
-  border-top-color: #2d3748;
-}
-
-.required {
-  color: #ef4444;
-  margin-left: 2px;
-}
-
-/* Remove file input styles */
-.file-input-wrapper,
-.file-input,
-.file-input-button,
-.file-name {
-  display: none;
 }
 </style>

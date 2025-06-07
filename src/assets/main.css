@@ -1149,13 +1149,10 @@ body.dark-mode .section-header h1 {
   margin-bottom: 16px;
 }
 
-/* input, select, textarea {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  width: 100%;
-  transition: border-color 0.2s;
-} */
+input[type='radio'] {
+  margin: 0;
+  cursor: pointer;
+}
 
 select,
 input,

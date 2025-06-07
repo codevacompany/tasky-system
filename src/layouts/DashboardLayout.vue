@@ -287,7 +287,6 @@ const initializeTicketPolling = () => {
 onMounted(() => {
   fetchUnreadCount();
 
-
   initializeTicketPolling();
 
   //let's use a polling strategy for now
