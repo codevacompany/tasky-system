@@ -5,6 +5,7 @@
     title="Detalhes do Ticket"
     :isLoading="loadedTicket ? false : true"
     @close="closeModal"
+    :showFooter="false"
   >
     <div v-if="loadedTicket" class="content">
       <!-- Assunto em largura total -->
@@ -201,41 +202,19 @@
         >
           <font-awesome-icon icon="wrench" /> Corrigir
         </button>
-        <div
-          v-else-if="loadedTicket.status === TicketStatus.UnderVerification"
-          class="verification-actions"
-        >
-          <div v-if="isTargetUser" class="status-waiting">
-            <font-awesome-icon icon="hourglass-half" class="waiting-icon" /> EM VERIFICAÇÃO
-          </div>
-          <template v-if="isRequester">
-            <button class="action-button approve" @click="approveTicket(loadedTicket.customId)">
-              <font-awesome-icon icon="check" /> Aprovar
-            </button>
-            <button
-              class="action-button request-correction"
-              @click="requestCorrection(loadedTicket.customId)"
-            >
-              <font-awesome-icon icon="exclamation-circle" /> Solicitar Correção
-            </button>
-            <button class="action-button reject" @click="rejectTicket(loadedTicket.customId)">
-              <font-awesome-icon icon="times" /> Reprovar
-            </button>
-          </template>
-        </div>
         <button
-          v-else-if="loadedTicket.status === TicketStatus.Completed"
-          class="btn btn-success disabled"
-          disabled
+          v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
+          class="action-button finalize"
+          @click="finalizeTicket(loadedTicket.customId)"
         >
-          <font-awesome-icon icon="check-circle" /> FINALIZADO
+          <font-awesome-icon icon="check-double" /> Finalizar
         </button>
         <button
-          v-else-if="loadedTicket.status === TicketStatus.Rejected"
-          class="btn btn-danger disabled"
-          disabled
+          v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
+          class="action-button return"
+          @click="openReturnTicketModal(loadedTicket.customId)"
         >
-          <font-awesome-icon icon="times-circle" /> REPROVADO
+          <font-awesome-icon icon="undo" /> Devolver
         </button>
       </div>
 
@@ -374,6 +353,54 @@
         </div>
       </div>
     </div>
+
+    <template #footer>
+      <div
+        class="ticket-actions"
+        v-if="
+          isTargetUser || (isRequester && loadedTicket.status === TicketStatus.UnderVerification)
+        "
+      >
+        <button
+          v-if="isTargetUser && loadedTicket?.status === TicketStatus.Pending"
+          class="action-button accept"
+          @click="acceptTicket(loadedTicket?.customId)"
+        >
+          <font-awesome-icon icon="check" /> Aceitar
+        </button>
+        <button
+          v-if="isTargetUser && loadedTicket?.status === TicketStatus.InProgress"
+          class="action-button verify"
+          @click="sendForReview(loadedTicket.customId)"
+        >
+          <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
+        </button>
+        <button
+          v-if="isTargetUser && loadedTicket?.status === TicketStatus.Returned"
+          class="action-button correct"
+          @click="correctTicket(loadedTicket.customId)"
+        >
+          <font-awesome-icon icon="wrench" /> Corrigir
+        </button>
+        <button
+          v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
+          class="action-button finalize"
+          @click="finalizeTicket(loadedTicket.customId)"
+        >
+          <font-awesome-icon icon="check-double" /> Finalizar
+        </button>
+        <button
+          v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
+          class="action-button return"
+          @click="openReturnTicketModal(loadedTicket.customId)"
+        >
+          <font-awesome-icon icon="undo" /> Devolver
+        </button>
+      </div>
+      <button class="close-button" @click="closeModal">
+        <font-awesome-icon icon="times" /> Fechar
+      </button>
+    </template>
   </BaseModal>
 
   <ConfirmationModal

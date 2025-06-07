@@ -1,18 +1,51 @@
 <template>
   <Teleport to="body">
-    <div v-if="isOpen" class="modal-backdrop" id="newTicketModal" @click.self="close">
+    <div
+      v-if="isOpen"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]"
+      id="newTicketModal"
+      @click.self="close"
+    >
       <LoadingSpinner v-if="isLoading" :size="50" :color="'white'" />
-      <div v-else class="modal-content">
-        <div class="modal-header">
+      <div
+        v-else
+        class="bg-white dark:bg-gray-800 rounded-md shadow-lg w-auto max-w-[80%] max-h-[90vh] flex flex-col overflow-hidden animate-modalSlideIn"
+      >
+        <div
+          class="primary-gradient flex items-center justify-between p-4 border-b border-gray-200 text-white"
+        >
           <slot name="header">
-            <h2>{{ title }}</h2>
+            <h2 class="text-lg font-semibold">{{ title }}</h2>
           </slot>
-          <button class="close-btn" @click="close">
+          <button
+            class="bg-transparent border-none text-white opacity-80 text-xl cursor-pointer p-2 rounded-full flex items-center justify-center transition-opacity hover:opacity-100"
+            @click="close"
+          >
             <font-awesome-icon icon="times" />
           </button>
         </div>
-        <div class="modal-body">
+        <div class="p-6 overflow-y-auto overflow-x-hidden min-w-[500px] max-h-[calc(90vh-72px)]">
           <slot></slot>
+        </div>
+        <div v-if="showFooter" class="p-4 flex justify-end gap-3 border-t border-gray-200">
+          <slot name="footer">
+            <button
+              v-if="showCancelButton"
+              type="button"
+              class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
+              @click="handleCancel"
+            >
+              {{ cancelButtonText }}
+            </button>
+            <button
+              v-if="showConfirmButton"
+              type="button"
+              class="px-4 py-2 primary-gradient hover:opacity-95 text-white rounded transition-colors"
+              @click="handleConfirm"
+            >
+              {{ confirmButtonText }}
+            </button>
+          </slot>
         </div>
       </div>
     </div>
@@ -23,46 +56,34 @@
 import { defineProps, defineEmits } from 'vue';
 import LoadingSpinner from './LoadingSpinner.vue';
 
-defineProps({
+const props = defineProps({
   isOpen: Boolean,
   title: { type: String, default: 'Modal Title' },
   isLoading: { type: Boolean, default: false },
+  showFooter: { type: Boolean, default: true },
+  showCancelButton: { type: Boolean, default: true },
+  showConfirmButton: { type: Boolean, default: true },
+  cancelButtonText: { type: String, default: 'Cancelar' },
+  confirmButtonText: { type: String, default: 'Confirmar' },
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'cancel', 'confirm']);
 
 const close = () => {
   emit('close');
 };
+
+const handleCancel = () => {
+  emit('cancel');
+  close();
+};
+
+const handleConfirm = () => {
+  emit('confirm');
+};
 </script>
 
-<style scoped>
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background-color: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  width: auto;
-  max-width: 80%;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  animation: modalSlideIn 0.3s ease;
-}
-
+<style>
 @keyframes modalSlideIn {
   from {
     transform: translateY(-50px);
@@ -74,51 +95,12 @@ const close = () => {
   }
 }
 
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-  background: var(--secondary-dark);
-  color: white;
+.animate-modalSlideIn {
+  animation: modalSlideIn 0.3s ease;
 }
 
-.modal-header h2 {
-  font-size: 1.15rem;
-  font-weight: 600;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  color: #ffffff;
-  opacity: 0.8;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition);
-}
-
-.close-btn:hover {
-  opacity: 1;
-}
-
-.modal-body {
-  padding: 1.5rem;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: calc(90vh - 72px);
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  border-top: 1px solid #ddd;
-  padding-top: 10px;
+/* Add a primary gradient class for consistent headers */
+.primary-gradient {
+  background: linear-gradient(135deg, #00143b 0%, #142046 100%);
 }
 </style>

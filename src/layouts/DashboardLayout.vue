@@ -242,7 +242,11 @@ const toggleNotificationsModal = () => {
 
 const toggleDarkMode = () => {
   darkMode.value = !darkMode.value;
+
+  // Handle both legacy dark-mode and Tailwind's dark class
   document.body.classList.toggle('dark-mode', darkMode.value);
+  document.body.classList.toggle('dark', darkMode.value);
+
   localStorageService.setTheme(darkMode.value ? 'dark' : 'light');
 };
 
@@ -283,10 +287,6 @@ const initializeTicketPolling = () => {
 onMounted(() => {
   fetchUnreadCount();
 
-  // Sincroniza o estado inicial do modo escuro
-  if (darkMode.value) {
-    document.body.classList.add('dark-mode');
-  }
 
   initializeTicketPolling();
 

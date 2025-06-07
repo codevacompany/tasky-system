@@ -1,5 +1,13 @@
 <template>
-  <BaseModal :isOpen="isOpen" title="Novo Ticket" @close="closeModal">
+  <BaseModal
+    :isOpen="isOpen"
+    title="Novo Ticket"
+    @close="closeModal"
+    @cancel="resetForm"
+    @confirm="handleSubmit"
+    :confirmButtonText="'Criar Ticket'"
+    :cancelButtonText="'Limpar'"
+  >
     <form @submit.prevent="handleSubmit" class="ticket-form">
       <div class="form-grid">
         <div class="form-group span-2">
@@ -129,11 +137,6 @@
             </li>
           </ul>
         </div>
-      </div>
-
-      <div class="form-actions">
-        <button type="button" class="btn btn-secondary" @click="resetForm">Limpar</button>
-        <button type="submit" class="btn btn-primary">Criar Ticket</button>
       </div>
     </form>
   </BaseModal>

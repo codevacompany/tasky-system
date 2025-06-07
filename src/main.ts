@@ -9,6 +9,13 @@ import router from './router';
 import Vue3Toastify, { type ToastContainerOptions } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import './assets/icons';
+import { localStorageService } from './utils/localStorageService';
+
+// Initialize dark mode at startup
+if (localStorageService.isDarkMode()) {
+  document.body.classList.add('dark');
+  document.body.classList.add('dark-mode');
+}
 
 const app = createApp(App);
 
