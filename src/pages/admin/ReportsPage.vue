@@ -827,126 +827,138 @@
               </div>
 
               <!-- Nova seção de Cycle Time -->
-              <div class="reports-card cycle-time-trend">
-                <div class="cycle-time-trend-header">
-                  <h2>TEMPO DE RESOLUÇÃO POR PERÍODO</h2>
-                  <div class="header-actions">
-                    <select
-                      v-model="selectedCycleTimePeriod"
-                      class="period-select"
-                      @change="handleCycleTimePeriodChange"
-                    >
-                      <option value="week">Por Semana</option>
-                      <option value="month">Por Mês</option>
-                      <option value="quarter">Por Trimestre</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="cycle-time-info">
-                  <p v-if="getLatestResolutionTime() > 0">
-                    O tempo médio de resolução da sua empresa foi de
-                    <strong>{{ formatTimeInSeconds(getLatestResolutionTime() * 3600) }}</strong>
-                    {{ periodTextMap[selectedCycleTimePeriod] }} {{ getPeriodName() }}.
-                  </p>
-                  <p
-                    v-if="getLatestResolutionTime() > 0 && hasPreviousPeriodData()"
-                    class="comparison-text"
-                  >
-                    Isso é
-                    <span
-                      :class="getResolutionTimeTrend() > 0 ? 'percentage-up' : 'percentage-down'"
-                    >
-                      {{ getResolutionTimeTrend() > 0 ? '+' : '' }}{{ getResolutionTimeTrend() }}%
-                      {{ getResolutionTimeTrend() > 0 ? 'mais' : 'menos' }}
-                    </span>
-                    que {{ getPreviousPeriodLabel() }}
-                  </p>
-                  <p v-else-if="getLatestResolutionTime() === 0" class="no-data-message">
-                    Não houveram tickets resolvidos
-                    <span v-if="selectedCycleTimePeriod === 'week'">na última semana</span>
-                    <span v-else-if="selectedCycleTimePeriod === 'month'">no último mês</span>
-                    <span v-else>no último trimestre</span>
-                  </p>
-                  <p class="average-info" v-if="getAverageResolutionTime() > 0">
-                    Média:
-                    <strong>{{ formatTimeInSeconds(getAverageResolutionTime() * 3600) }}</strong>
-                  </p>
-                </div>
-
-                <div class="cycle-time-chart">
-                  <div v-if="cycleTimeChartLoading" class="chart-loading-state">
-                    <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                    <p class="loading-text">Atualizando gráfico...</p>
-                  </div>
-                  <Bar
-                    v-else
-                    :data="cycleTimeBarData"
-                    :options="cycleTimeBarOptions"
-                    height="300"
-                    :key="`cycle-time-chart-${chartRenderKey}`"
-                  />
-                </div>
-              </div>
-
-              <!-- Nova seção de Tempo de Ciclo por Estado do Workflow -->
-              <div class="reports-card cycle-time-workflow">
-                <div class="cycle-time-workflow-header">
-                  <h2>TEMPO DE DURAÇÃO POR STATUS</h2>
-                </div>
-
-                <div class="workflow-analysis">
-                  <div class="workflow-description">
-                    <p>
-                      Quanto tempo as tarefas permanecem em cada status? Os status em que as tarefas
-                      permaneceram mais tempo foram:
-                    </p>
-                    <div v-if="sortedStatusDurations.length" class="workflow-state-list">
-                      <div
-                        v-for="(duration, index) in sortedStatusDurations.slice(0, 2)"
-                        :key="index"
-                        class="state-item"
+              <div class="charts-grid">
+                <!-- Cycle Time Trend Chart -->
+                <div class="reports-card cycle-time-trend">
+                  <div class="cycle-time-trend-header">
+                    <h2>TEMPO DE RESOLUÇÃO POR PERÍODO</h2>
+                    <div class="header-actions">
+                      <select
+                        v-model="selectedCycleTimePeriod"
+                        class="period-select"
+                        @change="handleCycleTimePeriodChange"
                       >
-                        <span class="state-name">{{
-                          formatSnakeToNaturalCase(duration.status)
-                        }}</span>
-                        <span class="state-time">{{
-                          formatTimeInSeconds(duration.averageDurationSeconds)
-                        }}</span>
-                      </div>
+                        <option value="week">Por Semana</option>
+                        <option value="month">Por Mês</option>
+                        <option value="quarter">Por Trimestre</option>
+                      </select>
                     </div>
-                    <div v-else class="workflow-state-list">
-                      <div class="state-item">
-                        <span class="state-name">Carregando dados...</span>
-                      </div>
-                    </div>
-                    <p class="workflow-note">
-                      Estas são médias para as tarefas concluídas nos últimos 3 meses.
+                  </div>
+
+                  <div class="cycle-time-info">
+                    <p v-if="getLatestResolutionTime() > 0">
+                      O tempo médio de resolução da sua empresa foi de
+                      <strong>{{ formatTimeInSeconds(getLatestResolutionTime() * 3600) }}</strong>
+                      {{ periodTextMap[selectedCycleTimePeriod] }} {{ getPeriodName() }}.
+                    </p>
+                    <p
+                      v-if="getLatestResolutionTime() > 0 && hasPreviousPeriodData()"
+                      class="comparison-text"
+                    >
+                      Isso é
+                      <span
+                        :class="getResolutionTimeTrend() > 0 ? 'percentage-up' : 'percentage-down'"
+                      >
+                        {{ getResolutionTimeTrend() > 0 ? '+' : '' }}{{ getResolutionTimeTrend() }}%
+                        {{ getResolutionTimeTrend() > 0 ? 'mais' : 'menos' }}
+                      </span>
+                      que {{ getPreviousPeriodLabel() }}
+                    </p>
+                    <p v-else-if="getLatestResolutionTime() === 0" class="no-data-message">
+                      Não houveram tickets resolvidos
+                      <span v-if="selectedCycleTimePeriod === 'week'">na última semana</span>
+                      <span v-else-if="selectedCycleTimePeriod === 'month'">no último mês</span>
+                      <span v-else>no último trimestre</span>
+                    </p>
+                    <p class="average-info" v-if="getAverageResolutionTime() > 0">
+                      Média:
+                      <strong>{{ formatTimeInSeconds(getAverageResolutionTime() * 3600) }}</strong>
                     </p>
                   </div>
 
                   <div class="cycle-time-chart">
-                    <div class="chart-bars">
-                      <template v-if="sortedDepartmentsByResolutionTime.length">
+                    <div v-if="cycleTimeChartLoading" class="chart-loading-state">
+                      <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                      <p class="loading-text">Atualizando gráfico...</p>
+                    </div>
+                    <Bar
+                      v-else
+                      :data="cycleTimeBarData"
+                      :options="cycleTimeBarOptions"
+                      height="300"
+                      :key="`cycle-time-chart-${chartRenderKey}`"
+                    />
+                  </div>
+                </div>
+
+                <!-- Nova seção de Tempo de Ciclo por Estado do Workflow -->
+                <div class="reports-card cycle-time-workflow">
+                  <div class="cycle-time-workflow-header">
+                    <h2>TEMPO DE DURAÇÃO POR STATUS</h2>
+                  </div>
+
+                  <div class="workflow-analysis">
+                    <div class="workflow-description">
+                      <p>
+                        Quanto tempo as tarefas permanecem em cada status? Os status em que as
+                        tarefas permaneceram mais tempo foram:
+                      </p>
+                      <div v-if="sortedStatusDurations.length" class="workflow-state-list">
                         <div
-                          v-for="(duration, index) in sortedStatusDurations"
+                          v-for="(duration, index) in sortedStatusDurations.slice(0, 2)"
                           :key="index"
-                          class="chart-item"
+                          class="state-item"
                         >
-                          <span class="chart-label">{{
+                          <span class="state-name">{{
                             formatSnakeToNaturalCase(duration.status)
                           }}</span>
-                          <div
-                            v-if="duration.averageDurationSeconds > 0"
-                            class="chart-bar"
-                            :style="{
-                              width: `${(duration.averageDurationSeconds / sortedStatusDurations[0].averageDurationSeconds) * 100}%`,
-                            }"
-                          >
-                            {{ formatTimeInSeconds(duration.averageDurationSeconds) }}
-                          </div>
+                          <span class="state-time">{{
+                            formatTimeInSecondsCompact(duration.averageDurationSeconds)
+                          }}</span>
                         </div>
-                      </template>
+                      </div>
+                      <div v-else class="workflow-state-list">
+                        <div class="state-item">
+                          <span class="state-name">Carregando dados...</span>
+                        </div>
+                      </div>
+                      <p class="workflow-note">
+                        Estas são médias para as tarefas concluídas nos últimos 3 meses.
+                      </p>
+                    </div>
+
+                    <div class="cycle-time-chart">
+                      <div class="chart-bars">
+                        <template v-if="sortedDepartmentsByResolutionTime.length">
+                          <div
+                            v-for="(duration, index) in sortedStatusDurations"
+                            :key="index"
+                            class="chart-item"
+                          >
+                            <span class="chart-label">{{
+                              formatSnakeToNaturalCase(duration.status)
+                            }}</span>
+                            <div
+                              v-if="duration.averageDurationSeconds > 0"
+                              class="chart-bar"
+                              :class="{
+                                'short-bar':
+                                  duration.averageDurationSeconds /
+                                    sortedStatusDurations[0].averageDurationSeconds <
+                                  0.05,
+                              }"
+                              :style="{
+                                width: `${(duration.averageDurationSeconds / sortedStatusDurations[0].averageDurationSeconds) * 100}%`,
+                              }"
+                              :data-duration="
+                                formatTimeInSecondsCompact(duration.averageDurationSeconds)
+                              "
+                            >
+                              {{ formatTimeInSecondsCompact(duration.averageDurationSeconds) }}
+                            </div>
+                          </div>
+                        </template>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -955,69 +967,54 @@
               <!-- Seção de Ciclo de Tempo Em Andamento -->
               <div class="reports-card cycle-time-progress">
                 <div class="cycle-time-progress-header">
-                  <h2>TEMPO GASTO NO STATUS "EM ANDAMENTO" (Mocked)</h2>
+                  <h2>TEMPO GASTO NO STATUS "EM ANDAMENTO"</h2>
                 </div>
 
                 <div class="progress-analysis">
                   <div class="progress-info">
-                    <p>
+                    <p v-if="inProgressTimeSeries?.data?.length">
                       O tempo médio foi de
-                      <strong>18h 29m</strong> para os
-                      <span class="highlight">50 tasks</span> completados durante os últimos
-                      <span class="highlight">3 meses</span>.
+                      <strong>{{ formatTimeInHours(inProgressTimeSeries.averageDuration) }}</strong>
+                      para
+                      <span class="highlight">{{ getTotalInProgressCount() }} tickets</span> nos
+                      últimos <span class="highlight">6 meses</span>.
                     </p>
-                    <p class="trend-info">
-                      Isso é <span class="percentage-up">100% mais</span> que em 16 de Janeiro, 2025
-                      (aumento é considerado ruim).
+                    <p class="trend-info" v-if="getInProgressTrend() !== 0">
+                      Isso é
+                      <span :class="getInProgressTrend() > 0 ? 'percentage-up' : 'percentage-down'">
+                        {{ Math.abs(getInProgressTrend()) }}%
+                        {{ getInProgressTrend() > 0 ? 'mais' : 'menos' }}
+                      </span>
+                      que no mês anterior
+                      {{
+                        getInProgressTrend() > 0
+                          ? '(aumento é considerado ruim)'
+                          : '(diminuição é positiva)'
+                      }}.
                     </p>
                   </div>
 
-                  <div class="progress-chart">
-                    <div class="time-axis">
-                      <span>21h</span>
-                      <span>19h</span>
-                      <span>17h</span>
-                      <span>15h</span>
-                      <span>13h</span>
-                      <span>11h</span>
-                      <span>9h</span>
-                      <span>7h</span>
-                      <span>5h</span>
-                      <span>3h</span>
-                      <span>1h</span>
-                    </div>
-                    <div class="chart-area">
-                      <div class="trend-line">
-                        <svg class="line-chart" viewBox="0 0 800 200" preserveAspectRatio="none">
-                          <path
-                            d="M0,180 L100,175 L200,170 L300,165 L400,160 L500,140 L600,100 L700,50 L800,30"
-                            class="trend-path"
-                          />
-                        </svg>
-                      </div>
-                      <div class="date-axis">
-                        <span>Jan 16</span>
-                        <span>Jan 28</span>
-                        <span>Feb 5</span>
-                        <span>Feb 15</span>
-                        <span>Mar 2</span>
-                        <span>Mar 17</span>
-                        <span>Mar 27</span>
-                        <span>Abr 11</span>
-                        <span>Abr 16</span>
-                      </div>
+                  <div class="chart-container mt-4">
+                    <Line
+                      v-if="inProgressTimeChartData"
+                      :data="inProgressTimeChartData"
+                      :options="inProgressTimeChartOptions"
+                    />
+                    <div v-else class="loading-state">
+                      <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                      <p class="loading-text">Carregando dados...</p>
                     </div>
                   </div>
 
-                  <div class="progress-stats" v-if="inProgressDuration">
+                  <div class="progress-stats" v-if="inProgressTimeSeries">
                     <div class="stat-item">
                       <span class="stat-value">{{
-                        formatTimeInSeconds(inProgressDuration.averageDurationSeconds)
+                        formatTimeInHours(inProgressTimeSeries.averageDuration)
                       }}</span>
-                      <span class="stat-label">Média últimos 3 meses</span>
+                      <span class="stat-label">Média últimos 6 meses</span>
                     </div>
                     <div class="stat-item">
-                      <span class="stat-value">{{ inProgressDuration.count }}</span>
+                      <span class="stat-value">{{ getTotalInProgressCount() }}</span>
                       <span class="stat-label">Número de tickets</span>
                     </div>
                   </div>
@@ -1100,6 +1097,8 @@ import type {
   ResolutionTimeResponseDto,
   ResolutionTimeDataDto,
   ResolutionTimeAverageDto,
+  StatusDurationTimeSeriesResponseDto,
+  StatusDurationTimePointDto,
 } from '@/services/reportService';
 import { TicketActionType, TicketStatus, type TicketUpdate } from '@/models';
 import DatePicker from 'vue-datepicker-next';
@@ -1108,6 +1107,7 @@ import {
   formatSnakeToNaturalCase,
   formatTimeCompact,
   formatTimeInSeconds,
+  formatTimeInSecondsCompact,
 } from '@/utils/generic-helper';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 ChartJS.register(ChartDataLabels);
@@ -1424,7 +1424,8 @@ const loadData = async () => {
       recentTicketsResult,
       statusDurationsResult,
       departmentStatsResult,
-      resolutionTimeResult, // Add this new result
+      resolutionTimeResult,
+      inProgressTimeSeriesResult, // Add this new result
     ] = await Promise.all([
       reportService.getTenantStatistics(),
       reportService.getTicketTrends(selectedTrendPeriod.value),
@@ -1433,7 +1434,8 @@ const loadData = async () => {
       ticketService.getTenantRecentTickets(10),
       reportService.getStatusDurations(selectedStatsPeriod.value),
       reportService.getTenantDepartmentsStatistics(),
-      reportService.getResolutionTimeData(), // Add this new API call
+      reportService.getResolutionTimeData(),
+      reportService.getStatusDurationTimeSeries(TicketStatus.InProgress), // Add this new API call
     ]);
 
     // Initialize trendData with the current period data
@@ -1499,6 +1501,9 @@ const loadData = async () => {
 
     cycleTimeData.value = resolutionTimeResult.data;
     cycleTimeAverage.value = resolutionTimeResult.average;
+
+    // Store the result in the reactive property
+    inProgressTimeSeries.value = inProgressTimeSeriesResult;
   } catch (err: unknown) {
     console.error('Erro ao carregar dados dos relatórios:', err);
     error.value = 'Ocorreu um erro ao carregar os dados. Por favor, tente novamente.';
@@ -1965,6 +1970,7 @@ const periodTextMap: Record<'week' | 'month' | 'quarter', string> = {
 
 const cycleTimeData = ref<ResolutionTimeDataDto | null>(null);
 const cycleTimeAverage = ref<ResolutionTimeAverageDto | null>(null);
+const inProgressTimeSeries = ref<StatusDurationTimeSeriesResponseDto | null>(null);
 
 const getLatestResolutionTime = () => {
   if (!cycleTimeData.value) return 0;
@@ -2134,6 +2140,141 @@ const getPreviousPeriodLabel = () => {
 
   return `${label} anterior (${getPreviousPeriodName()})`;
 };
+
+// Replace the inProgressTimeChartData computed property with properly typed version
+const inProgressTimeChartData = computed(() => {
+  if (!inProgressTimeSeries.value?.data) {
+    return null;
+  }
+
+  const data = inProgressTimeSeries.value.data;
+
+  return {
+    labels: data.map((point: StatusDurationTimePointDto) => point.month),
+    datasets: [
+      {
+        label: 'Tempo em Andamento (horas)',
+        data: data.map((point: StatusDurationTimePointDto) => point.value),
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 6,
+        pointBackgroundColor: '#3b82f6',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointHoverRadius: 8,
+      },
+    ],
+  };
+});
+
+const inProgressTimeChartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: true,
+      position: 'bottom' as const,
+      labels: {
+        usePointStyle: true,
+        padding: 20,
+        font: { size: 12 },
+      },
+    },
+    tooltip: {
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      padding: 12,
+      titleFont: { size: 14 },
+      bodyFont: { size: 13 },
+      callbacks: {
+        label: (context: any) => {
+          const value = context.parsed.y;
+          const hours = Math.floor(value);
+          const minutes = Math.floor((value - hours) * 60);
+          return `${hours}h ${minutes}m`;
+        },
+      },
+    },
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      title: {
+        display: true,
+        text: 'Tempo (horas)',
+        font: {
+          size: 12,
+        },
+      },
+      ticks: {
+        callback: function (value: any) {
+          return `${value}h`;
+        },
+      },
+    },
+    x: {
+      grid: {
+        display: false,
+      },
+    },
+  },
+}));
+
+// Format hours with decimal places
+const formatTimeInHours = (hours: number): string => {
+  if (!hours) return '0h';
+
+  const wholeHours = Math.floor(hours);
+  const minutes = Math.floor((hours - wholeHours) * 60);
+
+  if (minutes === 0) {
+    return `${wholeHours}h`;
+  }
+
+  return `${wholeHours}h ${minutes}m`;
+};
+
+// Get total count of tickets in "in progress" status
+const getTotalInProgressCount = (): number => {
+  if (!inProgressTimeSeries.value?.data) return 0;
+
+  return inProgressTimeSeries.value.data.reduce(
+    (sum: number, point: StatusDurationTimePointDto) => sum + point.count,
+    0,
+  );
+};
+
+// Calculate trend between last two months
+const getInProgressTrend = (): number => {
+  if (!inProgressTimeSeries.value?.data || inProgressTimeSeries.value.data.length < 2) {
+    return 0;
+  }
+
+  const data = inProgressTimeSeries.value.data;
+  const currentMonth = data[data.length - 1];
+  const previousMonth = data[data.length - 2];
+
+  if (previousMonth.value === 0 || currentMonth.count === 0 || previousMonth.count === 0) {
+    return 0;
+  }
+
+  const percentChange = ((currentMonth.value - previousMonth.value) / previousMonth.value) * 100;
+  return Math.round(percentChange);
+};
+
+// Add this to your loadData function
+const loadInProgressDuration = async () => {
+  try {
+    inProgressTimeSeries.value = await reportService.getStatusDurationTimeSeries(
+      TicketStatus.InProgress,
+    );
+  } catch (err) {
+    console.error('Error loading in-progress duration data:', err);
+  }
+};
+
+// Add this to the loadData function Promise.all
 </script>
 
 <style scoped>
@@ -3308,6 +3449,26 @@ const getPreviousPeriodLabel = () => {
   font-size: 0.875rem;
   font-weight: 500;
   transition: width 0.3s ease;
+  position: relative;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.chart-bar.short-bar {
+  color: transparent;
+  justify-content: flex-start;
+  overflow: visible;
+  min-width: 3px;
+  padding: 0;
+}
+
+.chart-bar.short-bar::after {
+  content: attr(data-duration);
+  position: absolute;
+  left: 100%;
+  margin-left: 6px;
+  color: #1f2937;
+  white-space: nowrap;
 }
 
 /* Cycle Time Trend Styles */
