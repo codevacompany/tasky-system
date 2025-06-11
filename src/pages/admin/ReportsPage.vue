@@ -127,6 +127,15 @@
               <div class="reports-card created-vs-completed">
                 <div class="created-vs-completed-header">
                   <h2>CRIADOS VS CONCLUÍDOS</h2>
+                  <TabSelector
+                    v-model="selectedTrendPeriod"
+                    :options="[
+                      { value: 'daily', label: 'Diário' },
+                      { value: 'weekly', label: 'Semanal' },
+                      { value: 'monthly', label: 'Mensal' },
+                    ]"
+                    @update:modelValue="updateTrendPeriod"
+                  />
                 </div>
 
                 <div class="created-vs-completed-content">
@@ -172,18 +181,6 @@
                   </div>
 
                   <div class="created-vs-completed-chart">
-                    <div class="period-selector">
-                      <button
-                        v-for="period in ['daily', 'weekly', 'monthly']"
-                        :key="period"
-                        @click="updateTrendPeriod(period as 'daily' | 'weekly' | 'monthly')"
-                        :class="['period-button', { active: selectedTrendPeriod === period }]"
-                      >
-                        {{
-                          period === 'daily' ? 'Diário' : period === 'weekly' ? 'Semanal' : 'Mensal'
-                        }}
-                      </button>
-                    </div>
                     <div class="chart-legend" v-if="trendData && trendData.length > 0">
                       <div class="legend-item">
                         <span class="legend-color completed"></span>
@@ -357,11 +354,14 @@
                       {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }} (média)
                     </p>
                   </div>
-                  <div class="cycle-time-filters">
-                    <button class="btn btn-outline secondary">
-                      Por Departamento
-                      <font-awesome-icon icon="chevron-down" />
-                    </button>
+                  <div>
+                    <Select
+                      :options="[
+                        { value: 'department', label: 'Por Setor' },
+                        { value: 'priority', label: 'Por Prioridade' },
+                      ]"
+                      v-model="selectedCycleTimeFilter"
+                    />
                   </div>
                 </div>
 
@@ -406,13 +406,26 @@
                         >
                           <span class="chart-label">{{ dept.departmentName }}</span>
                           <div
-                            v-if="dept.averageResolutionTimeSeconds > 0"
                             class="chart-bar"
-                            :style="{
-                              width: `${(dept.averageResolutionTimeSeconds / sortedDepartmentsByResolutionTime[0].averageResolutionTimeSeconds) * 100}%`,
+                            :class="{
+                              'short-bar':
+                                dept.averageResolutionTimeSeconds /
+                                  sortedDepartmentsByResolutionTime[0]
+                                    .averageResolutionTimeSeconds <
+                                0.05,
+                              'zero-bar': dept.averageResolutionTimeSeconds === 0,
                             }"
+                            :style="{
+                              width:
+                                dept.averageResolutionTimeSeconds === 0
+                                  ? '3px'
+                                  : `${(dept.averageResolutionTimeSeconds / sortedDepartmentsByResolutionTime[0].averageResolutionTimeSeconds) * 100}%`,
+                            }"
+                            :data-duration="
+                              formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds)
+                            "
                           >
-                            {{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}
+                            {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds) }}
                           </div>
                         </div>
                       </template>
@@ -530,12 +543,6 @@
               <div class="timings-section">
                 <div class="timings-header">
                   <h2 class="timings-title">TEMPOS POR SETOR</h2>
-                  <div class="timings-actions">
-                    <button class="btn btn-outline secondary">
-                      Por Setor
-                      <font-awesome-icon icon="chevron-down" />
-                    </button>
-                  </div>
                 </div>
 
                 <div class="timings-table-container">
@@ -636,13 +643,26 @@
                         >
                           <span class="chart-label">{{ dept.departmentName }}</span>
                           <div
-                            v-if="dept.averageResolutionTimeSeconds > 0"
                             class="chart-bar"
-                            :style="{
-                              width: `${(dept.averageResolutionTimeSeconds / sortedDepartmentsByResolutionTime[0].averageResolutionTimeSeconds) * 100}%`,
+                            :class="{
+                              'short-bar':
+                                dept.averageResolutionTimeSeconds /
+                                  sortedDepartmentsByResolutionTime[0]
+                                    .averageResolutionTimeSeconds <
+                                0.05,
+                              'zero-bar': dept.averageResolutionTimeSeconds === 0,
                             }"
+                            :style="{
+                              width:
+                                dept.averageResolutionTimeSeconds === 0
+                                  ? '3px'
+                                  : `${(dept.averageResolutionTimeSeconds / sortedDepartmentsByResolutionTime[0].averageResolutionTimeSeconds) * 100}%`,
+                            }"
+                            :data-duration="
+                              formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds)
+                            "
                           >
-                            {{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}
+                            {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds) }}
                           </div>
                         </div>
                       </template>
@@ -715,24 +735,34 @@
               <!-- Period Selector at the top of the tab -->
               <div class="stats-period-selector">
                 <label for="statsPeriod" class="stats-period-label">Período de análise:</label>
-                <select
-                  id="statsPeriod"
-                  v-model="selectedStatsPeriod"
-                  class="stats-period-select"
-                  @change="handlePeriodChange"
-                >
-                  <option value="annual">12 meses</option>
-                  <option value="semestral">6 meses</option>
-                  <option value="trimestral">3 meses</option>
-                  <option value="monthly">Último mês</option>
-                  <option value="weekly">Última semana</option>
-                </select>
+                <div>
+                  <Select
+                    v-model="selectedStatsPeriod"
+                    :options="[
+                      { value: 'annual', label: '12 meses' },
+                      { value: 'semestral', label: '6 meses' },
+                      { value: 'trimestral', label: '3 meses' },
+                      { value: 'monthly', label: 'Último mês' },
+                      { value: 'weekly', label: 'Última semana' },
+                    ]"
+                    @update:modelValue="handlePeriodChange"
+                  />
+                </div>
               </div>
 
               <!-- Nova seção Created vs Completed em Tendências -->
               <div class="reports-card created-vs-completed">
                 <div class="created-vs-completed-header">
                   <h2>CRIADOS VS CONCLUÍDOS</h2>
+                  <TabSelector
+                    v-model="selectedTrendPeriod"
+                    :options="[
+                      { value: 'daily', label: 'Diário' },
+                      { value: 'weekly', label: 'Semanal' },
+                      { value: 'monthly', label: 'Mensal' },
+                    ]"
+                    @update:modelValue="updateTrendPeriod"
+                  />
                 </div>
 
                 <div class="created-vs-completed-content">
@@ -742,18 +772,18 @@
                       <span class="highlight">{{ getTotalResolved() }} tickets</span> concluídos no
                       período selecionado
                     </p>
+                    <p class="info-text">
+                      <span class="highlight">{{ getTotalCreated() }} tickets</span> criados no
+                      período selecionado
+                    </p>
                     <p
-                      class="info-text"
+                      class="info-trend"
                       v-if="
                         trendData &&
                         trendData.length > 0 &&
                         (createdTrendPercentage !== 0 || resolvedTrendPercentage !== 0)
                       "
                     >
-                      <span class="highlight">{{ getTotalCreated() }} tickets</span> criados no
-                      período selecionado
-                    </p>
-                    <p class="info-trend" v-if="trendData && trendData.length > 1">
                       Isso é
                       <span
                         v-if="createdTrendPercentage > 0"
@@ -778,18 +808,6 @@
                   </div>
 
                   <div class="created-vs-completed-chart">
-                    <div class="period-selector">
-                      <button
-                        v-for="period in ['daily', 'weekly', 'monthly']"
-                        :key="period"
-                        @click="updateTrendPeriod(period as 'daily' | 'weekly' | 'monthly')"
-                        :class="['period-button', { active: selectedTrendPeriod === period }]"
-                      >
-                        {{
-                          period === 'daily' ? 'Diário' : period === 'weekly' ? 'Semanal' : 'Mensal'
-                        }}
-                      </button>
-                    </div>
                     <div class="chart-legend" v-if="trendData && trendData.length > 0">
                       <div class="legend-item">
                         <span class="legend-color completed"></span>
@@ -833,15 +851,16 @@
                   <div class="cycle-time-trend-header">
                     <h2>TEMPO DE RESOLUÇÃO POR PERÍODO</h2>
                     <div class="header-actions">
-                      <select
+                      <Select
                         v-model="selectedCycleTimePeriod"
-                        class="period-select"
-                        @change="handleCycleTimePeriodChange"
-                      >
-                        <option value="week">Por Semana</option>
-                        <option value="month">Por Mês</option>
-                        <option value="quarter">Por Trimestre</option>
-                      </select>
+                        :options="[
+                          { value: 'week', label: 'Por Semana' },
+                          { value: 'month', label: 'Por Mês' },
+                          { value: 'quarter', label: 'Por Trimestre' },
+                        ]"
+                        @update:modelValue="handleCycleTimePeriodChange"
+                        class="w-40"
+                      />
                     </div>
                   </div>
 
@@ -939,16 +958,19 @@
                               formatSnakeToNaturalCase(duration.status)
                             }}</span>
                             <div
-                              v-if="duration.averageDurationSeconds > 0"
                               class="chart-bar"
                               :class="{
                                 'short-bar':
                                   duration.averageDurationSeconds /
                                     sortedStatusDurations[0].averageDurationSeconds <
                                   0.05,
+                                'zero-bar': duration.averageDurationSeconds === 0,
                               }"
                               :style="{
-                                width: `${(duration.averageDurationSeconds / sortedStatusDurations[0].averageDurationSeconds) * 100}%`,
+                                width:
+                                  duration.averageDurationSeconds === 0
+                                    ? '3px'
+                                    : `${(duration.averageDurationSeconds / sortedStatusDurations[0].averageDurationSeconds) * 100}%`,
                               }"
                               :data-duration="
                                 formatTimeInSecondsCompact(duration.averageDurationSeconds)
@@ -994,28 +1016,30 @@
                     </p>
                   </div>
 
-                  <div class="chart-container mt-4">
-                    <Line
-                      v-if="inProgressTimeChartData"
-                      :data="inProgressTimeChartData"
-                      :options="inProgressTimeChartOptions"
-                    />
-                    <div v-else class="loading-state">
-                      <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                      <p class="loading-text">Carregando dados...</p>
+                  <div class="chart-stats-container">
+                    <div class="chart-container mt-4">
+                      <Line
+                        v-if="inProgressTimeChartData"
+                        :data="inProgressTimeChartData"
+                        :options="inProgressTimeChartOptions"
+                      />
+                      <div v-else class="loading-state">
+                        <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                        <p class="loading-text">Carregando dados...</p>
+                      </div>
                     </div>
-                  </div>
 
-                  <div class="progress-stats" v-if="inProgressTimeSeries">
-                    <div class="stat-item">
-                      <span class="stat-value">{{
-                        formatTimeInHours(inProgressTimeSeries.averageDuration)
-                      }}</span>
-                      <span class="stat-label">Média últimos 6 meses</span>
-                    </div>
-                    <div class="stat-item">
-                      <span class="stat-value">{{ getTotalInProgressCount() }}</span>
-                      <span class="stat-label">Número de tickets</span>
+                    <div class="progress-stats" v-if="inProgressTimeSeries">
+                      <div class="stat-item">
+                        <span class="stat-value">{{
+                          formatTimeInHours(inProgressTimeSeries.averageDuration)
+                        }}</span>
+                        <span class="stat-label">Média últimos 6 meses</span>
+                      </div>
+                      <div class="stat-item">
+                        <span class="stat-value">{{ getTotalInProgressCount() }}</span>
+                        <span class="stat-label">Número de tickets</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1110,6 +1134,8 @@ import {
   formatTimeInSecondsCompact,
 } from '@/utils/generic-helper';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import TabSelector from '@/components/common/TabSelector.vue';
+import Select from '@/components/common/Select.vue';
 ChartJS.register(ChartDataLabels);
 
 // Define the StatsPeriod enum
@@ -1604,6 +1630,7 @@ const priorityChartData = computed(() => ({
 
 // Keep selectedTrendPeriod for chart trend data
 const selectedTrendPeriod = ref<'daily' | 'weekly' | 'monthly'>('weekly');
+const selectedCycleTimeFilter = ref<'department' | 'priority'>('department');
 const trendData = ref<{ date: string; total: number; resolved: number; created: number }[]>([]);
 
 const trendChartData = computed(() => {
@@ -1682,12 +1709,12 @@ const disabledDate = (date: Date) => {
   return date > new Date() || date < new Date(2023, 0, 1);
 };
 
-const updateTrendPeriod = async (period: 'daily' | 'weekly' | 'monthly') => {
-  selectedTrendPeriod.value = period;
+const updateTrendPeriod = async (period: string) => {
+  selectedTrendPeriod.value = period as 'daily' | 'weekly' | 'monthly';
 
   try {
-    const data = await reportService.getTicketTrends(period);
-    trendData.value = data[period];
+    const data = await reportService.getTicketTrends(selectedTrendPeriod.value);
+    trendData.value = data[selectedTrendPeriod.value];
 
     // Just update the UI by triggering reactivity
     loading.value = true;
@@ -2802,11 +2829,16 @@ const loadInProgressDuration = async () => {
 }
 
 .stat-label {
+  font-size: 0.875rem;
   color: #6b7280;
 }
 
 .stat-value {
+  display: block;
+  font-size: 1.25rem;
   font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
 }
 
 /* Period Selector */
@@ -3379,7 +3411,7 @@ const loadInProgressDuration = async () => {
 
 .cycle-time-content {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 500px 1fr;
   gap: 2rem;
 }
 
@@ -3468,6 +3500,24 @@ const loadInProgressDuration = async () => {
   left: 100%;
   margin-left: 6px;
   color: #1f2937;
+  white-space: nowrap;
+}
+
+.chart-bar.zero-bar {
+  color: transparent;
+  justify-content: flex-start;
+  overflow: visible;
+  min-width: 3px;
+  padding: 0;
+  background-color: #d1d5db;
+}
+
+.chart-bar.zero-bar::after {
+  content: attr(data-duration);
+  position: absolute;
+  left: 100%;
+  margin-left: 6px;
+  color: #6b7280;
   white-space: nowrap;
 }
 
@@ -3822,10 +3872,23 @@ const loadInProgressDuration = async () => {
 }
 
 .progress-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
+  margin-left: 2rem;
+  min-width: 220px;
+  margin-top: 2rem;
+}
+
+.chart-stats-container {
+  display: flex;
+  align-items: flex-start;
   margin-top: 1rem;
+}
+
+.chart-stats-container .chart-container {
+  flex: 1;
+  min-height: 300px;
 }
 
 .stat-item {
@@ -3870,7 +3933,7 @@ const loadInProgressDuration = async () => {
 
 .created-vs-completed-content {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 400px 1fr;
   gap: 2rem;
 }
 
@@ -4004,23 +4067,15 @@ const loadInProgressDuration = async () => {
   font-size: 0.875rem;
   font-weight: 500;
   color: #6b7280;
-  margin-right: 0.5rem;
+  margin-right: 0.75rem;
 }
 
-.stats-period-select {
-  padding: 0.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
-  background-color: white;
-  color: #1f2937;
-  font-size: 0.875rem;
-  max-width: 150px;
+.stats-period-custom-select {
+  max-width: 180px;
 }
 
-.stats-period-select:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+.cycle-time-custom-select {
+  width: 160px;
 }
 
 .status-chart-flex {
