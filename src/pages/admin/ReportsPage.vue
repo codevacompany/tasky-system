@@ -1044,7 +1044,9 @@
                   <div class="progress-info">
                     <p v-if="inProgressTimeSeries?.data?.length">
                       O tempo médio foi de
-                      <strong>{{ formatTimeInHours(inProgressTimeSeries.averageDuration) }}</strong>
+                      <strong>{{
+                        formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
+                      }}</strong>
                       para
                       <span class="highlight">{{ getTotalInProgressCount() }} tickets</span> nos
                       últimos <span class="highlight">6 meses</span>.
@@ -1080,7 +1082,7 @@
                     <div class="progress-stats" v-if="inProgressTimeSeries">
                       <div class="stat-item">
                         <span class="stat-value">{{
-                          formatTimeInHours(inProgressTimeSeries.averageDuration)
+                          formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
                         }}</span>
                         <span class="stat-label">Média últimos 6 meses</span>
                       </div>
@@ -2229,7 +2231,7 @@ const inProgressTimeChartData = computed(() => {
     labels: data.map((point: StatusDurationTimePointDto) => point.month),
     datasets: [
       {
-        label: 'Tempo em Andamento (horas)',
+        label: 'Tempo em Andamento (segundos)',
         data: data.map((point: StatusDurationTimePointDto) => point.value),
         borderColor: '#3b82f6',
         backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -2266,9 +2268,7 @@ const inProgressTimeChartOptions = computed(() => ({
       callbacks: {
         label: (context: any) => {
           const value = context.parsed.y;
-          const hours = Math.floor(value);
-          const minutes = Math.floor((value - hours) * 60);
-          return `${hours}h ${minutes}m`;
+          return formatTimeInSeconds(value);
         },
       },
     },
@@ -2278,14 +2278,14 @@ const inProgressTimeChartOptions = computed(() => ({
       beginAtZero: true,
       title: {
         display: true,
-        text: 'Tempo (horas)',
+        text: 'Tempo',
         font: {
           size: 12,
         },
       },
       ticks: {
         callback: function (value: any) {
-          return `${value}h`;
+          return formatTimeInSecondsCompact(value);
         },
       },
     },
