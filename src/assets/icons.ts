@@ -78,6 +78,10 @@ import {
   faEdit,
   faEllipsisV,
   faTrash,
+  faFilter,
+  faFileExport,
+  faDownload,
+  faCalendar,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -167,6 +171,10 @@ const icons = [
   faEdit,
   faEllipsisV,
   faTrash,
+  faFilter,
+  faFileExport,
+  faDownload,
+  faCalendar,
 ];
 
 library.add(...icons);
