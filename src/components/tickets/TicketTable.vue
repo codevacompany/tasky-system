@@ -46,11 +46,13 @@
               />
             </td>
             <td v-if="tableType === 'criados'">
-              {{ ticket.targetUser ? ticket.targetUser.firstName + ' ' + ticket.targetUser.lastName : '-' }}
+              {{
+                ticket.targetUser
+                  ? ticket.targetUser.firstName + ' ' + ticket.targetUser.lastName
+                  : '-'
+              }}
             </td>
-            <td v-else>
-              {{ ticket.requester.firstName }} {{ ticket.requester.lastName }}
-            </td>
+            <td v-else>{{ ticket.requester.firstName }} {{ ticket.requester.lastName }}</td>
             <td>{{ ticket.department.name }}</td>
             <td>
               <div class="priority-wrapper">
@@ -576,9 +578,7 @@ const handleVerifyTicket = async (ticket: Ticket) => {
 
         await refreshTickets();
 
-        if (selectedTicket.value?.customId === ticket.customId) {
-          await ticketsStore.fetchTicketDetails(ticket.customId);
-        }
+        await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
         toast.error('Erro ao enviar o ticket para revisão');
       }
@@ -595,9 +595,7 @@ const handleApproveTicket = async (ticket: Ticket) => {
         await ticketService.approve(ticket.customId);
         toast.success('Ticket aprovado com sucesso');
 
-        if (selectedTicket.value?.customId === ticket.customId) {
-          await ticketsStore.fetchTicketDetails(ticket.customId);
-        }
+        await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
         toast.error('Erro ao aprovar o ticket');
       }
@@ -623,9 +621,7 @@ const handleRequestCorrection = async (ticket: Ticket) => {
 
         toast.success('Correção solicitada com sucesso');
 
-        if (selectedTicket.value?.customId === ticket.customId) {
-          await ticketsStore.fetchTicketDetails(ticket.customId);
-        }
+        await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
         toast.error('Erro ao solicitar correção');
       }
@@ -653,9 +649,7 @@ const handleRejectTicket = async (ticket: Ticket) => {
 
         toast.success('Ticket reprovado com sucesso');
 
-        if (selectedTicket.value?.customId === ticket.customId) {
-          await ticketsStore.fetchTicketDetails(ticket.customId);
-        }
+        await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
         toast.error('Erro ao reprovar o ticket');
       }
@@ -674,9 +668,7 @@ const handleStartVerification = async (ticket: Ticket) => {
     selectedTicket.value = ticketResponse.data.ticketData;
     isModalOpen.value = true;
 
-    if (selectedTicket.value?.customId === ticket.customId) {
-      await ticketsStore.fetchTicketDetails(ticket.customId);
-    }
+    await ticketsStore.fetchTicketDetails(ticket.customId);
   } catch {
     toast.error('Erro ao iniciar verificação');
   }
@@ -699,9 +691,7 @@ const handleCorrectTicket = async (ticket: Ticket) => {
         await ticketService.updateStatus(ticket.customId, { status: TicketStatus.InProgress });
         toast.success('Ticket em correção');
 
-        if (selectedTicket.value?.customId === ticket.customId) {
-          await ticketsStore.fetchTicketDetails(ticket.customId);
-        }
+        await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
         toast.error('Erro ao iniciar correção');
       }

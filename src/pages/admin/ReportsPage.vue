@@ -127,6 +127,15 @@
               <div class="reports-card created-vs-completed">
                 <div class="created-vs-completed-header">
                   <h2>CRIADOS VS CONCLUÍDOS</h2>
+                  <TabSelector
+                    v-model="selectedTrendPeriod"
+                    :options="[
+                      { value: 'daily', label: 'Diário' },
+                      { value: 'weekly', label: 'Semanal' },
+                      { value: 'monthly', label: 'Mensal' },
+                    ]"
+                    @update:modelValue="updateTrendPeriod"
+                  />
                 </div>
 
                 <div class="created-vs-completed-content">
@@ -172,39 +181,6 @@
                   </div>
 
                   <div class="created-vs-completed-chart">
-                    <div class="period-selector">
-                      <button
-                        v-for="period in ['daily', 'weekly', 'monthly']"
-                        :key="period"
-                        @click="updateTrendPeriod(period as 'daily' | 'weekly' | 'monthly')"
-                        :class="['period-button', { active: selectedTrendPeriod === period }]"
-                      >
-                        {{
-                          period === 'daily' ? 'Diário' : period === 'weekly' ? 'Semanal' : 'Mensal'
-                        }}
-                      </button>
-                    </div>
-                    <div class="chart-legend" v-if="trendData && trendData.length > 0">
-                      <div class="legend-item">
-                        <span class="legend-color completed"></span>
-                        <span>Concluídos (no período)</span>
-                        <span class="legend-value">{{ getTotalResolved() }}</span>
-                        <span v-if="resolvedTrendPercentage !== 0" class="legend-trend">
-                          {{ resolvedTrendPercentage >= 0 ? '↑' : '↓' }}
-                          {{ Math.abs(resolvedTrendPercentage) }}%
-                        </span>
-                      </div>
-                      <div class="legend-item">
-                        <span class="legend-color created"></span>
-                        <span>Criados (no período)</span>
-                        <span class="legend-value">{{ getTotalCreated() }}</span>
-                        <span v-if="createdTrendPercentage !== 0" class="legend-trend">
-                          {{ createdTrendPercentage >= 0 ? '↑' : '↓' }}
-                          {{ Math.abs(createdTrendPercentage) }}%
-                        </span>
-                      </div>
-                    </div>
-
                     <div class="chart-container">
                       <Line
                         v-if="trendData && trendData.length > 0"
@@ -348,74 +324,170 @@
                 </div>
               </div>
 
-              <!-- Cycle Time per Segment -->
-              <div class="reports-card cycle-time-section">
-                <div class="cycle-time-header">
-                  <div class="cycle-time-title">
-                    <h3>Tempo de Resolução Por Segmento:</h3>
-                    <p>
-                      {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }} (média)
-                    </p>
+              <div class="charts-grid cycle-time-section">
+                <!-- Cycle Time per Segment -->
+                <div class="reports-card">
+                  <div class="cycle-time-header">
+                    <div class="cycle-time-title">
+                      <h3>Tempo de Resolução Por Segmento:</h3>
+                      <p>
+                        {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }} (média)
+                      </p>
+                    </div>
+                    <div>
+                      <Select
+                        :options="[
+                          { value: 'department', label: 'Por Setor' },
+                          { value: 'priority', label: 'Por Prioridade' },
+                        ]"
+                        v-model="selectedCycleTimeFilter"
+                      />
+                    </div>
                   </div>
-                  <div class="cycle-time-filters">
-                    <button class="btn btn-outline secondary">
-                      Por Departamento
-                      <font-awesome-icon icon="chevron-down" />
-                    </button>
+
+                  <div class="cycle-time-content">
+                    <div class="cycle-time-info">
+                      <p class="info-title">Setores com maior tempo de resolução:</p>
+                      <div class="info-list">
+                        <div
+                          v-for="dept in departmentsWithLongestResolutionTime"
+                          :key="dept.departmentId"
+                          class="info-item"
+                        >
+                          <span class="label">{{ dept.departmentName }}</span>
+                          <span class="time">{{
+                            formatTimeInSeconds(dept.averageResolutionTimeSeconds)
+                          }}</span>
+                        </div>
+                      </div>
+
+                      <p class="info-title mt-4">Setores com menor tempo de resolução:</p>
+                      <div class="info-list">
+                        <div
+                          v-for="dept in departmentsWithShortestResolutionTime"
+                          :key="dept.departmentId"
+                          class="info-item"
+                        >
+                          <span class="label">{{ dept.departmentName }}</span>
+                          <span class="time">{{
+                            formatTimeInSeconds(dept.averageResolutionTimeSeconds)
+                          }}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="cycle-time-chart">
+                      <div class="chart-bars">
+                        <template v-if="sortedDepartmentsByResolutionTime.length">
+                          <div
+                            v-for="dept in sortedDepartmentsByResolutionTime"
+                            :key="dept.departmentId"
+                            class="chart-item"
+                          >
+                            <span class="chart-label">{{ dept.departmentName }}</span>
+                            <div
+                              class="chart-bar"
+                              :class="{
+                                'short-bar':
+                                  dept.averageResolutionTimeSeconds /
+                                    sortedDepartmentsByResolutionTime[0]
+                                      .averageResolutionTimeSeconds <
+                                  0.05,
+                                'zero-bar': dept.averageResolutionTimeSeconds === 0,
+                              }"
+                              :style="{
+                                width:
+                                  dept.averageResolutionTimeSeconds === 0
+                                    ? '3px'
+                                    : `${(dept.averageResolutionTimeSeconds / sortedDepartmentsByResolutionTime[0].averageResolutionTimeSeconds) * 100}%`,
+                              }"
+                              :data-duration="
+                                formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds)
+                              "
+                            >
+                              {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds) }}
+                            </div>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div class="cycle-time-content">
-                  <div class="cycle-time-info">
-                    <p class="info-title">Setores com maior tempo de resolução:</p>
-                    <div class="info-list">
-                      <div
-                        v-for="dept in departmentsWithLongestResolutionTime"
-                        :key="dept.departmentId"
-                        class="info-item"
-                      >
-                        <span class="label">{{ dept.departmentName }}</span>
-                        <span class="time">{{
-                          formatTimeInSeconds(dept.averageResolutionTimeSeconds)
-                        }}</span>
-                      </div>
-                    </div>
-
-                    <p class="info-title mt-4">Setores com menor tempo de resolução:</p>
-                    <div class="info-list">
-                      <div
-                        v-for="dept in departmentsWithShortestResolutionTime"
-                        :key="dept.departmentId"
-                        class="info-item"
-                      >
-                        <span class="label">{{ dept.departmentName }}</span>
-                        <span class="time">{{
-                          formatTimeInSeconds(dept.averageResolutionTimeSeconds)
-                        }}</span>
-                      </div>
-                    </div>
+                <!-- Top Colaboradores -->
+                <div class="reports-card top-contributors-card">
+                  <div class="top-contributors-header">
+                    <h2 class="top-contributors-title">Top Colaboradores</h2>
+                    <p class="top-contributors-subtitle">Últimos 3 meses</p>
                   </div>
 
-                  <div class="cycle-time-chart">
-                    <div class="chart-bars">
-                      <template v-if="sortedDepartmentsByResolutionTime.length">
-                        <div
-                          v-for="dept in sortedDepartmentsByResolutionTime"
-                          :key="dept.departmentId"
-                          class="chart-item"
-                        >
-                          <span class="chart-label">{{ dept.departmentName }}</span>
-                          <div
-                            v-if="dept.averageResolutionTimeSeconds > 0"
-                            class="chart-bar"
-                            :style="{
-                              width: `${(dept.averageResolutionTimeSeconds / sortedDepartmentsByResolutionTime[0].averageResolutionTimeSeconds) * 100}%`,
-                            }"
-                          >
-                            {{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}
+                  <div class="top-contributors-table">
+                    <!-- Table Headers -->
+                    <div class="contributors-table-header">
+                      <div class="header-profile">Perfil</div>
+                      <div class="header-tickets">Tickets resolvidos</div>
+                      <div class="header-rate">Taxa de resolução</div>
+                      <div class="header-total">Tickets totais</div>
+                    </div>
+
+                    <!-- Table Content -->
+                    <div
+                      v-if="topUsers && topUsers.users.length > 0"
+                      class="contributors-table-body"
+                    >
+                      <div
+                        v-for="user in topUsers.users"
+                        :key="user.userId"
+                        class="contributor-row"
+                      >
+                        <div class="contributor-profile">
+                          <div class="contributor-avatar" :class="getAvatarColorClass(user.userId)">
+                            <div v-if="!user.avatarUrl" class="avatar-placeholder">
+                              {{ getInitials(user.firstName, user.lastName) }}
+                            </div>
+                            <img
+                              v-else
+                              :src="user.avatarUrl"
+                              :alt="user.firstName"
+                              class="avatar-image"
+                            />
+                          </div>
+                          <div class="contributor-info">
+                            <h4 class="contributor-name">
+                              {{ user.firstName }} {{ user.lastName }}
+                            </h4>
+                            <p class="contributor-role">{{ user.departmentName }}</p>
                           </div>
                         </div>
-                      </template>
+
+                        <div class="contributor-tickets">
+                          <span class="ticket-count">{{ user.resolvedTickets }}</span>
+                        </div>
+
+                        <div class="contributor-rate">
+                          <span
+                            :class="[
+                              'status-indicator',
+                              getResolutionRateClass(user.resolutionRate),
+                            ]"
+                          >
+                            {{ formatPercentage(user.resolutionRate) }}
+                          </span>
+                        </div>
+
+                        <div class="contributor-total">
+                          <span class="total-count">{{ user.totalTickets }}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div v-else-if="loading" class="loading-contributors">
+                      <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                      <p>Carregando colaboradores...</p>
+                    </div>
+
+                    <div v-else class="no-contributors">
+                      <p>Nenhum colaborador encontrado nos últimos 3 meses.</p>
                     </div>
                   </div>
                 </div>
@@ -439,7 +511,7 @@
                   </div>
                   <div class="department-stats">
                     <div class="stat-row">
-                      <span class="stat-label">Total de Chamados</span>
+                      <span class="stat-label">Total de Tickets</span>
                       <span class="stat-value">{{ dept.totalTickets }}</span>
                     </div>
                     <div class="stat-row">
@@ -496,6 +568,16 @@
                     <div class="task-column time-progress">TEMPO EM ANDAMENTO</div>
                   </div>
 
+                  <div v-if="loadingInProgressTasks" class="loading-tasks">
+                    <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                    <p class="loading-text">Carregando tickets em andamento...</p>
+                  </div>
+
+                  <div v-else-if="inProgressTasks.length === 0" class="no-tasks-message">
+                    <font-awesome-icon icon="info-circle" class="info-icon" />
+                    <p>Não há tickets em andamento no momento.</p>
+                  </div>
+
                   <div v-for="task in inProgressTasks" :key="task.id" class="task-row">
                     <div class="task-column assignees">
                       <div class="avatar-group">
@@ -530,12 +612,6 @@
               <div class="timings-section">
                 <div class="timings-header">
                   <h2 class="timings-title">TEMPOS POR SETOR</h2>
-                  <div class="timings-actions">
-                    <button class="btn btn-outline secondary">
-                      Por Setor
-                      <font-awesome-icon icon="chevron-down" />
-                    </button>
-                  </div>
                 </div>
 
                 <div class="timings-table-container">
@@ -636,13 +712,26 @@
                         >
                           <span class="chart-label">{{ dept.departmentName }}</span>
                           <div
-                            v-if="dept.averageResolutionTimeSeconds > 0"
                             class="chart-bar"
-                            :style="{
-                              width: `${(dept.averageResolutionTimeSeconds / sortedDepartmentsByResolutionTime[0].averageResolutionTimeSeconds) * 100}%`,
+                            :class="{
+                              'short-bar':
+                                dept.averageResolutionTimeSeconds /
+                                  sortedDepartmentsByResolutionTime[0]
+                                    .averageResolutionTimeSeconds <
+                                0.05,
+                              'zero-bar': dept.averageResolutionTimeSeconds === 0,
                             }"
+                            :style="{
+                              width:
+                                dept.averageResolutionTimeSeconds === 0
+                                  ? '3px'
+                                  : `${(dept.averageResolutionTimeSeconds / sortedDepartmentsByResolutionTime[0].averageResolutionTimeSeconds) * 100}%`,
+                            }"
+                            :data-duration="
+                              formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds)
+                            "
                           >
-                            {{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}
+                            {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds) }}
                           </div>
                         </div>
                       </template>
@@ -668,7 +757,7 @@
                   </div>
                   <div class="department-stats">
                     <div class="stat-row">
-                      <span class="stat-label">Total de Chamados</span>
+                      <span class="stat-label">Total de Tickets</span>
                       <span class="stat-value">{{ dept.totalTickets }}</span>
                     </div>
                     <div class="stat-row">
@@ -715,24 +804,34 @@
               <!-- Period Selector at the top of the tab -->
               <div class="stats-period-selector">
                 <label for="statsPeriod" class="stats-period-label">Período de análise:</label>
-                <select
-                  id="statsPeriod"
-                  v-model="selectedStatsPeriod"
-                  class="stats-period-select"
-                  @change="handlePeriodChange"
-                >
-                  <option value="annual">12 meses</option>
-                  <option value="semestral">6 meses</option>
-                  <option value="trimestral">3 meses</option>
-                  <option value="monthly">Último mês</option>
-                  <option value="weekly">Última semana</option>
-                </select>
+                <div>
+                  <Select
+                    v-model="selectedStatsPeriod"
+                    :options="[
+                      { value: 'annual', label: '12 meses' },
+                      { value: 'semestral', label: '6 meses' },
+                      { value: 'trimestral', label: '3 meses' },
+                      { value: 'monthly', label: 'Último mês' },
+                      { value: 'weekly', label: 'Última semana' },
+                    ]"
+                    @update:modelValue="handlePeriodChange"
+                  />
+                </div>
               </div>
 
               <!-- Nova seção Created vs Completed em Tendências -->
               <div class="reports-card created-vs-completed">
                 <div class="created-vs-completed-header">
                   <h2>CRIADOS VS CONCLUÍDOS</h2>
+                  <TabSelector
+                    v-model="selectedTrendPeriod"
+                    :options="[
+                      { value: 'daily', label: 'Diário' },
+                      { value: 'weekly', label: 'Semanal' },
+                      { value: 'monthly', label: 'Mensal' },
+                    ]"
+                    @update:modelValue="updateTrendPeriod"
+                  />
                 </div>
 
                 <div class="created-vs-completed-content">
@@ -742,18 +841,18 @@
                       <span class="highlight">{{ getTotalResolved() }} tickets</span> concluídos no
                       período selecionado
                     </p>
+                    <p class="info-text">
+                      <span class="highlight">{{ getTotalCreated() }} tickets</span> criados no
+                      período selecionado
+                    </p>
                     <p
-                      class="info-text"
+                      class="info-trend"
                       v-if="
                         trendData &&
                         trendData.length > 0 &&
                         (createdTrendPercentage !== 0 || resolvedTrendPercentage !== 0)
                       "
                     >
-                      <span class="highlight">{{ getTotalCreated() }} tickets</span> criados no
-                      período selecionado
-                    </p>
-                    <p class="info-trend" v-if="trendData && trendData.length > 1">
                       Isso é
                       <span
                         v-if="createdTrendPercentage > 0"
@@ -778,39 +877,6 @@
                   </div>
 
                   <div class="created-vs-completed-chart">
-                    <div class="period-selector">
-                      <button
-                        v-for="period in ['daily', 'weekly', 'monthly']"
-                        :key="period"
-                        @click="updateTrendPeriod(period as 'daily' | 'weekly' | 'monthly')"
-                        :class="['period-button', { active: selectedTrendPeriod === period }]"
-                      >
-                        {{
-                          period === 'daily' ? 'Diário' : period === 'weekly' ? 'Semanal' : 'Mensal'
-                        }}
-                      </button>
-                    </div>
-                    <div class="chart-legend" v-if="trendData && trendData.length > 0">
-                      <div class="legend-item">
-                        <span class="legend-color completed"></span>
-                        <span>Concluídos (no período)</span>
-                        <span class="legend-value">{{ getTotalResolved() }}</span>
-                        <span v-if="resolvedTrendPercentage !== 0" class="legend-trend">
-                          {{ resolvedTrendPercentage >= 0 ? '↑' : '↓' }}
-                          {{ Math.abs(resolvedTrendPercentage) }}%
-                        </span>
-                      </div>
-                      <div class="legend-item">
-                        <span class="legend-color created"></span>
-                        <span>Criados (no período)</span>
-                        <span class="legend-value">{{ getTotalCreated() }}</span>
-                        <span v-if="createdTrendPercentage !== 0" class="legend-trend">
-                          {{ createdTrendPercentage >= 0 ? '↑' : '↓' }}
-                          {{ Math.abs(createdTrendPercentage) }}%
-                        </span>
-                      </div>
-                    </div>
-
                     <div class="chart-container">
                       <Line
                         v-if="trendData && trendData.length > 0 && trendChartData"
@@ -827,126 +893,142 @@
               </div>
 
               <!-- Nova seção de Cycle Time -->
-              <div class="reports-card cycle-time-trend">
-                <div class="cycle-time-trend-header">
-                  <h2>TEMPO DE RESOLUÇÃO POR PERÍODO</h2>
-                  <div class="header-actions">
-                    <select
-                      v-model="selectedCycleTimePeriod"
-                      class="period-select"
-                      @change="handleCycleTimePeriodChange"
-                    >
-                      <option value="week">Por Semana</option>
-                      <option value="month">Por Mês</option>
-                      <option value="quarter">Por Trimestre</option>
-                    </select>
+              <div class="charts-grid">
+                <!-- Cycle Time Trend Chart -->
+                <div class="reports-card cycle-time-trend">
+                  <div class="cycle-time-trend-header">
+                    <h2>TEMPO DE RESOLUÇÃO POR PERÍODO</h2>
+                    <div class="header-actions">
+                      <Select
+                        v-model="selectedCycleTimePeriod"
+                        :options="[
+                          { value: 'week', label: 'Por Semana' },
+                          { value: 'month', label: 'Por Mês' },
+                          { value: 'quarter', label: 'Por Trimestre' },
+                        ]"
+                        @update:modelValue="handleCycleTimePeriodChange"
+                        class="w-40"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div class="cycle-time-info">
-                  <p v-if="getLatestResolutionTime() > 0">
-                    O tempo médio de resolução da sua empresa foi de
-                    <strong>{{ formatTimeInSeconds(getLatestResolutionTime() * 3600) }}</strong>
-                    {{ periodTextMap[selectedCycleTimePeriod] }} {{ getPeriodName() }}.
-                  </p>
-                  <p
-                    v-if="getLatestResolutionTime() > 0 && hasPreviousPeriodData()"
-                    class="comparison-text"
-                  >
-                    Isso é
-                    <span
-                      :class="getResolutionTimeTrend() > 0 ? 'percentage-up' : 'percentage-down'"
-                    >
-                      {{ getResolutionTimeTrend() > 0 ? '+' : '' }}{{ getResolutionTimeTrend() }}%
-                      {{ getResolutionTimeTrend() > 0 ? 'mais' : 'menos' }}
-                    </span>
-                    que {{ getPreviousPeriodLabel() }}
-                  </p>
-                  <p v-else-if="getLatestResolutionTime() === 0" class="no-data-message">
-                    Não houveram tickets resolvidos
-                    <span v-if="selectedCycleTimePeriod === 'week'">na última semana</span>
-                    <span v-else-if="selectedCycleTimePeriod === 'month'">no último mês</span>
-                    <span v-else>no último trimestre</span>
-                  </p>
-                  <p class="average-info" v-if="getAverageResolutionTime() > 0">
-                    Média:
-                    <strong>{{ formatTimeInSeconds(getAverageResolutionTime() * 3600) }}</strong>
-                  </p>
-                </div>
-
-                <div class="cycle-time-chart">
-                  <div v-if="cycleTimeChartLoading" class="chart-loading-state">
-                    <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                    <p class="loading-text">Atualizando gráfico...</p>
-                  </div>
-                  <Bar
-                    v-else
-                    :data="cycleTimeBarData"
-                    :options="cycleTimeBarOptions"
-                    height="300"
-                    :key="`cycle-time-chart-${chartRenderKey}`"
-                  />
-                </div>
-              </div>
-
-              <!-- Nova seção de Tempo de Ciclo por Estado do Workflow -->
-              <div class="reports-card cycle-time-workflow">
-                <div class="cycle-time-workflow-header">
-                  <h2>TEMPO DE DURAÇÃO POR STATUS</h2>
-                </div>
-
-                <div class="workflow-analysis">
-                  <div class="workflow-description">
-                    <p>
-                      Quanto tempo as tarefas permanecem em cada status? Os status em que as tarefas
-                      permaneceram mais tempo foram:
+                  <div class="cycle-time-info">
+                    <p v-if="getLatestResolutionTime() > 0">
+                      O tempo médio de resolução da sua empresa foi de
+                      <strong>{{ formatTimeInSeconds(getLatestResolutionTime() * 3600) }}</strong>
+                      {{ periodTextMap[selectedCycleTimePeriod] }} {{ getPeriodName() }}.
                     </p>
-                    <div v-if="sortedStatusDurations.length" class="workflow-state-list">
-                      <div
-                        v-for="(duration, index) in sortedStatusDurations.slice(0, 2)"
-                        :key="index"
-                        class="state-item"
+                    <p
+                      v-if="getLatestResolutionTime() > 0 && hasPreviousPeriodData()"
+                      class="comparison-text"
+                    >
+                      Isso é
+                      <span
+                        :class="getResolutionTimeTrend() > 0 ? 'percentage-up' : 'percentage-down'"
                       >
-                        <span class="state-name">{{
-                          formatSnakeToNaturalCase(duration.status)
-                        }}</span>
-                        <span class="state-time">{{
-                          formatTimeInSeconds(duration.averageDurationSeconds)
-                        }}</span>
-                      </div>
-                    </div>
-                    <div v-else class="workflow-state-list">
-                      <div class="state-item">
-                        <span class="state-name">Carregando dados...</span>
-                      </div>
-                    </div>
-                    <p class="workflow-note">
-                      Estas são médias para as tarefas concluídas nos últimos 3 meses.
+                        {{ getResolutionTimeTrend() > 0 ? '+' : '' }}{{ getResolutionTimeTrend() }}%
+                        {{ getResolutionTimeTrend() > 0 ? 'mais' : 'menos' }}
+                      </span>
+                      que {{ getPreviousPeriodLabel() }}
+                    </p>
+                    <p v-else-if="getLatestResolutionTime() === 0" class="no-data-message">
+                      Não houveram tickets resolvidos
+                      <span v-if="selectedCycleTimePeriod === 'week'">na última semana</span>
+                      <span v-else-if="selectedCycleTimePeriod === 'month'">no último mês</span>
+                      <span v-else>no último trimestre</span>
+                    </p>
+                    <p class="average-info" v-if="getAverageResolutionTime() > 0">
+                      Média:
+                      <strong>{{ formatTimeInSeconds(getAverageResolutionTime() * 3600) }}</strong>
                     </p>
                   </div>
 
                   <div class="cycle-time-chart">
-                    <div class="chart-bars">
-                      <template v-if="sortedDepartmentsByResolutionTime.length">
+                    <div v-if="cycleTimeChartLoading" class="chart-loading-state">
+                      <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                      <p class="loading-text">Atualizando gráfico...</p>
+                    </div>
+                    <Bar
+                      v-else
+                      :data="cycleTimeBarData"
+                      :options="cycleTimeBarOptions"
+                      height="300"
+                      :key="`cycle-time-chart-${chartRenderKey}`"
+                    />
+                  </div>
+                </div>
+
+                <!-- Nova seção de Tempo de Ciclo por Estado do Workflow -->
+                <div class="reports-card cycle-time-workflow">
+                  <div class="cycle-time-workflow-header">
+                    <h2>TEMPO DE DURAÇÃO POR STATUS</h2>
+                  </div>
+
+                  <div class="workflow-analysis">
+                    <div class="workflow-description">
+                      <p>
+                        Quanto tempo as tarefas permanecem em cada status? Os status em que as
+                        tarefas permaneceram mais tempo foram:
+                      </p>
+                      <div v-if="sortedStatusDurations.length" class="workflow-state-list">
                         <div
-                          v-for="(duration, index) in sortedStatusDurations"
+                          v-for="(duration, index) in sortedStatusDurations.slice(0, 2)"
                           :key="index"
-                          class="chart-item"
+                          class="state-item"
                         >
-                          <span class="chart-label">{{
+                          <span class="state-name">{{
                             formatSnakeToNaturalCase(duration.status)
                           }}</span>
-                          <div
-                            v-if="duration.averageDurationSeconds > 0"
-                            class="chart-bar"
-                            :style="{
-                              width: `${(duration.averageDurationSeconds / sortedStatusDurations[0].averageDurationSeconds) * 100}%`,
-                            }"
-                          >
-                            {{ formatTimeInSeconds(duration.averageDurationSeconds) }}
-                          </div>
+                          <span class="state-time">{{
+                            formatTimeInSecondsCompact(duration.averageDurationSeconds)
+                          }}</span>
                         </div>
-                      </template>
+                      </div>
+                      <div v-else class="workflow-state-list">
+                        <div class="state-item">
+                          <span class="state-name">Carregando dados...</span>
+                        </div>
+                      </div>
+                      <p class="workflow-note">
+                        Estas são médias para as tarefas concluídas nos últimos 3 meses.
+                      </p>
+                    </div>
+
+                    <div class="cycle-time-chart">
+                      <div class="chart-bars">
+                        <template v-if="sortedDepartmentsByResolutionTime.length">
+                          <div
+                            v-for="(duration, index) in sortedStatusDurations"
+                            :key="index"
+                            class="chart-item"
+                          >
+                            <span class="chart-label">{{
+                              formatSnakeToNaturalCase(duration.status)
+                            }}</span>
+                            <div
+                              class="chart-bar"
+                              :class="{
+                                'short-bar':
+                                  duration.averageDurationSeconds /
+                                    sortedStatusDurations[0].averageDurationSeconds <
+                                  0.15,
+                                'zero-bar': duration.averageDurationSeconds === 0,
+                              }"
+                              :style="{
+                                width:
+                                  duration.averageDurationSeconds === 0
+                                    ? '3px'
+                                    : `${(duration.averageDurationSeconds / sortedStatusDurations[0].averageDurationSeconds) * 100}%`,
+                              }"
+                              :data-duration="
+                                formatTimeInSecondsCompact(duration.averageDurationSeconds)
+                              "
+                            >
+                              {{ formatTimeInSecondsCompact(duration.averageDurationSeconds) }}
+                            </div>
+                          </div>
+                        </template>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -955,70 +1037,59 @@
               <!-- Seção de Ciclo de Tempo Em Andamento -->
               <div class="reports-card cycle-time-progress">
                 <div class="cycle-time-progress-header">
-                  <h2>TEMPO GASTO NO STATUS "EM ANDAMENTO" (Mocked)</h2>
+                  <h2>TEMPO GASTO NO STATUS "EM ANDAMENTO"</h2>
                 </div>
 
                 <div class="progress-analysis">
                   <div class="progress-info">
-                    <p>
+                    <p v-if="inProgressTimeSeries?.data?.length">
                       O tempo médio foi de
-                      <strong>18h 29m</strong> para os
-                      <span class="highlight">50 tasks</span> completados durante os últimos
-                      <span class="highlight">3 meses</span>.
+                      <strong>{{
+                        formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
+                      }}</strong>
+                      para
+                      <span class="highlight">{{ getTotalInProgressCount() }} tickets</span> nos
+                      últimos <span class="highlight">6 meses</span>.
                     </p>
-                    <p class="trend-info">
-                      Isso é <span class="percentage-up">100% mais</span> que em 16 de Janeiro, 2025
-                      (aumento é considerado ruim).
+                    <p class="trend-info" v-if="getInProgressTrend() !== 0">
+                      Isso é
+                      <span :class="getInProgressTrend() > 0 ? 'percentage-up' : 'percentage-down'">
+                        {{ Math.abs(getInProgressTrend()) }}%
+                        {{ getInProgressTrend() > 0 ? 'mais' : 'menos' }}
+                      </span>
+                      que no mês anterior
+                      {{
+                        getInProgressTrend() > 0
+                          ? '(aumento é considerado ruim)'
+                          : '(diminuição é positiva)'
+                      }}.
                     </p>
                   </div>
 
-                  <div class="progress-chart">
-                    <div class="time-axis">
-                      <span>21h</span>
-                      <span>19h</span>
-                      <span>17h</span>
-                      <span>15h</span>
-                      <span>13h</span>
-                      <span>11h</span>
-                      <span>9h</span>
-                      <span>7h</span>
-                      <span>5h</span>
-                      <span>3h</span>
-                      <span>1h</span>
-                    </div>
-                    <div class="chart-area">
-                      <div class="trend-line">
-                        <svg class="line-chart" viewBox="0 0 800 200" preserveAspectRatio="none">
-                          <path
-                            d="M0,180 L100,175 L200,170 L300,165 L400,160 L500,140 L600,100 L700,50 L800,30"
-                            class="trend-path"
-                          />
-                        </svg>
-                      </div>
-                      <div class="date-axis">
-                        <span>Jan 16</span>
-                        <span>Jan 28</span>
-                        <span>Feb 5</span>
-                        <span>Feb 15</span>
-                        <span>Mar 2</span>
-                        <span>Mar 17</span>
-                        <span>Mar 27</span>
-                        <span>Abr 11</span>
-                        <span>Abr 16</span>
+                  <div class="chart-stats-container">
+                    <div class="chart-container mt-4">
+                      <Line
+                        v-if="inProgressTimeChartData"
+                        :data="inProgressTimeChartData"
+                        :options="inProgressTimeChartOptions"
+                      />
+                      <div v-else class="loading-state">
+                        <font-awesome-icon icon="spinner" spin class="loading-icon" />
+                        <p class="loading-text">Carregando dados...</p>
                       </div>
                     </div>
-                  </div>
 
-                  <div class="progress-stats" v-if="inProgressDuration">
-                    <div class="stat-item">
-                      <span class="stat-value">{{
-                        formatTimeInSeconds(inProgressDuration.averageDurationSeconds)
-                      }}</span>
-                      <span class="stat-label">Média últimos 3 meses</span>
-                    </div>
-                    <div class="stat-item">
-                      <span class="stat-value">{{ inProgressDuration.count }}</span>
-                      <span class="stat-label">Número de tickets</span>
+                    <div class="progress-stats" v-if="inProgressTimeSeries">
+                      <div class="stat-item">
+                        <span class="stat-value">{{
+                          formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
+                        }}</span>
+                        <span class="stat-label">Média últimos 6 meses</span>
+                      </div>
+                      <div class="stat-item">
+                        <span class="stat-value">{{ getTotalInProgressCount() }}</span>
+                        <span class="stat-label">Número de tickets</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1100,6 +1171,9 @@ import type {
   ResolutionTimeResponseDto,
   ResolutionTimeDataDto,
   ResolutionTimeAverageDto,
+  StatusDurationTimeSeriesResponseDto,
+  StatusDurationTimePointDto,
+  UserRankingResponseDto,
 } from '@/services/reportService';
 import { TicketActionType, TicketStatus, type TicketUpdate } from '@/models';
 import DatePicker from 'vue-datepicker-next';
@@ -1108,8 +1182,11 @@ import {
   formatSnakeToNaturalCase,
   formatTimeCompact,
   formatTimeInSeconds,
+  formatTimeInSecondsCompact,
 } from '@/utils/generic-helper';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import TabSelector from '@/components/common/TabSelector.vue';
+import Select from '@/components/common/Select.vue';
 ChartJS.register(ChartDataLabels);
 
 // Define the StatsPeriod enum
@@ -1341,9 +1418,9 @@ const createdVsCompletedChartOptions = ref<ChartOptions>({
 });
 
 const statistics = ref<TenantStatistics | null>(null);
-
 const loading = ref(true);
 const error = ref<string | null>(null);
+const topUsers = ref<UserRankingResponseDto | null>(null);
 
 const ticketsByStatus = ref<ChartData>({
   labels: [],
@@ -1424,7 +1501,9 @@ const loadData = async () => {
       recentTicketsResult,
       statusDurationsResult,
       departmentStatsResult,
-      resolutionTimeResult, // Add this new result
+      resolutionTimeResult,
+      inProgressTimeSeriesResult,
+      topUsersResult, // Add this new result
     ] = await Promise.all([
       reportService.getTenantStatistics(),
       reportService.getTicketTrends(selectedTrendPeriod.value),
@@ -1433,7 +1512,9 @@ const loadData = async () => {
       ticketService.getTenantRecentTickets(10),
       reportService.getStatusDurations(selectedStatsPeriod.value),
       reportService.getTenantDepartmentsStatistics(),
-      reportService.getResolutionTimeData(), // Add this new API call
+      reportService.getResolutionTimeData(),
+      reportService.getStatusDurationTimeSeries(TicketStatus.InProgress),
+      reportService.getTopUsers(5), // Add this new API call
     ]);
 
     // Initialize trendData with the current period data
@@ -1499,6 +1580,12 @@ const loadData = async () => {
 
     cycleTimeData.value = resolutionTimeResult.data;
     cycleTimeAverage.value = resolutionTimeResult.average;
+
+    // Store the result in the reactive property
+    inProgressTimeSeries.value = inProgressTimeSeriesResult;
+
+    // Store the top users
+    topUsers.value = topUsersResult;
   } catch (err: unknown) {
     console.error('Erro ao carregar dados dos relatórios:', err);
     error.value = 'Ocorreu um erro ao carregar os dados. Por favor, tente novamente.';
@@ -1599,6 +1686,7 @@ const priorityChartData = computed(() => ({
 
 // Keep selectedTrendPeriod for chart trend data
 const selectedTrendPeriod = ref<'daily' | 'weekly' | 'monthly'>('weekly');
+const selectedCycleTimeFilter = ref<'department' | 'priority'>('department');
 const trendData = ref<{ date: string; total: number; resolved: number; created: number }[]>([]);
 
 const trendChartData = computed(() => {
@@ -1607,16 +1695,7 @@ const trendChartData = computed(() => {
     labels: trendData.value.map((item) => formatDateDDMM(item.date)),
     datasets: [
       {
-        label: 'Total de Chamados',
-        data: trendData.value.map((item) => item.total),
-        borderColor: '#2563eb',
-        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-        fill: true,
-        tension: 0.4,
-        pointRadius: 3,
-      },
-      {
-        label: 'Chamados Resolvidos',
+        label: 'Concluídos',
         data: trendData.value.map((item) => item.resolved),
         borderColor: '#22c55e',
         backgroundColor: 'rgba(34, 197, 94, 0.1)',
@@ -1625,10 +1704,10 @@ const trendChartData = computed(() => {
         pointRadius: 3,
       },
       {
-        label: 'Novos Chamados',
+        label: 'Criados',
         data: trendData.value.map((item) => item.created),
-        borderColor: '#eab308',
-        backgroundColor: 'rgba(234, 179, 8, 0.1)',
+        borderColor: '#2563eb',
+        backgroundColor: 'rgba(37, 99, 235, 0.1)',
         fill: true,
         tension: 0.4,
         pointRadius: 3,
@@ -1677,12 +1756,12 @@ const disabledDate = (date: Date) => {
   return date > new Date() || date < new Date(2023, 0, 1);
 };
 
-const updateTrendPeriod = async (period: 'daily' | 'weekly' | 'monthly') => {
-  selectedTrendPeriod.value = period;
+const updateTrendPeriod = async (period: string) => {
+  selectedTrendPeriod.value = period as 'daily' | 'weekly' | 'monthly';
 
   try {
-    const data = await reportService.getTicketTrends(period);
-    trendData.value = data[period];
+    const data = await reportService.getTicketTrends(selectedTrendPeriod.value);
+    trendData.value = data[selectedTrendPeriod.value];
 
     // Just update the UI by triggering reactivity
     loading.value = true;
@@ -1738,9 +1817,11 @@ const inProgressTasks = ref<
     timeInProgressSeconds: number;
   }[]
 >([]);
+const loadingInProgressTasks = ref(false);
 
 // Function to load in-progress tickets
 const loadInProgressTasks = async () => {
+  loadingInProgressTasks.value = true;
   try {
     const response = await ticketService.fetch({
       status: TicketStatus.InProgress, // Using type assertion for now
@@ -1847,6 +1928,8 @@ const loadInProgressTasks = async () => {
     inProgressTasks.value = transformedTasks;
   } catch (err) {
     console.error('Error loading in-progress tickets:', err);
+  } finally {
+    loadingInProgressTasks.value = false;
   }
 };
 
@@ -1965,6 +2048,7 @@ const periodTextMap: Record<'week' | 'month' | 'quarter', string> = {
 
 const cycleTimeData = ref<ResolutionTimeDataDto | null>(null);
 const cycleTimeAverage = ref<ResolutionTimeAverageDto | null>(null);
+const inProgressTimeSeries = ref<StatusDurationTimeSeriesResponseDto | null>(null);
 
 const getLatestResolutionTime = () => {
   if (!cycleTimeData.value) return 0;
@@ -2133,6 +2217,157 @@ const getPreviousPeriodLabel = () => {
   const label = period === 'week' ? 'a semana' : period === 'month' ? 'o mês' : 'o trimestre';
 
   return `${label} anterior (${getPreviousPeriodName()})`;
+};
+
+// Replace the inProgressTimeChartData computed property with properly typed version
+const inProgressTimeChartData = computed(() => {
+  if (!inProgressTimeSeries.value?.data) {
+    return null;
+  }
+
+  const data = inProgressTimeSeries.value.data;
+
+  return {
+    labels: data.map((point: StatusDurationTimePointDto) => point.month),
+    datasets: [
+      {
+        label: 'Tempo em Andamento (segundos)',
+        data: data.map((point: StatusDurationTimePointDto) => point.value),
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 6,
+        pointBackgroundColor: '#3b82f6',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointHoverRadius: 8,
+      },
+    ],
+  };
+});
+
+const inProgressTimeChartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: true,
+      position: 'bottom' as const,
+      labels: {
+        usePointStyle: true,
+        padding: 20,
+        font: { size: 12 },
+      },
+    },
+    tooltip: {
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      padding: 12,
+      titleFont: { size: 14 },
+      bodyFont: { size: 13 },
+      callbacks: {
+        label: (context: any) => {
+          const value = context.parsed.y;
+          return formatTimeInSeconds(value);
+        },
+      },
+    },
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+      title: {
+        display: true,
+        text: 'Tempo',
+        font: {
+          size: 12,
+        },
+      },
+      ticks: {
+        callback: function (value: any) {
+          return formatTimeInSecondsCompact(value);
+        },
+      },
+    },
+    x: {
+      grid: {
+        display: false,
+      },
+    },
+  },
+}));
+
+// Format hours with decimal places
+const formatTimeInHours = (hours: number): string => {
+  if (!hours) return '0h';
+
+  const wholeHours = Math.floor(hours);
+  const minutes = Math.floor((hours - wholeHours) * 60);
+
+  if (minutes === 0) {
+    return `${wholeHours}h`;
+  }
+
+  return `${wholeHours}h ${minutes}m`;
+};
+
+// Get total count of tickets in "in progress" status
+const getTotalInProgressCount = (): number => {
+  if (!inProgressTimeSeries.value?.data) return 0;
+
+  return inProgressTimeSeries.value.data.reduce(
+    (sum: number, point: StatusDurationTimePointDto) => sum + point.count,
+    0,
+  );
+};
+
+// Calculate trend between last two months
+const getInProgressTrend = (): number => {
+  if (!inProgressTimeSeries.value?.data || inProgressTimeSeries.value.data.length < 2) {
+    return 0;
+  }
+
+  const data = inProgressTimeSeries.value.data;
+  const currentMonth = data[data.length - 1];
+  const previousMonth = data[data.length - 2];
+
+  if (previousMonth.value === 0 || currentMonth.count === 0 || previousMonth.count === 0) {
+    return 0;
+  }
+
+  const percentChange = ((currentMonth.value - previousMonth.value) / previousMonth.value) * 100;
+  return Math.round(percentChange);
+};
+
+// Add this to your loadData function
+const loadInProgressDuration = async () => {
+  try {
+    inProgressTimeSeries.value = await reportService.getStatusDurationTimeSeries(
+      TicketStatus.InProgress,
+    );
+  } catch (err) {
+    console.error('Error loading in-progress duration data:', err);
+  }
+};
+
+// Add this to the loadData function Promise.all
+
+// Add the utility functions after the loadData function
+const getInitials = (firstName: string, lastName: string): string => {
+  const firstInitial = firstName ? firstName.charAt(0) : '';
+  const lastInitial = lastName ? lastName.charAt(0) : '';
+  return (firstInitial + lastInitial).toUpperCase();
+};
+
+const getAvatarColorClass = (userId: number): string => {
+  const colors = ['avatar-blue', 'avatar-green', 'avatar-purple', 'avatar-orange', 'avatar-pink'];
+  return colors[userId % colors.length];
+};
+
+const getResolutionRateClass = (resolutionRate: number): string => {
+  if (resolutionRate >= 0.8) return 'status-available';
+  if (resolutionRate >= 0.5) return 'status-in-class';
+  return 'status-absent';
 };
 </script>
 
@@ -2661,11 +2896,16 @@ const getPreviousPeriodLabel = () => {
 }
 
 .stat-label {
+  font-size: 0.875rem;
   color: #6b7280;
 }
 
 .stat-value {
+  display: block;
+  font-size: 1.25rem;
   font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
 }
 
 /* Period Selector */
@@ -3004,7 +3244,7 @@ const getPreviousPeriodLabel = () => {
 
 .wip-header {
   padding: 1rem 1.5rem;
-  background-color: #f9fafb;
+  background-color: white;
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -3239,11 +3479,11 @@ const getPreviousPeriodLabel = () => {
 .cycle-time-content {
   display: grid;
   grid-template-columns: 300px 1fr;
-  gap: 2rem;
+  gap: 1.2rem;
 }
 
 .cycle-time-info {
-  padding-right: 2rem;
+  padding-right: 1.2rem;
   border-right: 1px solid #e5e7eb;
 }
 
@@ -3293,8 +3533,12 @@ const getPreviousPeriodLabel = () => {
 
 .chart-label {
   min-width: 120px;
+  max-width: 120px;
   font-size: 0.875rem;
   color: #374151;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .chart-bar {
@@ -3308,6 +3552,44 @@ const getPreviousPeriodLabel = () => {
   font-size: 0.875rem;
   font-weight: 500;
   transition: width 0.3s ease;
+  position: relative;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.chart-bar.short-bar {
+  color: transparent;
+  justify-content: flex-start;
+  overflow: visible;
+  min-width: 3px;
+  padding: 0;
+}
+
+.chart-bar.short-bar::after {
+  content: attr(data-duration);
+  position: absolute;
+  left: 100%;
+  margin-left: 6px;
+  color: #1f2937;
+  white-space: nowrap;
+}
+
+.chart-bar.zero-bar {
+  color: transparent;
+  justify-content: flex-start;
+  overflow: visible;
+  min-width: 3px;
+  padding: 0;
+  background-color: #d1d5db;
+}
+
+.chart-bar.zero-bar::after {
+  content: attr(data-duration);
+  position: absolute;
+  left: 100%;
+  margin-left: 6px;
+  color: #6b7280;
+  white-space: nowrap;
 }
 
 /* Cycle Time Trend Styles */
@@ -3456,9 +3738,10 @@ const getPreviousPeriodLabel = () => {
 }
 
 .cycle-time-workflow-header h2 {
-  font-size: 1.25rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #1f2937;
+  color: #374151;
+  letter-spacing: 0.05em;
 }
 
 .workflow-analysis {
@@ -3661,10 +3944,23 @@ const getPreviousPeriodLabel = () => {
 }
 
 .progress-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
+  margin-left: 2rem;
+  min-width: 220px;
+  margin-top: 2rem;
+}
+
+.chart-stats-container {
+  display: flex;
+  align-items: flex-start;
   margin-top: 1rem;
+}
+
+.chart-stats-container .chart-container {
+  flex: 1;
+  min-height: 300px;
 }
 
 .stat-item {
@@ -3709,7 +4005,7 @@ const getPreviousPeriodLabel = () => {
 
 .created-vs-completed-content {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 400px 1fr;
   gap: 2rem;
 }
 
@@ -3843,23 +4139,15 @@ const getPreviousPeriodLabel = () => {
   font-size: 0.875rem;
   font-weight: 500;
   color: #6b7280;
-  margin-right: 0.5rem;
+  margin-right: 0.75rem;
 }
 
-.stats-period-select {
-  padding: 0.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
-  background-color: white;
-  color: #1f2937;
-  font-size: 0.875rem;
-  max-width: 150px;
+.stats-period-custom-select {
+  max-width: 180px;
 }
 
-.stats-period-select:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+.cycle-time-custom-select {
+  width: 160px;
 }
 
 .status-chart-flex {
@@ -3986,5 +4274,229 @@ const getPreviousPeriodLabel = () => {
   color: #6b7280;
   font-size: 0.875rem;
   margin-top: 0.5rem;
+}
+
+.top-contributors-card {
+  padding: 1.5rem;
+}
+
+.top-contributors-header {
+  margin-bottom: 1.5rem;
+}
+
+.top-contributors-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.top-contributors-subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.top-contributors-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.contributors-table-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 0.5rem;
+}
+
+.contributor-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f3f4f6;
+  align-items: center;
+}
+
+.contributor-row:last-child {
+  border-bottom: none;
+}
+
+.header-profile,
+.header-tickets,
+.header-rate,
+.header-total {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4b5563;
+  text-transform: none;
+}
+
+.contributor-profile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.contributor-tickets,
+.contributor-rate,
+.contributor-total {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contributor-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.avatar-blue {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.avatar-green {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.avatar-purple {
+  background-color: #e9d5ff;
+  color: #9333ea;
+}
+
+.avatar-orange {
+  background-color: #fed7aa;
+  color: #ea580c;
+}
+
+.avatar-pink {
+  background-color: #fce7f3;
+  color: #ec4899;
+}
+
+.avatar-placeholder {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: inherit;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.contributor-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.contributor-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.contributor-role {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0.25rem 0 0 0;
+}
+
+.ticket-count,
+.total-count {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.status-indicator {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-available {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.status-in-class {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.status-absent {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.loading-contributors,
+.no-contributors {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+.loading-contributors .loading-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #2563eb;
+}
+
+.no-tasks-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-size: 0.975rem;
+  text-align: center;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  border: 1px dashed #e5e7eb;
+}
+
+.info-icon {
+  font-size: 1.25rem;
+  margin-right: 0.75rem;
+  color: #3b82f6;
+}
+
+.loading-tasks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-size: 0.975rem;
+  text-align: center;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  border: 1px dashed #e5e7eb;
+}
+
+.loading-icon {
+  font-size: 1.5rem;
+  margin-right: 0.75rem;
+  color: #2563eb;
+}
+
+.loading-text {
+  color: #4b5563;
 }
 </style>

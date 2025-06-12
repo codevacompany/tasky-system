@@ -102,6 +102,34 @@ export interface ResolutionTimeResponseDto {
   average: ResolutionTimeAverageDto;
 }
 
+export interface StatusDurationTimePointDto {
+  month: string;
+  value: number;
+  count: number;
+}
+
+export interface StatusDurationTimeSeriesResponseDto {
+  status: TicketStatus;
+  data: StatusDurationTimePointDto[];
+  averageDuration: number;
+}
+
+export type UserRankingItemDto = {
+  userId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  departmentName: string;
+  totalTickets: number;
+  resolvedTickets: number;
+  resolutionRate: number;
+  avatarUrl?: string;
+};
+
+export type UserRankingResponseDto = {
+  users: UserRankingItemDto[];
+};
+
 export const reportService = {
   async getTenantStatistics(): Promise<TenantStatistics> {
     const response = await apiClient.get('/stats/by-tenant');
@@ -151,6 +179,20 @@ export const reportService = {
 
   async getResolutionTimeData(): Promise<ResolutionTimeResponseDto> {
     const response = await apiClient.get('/stats/resolution-time');
+    return response.data;
+  },
+
+  async getStatusDurationTimeSeries(
+    status: TicketStatus,
+  ): Promise<StatusDurationTimeSeriesResponseDto> {
+    const response = await apiClient.get<StatusDurationTimeSeriesResponseDto>(
+      `/stats/status-duration-time-series?status=${status}`,
+    );
+    return response.data;
+  },
+
+  async getTopUsers(limit = 5): Promise<UserRankingResponseDto> {
+    const response = await apiClient.get(`/stats/top-users?limit=${limit}`);
     return response.data;
   },
 };

@@ -204,17 +204,25 @@
         </button>
         <button
           v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
-          class="action-button finalize"
-          @click="finalizeTicket(loadedTicket.customId)"
+          class="action-button approve"
+          @click="approveTicket(loadedTicket.customId)"
         >
-          <font-awesome-icon icon="check-double" /> Finalizar
+          <font-awesome-icon icon="check-double" /> Aprovar
         </button>
         <button
           v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
-          class="action-button return"
-          @click="openReturnTicketModal(loadedTicket.customId)"
+          class="action-button request-correction"
+          @click="requestCorrection(loadedTicket.customId)"
         >
-          <font-awesome-icon icon="undo" /> Devolver
+          <font-awesome-icon icon="undo" /> Solicitar Correção
+        </button>
+
+        <button
+          v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
+          class="action-button reject"
+          @click="rejectTicket(loadedTicket.customId)"
+        >
+          <font-awesome-icon icon="undo" /> Reprovar
         </button>
       </div>
 
@@ -353,54 +361,6 @@
         </div>
       </div>
     </div>
-
-    <template #footer>
-      <div
-        class="ticket-actions"
-        v-if="
-          isTargetUser || (isRequester && loadedTicket.status === TicketStatus.UnderVerification)
-        "
-      >
-        <button
-          v-if="isTargetUser && loadedTicket?.status === TicketStatus.Pending"
-          class="action-button accept"
-          @click="acceptTicket(loadedTicket?.customId)"
-        >
-          <font-awesome-icon icon="check" /> Aceitar
-        </button>
-        <button
-          v-if="isTargetUser && loadedTicket?.status === TicketStatus.InProgress"
-          class="action-button verify"
-          @click="sendForReview(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
-        </button>
-        <button
-          v-if="isTargetUser && loadedTicket?.status === TicketStatus.Returned"
-          class="action-button correct"
-          @click="correctTicket(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="wrench" /> Corrigir
-        </button>
-        <button
-          v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
-          class="action-button finalize"
-          @click="finalizeTicket(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="check-double" /> Finalizar
-        </button>
-        <button
-          v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
-          class="action-button return"
-          @click="openReturnTicketModal(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="undo" /> Devolver
-        </button>
-      </div>
-      <button class="close-button" @click="closeModal">
-        <font-awesome-icon icon="times" /> Fechar
-      </button>
-    </template>
   </BaseModal>
 
   <ConfirmationModal
@@ -1299,6 +1259,34 @@ const refreshSelectedTicket = async () => {
 .action-button.cancel:hover {
   background-color: #b91c1c;
 }
+
+.action-button.approve {
+  background-color: #059669;
+  color: white;
+}
+
+.action-button.approve:hover {
+  background-color: #047857;
+}
+
+.action-button.request-correction {
+  background-color: #7b1fa2;
+  color: white;
+}
+
+.action-button.request-correction:hover {
+  background-color: #6a1b9a;
+}
+
+.action-button.reject {
+  background-color: #dc2626;
+  color: white;
+}
+
+.action-button.reject:hover {
+  background-color: #b91c1c;
+}
+
 
 .status-waiting {
   display: inline-flex;
