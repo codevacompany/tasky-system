@@ -15,7 +15,28 @@
         </div>
         <div class="detail-content">
           <div class="detail-label">Assunto</div>
-          <div class="detail-value">{{ loadedTicket.name }}</div>
+          <div class="detail-value" v-if="!isEditingName">
+            <span
+              @click="startEditingName"
+              :class="{ 'editable-field': isRequester }"
+              :title="isRequester ? 'Clique para editar' : ''"
+            >
+              {{ loadedTicket.name }}
+            </span>
+          </div>
+          <div class="detail-value editing-container" v-else>
+            <input
+              v-model="editingName"
+              class="edit-input"
+              @keyup.enter="saveTicketName"
+              @keyup.escape="cancelEditingName"
+              ref="nameInput"
+            />
+            <div class="edit-buttons">
+              <button @click="saveTicketName" class="btn btn-save">Salvar</button>
+              <button @click="cancelEditingName" class="btn btn-cancel">Cancelar</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -169,8 +190,29 @@
             </div>
             <div class="detail-label">Descrição</div>
           </div>
-          <div class="description-box">
-            <div class="description-text" v-html="loadedTicket.description"></div>
+          <div class="description-box" v-if="!isEditingDescription">
+            <div
+              class="description-text"
+              v-html="loadedTicket.description"
+              @click="startEditingDescription"
+              :class="{ 'editable-field': isRequester }"
+              :title="isRequester ? 'Clique para editar' : ''"
+            ></div>
+          </div>
+          <div class="description-box editing-container" v-else>
+            <div class="quill-wrapper">
+              <QuillEditor
+                :key="descriptionEditorKey"
+                v-model:content="editingDescription"
+                contentType="html"
+                theme="snow"
+                :options="editorOptions"
+              />
+            </div>
+            <div class="edit-buttons">
+              <button @click="saveTicketDescription" class="btn btn-save">Salvar</button>
+              <button @click="cancelEditingDescription" class="btn btn-cancel">Cancelar</button>
+            </div>
           </div>
         </div>
       </div>
@@ -431,6 +473,14 @@ const loadedTicket = ref<Ticket | null>(null);
 const selectedFiles = ref<File[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isUploading = ref(false);
+
+// Editing states
+const isEditingName = ref(false);
+const isEditingDescription = ref(false);
+const editingName = ref('');
+const editingDescription = ref('');
+const descriptionEditorKey = ref(0);
+const nameInput = ref<HTMLInputElement | null>(null);
 
 const confirmationModal = ref({
   isOpen: false,
@@ -1023,6 +1073,86 @@ const refreshSelectedTicket = async () => {
   } catch (error) {
     console.error('Error refreshing ticket:', error);
   }
+};
+
+const startEditingName = () => {
+  if (!isRequester.value) return;
+  isEditingName.value = true;
+  editingName.value = loadedTicket.value?.name || '';
+  nextTick(() => {
+    nameInput.value?.focus();
+  });
+};
+
+const saveTicketName = async () => {
+  if (!editingName.value.trim()) {
+    toast.error('O assunto do ticket não pode estar vazio');
+    return;
+  }
+
+  try {
+    await ticketService.update(loadedTicket.value!.customId, {
+      name: editingName.value.trim(),
+    });
+
+    isEditingName.value = false;
+
+    if (loadedTicket.value) {
+      loadedTicket.value.name = editingName.value.trim();
+    }
+
+    toast.success('Assunto do ticket atualizado com sucesso');
+    refreshSelectedTicket();
+  } catch {
+    toast.error('Erro ao atualizar nome do ticket');
+  }
+};
+
+const cancelEditingName = () => {
+  isEditingName.value = false;
+  editingName.value = loadedTicket.value?.name || '';
+};
+
+const startEditingDescription = () => {
+  if (!isRequester.value) return;
+  isEditingDescription.value = true;
+  editingDescription.value = loadedTicket.value?.description || '';
+  descriptionEditorKey.value += 1;
+};
+
+const saveTicketDescription = async () => {
+  // Create a temporary div to strip HTML and check if content is actually empty
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = editingDescription.value;
+  const textContent = tempDiv.textContent || tempDiv.innerText || '';
+
+  if (!textContent.trim()) {
+    toast.error('Descrição do ticket não pode estar vazia');
+    return;
+  }
+
+  try {
+    await ticketService.update(loadedTicket.value!.customId, {
+      description: editingDescription.value,
+    });
+
+    isEditingDescription.value = false;
+
+    if (loadedTicket.value) {
+      loadedTicket.value.description = editingDescription.value;
+    }
+
+    toast.success('Descrição do ticket atualizada com sucesso');
+    refreshSelectedTicket();
+  } catch {
+    toast.error('Erro ao atualizar descrição do ticket');
+  }
+};
+
+const cancelEditingDescription = () => {
+  isEditingDescription.value = false;
+  editingDescription.value = loadedTicket.value?.description || '';
+  descriptionEditorKey.value += 1;
 };
 </script>
 
@@ -2584,8 +2714,120 @@ const refreshSelectedTicket = async () => {
   color: #9ca3af;
 }
 
-/* Dark mode image styling */
 :deep(body.dark-mode) .comment-text :deep(img) {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+:deep(body.dark-mode) .comment-text :deep(img) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.editable-field {
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.editable-field:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 0 0 1px #e9ecef;
+}
+
+.editing-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Edit input styling */
+.edit-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid #4f46e5;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: white;
+  color: #212529;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.edit-input:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-save {
+  background: #10b981;
+  color: white;
+}
+
+.btn-save:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.btn-cancel {
+  background: #6b7280;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+/* Dark mode editing styles */
+:deep(body.dark-mode) .editable-field:hover {
+  background-color: #374151;
+  box-shadow: 0 0 0 1px #4b5563;
+}
+
+:deep(body.dark-mode) .edit-input {
+  background: #374151;
+  color: #f9fafb;
+  border-color: #818cf8;
+}
+
+:deep(body.dark-mode) .edit-input:focus {
+  background: #1f2937;
+  border-color: #a5b4fc;
+}
+
+:deep(body.dark-mode) .btn-save {
+  background: #059669;
+}
+
+:deep(body.dark-mode) .btn-save:hover {
+  background: #047857;
+}
+
+:deep(body.dark-mode) .btn-cancel {
+  background: #4b5563;
+}
+
+:deep(body.dark-mode) .btn-cancel:hover {
+  background: #374151;
 }
 </style>
