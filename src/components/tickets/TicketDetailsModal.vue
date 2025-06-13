@@ -293,11 +293,16 @@
           "
           class="comment-input"
         >
-          <textarea
-            v-model="newComment"
-            placeholder="Digite seu comentário aqui..."
-            class="update-input"
-          ></textarea>
+          <div class="quill-wrapper">
+            <QuillEditor
+              :key="editorKey"
+              ref="quillEditor"
+              v-model:content="newComment"
+              contentType="html"
+              theme="snow"
+              :options="editorOptions"
+            />
+          </div>
           <button @click="comment()" class="btn btn-primary">
             <font-awesome-icon icon="paper-plane" /> Enviar
           </button>
@@ -320,7 +325,7 @@
                   >
                   <span class="comment-time">{{ formatRelativeTime(event.createdAt) }}</span>
                 </div>
-                <div class="comment-text">{{ event.data.content }}</div>
+                <div class="comment-text" v-html="event.data.content"></div>
               </div>
             </div>
 
@@ -378,7 +383,7 @@
 <script setup lang="ts">
 import BaseModal from '../common/BaseModal.vue';
 import { CancellationReason, TicketStatus, type Ticket, type TicketComment } from '@/models';
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import { ticketCommentService } from '@/services/ticketCommentService';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from '@/stores/user';
@@ -398,6 +403,8 @@ import type { TicketFile } from '@/models/ticketFile';
 import { awsService } from '@/services/awsService';
 import axios from 'axios';
 import { CorrectionReason, DisapprovalReason } from '@/models';
+import { QuillEditor } from '@vueup/vue-quill';
+import '@vueup/vue-quill/dist/vue-quill.snow.css';
 
 interface SpecialUpdateEvent {
   data?: {
@@ -416,6 +423,8 @@ const emit = defineEmits(['close', 'refresh']);
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
 const newComment = ref('');
+const quillEditor = ref<any>(null);
+const editorKey = ref(0);
 const comments = ref<TicketComment[]>([]);
 const ticketUpdates = ref<TicketUpdate[]>([]);
 const loadedTicket = ref<Ticket | null>(null);
@@ -431,6 +440,20 @@ const confirmationModal = ref({
   hasInput: false,
   reasonOptions: [] as { value: string; label: string }[],
 });
+
+const editorOptions = {
+  modules: {
+    toolbar: [
+      [{ size: ['small', false, 'large'] }],
+      [{ header: [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline'],
+      ['blockquote', 'code-block'],
+      [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
+      ['link', 'image', 'video'],
+    ],
+  },
+  placeholder: 'Digite seu comentário aqui...',
+};
 
 const closeModal = () => {
   emit('close');
@@ -695,7 +718,12 @@ const downloadFile = (file: TicketFile) => {
 };
 
 const comment = async () => {
-  if (!newComment.value.trim()) {
+  // Create a temporary div to strip HTML and check if content is actually empty
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = newComment.value;
+  const textContent = tempDiv.textContent || tempDiv.innerText || '';
+
+  if (!textContent.trim()) {
     toast.error('Comentário não pode estar vazio');
     return;
   }
@@ -714,7 +742,9 @@ const comment = async () => {
       await ticketsStore.fetchTicketDetails(loadedTicket.value.customId);
     }
 
+    // Clear the editor by resetting the content and forcing re-render
     newComment.value = '';
+    editorKey.value += 1; // Force component re-render
   } catch {
     toast.error('Erro ao adicionar comentário');
   }
@@ -1058,6 +1088,245 @@ const refreshSelectedTicket = async () => {
   color: #212529;
 }
 
+.description-text :deep(p) {
+  margin: 0 0 0.5rem 0;
+}
+
+.description-text :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.description-text :deep(strong) {
+  font-weight: 600;
+}
+
+.description-text :deep(em) {
+  font-style: italic;
+}
+
+.description-text :deep(u) {
+  text-decoration: underline;
+}
+
+.description-text :deep(h1) {
+  font-size: 2em;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem 0;
+  color: #1a202c;
+}
+
+.description-text :deep(h2) {
+  font-size: 1.5em;
+  font-weight: 600;
+  margin: 0.8rem 0 0.4rem 0;
+  color: #1a202c;
+}
+
+.description-text :deep(h3) {
+  font-size: 1.25em;
+  font-weight: 600;
+  margin: 0.6rem 0 0.3rem 0;
+  color: #1a202c;
+}
+
+.description-text :deep(h4) {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin: 0.5rem 0 0.25rem 0;
+  color: #1a202c;
+}
+
+.description-text :deep(h5) {
+  font-size: 1em;
+  font-weight: 600;
+  margin: 0.4rem 0 0.2rem 0;
+  color: #1a202c;
+}
+
+.description-text :deep(h6) {
+  font-size: 0.9em;
+  font-weight: 600;
+  margin: 0.3rem 0 0.15rem 0;
+  color: #1a202c;
+}
+
+.description-text :deep(.ql-size-small) {
+  font-size: 0.75em;
+}
+
+.description-text :deep(.ql-size-large) {
+  font-size: 1.5em;
+}
+
+.description-text :deep(.ql-size-huge) {
+  font-size: 2.5em;
+}
+
+.description-text :deep(.ql-syntax) {
+  background: #f8f9fa;
+  color: #212529;
+  padding: 1rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  border: 1px solid #e9ecef;
+  margin: 0.5rem 0;
+  overflow-x: auto;
+}
+
+.description-text :deep(ol),
+.description-text :deep(ul) {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.description-text :deep(ol) {
+  list-style-type: decimal;
+}
+
+.description-text :deep(ul) {
+  list-style-type: disc;
+}
+
+.description-text :deep(ol ol),
+.description-text :deep(ul ul) {
+  list-style-type: circle;
+}
+
+.description-text :deep(ol ol ol),
+.description-text :deep(ul ul ul) {
+  list-style-type: square;
+}
+
+.description-text :deep(li) {
+  margin-bottom: 0.25rem;
+}
+
+.description-text :deep(.ql-indent-1) {
+  padding-left: 3em;
+}
+
+.description-text :deep(.ql-indent-2) {
+  padding-left: 6em;
+}
+
+.description-text :deep(.ql-indent-3) {
+  padding-left: 9em;
+}
+
+.description-text :deep(.ql-indent-4) {
+  padding-left: 12em;
+}
+
+.description-text :deep(.ql-indent-5) {
+  padding-left: 15em;
+}
+
+.description-text :deep(.ql-indent-6) {
+  padding-left: 18em;
+}
+
+.description-text :deep(.ql-indent-7) {
+  padding-left: 21em;
+}
+
+.description-text :deep(.ql-indent-8) {
+  padding-left: 24em;
+}
+
+.description-text :deep(.ql-align-center) {
+  text-align: center;
+}
+
+.description-text :deep(.ql-align-right) {
+  text-align: right;
+}
+
+.description-text :deep(.ql-align-justify) {
+  text-align: justify;
+}
+
+.description-text :deep(.ql-direction-rtl) {
+  direction: rtl;
+  text-align: right;
+}
+
+.description-text :deep(blockquote) {
+  margin: 0.5rem 0;
+  padding: 0.5rem 1rem;
+  border-left: 4px solid #e9ecef;
+  background: #f8f9fa;
+  font-style: italic;
+}
+
+.description-text :deep(code) {
+  background: #f8f9fa;
+  padding: 0.125rem 0.25rem;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875em;
+}
+
+.description-text :deep(pre) {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+}
+
+.description-text :deep(a) {
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+.description-text :deep(a:hover) {
+  text-decoration: underline;
+}
+
+/* Checkbox lists styling */
+.description-text :deep(ul[data-checked]) {
+  list-style: none;
+  padding-left: 0;
+}
+
+.description-text :deep(ul[data-checked] li) {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.description-text :deep(ul[data-checked='false'] li::before) {
+  content: '☐';
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 1.2em;
+  color: #6c757d;
+}
+
+.description-text :deep(ul[data-checked='true'] li::before) {
+  content: '☑';
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 1.2em;
+  color: #28a745;
+}
+
+.description-text :deep(ul[data-checked='true'] li) {
+  text-decoration: line-through;
+  color: #6c757d;
+}
+
+/* Image styling */
+.description-text :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 .details-item {
   background: #f8f9fa;
   padding: 0.75rem;
@@ -1287,7 +1556,6 @@ const refreshSelectedTicket = async () => {
   background-color: #b91c1c;
 }
 
-
 .status-waiting {
   display: inline-flex;
   align-items: center;
@@ -1326,6 +1594,36 @@ const refreshSelectedTicket = async () => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.quill-wrapper {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+}
+
+.quill-wrapper :deep(.ql-toolbar) {
+  border: none;
+  border-bottom: 1px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+.quill-wrapper :deep(.ql-container) {
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.quill-wrapper :deep(.ql-editor) {
+  min-height: 100px;
+  padding: 1rem;
+  line-height: 1.5;
+}
+
+.quill-wrapper :deep(.ql-editor.ql-blank::before) {
+  font-style: normal;
+  color: #6c757d;
 }
 
 .update-input {
@@ -1443,6 +1741,113 @@ const refreshSelectedTicket = async () => {
 .comment-text {
   color: #495057;
   line-height: 1.5;
+}
+
+.comment-text :deep(p) {
+  margin: 0 0 0.5rem 0;
+}
+
+.comment-text :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.comment-text :deep(strong) {
+  font-weight: 600;
+}
+
+.comment-text :deep(em) {
+  font-style: italic;
+}
+
+.comment-text :deep(u) {
+  text-decoration: underline;
+}
+
+.comment-text :deep(ol),
+.comment-text :deep(ul) {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.comment-text :deep(li) {
+  margin-bottom: 0.25rem;
+}
+
+.comment-text :deep(blockquote) {
+  margin: 0.5rem 0;
+  padding: 0.5rem 1rem;
+  border-left: 4px solid #e9ecef;
+  background: #f8f9fa;
+  font-style: italic;
+}
+
+.comment-text :deep(code) {
+  background: #f8f9fa;
+  padding: 0.125rem 0.25rem;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875em;
+}
+
+.comment-text :deep(pre) {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+}
+
+.comment-text :deep(a) {
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+.comment-text :deep(a:hover) {
+  text-decoration: underline;
+}
+
+/* Checkbox lists styling */
+.comment-text :deep(ul[data-checked]) {
+  list-style: none;
+  padding-left: 0;
+}
+
+.comment-text :deep(ul[data-checked] li) {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.comment-text :deep(ul[data-checked='false'] li::before) {
+  content: '☐';
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 1.2em;
+  color: #6c757d;
+}
+
+.comment-text :deep(ul[data-checked='true'] li::before) {
+  content: '☑';
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 1.2em;
+  color: #28a745;
+}
+
+.comment-text :deep(ul[data-checked='true'] li) {
+  text-decoration: line-through;
+  color: #6c757d;
+}
+
+/* Image styling */
+.comment-text :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .deadline-danger {
@@ -1582,7 +1987,7 @@ const refreshSelectedTicket = async () => {
 }
 
 :deep(body.dark-mode) .comment-section {
-  background: #1a2233;
+  background: #1f2937;
 }
 
 :deep(body.dark-mode) .event-item {
@@ -1613,13 +2018,13 @@ const refreshSelectedTicket = async () => {
 }
 
 :deep(body.dark-mode) .comment-text {
-  color: #94a3b8;
+  color: #e5e7eb;
 }
 
 :deep(body.dark-mode) .update-input {
-  background: #1e293b;
-  border-color: #2d3748;
-  color: #e2e8f0;
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
 }
 
 :deep(body.dark-mode) .update-input:focus {
@@ -1840,5 +2245,347 @@ const refreshSelectedTicket = async () => {
 
 .upload-actions {
   display: none;
+}
+
+:deep(body.dark-mode) .quill-wrapper {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+:deep(body.dark-mode) .quill-wrapper .ql-toolbar {
+  background: #1f2937;
+  border-bottom-color: #4b5563;
+}
+
+:deep(body.dark-mode) .quill-wrapper .ql-editor {
+  background: #374151;
+  color: #f9fafb;
+}
+
+:deep(body.dark-mode) .quill-wrapper .ql-editor.ql-blank::before {
+  color: #9ca3af;
+}
+
+:deep(body.dark-mode) .comment-text {
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .comment-text blockquote {
+  border-left-color: #4b5563;
+  background: #1f2937;
+}
+
+:deep(body.dark-mode) .comment-text code {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .comment-text pre {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .comment-text a {
+  color: #60a5fa;
+}
+
+/* Dark mode Quill-specific styling */
+:deep(body.dark-mode) .comment-text h1,
+:deep(body.dark-mode) .comment-text h2,
+:deep(body.dark-mode) .comment-text h3,
+:deep(body.dark-mode) .comment-text h4,
+:deep(body.dark-mode) .comment-text h5,
+:deep(body.dark-mode) .comment-text h6 {
+  color: #f9fafb;
+}
+
+:deep(body.dark-mode) .comment-text .ql-syntax {
+  background: #1f2937;
+  color: #e5e7eb;
+  border: 1px solid #374151;
+}
+
+:deep(body.dark-mode) .comment-text .ql-size-small,
+:deep(body.dark-mode) .comment-text .ql-size-large,
+:deep(body.dark-mode) .comment-text .ql-size-huge {
+  color: #e5e7eb;
+}
+
+/* Quill-specific styling for comment display */
+.comment-text :deep(.ql-size-small) {
+  font-size: 0.75em;
+}
+
+.comment-text :deep(.ql-size-large) {
+  font-size: 1.5em;
+}
+
+.comment-text :deep(.ql-size-huge) {
+  font-size: 2.5em;
+}
+
+.comment-text :deep(h1) {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 0.67em 0;
+  line-height: 1.2;
+}
+
+.comment-text :deep(h2) {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.83em 0;
+  line-height: 1.2;
+}
+
+.comment-text :deep(h3) {
+  font-size: 1.17em;
+  font-weight: bold;
+  margin: 1em 0;
+  line-height: 1.2;
+}
+
+.comment-text :deep(h4) {
+  font-size: 1em;
+  font-weight: bold;
+  margin: 1.33em 0;
+  line-height: 1.2;
+}
+
+.comment-text :deep(h5) {
+  font-size: 0.83em;
+  font-weight: bold;
+  margin: 1.67em 0;
+  line-height: 1.2;
+}
+
+.comment-text :deep(h6) {
+  font-size: 0.67em;
+  font-weight: bold;
+  margin: 2.33em 0;
+  line-height: 1.2;
+}
+
+.comment-text :deep(.ql-syntax) {
+  background: #23241f;
+  color: #f8f8f2;
+  overflow: visible;
+  white-space: pre-wrap;
+  margin: 0.5rem 0;
+  padding: 1rem;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875em;
+  line-height: 1.4;
+}
+
+.comment-text :deep(.ql-code-block-container) {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.comment-text :deep(.ql-indent-1) {
+  padding-left: 3em;
+}
+
+.comment-text :deep(.ql-indent-2) {
+  padding-left: 6em;
+}
+
+.comment-text :deep(.ql-indent-3) {
+  padding-left: 9em;
+}
+
+.comment-text :deep(.ql-indent-4) {
+  padding-left: 12em;
+}
+
+.comment-text :deep(.ql-indent-5) {
+  padding-left: 15em;
+}
+
+.comment-text :deep(.ql-indent-6) {
+  padding-left: 18em;
+}
+
+.comment-text :deep(.ql-indent-7) {
+  padding-left: 21em;
+}
+
+.comment-text :deep(.ql-indent-8) {
+  padding-left: 24em;
+}
+
+.comment-text :deep(.ql-align-center) {
+  text-align: center;
+}
+
+.comment-text :deep(.ql-align-right) {
+  text-align: right;
+}
+
+.comment-text :deep(.ql-align-justify) {
+  text-align: justify;
+}
+
+.comment-text :deep(.ql-direction-rtl) {
+  direction: rtl;
+  text-align: inherit;
+}
+
+/* Enhanced list styling */
+.comment-text :deep(ol) {
+  counter-reset: list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+  padding-left: 1.5rem;
+}
+
+.comment-text :deep(ul) {
+  padding-left: 1.5rem;
+}
+
+.comment-text :deep(ol > li) {
+  counter-increment: list-1;
+  list-style-type: none;
+  position: relative;
+}
+
+.comment-text :deep(ol > li::before) {
+  content: counter(list-1, decimal) '. ';
+  position: absolute;
+  left: -1.5rem;
+  font-weight: normal;
+}
+
+.comment-text :deep(ul > li) {
+  list-style-type: disc;
+  position: relative;
+}
+
+.comment-text :deep(ul ul > li) {
+  list-style-type: circle;
+}
+
+.comment-text :deep(ul ul ul > li) {
+  list-style-type: square;
+}
+
+/* Nested list indentation */
+.comment-text :deep(li.ql-indent-1) {
+  padding-left: 3em;
+}
+
+.comment-text :deep(li.ql-indent-2) {
+  padding-left: 6em;
+}
+
+.comment-text :deep(li.ql-indent-3) {
+  padding-left: 9em;
+}
+
+/* Better spacing for nested elements */
+.comment-text :deep(p + h1),
+.comment-text :deep(p + h2),
+.comment-text :deep(p + h3),
+.comment-text :deep(p + h4),
+.comment-text :deep(p + h5),
+.comment-text :deep(p + h6) {
+  margin-top: 1em;
+}
+
+.comment-text :deep(h1 + p),
+.comment-text :deep(h2 + p),
+.comment-text :deep(h3 + p),
+.comment-text :deep(h4 + p),
+.comment-text :deep(h5 + p),
+.comment-text :deep(h6 + p) {
+  margin-top: 0.5em;
+}
+
+:deep(body.dark-mode) .description-box {
+  background: #1a2233;
+  border-color: #2d3748;
+}
+
+:deep(body.dark-mode) .description-text {
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .description-text :deep(h1),
+:deep(body.dark-mode) .description-text :deep(h2),
+:deep(body.dark-mode) .description-text :deep(h3),
+:deep(body.dark-mode) .description-text :deep(h4),
+:deep(body.dark-mode) .description-text :deep(h5),
+:deep(body.dark-mode) .description-text :deep(h6) {
+  color: #f9fafb;
+}
+
+:deep(body.dark-mode) .description-text :deep(blockquote) {
+  border-left-color: #4b5563;
+  background: #1f2937;
+}
+
+:deep(body.dark-mode) .description-text :deep(code) {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .description-text :deep(pre) {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .description-text :deep(.ql-syntax) {
+  background: #1f2937;
+  color: #e5e7eb;
+  border-color: #374151;
+}
+
+:deep(body.dark-mode) .description-text :deep(.ql-size-small),
+:deep(body.dark-mode) .description-text :deep(.ql-size-large),
+:deep(body.dark-mode) .description-text :deep(.ql-size-huge) {
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .description-text :deep(a) {
+  color: #60a5fa;
+}
+
+/* Dark mode checkbox styling */
+:deep(body.dark-mode) .description-text :deep(ul[data-checked='false'] li::before) {
+  color: #9ca3af;
+}
+
+:deep(body.dark-mode) .description-text :deep(ul[data-checked='true'] li::before) {
+  color: #10b981;
+}
+
+:deep(body.dark-mode) .description-text :deep(ul[data-checked='true'] li) {
+  color: #9ca3af;
+}
+
+/* Dark mode image styling */
+:deep(body.dark-mode) .description-text :deep(img) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+:deep(body.dark-mode) .comment-text :deep(a) {
+  color: #60a5fa;
+}
+
+/* Dark mode checkbox styling */
+:deep(body.dark-mode) .comment-text :deep(ul[data-checked='false'] li::before) {
+  color: #9ca3af;
+}
+
+:deep(body.dark-mode) .comment-text :deep(ul[data-checked='true'] li::before) {
+  color: #10b981;
+}
+
+:deep(body.dark-mode) .comment-text :deep(ul[data-checked='true'] li) {
+  color: #9ca3af;
+}
+
+/* Dark mode image styling */
+:deep(body.dark-mode) .comment-text :deep(img) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 </style>
