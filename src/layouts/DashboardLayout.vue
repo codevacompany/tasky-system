@@ -136,14 +136,6 @@
             </div>
           </router-link>
 
-          <button
-            class="dark-mode-toggle"
-            @click="toggleDarkMode"
-            :title="darkMode ? 'Mudar para modo claro' : 'Mudar para modo escuro'"
-          >
-            <font-awesome-icon :icon="darkMode ? 'sun' : 'moon'" />
-          </button>
-
           <div class="user-profile" @click="toggleProfileModal">
             <div class="profile-avatar">
               <span class="initials">{{ userInitials }}</span>
@@ -238,16 +230,6 @@ const toggleProfileModal = () => {
 
 const toggleNotificationsModal = () => {
   showNotificationsModal.value = !showNotificationsModal.value;
-};
-
-const toggleDarkMode = () => {
-  darkMode.value = !darkMode.value;
-
-  // Handle both legacy dark-mode and Tailwind's dark class
-  document.body.classList.toggle('dark-mode', darkMode.value);
-  document.body.classList.toggle('dark', darkMode.value);
-
-  localStorageService.setTheme(darkMode.value ? 'dark' : 'light');
 };
 
 const toggleAdminDropdown = () => {

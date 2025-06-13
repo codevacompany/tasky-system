@@ -12,6 +12,11 @@ export interface LoginResponse {
   user: User;
 }
 
+interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export const authService = {
   async login(data: { email: string; password: string }): Promise<AxiosResponse<LoginResponse>> {
     try {
@@ -31,5 +36,9 @@ export const authService = {
 
   logout() {
     localStorageService.clear();
+  },
+
+  async changePassword(data: ChangePasswordDto): Promise<AxiosResponse<{ message: string }>> {
+    return apiClient.post<{ message: string }>('/auth/change-password', data);
   },
 };
