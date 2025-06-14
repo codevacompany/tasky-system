@@ -27,7 +27,7 @@
           </div>
           <div class="stat-info">
             <span class="stat-label">Clientes Ativos</span>
-            <span class="stat-value">{{ stats.clientesAtivos }}</span>
+            <span class="stat-value">{{ stats.activeClients }}</span>
             <span class="stat-trend positive">
               <font-awesome-icon icon="arrow-up" /> 12% este mês
             </span>
@@ -40,7 +40,7 @@
           </div>
           <div class="stat-info">
             <span class="stat-label">Total de Usuários</span>
-            <span class="stat-value">{{ stats.totalUsuarios }}</span>
+            <span class="stat-value">{{ stats.totalUsers }}</span>
             <span class="stat-trend positive">
               <font-awesome-icon icon="arrow-up" /> 8% este mês
             </span>
@@ -53,7 +53,7 @@
           </div>
           <div class="stat-info">
             <span class="stat-label">Tickets no Mês</span>
-            <span class="stat-value">{{ stats.ticketsMes }}</span>
+            <span class="stat-value">{{ stats.monthlyTickets }}</span>
             <span class="stat-trend negative">
               <font-awesome-icon icon="arrow-down" /> 5% este mês
             </span>
@@ -66,7 +66,7 @@
           </div>
           <div class="stat-info">
             <span class="stat-label">Faturamento Mensal</span>
-            <span class="stat-value">{{ formatCurrency(stats.faturamentoMensal) }}</span>
+            <span class="stat-value">{{ formatCurrency(stats.monthlyRevenue) }}</span>
             <span class="stat-trend positive">
               <font-awesome-icon icon="arrow-up" /> 15% este mês
             </span>
@@ -91,7 +91,7 @@
           <option value="PERSONALIZADO">Personalizado</option>
         </select>
 
-        <select v-model="pagamentoFilter" class="filter-select">
+        <select v-model="paymentFilter" class="filter-select">
           <option value="">Status Pagamento</option>
           <option value="EM_DIA">Em dia</option>
           <option value="ATRASADO">Atrasado</option>
@@ -134,50 +134,52 @@
 
     <!-- Lista de Clientes -->
     <div class="clients-table-wrapper">
-      <table class="clients-table">
+      <div v-if="isLoading" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>Carregando dados dos clientes...</p>
+      </div>
+
+      <table v-else class="clients-table">
         <thead>
           <tr>
             <th class="checkbox-column">
               <input type="checkbox" :checked="isAllSelected" @change="toggleAllSelection" />
             </th>
-            <th @click="sortBy('razaoSocial')">
+            <th @click="sortBy('name')">
               Cliente
-              <font-awesome-icon
-                :icon="getSortIcon('razaoSocial')"
-                v-if="sortField === 'razaoSocial'"
-              />
+              <font-awesome-icon :icon="getSortIcon('name')" v-if="sortField === 'name'" />
             </th>
             <th @click="sortBy('cnpj')">
               CNPJ
               <font-awesome-icon :icon="getSortIcon('cnpj')" v-if="sortField === 'cnpj'" />
             </th>
-            <th @click="sortBy('plano')">
+            <th @click="sortBy('plan')">
               Plano
-              <font-awesome-icon :icon="getSortIcon('plano')" v-if="sortField === 'plano'" />
+              <font-awesome-icon :icon="getSortIcon('plan')" v-if="sortField === 'plan'" />
             </th>
             <th @click="sortBy('status')">
               Status
               <font-awesome-icon :icon="getSortIcon('status')" v-if="sortField === 'status'" />
             </th>
-            <th @click="sortBy('usuariosAtivos')">
+            <th @click="sortBy('activeUsers')">
               Usuários
               <font-awesome-icon
-                :icon="getSortIcon('usuariosAtivos')"
-                v-if="sortField === 'usuariosAtivos'"
+                :icon="getSortIcon('activeUsers')"
+                v-if="sortField === 'activeUsers'"
               />
             </th>
-            <th @click="sortBy('ticketsMes')">
+            <th @click="sortBy('ticketsThisMonth')">
               Tickets/Mês
               <font-awesome-icon
-                :icon="getSortIcon('ticketsMes')"
-                v-if="sortField === 'ticketsMes'"
+                :icon="getSortIcon('ticketsThisMonth')"
+                v-if="sortField === 'ticketsThisMonth'"
               />
             </th>
-            <th @click="sortBy('proximaFatura')">
+            <th @click="sortBy('nextInvoice')">
               Próx. Fatura
               <font-awesome-icon
-                :icon="getSortIcon('proximaFatura')"
-                v-if="sortField === 'proximaFatura'"
+                :icon="getSortIcon('nextInvoice')"
+                v-if="sortField === 'nextInvoice'"
               />
             </th>
             <th>Ações</th>
@@ -197,17 +199,15 @@
                   @change="toggleSelection(client)"
                 />
               </td>
-              <td class="client-info">
-                <img :src="client.logo || '/default-logo.png'" alt="Logo" class="client-logo" />
+              <td>
                 <div>
-                  <span class="client-name">{{ client.razaoSocial }}</span>
-                  <span class="client-domain">{{ client.dominio }}</span>
+                  <span class="client-name">{{ client.companyName }}</span>
                 </div>
               </td>
               <td>{{ formatCNPJ(client.cnpj) }}</td>
               <td>
-                <span :class="['plan-badge', client.plano.toLowerCase()]">
-                  {{ client.plano }}
+                <span :class="['plan-badge', client.plan.toLowerCase()]">
+                  {{ client.plan }}
                 </span>
               </td>
               <td>
@@ -217,35 +217,35 @@
               </td>
               <td>
                 <div class="usage-info">
-                  {{ client.usuariosAtivos }}/{{ client.limiteUsuarios }}
+                  {{ client.activeUsers }}/{{ client.userLimit }}
                   <div class="progress-bar">
                     <div
                       class="progress"
                       :style="{
-                        width: `${(client.usuariosAtivos / client.limiteUsuarios) * 100}%`,
+                        width: `${(client.activeUsers / client.userLimit) * 100}%`,
                       }"
-                      :class="{ warning: client.usuariosAtivos / client.limiteUsuarios > 0.8 }"
+                      :class="{ warning: client.activeUsers / client.userLimit > 0.8 }"
                     ></div>
                   </div>
                 </div>
               </td>
               <td>
                 <div class="usage-info">
-                  {{ client.ticketsMes }}/{{ client.limiteTickets }}
+                  {{ client.monthlyTickets }}/{{ client.ticketLimit }}
                   <div class="progress-bar">
                     <div
                       class="progress"
-                      :style="{ width: `${(client.ticketsMes / client.limiteTickets) * 100}%` }"
-                      :class="{ warning: client.ticketsMes / client.limiteTickets > 0.8 }"
+                      :style="{ width: `${(client.monthlyTickets / client.ticketLimit) * 100}%` }"
+                      :class="{ warning: client.monthlyTickets / client.ticketLimit > 0.8 }"
                     ></div>
                   </div>
                 </div>
               </td>
               <td>
                 <div class="payment-info">
-                  <span>{{ formatDate(client.proximaFatura) }}</span>
-                  <span :class="['payment-status', client.statusPagamento]">
-                    {{ client.statusPagamento }}
+                  <span>{{ formatDate(client.nextInvoice) }}</span>
+                  <span :class="['payment-status', client.paymentStatus]">
+                    {{ client.paymentStatus }}
                   </span>
                 </div>
               </td>
@@ -294,18 +294,20 @@
                           <span>{{ user.firstName }} {{ user.lastName }}</span>
                         </td>
                         <td>{{ user.email }}</td>
-                        <td>{{ user.departamento }}</td>
+                        <td>{{ user.department }}</td>
                         <td>
-                          <span :class="['profile-badge', user.perfil.toLowerCase()]">
-                            {{ user.perfil }}
-                          </span>
+                          <span class="profile-badge" :class="user.profile.toLowerCase()">{{
+                            user.profile
+                          }}</span>
                         </td>
                         <td>
-                          <span :class="['status-badge', user.status.toLowerCase()]">
-                            {{ user.status }}
-                          </span>
+                          <span class="status-badge" :class="user.status.toLowerCase()">{{
+                            user.status
+                          }}</span>
                         </td>
-                        <td>{{ formatDateTime(user.ultimoAcesso) }}</td>
+                        <td>
+                          {{ user.lastAccess ? formatDateTime(user.lastAccess) : 'Nunca' }}
+                        </td>
                         <td>
                           <div class="actions">
                             <button class="btn-icon" title="Editar" @click="editUser(user)">
@@ -361,37 +363,28 @@
           </button>
         </div>
         <div class="modal-body">
-          <form @submit.prevent="saveNewClient">
+          <form @submit.prevent="createNewClient">
             <div class="form-group">
               <label>Razão Social</label>
-              <input type="text" v-model="newClient.razaoSocial" required />
+              <input type="text" v-model="newClient.name" required />
             </div>
             <div class="form-group">
               <label>CNPJ</label>
               <input type="text" v-model="newClient.cnpj" required />
             </div>
             <div class="form-group">
-              <label>Plano</label>
-              <select v-model="newClient.plano" required>
-                <option value="BASICO">Básico</option>
-                <option value="PROFISSIONAL">Profissional</option>
-                <option value="EMPRESARIAL">Empresarial</option>
-                <option value="PERSONALIZADO">Personalizado</option>
-              </select>
+              <label>Chave Personalizada</label>
+              <input type="text" v-model="newClient.customKey" required />
             </div>
             <div class="form-group">
-              <label>Domínio</label>
-              <input type="text" v-model="newClient.dominio" required />
-            </div>
-            <div class="form-group">
-              <label>E-mail do Administrador</label>
-              <input type="email" v-model="newClient.adminEmail" required />
+              <label>E-mail</label>
+              <input type="email" v-model="newClient.email" required />
             </div>
           </form>
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" @click="showNewClientModal = false">Cancelar</button>
-          <button class="btn btn-primary" @click="saveNewClient">Criar Cliente</button>
+          <button class="btn btn-primary" @click="createNewClient">Criar Cliente</button>
         </div>
       </div>
     </div>
@@ -399,21 +392,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { getUserInitials } from '@/utils/generic-helper';
+import {
+  tenantService,
+  type TenantWithStats,
+  type TenantStatsResponse,
+} from '@/services/tenantService';
+import { toast } from 'vue3-toastify';
 
 type SortableClientField =
-  | 'razaoSocial'
+  | 'name'
   | 'cnpj'
-  | 'plano'
+  | 'plan'
   | 'status'
-  | 'dominio'
-  | 'usuariosAtivos'
-  | 'limiteUsuarios'
-  | 'ticketsMes'
-  | 'limiteTickets'
-  | 'proximaFatura'
-  | 'statusPagamento';
+  | 'customKey'
+  | 'activeUsers'
+  | 'totalUsers'
+  | 'ticketsThisMonth'
+  | 'totalTickets'
+  | 'nextInvoice'
+  | 'paymentStatus';
 
 // Estados
 const searchTerm = ref('');
@@ -423,193 +422,136 @@ const currentPage = ref(1);
 const showNewClientModal = ref(false);
 const expandedClient = ref<number | null>(null);
 const selectedClients = ref<number[]>([]);
-const sortField = ref<SortableClientField>('razaoSocial');
+const sortField = ref<SortableClientField>('name');
 const sortOrder = ref<'asc' | 'desc'>('asc');
-const pagamentoFilter = ref('');
+const paymentFilter = ref('');
 const dateFilter = ref({
   start: '',
   end: '',
 });
 
+// Loading state
+const isLoading = ref(true);
+const isLoadingStats = ref(true);
+
+// Data from API
+const tenants = ref<TenantWithStats[]>([]);
+const totalTenants = ref(0);
+const totalPages = ref(1);
+const globalStats = ref({
+  totalActiveClients: 0,
+  totalUsers: 0,
+  totalMonthlyTickets: 0,
+});
+
 // Novo cliente
 const newClient = ref({
-  razaoSocial: '',
+  name: '',
   cnpj: '',
-  plano: 'BASICO',
-  dominio: '',
-  adminEmail: '',
+  customKey: '',
+  email: '',
 });
 
-// Dados mockados para exemplo
-const clients = ref([
-  {
-    id: 1,
-    razaoSocial: 'Empresa ABC Ltda',
-    cnpj: '12345678901234',
-    plano: 'PROFISSIONAL',
-    status: 'ATIVO',
-    dominio: 'empresa-abc.tasksystem.com',
-    usuariosAtivos: 15,
-    limiteUsuarios: 20,
-    ticketsMes: 80,
-    limiteTickets: 100,
-    proximaFatura: '2024-04-15',
-    statusPagamento: 'EM_DIA',
-    logo: '/logos/abc.png',
-    users: [
-      {
-        id: 1,
-        firstName: 'João',
-        lastName: 'Silva',
-        email: 'joao.silva@empresa-abc.com',
-        departamento: 'TI',
-        perfil: 'ADMIN',
-        status: 'ATIVO',
-        ultimoAcesso: '2024-03-15T14:30:00',
-      },
-      {
-        id: 2,
-        firstName: 'Maria',
-        lastName: 'Santos',
-        email: 'maria.santos@empresa-abc.com',
-        departamento: 'Suporte',
-        perfil: 'NORMAL',
-        status: 'ATIVO',
-        ultimoAcesso: '2024-03-15T16:45:00',
-      },
-    ],
-  },
-  {
-    id: 2,
-    razaoSocial: 'Tech Solutions Brasil',
-    cnpj: '98765432101234',
-    plano: 'EMPRESARIAL',
-    status: 'ATIVO',
-    dominio: 'techsolutions.tasksystem.com',
-    usuariosAtivos: 45,
-    limiteUsuarios: 50,
-    ticketsMes: 180,
-    limiteTickets: 200,
-    proximaFatura: '2024-04-10',
-    statusPagamento: 'ATRASADO',
-    logo: '/logos/tech.png',
-    users: [
-      {
-        id: 3,
-        firstName: 'Pedro',
-        lastName: 'Oliveira',
-        email: 'pedro.oliveira@techsolutions.com',
-        departamento: 'Diretoria',
-        perfil: 'ADMIN',
-        status: 'ATIVO',
-        ultimoAcesso: '2024-03-16T09:15:00',
-      },
-      {
-        id: 4,
-        firstName: 'Ana',
-        lastName: 'Costa',
-        email: 'ana.costa@techsolutions.com',
-        departamento: 'RH',
-        perfil: 'NORMAL',
-        status: 'ATIVO',
-        ultimoAcesso: '2024-03-16T11:20:00',
-      },
-      {
-        id: 5,
-        firstName: 'Lucas',
-        lastName: 'Mendes',
-        email: 'lucas.mendes@techsolutions.com',
-        departamento: 'Suporte',
-        perfil: 'NORMAL',
-        status: 'SUSPENSO',
-        ultimoAcesso: '2024-03-14T16:30:00',
-      },
-    ],
-  },
-  {
-    id: 3,
-    razaoSocial: 'Indústrias XYZ S.A.',
-    cnpj: '45678912301234',
-    plano: 'BASICO',
-    status: 'SUSPENSO',
-    dominio: 'xyz.tasksystem.com',
-    usuariosAtivos: 8,
-    limiteUsuarios: 10,
-    ticketsMes: 45,
-    limiteTickets: 50,
-    proximaFatura: '2024-04-05',
-    statusPagamento: 'PENDENTE',
-    logo: '/logos/xyz.png',
-    users: [
-      {
-        id: 6,
-        firstName: 'Roberto',
-        lastName: 'Almeida',
-        email: 'roberto.almeida@xyz.com',
-        departamento: 'Operações',
-        perfil: 'ADMIN',
-        status: 'ATIVO',
-        ultimoAcesso: '2024-03-15T08:45:00',
-      },
-      {
-        id: 7,
-        firstName: 'Carla',
-        lastName: 'Santos',
-        email: 'carla.santos@xyz.com',
-        departamento: 'Financeiro',
-        perfil: 'NORMAL',
-        status: 'ATIVO',
-        ultimoAcesso: '2024-03-15T10:30:00',
-      },
-      {
-        id: 8,
-        firstName: 'Fernando',
-        lastName: 'Lima',
-        email: 'fernando.lima@xyz.com',
-        departamento: 'Produção',
-        perfil: 'NORMAL',
-        status: 'SUSPENSO',
-        ultimoAcesso: '2024-03-13T14:20:00',
-      },
-      {
-        id: 9,
-        firstName: 'Patricia',
-        lastName: 'Silva',
-        email: 'patricia.silva@xyz.com',
-        departamento: 'Qualidade',
-        perfil: 'NORMAL',
-        status: 'ATIVO',
-        ultimoAcesso: '2024-03-16T09:10:00',
-      },
-    ],
-  },
-]);
-
-// Estatísticas mockadas
-const stats = ref({
-  clientesAtivos: 145,
-  totalUsuarios: 2890,
-  ticketsMes: 1234,
-  faturamentoMensal: 89500.0,
+const stats = computed(() => {
+  return {
+    activeClients: globalStats.value.totalActiveClients,
+    totalUsers: globalStats.value.totalUsers,
+    monthlyTickets: globalStats.value.totalMonthlyTickets,
+    monthlyRevenue: 89500.0, // This remains mocked as per user requirement
+  };
 });
 
-// Computed properties
+const clients = computed(() => {
+  return tenants.value.map((tenant) => ({
+    id: tenant.id,
+    companyName: tenant.name,
+    cnpj: tenant.cnpj || '',
+    plan: 'PROFISSIONAL', // Mocked as per user requirement
+    status: tenant.isActive ? 'ATIVO' : 'SUSPENSO',
+    activeUsers: tenant.activeUsers,
+    userLimit: tenant.totalUsers + 10, // Mocked limit
+    monthlyTickets: tenant.ticketsThisMonth,
+    ticketLimit: tenant.totalTickets + 50, // Mocked limit
+    nextInvoice: '2024-04-15', // Mocked as per user requirement
+    paymentStatus: 'EM_DIA', // Mocked as per user requirement
+    users: tenant.users.map((user) => ({
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      department: user.departmentName,
+      profile: user.role,
+      status: user.isActive ? 'ATIVO' : 'SUSPENSO',
+      lastAccess: user.lastAccess,
+    })),
+  }));
+});
+
+const loadTenants = async () => {
+  try {
+    isLoading.value = true;
+    const response = await tenantService.getTenantsWithStats({
+      page: currentPage.value,
+      limit: 10,
+      name: searchTerm.value || undefined,
+    });
+
+    tenants.value = response.data.items;
+    totalTenants.value = response.data.total;
+    totalPages.value = response.data.totalPages;
+    globalStats.value = response.data.globalStats;
+  } catch (error) {
+    console.error('Error loading tenants:', error);
+    toast.error('Erro ao carregar dados dos clientes');
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const createNewClient = async () => {
+  try {
+    await tenantService.createTenant({
+      name: newClient.value.name,
+      customKey: newClient.value.customKey,
+      email: newClient.value.email,
+      cnpj: newClient.value.cnpj,
+    });
+
+    toast.success('Cliente criado com sucesso!');
+    showNewClientModal.value = false;
+
+    newClient.value = {
+      name: '',
+      cnpj: '',
+      customKey: '',
+      email: '',
+    };
+
+    await loadTenants();
+  } catch (error) {
+    console.error('Error creating tenant:', error);
+    toast.error('Erro ao criar cliente');
+  }
+};
+
+onMounted(async () => {
+  await loadTenants();
+});
+
 const filteredClients = computed(() => {
   return clients.value.filter((client) => {
     const matchSearch =
       !searchTerm.value ||
-      client.razaoSocial.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+      client.companyName.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
       client.cnpj.includes(searchTerm.value) ||
-      client.plano.toLowerCase().includes(searchTerm.value.toLowerCase());
+      client.plan.toLowerCase().includes(searchTerm.value.toLowerCase());
 
     const matchStatus = !statusFilter.value || client.status === statusFilter.value;
-    const matchPlan = !planFilter.value || client.plano === planFilter.value;
+    const matchPlan = !planFilter.value || client.plan === planFilter.value;
 
     return matchSearch && matchStatus && matchPlan;
   });
 });
-
-const totalPages = computed(() => Math.ceil(filteredClients.value.length / 10));
 
 const isAllSelected = computed(() => {
   return (
@@ -619,17 +561,52 @@ const isAllSelected = computed(() => {
 });
 
 const sortedClients = computed(() => {
-  return [...filteredClients.value].sort((a, b) => {
-    const aValue = a[sortField.value];
-    const bValue = b[sortField.value];
+  const sorted = [...filteredClients.value].sort((a, b) => {
+    let aValue: any;
+    let bValue: any;
 
-    if (aValue < bValue) return sortOrder.value === 'asc' ? -1 : 1;
-    if (aValue > bValue) return sortOrder.value === 'asc' ? 1 : -1;
+    switch (sortField.value) {
+      case 'name':
+        aValue = a.companyName;
+        bValue = b.companyName;
+        break;
+      case 'activeUsers':
+        aValue = a.activeUsers;
+        bValue = b.activeUsers;
+        break;
+      case 'ticketsThisMonth':
+        aValue = a.monthlyTickets;
+        bValue = b.monthlyTickets;
+        break;
+      case 'cnpj':
+        aValue = a.cnpj;
+        bValue = b.cnpj;
+        break;
+      case 'status':
+        aValue = a.status;
+        bValue = b.status;
+        break;
+      default:
+        aValue = a.companyName;
+        bValue = b.companyName;
+    }
+
+    if (typeof aValue === 'string' && typeof bValue === 'string') {
+      return sortOrder.value === 'asc'
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
+    }
+
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return sortOrder.value === 'asc' ? aValue - bValue : bValue - aValue;
+    }
+
     return 0;
   });
+
+  return sorted;
 });
 
-// Métodos
 const toggleClientExpansion = (clientId: number) => {
   expandedClient.value = expandedClient.value === clientId ? null : clientId;
 };
@@ -646,8 +623,14 @@ const formatDateTime = (datetime: string) => {
   return new Date(datetime).toLocaleString('pt-BR');
 };
 
+const formatCurrency = (value: number) => {
+  return value.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  });
+};
+
 const editClient = (client: any) => {
-  // Implementar edição do cliente
   console.log('Editar cliente:', client);
 };
 
@@ -679,19 +662,6 @@ const toggleUserStatus = (user: any) => {
 const resetPassword = (user: any) => {
   // Implementar reset de senha
   console.log('Resetar senha do usuário:', user);
-};
-
-const saveNewClient = () => {
-  // Implementar salvamento do novo cliente
-  console.log('Novo cliente:', newClient.value);
-  showNewClientModal.value = false;
-};
-
-const formatCurrency = (value: number) => {
-  return value.toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  });
 };
 
 const toggleSelection = (client: any) => {
@@ -833,14 +803,6 @@ const exportSelected = () => {
 .clients-table th:nth-child(2),
 .clients-table td:nth-child(2) {
   text-align: left;
-}
-
-.client-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  text-align: left;
-  justify-content: flex-start;
 }
 
 .client-logo {
@@ -1253,5 +1215,72 @@ th:hover {
 
 :deep(body.dark-mode) .bulk-actions {
   background: var(--background-dark);
+}
+
+.modal-footer .btn {
+  padding: 0.5rem 1rem;
+}
+
+/* Dark mode support */
+:deep(body.dark-mode) {
+  .client-management {
+    color: var(--text-color);
+  }
+
+  .clients-table-wrapper,
+  .modal-content {
+    background: var(--card-bg);
+  }
+
+  .clients-table th,
+  .clients-table td {
+    border-bottom-color: var(--border-color);
+  }
+
+  .search-box input,
+  .filter-select,
+  .form-group input,
+  .form-group select {
+    background: var(--input-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+  }
+
+  .btn-icon:hover {
+    background: var(--hover-bg);
+  }
+
+  .modal {
+    background: rgba(0, 0, 0, 0.7);
+  }
+}
+
+/* Loading state styles */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: var(--text-light);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color);
+  border-top: 3px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
