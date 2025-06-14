@@ -36,8 +36,8 @@
           Tickets do Setor
         </button>
         <button
-          :class="['tab-button', activeTab === 'arquivo' ? 'active' : '']"
-          @click="switchTab('arquivo')"
+          :class="['tab-button', activeTab === 'arquivados' ? 'active' : '']"
+          @click="switchTab('arquivados')"
         >
           Arquivados
         </button>
@@ -97,7 +97,7 @@
         </div>
 
         <!-- Tab Content -->
-        <div v-if="activeTab === 'arquivo'" class="archive-sections">
+        <div v-if="activeTab === 'arquivados'" class="archive-sections">
           <TicketTable
             :tickets="tickets"
             :isLoading="isLoading"
@@ -203,6 +203,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { ticketService } from '@/services/ticketService';
 import { useTicketsStore } from '@/stores/tickets';
 import { useUserStore } from '@/stores/user';
@@ -214,8 +215,22 @@ import { toast } from 'vue3-toastify';
 import { debounce, formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { localStorageService } from '@/utils/localStorageService';
 
+const route = useRoute();
+const router = useRouter();
 const ticketsStore = useTicketsStore();
-const activeTab = ref<'recebidos' | 'criados' | 'setor' | 'arquivo'>('recebidos');
+
+const getInitialTab = (): 'recebidos' | 'criados' | 'setor' | 'arquivados' => {
+  const tabFromUrl = route.query.tab as string;
+  const validTabs = ['recebidos', 'criados', 'setor', 'arquivados'];
+
+  if (validTabs.includes(tabFromUrl)) {
+    return tabFromUrl as 'recebidos' | 'criados' | 'setor' | 'arquivados';
+  }
+
+  return 'recebidos';
+};
+
+const activeTab = ref<'recebidos' | 'criados' | 'setor' | 'arquivados'>(getInitialTab());
 const searchTerm = ref('');
 const statusFilter = ref<TicketStatus | null>(null);
 const priorityFilter = ref<TicketPriority | null>(null);
@@ -246,7 +261,7 @@ const tickets = computed(() => {
       return ticketsStore.myTickets.data;
     case 'setor':
       return ticketsStore.departmentTickets.data;
-    case 'arquivo':
+    case 'arquivados':
       return ticketsStore.archivedTickets.data;
     default:
       return [];
@@ -262,7 +277,7 @@ const isLoading = computed(() => {
       return ticketsStore.myTickets.isLoading;
     case 'setor':
       return ticketsStore.departmentTickets.isLoading;
-    case 'arquivo':
+    case 'arquivados':
       return ticketsStore.archivedTickets.isLoading;
     default:
       return false;
@@ -278,21 +293,27 @@ const totalPages = computed(() => {
       return Math.ceil(ticketsStore.myTickets.totalCount / 10);
     case 'setor':
       return Math.ceil(ticketsStore.departmentTickets.totalCount / 10);
-    case 'arquivo':
+    case 'arquivados':
       return Math.ceil(ticketsStore.archivedTickets.totalCount / 10);
     default:
       return 1;
   }
 });
 
-// Switch tabs without refetching data
-const switchTab = (tab: 'recebidos' | 'criados' | 'setor' | 'arquivo') => {
+const switchTab = (tab: 'recebidos' | 'criados' | 'setor' | 'arquivados') => {
   statusFilter.value = null;
   priorityFilter.value = null;
   searchTerm.value = '';
 
   activeTab.value = tab;
   currentPage.value = 1;
+
+  router.push({
+    query: {
+      ...route.query,
+      tab: tab,
+    },
+  });
 };
 
 const fetchTicketsWithFilters = async () => {
@@ -429,6 +450,16 @@ const toggleView = () => {
   isKanbanView.value = !isKanbanView.value;
   localStorageService.setTicketsViewPreference(isKanbanView.value ? 'kanban' : 'table');
 };
+
+watch(
+  () => route.query.tab,
+  (newTab) => {
+    const validTabs = ['recebidos', 'criados', 'setor', 'arquivados'];
+    if (newTab && validTabs.includes(newTab as string)) {
+      activeTab.value = newTab as 'recebidos' | 'criados' | 'setor' | 'arquivados';
+    }
+  },
+);
 
 watch(searchTerm, () => {
   debouncedSearch();

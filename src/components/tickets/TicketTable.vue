@@ -205,7 +205,7 @@
                 </template>
 
                 <!-- Botões para tabela de tickets arquivados -->
-                <template v-else-if="tableType === 'arquivo'">
+                <template v-else-if="tableType === 'arquivados'">
                   <div
                     v-if="ticket.status === TicketStatus.Completed"
                     class="action-btn completed"
@@ -280,6 +280,7 @@
       :isOpen="showVerificationAlert"
       title="Ação Necessária"
       @close="showVerificationAlert = false"
+      :show-footer="false"
     >
       <div class="verification-alert">
         <div class="alert-icon">
@@ -314,7 +315,7 @@ import BaseModal from '../common/BaseModal.vue';
 import { calculateDeadline, formatSnakeToNaturalCase, enumToOptions } from '@/utils/generic-helper';
 
 const props = defineProps<{
-  tableType: 'recebidos' | 'criados' | 'setor' | 'arquivo';
+  tableType: 'recebidos' | 'criados' | 'setor' | 'arquivados';
   pagination?: boolean;
   currentPage: number;
 }>();
@@ -347,7 +348,7 @@ const displayedTickets = computed(() => {
       return ticketsStore.myTickets.data;
     case 'setor':
       return ticketsStore.departmentTickets.data;
-    case 'arquivo':
+    case 'arquivados':
       return ticketsStore.archivedTickets.data;
     default:
       return [];
@@ -362,7 +363,7 @@ const isLoading = computed(() => {
       return ticketsStore.myTickets.isLoading;
     case 'setor':
       return ticketsStore.departmentTickets.isLoading;
-    case 'arquivo':
+    case 'arquivados':
       return ticketsStore.archivedTickets.isLoading;
     default:
       return false;
@@ -381,7 +382,7 @@ const totalPages = computed(() => {
     case 'setor':
       totalCount = ticketsStore.departmentTickets.totalCount;
       break;
-    case 'arquivo':
+    case 'arquivados':
       totalCount = ticketsStore.archivedTickets.totalCount;
       break;
   }
@@ -431,7 +432,7 @@ const refreshTickets = async () => {
     case 'setor':
       await ticketsStore.fetchDepartmentTickets(currentPage.value);
       break;
-    case 'arquivo':
+    case 'arquivados':
       await ticketsStore.fetchArchivedTickets(currentPage.value);
       break;
   }

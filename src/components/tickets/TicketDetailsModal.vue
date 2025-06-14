@@ -238,6 +238,13 @@
           <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
         </button>
         <button
+          v-if="isTargetUser && loadedTicket?.status === TicketStatus.AwaitingVerification"
+          class="action-button cancel-verification"
+          @click="cancelVerificationRequest(loadedTicket.customId)"
+        >
+          <font-awesome-icon icon="undo" /> Cancelar envio para verificação
+        </button>
+        <button
           v-if="isTargetUser && loadedTicket?.status === TicketStatus.Returned"
           class="action-button correct"
           @click="correctTicket(loadedTicket.customId)"
@@ -621,7 +628,7 @@ const acceptTicket = async (ticketId: string) => {
         await ticketService.accept(ticketId);
         toast.success('Ticket aceito com sucesso');
 
-        refreshSelectedTicket();
+        emit('refresh');
       } catch {
         toast.error('Erro ao aceitar o ticket');
       }
@@ -638,7 +645,7 @@ const sendForReview = async (ticketId: string) => {
         await ticketService.updateStatus(ticketId, { status: TicketStatus.AwaitingVerification });
         toast.success('Ticket enviado para revisão');
 
-        refreshSelectedTicket();
+        emit('refresh');
       } catch {
         toast.error('Erro ao enviar o ticket para revisão');
       }
@@ -656,7 +663,7 @@ const approveTicket = async (ticketId: string) => {
         toast.success('Ticket aprovado com sucesso');
 
         if (props.ticket) {
-          refreshSelectedTicket();
+          emit('refresh');
         } else {
           await ticketsStore.fetchTicketDetails(ticketId);
         }
@@ -681,7 +688,7 @@ const requestCorrection = async (ticketId: string) => {
 
         toast.success('Correção solicitada com sucesso');
 
-        refreshSelectedTicket();
+        emit('refresh');
       } catch {
         toast.error('Erro ao solicitar correção');
       }
@@ -721,7 +728,7 @@ const rejectTicket = async (ticketId: string) => {
 
         toast.success('Ticket reprovado com sucesso');
 
-        refreshSelectedTicket();
+        emit('refresh');
       } catch {
         toast.error('Erro ao reprovar o ticket');
       }
@@ -1102,7 +1109,7 @@ const saveTicketName = async () => {
     }
 
     toast.success('Assunto do ticket atualizado com sucesso');
-    refreshSelectedTicket();
+    emit('refresh');
   } catch {
     toast.error('Erro ao atualizar nome do ticket');
   }
@@ -1143,7 +1150,7 @@ const saveTicketDescription = async () => {
     }
 
     toast.success('Descrição do ticket atualizada com sucesso');
-    refreshSelectedTicket();
+    emit('refresh');
   } catch {
     toast.error('Erro ao atualizar descrição do ticket');
   }
@@ -1153,6 +1160,23 @@ const cancelEditingDescription = () => {
   isEditingDescription.value = false;
   editingDescription.value = loadedTicket.value?.description || '';
   descriptionEditorKey.value += 1;
+};
+
+const cancelVerificationRequest = async (ticketId: string) => {
+  openConfirmationModal(
+    'Cancelar Envio para Verificação',
+    'Tem certeza que deseja cancelar o envio para verificação?',
+    async () => {
+      try {
+        await ticketService.updateStatus(ticketId, { status: TicketStatus.InProgress });
+        toast.success('Envio para verificação cancelado');
+
+        emit('refresh');
+      } catch {
+        toast.error('Erro ao cancelar envio para verificação');
+      }
+    },
+  );
 };
 </script>
 
@@ -2829,5 +2853,21 @@ const cancelEditingDescription = () => {
 
 :deep(body.dark-mode) .btn-cancel:hover {
   background: #374151;
+}
+
+.action-button.cancel {
+  background-color: #dc2626;
+}
+
+.action-button.cancel:hover {
+  background-color: #b91c1c;
+}
+
+.action-button.cancel-verification {
+  background-color: #f59e0b;
+}
+
+.action-button.cancel-verification:hover {
+  background-color: #d97706;
 }
 </style>
