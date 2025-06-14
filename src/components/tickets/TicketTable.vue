@@ -280,6 +280,7 @@
       :isOpen="showVerificationAlert"
       title="Ação Necessária"
       @close="showVerificationAlert = false"
+      :show-footer="false"
     >
       <div class="verification-alert">
         <div class="alert-icon">
