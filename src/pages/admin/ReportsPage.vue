@@ -40,7 +40,7 @@
               <font-awesome-icon icon="filter" />
               Filtros
             </button>
-            <button class="btn btn-primary">
+            <button @click="exportToCSV" class="btn btn-primary">
               <font-awesome-icon icon="file-export" />
               Exportar Relatório
             </button>
@@ -1187,6 +1187,8 @@ import {
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import TabSelector from '@/components/common/TabSelector.vue';
 import Select from '@/components/common/Select.vue';
+import { toast } from 'vue3-toastify';
+import { downloadFile } from '@/utils/file-helper';
 ChartJS.register(ChartDataLabels);
 
 // Define the StatsPeriod enum
@@ -2368,6 +2370,145 @@ const getResolutionRateClass = (resolutionRate: number): string => {
   if (resolutionRate >= 0.8) return 'status-available';
   if (resolutionRate >= 0.5) return 'status-in-class';
   return 'status-absent';
+};
+
+const formatStatsPeriod = (period: string): string => {
+  switch (period) {
+    case 'annual':
+      return 'últimos 12 meses';
+    case 'semestral':
+      return 'últimos 6 meses';
+    case 'trimestral':
+      return 'últimos 3 meses';
+    case 'monthly':
+      return 'último mês';
+    case 'weekly':
+      return 'última semana';
+    default:
+      return period;
+  }
+};
+
+const exportToCSV = () => {
+  try {
+    const now = new Date();
+    const timestamp = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR');
+
+    let csvContent = '';
+
+    // Header
+    csvContent += '=== RELATÓRIO GERAL DO SISTEMA ===\n';
+    csvContent += `Data de Geração,${timestamp}\n`;
+    csvContent += `Período,${formatStatsPeriod(selectedStatsPeriod.value)}\n`;
+    csvContent += '\n';
+
+    // General Metrics
+    csvContent += '=== MÉTRICAS GERAIS ===\n';
+    csvContent += 'Métrica,Valor\n';
+    csvContent += `Total de Tickets,${statistics.value?.totalTickets || 0}\n`;
+    csvContent += `Taxa de Resolução,${formatPercentage(statistics.value?.resolutionRate)}\n`;
+    csvContent += `Tempo Médio de Resolução,${formatTimeInSeconds(statistics.value?.averageResolutionTimeSeconds)}\n`;
+    csvContent += `Tempo Médio de Aceitação,${formatTimeInSeconds(statistics.value?.averageAcceptanceTimeSeconds)}\n`;
+    csvContent += '\n';
+
+    // Distribution by Status
+    csvContent += '=== DISTRIBUIÇÃO POR STATUS ===\n';
+    csvContent += 'Status,Quantidade,Percentual\n';
+    const totalStatusTickets = ticketsByStatus.value.datasets[0].data.reduce(
+      (sum, count) => sum + count,
+      0,
+    );
+    ticketsByStatus.value.labels.forEach((label, index) => {
+      const count = ticketsByStatus.value.datasets[0].data[index];
+      const percentage =
+        totalStatusTickets > 0 ? ((count / totalStatusTickets) * 100).toFixed(1) : '0.0';
+      csvContent += `${label},${count},${percentage}%\n`;
+    });
+    csvContent += '\n';
+
+    // Distribution by Priority
+    csvContent += '=== DISTRIBUIÇÃO POR PRIORIDADE ===\n';
+    csvContent += 'Prioridade,Quantidade,Percentual\n';
+    const totalPriorityTickets = ticketsByPriority.value.datasets[0].data.reduce(
+      (sum, count) => sum + count,
+      0,
+    );
+    ticketsByPriority.value.labels.forEach((label, index) => {
+      const count = ticketsByPriority.value.datasets[0].data[index];
+      const percentage =
+        totalPriorityTickets > 0 ? ((count / totalPriorityTickets) * 100).toFixed(1) : '0.0';
+      csvContent += `${label},${count},${percentage}%\n`;
+    });
+    csvContent += '\n';
+
+    // Department Statistics
+    if (departmentStats.value && departmentStats.value.length > 0) {
+      csvContent += '=== ESTATÍSTICAS POR DEPARTAMENTO ===\n';
+      csvContent +=
+        'Departamento,Total Tickets,Resolvidos,Taxa Resolução,Tempo Aceitação,Tempo Resolução,Tempo Total\n';
+      departmentStats.value.forEach((dept) => {
+        csvContent += `${dept.departmentName},${dept.totalTickets},${dept.resolvedTickets},${formatPercentage(dept.resolutionRate)},${formatTimeInSeconds(dept.averageAcceptanceTimeSeconds)},${formatTimeInSeconds(dept.averageResolutionTimeSeconds)},${formatTimeInSeconds(dept.averageTotalTimeSeconds)}\n`;
+      });
+      csvContent += '\n';
+    }
+
+    // Top Contributors
+    if (topUsers.value && topUsers.value.users && topUsers.value.users.length > 0) {
+      csvContent += '=== TOP COLABORADORES ===\n';
+      csvContent += 'Nome,Departamento,Tickets Resolvidos,Taxa Resolução,Total Tickets\n';
+      topUsers.value.users.forEach((user) => {
+        csvContent += `${user.firstName} ${user.lastName},${user.departmentName},${user.resolvedTickets},${formatPercentage(user.resolutionRate)},${user.totalTickets}\n`;
+      });
+      csvContent += '\n';
+    }
+
+    // Recent Tickets
+    if (recentTickets.value && recentTickets.value.length > 0) {
+      csvContent += '=== TICKETS RECENTES ===\n';
+      csvContent += 'ID,Assunto,Status,Prioridade,Data Criação\n';
+      recentTickets.value.forEach((ticket) => {
+        const createdDate = new Date(ticket.createdAt).toLocaleDateString('pt-BR');
+        csvContent += `${ticket.customId},"${ticket.name.replace(/"/g, '""')}",${ticket.status},${ticket.priority},${createdDate}\n`;
+      });
+      csvContent += '\n';
+    }
+
+    // Trend Data (Created vs Completed)
+    if (trendData.value && trendData.value.length > 0) {
+      csvContent += '=== TENDÊNCIAS (CRIADOS VS CONCLUÍDOS) ===\n';
+      csvContent += 'Data,Tickets Criados,Tickets Concluídos,Total\n';
+      trendData.value.forEach((item) => {
+        const date = new Date(item.date).toLocaleDateString('pt-BR');
+        csvContent += `${date},${item.created},${item.resolved},${item.total}\n`;
+      });
+      csvContent += '\n';
+    }
+
+    // In-Progress Tasks
+    if (inProgressTasks.value && inProgressTasks.value.length > 0) {
+      csvContent += '=== TAREFAS EM ANDAMENTO ===\n';
+      csvContent += 'ID,Assunto,Responsável,Tempo em Andamento,Status Prazo\n';
+      inProgressTasks.value.forEach((task) => {
+        const overdueStatus = task.isOverdue ? 'Em atraso' : 'No prazo';
+        csvContent += `${task.customId},"${task.name.replace(/"/g, '""')}",${task.assignee.name},${task.timeInProgress},${overdueStatus}\n`;
+      });
+      csvContent += '\n';
+    }
+
+    // Summary footer
+    csvContent += '=== RESUMO FINAL ===\n';
+    csvContent += `Total de Tickets Criados,${getTotalCreated()}\n`;
+    csvContent += `Total de Tickets Concluídos,${getTotalResolved()}\n`;
+    csvContent += `Tickets em Andamento,${inProgressTasks.value?.length || 0}\n`;
+    csvContent += `Departamentos Ativos,${departmentStats.value?.length || 0}\n`;
+
+    downloadFile(`relatorio-sistema-${now.toISOString().split('T')[0]}.csv`, csvContent, 'text/csv;charset=utf-8;');
+
+    toast.success('Relatório exportado com sucesso!');
+  } catch (error) {
+    console.error('Erro ao exportar relatório:', error);
+    toast.error('Erro ao exportar relatório. Tente novamente.');
+  }
 };
 </script>
 
