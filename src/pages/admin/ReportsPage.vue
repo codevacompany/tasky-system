@@ -40,7 +40,7 @@
               <font-awesome-icon icon="filter" />
               Filtros
             </button>
-            <button @click="exportToCSV" class="btn btn-primary">
+            <button @click="openExportModal" class="btn btn-primary">
               <font-awesome-icon icon="file-export" />
               Exportar Relatório
             </button>
@@ -1142,6 +1142,42 @@
       </div>
     </div>
   </div>
+
+  <BaseModal
+    :isOpen="showExportModal"
+    title="Exportar Relatório"
+    @close="closeExportModal"
+    @cancel="closeExportModal"
+    :showFooter="false"
+  >
+    <div class="text-center">
+      <p class="mb-6 text-gray-600 dark:text-gray-300">
+        Escolha o formato para exportar o relatório:
+      </p>
+
+      <div class="flex flex-col gap-4 max-w-xs mx-auto">
+        <button
+          @click="exportToCSV"
+          class="flex items-center justify-center gap-3 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+        >
+          <font-awesome-icon icon="file-csv" />
+          <div class="text-left">
+            <div class="font-semibold">CSV</div>
+          </div>
+        </button>
+
+        <button
+          @click="exportToExcel"
+          class="flex items-center justify-center gap-3 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+        >
+          <font-awesome-icon icon="file-excel" />
+          <div class="text-left">
+            <div class="font-semibold">Excel (XLSX)</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
@@ -1189,6 +1225,9 @@ import TabSelector from '@/components/common/TabSelector.vue';
 import Select from '@/components/common/Select.vue';
 import { toast } from 'vue3-toastify';
 import { downloadFile } from '@/utils/file-helper';
+import * as XLSX from 'xlsx';
+import BaseModal from '@/components/common/BaseModal.vue';
+import JSZip from 'jszip';
 ChartJS.register(ChartDataLabels);
 
 // Define the StatsPeriod enum
@@ -1202,6 +1241,7 @@ enum StatsPeriod {
 
 // Default to 3 months period
 const selectedStatsPeriod = ref<string>(StatsPeriod.TRIMESTRAL);
+const showExportModal = ref(false);
 
 // Chart.js setup
 ChartJS.register(
@@ -2389,10 +2429,230 @@ const formatStatsPeriod = (period: string): string => {
   }
 };
 
-const exportToCSV = () => {
+const openExportModal = () => {
+  showExportModal.value = true;
+};
+
+const closeExportModal = () => {
+  showExportModal.value = false;
+};
+
+const fetchAllTickets = async () => {
+  try {
+    const response = await ticketService.fetch({ limit: 10000 });
+    return response.data.items;
+  } catch (error) {
+    console.error('Error fetching all tickets:', error);
+    toast.error('Erro ao buscar tickets para exportação');
+    return [];
+  }
+};
+
+const exportToExcel = async () => {
   try {
     const now = new Date();
     const timestamp = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR');
+
+    toast.info('Preparando exportação Excel...');
+
+    const allTickets = await fetchAllTickets();
+    const workbook = XLSX.utils.book_new();
+
+    // General Metrics Sheet with Status and Priority distributions and Summary
+    const generalData = [
+      ['=== RELATÓRIO GERAL DO SISTEMA ==='],
+      ['Data de Geração', timestamp],
+      ['Período', formatStatsPeriod(selectedStatsPeriod.value)],
+      [],
+      ['=== MÉTRICAS GERAIS ==='],
+      ['Métrica', 'Valor'],
+      ['Total de Tickets', statistics.value?.totalTickets || 0],
+      ['Taxa de Resolução', formatPercentage(statistics.value?.resolutionRate)],
+      [
+        'Tempo Médio de Resolução',
+        formatTimeInSeconds(statistics.value?.averageResolutionTimeSeconds),
+      ],
+      [
+        'Tempo Médio de Aceitação',
+        formatTimeInSeconds(statistics.value?.averageAcceptanceTimeSeconds),
+      ],
+      [],
+      ['=== DISTRIBUIÇÃO POR STATUS ==='],
+      ['Status', 'Quantidade', 'Percentual'],
+    ];
+
+    // Add status distribution data
+    if (ticketsByStatus.value && ticketsByStatus.value.labels.length > 0) {
+      const totalStatusTickets = ticketsByStatus.value.datasets[0].data.reduce(
+        (sum, count) => sum + count,
+        0,
+      );
+      ticketsByStatus.value.labels.forEach((label, index) => {
+        const count = ticketsByStatus.value.datasets[0].data[index];
+        const percentage =
+          totalStatusTickets > 0 ? ((count / totalStatusTickets) * 100).toFixed(1) : '0.0';
+        generalData.push([label, count, `${percentage}%`]);
+      });
+    }
+
+    // Add priority distribution
+    generalData.push([]);
+    generalData.push(['=== DISTRIBUIÇÃO POR PRIORIDADE ===']);
+    generalData.push(['Prioridade', 'Quantidade', 'Percentual']);
+
+    if (ticketsByPriority.value && ticketsByPriority.value.labels.length > 0) {
+      const totalPriorityTickets = ticketsByPriority.value.datasets[0].data.reduce(
+        (sum, count) => sum + count,
+        0,
+      );
+      ticketsByPriority.value.labels.forEach((label, index) => {
+        const count = ticketsByPriority.value.datasets[0].data[index];
+        const percentage =
+          totalPriorityTickets > 0 ? ((count / totalPriorityTickets) * 100).toFixed(1) : '0.0';
+        generalData.push([label, count, `${percentage}%`]);
+      });
+    }
+
+    // Add summary data
+    generalData.push([]);
+    generalData.push(['=== RESUMO FINAL ===']);
+    generalData.push(['Métrica', 'Valor']);
+    generalData.push(['Total de Tickets Criados', getTotalCreated()]);
+    generalData.push(['Total de Tickets Concluídos', getTotalResolved()]);
+    generalData.push(['Tickets em Andamento', inProgressTasks.value?.length || 0]);
+    generalData.push(['Departamentos Ativos', departmentStats.value?.length || 0]);
+
+    const generalSheet = XLSX.utils.aoa_to_sheet(generalData);
+    XLSX.utils.book_append_sheet(workbook, generalSheet, 'Métricas Gerais');
+
+    // All Tickets Sheet
+    if (allTickets.length > 0) {
+      const ticketsData = [
+        [
+          'ID',
+          'Assunto',
+          'Status',
+          'Prioridade',
+          'Solicitante',
+          'Responsável',
+          'Departamento',
+          'Data Criação',
+          'Data Atualização',
+        ],
+        ...allTickets.map((ticket) => [
+          ticket.customId,
+          ticket.name,
+          ticket.status,
+          ticket.priority,
+          `${ticket.requester.firstName} ${ticket.requester.lastName}`,
+          ticket.targetUser
+            ? `${ticket.targetUser.firstName} ${ticket.targetUser.lastName}`
+            : 'Não atribuído',
+          ticket.department.name,
+          new Date(ticket.createdAt).toLocaleDateString('pt-BR'),
+          new Date(ticket.updatedAt).toLocaleDateString('pt-BR'),
+        ]),
+      ];
+      const allTicketsSheet = XLSX.utils.aoa_to_sheet(ticketsData);
+      XLSX.utils.book_append_sheet(workbook, allTicketsSheet, 'Tickets');
+    }
+
+    // Department Statistics Sheet
+    if (departmentStats.value && departmentStats.value.length > 0) {
+      const deptData = [
+        ['=== ESTATÍSTICAS POR DEPARTAMENTO ==='],
+        [
+          'Departamento',
+          'Total Tickets',
+          'Resolvidos',
+          'Taxa Resolução',
+          'Tempo Aceitação',
+          'Tempo Resolução',
+          'Tempo Total',
+        ],
+        ...departmentStats.value.map((dept) => [
+          dept.departmentName,
+          dept.totalTickets,
+          dept.resolvedTickets,
+          formatPercentage(dept.resolutionRate),
+          formatTimeInSeconds(dept.averageAcceptanceTimeSeconds),
+          formatTimeInSeconds(dept.averageResolutionTimeSeconds),
+          formatTimeInSeconds(dept.averageTotalTimeSeconds),
+        ]),
+      ];
+      const deptSheet = XLSX.utils.aoa_to_sheet(deptData);
+      XLSX.utils.book_append_sheet(workbook, deptSheet, 'Departamentos');
+    }
+
+    // Top Contributors Sheet
+    if (topUsers.value && topUsers.value.users && topUsers.value.users.length > 0) {
+      const usersData = [
+        ['=== TOP COLABORADORES ==='],
+        ['Nome', 'Departamento', 'Tickets Resolvidos', 'Taxa Resolução', 'Total Tickets'],
+        ...topUsers.value.users.map((user) => [
+          `${user.firstName} ${user.lastName}`,
+          user.departmentName,
+          user.resolvedTickets,
+          formatPercentage(user.resolutionRate),
+          user.totalTickets,
+        ]),
+      ];
+      const usersSheet = XLSX.utils.aoa_to_sheet(usersData);
+      XLSX.utils.book_append_sheet(workbook, usersSheet, 'Top Colaboradores');
+    }
+
+    // Trend Data Sheet
+    if (trendData.value && trendData.value.length > 0) {
+      const trendDataSheet = [
+        ['=== TENDÊNCIAS (CRIADOS VS CONCLUÍDOS) ==='],
+        ['Data', 'Tickets Criados', 'Tickets Concluídos', 'Total'],
+        ...trendData.value.map((item) => [
+          new Date(item.date).toLocaleDateString('pt-BR'),
+          item.created,
+          item.resolved,
+          item.total,
+        ]),
+      ];
+      const trendSheet = XLSX.utils.aoa_to_sheet(trendDataSheet);
+      XLSX.utils.book_append_sheet(workbook, trendSheet, 'Tendências');
+    }
+
+    // In-Progress Tasks Sheet
+    if (inProgressTasks.value && inProgressTasks.value.length > 0) {
+      const tasksData = [
+        ['=== TAREFAS EM ANDAMENTO ==='],
+        ['ID', 'Assunto', 'Responsável', 'Tempo em Andamento', 'Status Prazo'],
+        ...inProgressTasks.value.map((task) => [
+          task.customId,
+          task.name,
+          task.assignee.name,
+          task.timeInProgress,
+          task.isOverdue ? 'Em atraso' : 'No prazo',
+        ]),
+      ];
+      const tasksSheet = XLSX.utils.aoa_to_sheet(tasksData);
+      XLSX.utils.book_append_sheet(workbook, tasksSheet, 'Tarefas em Andamento');
+    }
+
+    // Write file
+    XLSX.writeFile(workbook, `relatorio-sistema-${now.toISOString().split('T')[0]}.xlsx`);
+
+    closeExportModal();
+    toast.success('Relatório Excel exportado com sucesso!');
+  } catch (error) {
+    console.error('Erro ao exportar relatório Excel:', error);
+    toast.error('Erro ao exportar relatório Excel. Tente novamente.');
+  }
+};
+
+const exportToCSV = async () => {
+  try {
+    const now = new Date();
+    const timestamp = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR');
+
+    toast.info('Preparando exportação CSV...');
+
+    const allTickets = await fetchAllTickets();
 
     let csvContent = '';
 
@@ -2502,12 +2762,41 @@ const exportToCSV = () => {
     csvContent += `Tickets em Andamento,${inProgressTasks.value?.length || 0}\n`;
     csvContent += `Departamentos Ativos,${departmentStats.value?.length || 0}\n`;
 
-    downloadFile(`relatorio-sistema-${now.toISOString().split('T')[0]}.csv`, csvContent, 'text/csv;charset=utf-8;');
+    // Create tickets CSV content
+    let ticketsCsvContent = '';
+    ticketsCsvContent +=
+      'ID,Assunto,Status,Prioridade,Solicitante,Responsável,Departamento,Data Criação,Data Atualização\n';
 
-    toast.success('Relatório exportado com sucesso!');
+    allTickets.forEach((ticket) => {
+      const requesterName = `${ticket.requester.firstName} ${ticket.requester.lastName}`;
+      const targetUserName = ticket.targetUser
+        ? `${ticket.targetUser.firstName} ${ticket.targetUser.lastName}`
+        : 'Não atribuído';
+      const createdDate = new Date(ticket.createdAt).toLocaleDateString('pt-BR');
+      const updatedDate = new Date(ticket.updatedAt).toLocaleDateString('pt-BR');
+
+      ticketsCsvContent += `${ticket.customId},"${ticket.name.replace(/"/g, '""')}",${ticket.status},${ticket.priority},"${requesterName}","${targetUserName}","${ticket.department.name}",${createdDate},${updatedDate}\n`;
+    });
+
+    const zip = new JSZip();
+    zip.file(`relatorio-sistema-${now.toISOString().split('T')[0]}.csv`, csvContent);
+    zip.file(`tickets-${now.toISOString().split('T')[0]}.csv`, ticketsCsvContent);
+
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(zipBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `relatorio-completo-${now.toISOString().split('T')[0]}.zip`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    closeExportModal();
+    toast.success('Relatório CSV exportado com sucesso!');
   } catch (error) {
-    console.error('Erro ao exportar relatório:', error);
-    toast.error('Erro ao exportar relatório. Tente novamente.');
+    console.error('Erro ao exportar relatório CSV:', error);
+    toast.error('Erro ao exportar relatório CSV. Tente novamente.');
   }
 };
 </script>

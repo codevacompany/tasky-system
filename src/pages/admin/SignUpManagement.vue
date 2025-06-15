@@ -188,7 +188,7 @@ async function fetchSignups() {
 function startAutoRefresh() {
   autoRefreshInterval = setInterval(() => {
     fetchSignups();
-  }, 60000);
+  }, 60000) as unknown as number;
 }
 
 function stopAutoRefresh() {
