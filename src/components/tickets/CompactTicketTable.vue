@@ -1,47 +1,111 @@
 <template>
-  <div class="dashboard-card">
-    <div class="card-header">
-      <h2>{{ title }}</h2>
-      <router-link to="/meus-tickets" class="card-action">Ver todos</router-link>
+  <div
+    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm flex-1 min-w-0"
+  >
+    <div
+      class="flex justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-gray-700"
+    >
+      <h2 class="text-base font-semibold text-gray-900 dark:text-white m-0">{{ title }}</h2>
+      <router-link
+        to="/meus-tickets"
+        class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors duration-200"
+        >Ver todos</router-link
+      >
     </div>
-    <div class="card-content">
-      <table class="data-table">
+    <div class="p-0">
+      <table class="w-full border-collapse">
         <thead>
           <tr>
-            <th>Assunto</th>
-            <th v-if="title !== 'Últimos Tickets Criados'">Solicitante</th>
-            <th>{{ title === 'Últimos Tickets Criados' ? 'Destino' : 'Setor' }}</th>
-            <th>Prazo</th>
-            <th>Status</th>
+            <th
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50"
+            >
+              Assunto
+            </th>
+            <th
+              v-if="title !== 'Últimos Tickets Criados'"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50"
+            >
+              Solicitante
+            </th>
+            <th
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50"
+            >
+              {{ title === 'Últimos Tickets Criados' ? 'Destino' : 'Setor' }}
+            </th>
+            <th
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50"
+            >
+              Prazo
+            </th>
+            <th
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50"
+            >
+              Status
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="isLoading">
-            <td :colspan="title === 'Últimos Tickets Criados' ? 4 : 5" class="loading-cell">
+            <td
+              :colspan="title === 'Últimos Tickets Criados' ? 4 : 5"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white"
+            >
               <LoadingSpinner :size="28" />
             </td>
           </tr>
-          <tr v-else v-for="ticket in tickets" :key="ticket.id">
-            <td class="assunto-col" :title="ticket.name">{{ ticket.name }}</td>
-            <td v-if="title !== 'Últimos Tickets Criados'">{{ ticket.requester.firstName }}</td>
-            <td>{{ ticket.department.name }}</td>
-            <td>
-              <template v-if="title === 'Últimos Tickets Criados' || title === 'Últimos Tickets Recebidos'">
+          <tr
+            v-else
+            v-for="ticket in tickets"
+            :key="ticket.id"
+            class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200"
+          >
+            <td
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis max-w-[220px]"
+              :title="ticket.name"
+            >
+              {{ ticket.name }}
+            </td>
+            <td
+              v-if="title !== 'Últimos Tickets Criados'"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white"
+            >
+              {{ ticket.requester.firstName }}
+            </td>
+            <td
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white"
+            >
+              {{ ticket.department.name }}
+            </td>
+            <td
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white"
+            >
+              <template
+                v-if="title === 'Últimos Tickets Criados' || title === 'Últimos Tickets Recebidos'"
+              >
                 {{ calculateDeadlineCompact(ticket) }}
               </template>
               <template v-else>
                 {{ formatDate(ticket.createdAt) }}
               </template>
             </td>
-            <td>
-              <span :class="['status-label', statusColor(ticket.status)]">{{
-                formatSnakeToNaturalCase(ticket.status).toUpperCase()
-              }}</span>
+            <td
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white"
+            >
+              <span
+                :class="[
+                  'inline-flex items-center px-2 py-1 rounded text-xs font-medium gap-2 whitespace-nowrap',
+                  getStatusClasses(ticket.status),
+                ]"
+                >{{ formatSnakeToNaturalCase(ticket.status).toUpperCase() }}</span
+              >
             </td>
           </tr>
-          <tr v-if="!isLoading && tickets.length === 0">
-            <td :colspan="title === 'Últimos Tickets Criados' ? 4 : 5" class="empty-state">
-              <font-awesome-icon icon="inbox" /> Nenhum ticket encontrado
+          <tr v-if="!isLoading && tickets.length === 0" class="last:border-b-0">
+            <td
+              :colspan="title === 'Últimos Tickets Criados' ? 4 : 5"
+              class="px-3 py-6 text-center text-gray-500 dark:text-gray-400 text-sm flex flex-col items-center gap-2"
+            >
+              <font-awesome-icon icon="inbox" class="text-lg" /> Nenhum ticket encontrado
             </td>
           </tr>
         </tbody>
@@ -133,103 +197,28 @@ function calculateDeadlineCompact(ticket: Ticket) {
   }
   return `${diffDays}d`;
 }
+
+function getStatusClasses(status: TicketStatus) {
+  switch (status) {
+    case TicketStatus.Pending:
+      return 'bg-orange-50 text-orange-500 border border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800';
+    case TicketStatus.InProgress:
+      return 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800';
+    case TicketStatus.AwaitingVerification:
+    case TicketStatus.UnderVerification:
+      return 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800';
+    case TicketStatus.Completed:
+      return 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800';
+    case TicketStatus.Returned:
+      return 'bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800';
+    case TicketStatus.Rejected:
+      return 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
+    default:
+      return '';
+  }
+}
 </script>
 
 <style scoped>
-.loading-cell {
-  text-align: center;
-}
-
-.card-content {
-  padding: 0;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.data-table th,
-.data-table td {
-  padding: 0.75rem;
-  text-align: center;
-  border-bottom: 1px solid var(--border-color);
-  font-size: 0.85rem;
-}
-
-.data-table th {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-light);
-  background-color: rgba(0, 0, 0, 0.02);
-  text-align: center;
-}
-
-.data-table tr:last-child td {
-  border-bottom: none;
-}
-
-.data-table tr:hover td {
-  background-color: rgba(0, 0, 0, 0.02);
-}
-
-.status-label {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  gap: 0.5rem;
-  white-space: nowrap;
-}
-
-.status-pending {
-  background-color: #fff3e0;
-  color: #f57c00;
-  border: 1px solid rgba(245, 124, 0, 0.3);
-}
-
-.status-in-progress {
-  background-color: #e3f2fd;
-  color: #1976d2;
-  border: 1px solid rgba(25, 118, 210, 0.3);
-}
-
-.status-awaiting-verification {
-  background-color: #f3e5f5;
-  color: #7b1fa2;
-  border: 1px solid rgba(123, 31, 162, 0.3);
-}
-
-.status-overdue {
-  background-color: #ffebee;
-  color: #c62828;
-  border: 1px solid rgba(198, 40, 40, 0.3);
-}
-
-.status-completed {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid rgba(46, 125, 50, 0.3);
-}
-
-.status-returned {
-  background-color: #fff3e0;
-  color: #f57c00;
-  border: 1px solid rgba(245, 124, 0, 0.3);
-}
-
-.status-rejected {
-  background-color: #ffebee;
-  color: #c62828;
-  border: 1px solid rgba(198, 40, 40, 0.3);
-}
-
-.data-table td.assunto-col {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 220px;
-}
+/* All styles have been converted to Tailwind classes */
 </style>

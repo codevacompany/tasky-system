@@ -179,7 +179,3 @@ const formatNotificationMessage = (notification: Notification) => {
 
 onMounted(fetchNotifications);
 </script>
-
-<style scoped>
-/* All styles have been converted to Tailwind classes */
-</style>
