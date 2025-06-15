@@ -1,54 +1,94 @@
 <template>
   <Teleport to="body">
-    <div v-if="showProfileModal" class="backdrop" @click="closeModal"></div>
-    <div v-if="showProfileModal" class="profile-dropdown" id="profileModal" @click.stop>
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Perfil</h2>
-          <button class="close-btn" @click="closeModal">×</button>
+    <div
+      v-if="showProfileModal"
+      class="fixed inset-0 bg-transparent z-[999] pointer-events-auto"
+      @click="closeModal"
+    ></div>
+    <div
+      v-if="showProfileModal"
+      class="fixed top-[calc(var(--header-height)+6px)] right-5 w-[310px] bg-white dark:bg-gray-800 rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.1)] z-[1000] overflow-hidden transition-all duration-300 pointer-events-auto border border-gray-200 dark:border-gray-700"
+      id="profileModal"
+      @click.stop
+    >
+      <div class="w-full">
+        <div
+          class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-between items-center"
+        >
+          <h2
+            class="m-0 text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"
+          >
+            Perfil
+          </h2>
+          <button
+            class="text-gray-900 dark:text-white opacity-70 bg-none border-none cursor-pointer p-1 text-2xl leading-none rounded hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+            @click="closeModal"
+          >
+            ×
+          </button>
         </div>
-        <div class="modal-body">
-          <div class="profile-section">
-            <div class="profile-header">
-              <div class="profile-avatar">
+        <div class="p-0">
+          <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-4">
+              <div
+                class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-lg font-semibold flex-shrink-0"
+              >
                 <span class="initials">{{ userInitials }}</span>
               </div>
-              <div class="profile-info">
-                <h4 class="user-name">{{ user?.firstName }} {{ user?.lastName }}</h4>
-                <p class="user-email">{{ user?.email }}</p>
+              <div class="flex-1 min-w-0">
+                <h4 class="m-0 mb-1 text-base font-semibold text-gray-900 dark:text-white">
+                  {{ user?.firstName }} {{ user?.lastName }}
+                </h4>
+                <p class="m-0 text-sm text-gray-600 dark:text-gray-400">{{ user?.email }}</p>
               </div>
             </div>
           </div>
 
-          <div class="menu-section">
-            <div class="menu-options">
-              <router-link to="/faq" @click="closeModal" class="menu-item">
-                <div class="menu-icon">
+          <div class="py-4">
+            <div class="flex flex-col">
+              <router-link
+                to="/faq"
+                @click="closeModal"
+                class="flex items-center gap-3 px-6 py-3.5 text-gray-900 hover:text-gray-900 dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
                   <font-awesome-icon icon="question-circle" />
                 </div>
-                <span>Ajuda</span>
+                <span class="flex-1 text-sm text font-medium">Ajuda</span>
               </router-link>
 
-              <div class="menu-item" @click="toggleThemeModal">
-                <div class="menu-icon">
+              <div
+                class="flex items-center gap-3 px-6 py-3.5 text-gray-900 dark:text-white cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
+                @click="toggleThemeModal"
+              >
+                <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
                   <font-awesome-icon :icon="isDarkMode ? 'moon' : 'sun'" />
                 </div>
-                <span>Tema</span>
-                <font-awesome-icon icon="chevron-right" class="arrow" />
+                <span class="flex-1 text-sm font-medium">Tema</span>
+                <font-awesome-icon
+                  icon="chevron-right"
+                  class="text-xs text-gray-600 dark:text-gray-400 opacity-50"
+                />
               </div>
 
-              <div class="menu-item" @click="openChangePasswordModal">
-                <div class="menu-icon">
+              <div
+                class="flex items-center gap-3 px-6 py-3.5 text-gray-900 dark:text-white cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
+                @click="openChangePasswordModal"
+              >
+                <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
                   <font-awesome-icon icon="key" />
                 </div>
-                <span>Alterar senha</span>
+                <span class="flex-1 text-sm font-medium">Alterar senha</span>
               </div>
 
-              <div class="menu-item logout" @click="handleLogout">
-                <div class="menu-icon">
+              <div
+                class="flex items-center gap-3 px-6 py-3.5 text-red-600 cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-red-50 dark:hover:bg-red-900/10"
+                @click="handleLogout"
+              >
+                <div class="w-5 flex justify-center text-base text-red-600">
                   <font-awesome-icon icon="sign-out-alt" />
                 </div>
-                <span>Fazer Logout</span>
+                <span class="flex-1 text-sm font-medium">Fazer Logout</span>
               </div>
             </div>
           </div>
@@ -56,39 +96,86 @@
       </div>
     </div>
 
-    <div v-if="showThemeModal" class="backdrop" @click="closeThemeModal"></div>
-    <div v-if="showThemeModal" class="theme-modal" @click.stop>
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>
+    <div
+      v-if="showThemeModal"
+      class="fixed inset-0 bg-transparent z-[999] pointer-events-auto"
+      @click="closeThemeModal"
+    ></div>
+    <div
+      v-if="showThemeModal"
+      class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.15)] z-[1001] overflow-hidden border border-gray-200 dark:border-gray-700"
+      @click.stop
+    >
+      <div class="w-full">
+        <div
+          class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-between items-center"
+        >
+          <h2
+            class="m-0 text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"
+          >
             <font-awesome-icon :icon="isDarkMode ? 'moon' : 'sun'" />
             Tema
           </h2>
-          <button class="close-btn" @click="closeThemeModal">×</button>
+          <button
+            class="text-gray-900 dark:text-white opacity-70 bg-none border-none cursor-pointer p-1 text-2xl leading-none rounded hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+            @click="closeThemeModal"
+          >
+            ×
+          </button>
         </div>
-        <div class="modal-body">
-          <div class="theme-options">
-            <div class="theme-option" @click="setTheme('light')" :class="{ active: !isDarkMode }">
-              <div class="theme-preview light">
-                <div class="preview-header"></div>
-                <div class="preview-content"></div>
+        <div class="p-0">
+          <div class="p-6 flex flex-col gap-4">
+            <div
+              class="flex items-center gap-4 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer transition-all duration-200 relative hover:border-blue-500 dark:hover:border-blue-400"
+              :class="{
+                'border-blue-500 dark:border-blue-400 bg-blue-50/50 dark:bg-blue-900/10':
+                  !isDarkMode,
+              }"
+              @click="setTheme('light')"
+            >
+              <div
+                class="w-[60px] h-10 rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 flex-shrink-0 bg-white"
+              >
+                <div class="h-3 bg-gray-100 border-b border-gray-200"></div>
+                <div class="h-7 bg-white"></div>
               </div>
-              <div class="theme-info">
-                <h4>Claro</h4>
-                <p>Tema padrão com fundo branco</p>
+              <div class="flex-1">
+                <h4 class="m-0 mb-1 text-sm font-semibold text-gray-900 dark:text-white">Claro</h4>
+                <p class="m-0 text-xs text-gray-600 dark:text-gray-400">
+                  Tema padrão com fundo branco
+                </p>
               </div>
-              <font-awesome-icon v-if="!isDarkMode" icon="check" class="check-icon" />
+              <font-awesome-icon
+                v-if="!isDarkMode"
+                icon="check"
+                class="absolute top-2 right-2 text-blue-500 dark:text-blue-400 text-sm"
+              />
             </div>
-            <div class="theme-option" @click="setTheme('dark')" :class="{ active: isDarkMode }">
-              <div class="theme-preview dark">
-                <div class="preview-header"></div>
-                <div class="preview-content"></div>
+            <div
+              class="flex items-center gap-4 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer transition-all duration-200 relative hover:border-blue-500 dark:hover:border-blue-400"
+              :class="{
+                'border-blue-500 dark:border-blue-400 bg-blue-50/50 dark:bg-blue-900/10':
+                  isDarkMode,
+              }"
+              @click="setTheme('dark')"
+            >
+              <div
+                class="w-[60px] h-10 rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 flex-shrink-0 bg-gray-800"
+              >
+                <div class="h-3 bg-gray-700 border-b border-gray-600"></div>
+                <div class="h-7 bg-gray-800"></div>
               </div>
-              <div class="theme-info">
-                <h4>Escuro</h4>
-                <p>Tema escuro para reduzir o cansaço visual</p>
+              <div class="flex-1">
+                <h4 class="m-0 mb-1 text-sm font-semibold text-gray-900 dark:text-white">Escuro</h4>
+                <p class="m-0 text-xs text-gray-600 dark:text-gray-400">
+                  Tema escuro para reduzir o cansaço visual
+                </p>
               </div>
-              <font-awesome-icon v-if="isDarkMode" icon="check" class="check-icon" />
+              <font-awesome-icon
+                v-if="isDarkMode"
+                icon="check"
+                class="absolute top-2 right-2 text-blue-500 dark:text-blue-400 text-sm"
+              />
             </div>
           </div>
         </div>
@@ -107,59 +194,123 @@
       @confirm="changePassword"
     >
       <form @submit.prevent="changePassword">
-        <div class="form-group">
-          <label for="currentPassword">Senha Atual</label>
+        <div class="mb-6">
+          <label
+            for="currentPassword"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Senha Atual</label
+          >
           <input
             type="password"
             id="currentPassword"
             v-model="passwordForm.currentPassword"
-            class="form-control"
-            :class="{ error: passwordForm.errors.currentPassword }"
+            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:outline-none focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
+            :class="{ 'border-red-500': passwordForm.errors.currentPassword }"
             placeholder="Digite sua senha atual"
             required
           />
-          <span v-if="passwordForm.errors.currentPassword" class="error-message">
+          <span v-if="passwordForm.errors.currentPassword" class="block mt-2 text-xs text-red-500">
             {{ passwordForm.errors.currentPassword }}
           </span>
         </div>
-        <div class="form-group">
-          <label for="newPassword">Nova Senha</label>
+        <div class="mb-6">
+          <label
+            for="newPassword"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Nova Senha</label
+          >
           <input
             type="password"
             id="newPassword"
             v-model="passwordForm.newPassword"
-            class="form-control"
-            :class="{ error: passwordForm.errors.newPassword }"
+            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:outline-none focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
+            :class="{ 'border-red-500': passwordForm.errors.newPassword }"
             placeholder="Digite sua nova senha"
             required
           />
-          <span v-if="passwordForm.errors.newPassword" class="error-message">
+          <span v-if="passwordForm.errors.newPassword" class="block mt-2 text-xs text-red-500">
             {{ passwordForm.errors.newPassword }}
           </span>
         </div>
-        <div class="form-group">
-          <label for="confirmPassword">Confirmar Nova Senha</label>
+        <div class="mb-6">
+          <label
+            for="confirmPassword"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >Confirmar Nova Senha</label
+          >
           <input
             type="password"
             id="confirmPassword"
             v-model="passwordForm.confirmPassword"
-            class="form-control"
-            :class="{ error: passwordForm.errors.confirmPassword }"
+            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:outline-none focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
+            :class="{ 'border-red-500': passwordForm.errors.confirmPassword }"
             placeholder="Confirme sua nova senha"
             required
           />
-          <span v-if="passwordForm.errors.confirmPassword" class="error-message">
+          <span v-if="passwordForm.errors.confirmPassword" class="block mt-2 text-xs text-red-500">
             {{ passwordForm.errors.confirmPassword }}
           </span>
         </div>
-        <div class="password-requirements">
-          <p>A senha deve conter:</p>
-          <ul>
-            <li :class="{ valid: hasMinLength }">Mínimo de 8 caracteres</li>
-            <li :class="{ valid: hasUpperCase }">Pelo menos 1 letra maiúscula</li>
-            <li :class="{ valid: hasLowerCase }">Pelo menos 1 letra minúscula</li>
-            <li :class="{ valid: hasNumber }">Pelo menos 1 número</li>
-            <li :class="{ valid: hasSpecialChar }">Pelo menos 1 caractere especial</li>
+        <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-md mb-6">
+          <p class="m-0 mb-2 text-xs font-medium text-gray-900 dark:text-white">
+            A senha deve conter:
+          </p>
+          <ul class="m-0 p-0 list-none">
+            <li
+              class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mb-1"
+              :class="{ 'text-green-600 dark:text-green-400': hasMinLength }"
+            >
+              <span
+                class="font-bold"
+                :class="hasMinLength ? 'text-green-600 dark:text-green-400' : 'text-red-500'"
+                >{{ hasMinLength ? '✓' : '✗' }}</span
+              >
+              Mínimo de 8 caracteres
+            </li>
+            <li
+              class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mb-1"
+              :class="{ 'text-green-600 dark:text-green-400': hasUpperCase }"
+            >
+              <span
+                class="font-bold"
+                :class="hasUpperCase ? 'text-green-600 dark:text-green-400' : 'text-red-500'"
+                >{{ hasUpperCase ? '✓' : '✗' }}</span
+              >
+              Pelo menos 1 letra maiúscula
+            </li>
+            <li
+              class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mb-1"
+              :class="{ 'text-green-600 dark:text-green-400': hasLowerCase }"
+            >
+              <span
+                class="font-bold"
+                :class="hasLowerCase ? 'text-green-600 dark:text-green-400' : 'text-red-500'"
+                >{{ hasLowerCase ? '✓' : '✗' }}</span
+              >
+              Pelo menos 1 letra minúscula
+            </li>
+            <li
+              class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mb-1"
+              :class="{ 'text-green-600 dark:text-green-400': hasNumber }"
+            >
+              <span
+                class="font-bold"
+                :class="hasNumber ? 'text-green-600 dark:text-green-400' : 'text-red-500'"
+                >{{ hasNumber ? '✓' : '✗' }}</span
+              >
+              Pelo menos 1 número
+            </li>
+            <li
+              class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mb-1"
+              :class="{ 'text-green-600 dark:text-green-400': hasSpecialChar }"
+            >
+              <span
+                class="font-bold"
+                :class="hasSpecialChar ? 'text-green-600 dark:text-green-400' : 'text-red-500'"
+                >{{ hasSpecialChar ? '✓' : '✗' }}</span
+              >
+              Pelo menos 1 caractere especial
+            </li>
           </ul>
         </div>
       </form>
@@ -358,476 +509,3 @@ const userInitials = computed(() => {
   return '';
 });
 </script>
-
-<style scoped>
-.backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: transparent;
-  z-index: 999;
-  pointer-events: auto;
-}
-
-.profile-dropdown {
-  position: fixed;
-  top: calc(var(--header-height) + 6px);
-  right: 20px;
-  width: 310px;
-  background-color: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  pointer-events: auto;
-  border: 1px solid var(--border-color);
-}
-
-.theme-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90%;
-  max-width: 500px;
-  background-color: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  z-index: 1001;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-}
-
-.modal-content {
-  width: 100%;
-}
-
-.modal-header {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-  background-color: var(--card-bg);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-header h2 {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text-color);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.close-btn {
-  color: var(--text-color);
-  opacity: 0.7;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  font-size: 1.5rem;
-  line-height: 1;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.close-btn:hover {
-  opacity: 1;
-  background-color: var(--hover-bg);
-}
-
-.modal-body {
-  padding: 0;
-}
-
-.profile-section {
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.section-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-light);
-  margin: 0 0 1rem 0;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.profile-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.profile-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.2rem;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.profile-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.user-name {
-  margin: 0 0 0.25rem 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.user-email {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--text-light);
-}
-
-.menu-section {
-  padding: 1rem 0;
-}
-
-.menu-section .section-title {
-  padding: 0 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.menu-options {
-  display: flex;
-  flex-direction: column;
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1.5rem;
-  color: var(--text-color);
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-}
-
-.menu-item:hover {
-  background-color: var(--hover-bg);
-}
-
-.menu-item.logout {
-  color: var(--danger-color);
-}
-
-.menu-item.logout:hover {
-  background-color: rgba(239, 68, 68, 0.05);
-}
-
-.menu-icon {
-  width: 20px;
-  display: flex;
-  justify-content: center;
-  font-size: 1rem;
-  color: var(--text-light);
-}
-
-.menu-item.logout .menu-icon {
-  color: var(--danger-color);
-}
-
-.menu-item span {
-  flex: 1;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.arrow {
-  font-size: 0.75rem;
-  color: var(--text-light);
-  opacity: 0.5;
-}
-
-/* Theme Modal Styles */
-.theme-options {
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.theme-option {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.theme-option:hover {
-  border-color: var(--primary-color);
-}
-
-.theme-option.active {
-  border-color: var(--primary-color);
-  background-color: rgba(37, 99, 235, 0.05);
-}
-
-.theme-preview {
-  width: 60px;
-  height: 40px;
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-  flex-shrink: 0;
-}
-
-.theme-preview.light {
-  background: #ffffff;
-}
-
-.theme-preview.light .preview-header {
-  height: 12px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.theme-preview.light .preview-content {
-  height: 27px;
-  background: #ffffff;
-}
-
-.theme-preview.dark {
-  background: #1a2233;
-}
-
-.theme-preview.dark .preview-header {
-  height: 12px;
-  background: #1e293b;
-  border-bottom: 1px solid #334155;
-}
-
-.theme-preview.dark .preview-content {
-  height: 27px;
-  background: #1a2233;
-}
-
-.theme-info {
-  flex: 1;
-}
-
-.theme-info h4 {
-  margin: 0 0 0.25rem 0;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.theme-info p {
-  margin: 0;
-  font-size: 0.75rem;
-  color: var(--text-light);
-}
-
-.check-icon {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  color: var(--primary-color);
-  font-size: 0.875rem;
-}
-
-/* Password Change Form Styles (for BaseModal content) */
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-color);
-}
-
-.form-control {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid var(--border-color);
-  border-radius: 6px;
-  font-size: 0.875rem;
-  color: var(--text-color);
-  background-color: var(--card-bg);
-  transition: all 0.2s ease;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.form-control.error {
-  border-color: var(--danger-color);
-}
-
-.error-message {
-  display: block;
-  margin-top: 0.5rem;
-  font-size: 0.75rem;
-  color: var(--danger-color);
-}
-
-.password-requirements {
-  background: var(--hover-bg);
-  padding: 1rem;
-  border-radius: 6px;
-  margin-bottom: 1.5rem;
-}
-
-.password-requirements p {
-  margin: 0 0 0.5rem 0;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-color);
-}
-
-.password-requirements ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.password-requirements li {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: var(--text-light);
-  margin-bottom: 0.25rem;
-}
-
-.password-requirements li::before {
-  content: '✗';
-  color: var(--danger-color);
-  font-weight: bold;
-}
-
-.password-requirements li.valid {
-  color: var(--success-color);
-}
-
-.password-requirements li.valid::before {
-  content: '✓';
-  color: var(--success-color);
-}
-
-/* Dark mode styles */
-:deep(body.dark-mode) .profile-dropdown,
-:deep(body.dark-mode) .theme-modal {
-  background-color: var(--card-bg);
-  border-color: var(--border-color);
-}
-
-:deep(body.dark-mode) .modal-header {
-  background-color: var(--card-bg);
-  border-bottom-color: var(--border-color);
-}
-
-:deep(body.dark-mode) .modal-header h2 {
-  color: var(--text-color);
-}
-
-:deep(body.dark-mode) .close-btn {
-  color: var(--text-color);
-}
-
-:deep(body.dark-mode) .close-btn:hover {
-  background-color: var(--hover-bg);
-}
-
-:deep(body.dark-mode) .profile-section {
-  border-bottom-color: var(--border-color);
-}
-
-:deep(body.dark-mode) .section-title {
-  color: var(--text-light);
-}
-
-:deep(body.dark-mode) .user-name {
-  color: var(--text-color);
-}
-
-:deep(body.dark-mode) .user-email {
-  color: var(--text-light);
-}
-
-:deep(body.dark-mode) .menu-item {
-  color: var(--text-color);
-}
-
-:deep(body.dark-mode) .menu-item:hover {
-  background-color: var(--hover-bg);
-}
-
-:deep(body.dark-mode) .menu-icon {
-  color: var(--text-light);
-}
-
-:deep(body.dark-mode) .arrow {
-  color: var(--text-light);
-}
-
-:deep(body.dark-mode) .theme-option {
-  border-color: var(--border-color);
-}
-
-:deep(body.dark-mode) .theme-option:hover {
-  border-color: var(--primary-color);
-}
-
-:deep(body.dark-mode) .theme-option.active {
-  background-color: rgba(37, 99, 235, 0.1);
-}
-
-:deep(body.dark-mode) .theme-info h4 {
-  color: var(--text-color);
-}
-
-:deep(body.dark-mode) .theme-info p {
-  color: var(--text-light);
-}
-
-:deep(body.dark-mode) .form-control {
-  background-color: var(--hover-bg);
-  border-color: var(--border-color);
-  color: var(--text-color);
-}
-
-:deep(body.dark-mode) .form-control:focus {
-  border-color: var(--primary-color);
-}
-
-:deep(body.dark-mode) .password-requirements {
-  background-color: var(--hover-bg);
-}
-</style>
