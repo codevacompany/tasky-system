@@ -274,7 +274,7 @@ onMounted(() => {
   //let's use a polling strategy for now
   notificationsIntervalId = setInterval(() => {
     fetchUnreadCount();
-  }, 90000);
+  }, 90000) as unknown as number;
 
   // source = new EventSource(`${import.meta.env.VITE_API_BASE_URL}/notifications/stream/${user?.id}`);
   // source.onmessage = () => {

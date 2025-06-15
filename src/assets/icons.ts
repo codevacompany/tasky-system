@@ -82,6 +82,8 @@ import {
   faFileExport,
   faDownload,
   faCalendar,
+  faFileCsv,
+  faFileExcel,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -175,6 +177,8 @@ const icons = [
   faFileExport,
   faDownload,
   faCalendar,
+  faFileCsv,
+  faFileExcel,
 ];
 
 library.add(...icons);
