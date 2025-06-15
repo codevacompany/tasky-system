@@ -12,33 +12,33 @@
         >Ver todos</router-link
       >
     </div>
-    <div class="p-0">
-      <table class="w-full border-collapse">
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse min-w-[600px]">
         <thead>
           <tr>
             <th
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50 whitespace-nowrap"
             >
               Assunto
             </th>
             <th
               v-if="title !== 'Últimos Tickets Criados'"
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50 whitespace-nowrap"
             >
               Solicitante
             </th>
             <th
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50 whitespace-nowrap"
             >
               {{ title === 'Últimos Tickets Criados' ? 'Destino' : 'Setor' }}
             </th>
             <th
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50 whitespace-nowrap"
             >
               Prazo
             </th>
             <th
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50 whitespace-nowrap"
             >
               Status
             </th>
@@ -60,24 +60,24 @@
             class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200"
           >
             <td
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis max-w-[220px]"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]"
               :title="ticket.name"
             >
               {{ ticket.name }}
             </td>
             <td
               v-if="title !== 'Últimos Tickets Criados'"
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap"
             >
               {{ ticket.requester.firstName }}
             </td>
             <td
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap"
             >
               {{ ticket.department.name }}
             </td>
             <td
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap"
             >
               <template
                 v-if="title === 'Últimos Tickets Criados' || title === 'Últimos Tickets Recebidos'"
@@ -89,7 +89,7 @@
               </template>
             </td>
             <td
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap"
             >
               <span
                 :class="[
@@ -218,7 +218,3 @@ function getStatusClasses(status: TicketStatus) {
   }
 }
 </script>
-
-<style scoped>
-/* All styles have been converted to Tailwind classes */
-</style>

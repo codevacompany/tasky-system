@@ -1,198 +1,360 @@
 <template>
-  <section id="ticketsSection" class="section-content">
-    <div class="section-header">
-      <div class="header-content">
-        <h1>Tickets</h1>
+  <section id="ticketsSection" class="p-4 md:p-6">
+    <div class="mb-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Tickets</h1>
         <button
-          class="view-toggle-btn"
+          class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
           @click="toggleView"
           :title="
             isKanbanView ? 'Mudar para visualização em tabela' : 'Mudar para visualização Kanban'
           "
         >
-          <font-awesome-icon :icon="isKanbanView ? 'table' : 'columns'" />
-          <span>{{ isKanbanView ? 'Visualização em Tabela' : 'Visualização Kanban' }}</span>
+          <font-awesome-icon :icon="isKanbanView ? 'table' : 'columns'" class="w-4 h-4" />
+          <span class="hidden sm:inline">{{
+            isKanbanView ? 'Visualização em Tabela' : 'Visualização Kanban'
+          }}</span>
+          <span class="sm:hidden">{{ isKanbanView ? 'Tabela' : 'Kanban' }}</span>
         </button>
       </div>
     </div>
-    <div class="tab-container">
-      <div class="tab-buttons">
+    <div class="mt-6">
+      <!-- Mobile-friendly tabs -->
+      <div class="flex border-b border-gray-200 dark:border-gray-700 mb-6 overflow-auto">
         <button
-          :class="['tab-button', activeTab === 'recebidos' ? 'active' : '']"
+          :class="[
+            'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
+            activeTab === 'recebidos'
+              ? 'text-blue-600 dark:text-blue-400'
+              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
+          ]"
+          :style="
+            activeTab === 'recebidos'
+              ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
+              : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
+          "
           @click="switchTab('recebidos')"
         >
           Recebidos
         </button>
         <button
-          :class="['tab-button', activeTab === 'criados' ? 'active' : '']"
+          :class="[
+            'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
+            activeTab === 'criados'
+              ? 'text-blue-600 dark:text-blue-400'
+              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
+          ]"
+          :style="
+            activeTab === 'criados'
+              ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
+              : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
+          "
           @click="switchTab('criados')"
         >
-          Criados por Mim
+          <span class="hidden sm:inline">Criados por Mim</span>
+          <span class="sm:hidden">Criados</span>
         </button>
         <button
-          :class="['tab-button', activeTab === 'setor' ? 'active' : '']"
+          :class="[
+            'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
+            activeTab === 'setor'
+              ? 'text-blue-600 dark:text-blue-400'
+              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
+          ]"
+          :style="
+            activeTab === 'setor'
+              ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
+              : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
+          "
           @click="switchTab('setor')"
         >
-          Tickets do Setor
+          <span class="hidden sm:inline">Tickets do Setor</span>
+          <span class="sm:hidden">Setor</span>
         </button>
         <button
-          :class="['tab-button', activeTab === 'arquivados' ? 'active' : '']"
+          :class="[
+            'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
+            activeTab === 'arquivados'
+              ? 'text-blue-600 dark:text-blue-400'
+              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
+          ]"
+          :style="
+            activeTab === 'arquivados'
+              ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
+              : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
+          "
           @click="switchTab('arquivados')"
         >
           Arquivados
         </button>
       </div>
 
-      <div class="tab-content">
-        <div class="ticket-filters">
-          <div class="filter-group">
-            <label for="statusFilter">Status:</label>
-            <select id="statusFilter" v-model="statusFilter">
-              <option :value="null">Todos</option>
-              <option :value="TicketStatus.Pending">
-                {{ formatSnakeToNaturalCase(TicketStatus.Pending) }}
-              </option>
-              <option :value="TicketStatus.InProgress">
-                {{ formatSnakeToNaturalCase(TicketStatus.InProgress) }}
-              </option>
-              <option :value="TicketStatus.Completed">
-                {{ formatSnakeToNaturalCase(TicketStatus.Completed) }}
-              </option>
-              <option :value="TicketStatus.AwaitingVerification">
-                {{ formatSnakeToNaturalCase(TicketStatus.AwaitingVerification) }}
-              </option>
-              <option :value="TicketStatus.UnderVerification">
-                {{ formatSnakeToNaturalCase(TicketStatus.UnderVerification) }}
-              </option>
-            </select>
+      <div class="min-h-[300px]">
+        <!-- Desktop filters -->
+        <div class="hidden md:flex items-center mb-6 gap-4 flex-wrap">
+          <div class="flex items-center gap-2">
+            <label for="statusFilter" class="text-sm font-medium text-gray-600 dark:text-gray-400"
+              >Status:</label
+            >
+            <div class="w-48">
+              <Select v-model="statusFilter" :options="statusOptions" />
+            </div>
           </div>
 
-          <div class="filter-group">
-            <label for="priorityFilter">Prioridade:</label>
-            <select id="priorityFilter" v-model="priorityFilter">
-              <option :value="null">Todas</option>
-              <option :value="TicketPriority.Low">
-                {{ formatSnakeToNaturalCase(TicketPriority.Low) }}
-              </option>
-              <option :value="TicketPriority.Medium">
-                {{ formatSnakeToNaturalCase(TicketPriority.Medium) }}
-              </option>
-              <option :value="TicketPriority.High">
-                {{ formatSnakeToNaturalCase(TicketPriority.High) }}
-              </option>
-            </select>
+          <div class="flex items-center gap-2">
+            <label for="priorityFilter" class="text-sm font-medium text-gray-600 dark:text-gray-400"
+              >Prioridade:</label
+            >
+            <div class="w-48">
+              <Select v-model="priorityFilter" :options="priorityOptions" />
+            </div>
           </div>
 
-          <div class="search-group">
-            <div class="search-input-wrapper">
-              <font-awesome-icon icon="search" class="input-icon" />
+          <div class="flex items-center gap-4">
+            <div class="relative w-full">
+              <font-awesome-icon
+                icon="search"
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 pointer-events-none"
+              />
               <input
                 type="text"
                 id="searchTickets"
                 placeholder="Buscar tickets..."
                 v-model="searchTerm"
+                class="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
               />
             </div>
           </div>
         </div>
 
+        <!-- Mobile filter button -->
+        <div class="md:hidden mb-4 flex items-center justify-between">
+          <button
+            class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+            @click="showFiltersModal = true"
+          >
+            <font-awesome-icon icon="filter" class="w-4 h-4" />
+            Filtros
+          </button>
+
+          <!-- Mobile search -->
+          <div class="relative flex-1 ml-4">
+            <font-awesome-icon
+              icon="search"
+              class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 pointer-events-none"
+            />
+            <input
+              type="text"
+              placeholder="Buscar..."
+              v-model="searchTerm"
+              class="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
+            />
+          </div>
+        </div>
+
         <!-- Tab Content -->
-        <div v-if="activeTab === 'arquivados'" class="archive-sections">
-          <TicketTable
-            :tickets="tickets"
-            :isLoading="isLoading"
-            :tableType="activeTab"
-            :currentPage="currentPage"
-            :totalPages="totalPages"
-            :pagination="true"
-            @changePage="(page) => (currentPage = page)"
-            @viewTicket="handleViewTicket"
-            @refresh="fetchTicketsWithFilters"
-          />
+        <div v-if="activeTab === 'arquivados'" class="flex flex-col gap-8">
+          <!-- Horizontal scroll wrapper for table -->
+          <div class="overflow-x-auto">
+            <TicketTable
+              :tickets="tickets"
+              :isLoading="isLoading"
+              :tableType="activeTab"
+              :currentPage="currentPage"
+              :totalPages="totalPages"
+              :pagination="true"
+              @changePage="(page) => (currentPage = page)"
+              @viewTicket="handleViewTicket"
+              @refresh="fetchTicketsWithFilters"
+            />
+          </div>
         </div>
 
         <div v-else>
-          <div class="tickets-summary">
-            <div class="summary-item">
-              <div class="summary-item-content">
-                <div class="stat-icon">
-                  <font-awesome-icon icon="ticket" />
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div
+              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white"
+                  >
+                    <font-awesome-icon icon="ticket" />
+                  </div>
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total</span>
                 </div>
-                <span class="summary-label">Total</span>
+                <span class="text-xl font-bold text-blue-600 dark:text-blue-400">{{
+                  totalTickets
+                }}</span>
               </div>
-              <span class="stat-number">{{ totalTickets }}</span>
             </div>
-            <div class="summary-item">
-              <div class="summary-item-content">
-                <div class="stat-icon orange">
-                  <font-awesome-icon icon="clock" />
+            <div
+              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white"
+                  >
+                    <font-awesome-icon icon="clock" />
+                  </div>
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >Pendentes</span
+                  >
                 </div>
-                <span class="summary-label">Pendentes</span>
+                <span class="text-xl font-bold text-orange-500 dark:text-orange-400">{{
+                  pendingTickets
+                }}</span>
               </div>
-              <span class="stat-number">{{ pendingTickets }}</span>
             </div>
-            <div class="summary-item">
-              <div class="summary-item-content">
-                <div class="stat-icon blue">
-                  <font-awesome-icon icon="spinner" />
+            <div
+              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white"
+                  >
+                    <font-awesome-icon icon="spinner" />
+                  </div>
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >Em Andamento</span
+                  >
                 </div>
-                <span class="summary-label">Em Andamento</span>
+                <span class="text-xl font-bold text-blue-500 dark:text-blue-400">{{
+                  inProgressTickets
+                }}</span>
               </div>
-              <span class="stat-number">{{ inProgressTickets }}</span>
             </div>
           </div>
 
-          <!-- Tabela principal para tabs não-arquivo -->
-          <TicketTable
-            v-if="!isKanbanView"
-            :tickets="tickets"
-            :isLoading="isLoading"
-            :tableType="activeTab"
-            :currentPage="currentPage"
-            :totalPages="totalPages"
-            :pagination="true"
-            @changePage="(page) => (currentPage = page)"
-            @viewTicket="handleViewTicket"
-            @editTicket="handleEditTicket"
-            @cancelTicket="handleCancelTicket"
-            @acceptTicket="handleAcceptTicket"
-            @verifyTicket="handleVerifyTicket"
-            @approveTicket="handleApproveTicket"
-            @requestCorrection="handleRequestCorrection"
-            @rejectTicket="handleRejectTicket"
-            @refresh="fetchTicketsWithFilters"
-          />
-          <TicketKanban v-else :tickets="tickets" @viewTicket="handleViewTicket" />
+          <!-- Horizontal scroll wrapper for table -->
+          <div class="overflow-x-auto">
+            <TicketTable
+              v-if="!isKanbanView"
+              :tickets="tickets"
+              :isLoading="isLoading"
+              :tableType="activeTab"
+              :currentPage="currentPage"
+              :totalPages="totalPages"
+              :pagination="true"
+              @changePage="(page) => (currentPage = page)"
+              @viewTicket="handleViewTicket"
+              @editTicket="handleEditTicket"
+              @cancelTicket="handleCancelTicket"
+              @acceptTicket="handleAcceptTicket"
+              @verifyTicket="handleVerifyTicket"
+              @approveTicket="handleApproveTicket"
+              @requestCorrection="handleRequestCorrection"
+              @rejectTicket="handleRejectTicket"
+              @refresh="fetchTicketsWithFilters"
+            />
+            <TicketKanban v-else :tickets="tickets" @viewTicket="handleViewTicket" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Filtros (Mobile) -->
+    <div
+      v-if="showFiltersModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+    >
+      <div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md shadow-xl">
+        <div
+          class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700"
+        >
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Filtros</h3>
+          <button
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            @click="showFiltersModal = false"
+          >
+            <font-awesome-icon icon="times" class="w-5 h-5" />
+          </button>
+        </div>
+        <div class="px-6 py-4 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >Status:</label
+            >
+            <Select v-model="statusFilter" :options="statusOptions" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >Prioridade:</label
+            >
+            <Select v-model="priorityFilter" :options="priorityOptions" />
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+          <button
+            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            @click="clearFilters"
+          >
+            Limpar
+          </button>
+          <button
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+            @click="showFiltersModal = false"
+          >
+            Aplicar
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Modal de Correção -->
-    <div v-if="showCorrectionModal" class="modal-overlay">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>Solicitar Correção</h3>
-          <button class="close-btn" @click="cancelCorrection">
-            <font-awesome-icon icon="times" />
+    <div
+      v-if="showCorrectionModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white dark:bg-gray-800 rounded-lg w-[90%] max-w-md shadow-xl">
+        <div
+          class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700"
+        >
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white m-0">
+            Solicitar Correção
+          </h3>
+          <button
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            @click="cancelCorrection"
+          >
+            <font-awesome-icon icon="times" class="w-5 h-5" />
           </button>
         </div>
-        <div class="modal-body">
-          <p class="mb-4">Por favor, defina uma nova data de conclusão para o ticket:</p>
-          <div class="form-group">
-            <label for="newCompletionDate">Nova Data de Conclusão:</label>
+        <div class="px-6 py-4">
+          <p class="mb-4 text-gray-700 dark:text-gray-300">
+            Por favor, defina uma nova data de conclusão para o ticket:
+          </p>
+          <div class="mb-4">
+            <label
+              for="newCompletionDate"
+              class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Nova Data de Conclusão:</label
+            >
             <input
               type="date"
               id="newCompletionDate"
               v-model="newCompletionDate"
-              class="form-control"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
               :min="new Date().toISOString().split('T')[0]"
               required
             />
           </div>
         </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" @click="cancelCorrection">Cancelar</button>
-          <button class="btn btn-primary" @click="confirmCorrection" :disabled="!newCompletionDate">
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+          <button
+            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            @click="cancelCorrection"
+          >
+            Cancelar
+          </button>
+          <button
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="confirmCorrection"
+            :disabled="!newCompletionDate"
+          >
             Confirmar
           </button>
         </div>
@@ -211,6 +373,7 @@ import type { Ticket } from '@/models';
 import { TicketStatus, TicketPriority } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
 import TicketKanban from '@/components/tickets/TicketKanban.vue';
+import Select from '@/components/common/Select.vue';
 import { toast } from 'vue3-toastify';
 import { debounce, formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { localStorageService } from '@/utils/localStorageService';
@@ -232,8 +395,8 @@ const getInitialTab = (): 'recebidos' | 'criados' | 'setor' | 'arquivados' => {
 
 const activeTab = ref<'recebidos' | 'criados' | 'setor' | 'arquivados'>(getInitialTab());
 const searchTerm = ref('');
-const statusFilter = ref<TicketStatus | null>(null);
-const priorityFilter = ref<TicketPriority | null>(null);
+const statusFilter = ref<string>('');
+const priorityFilter = ref<string>('');
 const currentPage = ref(1);
 
 const showCorrectionModal = ref(false);
@@ -241,6 +404,8 @@ const selectedTicket = ref<Ticket | null>(null);
 const newCompletionDate = ref('');
 
 const isKanbanView = ref(false);
+
+const showFiltersModal = ref(false);
 
 onMounted(async () => {
   const savedView = localStorageService.getTicketsViewPreference();
@@ -300,9 +465,31 @@ const totalPages = computed(() => {
   }
 });
 
+const statusOptions = computed(() => [
+  { value: '', label: 'Todos' },
+  { value: TicketStatus.Pending, label: formatSnakeToNaturalCase(TicketStatus.Pending) },
+  { value: TicketStatus.InProgress, label: formatSnakeToNaturalCase(TicketStatus.InProgress) },
+  { value: TicketStatus.Completed, label: formatSnakeToNaturalCase(TicketStatus.Completed) },
+  {
+    value: TicketStatus.AwaitingVerification,
+    label: formatSnakeToNaturalCase(TicketStatus.AwaitingVerification),
+  },
+  {
+    value: TicketStatus.UnderVerification,
+    label: formatSnakeToNaturalCase(TicketStatus.UnderVerification),
+  },
+]);
+
+const priorityOptions = computed(() => [
+  { value: '', label: 'Todas' },
+  { value: TicketPriority.Low, label: formatSnakeToNaturalCase(TicketPriority.Low) },
+  { value: TicketPriority.Medium, label: formatSnakeToNaturalCase(TicketPriority.Medium) },
+  { value: TicketPriority.High, label: formatSnakeToNaturalCase(TicketPriority.High) },
+]);
+
 const switchTab = (tab: 'recebidos' | 'criados' | 'setor' | 'arquivados') => {
-  statusFilter.value = null;
-  priorityFilter.value = null;
+  statusFilter.value = '';
+  priorityFilter.value = '';
   searchTerm.value = '';
 
   activeTab.value = tab;
@@ -332,12 +519,12 @@ const fetchTicketsWithFilters = async () => {
     name?: string;
   } = {};
 
-  if (priorityFilter.value !== null) {
-    filters.priority = priorityFilter.value;
+  if (priorityFilter.value && priorityFilter.value !== '') {
+    filters.priority = priorityFilter.value as TicketPriority;
   }
 
-  if (statusFilter.value !== null) {
-    filters.status = statusFilter.value;
+  if (statusFilter.value && statusFilter.value !== '') {
+    filters.status = statusFilter.value as TicketStatus;
   }
 
   if (searchTerm.value) {
@@ -451,6 +638,12 @@ const toggleView = () => {
   localStorageService.setTicketsViewPreference(isKanbanView.value ? 'kanban' : 'table');
 };
 
+const clearFilters = () => {
+  statusFilter.value = '';
+  priorityFilter.value = '';
+  fetchTicketsWithFilters();
+};
+
 watch(
   () => route.query.tab,
   (newTab) => {
@@ -479,489 +672,5 @@ watch(activeTab, () => {
 </script>
 
 <style scoped>
-.tab-container {
-  margin-top: 1.5rem;
-}
-
-.tab-buttons {
-  display: flex;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 1.5rem;
-  gap: 1rem;
-}
-
-.tab-button {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  background: none;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-light);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-}
-
-.tab-button:hover {
-  color: var(--primary-color);
-}
-
-.tab-button.active {
-  color: var(--primary-color);
-  border-bottom-color: var(--primary-color);
-}
-
-/* Dark mode */
-:deep(body.dark-mode) .tab-button {
-  color: #94a3b8;
-}
-
-:deep(body.dark-mode) .tab-button:hover {
-  color: #818cf8;
-}
-
-:deep(body.dark-mode) .tab-button.active {
-  color: #818cf8;
-  border-bottom-color: #818cf8;
-}
-
-.tab-content {
-  min-height: 300px;
-}
-
-/* .tab-pane {
-  display: none;
-} */
-
-.tab-pane.active {
-  display: block;
-  animation: fadeIn 0.3s ease;
-}
-
-/* Filtros */
-.ticket-filters {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.filter-group {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.filter-group label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-light);
-}
-
-.filter-group select {
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius);
-  border: 1px solid var(--border-color);
-  background-color: var(--card-bg);
-  color: var(--text-color);
-  font-size: 0.9rem;
-  transition: var(--transition);
-}
-
-.filter-group select:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.search-group {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.search-group input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
-
-.search-input-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.search-input-wrapper input {
-  padding-left: 2rem; /* space for the icon */
-}
-
-.input-icon {
-  position: absolute;
-  left: 0.6rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #aaa;
-  pointer-events: none;
-  height: 15px;
-}
-
-/* Status e Prioridade */
-.status-label,
-.priority-label {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.3rem 0.6rem;
-  border-radius: 50px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  gap: 0.3rem;
-}
-
-.status-pendente {
-  background-color: rgba(245, 158, 11, 0.1);
-  color: var(--warning-color);
-}
-
-.status-em_andamento {
-  background-color: rgba(14, 165, 233, 0.1);
-  color: var(--info-color);
-}
-
-.status-finalizado {
-  background-color: rgba(16, 185, 129, 0.1);
-  color: var(--success-color);
-}
-
-.status-cancelado {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: var(--danger-color);
-}
-
-.priority-alta {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: var(--danger-color);
-}
-
-.priority-media {
-  background-color: rgba(245, 158, 11, 0.1);
-  color: var(--warning-color);
-}
-
-.priority-baixa {
-  background-color: rgba(16, 185, 129, 0.1);
-  color: var(--success-color);
-}
-
-/* Prazo */
-.prazo-col {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-weight: 500;
-  font-size: 0.85rem;
-  white-space: nowrap;
-}
-
-.prazo-atrasado {
-  color: #dc2626;
-  font-weight: bold;
-}
-
-.prazo-urgente {
-  color: #ef4444;
-  font-weight: 600;
-}
-
-.prazo-proximo {
-  color: #f97316;
-}
-
-.prazo-ok {
-  color: #10b981;
-}
-
-/* Paginação */
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.pagination-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
-  font-size: 0.9rem;
-  transition: var(--transition);
-}
-
-.pagination-btn:hover {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
-}
-
-.pagination-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-#paginationInfo {
-  font-size: 0.9rem;
-  color: var(--text-light);
-}
-
-/* Estado Vazio */
-.no-tickets-message {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 1rem;
-  text-align: center;
-  color: var(--text-light);
-}
-
-.no-tickets-message i {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  opacity: 0.5;
-}
-
-.no-tickets-message p {
-  font-size: 1rem;
-}
-
-@media (max-width: 992px) {
-  .ticket-details {
-    grid-template-columns: 1fr;
-  }
-
-  .ticket-details p.full-width {
-    grid-column: span 1;
-  }
-
-  .search-group input {
-    width: 180px;
-  }
-}
-
-@media (max-width: 768px) {
-  .tab-btn {
-    padding: 0.8rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  .ticket-filters {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .filter-group {
-    width: 100%;
-  }
-
-  .filter-group select {
-    width: 100%;
-  }
-
-  .search-group {
-    width: 100%;
-    margin-left: 0;
-  }
-
-  .search-group input {
-    width: 100%;
-  }
-
-  .tickets-table-container {
-    overflow-x: auto;
-  }
-
-  .tickets-table th,
-  .tickets-table td {
-    padding: 0.8rem;
-  }
-}
-
-.archive-sections {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.archive-section {
-  background: var(--card-bg);
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  box-shadow: var(--shadow-sm);
-}
-
-.archive-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text-color);
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.archive-title::before {
-  content: '';
-  width: 4px;
-  height: 1.1rem;
-  background: var(--primary-color);
-  border-radius: 2px;
-}
-
-/* Dark mode */
-:deep(body.dark-mode) .archive-section {
-  background: var(--dark-card-bg);
-}
-
-:deep(body.dark-mode) .archive-title {
-  color: var(--dark-text-color);
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: var(--card-bg);
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.modal-header h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--text-color);
-}
-
-.modal-body {
-  padding: 1.5rem;
-}
-
-.modal-footer {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: var(--text-color);
-}
-
-.form-control {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  font-size: 1rem;
-  color: var(--text-color);
-  background-color: var(--input-bg);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.1);
-}
-
-/* Dark mode */
-:deep(body.dark-mode) .modal-content {
-  background-color: var(--card-bg-dark);
-}
-
-:deep(body.dark-mode) .modal-header {
-  border-bottom-color: var(--border-color-dark);
-}
-
-:deep(body.dark-mode) .modal-footer {
-  border-top-color: var(--border-color-dark);
-}
-
-:deep(body.dark-mode) .modal-header h3 {
-  color: var(--text-color-dark);
-}
-
-:deep(body.dark-mode) .form-group label {
-  color: var(--text-color-dark);
-}
-
-:deep(body.dark-mode) .form-control {
-  background-color: var(--input-bg-dark);
-  border-color: var(--border-color-dark);
-  color: var(--text-color-dark);
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.view-toggle-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--surface-border);
-  border-radius: 6px;
-  background: var(--surface-card);
-  color: var(--text-color);
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.view-toggle-btn:hover {
-  background: var(--surface-hover);
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-}
-
-.view-toggle-btn svg {
-  width: 16px;
-  height: 16px;
-}
+/* All styles have been converted to Tailwind classes */
 </style>
