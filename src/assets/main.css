@@ -1334,12 +1334,12 @@ body.dark-mode label {
 
 /* Dark mode */
 body.dark-mode .btn-primary {
-  background-color: #f8f9fa;
-  color: #1a2233;
+  background: var(--primary-dark);
+  color: white;
 }
 
 body.dark-mode .btn-primary:hover {
-  background-color: #e8eaed;
+  opacity: 0.9;
 }
 
 body.dark-mode .btn-secondary {

@@ -20,7 +20,10 @@
     </div>
     <div class="mt-6">
       <!-- Mobile-friendly tabs -->
-      <div class="flex border-b border-gray-200 dark:border-gray-700 mb-6 overflow-auto">
+      <div
+        class="flex border-b border-gray-200 dark:border-gray-700 mb-6 overflow-x-auto overflow-y-hidden scrollbar-hide"
+        style="height: 48px"
+      >
         <button
           :class="[
             'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
@@ -673,4 +676,13 @@ watch(activeTab, () => {
 
 <style scoped>
 /* All styles have been converted to Tailwind classes */
+
+/* Hide scrollbar for tabs */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
 </style>

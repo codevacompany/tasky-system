@@ -5,7 +5,7 @@
     @click="closeModal"
   >
     <div
-      class="fixed top-[calc(var(--header-height)+4px)] right-5 w-[420px] bg-white dark:bg-gray-800 rounded shadow-[0_2px_8px_rgba(0,0,0,0.15)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] z-[1000] overflow-hidden border border-gray-200 dark:border-gray-700"
+      class="fixed top-[calc(var(--header-height)+4px)] right-5 w-[90vw] sm:w-[420px] bg-white dark:bg-gray-800 rounded shadow-[0_2px_8px_rgba(0,0,0,0.15)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] z-[1000] overflow-hidden border border-gray-200 dark:border-gray-700"
       @click.stop
     >
       <div

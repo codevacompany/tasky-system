@@ -8,7 +8,7 @@
           class="hidden md:flex items-center justify-center px-6 min-w-[150px] bg-gray-200 dark:bg-gray-900 h-full relative shadow-sm"
         >
           <img
-            :src="darkMode ? taskyWhiteLogo : taskyLogo"
+            :src="userPreferencesStore.isDarkMode ? taskyWhiteLogo : taskyLogo"
             alt="Tasky Logo"
             class="w-[70px] h-[70px] block mx-auto relative top-2 object-contain"
           />
@@ -28,7 +28,7 @@
               <router-link to="/">
                 <li>
                   <div
-                    :class="{ 'primary-gradient text-white': isActive('/') }"
+                    :class="{ 'btn btn-primary text-white': isActive('/') }"
                     class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
                   >
                     <font-awesome-icon icon="tachometer-alt-average" /> Dashboard
@@ -38,7 +38,7 @@
               <router-link v-if="user?.role.name !== RoleName.GlobalAdmin" to="/meus-tickets">
                 <li>
                   <div
-                    :class="{ 'primary-gradient text-white': isActive('/meus-tickets') }"
+                    :class="{ 'btn btn-primary text-white': isActive('/meus-tickets') }"
                     class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
                   >
                     <font-awesome-icon icon="ticket" />Tickets
@@ -48,7 +48,7 @@
               <router-link v-if="user?.role.name === RoleName.TenantAdmin" to="/admin/relatorios">
                 <li>
                   <div
-                    :class="{ 'primary-gradient text-white': isActive('/admin/relatorios') }"
+                    :class="{ 'btn btn-primary text-white': isActive('/admin/relatorios') }"
                     class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
                   >
                     <font-awesome-icon icon="chart-line" />
@@ -67,7 +67,7 @@
               >
                 <div
                   :class="{
-                    'primary-gradient text-white':
+                    'btn btn-primary text-white':
                       isActive('/admin/usuarios') ||
                       isActive('/admin/setores') ||
                       isActive('/admin/categorias') ||
@@ -221,7 +221,7 @@
           class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
         >
           <img
-            :src="darkMode ? taskyWhiteLogo : taskyLogo"
+            :src="userPreferencesStore.isDarkMode ? taskyWhiteLogo : taskyLogo"
             alt="Tasky Logo"
             class="w-12 h-12 object-contain"
           />
@@ -419,15 +419,16 @@ import NewTicketModal from '@/components/layout/NewTicketModal.vue';
 import ProfileModal from '@/components/layout/ProfileModal.vue';
 import NotificationsDropdown from '@/components/layout/NotificationsDropdown.vue';
 import { useUserStore } from '@/stores/user';
+import { useUserPreferencesStore } from '@/stores/userPreferences';
 import { useTicketsStore } from '@/stores/tickets';
 import { useRoute } from 'vue-router';
 import { notificationService } from '@/services/notificationService';
 import { RoleName } from '@/models';
 import taskyLogo from '@/assets/images/tasky.png';
 import taskyWhiteLogo from '@/assets/images/tasky-white-large.png';
-import { localStorageService } from '@/utils/localStorageService';
 
 const user = useUserStore().user;
+const userPreferencesStore = useUserPreferencesStore();
 const ticketsStore = useTicketsStore();
 const route = useRoute();
 
@@ -437,8 +438,6 @@ const showNotificationsModal = ref(false);
 const unreadCount = ref<number | undefined>(undefined);
 let notificationsIntervalId: number | null = null;
 // let source: EventSource | null = null;
-
-const darkMode = ref(localStorageService.isDarkMode());
 
 const showAdminDropdown = ref(false);
 const showMobileMenu = ref(false);
@@ -559,6 +558,11 @@ onUnmounted(() => {
 
 .menu-item-hover:hover {
   background: var(--button-primary-color);
+  color: white;
+}
+
+.dark-mode .menu-item-hover:hover {
+  background: var(--primary-dark);
   color: white;
 }
 </style>

@@ -1,100 +1,174 @@
 <template>
-  <div class="client-settings">
-    <header class="page-header">
-      <div class="header-content">
-        <div class="header-title">
-          <h1>Configurações do Cliente</h1>
-          <h2>{{ client.razaoSocial }}</h2>
+  <div class="p-6">
+    <header class="mb-8">
+      <div class="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+        <div>
+          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white m-0">
+            Configurações do Cliente
+          </h1>
+          <h2 class="text-base text-gray-600 dark:text-gray-400 mt-1 m-0">
+            {{ client.razaoSocial }}
+          </h2>
         </div>
-        <div class="header-actions">
-          <button class="btn btn-primary" @click="saveSettings">
+        <div>
+          <button
+            class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+            @click="saveSettings"
+          >
             <font-awesome-icon icon="save" /> Salvar Alterações
           </button>
         </div>
       </div>
     </header>
 
-    <div class="settings-grid">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Informações Básicas -->
-      <div class="settings-card">
-        <h3>Informações Básicas</h3>
-        <div class="form-group">
-          <label>Razão Social</label>
-          <input type="text" v-model="settings.razaoSocial" />
+      <div
+        class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+      >
+        <h3 class="m-0 mb-6 text-lg font-semibold text-gray-900 dark:text-white">
+          Informações Básicas
+        </h3>
+        <div class="mb-4">
+          <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
+            >Razão Social</label
+          >
+          <input
+            type="text"
+            v-model="settings.razaoSocial"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+          />
         </div>
-        <div class="form-group">
-          <label>CNPJ</label>
-          <input type="text" v-model="settings.cnpj" />
+        <div class="mb-4">
+          <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300">CNPJ</label>
+          <input
+            type="text"
+            v-model="settings.cnpj"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+          />
         </div>
-        <div class="form-group">
-          <label>Domínio</label>
-          <input type="text" v-model="settings.dominio" />
+        <div class="mb-4">
+          <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300">Domínio</label>
+          <input
+            type="text"
+            v-model="settings.dominio"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+          />
         </div>
-        <div class="form-group">
-          <label>Email Principal</label>
-          <input type="email" v-model="settings.emailPrincipal" />
+        <div class="mb-0">
+          <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
+            >Email Principal</label
+          >
+          <input
+            type="email"
+            v-model="settings.emailPrincipal"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+          />
         </div>
       </div>
 
       <!-- Plano e Limites -->
-      <div class="settings-card">
-        <h3>Plano e Limites</h3>
-        <div class="form-group">
-          <label>Plano Atual</label>
-          <select v-model="settings.plano">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+      >
+        <h3 class="m-0 mb-6 text-lg font-semibold text-gray-900 dark:text-white">
+          Plano e Limites
+        </h3>
+        <div class="mb-4">
+          <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300">Plano Atual</label>
+          <select
+            v-model="settings.plano"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+          >
             <option value="BASIC">Básico</option>
             <option value="PRO">Profissional</option>
             <option value="ENTERPRISE">Empresarial</option>
             <option value="CUSTOM">Personalizado</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>Limite de Usuários</label>
-          <input type="number" v-model="settings.limiteUsuarios" min="1" />
+        <div class="mb-4">
+          <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
+            >Limite de Usuários</label
+          >
+          <input
+            type="number"
+            v-model="settings.limiteUsuarios"
+            min="1"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+          />
         </div>
-        <div class="form-group">
-          <label>Limite de Tickets/mês</label>
-          <input type="number" v-model="settings.limiteTickets" min="1" />
+        <div class="mb-4">
+          <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
+            >Limite de Tickets/mês</label
+          >
+          <input
+            type="number"
+            v-model="settings.limiteTickets"
+            min="1"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+          />
         </div>
-        <div class="form-group">
-          <label>Data de Renovação</label>
-          <input type="date" v-model="settings.dataRenovacao" />
+        <div class="mb-0">
+          <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
+            >Data de Renovação</label
+          >
+          <input
+            type="date"
+            v-model="settings.dataRenovacao"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+          />
         </div>
       </div>
 
       <!-- Configurações de Notificação -->
-      <div class="settings-card">
-        <h3>Notificações</h3>
-        <div class="form-group">
-          <label class="checkbox-label">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+      >
+        <h3 class="m-0 mb-6 text-lg font-semibold text-gray-900 dark:text-white">Notificações</h3>
+        <div class="mb-4">
+          <label class="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
               v-model="settings.notificacoes.emailNovoTicket"
+              class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:focus:ring-blue-400"
             />
-            Notificar por email ao receber novo ticket
+            <span class="text-gray-700 dark:text-gray-300"
+              >Notificar por email ao receber novo ticket</span
+            >
           </label>
         </div>
-        <div class="form-group">
-          <label class="checkbox-label">
+        <div class="mb-4">
+          <label class="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
               v-model="settings.notificacoes.emailAtualizacaoTicket"
+              class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:focus:ring-blue-400"
             />
-            Notificar por email ao atualizar ticket
+            <span class="text-gray-700 dark:text-gray-300"
+              >Notificar por email ao atualizar ticket</span
+            >
           </label>
         </div>
-        <div class="form-group">
-          <label class="checkbox-label">
+        <div class="mb-4">
+          <label class="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
               v-model="settings.notificacoes.emailFinalizacaoTicket"
+              class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:focus:ring-blue-400"
             />
-            Notificar por email ao finalizar ticket
+            <span class="text-gray-700 dark:text-gray-300"
+              >Notificar por email ao finalizar ticket</span
+            >
           </label>
         </div>
-        <div class="form-group">
-          <label>Frequência do Relatório</label>
-          <select v-model="settings.notificacoes.frequenciaRelatorio">
+        <div class="mb-0">
+          <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
+            >Frequência do Relatório</label
+          >
+          <select
+            v-model="settings.notificacoes.frequenciaRelatorio"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+          >
             <option value="DIARIO">Diário</option>
             <option value="SEMANAL">Semanal</option>
             <option value="MENSAL">Mensal</option>
@@ -104,88 +178,47 @@
       </div>
 
       <!-- Personalização -->
-      <div class="settings-card">
-        <h3>Personalização</h3>
-        <div class="form-group">
-          <label>Cor Primária</label>
-          <input type="color" v-model="settings.personalizacao.corPrimaria" />
+      <div
+        class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+      >
+        <h3 class="m-0 mb-6 text-lg font-semibold text-gray-900 dark:text-white">Personalização</h3>
+        <div class="mb-4">
+          <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
+            >Cor Primária</label
+          >
+          <input
+            type="color"
+            v-model="settings.personalizacao.corPrimaria"
+            class="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer"
+          />
         </div>
-        <div class="form-group">
-          <label>Logo da Empresa</label>
-          <div class="logo-upload">
+        <div class="mb-4">
+          <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
+            >Logo da Empresa</label
+          >
+          <div class="flex flex-col gap-4 items-center">
             <img
               v-if="settings.personalizacao.logo"
               :src="settings.personalizacao.logo"
               alt="Logo da empresa"
+              class="max-w-[200px] max-h-[100px] object-contain"
             />
-            <button class="btn btn-secondary">
+            <button
+              class="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-md text-sm font-medium hover:bg-gray-700 transition-colors"
+            >
               <font-awesome-icon icon="upload" /> Alterar Logo
             </button>
           </div>
         </div>
-        <div class="form-group">
-          <label>Mensagem de Boas-vindas</label>
+        <div class="mb-0">
+          <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
+            >Mensagem de Boas-vindas</label
+          >
           <textarea
             v-model="settings.personalizacao.mensagemBoasVindas"
             rows="3"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 resize-y min-h-[80px]"
           ></textarea>
-        </div>
-      </div>
-
-      <!-- Integrações -->
-      <div class="settings-card">
-        <h3>Integrações</h3>
-        <div class="integration-list">
-          <div class="integration-item">
-            <div class="integration-info">
-              <img src="@/assets/images/icons/slack.svg" alt="Slack" />
-              <div>
-                <h4>Slack</h4>
-                <p>Receba notificações no Slack</p>
-              </div>
-            </div>
-            <button
-              class="btn"
-              :class="settings.integracoes.slack ? 'btn-danger' : 'btn-primary'"
-              @click="toggleIntegration('slack')"
-            >
-              {{ settings.integracoes.slack ? 'Desconectar' : 'Conectar' }}
-            </button>
-          </div>
-
-          <div class="integration-item">
-            <div class="integration-info">
-              <img src="@/assets/images/icons/teams.svg" alt="Microsoft Teams" />
-              <div>
-                <h4>Microsoft Teams</h4>
-                <p>Integre com seus canais do Teams</p>
-              </div>
-            </div>
-            <button
-              class="btn"
-              :class="settings.integracoes.teams ? 'btn-danger' : 'btn-primary'"
-              @click="toggleIntegration('teams')"
-            >
-              {{ settings.integracoes.teams ? 'Desconectar' : 'Conectar' }}
-            </button>
-          </div>
-
-          <div class="integration-item">
-            <div class="integration-info">
-              <img src="@/assets/images/icons/jira.svg" alt="Jira" />
-              <div>
-                <h4>Jira</h4>
-                <p>Sincronize tickets com o Jira</p>
-              </div>
-            </div>
-            <button
-              class="btn"
-              :class="settings.integracoes.jira ? 'btn-danger' : 'btn-primary'"
-              @click="toggleIntegration('jira')"
-            >
-              {{ settings.integracoes.jira ? 'Desconectar' : 'Conectar' }}
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -200,7 +233,7 @@ type IntegrationKey = keyof typeof settings.value.integracoes;
 // Dados mockados do cliente
 const client = ref({
   id: 1,
-  razaoSocial: 'Empresa ABC Ltda'
+  razaoSocial: 'Empresa ABC Ltda',
 });
 
 // Configurações do cliente
@@ -217,18 +250,18 @@ const settings = ref({
     emailNovoTicket: true,
     emailAtualizacaoTicket: true,
     emailFinalizacaoTicket: true,
-    frequenciaRelatorio: 'SEMANAL'
+    frequenciaRelatorio: 'SEMANAL',
   },
   personalizacao: {
     corPrimaria: '#007BFF',
     logo: '/logos/empresa-abc.png',
-    mensagemBoasVindas: 'Bem-vindo ao sistema de tickets da Empresa ABC!'
+    mensagemBoasVindas: 'Bem-vindo ao sistema de tickets da Empresa ABC!',
   },
   integracoes: {
     slack: true,
     teams: false,
-    jira: true
-  }
+    jira: true,
+  },
 });
 
 // Métodos
@@ -242,166 +275,5 @@ const toggleIntegration = (integration: IntegrationKey) => {
 </script>
 
 <style scoped>
-.client-settings {
-  padding: 1.5rem;
-}
-
-.page-header {
-  margin-bottom: 2rem;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header-title h1 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-color);
-  margin: 0;
-}
-
-.header-title h2 {
-  font-size: 1rem;
-  color: var(--text-light);
-  margin: 0.25rem 0 0 0;
-}
-
-.settings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.settings-card {
-  background: var(--card-bg);
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.settings-card h3 {
-  margin: 0 0 1.5rem 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group:last-child {
-  margin-bottom: 0;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: var(--text-color);
-}
-
-.form-group input[type="text"],
-.form-group input[type="email"],
-.form-group input[type="number"],
-.form-group input[type="date"],
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  font-size: 0.9rem;
-  background: var(--input-bg);
-  color: var(--text-color);
-}
-
-.form-group textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.checkbox-label input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-}
-
-.logo-upload {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  align-items: center;
-}
-
-.logo-upload img {
-  max-width: 200px;
-  max-height: 100px;
-  object-fit: contain;
-}
-
-.integration-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.integration-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background: var(--background-light);
-  border-radius: 4px;
-}
-
-.integration-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.integration-info img {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-}
-
-.integration-info h4 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.integration-info p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: var(--text-light);
-}
-
-/* Dark mode */
-:deep(body.dark-mode) .settings-card {
-  background-color: var(--card-bg-dark);
-}
-
-:deep(body.dark-mode) .integration-item {
-  background-color: var(--background-dark);
-}
-
-:deep(body.dark-mode) .form-group input,
-:deep(body.dark-mode) .form-group select,
-:deep(body.dark-mode) .form-group textarea {
-  background-color: var(--input-bg-dark);
-  border-color: var(--border-color-dark);
-  color: var(--text-color-dark);
-}
+/* All styles have been converted to Tailwind classes */
 </style>

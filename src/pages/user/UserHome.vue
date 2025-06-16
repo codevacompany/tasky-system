@@ -9,25 +9,24 @@
     />
 
     <!-- Estatísticas -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
       <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
       >
         <div
-          class="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
+          class="p-2.5 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
         >
           <font-awesome-icon icon="ticket" />
         </div>
         <div class="flex-1 min-w-0">
-          <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">Total de Tickets</h3>
-          <p
-            id="totalTicketsCount"
-            class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2"
-          >
-            {{ totalTickets.total }}
-          </p>
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Total de Tickets</h3>
+            <p id="totalTicketsCount" class="text-xl font-bold text-gray-900 dark:text-gray-100">
+              {{ totalTickets.total }}
+            </p>
+          </div>
           <div
-            class="flex flex-col sm:flex-row gap-1 sm:gap-3 text-xs text-gray-600 dark:text-gray-400"
+            class="flex flex-col sm:flex-row sm:justify-end gap-1 sm:gap-3 text-xs text-gray-600 dark:text-gray-400"
           >
             <span>Recebidos: {{ totalTickets.recebidos }}</span>
             <span>Criados: {{ totalTickets.criados }}</span>
@@ -36,23 +35,25 @@
       </div>
 
       <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
       >
         <div
-          class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
+          class="p-2.5 bg-orange-500 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
         >
           <font-awesome-icon icon="clock" />
         </div>
         <div class="flex-1 min-w-0">
-          <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">Pendentes</h3>
-          <p
-            id="pendingTicketsCount"
-            class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2"
-          >
-            {{ ticketsPendentes.total }}
-          </p>
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">Pendentes</h3>
+            <p
+              id="pendingTicketsCount"
+              class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2"
+            >
+              {{ ticketsPendentes.total }}
+            </p>
+          </div>
           <div
-            class="flex flex-col sm:flex-row gap-1 sm:gap-3 text-xs text-gray-600 dark:text-gray-400"
+            class="flex flex-col sm:flex-row sm:justify-end gap-1 sm:gap-3 text-xs text-gray-600 dark:text-gray-400"
           >
             <span>Recebidos: {{ ticketsPendentes.recebidos }}</span>
             <span>Criados: {{ ticketsPendentes.criados }}</span>
@@ -61,23 +62,25 @@
       </div>
 
       <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
       >
         <div
-          class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
+          class="p-2.5 bg-blue-500 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
         >
           <font-awesome-icon icon="spinner" />
         </div>
         <div class="flex-1 min-w-0">
-          <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">Em Andamento</h3>
-          <p
-            id="inProgressTicketsCount"
-            class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2"
-          >
-            {{ ticketsEmAndamento.total }}
-          </p>
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">Em Andamento</h3>
+            <p
+              id="inProgressTicketsCount"
+              class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2"
+            >
+              {{ ticketsEmAndamento.total }}
+            </p>
+          </div>
           <div
-            class="flex flex-col sm:flex-row gap-1 sm:gap-3 text-xs text-gray-600 dark:text-gray-400"
+            class="flex flex-col sm:flex-row sm:justify-end gap-1 sm:gap-3 text-xs text-gray-600 dark:text-gray-400"
           >
             <span>Recebidos: {{ ticketsEmAndamento.recebidos }}</span>
             <span>Criados: {{ ticketsEmAndamento.criados }}</span>
@@ -86,23 +89,25 @@
       </div>
 
       <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
       >
         <div
-          class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
+          class="p-2.5 bg-green-500 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
         >
           <font-awesome-icon icon="check-circle" />
         </div>
         <div class="flex-1 min-w-0">
-          <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">Finalizados</h3>
-          <p
-            id="resolvedTicketsCount"
-            class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2"
-          >
-            {{ ticketsFinalizados.total }}
-          </p>
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">Finalizados</h3>
+            <p
+              id="resolvedTicketsCount"
+              class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2"
+            >
+              {{ ticketsFinalizados.total }}
+            </p>
+          </div>
           <div
-            class="flex flex-col sm:flex-row gap-1 sm:gap-3 text-xs text-gray-600 dark:text-gray-400"
+            class="flex flex-col sm:flex-row sm:justify-end gap-1 sm:gap-3 text-xs text-gray-600 dark:text-gray-400"
           >
             <span>Recebidos: {{ ticketsFinalizados.recebidos }}</span>
             <span>Criados: {{ ticketsFinalizados.criados }}</span>
@@ -114,23 +119,27 @@
     <!-- Estatísticas Adicionais -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
       <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
       >
         <div
-          class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
+          class="p-2.5 bg-purple-600 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
         >
           <font-awesome-icon icon="chart-pie" />
         </div>
         <div class="flex-1 min-w-0">
-          <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">Taxa de Resolução</h3>
-          <p
-            id="resolucaoPercentual"
-            class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2"
-          >
-            {{ resolutionRate }}%
-          </p>
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+              Taxa de Resolução
+            </h3>
+            <p
+              id="resolucaoPercentual"
+              class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2"
+            >
+              {{ resolutionRate }}%
+            </p>
+          </div>
           <div
-            class="text-xs text-green-600 dark:text-green-400"
+            class="flex justify-end text-xs text-green-600 dark:text-green-400"
             v-if="userStats && userStats.averageAcceptanceTimeSeconds"
           >
             <font-awesome-icon icon="clock" class="mr-1" />
@@ -140,22 +149,27 @@
       </div>
 
       <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
       >
         <div
-          class="w-12 h-12 bg-teal-600 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
+          class="p-2.5 bg-teal-600 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
         >
           <font-awesome-icon icon="hourglass-half" />
         </div>
         <div class="flex-1 min-w-0">
-          <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">
-            Tempo Médio de Aceite
-          </h3>
-          <p id="tempoMedioAceite" class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            {{ userStats ? formatTimeInSeconds(userStats.averageAcceptanceTimeSeconds) : 'N/A' }}
-          </p>
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+              Tempo Médio de Aceite
+            </h3>
+            <p
+              id="tempoMedioAceite"
+              class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2"
+            >
+              {{ userStats ? formatTimeInSeconds(userStats.averageAcceptanceTimeSeconds) : 'N/A' }}
+            </p>
+          </div>
           <div
-            class="text-xs text-green-600 dark:text-green-400"
+            class="flex justify-end text-xs text-green-600 dark:text-green-400"
             v-if="userStats && userStats.averageAcceptanceTimeSeconds"
           >
             <font-awesome-icon icon="clock" class="mr-1" />
@@ -165,25 +179,27 @@
       </div>
 
       <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-4 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
       >
         <div
-          class="w-12 h-12 bg-indigo-500 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
+          class="p-2.5 bg-indigo-500 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
         >
           <font-awesome-icon icon="calendar-check" />
         </div>
         <div class="flex-1 min-w-0">
-          <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">
-            Tempo Médio de Conclusão
-          </h3>
-          <p
-            id="tempoMedioConclusao"
-            class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2"
-          >
-            {{ userStats ? formatTimeInSeconds(userStats.averageResolutionTimeSeconds) : 'N/A' }}
-          </p>
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">
+              Tempo Médio de Conclusão
+            </h3>
+            <p
+              id="tempoMedioConclusao"
+              class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2"
+            >
+              {{ userStats ? formatTimeInSeconds(userStats.averageResolutionTimeSeconds) : 'N/A' }}
+            </p>
+          </div>
           <div
-            class="text-xs text-green-600 dark:text-green-400"
+            class="flex justify-end text-xs text-green-600 dark:text-green-400"
             v-if="userStats && userStats.closedTickets"
           >
             <font-awesome-icon icon="check-circle" class="mr-1" />

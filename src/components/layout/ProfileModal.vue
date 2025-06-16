@@ -62,7 +62,7 @@
                 @click="toggleThemeModal"
               >
                 <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
-                  <font-awesome-icon :icon="isDarkMode ? 'moon' : 'sun'" />
+                  <font-awesome-icon :icon="userPreferencesStore.isDarkMode ? 'moon' : 'sun'" />
                 </div>
                 <span class="flex-1 text-sm font-medium">Tema</span>
                 <font-awesome-icon
@@ -113,7 +113,7 @@
           <h2
             class="m-0 text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"
           >
-            <font-awesome-icon :icon="isDarkMode ? 'moon' : 'sun'" />
+            <font-awesome-icon :icon="userPreferencesStore.isDarkMode ? 'moon' : 'sun'" />
             Tema
           </h2>
           <button
@@ -129,7 +129,7 @@
               class="flex items-center gap-4 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer transition-all duration-200 relative hover:border-blue-500 dark:hover:border-blue-400"
               :class="{
                 'border-blue-500 dark:border-blue-400 bg-blue-50/50 dark:bg-blue-900/10':
-                  !isDarkMode,
+                  !userPreferencesStore.isDarkMode,
               }"
               @click="setTheme('light')"
             >
@@ -146,7 +146,7 @@
                 </p>
               </div>
               <font-awesome-icon
-                v-if="!isDarkMode"
+                v-if="!userPreferencesStore.isDarkMode"
                 icon="check"
                 class="absolute top-2 right-2 text-blue-500 dark:text-blue-400 text-sm"
               />
@@ -155,7 +155,7 @@
               class="flex items-center gap-4 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer transition-all duration-200 relative hover:border-blue-500 dark:hover:border-blue-400"
               :class="{
                 'border-blue-500 dark:border-blue-400 bg-blue-50/50 dark:bg-blue-900/10':
-                  isDarkMode,
+                  userPreferencesStore.isDarkMode,
               }"
               @click="setTheme('dark')"
             >
@@ -172,7 +172,7 @@
                 </p>
               </div>
               <font-awesome-icon
-                v-if="isDarkMode"
+                v-if="userPreferencesStore.isDarkMode"
                 icon="check"
                 class="absolute top-2 right-2 text-blue-500 dark:text-blue-400 text-sm"
               />
@@ -321,10 +321,10 @@
 <script setup lang="ts">
 import { computed, ref, reactive } from 'vue';
 import { useUserStore } from '@/stores/user';
+import { useUserPreferencesStore } from '@/stores/userPreferences';
 import { authService } from '@/services/authService';
 import { userService } from '@/services/userService';
 import { useRouter } from 'vue-router';
-import { localStorageService } from '@/utils/localStorageService';
 import { toast } from 'vue3-toastify';
 import BaseModal from '@/components/common/BaseModal.vue';
 
@@ -339,8 +339,8 @@ const emit = defineEmits<{
 }>();
 
 const user = useUserStore().user;
+const userPreferencesStore = useUserPreferencesStore();
 
-const isDarkMode = ref(localStorageService.isDarkMode());
 const showThemeModal = ref(false);
 
 const showChangePasswordModal = ref(false);
@@ -375,12 +375,7 @@ const closeThemeModal = () => {
 };
 
 const setTheme = (theme: 'light' | 'dark') => {
-  isDarkMode.value = theme === 'dark';
-
-  document.body.classList.toggle('dark-mode', isDarkMode.value);
-  document.body.classList.toggle('dark', isDarkMode.value);
-
-  localStorageService.setTheme(theme);
+  userPreferencesStore.setTheme(theme);
   closeThemeModal();
 };
 
