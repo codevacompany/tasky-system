@@ -1,15 +1,15 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900 p-6">
+  <div class="min-h-screen bg-white dark:bg-gray-900 p-3 sm:p-6">
     <!-- Loading State -->
     <div
       v-if="loading"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
       <div
-        class="bg-white dark:bg-gray-800 rounded-lg p-8 flex flex-col items-center gap-4 shadow-lg"
+        class="bg-white dark:bg-gray-800 rounded-lg p-6 sm:p-8 flex flex-col items-center gap-4 shadow-lg mx-4"
       >
         <font-awesome-icon icon="spinner" spin class="text-3xl text-blue-600 dark:text-blue-400" />
-        <p class="text-gray-700 dark:text-gray-300 text-lg font-medium">
+        <p class="text-gray-700 dark:text-gray-300 text-base sm:text-lg font-medium text-center">
           Carregando dados dos relatórios...
         </p>
       </div>
@@ -18,21 +18,21 @@
     <!-- Error State -->
     <div
       v-if="error"
-      class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-6"
+      class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6"
     >
-      <div class="flex items-start gap-4">
+      <div class="flex items-start gap-3 sm:gap-4">
         <font-awesome-icon
           icon="exclamation-circle"
-          class="text-2xl text-red-600 dark:text-red-400 mt-1"
+          class="text-xl sm:text-2xl text-red-600 dark:text-red-400 mt-1"
         />
         <div class="flex-1">
-          <p class="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
+          <p class="text-base sm:text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
             Erro ao carregar dados
           </p>
-          <p class="text-red-700 dark:text-red-300 mb-4">{{ error }}</p>
+          <p class="text-sm sm:text-base text-red-700 dark:text-red-300 mb-4">{{ error }}</p>
           <button
             @click="loadData"
-            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-medium transition-colors"
+            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-medium transition-colors text-sm sm:text-base"
           >
             Tentar Novamente
           </button>
@@ -40,119 +40,128 @@
       </div>
     </div>
 
-    <div v-if="!loading && !error" class="space-y-6">
+    <div v-if="!loading && !error" class="space-y-4 sm:space-y-6">
       <!-- Header -->
-      <div class="space-y-4">
-        <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+      <div class="space-y-3 sm:space-y-4">
+        <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
           <span>Dashboard</span>
           <font-awesome-icon icon="chevron-right" class="text-xs" />
           <span class="text-blue-600 dark:text-blue-400 font-medium">Relatórios</span>
         </div>
 
-        <div class="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+        <div class="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:justify-between sm:items-center">
           <div>
-            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+            <h1
+              class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2"
+            >
               Relatórios do Sistema
             </h1>
-            <p class="text-gray-600 dark:text-gray-400">
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400">
               Acompanhe métricas e indicadores importantes dos tickets
             </p>
           </div>
-          <div class="flex gap-3">
+          <div class="flex gap-2 sm:gap-3">
             <button
               @click="openExportModal"
-              class="flex items-center gap-2 px-4 py-2 btn btn-primary text-sm text-white rounded-md font-medium transition-colors"
+              class="flex items-center gap-2 px-3 sm:px-4 py-2 btn btn-primary text-xs sm:text-sm text-white rounded-md font-medium transition-colors"
             >
               <font-awesome-icon icon="file-export" />
-              Exportar Relatório
+              <span class="hidden sm:inline">Exportar Relatório</span>
+              <span class="sm:hidden">Exportar</span>
             </button>
           </div>
         </div>
       </div>
 
       <!-- Metrics Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         <div
-          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-lg p-6 shadow-sm"
+          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-lg p-4 sm:p-6 shadow-sm"
         >
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+              <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Total de Tickets
               </p>
-              <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+              <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                 {{ statistics?.totalTickets }}
               </h3>
             </div>
             <div
-              class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center"
-            >
-              <font-awesome-icon icon="ticket" class="text-xl text-blue-600 dark:text-blue-400" />
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-yellow-500 rounded-lg p-6 shadow-sm"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Taxa de Resolução
-              </p>
-              <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-                {{ formatPercentage(statistics?.resolutionRate) }}
-              </h3>
-            </div>
-            <div
-              class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center"
+              class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center"
             >
               <font-awesome-icon
-                icon="chart-line"
-                class="text-xl text-yellow-600 dark:text-yellow-400"
+                icon="ticket"
+                class="text-lg sm:text-xl text-blue-600 dark:text-blue-400"
               />
             </div>
           </div>
         </div>
 
         <div
-          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-green-500 rounded-lg p-6 shadow-sm"
+          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-yellow-500 rounded-lg p-4 sm:p-6 shadow-sm"
         >
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Tempo Médio de Resolução
+              <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                Taxa de Resolução
               </p>
-              <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-                {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }}
+              <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                {{ formatPercentage(statistics?.resolutionRate) }}
               </h3>
             </div>
             <div
-              class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center"
+              class="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center"
             >
-              <font-awesome-icon icon="clock" class="text-xl text-green-600 dark:text-green-400" />
+              <font-awesome-icon
+                icon="chart-line"
+                class="text-lg sm:text-xl text-yellow-600 dark:text-yellow-400"
+              />
             </div>
           </div>
         </div>
 
         <div
-          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-purple-500 rounded-lg p-6 shadow-sm"
+          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-green-500 rounded-lg p-4 sm:p-6 shadow-sm"
         >
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+              <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                Tempo Médio de Resolução
+              </p>
+              <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }}
+              </h3>
+            </div>
+            <div
+              class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center"
+            >
+              <font-awesome-icon
+                icon="clock"
+                class="text-lg sm:text-xl text-green-600 dark:text-green-400"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-purple-500 rounded-lg p-4 sm:p-6 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Tempo médio de Aceitação
               </p>
-              <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+              <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                 {{ formatTimeInSeconds(statistics?.averageAcceptanceTimeSeconds) }}
               </h3>
             </div>
             <div
-              class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center"
+              class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center"
             >
               <font-awesome-icon
                 icon="thumbs-up"
-                class="text-xl text-purple-600 dark:text-purple-400"
+                class="text-lg sm:text-xl text-purple-600 dark:text-purple-400"
               />
             </div>
           </div>
@@ -162,25 +171,25 @@
       <!-- Tabs -->
       <div class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm">
         <div class="border-b border-gray-200 dark:border-gray-700">
-          <nav class="flex">
+          <nav class="flex overflow-x-auto scrollbar-hide">
             <button
               v-for="tab in tabs"
               :key="tab.id"
               @click="currentTab = tab.id"
               :class="[
-                'flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors',
+                'flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0',
                 currentTab === tab.id
                   ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600',
               ]"
             >
-              <font-awesome-icon :icon="tab.icon" />
+              <font-awesome-icon :icon="tab.icon" class="text-xs sm:text-sm" />
               {{ tab.name }}
             </button>
           </nav>
         </div>
 
-        <div class="p-6">
+        <div class="p-3 sm:p-6">
           <!-- Overview Tab -->
           <div v-if="currentTab === 'overview'" class="space-y-6">
             <!-- Created vs Completed Section -->
@@ -524,7 +533,7 @@
                             class="w-full h-full object-cover rounded-full"
                           />
                         </div>
-                        <div class="min-w-0">
+                        <div class="min-w-0 hidden sm:block">
                           <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
                             {{ user.firstName }} {{ user.lastName }}
                           </p>
@@ -2161,10 +2170,10 @@ onMounted(() => {
 });
 
 const tabs = [
-  { id: 'overview', name: 'Visão Geral', icon: 'chart-pie' },
-  { id: 'in-progress', name: 'Em Andamento', icon: 'clock' },
-  { id: 'department', name: 'Setores', icon: 'building' },
-  { id: 'trends', name: 'Tendências', icon: 'chart-line' },
+  { id: 'overview', name: 'Visão Geral', shortName: 'Visão Geral', icon: 'chart-pie' },
+  { id: 'in-progress', name: 'Em Andamento', shortName: 'Andamento', icon: 'clock' },
+  { id: 'department', name: 'Setores', shortName: 'Setores', icon: 'building' },
+  { id: 'trends', name: 'Tendências', shortName: 'Tendências', icon: 'chart-line' },
   //lets not use this yet { id: 'custom', name: 'Análise por Período', icon: 'calendar' },
 ];
 
