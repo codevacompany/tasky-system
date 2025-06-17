@@ -582,7 +582,8 @@
                       Tempo de Resolução Por Segmento:
                     </h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                      {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }} (média)
+                      {{ formatTimeInSecondsCompact(getAverageResolutionTime() * 3600) }} (média
+                      {{ periodTextMap[selectedCycleTimePeriod] }})
                     </p>
                   </div>
                   <div class="mt-4 sm:mt-0">
@@ -732,96 +733,6 @@
                           </div>
                         </div>
                       </template>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- In Progress Time Analysis -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-              <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                  TEMPO GASTO NO STATUS "EM ANDAMENTO"
-                </h2>
-              </div>
-
-              <div class="flex flex-col lg:flex-row">
-                <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
-                  <div class="space-y-4 text-sm">
-                    <p
-                      v-if="inProgressTimeSeries?.data?.length"
-                      class="text-gray-700 dark:text-gray-300"
-                    >
-                      O tempo médio foi de
-                      <strong class="text-gray-900 dark:text-white">{{
-                        formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
-                      }}</strong>
-                      para
-                      <span class="font-semibold text-blue-600 dark:text-blue-400"
-                        >{{ getTotalInProgressCount() }} tickets</span
-                      >
-                      nos últimos
-                      <span class="font-semibold text-blue-600 dark:text-blue-400">6 meses</span>.
-                    </p>
-                    <p v-if="getInProgressTrend() !== 0" class="text-sm">
-                      Isso é
-                      <span
-                        :class="
-                          getInProgressTrend() > 0
-                            ? 'text-red-600 dark:text-red-400 font-medium'
-                            : 'text-green-600 dark:text-green-400 font-medium'
-                        "
-                      >
-                        {{ Math.abs(getInProgressTrend()) }}%
-                        {{ getInProgressTrend() > 0 ? 'mais' : 'menos' }}
-                      </span>
-                      que no mês anterior
-                      <span class="text-gray-600 dark:text-gray-400">
-                        {{
-                          getInProgressTrend() > 0
-                            ? '(aumento é considerado ruim)'
-                            : '(diminuição é positiva)'
-                        }} </span
-                      >.
-                    </p>
-                  </div>
-                </div>
-
-                <div class="p-6 lg:w-2/3">
-                  <div class="space-y-4">
-                    <div class="h-64">
-                      <Line
-                        v-if="inProgressTimeChartData"
-                        :data="inProgressTimeChartData"
-                        :options="inProgressTimeChartOptions"
-                      />
-                      <div
-                        v-else
-                        class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
-                      >
-                        <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
-                        <p class="text-sm">Carregando dados...</p>
-                      </div>
-                    </div>
-
-                    <div v-if="inProgressTimeSeries" class="grid grid-cols-2 gap-4">
-                      <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <span class="block text-lg font-semibold text-gray-900 dark:text-white">{{
-                          formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
-                        }}</span>
-                        <span class="text-xs text-gray-500 dark:text-gray-400"
-                          >Média últimos 6 meses</span
-                        >
-                      </div>
-                      <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <span class="block text-lg font-semibold text-gray-900 dark:text-white">{{
-                          getTotalInProgressCount()
-                        }}</span>
-                        <span class="text-xs text-gray-500 dark:text-gray-400"
-                          >Número de tickets</span
-                        >
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -1345,16 +1256,46 @@
 
           <!-- Tendências Tab -->
           <div v-if="currentTab === 'trends'" class="space-y-6">
+            <!-- Period Analysis Controls -->
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+              <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  Análise de Tendências
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400">
+                  Acompanhe as tendências dos tickets ao longo do tempo
+                </p>
+              </div>
+              <div class="flex items-center gap-3 mt-4 sm:mt-0">
+                <label
+                  class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap"
+                >
+                  Período de análise:
+                </label>
+                <Select
+                  :options="[
+                    { value: 'weekly', label: '1 semana' },
+                    { value: 'monthly', label: '1 mês' },
+                    { value: 'trimestral', label: '3 meses' },
+                    { value: 'semestral', label: '6 meses' },
+                    { value: 'annual', label: '1 ano' },
+                  ]"
+                  v-model="selectedStatsPeriod"
+                  @update:modelValue="handlePeriodChange"
+                />
+              </div>
+            </div>
+
             <!-- Trends Overview -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
               <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                   <div>
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                      Análise de Tendências
+                      Criados vs Concluídos
                     </h2>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                      Acompanhe a evolução dos tickets ao longo do tempo
+                      Novos tickets criados vs tickets concluídos
                     </p>
                   </div>
                   <TabSelector
@@ -1418,7 +1359,7 @@
                         Tempo {{ periodTextMap[selectedCycleTimePeriod] }}:
                       </p>
                       <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                        {{ formatTimeInSecondsCompact(getLatestResolutionTime()) }}
+                        {{ formatTimeInSecondsCompact(getLatestResolutionTime() * 3600) }}
                       </div>
                       <p class="text-xs text-gray-500 dark:text-gray-400">
                         {{ getPeriodName() }}
@@ -1466,7 +1407,7 @@
                         Média histórica:
                       </p>
                       <div class="text-lg font-semibold text-gray-700 dark:text-gray-300">
-                        {{ formatTimeInSecondsCompact(getAverageResolutionTime()) }}
+                        {{ formatTimeInSecondsCompact(getAverageResolutionTime() * 3600) }}
                       </div>
                     </div>
                   </div>
@@ -1616,6 +1557,96 @@
                           </div>
                         </div>
                       </template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- In Progress Time Analysis -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  TEMPO GASTO NO STATUS "EM ANDAMENTO"
+                </h2>
+              </div>
+
+              <div class="flex flex-col lg:flex-row">
+                <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
+                  <div class="space-y-4 text-sm">
+                    <p
+                      v-if="inProgressTimeSeries?.data?.length"
+                      class="text-gray-700 dark:text-gray-300"
+                    >
+                      O tempo médio foi de
+                      <strong class="text-gray-900 dark:text-white">{{
+                        formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
+                      }}</strong>
+                      para
+                      <span class="font-semibold text-blue-600 dark:text-blue-400"
+                        >{{ getTotalInProgressCount() }} tickets</span
+                      >
+                      nos últimos
+                      <span class="font-semibold text-blue-600 dark:text-blue-400">6 meses</span>.
+                    </p>
+                    <p v-if="getInProgressTrend() !== 0" class="text-sm">
+                      Isso é
+                      <span
+                        :class="
+                          getInProgressTrend() > 0
+                            ? 'text-red-600 dark:text-red-400 font-medium'
+                            : 'text-green-600 dark:text-green-400 font-medium'
+                        "
+                      >
+                        {{ Math.abs(getInProgressTrend()) }}%
+                        {{ getInProgressTrend() > 0 ? 'mais' : 'menos' }}
+                      </span>
+                      que no mês anterior
+                      <span class="text-gray-600 dark:text-gray-400">
+                        {{
+                          getInProgressTrend() > 0
+                            ? '(aumento é considerado ruim)'
+                            : '(diminuição é positiva)'
+                        }} </span
+                      >.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="p-6 lg:w-2/3">
+                  <div class="space-y-4">
+                    <div class="h-64">
+                      <Line
+                        v-if="inProgressTimeChartData"
+                        :data="inProgressTimeChartData"
+                        :options="inProgressTimeChartOptions"
+                      />
+                      <div
+                        v-else
+                        class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                      >
+                        <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
+                        <p class="text-sm">Carregando dados...</p>
+                      </div>
+                    </div>
+
+                    <div v-if="inProgressTimeSeries" class="grid grid-cols-2 gap-4">
+                      <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <span class="block text-lg font-semibold text-gray-900 dark:text-white">{{
+                          formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
+                        }}</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400"
+                          >Média últimos 6 meses</span
+                        >
+                      </div>
+                      <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <span class="block text-lg font-semibold text-gray-900 dark:text-white">{{
+                          getTotalInProgressCount()
+                        }}</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400"
+                          >Número de tickets</span
+                        >
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2134,7 +2165,7 @@ const tabs = [
   { id: 'in-progress', name: 'Em Andamento', icon: 'clock' },
   { id: 'department', name: 'Setores', icon: 'building' },
   { id: 'trends', name: 'Tendências', icon: 'chart-line' },
-  { id: 'custom', name: 'Análise por Período', icon: 'calendar' },
+  //lets not use this yet { id: 'custom', name: 'Análise por Período', icon: 'calendar' },
 ];
 
 const currentTab = ref('overview');
