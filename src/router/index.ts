@@ -17,15 +17,9 @@ import LandingPage from '@/pages/public/LandingPage.vue';
 import { localStorageService } from '@/utils/localStorageService';
 import SignUpManagement from '@/pages/admin/SignUpManagement.vue';
 import { RoleName } from '@/models';
-import TailwindTest from '@/components/TailwindTest.vue';
 
 const routes: RouteRecordRaw[] = [
   // Public Routes (No Layout)
-  {
-    path: '/tailwind-test',
-    component: TailwindTest,
-    meta: { requiresAuth: false },
-  },
   {
     path: '/landing',
     component: LandingPage,

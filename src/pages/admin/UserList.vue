@@ -1,58 +1,131 @@
 <template>
-  <section id="colaboradoresSection" class="section-content admin-section">
-    <div class="section-header">
-      <h1>Colaboradores</h1>
-      <button id="newColaboradorBtn" class="btn btn-primary" @click="openModal">
+  <section id="colaboradoresSection" class="p-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Colaboradores</h1>
+      <button
+        id="newColaboradorBtn"
+        class="flex items-center gap-2 px-4 py-2 primary-gradient text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+        @click="openModal"
+      >
         <font-awesome-icon icon="plus" />
-        <p>Novo Colaborador</p>
+        <span>Novo Colaborador</span>
       </button>
     </div>
 
-    <div class="search-group">
-      <div class="search-input-wrapper">
-        <font-awesome-icon icon="search" class="input-icon" />
-        <input type="text" id="searchTickets" placeholder="Buscar usuários" v-model="searchTerm" />
+    <div class="w-64 mb-6">
+      <div class="relative">
+        <font-awesome-icon
+          icon="search"
+          class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 pointer-events-none"
+        />
+        <input
+          type="text"
+          id="searchTickets"
+          placeholder="Buscar usuários"
+          v-model="searchTerm"
+          class="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
+        />
       </div>
     </div>
 
-    <div class="table-container">
-      <table class="data-table" id="colaboradoresTable">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Setor</th>
-            <th>Ativo</th>
-            <th>Email</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="isLoading">
-            <td colspan="5" class="loading-cell">
-              <div class="loading-wrapper">
-                <LoadingSpinner :size="28" />
-              </div>
-            </td>
-          </tr>
-          <tr v-else v-for="user in users" :key="user.id">
-            <td>{{ user.id }}</td>
-            <td>{{ user.firstName }} {{ user.lastName }}</td>
-            <td>{{ user.department?.name || 'N/A' }}</td>
-            <td>{{ user.isActive ? 'Sim' : 'Não' }}</td>
-            <td>{{ user.email }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <div
+      class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden"
+    >
+      <div class="overflow-x-auto">
+        <table class="w-full" id="colaboradoresTable">
+          <thead class="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600"
+              >
+                ID
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600"
+              >
+                Nome
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600"
+              >
+                Setor
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600"
+              >
+                Ativo
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600"
+              >
+                Email
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tr v-if="isLoading">
+              <td colspan="5" class="px-6 py-8">
+                <div class="flex justify-center items-center">
+                  <LoadingSpinner :size="28" />
+                </div>
+              </td>
+            </tr>
+            <tr
+              v-else
+              v-for="user in users"
+              :key="user.id"
+              class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                {{ user.id }}
+              </td>
+              <td
+                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100"
+              >
+                {{ user.firstName }} {{ user.lastName }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-400">
+                {{ user.department?.name || 'N/A' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  :class="[
+                    'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
+                    user.isActive
+                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+                      : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+                  ]"
+                >
+                  {{ user.isActive ? 'Sim' : 'Não' }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-400">
+                {{ user.email }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="pagination">
-      <button class="btn btn-icon" :disabled="currentPage === 1" @click="currentPage--">
+    <div class="flex items-center justify-center gap-4 mt-6">
+      <button
+        class="flex items-center justify-center w-9 h-9 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 hover:bg-blue-600 hover:border-blue-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 disabled:hover:text-gray-700 dark:disabled:hover:bg-gray-800 dark:disabled:hover:border-gray-600 dark:disabled:hover:text-gray-300"
+        :disabled="currentPage === 1"
+        @click="currentPage--"
+      >
         <font-awesome-icon icon="chevron-left" />
       </button>
 
-      <span>Página {{ currentPage }} de {{ totalPages }}</span>
+      <span class="text-sm text-gray-600 dark:text-gray-400"
+        >Página {{ currentPage }} de {{ totalPages }}</span
+      >
 
-      <button class="btn btn-icon" :disabled="currentPage === totalPages" @click="currentPage++">
+      <button
+        class="flex items-center justify-center w-9 h-9 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 hover:bg-blue-600 hover:border-blue-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 disabled:hover:text-gray-700 dark:disabled:hover:bg-gray-800 dark:disabled:hover:border-gray-600 dark:disabled:hover:text-gray-300"
+        :disabled="currentPage === totalPages"
+        @click="currentPage++"
+      >
         <font-awesome-icon icon="chevron-right" />
       </button>
     </div>
@@ -116,94 +189,3 @@ watch(currentPage, () => {
   loadUsers();
 });
 </script>
-
-<style scoped>
-.loading-cell {
-  margin: 2rem 0;
-}
-
-.loading-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
-
-h1,
-h3 {
-  color: black;
-}
-
-.header-action-btn {
-  gap: 5px;
-}
-
-.search-group {
-  width: 250px;
-  display: flex;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.search-group input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
-
-.search-input-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.search-input-wrapper input {
-  padding-left: 2rem; /* space for the icon */
-}
-
-.input-icon {
-  position: absolute;
-  left: 0.6rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #aaa;
-  pointer-events: none;
-  height: 15px;
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.btn-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
-  font-size: 0.9rem;
-  transition: var(--transition);
-}
-
-.btn-icon:hover {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
-}
-
-.btn-icon:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-#paginationInfo {
-  font-size: 0.9rem;
-  color: var(--text-light);
-}
-</style>

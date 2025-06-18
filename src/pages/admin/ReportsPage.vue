@@ -1,166 +1,250 @@
 <template>
-  <div class="reports-container">
+  <div class="min-h-screen bg-white dark:bg-gray-900 p-3 sm:p-6">
     <!-- Loading State -->
-    <div v-if="loading" class="loading-overlay">
-      <div class="loading-modal">
-        <font-awesome-icon icon="spinner" spin class="loading-icon" />
-        <p class="loading-text">Carregando dados dos relatórios...</p>
+    <div
+      v-if="loading"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div
+        class="bg-white dark:bg-gray-800 rounded-lg p-6 sm:p-8 flex flex-col items-center gap-4 shadow-lg mx-4"
+      >
+        <font-awesome-icon icon="spinner" spin class="text-3xl text-blue-600 dark:text-blue-400" />
+        <p class="text-gray-700 dark:text-gray-300 text-base sm:text-lg font-medium text-center">
+          Carregando dados dos relatórios...
+        </p>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-if="error" class="error-message">
-      <div class="error-content">
-        <div class="error-header">
-          <font-awesome-icon icon="exclamation-circle" class="error-icon" />
-          <div>
-            <p class="error-title">Erro ao carregar dados</p>
-            <p class="error-text">{{ error }}</p>
-          </div>
-          <button @click="loadData" class="error-action">Tentar Novamente</button>
+    <div
+      v-if="error"
+      class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6"
+    >
+      <div class="flex items-start gap-3 sm:gap-4">
+        <font-awesome-icon
+          icon="exclamation-circle"
+          class="text-xl sm:text-2xl text-red-600 dark:text-red-400 mt-1"
+        />
+        <div class="flex-1">
+          <p class="text-base sm:text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
+            Erro ao carregar dados
+          </p>
+          <p class="text-sm sm:text-base text-red-700 dark:text-red-300 mb-4">{{ error }}</p>
+          <button
+            @click="loadData"
+            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-medium transition-colors text-sm sm:text-base"
+          >
+            Tentar Novamente
+          </button>
         </div>
       </div>
     </div>
 
-    <div v-if="!loading && !error">
-      <!-- Cabeçalho -->
-      <div class="header">
-        <div class="breadcrumb">
+    <div v-if="!loading && !error" class="space-y-4 sm:space-y-6">
+      <!-- Header -->
+      <div class="space-y-3 sm:space-y-4">
+        <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
           <span>Dashboard</span>
-          <font-awesome-icon icon="chevron-right" class="breadcrumb-separator" />
-          <span class="breadcrumb-active">Relatórios</span>
+          <font-awesome-icon icon="chevron-right" class="text-xs" />
+          <span class="text-blue-600 dark:text-blue-400 font-medium">Relatórios</span>
         </div>
-        <div class="header-content">
+
+        <div class="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:justify-between sm:items-center">
           <div>
-            <h1 class="header-title">Relatórios do Sistema</h1>
-            <p class="header-subtitle">Acompanhe métricas e indicadores importantes dos tickets</p>
+            <h1
+              class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2"
+            >
+              Relatórios do Sistema
+            </h1>
+            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+              Acompanhe métricas e indicadores importantes dos tickets
+            </p>
           </div>
-          <div class="header-actions">
-            <button class="btn btn-outline secondary">
-              <font-awesome-icon icon="filter" />
-              Filtros
-            </button>
-            <button @click="openExportModal" class="btn btn-primary">
+          <div class="flex gap-2 sm:gap-3">
+            <button
+              @click="openExportModal"
+              class="flex items-center gap-2 px-3 sm:px-4 py-2 btn btn-primary text-xs sm:text-sm text-white rounded-md font-medium transition-colors"
+            >
               <font-awesome-icon icon="file-export" />
-              Exportar Relatório
+              <span class="hidden sm:inline">Exportar Relatório</span>
+              <span class="sm:hidden">Exportar</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div class="content">
-        <!-- Cards de Métricas -->
-        <div class="metrics-grid">
-          <div class="reports-card blue-border">
-            <div class="metric-content">
-              <div class="metric-info">
-                <p class="metric-label">Total de Tickets</p>
-                <h3 class="metric-value">{{ statistics?.totalTickets }}</h3>
-              </div>
-              <div class="metric-icon blue">
-                <font-awesome-icon icon="ticket" />
-              </div>
+      <!-- Metrics Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+        <div
+          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-lg p-4 sm:p-6 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                Total de Tickets
+              </p>
+              <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                {{ statistics?.totalTickets }}
+              </h3>
             </div>
-          </div>
-
-          <div class="reports-card yellow-border">
-            <div class="metric-content">
-              <div class="metric-info">
-                <p class="metric-label">Taxa de Resolução</p>
-                <h3 class="metric-value">{{ formatPercentage(statistics?.resolutionRate) }}</h3>
-              </div>
-              <div class="metric-icon yellow">
-                <font-awesome-icon icon="chart-line" />
-              </div>
-            </div>
-          </div>
-
-          <div class="reports-card green-border">
-            <div class="metric-content">
-              <div class="metric-info">
-                <p class="metric-label">Tempo Médio de Resolução</p>
-                <h3 class="metric-value">
-                  {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }}
-                </h3>
-              </div>
-              <div class="metric-icon green">
-                <font-awesome-icon icon="clock" />
-              </div>
-            </div>
-          </div>
-
-          <div class="reports-card purple-border">
-            <div class="metric-content">
-              <div class="metric-info">
-                <p class="metric-label">Tempo médio de Aceitação</p>
-                <h3 class="metric-value">
-                  {{ formatTimeInSeconds(statistics?.averageAcceptanceTimeSeconds) }}
-                </h3>
-              </div>
-              <div class="metric-icon purple">
-                <font-awesome-icon icon="thumbs-up" />
-              </div>
+            <div
+              class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center"
+            >
+              <font-awesome-icon
+                icon="ticket"
+                class="text-lg sm:text-xl text-blue-600 dark:text-blue-400"
+              />
             </div>
           </div>
         </div>
 
-        <!-- Abas -->
-        <div class="tabs-container">
-          <div class="tabs-header">
-            <nav class="tabs-nav">
-              <button
-                v-for="tab in tabs"
-                :key="tab.id"
-                @click="currentTab = tab.id"
-                :class="['tab-button', { active: currentTab === tab.id }]"
-              >
-                <font-awesome-icon :icon="tab.icon" />
-                {{ tab.name }}
-              </button>
-            </nav>
+        <div
+          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-yellow-500 rounded-lg p-4 sm:p-6 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                Taxa de Resolução
+              </p>
+              <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                {{ formatPercentage(statistics?.resolutionRate) }}
+              </h3>
+            </div>
+            <div
+              class="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center"
+            >
+              <font-awesome-icon
+                icon="chart-line"
+                class="text-lg sm:text-xl text-yellow-600 dark:text-yellow-400"
+              />
+            </div>
           </div>
+        </div>
 
-          <div class="tab-content">
-            <!-- Visão Geral -->
-            <div v-if="currentTab === 'overview'" class="tab-panel">
-              <!-- Nova seção Created vs Completed -->
-              <div class="reports-card created-vs-completed">
-                <div class="created-vs-completed-header">
-                  <h2>CRIADOS VS CONCLUÍDOS</h2>
-                  <TabSelector
-                    v-model="selectedTrendPeriod"
-                    :options="[
-                      { value: 'daily', label: 'Diário' },
-                      { value: 'weekly', label: 'Semanal' },
-                      { value: 'monthly', label: 'Mensal' },
-                    ]"
-                    @update:modelValue="updateTrendPeriod"
-                  />
-                </div>
+        <div
+          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-green-500 rounded-lg p-4 sm:p-6 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                Tempo Médio de Resolução
+              </p>
+              <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }}
+              </h3>
+            </div>
+            <div
+              class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center"
+            >
+              <font-awesome-icon
+                icon="clock"
+                class="text-lg sm:text-xl text-green-600 dark:text-green-400"
+              />
+            </div>
+          </div>
+        </div>
 
-                <div class="created-vs-completed-content">
-                  <div class="created-vs-completed-info">
-                    <p class="info-title">Novos tickets criados vs concluídos</p>
-                    <p class="info-text" v-if="trendData && trendData.length > 0">
-                      <span class="highlight">{{ getTotalResolved() }} tickets</span> concluídos no
-                      período selecionado
+        <div
+          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-purple-500 rounded-lg p-4 sm:p-6 shadow-sm"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                Tempo médio de Aceitação
+              </p>
+              <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                {{ formatTimeInSeconds(statistics?.averageAcceptanceTimeSeconds) }}
+              </h3>
+            </div>
+            <div
+              class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center"
+            >
+              <font-awesome-icon
+                icon="thumbs-up"
+                class="text-lg sm:text-xl text-purple-600 dark:text-purple-400"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm">
+        <div class="border-b border-gray-200 dark:border-gray-700">
+          <nav class="flex overflow-x-auto scrollbar-hide">
+            <button
+              v-for="tab in tabs"
+              :key="tab.id"
+              @click="currentTab = tab.id"
+              :class="[
+                'flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0',
+                currentTab === tab.id
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600',
+              ]"
+            >
+              <font-awesome-icon :icon="tab.icon" class="text-xs sm:text-sm" />
+              {{ tab.name }}
+            </button>
+          </nav>
+        </div>
+
+        <div class="p-3 sm:p-6">
+          <!-- Overview Tab -->
+          <div v-if="currentTab === 'overview'" class="space-y-6">
+            <!-- Created vs Completed Section -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div
+                class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-6 border-b border-gray-200 dark:border-gray-700"
+              >
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 sm:mb-0">
+                  CRIADOS VS CONCLUÍDOS
+                </h2>
+                <TabSelector
+                  v-model="selectedTrendPeriod"
+                  :options="[
+                    { value: 'daily', label: 'Diário' },
+                    { value: 'weekly', label: 'Semanal' },
+                    { value: 'monthly', label: 'Mensal' },
+                  ]"
+                  @update:modelValue="updateTrendPeriod"
+                />
+              </div>
+
+              <div class="flex flex-col lg:flex-row">
+                <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
+                  <p class="text-base font-medium text-gray-900 dark:text-white mb-4">
+                    Novos tickets criados vs concluídos
+                  </p>
+                  <div class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                    <p v-if="trendData && trendData.length > 0">
+                      <span class="font-semibold text-blue-600 dark:text-blue-400"
+                        >{{ getTotalResolved() }} tickets</span
+                      >
+                      concluídos no período selecionado
                     </p>
-                    <p class="info-text" v-if="trendData && trendData.length > 0">
-                      <span class="highlight">{{ getTotalCreated() }} tickets</span> criados no
-                      período selecionado
+                    <p v-if="trendData && trendData.length > 0">
+                      <span class="font-semibold text-green-600 dark:text-green-400"
+                        >{{ getTotalCreated() }} tickets</span
+                      >
+                      criados no período selecionado
                     </p>
                     <p
-                      class="info-trend"
                       v-if="
                         trendData &&
                         trendData.length > 1 &&
                         (createdTrendPercentage !== 0 || resolvedTrendPercentage !== 0)
                       "
+                      class="text-sm"
                     >
                       Isso é
                       <span
                         v-if="createdTrendPercentage > 0"
-                        :class="createdTrendPercentage >= 0 ? 'trend-value' : 'trend-value-down'"
+                        :class="
+                          createdTrendPercentage >= 0
+                            ? 'text-green-600 dark:text-green-400 font-medium'
+                            : 'text-red-600 dark:text-red-400 font-medium'
+                        "
                       >
                         {{ createdTrendPercentage }}%
                         {{ createdTrendPercentage >= 0 ? 'mais' : 'menos' }} criados
@@ -170,568 +254,435 @@
                       </span>
                       <span
                         v-if="resolvedTrendPercentage > 0"
-                        :class="resolvedTrendPercentage >= 0 ? 'trend-value' : 'trend-value-down'"
+                        :class="
+                          resolvedTrendPercentage >= 0
+                            ? 'text-green-600 dark:text-green-400 font-medium'
+                            : 'text-red-600 dark:text-red-400 font-medium'
+                        "
                       >
                         {{ resolvedTrendPercentage }}%
                         {{ resolvedTrendPercentage >= 0 ? 'mais' : 'menos' }} concluídos
                       </span>
                       comparado a
-                      <span class="date-reference">{{ firstDate }}</span>
+                      <span class="font-medium text-gray-900 dark:text-white">{{ firstDate }}</span>
                     </p>
                   </div>
+                </div>
 
-                  <div class="created-vs-completed-chart">
-                    <div class="chart-container">
-                      <Line
-                        v-if="trendData && trendData.length > 0"
-                        :data="createdVsCompletedChartData"
-                        :options="createdVsCompletedChartOptions"
-                      />
-                      <div v-else class="loading-state">
-                        <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                        <p class="loading-text">Carregando dados...</p>
-                      </div>
+                <div class="p-6 lg:w-2/3">
+                  <div class="h-80">
+                    <Line
+                      v-if="trendData && trendData.length > 0"
+                      :data="createdVsCompletedChartData"
+                      :options="createdVsCompletedChartOptions"
+                    />
+                    <div
+                      v-else
+                      class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                    >
+                      <font-awesome-icon icon="spinner" spin class="text-2xl mb-3" />
+                      <p>Carregando dados...</p>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div class="charts-grid">
-                <!-- Gráfico de Status -->
-                <div class="reports-card status-chart-flex">
-                  <div class="chart-header">
-                    <h2 class="chart-title">Distribuição por Status</h2>
-                    <div class="chart-icon">
-                      <font-awesome-icon icon="chart-pie" />
+            <!-- Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Status Chart -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div
+                  class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700"
+                >
+                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Distribuição por Status
+                  </h2>
+                  <div class="text-blue-600 dark:text-blue-400">
+                    <font-awesome-icon icon="chart-pie" class="text-xl" />
+                  </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row p-6">
+                  <div class="w-full md:w-2/3 h-64">
+                    <Doughnut
+                      v-if="ticketsByStatus.labels.length"
+                      :data="statusChartData"
+                      :options="chartOptions"
+                    />
+                    <div
+                      v-else
+                      class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                    >
+                      <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
+                      <p class="text-sm">Carregando dados...</p>
                     </div>
                   </div>
-                  <div class="status-chart-row">
-                    <div class="chart-container">
-                      <div class="chart-wrapper">
-                        <Doughnut
-                          v-if="ticketsByStatus.labels.length"
-                          :data="statusChartData"
-                          :options="chartOptions"
-                        />
-                        <div v-else class="loading-state">
-                          <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                          <p class="loading-text">Carregando dados...</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="status-custom-legend">
+
+                  <div class="w-full md:w-1/3 mt-4 md:mt-0 md:ml-6">
+                    <div class="space-y-3">
                       <div
                         v-for="(label, idx) in statusChartData.labels"
                         :key="label"
-                        class="legend-item"
+                        class="flex items-center gap-3"
                       >
                         <span
-                          class="legend-color"
+                          class="w-3 h-3 rounded-full"
                           :style="{
                             backgroundColor: statusChartData.datasets[0].backgroundColor[idx],
                           }"
                         ></span>
-                        <span class="legend-label">{{ label }}</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">{{ label }}</span>
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <!-- Gráfico de Prioridade -->
-                <div class="reports-card status-chart-flex">
-                  <div class="chart-header">
-                    <h2 class="chart-title">Distribuição por Prioridade</h2>
-                    <div class="chart-icon">
-                      <font-awesome-icon icon="chart-bar" />
+              <!-- Priority Chart -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div
+                  class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700"
+                >
+                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Distribuição por Prioridade
+                  </h2>
+                  <div class="text-blue-600 dark:text-blue-400">
+                    <font-awesome-icon icon="chart-bar" class="text-xl" />
+                  </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row p-6">
+                  <div class="w-full md:w-2/3 h-64">
+                    <Doughnut
+                      v-if="ticketsByPriority.labels.length"
+                      :data="priorityChartData"
+                      :options="chartOptions"
+                    />
+                    <div
+                      v-else
+                      class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                    >
+                      <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
+                      <p class="text-sm">Carregando dados...</p>
                     </div>
                   </div>
-                  <div class="status-chart-row">
-                    <div class="chart-container">
-                      <div class="chart-wrapper">
-                        <Doughnut
-                          v-if="ticketsByPriority.labels.length"
-                          :data="priorityChartData"
-                          :options="chartOptions"
-                        />
-                        <div v-else class="loading-state">
-                          <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                          <p class="loading-text">Carregando dados...</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="status-custom-legend">
+
+                  <div class="w-full md:w-1/3 mt-4 md:mt-0 md:ml-6">
+                    <div class="space-y-3">
                       <div
                         v-for="(label, idx) in priorityChartData.labels"
                         :key="label"
-                        class="legend-item"
+                        class="flex items-center gap-3"
                       >
                         <span
-                          class="legend-color"
+                          class="w-3 h-3 rounded-full"
                           :style="{
                             backgroundColor: priorityChartData.datasets[0].backgroundColor[idx],
                           }"
                         ></span>
-                        <span class="legend-label">{{ label }}</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">{{ label }}</span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Tabela -->
-              <div class="reports-card reports-table-container">
-                <div class="table-header">
-                  <div class="table-header-content">
-                    <div>
-                      <h2 class="table-title">Últimos Tickets</h2>
-                      <p class="table-subtitle">Acompanhe os tickets mais recentes do sistema</p>
-                    </div>
-                    <button class="btn btn-outline primary">
-                      <font-awesome-icon icon="download" />
-                      Exportar
-                    </button>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Recent Tickets Table -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3">
+                <div
+                  class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-6 border-b border-gray-200 dark:border-gray-700"
+                >
+                  <div>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      Últimos Tickets
+                    </h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      Acompanhe os tickets mais recentes do sistema
+                    </p>
                   </div>
+                  <button
+                    class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors mt-4 sm:mt-0"
+                  >
+                    <font-awesome-icon icon="download" />
+                    Exportar
+                  </button>
                 </div>
-                <div class="table-wrapper">
-                  <table class="table">
-                    <thead>
+
+                <div class="overflow-x-auto">
+                  <table class="w-full">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
                       <tr>
-                        <th>ID</th>
-                        <th>Assunto</th>
-                        <th>Status</th>
-                        <th>Prioridade</th>
-                        <th>Data</th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                        >
+                          ID
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                        >
+                          Assunto
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                        >
+                          Status
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                        >
+                          Prioridade
+                        </th>
+                        <th
+                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                        >
+                          Data
+                        </th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr v-for="ticket in recentTickets" :key="ticket.customId">
-                        <td>{{ ticket.customId }}</td>
-                        <td>{{ ticket.name }}</td>
-                        <td>
-                          <span :class="['status-badge', getStatusClass(ticket.status)]">
+                    <tbody
+                      class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
+                    >
+                      <tr
+                        v-for="ticket in recentTickets"
+                        :key="ticket.customId"
+                        class="hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white"
+                        >
+                          {{ ticket.customId }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">
+                          {{ ticket.name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <span
+                            :class="[
+                              'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
+                              getStatusClass(ticket.status),
+                            ]"
+                          >
                             {{ formatSnakeToNaturalCase(ticket.status) }}
                           </span>
                         </td>
-                        <td>
-                          <span :class="['priority-badge', getPriorityClass(ticket.priority)]">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <span
+                            :class="[
+                              'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
+                              getPriorityClass(ticket.priority),
+                            ]"
+                          >
                             {{ formatSnakeToNaturalCase(ticket.priority) }}
                           </span>
                         </td>
-                        <td>{{ formatDate(ticket.createdAt) }}</td>
+                        <td
+                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
+                        >
+                          {{ formatDate(ticket.createdAt) }}
+                        </td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
 
-              <div class="charts-grid cycle-time-section">
-                <!-- Cycle Time per Segment -->
-                <div class="reports-card">
-                  <div class="cycle-time-header">
-                    <div class="cycle-time-title">
-                      <h3>Tempo de Resolução Por Segmento:</h3>
-                      <p>
-                        {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }} (média)
-                      </p>
-                    </div>
-                    <div>
-                      <Select
-                        :options="[
-                          { value: 'department', label: 'Por Setor' },
-                          { value: 'priority', label: 'Por Prioridade' },
-                        ]"
-                        v-model="selectedCycleTimeFilter"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="cycle-time-content">
-                    <div class="cycle-time-info">
-                      <p class="info-title">Setores com maior tempo de resolução:</p>
-                      <div class="info-list">
-                        <div
-                          v-for="dept in departmentsWithLongestResolutionTime"
-                          :key="dept.departmentId"
-                          class="info-item"
-                        >
-                          <span class="label">{{ dept.departmentName }}</span>
-                          <span class="time">{{
-                            formatTimeInSeconds(dept.averageResolutionTimeSeconds)
-                          }}</span>
-                        </div>
-                      </div>
-
-                      <p class="info-title mt-4">Setores com menor tempo de resolução:</p>
-                      <div class="info-list">
-                        <div
-                          v-for="dept in departmentsWithShortestResolutionTime"
-                          :key="dept.departmentId"
-                          class="info-item"
-                        >
-                          <span class="label">{{ dept.departmentName }}</span>
-                          <span class="time">{{
-                            formatTimeInSeconds(dept.averageResolutionTimeSeconds)
-                          }}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="cycle-time-chart">
-                      <div class="chart-bars">
-                        <template v-if="sortedDepartmentsByResolutionTime.length">
-                          <div
-                            v-for="dept in sortedDepartmentsByResolutionTime"
-                            :key="dept.departmentId"
-                            class="chart-item"
-                          >
-                            <span class="chart-label">{{ dept.departmentName }}</span>
-                            <div
-                              class="chart-bar"
-                              :class="{
-                                'short-bar':
-                                  dept.averageResolutionTimeSeconds /
-                                    sortedDepartmentsByResolutionTime[0]
-                                      .averageResolutionTimeSeconds <
-                                  0.05,
-                                'zero-bar': dept.averageResolutionTimeSeconds === 0,
-                              }"
-                              :style="{
-                                width:
-                                  dept.averageResolutionTimeSeconds === 0
-                                    ? '3px'
-                                    : `${(dept.averageResolutionTimeSeconds / sortedDepartmentsByResolutionTime[0].averageResolutionTimeSeconds) * 100}%`,
-                              }"
-                              :data-duration="
-                                formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds)
-                              "
-                            >
-                              {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds) }}
-                            </div>
-                          </div>
-                        </template>
-                      </div>
-                    </div>
-                  </div>
+              <!-- Top Contributors -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                    Top Colaboradores
+                  </h2>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Últimos 3 meses</p>
                 </div>
 
-                <!-- Top Colaboradores -->
-                <div class="reports-card top-contributors-card">
-                  <div class="top-contributors-header">
-                    <h2 class="top-contributors-title">Top Colaboradores</h2>
-                    <p class="top-contributors-subtitle">Últimos 3 meses</p>
+                <div class="p-6">
+                  <!-- Table Headers -->
+                  <div
+                    class="grid grid-cols-4 gap-4 pb-3 border-b border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  >
+                    <div>Perfil</div>
+                    <div class="text-center">Tickets resolvidos</div>
+                    <div class="text-center">Taxa de resolução</div>
+                    <div class="text-center">Tickets totais</div>
                   </div>
 
-                  <div class="top-contributors-table">
-                    <!-- Table Headers -->
-                    <div class="contributors-table-header">
-                      <div class="header-profile">Perfil</div>
-                      <div class="header-tickets">Tickets resolvidos</div>
-                      <div class="header-rate">Taxa de resolução</div>
-                      <div class="header-total">Tickets totais</div>
-                    </div>
-
-                    <!-- Table Content -->
+                  <!-- Table Content -->
+                  <div v-if="topUsers && topUsers.users.length > 0" class="space-y-4 mt-4">
                     <div
-                      v-if="topUsers && topUsers.users.length > 0"
-                      class="contributors-table-body"
+                      v-for="user in topUsers.users"
+                      :key="user.userId"
+                      class="grid grid-cols-4 gap-4 items-center py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-2 -mx-2 transition-colors"
                     >
-                      <div
-                        v-for="user in topUsers.users"
-                        :key="user.userId"
-                        class="contributor-row"
-                      >
-                        <div class="contributor-profile">
-                          <div class="contributor-avatar" :class="getAvatarColorClass(user.userId)">
-                            <div v-if="!user.avatarUrl" class="avatar-placeholder">
-                              {{ getInitials(user.firstName, user.lastName) }}
-                            </div>
-                            <img
-                              v-else
-                              :src="user.avatarUrl"
-                              :alt="user.firstName"
-                              class="avatar-image"
-                            />
+                      <div class="flex items-center gap-3">
+                        <div
+                          :class="[
+                            'w-12 h-12 rounded-full flex items-center justify-center text-base font-bold',
+                            getAvatarColorClass(user.userId),
+                          ]"
+                        >
+                          <div v-if="!user.avatarUrl">
+                            {{ getInitials(user.firstName, user.lastName) }}
                           </div>
-                          <div class="contributor-info">
-                            <h4 class="contributor-name">
-                              {{ user.firstName }} {{ user.lastName }}
-                            </h4>
-                            <p class="contributor-role">{{ user.departmentName }}</p>
-                          </div>
+                          <img
+                            v-else
+                            :src="user.avatarUrl"
+                            :alt="`${user.firstName} ${user.lastName}`"
+                            class="w-full h-full object-cover rounded-full"
+                          />
                         </div>
-
-                        <div class="contributor-tickets">
-                          <span class="ticket-count">{{ user.resolvedTickets }}</span>
-                        </div>
-
-                        <div class="contributor-rate">
-                          <span
-                            :class="[
-                              'status-indicator',
-                              getResolutionRateClass(user.resolutionRate),
-                            ]"
-                          >
-                            {{ formatPercentage(user.resolutionRate) }}
-                          </span>
-                        </div>
-
-                        <div class="contributor-total">
-                          <span class="total-count">{{ user.totalTickets }}</span>
+                        <div class="min-w-0 hidden sm:block">
+                          <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                            {{ user.firstName }} {{ user.lastName }}
+                          </p>
+                          <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                            {{ user.departmentName }}
+                          </p>
                         </div>
                       </div>
+                      <div class="text-center">
+                        <span class="text-lg font-semibold text-gray-900 dark:text-white">{{
+                          user.resolvedTickets
+                        }}</span>
+                      </div>
+                      <div class="text-center">
+                        <span
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          :class="getResolutionRateBadgeClass(user.resolutionRate)"
+                        >
+                          {{ formatPercentage(user.resolutionRate) }}
+                        </span>
+                      </div>
+                      <div class="text-center">
+                        <span class="text-lg font-semibold text-gray-900 dark:text-white">{{
+                          user.totalTickets
+                        }}</span>
+                      </div>
                     </div>
+                  </div>
 
-                    <div v-else-if="loading" class="loading-contributors">
-                      <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                      <p>Carregando colaboradores...</p>
-                    </div>
+                  <div
+                    v-else-if="!topUsers"
+                    class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400"
+                  >
+                    <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
+                    <p class="text-sm">Carregando colaboradores...</p>
+                  </div>
 
-                    <div v-else class="no-contributors">
-                      <p>Nenhum colaborador encontrado nos últimos 3 meses.</p>
-                    </div>
+                  <div
+                    v-else
+                    class="flex items-center justify-center py-8 text-gray-500 dark:text-gray-400"
+                  >
+                    <font-awesome-icon icon="info-circle" class="mr-2" />
+                    <p class="text-sm">Nenhum colaborador encontrado</p>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Existing department cards -->
-              <div class="departments-grid">
+            <!-- Cycle Time Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Cycle Time per Department -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
                 <div
-                  v-for="dept in departmentStats"
-                  :key="dept.departmentId"
-                  class="reports-card department-card-modern"
+                  class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-6 border-b border-gray-200 dark:border-gray-700"
                 >
-                  <div class="department-card-header">
-                    <div
-                      class="department-icon"
-                      :style="{ background: '#2563eb20', color: '#2563eb' }"
-                    >
-                      <font-awesome-icon icon="building" />
-                    </div>
-                    <h4 class="department-title">{{ dept.departmentName }}</h4>
-                  </div>
-                  <div class="department-stats">
-                    <div class="stat-row">
-                      <span class="stat-label">Total de Tickets</span>
-                      <span class="stat-value">{{ dept.totalTickets }}</span>
-                    </div>
-                    <div class="stat-row">
-                      <span class="stat-label">Resolvidos</span>
-                      <span class="stat-value">{{ dept.resolvedTickets }}</span>
-                    </div>
-                    <div class="stat-row">
-                      <span class="stat-label">Taxa de Resolução</span>
-                      <span class="stat-value">{{ formatPercentage(dept.resolutionRate) }}</span>
-                    </div>
-                    <div class="stat-row">
-                      <span class="stat-label">Tempo Médio</span>
-                      <span class="stat-value">{{
-                        formatTimeInSeconds(dept.averageResolutionTimeSeconds)
-                      }}</span>
-                    </div>
-                    <div class="stat-row progress-row">
-                      <span class="stat-label">Progresso</span>
-                      <div class="progress-bar-bg">
-                        <div
-                          class="progress-bar-fill"
-                          :style="{
-                            width: dept.resolutionRate * 100 + '%',
-                            background:
-                              dept.resolutionRate > 0.7
-                                ? '#22c55e'
-                                : dept.resolutionRate > 0.4
-                                  ? '#eab308'
-                                  : '#ef4444',
-                          }"
-                        ></div>
-                      </div>
-                      <span class="progress-value">{{
-                        formatPercentage(dept.resolutionRate)
-                      }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Em Andamento -->
-            <div v-if="currentTab === 'in-progress'" class="tab-panel">
-              <div class="work-in-progress">
-                <div class="wip-header">
-                  <h2 class="wip-title">EM ANDAMENTO</h2>
-                </div>
-
-                <div class="task-list">
-                  <div class="task-header">
-                    <div class="task-column assignees">RESPONSÁVEL</div>
-                    <div class="task-column task-name">TÍTULO DO CHAMADO</div>
-                    <div class="task-column workflow-state">STATUS</div>
-                    <div class="task-column time-progress">TEMPO EM ANDAMENTO</div>
-                  </div>
-
-                  <div v-if="loadingInProgressTasks" class="loading-tasks">
-                    <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                    <p class="loading-text">Carregando tickets em andamento...</p>
-                  </div>
-
-                  <div v-else-if="inProgressTasks.length === 0" class="no-tasks-message">
-                    <font-awesome-icon icon="info-circle" class="info-icon" />
-                    <p>Não há tickets em andamento no momento.</p>
-                  </div>
-
-                  <div v-for="task in inProgressTasks" :key="task.id" class="task-row">
-                    <div class="task-column assignees">
-                      <div class="avatar-group">
-                        <div class="avatar-placeholder">
-                          {{ task.assignee?.initials || '?' }}
-                        </div>
-                      </div>
-                    </div>
-                    <div class="task-column task-name">
-                      <span class="task-title">{{ task.name }}</span>
-                    </div>
-                    <div class="task-column workflow-state">
-                      <span class="status-badge">{{ task.status }}</span>
-                    </div>
-                    <div class="task-column time-progress">
-                      <span class="time-badge">{{ task.timeInProgress }}</span>
-                      <font-awesome-icon
-                        v-if="task.isOverdue"
-                        icon="exclamation-circle"
-                        class="overdue-icon"
-                        :title="task.overdueReason || 'Ticket atrasado'"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Departamentos -->
-            <div v-if="currentTab === 'department'" class="tab-panel">
-              <!-- Timings by Segment -->
-              <div class="timings-section">
-                <div class="timings-header">
-                  <h2 class="timings-title">TEMPOS POR SETOR</h2>
-                </div>
-
-                <div class="timings-table-container">
-                  <table class="timings-table">
-                    <thead>
-                      <tr>
-                        <th>SETOR</th>
-                        <th>QUANTIDADE (CONCLUÍDOS)</th>
-                        <th>TEMPO DE REAÇÃO (ACEITAÇÃO)</th>
-                        <th>TEMPO DE RESOLUÇÃO</th>
-                        <th>TEMPO TOTAL</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="dept in departmentStats" :key="dept.departmentId">
-                        <td>{{ dept.departmentName }}</td>
-                        <td>{{ dept.resolvedTickets }}</td>
-                        <td>{{ formatTimeInSeconds(dept.averageAcceptanceTimeSeconds) }}</td>
-                        <td>{{ formatTimeInSeconds(dept.averageResolutionTimeSeconds) }}</td>
-                        <td>{{ formatTimeInSeconds(dept.averageTotalTimeSeconds) }}</td>
-                      </tr>
-                      <tr class="summary-row" v-if="departmentStatsSummary">
-                        <td>Resumo</td>
-                        <td>{{ departmentStatsSummary.totalResolved }}</td>
-                        <td>
-                          {{
-                            formatTimeInSeconds(departmentStatsSummary.averageAcceptanceTimeSeconds)
-                          }}
-                        </td>
-                        <td>
-                          {{
-                            formatTimeInSeconds(departmentStatsSummary.averageResolutionTimeSeconds)
-                          }}
-                        </td>
-                        <td>
-                          {{ formatTimeInSeconds(departmentStatsSummary.averageTotalTimeSeconds) }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <div class="pagination">
-                  <button class="pagination-button active">1</button>
-                  <button class="pagination-button">2</button>
-                </div>
-              </div>
-
-              <!-- Cycle Time per Segment -->
-              <div class="reports-card cycle-time-section">
-                <div class="cycle-time-header">
-                  <div class="cycle-time-title">
-                    <h3>Tempo de resolução:</h3>
-                    <p>
-                      {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }} (média)
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      Tempo de Resolução Por Segmento:
+                    </h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ formatTimeInSecondsCompact(getAverageResolutionTime() * 3600) }} (média
+                      {{ periodTextMap[selectedCycleTimePeriod] }})
                     </p>
                   </div>
+                  <div class="mt-4 sm:mt-0">
+                    <Select
+                      :options="[
+                        { value: 'department', label: 'Por Setor' },
+                        { value: 'priority', label: 'Por Prioridade' },
+                      ]"
+                      v-model="selectedCycleTimeFilter"
+                    />
+                  </div>
                 </div>
 
-                <div class="cycle-time-content">
-                  <div class="cycle-time-info">
-                    <p class="info-title">Setores com maior tempo de resolução:</p>
-                    <div class="info-list">
-                      <div
-                        v-for="dept in departmentsWithLongestResolutionTime"
-                        :key="dept.departmentId"
-                        class="info-item"
-                      >
-                        <span class="label">{{ dept.departmentName }}</span>
-                        <span class="time">{{
-                          formatTimeInSeconds(dept.averageResolutionTimeSeconds)
-                        }}</span>
+                <div class="flex flex-col lg:flex-row">
+                  <div class="p-6 lg:w-1/2 border-r border-gray-200 dark:border-gray-700">
+                    <div class="space-y-4">
+                      <div>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                          Setores com maior tempo de resolução:
+                        </p>
+                        <div class="space-y-2">
+                          <div
+                            v-for="dept in departmentsWithLongestResolutionTime"
+                            :key="dept.departmentId"
+                            class="flex justify-between items-center text-sm"
+                          >
+                            <span class="text-gray-700 dark:text-gray-300">{{
+                              dept.departmentName
+                            }}</span>
+                            <span class="font-medium text-red-600 dark:text-red-400">{{
+                              formatTimeInSeconds(dept.averageResolutionTimeSeconds)
+                            }}</span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
 
-                    <p class="info-title mt-4">Setores com menor tempo de resolução:</p>
-                    <div class="info-list">
-                      <div
-                        v-for="dept in departmentsWithShortestResolutionTime"
-                        :key="dept.departmentId"
-                        class="info-item"
-                      >
-                        <span class="label">{{ dept.departmentName }}</span>
-                        <span class="time">{{
-                          formatTimeInSeconds(dept.averageResolutionTimeSeconds)
-                        }}</span>
+                      <div>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                          Setores com menor tempo de resolução:
+                        </p>
+                        <div class="space-y-2">
+                          <div
+                            v-for="dept in departmentsWithShortestResolutionTime"
+                            :key="dept.departmentId"
+                            class="flex justify-between items-center text-sm"
+                          >
+                            <span class="text-gray-700 dark:text-gray-300">{{
+                              dept.departmentName
+                            }}</span>
+                            <span class="font-medium text-green-600 dark:text-green-400">{{
+                              formatTimeInSeconds(dept.averageResolutionTimeSeconds)
+                            }}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <div class="cycle-time-chart">
-                    <div class="chart-bars">
+                  <div class="p-6 lg:w-1/2">
+                    <div class="space-y-3">
                       <template v-if="sortedDepartmentsByResolutionTime.length">
                         <div
                           v-for="dept in sortedDepartmentsByResolutionTime"
                           :key="dept.departmentId"
-                          class="chart-item"
+                          class="space-y-1"
                         >
-                          <span class="chart-label">{{ dept.departmentName }}</span>
-                          <div
-                            class="chart-bar"
-                            :class="{
-                              'short-bar':
-                                dept.averageResolutionTimeSeconds /
-                                  sortedDepartmentsByResolutionTime[0]
-                                    .averageResolutionTimeSeconds <
-                                0.05,
-                              'zero-bar': dept.averageResolutionTimeSeconds === 0,
-                            }"
-                            :style="{
-                              width:
-                                dept.averageResolutionTimeSeconds === 0
-                                  ? '3px'
-                                  : `${(dept.averageResolutionTimeSeconds / sortedDepartmentsByResolutionTime[0].averageResolutionTimeSeconds) * 100}%`,
-                            }"
-                            :data-duration="
-                              formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds)
-                            "
-                          >
-                            {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds) }}
+                          <div class="flex justify-between items-center text-xs">
+                            <span class="text-gray-700 dark:text-gray-300 truncate max-w-24">{{
+                              dept.departmentName
+                            }}</span>
+                            <span class="font-medium text-gray-900 dark:text-white">
+                              {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds) }}
+                            </span>
+                          </div>
+                          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div
+                              class="bg-gradient-to-r from-green-500 to-red-500 h-2 rounded-full relative"
+                              :class="{
+                                'min-w-[2px]': dept.averageResolutionTimeSeconds === 0,
+                              }"
+                              :style="{
+                                width:
+                                  dept.averageResolutionTimeSeconds === 0
+                                    ? '2px'
+                                    : `${(dept.averageResolutionTimeSeconds / sortedDepartmentsByResolutionTime[0].averageResolutionTimeSeconds) * 100}%`,
+                              }"
+                            ></div>
                           </div>
                         </div>
                       </template>
@@ -739,90 +690,626 @@
                   </div>
                 </div>
               </div>
-              <!-- Existing department cards -->
-              <div class="departments-grid">
-                <div
-                  v-for="dept in departmentStats"
-                  :key="dept.departmentId"
-                  class="reports-card department-card-modern"
-                >
-                  <div class="department-card-header">
-                    <div
-                      class="department-icon"
-                      :style="{ background: '#2563eb20', color: '#2563eb' }"
-                    >
-                      <font-awesome-icon icon="building" />
+
+              <!-- Status Duration Chart -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Tempo Médio Por Status
+                  </h2>
+                </div>
+
+                <div class="flex flex-col lg:flex-row">
+                  <div class="p-6 lg:w-1/2 border-r border-gray-200 dark:border-gray-700">
+                    <p class="text-sm font-medium text-gray-900 dark:text-white mb-4">
+                      Análise de tempo por status:
+                    </p>
+                    <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                      <p>
+                        Esta análise mostra quanto tempo em média os tickets permanecem em cada
+                        status.
+                      </p>
+                      <p>Tempos altos em determinados status podem indicar gargalos no processo.</p>
                     </div>
-                    <h4 class="department-title">{{ dept.departmentName }}</h4>
                   </div>
-                  <div class="department-stats">
-                    <div class="stat-row">
-                      <span class="stat-label">Total de Tickets</span>
-                      <span class="stat-value">{{ dept.totalTickets }}</span>
-                    </div>
-                    <div class="stat-row">
-                      <span class="stat-label">Resolvidos</span>
-                      <span class="stat-value">{{ dept.resolvedTickets }}</span>
-                    </div>
-                    <div class="stat-row">
-                      <span class="stat-label">Taxa de Resolução</span>
-                      <span class="stat-value">{{ formatPercentage(dept.resolutionRate) }}</span>
-                    </div>
-                    <div class="stat-row">
-                      <span class="stat-label">Tempo Médio</span>
-                      <span class="stat-value">{{
-                        formatTimeInSeconds(dept.averageResolutionTimeSeconds)
-                      }}</span>
-                    </div>
-                    <div class="stat-row progress-row">
-                      <span class="stat-label">Progresso</span>
-                      <div class="progress-bar-bg">
+
+                  <div class="p-6 lg:w-1/2">
+                    <div class="space-y-3">
+                      <template v-if="sortedStatusDurations.length">
                         <div
-                          class="progress-bar-fill"
-                          :style="{
-                            width: dept.resolutionRate * 100 + '%',
-                            background:
-                              dept.resolutionRate > 0.7
-                                ? '#22c55e'
-                                : dept.resolutionRate > 0.4
-                                  ? '#eab308'
-                                  : '#ef4444',
-                          }"
-                        ></div>
-                      </div>
-                      <span class="progress-value">{{
-                        formatPercentage(dept.resolutionRate)
-                      }}</span>
+                          v-for="(duration, index) in sortedStatusDurations"
+                          :key="index"
+                          class="space-y-1"
+                        >
+                          <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-700 dark:text-gray-300">{{
+                              formatSnakeToNaturalCase(duration.status)
+                            }}</span>
+                            <span class="font-medium text-gray-900 dark:text-white">
+                              {{ formatTimeInSecondsCompact(duration.averageDurationSeconds) }}
+                            </span>
+                          </div>
+                          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div
+                              class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
+                              :class="{
+                                'min-w-[2px]': duration.averageDurationSeconds === 0,
+                              }"
+                              :style="{
+                                width:
+                                  duration.averageDurationSeconds === 0
+                                    ? '2px'
+                                    : `${(duration.averageDurationSeconds / sortedStatusDurations[0].averageDurationSeconds) * 100}%`,
+                              }"
+                            ></div>
+                          </div>
+                        </div>
+                      </template>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Tendências -->
-            <div v-if="currentTab === 'trends'" class="tab-panel">
-              <!-- Period Selector at the top of the tab -->
-              <div class="stats-period-selector">
-                <label for="statsPeriod" class="stats-period-label">Período de análise:</label>
-                <div>
-                  <Select
-                    v-model="selectedStatsPeriod"
-                    :options="[
-                      { value: 'annual', label: '12 meses' },
-                      { value: 'semestral', label: '6 meses' },
-                      { value: 'trimestral', label: '3 meses' },
-                      { value: 'monthly', label: 'Último mês' },
-                      { value: 'weekly', label: 'Última semana' },
-                    ]"
-                    @update:modelValue="handlePeriodChange"
-                  />
+          <!-- Custom Period Analysis Tab -->
+          <div v-if="currentTab === 'custom'" class="space-y-6">
+            <div class="flex gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >Data Inicial</label
+                >
+                <DatePicker
+                  v-model="dateRange.start"
+                  :format="formatDate"
+                  :placeholder="'Selecione uma data'"
+                  :clearable="false"
+                  :editable="false"
+                  :disabled-date="disabledDate"
+                  :max-date="new Date()"
+                  :min-date="new Date(2023, 0, 1)"
+                  :value-type="'format'"
+                  :input-class="'w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'"
+                  :placeholder-class="'text-gray-500 dark:text-gray-400'"
+                  :clear-icon="false"
+                  :confirm="false"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >Data Final</label
+                >
+                <DatePicker
+                  v-model="dateRange.end"
+                  :format="formatDate"
+                  :placeholder="'Selecione uma data'"
+                  :clearable="false"
+                  :editable="false"
+                  :disabled-date="disabledDate"
+                  :max-date="new Date()"
+                  :min-date="new Date(2023, 0, 1)"
+                  :value-type="'format'"
+                  :input-class="'w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'"
+                  :placeholder-class="'text-gray-500 dark:text-gray-400'"
+                  :clear-icon="false"
+                  :confirm="false"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Em Andamento Tab -->
+          <div v-if="currentTab === 'in-progress'" class="space-y-6">
+            <!-- In Progress Overview Card -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3">
+              <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                  <div>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      Tickets em Andamento
+                    </h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      Acompanhe o progresso dos tickets atualmente sendo processados
+                    </p>
+                  </div>
+                  <div class="mt-4 sm:mt-0 flex items-center gap-4">
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                        {{ inProgressTasks.length }}
+                      </div>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">Total</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-red-600 dark:text-red-400">
+                        {{ inProgressTasks.filter((task) => task.isOverdue).length }}
+                      </div>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">Em atraso</div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <!-- Nova seção Created vs Completed em Tendências -->
-              <div class="reports-card created-vs-completed">
-                <div class="created-vs-completed-header">
-                  <h2>CRIADOS VS CONCLUÍDOS</h2>
+              <div v-if="loadingInProgressTasks" class="p-6">
+                <div
+                  class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400"
+                >
+                  <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
+                  <p class="text-sm">Carregando tickets em andamento...</p>
+                </div>
+              </div>
+
+              <div v-else-if="inProgressTasks.length === 0" class="p-6">
+                <div
+                  class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400"
+                >
+                  <font-awesome-icon icon="check-circle" class="text-3xl mb-3 text-green-500" />
+                  <p class="text-lg font-medium">Nenhum ticket em andamento</p>
+                  <p class="text-sm">Todos os tickets foram processados!</p>
+                </div>
+              </div>
+
+              <div v-else class="overflow-x-auto">
+                <table class="w-full">
+                  <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        Responsável
+                      </th>
+                      <th
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        Título do Chamado
+                      </th>
+                      <th
+                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        Status
+                      </th>
+                      <th
+                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        Tempo em Andamento
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
+                  >
+                    <tr
+                      v-for="task in inProgressTasks"
+                      :key="task.id"
+                      class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-3">
+                          <div
+                            class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-xs font-medium text-blue-600 dark:text-blue-400"
+                          >
+                            {{ task.assignee.initials }}
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                          <span class="text-sm font-medium text-blue-600 dark:text-blue-400">
+                            {{ task.customId }}
+                          </span>
+                          <span class="text-sm text-gray-900 dark:text-white">
+                            {{ task.name }}
+                          </span>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <span
+                          class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
+                        >
+                          {{ task.status }}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <div class="flex items-center justify-center gap-1">
+                          <span class="text-sm font-medium text-gray-900 dark:text-white">
+                            {{ task.timeInProgress }}
+                          </span>
+                          <span
+                            v-if="task.isOverdue"
+                            class="text-red-600 dark:text-red-400 ml-1"
+                            :title="task.overdueReason"
+                          >
+                            <font-awesome-icon icon="exclamation-triangle" />
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- In Progress Time Analysis -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  Análise de Tempo em Andamento
+                </h2>
+              </div>
+
+              <div class="p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div class="space-y-4">
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+                      Distribuição por Tempo
+                    </h3>
+                    <div class="space-y-3">
+                      <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-600 dark:text-gray-400">Menos de 1 dia</span>
+                        <span class="font-medium text-gray-900 dark:text-white">
+                          {{
+                            inProgressTasks.filter((t) => t.timeInProgressSeconds < 86400).length
+                          }}
+                        </span>
+                      </div>
+                      <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-600 dark:text-gray-400">1-3 dias</span>
+                        <span class="font-medium text-gray-900 dark:text-white">
+                          {{
+                            inProgressTasks.filter(
+                              (t) =>
+                                t.timeInProgressSeconds >= 86400 &&
+                                t.timeInProgressSeconds < 259200,
+                            ).length
+                          }}
+                        </span>
+                      </div>
+                      <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-600 dark:text-gray-400">3-7 dias</span>
+                        <span class="font-medium text-gray-900 dark:text-white">
+                          {{
+                            inProgressTasks.filter(
+                              (t) =>
+                                t.timeInProgressSeconds >= 259200 &&
+                                t.timeInProgressSeconds < 604800,
+                            ).length
+                          }}
+                        </span>
+                      </div>
+                      <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-600 dark:text-gray-400">Mais de 1 semana</span>
+                        <span class="font-medium text-red-600 dark:text-red-400">
+                          {{
+                            inProgressTasks.filter((t) => t.timeInProgressSeconds >= 604800).length
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="space-y-4">
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">Estatísticas</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="text-lg font-semibold text-gray-900 dark:text-white">
+                          {{
+                            inProgressTasks.length > 0
+                              ? Math.round(
+                                  inProgressTasks.reduce(
+                                    (sum, task) => sum + task.timeInProgressSeconds,
+                                    0,
+                                  ) /
+                                    inProgressTasks.length /
+                                    3600,
+                                )
+                              : 0
+                          }}h
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Tempo médio</div>
+                      </div>
+                      <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="text-lg font-semibold text-gray-900 dark:text-white">
+                          {{
+                            inProgressTasks.length > 0
+                              ? Math.round(
+                                  Math.max(...inProgressTasks.map((t) => t.timeInProgressSeconds)) /
+                                    3600,
+                                )
+                              : 0
+                          }}h
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Tempo máximo</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Setores Tab -->
+          <div v-if="currentTab === 'department'" class="space-y-6">
+            <!-- Department Summary Card -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3">
+              <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                  Estatísticas por Setor
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  Análise detalhada do desempenho de cada departamento
+                </p>
+              </div>
+
+              <div
+                v-if="departmentStatsSummary"
+                class="p-6 border-b border-gray-200 dark:border-gray-700"
+              >
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  <div class="text-center">
+                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      {{ departmentStatsSummary.totalTickets }}
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Total de Tickets</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-2xl font-bold text-green-600 dark:text-green-400">
+                      {{ departmentStatsSummary.totalResolved }}
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Tickets Resolvidos</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                      {{
+                        formatTimeInSecondsCompact(
+                          departmentStatsSummary.averageResolutionTimeSeconds,
+                        )
+                      }}
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                      Tempo Médio de Resolução
+                    </div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                      {{ departmentStats.length }}
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">Setores Ativos</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full">
+                  <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        Setor
+                      </th>
+                      <th
+                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        Total
+                      </th>
+                      <th
+                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        Resolvidos
+                      </th>
+                      <th
+                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        Taxa de Resolução
+                      </th>
+                      <th
+                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        Tempo de Aceitação
+                      </th>
+                      <th
+                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        Tempo de Resolução
+                      </th>
+                      <th
+                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                      >
+                        Performance
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
+                  >
+                    <tr
+                      v-for="dept in departmentStats"
+                      :key="dept.departmentId"
+                      class="hover:bg-gray-50 dark:hover:bg-gray-700"
+                    >
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900 dark:text-white">
+                          {{ dept.departmentName }}
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <div class="text-sm text-gray-900 dark:text-white">
+                          {{ dept.totalTickets }}
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <div class="text-sm text-gray-900 dark:text-white">
+                          {{ dept.resolvedTickets }}
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <span
+                          :class="[
+                            'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
+                            dept.resolutionRate >= 0.8
+                              ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                              : dept.resolutionRate >= 0.5
+                                ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
+                                : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
+                          ]"
+                        >
+                          {{ formatPercentage(dept.resolutionRate) }}
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <div class="text-sm text-gray-900 dark:text-white">
+                          {{ formatTimeInSecondsCompact(dept.averageAcceptanceTimeSeconds) }}
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <div class="text-sm text-gray-900 dark:text-white">
+                          {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds) }}
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <div class="flex items-center justify-center">
+                          <div
+                            class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 max-w-[60px]"
+                          >
+                            <div
+                              class="h-2 rounded-full"
+                              :class="
+                                dept.resolutionRate >= 0.8
+                                  ? 'bg-green-500'
+                                  : dept.resolutionRate >= 0.5
+                                    ? 'bg-yellow-500'
+                                    : 'bg-red-500'
+                              "
+                              :style="{ width: `${dept.resolutionRate * 100}%` }"
+                            ></div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Top Performing vs Underperforming Departments -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Top Performing -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Melhor Desempenho
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Setores com maior taxa de resolução
+                  </p>
+                </div>
+                <div class="p-6">
+                  <div class="space-y-4">
+                    <div
+                      v-for="dept in departmentStats
+                        .slice()
+                        .sort((a, b) => b.resolutionRate - a.resolutionRate)
+                        .slice(0, 3)"
+                      :key="dept.departmentId"
+                      class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
+                    >
+                      <div>
+                        <div class="font-medium text-gray-900 dark:text-white">
+                          {{ dept.departmentName }}
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                          {{ dept.resolvedTickets }}/{{ dept.totalTickets }} tickets
+                        </div>
+                      </div>
+                      <div class="text-lg font-bold text-green-600 dark:text-green-400">
+                        {{ formatPercentage(dept.resolutionRate) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Needs Improvement -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Necessita Melhoria
+                  </h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Setores com menor taxa de resolução
+                  </p>
+                </div>
+                <div class="p-6">
+                  <div class="space-y-4">
+                    <div
+                      v-for="dept in departmentStats
+                        .slice()
+                        .sort((a, b) => a.resolutionRate - b.resolutionRate)
+                        .slice(0, 3)"
+                      :key="dept.departmentId"
+                      class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
+                    >
+                      <div>
+                        <div class="font-medium text-gray-900 dark:text-white">
+                          {{ dept.departmentName }}
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                          {{ dept.resolvedTickets }}/{{ dept.totalTickets }} tickets
+                        </div>
+                      </div>
+                      <div class="text-lg font-bold text-red-600 dark:text-red-400">
+                        {{ formatPercentage(dept.resolutionRate) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tendências Tab -->
+          <div v-if="currentTab === 'trends'" class="space-y-6">
+            <!-- Period Analysis Controls -->
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
+              <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  Análise de Tendências
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400">
+                  Acompanhe as tendências dos tickets ao longo do tempo
+                </p>
+              </div>
+              <div class="flex items-center gap-3 mt-4 sm:mt-0">
+                <label
+                  class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap"
+                >
+                  Período de análise:
+                </label>
+                <Select
+                  :options="[
+                    { value: 'weekly', label: '1 semana' },
+                    { value: 'monthly', label: '1 mês' },
+                    { value: 'trimestral', label: '3 meses' },
+                    { value: 'semestral', label: '6 meses' },
+                    { value: 'annual', label: '1 ano' },
+                  ]"
+                  v-model="selectedStatsPeriod"
+                  @update:modelValue="handlePeriodChange"
+                />
+              </div>
+            </div>
+
+            <!-- Trends Overview -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                  <div>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      Criados vs Concluídos
+                    </h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      Novos tickets criados vs tickets concluídos
+                    </p>
+                  </div>
                   <TabSelector
                     v-model="selectedTrendPeriod"
                     :options="[
@@ -833,307 +1320,347 @@
                     @update:modelValue="updateTrendPeriod"
                   />
                 </div>
+              </div>
 
-                <div class="created-vs-completed-content">
-                  <div class="created-vs-completed-info">
-                    <p class="info-title">Novos tickets criados vs concluídos</p>
-                    <p class="info-text" v-if="trendData && trendData.length > 0">
-                      <span class="highlight">{{ getTotalResolved() }} tickets</span> concluídos no
-                      período selecionado
-                    </p>
-                    <p class="info-text">
-                      <span class="highlight">{{ getTotalCreated() }} tickets</span> criados no
-                      período selecionado
-                    </p>
-                    <p
-                      class="info-trend"
-                      v-if="
-                        trendData &&
-                        trendData.length > 0 &&
-                        (createdTrendPercentage !== 0 || resolvedTrendPercentage !== 0)
-                      "
-                    >
-                      Isso é
-                      <span
-                        v-if="createdTrendPercentage > 0"
-                        :class="createdTrendPercentage >= 0 ? 'trend-value' : 'trend-value-down'"
-                      >
-                        {{ createdTrendPercentage }}%
-                        {{ createdTrendPercentage >= 0 ? 'mais' : 'menos' }} criados
-                      </span>
-                      <span v-if="createdTrendPercentage > 0 && resolvedTrendPercentage > 0">
-                        e
-                      </span>
-                      <span
-                        v-if="resolvedTrendPercentage > 0"
-                        :class="resolvedTrendPercentage >= 0 ? 'trend-value' : 'trend-value-down'"
-                      >
-                        {{ resolvedTrendPercentage }}%
-                        {{ resolvedTrendPercentage >= 0 ? 'mais' : 'menos' }} concluídos
-                      </span>
-                      comparado a
-                      <span class="date-reference">{{ firstDate }}</span>
-                    </p>
-                  </div>
-
-                  <div class="created-vs-completed-chart">
-                    <div class="chart-container">
-                      <Line
-                        v-if="trendData && trendData.length > 0 && trendChartData"
-                        :data="trendChartData"
-                        :options="trendChartOptions"
-                      />
-                      <div v-else class="loading-state">
-                        <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                        <p class="loading-text">Carregando dados...</p>
-                      </div>
-                    </div>
+              <div class="p-6">
+                <div class="h-80">
+                  <Line v-if="trendChartData" :data="trendChartData" :options="trendChartOptions" />
+                  <div
+                    v-else
+                    class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                  >
+                    <font-awesome-icon icon="spinner" spin class="text-2xl mb-3" />
+                    <p>Carregando dados de tendências...</p>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <!-- Nova seção de Cycle Time -->
-              <div class="charts-grid">
-                <!-- Cycle Time Trend Chart -->
-                <div class="reports-card cycle-time-trend">
-                  <div class="cycle-time-trend-header">
-                    <h2>TEMPO DE RESOLUÇÃO POR PERÍODO</h2>
-                    <div class="header-actions">
-                      <Select
-                        v-model="selectedCycleTimePeriod"
-                        :options="[
-                          { value: 'week', label: 'Por Semana' },
-                          { value: 'month', label: 'Por Mês' },
-                          { value: 'quarter', label: 'Por Trimestre' },
-                        ]"
-                        @update:modelValue="handleCycleTimePeriodChange"
-                        class="w-40"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="cycle-time-info">
-                    <p v-if="getLatestResolutionTime() > 0">
-                      O tempo médio de resolução da sua empresa foi de
-                      <strong>{{ formatTimeInSeconds(getLatestResolutionTime() * 3600) }}</strong>
-                      {{ periodTextMap[selectedCycleTimePeriod] }} {{ getPeriodName() }}.
-                    </p>
-                    <p
-                      v-if="getLatestResolutionTime() > 0 && hasPreviousPeriodData()"
-                      class="comparison-text"
-                    >
-                      Isso é
-                      <span
-                        :class="getResolutionTimeTrend() > 0 ? 'percentage-up' : 'percentage-down'"
-                      >
-                        {{ getResolutionTimeTrend() > 0 ? '+' : '' }}{{ getResolutionTimeTrend() }}%
-                        {{ getResolutionTimeTrend() > 0 ? 'mais' : 'menos' }}
-                      </span>
-                      que {{ getPreviousPeriodLabel() }}
-                    </p>
-                    <p v-else-if="getLatestResolutionTime() === 0" class="no-data-message">
-                      Não houveram tickets resolvidos
-                      <span v-if="selectedCycleTimePeriod === 'week'">na última semana</span>
-                      <span v-else-if="selectedCycleTimePeriod === 'month'">no último mês</span>
-                      <span v-else>no último trimestre</span>
-                    </p>
-                    <p class="average-info" v-if="getAverageResolutionTime() > 0">
-                      Média:
-                      <strong>{{ formatTimeInSeconds(getAverageResolutionTime() * 3600) }}</strong>
+            <!-- Cycle Time Analysis -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                  <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                      Tempo de Resolução - Análise Temporal
+                    </h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      {{ formatTimeInSecondsCompact(getAverageResolutionTime()) }} (média
+                      {{ periodTextMap[selectedCycleTimePeriod] }})
                     </p>
                   </div>
-
-                  <div class="cycle-time-chart">
-                    <div v-if="cycleTimeChartLoading" class="chart-loading-state">
-                      <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                      <p class="loading-text">Atualizando gráfico...</p>
-                    </div>
-                    <Bar
-                      v-else
-                      :data="cycleTimeBarData"
-                      :options="cycleTimeBarOptions"
-                      height="300"
-                      :key="`cycle-time-chart-${chartRenderKey}`"
+                  <div class="mt-4 sm:mt-0">
+                    <Select
+                      :options="[
+                        { value: 'week', label: 'Semanal' },
+                        { value: 'month', label: 'Mensal' },
+                        { value: 'quarter', label: 'Trimestral' },
+                      ]"
+                      v-model="selectedCycleTimePeriod"
+                      @update:modelValue="handleCycleTimePeriodChange"
                     />
                   </div>
                 </div>
-
-                <!-- Nova seção de Tempo de Ciclo por Estado do Workflow -->
-                <div class="reports-card cycle-time-workflow">
-                  <div class="cycle-time-workflow-header">
-                    <h2>TEMPO DE DURAÇÃO POR STATUS</h2>
-                  </div>
-
-                  <div class="workflow-analysis">
-                    <div class="workflow-description">
-                      <p>
-                        Quanto tempo as tarefas permanecem em cada status? Os status em que as
-                        tarefas permaneceram mais tempo foram:
-                      </p>
-                      <div v-if="sortedStatusDurations.length" class="workflow-state-list">
-                        <div
-                          v-for="(duration, index) in sortedStatusDurations.slice(0, 2)"
-                          :key="index"
-                          class="state-item"
-                        >
-                          <span class="state-name">{{
-                            formatSnakeToNaturalCase(duration.status)
-                          }}</span>
-                          <span class="state-time">{{
-                            formatTimeInSecondsCompact(duration.averageDurationSeconds)
-                          }}</span>
-                        </div>
-                      </div>
-                      <div v-else class="workflow-state-list">
-                        <div class="state-item">
-                          <span class="state-name">Carregando dados...</span>
-                        </div>
-                      </div>
-                      <p class="workflow-note">
-                        Estas são médias para as tarefas concluídas nos últimos 3 meses.
-                      </p>
-                    </div>
-
-                    <div class="cycle-time-chart">
-                      <div class="chart-bars">
-                        <template v-if="sortedDepartmentsByResolutionTime.length">
-                          <div
-                            v-for="(duration, index) in sortedStatusDurations"
-                            :key="index"
-                            class="chart-item"
-                          >
-                            <span class="chart-label">{{
-                              formatSnakeToNaturalCase(duration.status)
-                            }}</span>
-                            <div
-                              class="chart-bar"
-                              :class="{
-                                'short-bar':
-                                  duration.averageDurationSeconds /
-                                    sortedStatusDurations[0].averageDurationSeconds <
-                                  0.15,
-                                'zero-bar': duration.averageDurationSeconds === 0,
-                              }"
-                              :style="{
-                                width:
-                                  duration.averageDurationSeconds === 0
-                                    ? '3px'
-                                    : `${(duration.averageDurationSeconds / sortedStatusDurations[0].averageDurationSeconds) * 100}%`,
-                              }"
-                              :data-duration="
-                                formatTimeInSecondsCompact(duration.averageDurationSeconds)
-                              "
-                            >
-                              {{ formatTimeInSecondsCompact(duration.averageDurationSeconds) }}
-                            </div>
-                          </div>
-                        </template>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
 
-              <!-- Seção de Ciclo de Tempo Em Andamento -->
-              <div class="reports-card cycle-time-progress">
-                <div class="cycle-time-progress-header">
-                  <h2>TEMPO GASTO NO STATUS "EM ANDAMENTO"</h2>
-                </div>
-
-                <div class="progress-analysis">
-                  <div class="progress-info">
-                    <p v-if="inProgressTimeSeries?.data?.length">
-                      O tempo médio foi de
-                      <strong>{{
-                        formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
-                      }}</strong>
-                      para
-                      <span class="highlight">{{ getTotalInProgressCount() }} tickets</span> nos
-                      últimos <span class="highlight">6 meses</span>.
-                    </p>
-                    <p class="trend-info" v-if="getInProgressTrend() !== 0">
-                      Isso é
-                      <span :class="getInProgressTrend() > 0 ? 'percentage-up' : 'percentage-down'">
-                        {{ Math.abs(getInProgressTrend()) }}%
-                        {{ getInProgressTrend() > 0 ? 'mais' : 'menos' }}
-                      </span>
-                      que no mês anterior
-                      {{
-                        getInProgressTrend() > 0
-                          ? '(aumento é considerado ruim)'
-                          : '(diminuição é positiva)'
-                      }}.
-                    </p>
-                  </div>
-
-                  <div class="chart-stats-container">
-                    <div class="chart-container mt-4">
-                      <Line
-                        v-if="inProgressTimeChartData"
-                        :data="inProgressTimeChartData"
-                        :options="inProgressTimeChartOptions"
-                      />
-                      <div v-else class="loading-state">
-                        <font-awesome-icon icon="spinner" spin class="loading-icon" />
-                        <p class="loading-text">Carregando dados...</p>
+              <div class="flex flex-col lg:flex-row">
+                <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
+                  <div class="space-y-4">
+                    <div>
+                      <p class="text-sm font-medium text-gray-900 dark:text-white mb-2">
+                        Tempo {{ periodTextMap[selectedCycleTimePeriod] }}:
+                      </p>
+                      <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                        {{ formatTimeInSecondsCompact(getLatestResolutionTime() * 3600) }}
                       </div>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">
+                        {{ getPeriodName() }}
+                      </p>
                     </div>
 
-                    <div class="progress-stats" v-if="inProgressTimeSeries">
-                      <div class="stat-item">
-                        <span class="stat-value">{{
-                          formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
-                        }}</span>
-                        <span class="stat-label">Média últimos 6 meses</span>
+                    <div v-if="hasPreviousPeriodData()">
+                      <p class="text-sm font-medium text-gray-900 dark:text-white mb-2">
+                        Comparação:
+                      </p>
+                      <div class="flex items-center gap-2">
+                        <font-awesome-icon
+                          :icon="getResolutionTimeTrend() > 0 ? 'arrow-up' : 'arrow-down'"
+                          :class="
+                            getResolutionTimeTrend() > 0
+                              ? 'text-red-600 dark:text-red-400'
+                              : 'text-green-600 dark:text-green-400'
+                          "
+                        />
+                        <span
+                          :class="
+                            getResolutionTimeTrend() > 0
+                              ? 'text-red-600 dark:text-red-400'
+                              : 'text-green-600 dark:text-green-400'
+                          "
+                          class="font-medium"
+                        >
+                          {{ Math.abs(getResolutionTimeTrend()) }}%
+                        </span>
+                        <span class="text-gray-600 dark:text-gray-400 text-sm">
+                          vs {{ getPreviousPeriodLabel() }}
+                        </span>
                       </div>
-                      <div class="stat-item">
-                        <span class="stat-value">{{ getTotalInProgressCount() }}</span>
-                        <span class="stat-label">Número de tickets</span>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {{
+                          getResolutionTimeTrend() > 0
+                            ? 'Aumento no tempo de resolução (preocupante)'
+                            : 'Diminuição no tempo de resolução (positivo)'
+                        }}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p class="text-sm font-medium text-gray-900 dark:text-white mb-2">
+                        Média histórica:
+                      </p>
+                      <div class="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                        {{ formatTimeInSecondsCompact(getAverageResolutionTime() * 3600) }}
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-6 lg:w-2/3">
+                  <div :key="chartRenderKey" class="h-64">
+                    <div
+                      v-if="cycleTimeChartLoading"
+                      class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                    >
+                      <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
+                      <p class="text-sm">Atualizando gráfico...</p>
+                    </div>
+                    <Bar
+                      v-else-if="cycleTimeBarData && cycleTimeBarData.labels.length"
+                      :data="cycleTimeBarData"
+                      :options="cycleTimeBarOptions"
+                    />
+                    <div
+                      v-else
+                      class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                    >
+                      <font-awesome-icon icon="chart-bar" class="text-2xl mb-2" />
+                      <p class="text-sm">Nenhum dado disponível para o período selecionado</p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Análise por Período -->
-            <div v-if="currentTab === 'custom'" class="tab-panel">
-              <div class="report-filters">
-                <div class="filter-group">
-                  <label class="filter-label">Data Inicial</label>
-                  <DatePicker
-                    v-model="dateRange.start"
-                    :format="formatDate"
-                    :placeholder="'Selecione uma data'"
-                    :clearable="false"
-                    :editable="false"
-                    :disabled-date="disabledDate"
-                    :max-date="new Date()"
-                    :min-date="new Date(2023, 0, 1)"
-                    :value-type="'format'"
-                    :input-class="'date-picker'"
-                    :placeholder-class="'placeholder-class'"
-                    :clear-icon="false"
-                    :confirm="false"
-                  />
+            <!-- Trend Insights -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Performance Trends -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Tendências de Performance
+                  </h3>
                 </div>
-                <div class="filter-group">
-                  <label class="filter-label">Data Final</label>
-                  <DatePicker
-                    v-model="dateRange.end"
-                    :format="formatDate"
-                    :placeholder="'Selecione uma data'"
-                    :clearable="false"
-                    :editable="false"
-                    :disabled-date="disabledDate"
-                    :max-date="new Date()"
-                    :min-date="new Date(2023, 0, 1)"
-                    :value-type="'format'"
-                    :input-class="'date-picker'"
-                    :placeholder-class="'placeholder-class'"
-                    :clear-icon="false"
-                    :confirm="false"
-                  />
+                <div class="p-6 space-y-4">
+                  <div
+                    class="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
+                  >
+                    <div>
+                      <div class="font-medium text-gray-900 dark:text-white">Tickets Criados</div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">
+                        {{ getTotalCreated() }} no período
+                      </div>
+                    </div>
+                    <div class="text-lg font-bold text-blue-600 dark:text-blue-400">
+                      <font-awesome-icon
+                        :icon="createdTrendPercentage >= 0 ? 'arrow-up' : 'arrow-down'"
+                        class="mr-1"
+                      />
+                      {{ Math.abs(createdTrendPercentage) }}%
+                    </div>
+                  </div>
+
+                  <div
+                    class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
+                  >
+                    <div>
+                      <div class="font-medium text-gray-900 dark:text-white">
+                        Tickets Resolvidos
+                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">
+                        {{ getTotalResolved() }} no período
+                      </div>
+                    </div>
+                    <div class="text-lg font-bold text-green-600 dark:text-green-400">
+                      <font-awesome-icon
+                        :icon="resolvedTrendPercentage >= 0 ? 'arrow-up' : 'arrow-down'"
+                        class="mr-1"
+                      />
+                      {{ Math.abs(resolvedTrendPercentage) }}%
+                    </div>
+                  </div>
+
+                  <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="font-medium text-gray-900 dark:text-white mb-1">
+                      Taxa de Resolução
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                      {{
+                        getTotalCreated() > 0
+                          ? formatPercentage(getTotalResolved() / getTotalCreated())
+                          : '0%'
+                      }}
+                      dos tickets criados foram resolvidos
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Status Distribution Trends -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Tempo Médio Por Status
+                  </h2>
+                </div>
+
+                <div class="flex flex-col lg:flex-row">
+                  <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
+                    <p class="text-sm font-medium text-gray-900 dark:text-white mb-4">
+                      Análise de tempo por status:
+                    </p>
+                    <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                      <p>
+                        Esta análise mostra quanto tempo em média os tickets permanecem em cada
+                        status.
+                      </p>
+                      <p>Tempos altos em determinados status podem indicar gargalos no processo.</p>
+                    </div>
+                  </div>
+
+                  <div class="p-6 lg:w-2/3">
+                    <div class="space-y-3">
+                      <template v-if="sortedStatusDurations.length">
+                        <div
+                          v-for="(duration, index) in sortedStatusDurations"
+                          :key="index"
+                          class="space-y-1"
+                        >
+                          <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-700 dark:text-gray-300">{{
+                              formatSnakeToNaturalCase(duration.status)
+                            }}</span>
+                            <span class="font-medium text-gray-900 dark:text-white">
+                              {{ formatTimeInSecondsCompact(duration.averageDurationSeconds) }}
+                            </span>
+                          </div>
+                          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div
+                              class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
+                              :class="{
+                                'min-w-[2px]': duration.averageDurationSeconds === 0,
+                              }"
+                              :style="{
+                                width:
+                                  duration.averageDurationSeconds === 0
+                                    ? '2px'
+                                    : `${(duration.averageDurationSeconds / sortedStatusDurations[0].averageDurationSeconds) * 100}%`,
+                              }"
+                            ></div>
+                          </div>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- In Progress Time Analysis -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  TEMPO GASTO NO STATUS "EM ANDAMENTO"
+                </h2>
+              </div>
+
+              <div class="flex flex-col lg:flex-row">
+                <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
+                  <div class="space-y-4 text-sm">
+                    <p
+                      v-if="inProgressTimeSeries?.data?.length"
+                      class="text-gray-700 dark:text-gray-300"
+                    >
+                      O tempo médio foi de
+                      <strong class="text-gray-900 dark:text-white">{{
+                        formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
+                      }}</strong>
+                      para
+                      <span class="font-semibold text-blue-600 dark:text-blue-400"
+                        >{{ getTotalInProgressCount() }} tickets</span
+                      >
+                      nos últimos
+                      <span class="font-semibold text-blue-600 dark:text-blue-400">6 meses</span>.
+                    </p>
+                    <p v-if="getInProgressTrend() !== 0" class="text-sm">
+                      Isso é
+                      <span
+                        :class="
+                          getInProgressTrend() > 0
+                            ? 'text-red-600 dark:text-red-400 font-medium'
+                            : 'text-green-600 dark:text-green-400 font-medium'
+                        "
+                      >
+                        {{ Math.abs(getInProgressTrend()) }}%
+                        {{ getInProgressTrend() > 0 ? 'mais' : 'menos' }}
+                      </span>
+                      que no mês anterior
+                      <span class="text-gray-600 dark:text-gray-400">
+                        {{
+                          getInProgressTrend() > 0
+                            ? '(aumento é considerado ruim)'
+                            : '(diminuição é positiva)'
+                        }} </span
+                      >.
+                    </p>
+                  </div>
+                </div>
+
+                <div class="p-6 lg:w-2/3">
+                  <div class="space-y-4">
+                    <div class="h-64">
+                      <Line
+                        v-if="inProgressTimeChartData"
+                        :data="inProgressTimeChartData"
+                        :options="inProgressTimeChartOptions"
+                      />
+                      <div
+                        v-else
+                        class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                      >
+                        <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
+                        <p class="text-sm">Carregando dados...</p>
+                      </div>
+                    </div>
+
+                    <div v-if="inProgressTimeSeries" class="grid grid-cols-2 gap-4">
+                      <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <span class="block text-lg font-semibold text-gray-900 dark:text-white">{{
+                          formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
+                        }}</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400"
+                          >Média últimos 6 meses</span
+                        >
+                      </div>
+                      <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <span class="block text-lg font-semibold text-gray-900 dark:text-white">{{
+                          getTotalInProgressCount()
+                        }}</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400"
+                          >Número de tickets</span
+                        >
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1646,11 +2173,11 @@ onMounted(() => {
 });
 
 const tabs = [
-  { id: 'overview', name: 'Visão Geral', icon: 'chart-pie' },
-  { id: 'in-progress', name: 'Em Andamento', icon: 'clock' },
-  { id: 'department', name: 'Setores', icon: 'building' },
-  { id: 'trends', name: 'Tendências', icon: 'chart-line' },
-  { id: 'custom', name: 'Análise por Período', icon: 'calendar' },
+  { id: 'overview', name: 'Visão Geral', shortName: 'Visão Geral', icon: 'chart-pie' },
+  { id: 'in-progress', name: 'Em Andamento', shortName: 'Andamento', icon: 'clock' },
+  { id: 'department', name: 'Setores', shortName: 'Setores', icon: 'building' },
+  { id: 'trends', name: 'Tendências', shortName: 'Tendências', icon: 'chart-line' },
+  //lets not use this yet { id: 'custom', name: 'Análise por Período', icon: 'calendar' },
 ];
 
 const currentTab = ref('overview');
@@ -1792,6 +2319,20 @@ const createdVsCompletedChartData = computed(() => {
 const formatPercentage = (value?: number) => {
   if (value === undefined) return '0.0%';
   return `${(value * 100).toFixed(1)}%`;
+};
+
+const getResolutionRateBadgeClass = (rate?: number) => {
+  if (rate === undefined) return 'bg-gray-100 text-gray-800';
+
+  const percentage = rate * 100;
+
+  if (percentage >= 70) {
+    return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+  } else if (percentage >= 40) {
+    return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+  } else {
+    return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+  }
 };
 
 const disabledDate = (date: Date) => {
@@ -2402,7 +2943,16 @@ const getInitials = (firstName: string, lastName: string): string => {
 };
 
 const getAvatarColorClass = (userId: number): string => {
-  const colors = ['avatar-blue', 'avatar-green', 'avatar-purple', 'avatar-orange', 'avatar-pink'];
+  const colors = [
+    'avatar-pink',
+    'avatar-orange',
+    'avatar-blue',
+    'avatar-green',
+    'avatar-purple',
+    'avatar-teal',
+    'avatar-indigo',
+    'avatar-red',
+  ];
   return colors[userId % colors.length];
 };
 
@@ -2802,2131 +3352,44 @@ const exportToCSV = async () => {
 </script>
 
 <style scoped>
-.reports-container {
-  min-height: 100vh;
-  background-color: #f9fafb;
-  padding-bottom: 2rem;
-}
-
-.loading-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(17, 24, 39, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
-}
-
-.loading-modal {
-  background-color: white;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-.loading-icon {
-  color: #2563eb;
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.loading-text {
-  color: #4b5563;
-}
-
-/* Error State */
-.error-message {
-  margin: 1.5rem;
-}
-
-.error-content {
-  background-color: #fef2f2;
-  border-left: 4px solid #ef4444;
-  padding: 1rem;
-  border-radius: 0.375rem;
-}
-
-.error-header {
-  display: flex;
-  align-items: center;
-}
-
-.error-icon {
-  color: #ef4444;
-  font-size: 1.25rem;
-  margin-right: 0.75rem;
-}
-
-.error-title {
-  color: #b91c1c;
-  font-weight: 500;
-}
-
-.error-text {
-  color: #dc2626;
-  margin-top: 0.25rem;
-}
-
-.error-action {
-  margin-left: auto;
-  background-color: #fee2e2;
-  color: #b91c1c;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  transition: background-color 0.2s;
-}
-
-.error-action:hover {
-  background-color: #fecaca;
-}
-
-/* Header */
-.header {
-  background-color: white;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  padding: 1rem 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-bottom: 0.5rem;
-}
-
-.breadcrumb-separator {
-  margin: 0 0.5rem;
-  font-size: 0.75rem;
-}
-
-.breadcrumb-active {
-  color: #2563eb;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.header-subtitle {
-  color: #4b5563;
-  margin-top: 0.25rem;
-}
-
-.header-actions {
-  display: flex;
-  gap: 0.75rem;
-}
-
-/* Buttons */
-.btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.btn-primary {
-  background-color: #2563eb;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #1d4ed8;
-}
-
-.btn-outline {
-  border: 1px solid;
-}
-
-.btn-outline.primary {
-  border-color: #2563eb;
-  color: #2563eb;
-}
-
-.btn-outline.primary:hover {
-  background-color: #eff6ff;
-}
-
-.btn-outline.secondary {
-  border-color: #6b7280;
-  color: #6b7280;
-}
-
-.btn-outline.secondary:hover {
-  background-color: #f3f4f6;
-}
-
-/* Content */
-.content {
-  padding: 0 1.5rem;
-}
-
-/* Metrics Grid */
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-@media (min-width: 768px) {
-  .metrics-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .metrics-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-.metric-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.metric-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #6b7280;
-}
-
-.metric-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-top: 0.25rem;
-}
-
-.metric-icon {
-  padding: 0.75rem;
-  border-radius: 9999px;
-}
-
-/* Border Colors */
-.blue-border {
-  border-left-color: #2563eb;
-}
-
-.yellow-border {
-  border-left-color: #eab308;
-}
-
-.green-border {
-  border-left-color: #22c55e;
-}
-
-.purple-border {
-  border-left-color: #9333ea;
-}
-
-/* Icon Colors */
-.metric-icon.blue {
-  background-color: #eff6ff;
-  color: #2563eb;
-}
-
-.metric-icon.yellow {
-  background-color: #fefce8;
-  color: #eab308;
-}
-
-.metric-icon.green {
-  background-color: #f0fdf4;
-  color: #22c55e;
-}
-
-.metric-icon.purple {
-  background-color: #faf5ff;
-  color: #9333ea;
-}
-
-/* Tabs */
-.tabs-header {
-  padding: 0.5rem;
-  border-bottom: 1px solid #f3f4f6;
-  background-color: white;
-  border-radius: 0.5rem;
-}
-
-.tabs-nav {
-  display: flex;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  background-color: #f9fafb;
-  border-radius: 0.5rem;
-}
-
-.tab-button {
-  position: relative;
-  padding: 0.75rem 1.25rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #6b7280;
-  transition: all 0.3s ease;
-  border-radius: 0.375rem;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-.tab-button svg {
-  width: 1.25rem;
-  height: 1.25rem;
-  transition: transform 0.3s ease;
-}
-
-.tab-button:hover {
-  color: #2563eb;
-  background-color: #ffffff;
-}
-
-.tab-button:hover svg {
-  transform: scale(1.1);
-}
-
-.tab-button.active {
-  color: #2563eb;
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.tab-button.active svg {
-  color: #2563eb;
-}
-
-.tab-button::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: #2563eb;
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-}
-
-.tab-button.active::after {
-  transform: scaleX(1);
-}
-
-.tab-content {
-  background-color: #f9fafb;
-  margin-top: 0.5rem;
-}
-
-.tab-panel {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Charts */
-.charts-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-}
-
-@media (min-width: 1024px) {
-  .charts-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.reports-card {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-}
-
-.chart-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-}
-
-.chart-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.chart-icon {
-  background-color: #f3f4f6;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  color: #6b7280;
-}
-
-.chart-container {
-  height: 20rem;
-  position: relative;
-}
-
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
-.loading-state .loading-icon {
-  color: #9ca3af;
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.loading-state .loading-text {
-  color: #6b7280;
-}
-
-/* Table */
-.reports-table-container {
-  margin-top: 1.5rem;
-}
-
-.table-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.table-header-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.table-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.table-subtitle {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-top: 0.25rem;
-}
-
-.table-wrapper {
-  overflow-x: auto;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table th {
-  padding: 0.75rem 1.5rem;
-  text-align: left;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  color: #6b7280;
-  background-color: #f9fafb;
-}
-
-.table td {
-  padding: 1rem 1.5rem;
-  font-size: 0.875rem;
-  color: #1f2937;
-  white-space: nowrap;
-}
-
-.table tbody tr {
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.table tbody tr:hover {
-  background-color: #f9fafb;
-}
-
-/* Status and Priority Badges */
-.status-badge,
-.priority-badge {
-  display: inline-flex;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-/* Departments */
-.departments-grid {
-  margin-top: 1rem;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
-}
-
-@media (min-width: 768px) {
-  .departments-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .departments-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.department-title {
-  font-weight: 500;
-  font-size: 1.125rem;
-  margin-bottom: 1rem;
-}
-
-.department-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.stat-label {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.stat-value {
-  display: block;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-}
-
-/* Period Selector */
-.period-selector {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.period-button {
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: 0.375rem;
-  background-color: #f3f4f6;
-  color: #4b5563;
-  transition: all 0.2s;
-}
-
-.period-button:hover {
-  background-color: #e5e7eb;
-}
-
-.period-button.active {
-  background-color: #dbeafe;
-  color: #2563eb;
-}
-
-/* Date Picker */
-.date-picker-container {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
-
-.date-picker {
-  width: 12rem;
-}
-
-/* Charts and Reports */
-.chart-wrapper {
-  position: relative;
-  height: 100%;
-  min-height: 300px;
-  padding: 1rem;
-}
-
-.chart-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1rem;
-  padding: 0.5rem;
-  background-color: #f9fafb;
-  border-radius: 0.375rem;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: #4b5563;
-}
-
-.legend-color {
-  width: 1rem;
-  height: 1rem;
-  border-radius: 0.25rem;
-}
-
-.chart-tooltip {
-  background-color: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
-  padding: 0.5rem 1rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  font-size: 0.875rem;
-}
-
-.tooltip-header {
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-}
-
-.tooltip-value {
-  color: #4b5563;
-}
-
-/* Report Cards */
-.report-card {
-  margin-bottom: 1.5rem;
-}
-
-.report-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.report-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.report-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.report-content {
-  margin-top: 1rem;
-}
-
-.report-metrics {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.metric-item {
-  padding: 1rem;
-  background-color: #f9fafb;
-  border-radius: 0.375rem;
-}
-
-.metric-label {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-bottom: 0.25rem;
-}
-
-.metric-value {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.metric-trend {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-}
-
-.trend-up {
-  color: #22c55e;
-}
-
-.trend-down {
-  color: #ef4444;
-}
-
-.trend-neutral {
-  color: #6b7280;
-}
-
-/* Report Filters */
-.report-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background-color: #f9fafb;
-  border-radius: 0.375rem;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.filter-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #4b5563;
-}
-
-.filter-select {
-  padding: 0.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
-  background-color: white;
-  color: #1f2937;
-  font-size: 0.875rem;
-  min-width: 200px;
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
-}
-
-/* Report Table */
-.report-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-}
-
-.report-table th {
-  background-color: #f9fafb;
-  padding: 0.75rem 1rem;
-  text-align: left;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  color: #6b7280;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.report-table td {
-  padding: 1rem;
-  font-size: 0.875rem;
-  color: #1f2937;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.report-table tr:hover {
-  background-color: #f9fafb;
-}
-
-/* Report Pagination */
-.report-pagination {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.pagination-info {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.pagination-controls {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.pagination-button {
-  padding: 0.5rem 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
-  background-color: white;
-  color: #4b5563;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-}
-
-.pagination-button:hover {
-  background-color: #f3f4f6;
-}
-
-.pagination-button.active {
-  background-color: #2563eb;
-  color: white;
-  border-color: #2563eb;
-}
-
-/* Report Export */
-.export-options {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-
-.export-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
-  background-color: white;
-  color: #4b5563;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-}
-
-.export-button:hover {
-  background-color: #f3f4f6;
-}
-
-.export-icon {
-  font-size: 1rem;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .report-metrics {
-    grid-template-columns: 1fr;
-  }
-
-  .report-filters {
-    flex-direction: column;
-  }
-
-  .filter-select {
-    width: 100%;
-  }
-
-  .report-table {
-    display: block;
-    overflow-x: auto;
-  }
-
-  .report-pagination {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-
-  .pagination-controls {
-    justify-content: center;
-  }
-}
-
-/* Work in Progress */
-.work-in-progress {
-  background: white;
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-
-.wip-header {
-  padding: 1rem 1.5rem;
-  background-color: white;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.wip-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #6b7280;
-  letter-spacing: 0.05em;
-}
-
-.task-list {
-  width: 100%;
-}
-
-.task-header {
-  display: grid;
-  grid-template-columns: 120px 1fr 150px 150px;
-  gap: 1rem;
-  padding: 0.75rem 1.5rem;
-  background-color: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #6b7280;
-}
-
-.task-row {
-  display: grid;
-  grid-template-columns: 120px 1fr 150px 150px;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  align-items: center;
-  border-bottom: 1px solid #e5e7eb;
-  transition: background-color 0.2s;
-}
-
-.task-row:hover {
-  background-color: #f9fafb;
-}
-
-.task-column {
-  display: flex;
-  align-items: center;
-}
-
-.avatar-group {
-  display: flex;
-  align-items: center;
-}
-
-.avatar {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 9999px;
-  object-fit: cover;
-}
-
-.avatar-placeholder {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 9999px;
-  background-color: #e5e7eb;
-  color: #6b7280;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.task-title {
-  color: #2563eb;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.task-title:hover {
-  text-decoration: underline;
-}
-
-.status-badge {
-  padding: 0.25rem 0.75rem;
-  background-color: #dbeafe;
-  color: #2563eb;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.time-badge {
-  font-size: 0.875rem;
-  color: #4b5563;
-  margin-right: 0.5rem;
-}
-
-.overdue-icon {
-  color: #ef4444;
-  font-size: 1rem;
-}
-
-@media (max-width: 768px) {
-  .task-header,
-  .task-row {
-    grid-template-columns: 80px 1fr 120px;
-  }
-
-  .time-progress {
-    display: none;
-  }
-}
-
-/* Timings Section */
-.timings-section {
-  background: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1.5rem;
-}
-
-.timings-header {
-  padding: 1rem 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.timings-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #6b7280;
-  letter-spacing: 0.05em;
-}
-
-.timings-actions {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.timings-table-container {
-  overflow-x: auto;
-}
-
-.timings-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.timings-table th {
-  background-color: #f9fafb;
-  padding: 0.75rem 1.5rem;
-  text-align: left;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #6b7280;
-  border-bottom: 1px solid #e5e7eb;
-  white-space: nowrap;
-}
-
-.timings-table td {
-  padding: 1rem 1.5rem;
-  font-size: 0.875rem;
-  color: #1f2937;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.timings-table tr:hover:not(.summary-row) {
-  background-color: #f9fafb;
-}
-
-.summary-row {
-  background-color: #f9fafb;
-  font-weight: 600;
-}
-
-.summary-row td {
-  border-top: 2px solid #e5e7eb;
-}
-
-.pagination {
-  display: flex;
-  gap: 0.5rem;
-  padding: 1rem 1.5rem;
-  justify-content: center;
-}
-
-.pagination-button {
-  padding: 0.5rem 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
-  background-color: white;
-  color: #4b5563;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-}
-
-.pagination-button:hover {
-  background-color: #f3f4f6;
-}
-
-.pagination-button.active {
-  background-color: #2563eb;
-  color: white;
-  border-color: #2563eb;
-}
-
-/* Cycle Time Section */
-.cycle-time-section {
-  margin-top: 1rem;
-}
-
-.cycle-time-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.cycle-time-title h2 {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.cycle-time-filters {
-  display: flex;
-  gap: 1rem;
-}
-
-.cycle-time-content {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 1.2rem;
-}
-
-.cycle-time-info {
-  padding-right: 1.2rem;
-  border-right: 1px solid #e5e7eb;
-}
-
-.info-title {
-  font-size: 0.875rem;
-  color: #4b5563;
-  margin-bottom: 1rem;
-}
-
-.info-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.875rem;
-}
-
-.info-item .label {
-  color: #374151;
-  font-weight: 500;
-}
-
-.info-item .time {
-  color: #6b7280;
-}
-
-.mt-4 {
-  margin-top: 1.5rem;
-}
-
-.chart-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.chart-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.chart-label {
-  min-width: 120px;
-  max-width: 120px;
-  font-size: 0.875rem;
-  color: #374151;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.chart-bar {
-  height: 24px;
-  background-color: #10b981;
-  color: white;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  padding: 0 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: width 0.3s ease;
-  position: relative;
-  overflow: visible;
-  white-space: nowrap;
-}
-
-.chart-bar.short-bar {
-  color: transparent;
-  justify-content: flex-start;
-  overflow: visible;
-  min-width: 3px;
-  padding: 0;
-}
-
-.chart-bar.short-bar::after {
-  content: attr(data-duration);
-  position: absolute;
-  left: 100%;
-  margin-left: 6px;
-  color: #1f2937;
-  white-space: nowrap;
-}
-
-.chart-bar.zero-bar {
-  color: transparent;
-  justify-content: flex-start;
-  overflow: visible;
-  min-width: 3px;
-  padding: 0;
-  background-color: #d1d5db;
-}
-
-.chart-bar.zero-bar::after {
-  content: attr(data-duration);
-  position: absolute;
-  left: 100%;
-  margin-left: 6px;
-  color: #6b7280;
-  white-space: nowrap;
-}
-
-/* Cycle Time Trend Styles */
-.cycle-time-trend {
-  margin-top: 1.5rem;
-}
-
-.cycle-time-trend-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.cycle-time-trend-header h2 {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  letter-spacing: 0.05em;
-}
-
-.cycle-time-info {
-  margin-bottom: 2rem;
-}
-
-.cycle-time-info p {
-  color: #374151;
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-
-.cycle-time-info strong {
-  color: #111827;
-  font-weight: 600;
-}
-
-.percentage-up {
-  color: #ef4444;
-  font-weight: 500;
-}
-
-.average-info {
-  color: #6b7280;
-  margin-top: 0.5rem;
-}
-
-.cycle-time-chart {
-  display: flex;
-  height: 300px;
-  margin-top: 1rem;
-}
-
-.time-axis {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 1rem 0;
-  margin-right: 1.5rem;
-  color: #6b7280;
-  font-size: 0.75rem;
-  border-right: 1px solid #e5e7eb;
-  min-width: 60px;
-}
-
-.chart-area {
-  flex: 1;
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-end;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 0 1rem 1rem;
-  position: relative;
-}
-
-.chart-area::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    #f3f4f6 0%,
-    #f3f4f6 1px,
-    transparent 1px,
-    transparent 20%
-  );
-  pointer-events: none;
-}
-
-.bar-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 60px;
-  position: relative;
-}
-
-.bar {
-  width: 40px;
-  background-color: #60a5fa;
-  border-radius: 4px;
-  position: relative;
-  transition: all 0.3s ease;
-  min-height: 4px;
-}
-
-.bar:hover {
-  background-color: #3b82f6;
-  width: 48px;
-}
-
-.bar-label {
-  position: absolute;
-  top: -1.8rem;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  font-size: 0.75rem;
-  color: #374151;
-  font-weight: 500;
-  background-color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.week-label {
-  margin-top: 0.75rem;
-  font-size: 0.75rem;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-/* Cycle Time Workflow Styles */
-.cycle-time-workflow {
-  margin-top: 1.5rem;
-}
-
-.cycle-time-workflow-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.cycle-time-workflow-header h2 {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  letter-spacing: 0.05em;
-}
-
-.workflow-analysis {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 32px;
-}
-
-.workflow-description p {
-  color: #4b5563;
-  margin-bottom: 16px;
-  line-height: 1.5;
-}
-
-.workflow-state-list {
-  margin: 16px 0;
-}
-
-.status-chart-item {
-  background-color: blue;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.state-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.state-name {
-  color: #1f2937;
-  font-weight: 500;
-}
-
-.state-time {
-  color: #6b7280;
-}
-
-.workflow-note {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.workflow-chart {
-  display: flex;
-  gap: 16px;
-}
-
-.time-scale {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 8px 0;
-  color: #6b7280;
-  font-size: 0.875rem;
-}
-
-.chart-bars {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.chart-bar {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.bar-label {
-  width: 150px;
-  color: #1f2937;
-  font-weight: 500;
-}
-
-.bar {
-  height: 24px;
-  background: #22c55e;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  padding: 0 8px;
-  color: white;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-/* Cycle Time Progress Styles */
-.cycle-time-progress {
-  margin-top: 1.5rem;
-  display: block; /* Garantir que a seção seja exibida como bloco */
-}
-
-.cycle-time-progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.cycle-time-progress-header h2 {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  letter-spacing: 0.05em;
-}
-
-.progress-analysis {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.progress-info {
-  color: #374151;
-  line-height: 1.5;
-}
-
-.progress-info p {
-  margin-bottom: 0.75rem;
-}
-
-.progress-info strong {
-  color: #111827;
-  font-weight: 600;
-}
-
-.highlight {
-  color: #2563eb;
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  cursor: help;
-}
-
-.trend-info {
-  font-size: 0.925rem;
-}
-
-.percentage-up {
-  color: #ef4444;
-  font-weight: 500;
-}
-
-.note-info {
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-style: italic;
-}
-
-.progress-chart {
-  height: 300px;
-  margin: 1.5rem 0;
-  display: flex;
-  position: relative;
-  border-left: 1px solid #e5e7eb;
-}
-
-.trend-line {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 2rem;
-}
-
-.line-chart {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.trend-path {
-  fill: none;
-  stroke: #3b82f6;
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
-}
-
-.date-axis {
-  display: flex;
-  justify-content: space-between;
-  padding-top: 0.5rem;
-  color: #6b7280;
-  font-size: 0.75rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.time-axis {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 1rem 0.5rem;
-  color: #6b7280;
-  font-size: 0.75rem;
-  min-width: 60px;
-  margin-right: 0.5rem;
-}
-
-.progress-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-left: 2rem;
-  min-width: 220px;
-  margin-top: 2rem;
-}
-
-.chart-stats-container {
-  display: flex;
-  align-items: flex-start;
-  margin-top: 1rem;
-}
-
-.chart-stats-container .chart-container {
-  flex: 1;
-  min-height: 300px;
-}
-
-.stat-item {
-  background: #f9fafb;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  text-align: center;
-}
-
-.stat-value {
-  display: block;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-}
-
-.stat-label {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-/* Created vs Completed Styles */
-.created-vs-completed {
-  border-radius: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.created-vs-completed-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.created-vs-completed-header h2 {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  letter-spacing: 0.05em;
-}
-
-.created-vs-completed-content {
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 2rem;
-}
-
-.created-vs-completed-info {
-  padding-right: 2rem;
-  border-right: 1px solid #e5e7eb;
-}
-
-.info-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 1rem;
-}
-
-.info-text {
-  font-size: 0.875rem;
-  color: #4b5563;
-  margin-bottom: 0.5rem;
-}
-
-.info-trend {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-top: 1rem;
-}
-
-.highlight {
-  color: #2563eb;
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  cursor: help;
-}
-
-.trend-value {
-  color: #22c55e;
-  font-weight: 500;
-}
-
-.trend-value-down {
-  color: #ef4444;
-  font-weight: 500;
-}
-
-.date-reference {
-  color: #6b7280;
-  font-style: italic;
-}
-
-.created-vs-completed-chart {
-  flex: 1;
-}
-
-.chart-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-size: 0.875rem;
-  color: #4b5563;
-}
-
-.legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-}
-
-.legend-color.completed {
-  background-color: #22c55e;
-}
-
-.legend-color.created {
-  background-color: #3b82f6;
-}
-
-.legend-value {
-  font-weight: 600;
-  color: #374151;
-}
-
-.legend-trend {
-  color: #22c55e;
-  font-weight: 500;
-}
-
-.chart-container {
-  height: 300px;
-  position: relative;
-}
-
-@media (max-width: 1024px) {
-  .created-vs-completed-content {
-    grid-template-columns: 1fr;
-  }
-
-  .created-vs-completed-info {
-    padding-right: 0;
-    border-right: none;
-    border-bottom: 1px solid #e5e7eb;
-    padding-bottom: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-}
-
-.chart-loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  min-height: 200px;
-  color: #6b7280;
-  font-size: 0.875rem;
-  background-color: rgba(249, 250, 251, 0.5);
-}
-
-/* Stats Period Selector Styles */
-.stats-period-selector {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.stats-period-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #6b7280;
-  margin-right: 0.75rem;
-}
-
-.stats-period-custom-select {
-  max-width: 180px;
-}
-
-.cycle-time-custom-select {
-  width: 160px;
-}
-
-.status-chart-flex {
-  display: flex;
-  flex-direction: column;
-}
-.status-chart-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center; /* Centraliza horizontalmente o conteúdo (gráfico + legenda) */
-}
-.status-custom-legend {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-left: 2rem;
-  min-width: 140px;
-}
-.status-custom-legend .legend-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.5rem;
-  font-size: 0.95em;
-}
-.status-custom-legend .legend-color {
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  margin-right: 0.5rem;
-  border: 1px solid #e5e7eb;
-}
-.status-custom-legend .legend-label {
-  color: #374151;
-  font-weight: 500;
-}
-
-.department-card-modern {
-  border: 1px solid #e5e7eb;
-  transition: box-shadow 0.2s;
-  position: relative;
-  overflow: hidden;
-  padding-top: 1.25rem;
-}
-.department-card-modern:hover {
-  box-shadow: 0 4px 16px 0 rgba(37, 99, 235, 0.13);
-}
-.department-card-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-.department-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  background: #2563eb20;
-  color: #2563eb;
-}
-.progress-row {
-  align-items: center;
-  gap: 0.5rem;
-}
-.progress-bar-bg {
-  flex: 1;
-  height: 8px;
-  background: #f3f4f6;
-  border-radius: 4px;
-  margin: 0 0.5rem;
-  overflow: hidden;
-  min-width: 60px;
-  max-width: 120px;
-  display: inline-block;
-}
-.progress-bar-fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.4s;
-}
-.progress-value {
-  font-size: 0.85em;
-  color: #374151;
-  min-width: 40px;
-  text-align: right;
-}
-
-.chart-loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 300px;
-  background-color: rgba(255, 255, 255, 0.7);
-  border-radius: 0.5rem;
-}
-
-.chart-loading-state .loading-icon {
-  font-size: 2rem;
-  color: #2563eb;
-  margin-bottom: 0.5rem;
-}
-
-.chart-loading-state .loading-text {
-  color: #4b5563;
-  font-size: 0.875rem;
-}
-
-.percentage-down {
-  color: #22c55e;
-  font-weight: 500;
-}
-
-.no-data-message {
-  color: #6b7280;
-  font-style: italic;
-}
-
-.comparison-text {
-  color: #6b7280;
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-}
-
-.top-contributors-card {
-  padding: 1.5rem;
-}
-
-.top-contributors-header {
-  margin-bottom: 1.5rem;
-}
-
-.top-contributors-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-}
-
-.top-contributors-subtitle {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.top-contributors-table {
-  display: flex;
-  flex-direction: column;
-}
-
-.contributors-table-header {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 0.5rem;
-}
-
-.contributor-row {
-  display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr 1fr;
-  padding: 1rem 0;
-  border-bottom: 1px solid #f3f4f6;
-  align-items: center;
-}
-
-.contributor-row:last-child {
-  border-bottom: none;
-}
-
-.header-profile,
-.header-tickets,
-.header-rate,
-.header-total {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #4b5563;
-  text-transform: none;
-}
-
-.contributor-profile {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.contributor-tickets,
-.contributor-rate,
-.contributor-total {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.contributor-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 9999px;
-  background-color: #f3f4f6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
+/* Avatar color classes - light backgrounds with colored text */
 .avatar-blue {
-  background-color: #dbeafe;
-  color: #2563eb;
+  @apply bg-sky-100 text-sky-600;
 }
 
 .avatar-green {
-  background-color: #dcfce7;
-  color: #16a34a;
+  @apply bg-emerald-100 text-emerald-600;
 }
 
 .avatar-purple {
-  background-color: #e9d5ff;
-  color: #9333ea;
+  @apply bg-violet-100 text-violet-600;
 }
 
 .avatar-orange {
-  background-color: #fed7aa;
-  color: #ea580c;
+  @apply bg-orange-100 text-orange-600;
 }
 
 .avatar-pink {
-  background-color: #fce7f3;
-  color: #ec4899;
+  @apply bg-rose-100 text-rose-600;
 }
 
-.avatar-placeholder {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: inherit;
+.avatar-indigo {
+  @apply bg-indigo-100 text-indigo-600;
 }
 
-.avatar-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.avatar-red {
+  @apply bg-red-100 text-red-600;
 }
 
-.contributor-info {
-  display: flex;
-  flex-direction: column;
+.avatar-yellow {
+  @apply bg-yellow-100 text-yellow-600;
 }
 
-.contributor-name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
+.avatar-teal {
+  @apply bg-teal-100 text-teal-600;
 }
 
-.contributor-role {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin: 0.25rem 0 0 0;
-}
-
-.ticket-count,
-.total-count {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.status-indicator {
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.status-available {
-  background-color: #dcfce7;
-  color: #16a34a;
-}
-
-.status-in-class {
-  background-color: #dbeafe;
-  color: #2563eb;
-}
-
-.status-absent {
-  background-color: #fee2e2;
-  color: #dc2626;
-}
-
-.loading-contributors,
-.no-contributors {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  color: #6b7280;
-}
-
-.loading-contributors .loading-icon {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: #2563eb;
-}
-
-.no-tasks-message {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  color: #6b7280;
-  font-size: 0.975rem;
-  text-align: center;
-  background-color: #f9fafb;
-  border-radius: 0.5rem;
-  margin: 1rem 0;
-  border: 1px dashed #e5e7eb;
-}
-
-.info-icon {
-  font-size: 1.25rem;
-  margin-right: 0.75rem;
-  color: #3b82f6;
-}
-
-.loading-tasks {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  color: #6b7280;
-  font-size: 0.975rem;
-  text-align: center;
-  background-color: #f9fafb;
-  border-radius: 0.5rem;
-  margin: 1rem 0;
-  border: 1px dashed #e5e7eb;
-}
-
-.loading-icon {
-  font-size: 1.5rem;
-  margin-right: 0.75rem;
-  color: #2563eb;
-}
-
-.loading-text {
-  color: #4b5563;
+.avatar-cyan {
+  @apply bg-cyan-100 text-cyan-600;
 }
 </style>

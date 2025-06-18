@@ -1,43 +1,55 @@
 <template>
-  <div class="chat-support-button" :class="{ 'chat-active': isOpen }">
+  <div class="fixed bottom-8 right-8 z-[1000] flex flex-col items-end">
     <button
-      class="chat-button"
+      class="w-14 h-14 rounded-full bg-blue-600 text-white border-none shadow-lg cursor-pointer flex justify-center items-center transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl"
       @click="toggleChat"
       :aria-label="isOpen ? 'Fechar chat de suporte' : 'Abrir chat de suporte'"
     >
-      <font-awesome-icon :icon="isOpen ? 'times' : 'comment'" class="chat-icon" />
+      <font-awesome-icon :icon="isOpen ? 'times' : 'comment'" class="text-2xl" />
     </button>
 
-    <div v-if="isOpen" class="chat-container">
-      <div class="chat-header">
+    <div
+      v-if="isOpen"
+      class="absolute bottom-20 right-0 w-[350px] h-[450px] bg-white rounded-xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 md:w-[350px] md:h-[450px] max-md:w-[300px] max-md:h-[400px]"
+    >
+      <div class="px-4 py-4 bg-blue-600 text-white font-semibold flex justify-between items-center">
         <span>Chat de Suporte</span>
-        <button @click="toggleChat" class="chat-close-button">
+        <button
+          @click="toggleChat"
+          class="bg-transparent border-none text-white cursor-pointer text-base p-0 hover:opacity-80 transition-opacity"
+        >
           <font-awesome-icon icon="times" />
         </button>
       </div>
-      <div class="chat-body" ref="chatBody">
-        <div class="chat-messages">
+      <div class="flex-1 p-4 overflow-y-auto bg-gray-50" ref="chatBody">
+        <div class="flex flex-col gap-2.5">
           <div
             v-for="(message, index) in messages"
             :key="index"
-            class="chat-message"
-            :class="message.sender"
+            class="max-w-[80%] px-4 py-2.5 rounded-2xl relative break-words"
+            :class="{
+              'self-end bg-blue-50 rounded-br-md': message.sender === 'user',
+              'self-start bg-gray-100 rounded-bl-md': message.sender === 'support',
+            }"
           >
-            <div class="message-content">
+            <div class="flex flex-col">
               <span v-html="message.text"></span>
-              <span class="message-time">{{ message.time }}</span>
+              <span class="text-xs text-gray-500 mt-1 self-end">{{ message.time }}</span>
             </div>
           </div>
         </div>
       </div>
-      <div class="chat-input-container">
+      <div class="flex p-2.5 bg-white border-t border-gray-200">
         <textarea
           v-model="newMessage"
-          class="chat-input"
+          class="flex-1 border border-gray-300 rounded-2xl px-4 py-2 text-sm resize-none h-10 max-h-20 outline-none font-sans focus:border-blue-500 transition-colors"
           placeholder="Digite sua mensagem..."
           @keydown.enter.prevent="sendMessage"
         ></textarea>
-        <button @click="sendMessage" class="chat-send-button">
+        <button
+          @click="sendMessage"
+          class="bg-blue-600 text-white border-none w-10 h-10 rounded-full ml-2.5 cursor-pointer flex justify-center items-center hover:bg-blue-700 transition-colors"
+        >
           <font-awesome-icon icon="paper-plane" />
         </button>
       </div>
@@ -139,7 +151,7 @@ onMounted(() => {
   // Add event listener to close chat when clicking outside
   document.addEventListener('click', (event) => {
     const target = event.target as HTMLElement;
-    const chatElement = document.querySelector('.chat-support-button');
+    const chatElement = document.querySelector('.fixed.bottom-8.right-8');
 
     if (isOpen.value && chatElement && !chatElement.contains(target)) {
       isOpen.value = false;
@@ -147,160 +159,3 @@ onMounted(() => {
   });
 });
 </script>
-
-<style scoped>
-.chat-support-button {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.chat-button {
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  background-color: var(--primary-color, #1976d2);
-  color: white;
-  border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: all 0.3s ease;
-}
-
-.chat-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-
-.chat-icon {
-  font-size: 1.5rem;
-}
-
-.chat-container {
-  position: absolute;
-  bottom: 75px;
-  right: 0;
-  width: 350px;
-  height: 450px;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid #e0e0e0;
-}
-
-.chat-header {
-  padding: 15px;
-  background-color: var(--primary-color, #1976d2);
-  color: white;
-  font-weight: 600;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.chat-close-button {
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  font-size: 1rem;
-  padding: 0;
-}
-
-.chat-body {
-  flex: 1;
-  padding: 15px;
-  overflow-y: auto;
-  background-color: #f8f9fa;
-}
-
-.chat-messages {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.chat-message {
-  max-width: 80%;
-  padding: 10px 15px;
-  border-radius: 18px;
-  position: relative;
-  word-break: break-word;
-}
-
-.chat-message.user {
-  align-self: flex-end;
-  background-color: #e3f2fd;
-  border-bottom-right-radius: 5px;
-}
-
-.chat-message.support {
-  align-self: flex-start;
-  background-color: #f1f1f1;
-  border-bottom-left-radius: 5px;
-}
-
-.message-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.message-time {
-  font-size: 0.7rem;
-  color: #888;
-  margin-top: 5px;
-  align-self: flex-end;
-}
-
-.chat-input-container {
-  display: flex;
-  padding: 10px;
-  background-color: white;
-  border-top: 1px solid #e0e0e0;
-}
-
-.chat-input {
-  flex: 1;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  padding: 8px 15px;
-  font-size: 0.9rem;
-  resize: none;
-  height: 40px;
-  max-height: 80px;
-  outline: none;
-  font-family: inherit;
-}
-
-.chat-send-button {
-  background-color: var(--primary-color, #1976d2);
-  color: white;
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-left: 10px;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-@media (max-width: 768px) {
-  .chat-container {
-    width: 300px;
-    height: 400px;
-    right: 0;
-  }
-}
-</style>

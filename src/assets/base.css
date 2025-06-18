@@ -51,6 +51,10 @@ ul {
   list-style: none;
 }
 
+.primary-color {
+  background-color: var(--primary-color);
+}
+
 /* Cabeçalho */
 .main-header {
   display: flex;

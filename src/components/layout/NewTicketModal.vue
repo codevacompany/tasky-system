@@ -441,7 +441,6 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-/* Keep only essential styles that might not be covered by Tailwind */
 .quill-wrapper {
   margin-bottom: 50px;
 }

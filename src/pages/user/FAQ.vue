@@ -1,22 +1,36 @@
 <template>
-  <section class="section-content active faq-page">
-    <div class="faq-header-row">
-      <h1>FAQ - Central de Ajuda</h1>
-      <div class="faq-search-box">
+  <section class="max-w-4xl mx-auto py-4 px-4 sm:py-7 sm:px-2">
+    <!-- Mobile-first responsive header -->
+    <div
+      class="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:mb-2"
+    >
+      <h1
+        class="text-2xl sm:text-[28px] font-semibold text-gray-900 dark:text-white text-center sm:text-left"
+      >
+        FAQ - Central de Ajuda
+      </h1>
+      <!-- Search input - full width on mobile, constrained on larger screens -->
+      <div class="flex items-center relative w-full sm:min-w-[280px] sm:max-w-[400px] sm:w-auto">
         <input
           v-model="searchTerm"
           type="text"
-          placeholder="Digite sua dúvida, palavra-chave ou termo..."
-          class="faq-search-input"
+          placeholder="Digite sua dúvida..."
+          class="w-full py-2.5 sm:py-3 pr-10 sm:pr-12 pl-3 sm:pl-4 border border-gray-300 dark:border-gray-600 rounded-md text-sm sm:text-base bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-200 focus:outline-none focus:border-blue-600 dark:focus:border-blue-400"
         />
-        <font-awesome-icon icon="search" class="faq-search-icon" />
+        <font-awesome-icon
+          icon="search"
+          class="absolute right-2.5 sm:right-3 text-gray-400 dark:text-gray-500 text-base sm:text-lg pointer-events-none"
+        />
       </div>
     </div>
-    <p class="faq-subtitle">
+
+    <p
+      class="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-6 sm:mb-8 ml-0.5 text-center sm:text-left"
+    >
       Encontre respostas para as dúvidas mais comuns sobre o uso do Tasky System.
     </p>
 
-    <div class="faq-sections">
+    <div class="flex flex-col gap-3 sm:gap-5">
       <Accordion
         v-for="(section, idx) in filteredSections"
         :key="section.title"
@@ -24,20 +38,28 @@
         :icon="section.icon"
         @toggle="(isOpen) => handleAccordionToggle(idx, isOpen)"
       >
-        <div class="faq-list">
+        <div class="flex flex-col gap-4 sm:gap-6">
           <FaqItem
             v-for="faq in section.faqs"
             :key="faq.question"
             :question="faq.question"
             :answer="faq.answer"
           />
-          <div v-if="section.faqs.length === 0" class="faq-empty">
-            <font-awesome-icon icon="info-circle" /> Nenhuma resposta encontrada para sua busca.
+          <div
+            v-if="section.faqs.length === 0"
+            class="text-center text-gray-500 dark:text-gray-400 mt-6 sm:mt-8 text-base sm:text-lg flex flex-col sm:flex-row items-center gap-2 justify-center"
+          >
+            <font-awesome-icon icon="info-circle" />
+            <span>Nenhuma resposta encontrada para sua busca.</span>
           </div>
         </div>
       </Accordion>
-      <div v-if="filteredSections.every((section) => section.faqs.length === 0)" class="faq-empty">
-        <font-awesome-icon icon="info-circle" /> Nenhuma resposta encontrada para sua busca.
+      <div
+        v-if="filteredSections.every((section) => section.faqs.length === 0)"
+        class="text-center text-gray-500 dark:text-gray-400 mt-6 sm:mt-8 text-base sm:text-lg flex flex-col sm:flex-row items-center gap-2 justify-center"
+      >
+        <font-awesome-icon icon="info-circle" />
+        <span>Nenhuma resposta encontrada para sua busca.</span>
       </div>
     </div>
 
@@ -286,87 +308,3 @@ watch(
   { immediate: true },
 );
 </script>
-
-<style scoped>
-.faq-page {
-  max-width: 900px;
-  margin: 0 auto;
-  padding-bottom: 2rem;
-}
-
-.faq-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
-  gap: 1.5rem;
-}
-
-.faq-header-row h1 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #1a2233;
-  margin: 0;
-}
-
-.faq-subtitle {
-  font-size: 1.05rem;
-  color: #4b5563;
-  margin-bottom: 2rem;
-  margin-left: 2px;
-}
-
-.faq-search-box {
-  display: flex;
-  align-items: center;
-  position: relative;
-  min-width: 320px;
-  max-width: 400px;
-  width: 100%;
-}
-
-.faq-search-input {
-  width: 100%;
-  padding: 0.7rem 2.2rem 0.7rem 1rem;
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
-  font-size: 1rem;
-  outline: none;
-  background: #f9f9fb;
-  transition: border 0.2s;
-}
-
-.faq-search-input:focus {
-  border-color: #1976d2;
-}
-
-.faq-search-icon {
-  position: absolute;
-  right: 12px;
-  color: #b0b0b0;
-  font-size: 1.1rem;
-}
-
-.faq-sections {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-
-.faq-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.faq-empty {
-  text-align: center;
-  color: #888;
-  margin-top: 2rem;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
-}
-</style>

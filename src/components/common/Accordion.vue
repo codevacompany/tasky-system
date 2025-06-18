@@ -1,12 +1,29 @@
 <template>
-  <div class="accordion-section">
-    <button class="accordion-header" @click="toggle" :aria-expanded="isOpen">
-      <font-awesome-icon :icon="icon" class="accordion-icon" v-if="icon" />
-      <span>{{ title }}</span>
-      <font-awesome-icon icon="chevron-down" class="accordion-chevron" />
+  <div
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 px-6 py-2 transition-shadow duration-200 hover:shadow-md"
+  >
+    <button
+      class="flex items-center gap-3 w-full bg-transparent border-none text-xl font-semibold text-blue-600 dark:text-blue-400 py-5 cursor-pointer text-left transition-colors duration-200 hover:text-blue-700 dark:hover:text-blue-300"
+      @click="toggle"
+      :aria-expanded="isOpen"
+    >
+      <font-awesome-icon :icon="icon" class="text-xl" v-if="icon" />
+      <span class="flex-1">{{ title }}</span>
+      <font-awesome-icon
+        icon="chevron-down"
+        class="ml-auto text-lg text-gray-400 dark:text-gray-500 transition-transform duration-300 ease-in-out"
+        :class="{ 'rotate-180': isOpen }"
+      />
     </button>
-    <transition name="fade">
-      <div v-show="isOpen" class="accordion-content">
+    <transition
+      enter-active-class="transition-all duration-200 ease-out"
+      leave-active-class="transition-all duration-200 ease-in"
+      enter-from-class="opacity-0 max-h-0"
+      enter-to-class="opacity-100 max-h-[1000px]"
+      leave-from-class="opacity-100 max-h-[1000px]"
+      leave-to-class="opacity-0 max-h-0"
+    >
+      <div v-show="isOpen" class="pb-4 overflow-hidden">
         <slot></slot>
       </div>
     </transition>
@@ -40,65 +57,3 @@ function toggle() {
   emit('toggle', isOpen.value);
 }
 </script>
-
-<style scoped>
-.accordion-section {
-  background: var(--card-bg, #fff);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
-  padding: 0.5rem 1.5rem 0.5rem 1.5rem;
-  transition: box-shadow 0.2s;
-}
-
-.accordion-header {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  width: 100%;
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--primary-color, #1976d2);
-  padding: 1.2rem 0 1.2rem 0;
-  cursor: pointer;
-  text-align: left;
-  transition: background 0.2s;
-}
-
-.accordion-icon {
-  font-size: 1.2rem;
-}
-
-.accordion-chevron {
-  margin-left: auto;
-  font-size: 1.1rem;
-  color: #b0b0b0;
-  transition: transform 0.3s ease;
-}
-
-.accordion-header[aria-expanded='true'] .accordion-chevron {
-  transform: rotate(180deg);
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: all 0.2s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-  max-height: 0;
-}
-
-.fade-enter-to,
-.fade-leave-from {
-  opacity: 1;
-  max-height: 1000px;
-}
-
-.accordion-content {
-  padding-bottom: 1rem;
-}
-</style>

@@ -1,154 +1,259 @@
 <template>
-  <div class="sync-page">
-    <div class="page-content">
+  <div class="flex flex-col h-full">
+    <div class="flex-1 overflow-hidden">
       <!-- Main Content -->
-      <div class="sync-container">
+      <div class="flex h-full bg-white dark:bg-gray-900 rounded-lg shadow-sm overflow-hidden">
         <!-- Sidebar -->
-        <div class="sync-sidebar">
-          <div class="channels">
+        <div class="w-[280px] border-r border-gray-200 dark:border-gray-700 flex flex-col">
+          <div class="p-5 border-b border-gray-200 dark:border-gray-700">
             <div
-              class="channel-item"
-              :class="{ active: currentChannel === 'inicio' }"
+              class="flex items-center p-3 mb-2 rounded-md cursor-pointer transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800"
+              :class="{
+                'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400':
+                  currentChannel === 'inicio',
+              }"
               @click="currentChannel = 'inicio'"
             >
-              <font-awesome-icon icon="home" />
+              <font-awesome-icon icon="home" class="mr-3 text-xl" />
               <span>Início</span>
             </div>
             <div
-              class="channel-item"
-              :class="{ active: currentChannel === 'geral' }"
+              class="flex items-center p-3 mb-2 rounded-md cursor-pointer transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800"
+              :class="{
+                'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400':
+                  currentChannel === 'geral',
+              }"
               @click="currentChannel = 'geral'"
             >
-              <font-awesome-icon icon="users" />
+              <font-awesome-icon icon="users" class="mr-3 text-xl" />
               <span>Canal Geral</span>
-              <span class="unread-count" v-if="getUnreadCount('geral')">
+              <span
+                class="ml-auto px-2 py-1 bg-blue-600 text-white text-xs rounded-xl"
+                v-if="getUnreadCount('geral')"
+              >
                 {{ getUnreadCount('geral') }}
               </span>
             </div>
             <div
-              class="channel-item"
-              :class="{ active: currentChannel === 'setor' }"
+              class="flex items-center p-3 mb-2 rounded-md cursor-pointer transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800"
+              :class="{
+                'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400':
+                  currentChannel === 'setor',
+              }"
               @click="currentChannel = 'setor'"
             >
-              <font-awesome-icon icon="building" />
+              <font-awesome-icon icon="building" class="mr-3 text-xl" />
               <span>Canal do Setor</span>
-              <span class="unread-count" v-if="getUnreadCount('setor')">
+              <span
+                class="ml-auto px-2 py-1 bg-blue-600 text-white text-xs rounded-xl"
+                v-if="getUnreadCount('setor')"
+              >
                 {{ getUnreadCount('setor') }}
               </span>
             </div>
             <div
-              class="channel-item"
-              :class="{ active: currentChannel === 'individual' }"
+              class="flex items-center p-3 mb-2 rounded-md cursor-pointer transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800"
+              :class="{
+                'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400':
+                  currentChannel === 'individual',
+              }"
               @click="currentChannel = 'individual'"
             >
-              <font-awesome-icon icon="user" />
+              <font-awesome-icon icon="user" class="mr-3 text-xl" />
               <span>Canal Individual</span>
-              <span class="unread-count" v-if="getUnreadCount('individual')">
+              <span
+                class="ml-auto px-2 py-1 bg-blue-600 text-white text-xs rounded-xl"
+                v-if="getUnreadCount('individual')"
+              >
                 {{ getUnreadCount('individual') }}
               </span>
             </div>
           </div>
 
           <!-- Lista de usuários para chat individual -->
-          <div v-if="currentChannel === 'individual'" class="users-list">
-            <div class="users-list-header">
-              <h3>Usuários</h3>
-              <div class="user-search">
-                <input type="text" v-model="userSearchTerm" placeholder="Buscar usuário..." />
+          <div v-if="currentChannel === 'individual'" class="flex-1 flex flex-col overflow-hidden">
+            <div class="p-5 border-b border-gray-200 dark:border-gray-700">
+              <h3 class="mb-3 text-lg font-semibold text-gray-900 dark:text-white">Usuários</h3>
+              <div class="relative">
+                <input
+                  type="text"
+                  v-model="userSearchTerm"
+                  placeholder="Buscar usuário..."
+                  class="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                />
               </div>
             </div>
-            <div class="users-list-content">
+            <div class="flex-1 overflow-y-auto p-3">
               <div
                 v-for="user in filteredUsers"
                 :key="user.id"
-                class="user-item"
-                :class="{ active: selectedUser?.id === user.id }"
+                class="flex items-center p-3 rounded-md cursor-pointer transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800"
+                :class="{ 'bg-blue-50 dark:bg-blue-900/30': selectedUser?.id === user.id }"
                 @click="selectUser(user)"
               >
-                <div class="user-avatar">
-                  <span class="initials">{{ getUserInitials(user) }}</span>
+                <div
+                  class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center mr-3 font-medium"
+                >
+                  <span class="text-sm">{{ getUserInitials(user) }}</span>
                 </div>
-                <div class="user-info">
-                  <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
-                  <span class="user-department">{{ user.department.name }}</span>
+                <div class="flex-1 flex flex-col">
+                  <span class="font-medium text-gray-900 dark:text-white"
+                    >{{ user.firstName }} {{ user.lastName }}</span
+                  >
+                  <span class="text-xs text-gray-500 dark:text-gray-400">{{
+                    user.department.name
+                  }}</span>
                 </div>
-                <div class="user-status" :class="user.status"></div>
+                <div
+                  class="w-2.5 h-2.5 rounded-full ml-2"
+                  :class="{
+                    'bg-green-500': user.status === 'online',
+                    'bg-gray-400': user.status === 'offline',
+                    'bg-orange-500': user.status === 'away',
+                  }"
+                ></div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Messages Area -->
-        <div class="messages-area">
-          <div v-if="currentChannel === 'inicio'" class="inicio-panel">
-            <h2>Bem-vindo ao Sync!</h2>
-            <ul class="instructions-list">
-              <li>
-                Selecione um canal para conversar com todos, com seu setor ou individualmente.
-              </li>
-              <li>Use <b>@nome</b> para mencionar alguém em uma mensagem.</li>
-              <li>Responda mensagens usando o botão <b>Responder</b> para criar threads.</li>
-              <li>Marque mensagens importantes para confirmação de leitura/aceite.</li>
-              <li>Use reações para interagir rapidamente com as mensagens.</li>
-              <li>As mensagens do canal do setor só são visíveis para membros do mesmo setor.</li>
-              <li>Você pode anexar arquivos e usar emojis nas conversas.</li>
-            </ul>
-            <div class="inicio-dica">
-              <font-awesome-icon icon="info-circle" />
-              Dica: Use o Sync para centralizar a comunicação e garantir o registro das interações
-              importantes!
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <div
+            v-if="currentChannel === 'inicio'"
+            class="flex-1 flex items-center justify-center p-8"
+          >
+            <div
+              class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-left"
+            >
+              <h2 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-5">
+                Bem-vindo ao Sync!
+              </h2>
+              <ul class="space-y-2 text-gray-700 dark:text-gray-300 text-base mb-5">
+                <li class="flex items-start">
+                  <span class="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  Selecione um canal para conversar com todos, com seu setor ou individualmente.
+                </li>
+                <li class="flex items-start">
+                  <span class="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  Use <b>@nome</b> para mencionar alguém em uma mensagem.
+                </li>
+                <li class="flex items-start">
+                  <span class="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  Responda mensagens usando o botão <b>Responder</b> para criar threads.
+                </li>
+                <li class="flex items-start">
+                  <span class="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  Marque mensagens importantes para confirmação de leitura/aceite.
+                </li>
+                <li class="flex items-start">
+                  <span class="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  Use reações para interagir rapidamente com as mensagens.
+                </li>
+                <li class="flex items-start">
+                  <span class="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  As mensagens do canal do setor só são visíveis para membros do mesmo setor.
+                </li>
+                <li class="flex items-start">
+                  <span class="w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                  Você pode anexar arquivos e usar emojis nas conversas.
+                </li>
+              </ul>
+              <div
+                class="mt-5 flex items-center gap-3 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg"
+              >
+                <font-awesome-icon icon="info-circle" class="text-lg" />
+                <span class="text-base">
+                  Dica: Use o Sync para centralizar a comunicação e garantir o registro das
+                  interações importantes!
+                </span>
+              </div>
             </div>
           </div>
-          <div v-if="replyingTo" class="reply-banner">
+
+          <div
+            v-if="replyingTo"
+            class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-2 px-4 rounded-lg mx-4 mt-2 flex items-center gap-3"
+          >
             <span>Respondendo a: {{ replyingTo.content.slice(0, 60) }}...</span>
-            <button @click="cancelReply" class="cancel-reply-btn">
+            <button
+              @click="cancelReply"
+              class="bg-transparent border-none text-blue-600 dark:text-blue-400 text-lg cursor-pointer"
+            >
               <font-awesome-icon icon="times" />
             </button>
           </div>
-          <div class="messages-list" ref="messagesList">
-            <div v-if="isLoading && messages.length === 0" class="loading-messages">
-              <font-awesome-icon icon="spinner" spin />
+
+          <div
+            class="flex-1 overflow-y-auto p-5 will-change-transform"
+            ref="messagesList"
+            style="scroll-behavior: smooth; -webkit-overflow-scrolling: touch"
+          >
+            <div
+              v-if="isLoading && messages.length === 0"
+              class="flex-1 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 gap-3"
+            >
+              <font-awesome-icon icon="spinner" spin class="text-2xl" />
               <span>Carregando mensagens...</span>
             </div>
             <template v-else>
-              <div v-if="isLoading" class="loading-more">
+              <div
+                v-if="isLoading"
+                class="flex items-center justify-center p-3 text-gray-500 dark:text-gray-400 gap-2"
+              >
                 <font-awesome-icon icon="spinner" spin />
                 <span>Carregando mais mensagens...</span>
               </div>
               <div
                 v-for="message in rootMessages"
                 :key="message.id"
-                class="message-item"
-                :class="{ unread: !message.read }"
+                class="flex mb-5"
+                :class="{ 'bg-gray-50 dark:bg-gray-800 rounded-lg p-2': !message.read }"
               >
-                <div class="message-avatar">
-                  <span class="initials">{{ getUserInitials(message.sender) }}</span>
+                <div
+                  class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center mr-3 font-medium"
+                >
+                  <span class="text-sm">{{ getUserInitials(message.sender) }}</span>
                 </div>
-                <div class="message-content">
-                  <div class="message-header">
-                    <div class="message-info">
-                      <span class="sender-name"
+                <div class="flex-1">
+                  <div class="flex justify-between items-start mb-1">
+                    <div class="flex flex-col">
+                      <span class="font-medium text-gray-900 dark:text-white"
                         >{{ message.sender.firstName }} {{ message.sender.lastName }}</span
                       >
-                      <span class="sender-department">{{ message.sender.department.name }}</span>
+                      <span class="text-xs text-gray-500 dark:text-gray-400">{{
+                        message.sender.department.name
+                      }}</span>
                     </div>
-                    <span class="message-time">{{ formatTime(message.createdAt) }}</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">{{
+                      formatTime(message.createdAt)
+                    }}</span>
                   </div>
                   <div
                     v-if="message.requiresConfirmation && !hasConfirmedView(message)"
-                    class="message-confirmation"
+                    class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-2"
                   >
-                    <div class="confirmation-placeholder">
-                      <font-awesome-icon icon="eye" />
+                    <div class="flex items-center gap-3 text-gray-500 dark:text-gray-400">
+                      <font-awesome-icon
+                        icon="eye"
+                        class="text-lg text-blue-600 dark:text-blue-400"
+                      />
                       <span>Esta mensagem requer confirmação de visualização</span>
-                      <button class="confirm-btn" @click="confirmView(message)">
+                      <button
+                        class="ml-auto px-4 py-2 bg-blue-600 text-white border-none rounded cursor-pointer transition-colors duration-200 hover:bg-blue-700"
+                      >
                         Mostrar Mensagem
                       </button>
                     </div>
                   </div>
-                  <div v-else class="message-text">
-                    {{ message.content }}
-                    <div v-if="message.requiresConfirmation" class="confirmation-status">
+                  <div v-else class="mb-2">
+                    <div class="leading-relaxed text-gray-900 dark:text-gray-100">
+                      {{ message.content }}
+                    </div>
+                    <div
+                      v-if="message.requiresConfirmation"
+                      class="flex items-center gap-2 mt-2 text-sm text-green-600 dark:text-green-400"
+                    >
                       <font-awesome-icon icon="check-circle" />
                       <span
                         >Visualizado em
@@ -156,46 +261,65 @@
                       >
                     </div>
                   </div>
-                  <div class="message-actions">
+                  <div class="flex gap-2">
                     <button
                       v-for="reaction in message.reactions"
                       :key="reaction.type"
-                      class="reaction-btn"
-                      :class="{ active: reaction.active }"
+                      class="px-2 py-1 border border-gray-200 dark:border-gray-600 rounded-xl bg-transparent cursor-pointer text-sm transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      :class="{
+                        'bg-blue-50 dark:bg-blue-900/30 border-blue-600 text-blue-600 dark:text-blue-400':
+                          reaction.active,
+                      }"
                       @click="handleReaction(message, reaction.type)"
                     >
                       {{ reaction.type }} {{ reaction.count }}
                     </button>
-                    <button class="reaction-btn add-reaction">
+                    <button
+                      class="px-1 py-1 border border-gray-200 dark:border-gray-600 rounded-xl bg-transparent cursor-pointer text-sm transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    >
                       <font-awesome-icon icon="smile" />
                     </button>
-                    <button class="reaction-btn reply-btn" @click="setReply(message)">
+                    <button
+                      class="px-1 py-1 bg-transparent border-none text-blue-600 dark:text-blue-400 cursor-pointer text-sm flex items-center gap-1 ml-2 hover:underline"
+                      @click="setReply(message)"
+                    >
                       <font-awesome-icon icon="reply" /> Responder
                     </button>
                   </div>
                 </div>
                 <!-- Respostas (threads) -->
-                <div v-if="repliesMap[message.id]" class="thread-replies">
+                <div
+                  v-if="repliesMap[message.id]"
+                  class="ml-12 mt-2 border-l-2 border-blue-50 dark:border-blue-900/30 pl-3"
+                >
                   <div
                     v-for="reply in repliesMap[message.id]"
                     :key="reply.id"
-                    class="message-item reply-item"
-                    :class="{ unread: !reply.read }"
+                    class="flex mb-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-2"
+                    :class="{ 'bg-gray-100 dark:bg-gray-700': !reply.read }"
                   >
-                    <div class="message-avatar">
-                      <span class="initials">{{ getInitials(reply.sender) }}</span>
+                    <div
+                      class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center mr-3 font-medium"
+                    >
+                      <span class="text-sm">{{ getInitials(reply.sender) }}</span>
                     </div>
-                    <div class="message-content">
-                      <div class="message-header">
-                        <div class="message-info">
-                          <span class="sender-name"
+                    <div class="flex-1">
+                      <div class="flex justify-between items-start mb-1">
+                        <div class="flex flex-col">
+                          <span class="font-medium text-gray-900 dark:text-white"
                             >{{ reply.sender.firstName }} {{ reply.sender.lastName }}</span
                           >
-                          <span class="sender-department">{{ reply.sender.department.name }}</span>
+                          <span class="text-xs text-gray-500 dark:text-gray-400">{{
+                            reply.sender.department.name
+                          }}</span>
                         </div>
-                        <span class="message-time">{{ formatTime(reply.createdAt) }}</span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">{{
+                          formatTime(reply.createdAt)
+                        }}</span>
                       </div>
-                      <div class="message-text">{{ reply.content }}</div>
+                      <div class="leading-relaxed text-gray-900 dark:text-gray-100">
+                        {{ reply.content }}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -204,24 +328,35 @@
           </div>
 
           <!-- Message Input -->
-          <div class="message-input">
-            <div class="input-actions">
-              <button class="action-btn" title="Anexar arquivo">
+          <div
+            class="p-5 border-t border-gray-200 dark:border-gray-700 flex items-start gap-3 bg-gray-50 dark:bg-gray-800"
+          >
+            <div class="flex gap-2 pt-2">
+              <button
+                class="w-9 h-9 rounded-full border-none bg-transparent text-gray-500 dark:text-gray-400 cursor-pointer transition-all duration-200 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-blue-600"
+                title="Anexar arquivo"
+              >
                 <font-awesome-icon icon="paperclip" />
               </button>
-              <button class="action-btn" title="Inserir emoji">
+              <button
+                class="w-9 h-9 rounded-full border-none bg-transparent text-gray-500 dark:text-gray-400 cursor-pointer transition-all duration-200 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-blue-600"
+                title="Inserir emoji"
+              >
                 <font-awesome-icon icon="smile" />
               </button>
               <button
-                class="action-btn"
-                :class="{ active: requiresConfirmation }"
+                class="w-9 h-9 rounded-full border-none bg-transparent text-gray-500 dark:text-gray-400 cursor-pointer transition-all duration-200 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-blue-600"
+                :class="{
+                  'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400':
+                    requiresConfirmation,
+                }"
                 title="Requer confirmação de visualização"
                 @click="requiresConfirmation = !requiresConfirmation"
               >
                 <font-awesome-icon icon="eye" />
               </button>
             </div>
-            <div class="input-container">
+            <div class="relative flex-1">
               <textarea
                 v-model="newMessage"
                 placeholder="Digite sua mensagem... (use @ para mencionar)"
@@ -230,6 +365,7 @@
                 @keydown="handleKeyDown"
                 rows="1"
                 ref="messageInput"
+                class="w-full min-h-[44px] max-h-[120px] border border-gray-200 dark:border-gray-600 rounded-2xl px-4 py-3 resize-none text-gray-900 dark:text-gray-100 text-sm leading-relaxed overflow-y-auto bg-white dark:bg-gray-900 focus:outline-none focus:border-blue-600 focus:shadow-[0_0_0_2px_rgba(25,118,210,0.1)]"
               ></textarea>
               <MentionSelector
                 v-if="showMentionSelector"
@@ -241,8 +377,12 @@
                 @close="closeMentionSelector"
               />
             </div>
-            <button class="send-btn" @click="sendMessage" :disabled="!newMessage.trim()">
-              <font-awesome-icon icon="paper-plane" />
+            <button
+              class="w-11 h-11 rounded-full border-none bg-blue-600 text-white cursor-pointer transition-all duration-200 flex items-center justify-center mt-0.5 hover:bg-blue-700 hover:scale-105 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:transform-none"
+              @click="sendMessage"
+              :disabled="!newMessage.trim()"
+            >
+              <font-awesome-icon icon="paper-plane" class="text-lg" />
             </button>
           </div>
         </div>
@@ -612,544 +752,47 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.sync-page {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+/* Mobile responsive design */
+@media (max-width: 768px) {
+  .flex {
+    flex-direction: column;
+  }
+
+  .w-\[280px\] {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid theme('colors.gray.200');
+  }
+
+  :is(.dark .w-\[280px\]) {
+    border-bottom-color: theme('colors.gray.700');
+  }
+
+  .flex-1.flex.flex-col.overflow-hidden {
+    height: 400px;
+  }
 }
 
-.page-content {
-  flex: 1;
-  overflow: hidden;
-}
-
-.sync-container {
-  height: 100%;
-  display: flex;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.sync-sidebar {
-  width: 280px;
-  border-right: 1px solid #e0e0e0;
-  display: flex;
-  flex-direction: column;
-}
-
-.channels {
-  padding: 20px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.channel-item {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.channel-item:hover {
-  background-color: #f5f5f5;
-}
-
-.channel-item.active {
-  background-color: #e3f2fd;
-  color: #1976d2;
-}
-
-.channel-item svg {
-  margin-right: 12px;
-  font-size: 1.2rem;
-}
-
-.unread-count {
-  margin-left: auto;
-  background-color: #1976d2;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-}
-
-.users-list {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.users-list-header {
-  padding: 20px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.users-list-header h3 {
-  margin: 0 0 12px 0;
-  font-size: 1.1rem;
-}
-
-.user-search input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  font-size: 0.9rem;
-}
-
-.users-list-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px;
-}
-
-.user-item {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.user-item:hover {
-  background-color: #f5f5f5;
-}
-
-.user-item.active {
-  background-color: #e3f2fd;
-}
-
-.user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #1976d2;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 12px;
-  font-weight: 500;
-}
-
-.user-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.user-name {
-  font-weight: 500;
-}
-
-.user-department {
-  font-size: 0.8rem;
-  color: #666;
-}
-
-.user-status {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-left: 8px;
-}
-
-.user-status.online {
-  background-color: #4caf50;
-}
-
-.user-status.offline {
-  background-color: #9e9e9e;
-}
-
-.user-status.away {
-  background-color: #ff9800;
-}
-
-.messages-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.loading-messages {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #666;
-  gap: 12px;
-}
-
-.loading-messages svg {
-  font-size: 2rem;
-}
-
-.messages-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
-  will-change: transform;
-  -webkit-overflow-scrolling: touch;
-}
-
-.message-item {
-  contain: content;
-  will-change: transform;
-  display: flex;
-  margin-bottom: 20px;
-}
-
-.message-item.unread {
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  padding: 8px;
-}
-
-.message-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #1976d2;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 12px;
-  font-weight: 500;
-}
-
-.message-content {
-  flex: 1;
-}
-
-.message-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 4px;
-}
-
-.message-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.sender-name {
-  font-weight: 500;
-}
-
-.sender-department {
-  font-size: 0.8rem;
-  color: #666;
-}
-
-.message-time {
-  font-size: 0.8rem;
-  color: #666;
-}
-
-.message-text {
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
-
-.message-text .mention {
-  color: #1976d2;
-  font-weight: 500;
-  background-color: #e3f2fd;
-  padding: 2px 4px;
-  border-radius: 4px;
-  margin: 0 2px;
-}
-
-.message-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.reaction-btn {
-  padding: 4px 8px;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  background: none;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.2s;
-}
-
-.reaction-btn:hover {
-  background-color: #f5f5f5;
-}
-
-.reaction-btn.active {
-  background-color: #e3f2fd;
-  border-color: #1976d2;
-  color: #1976d2;
-}
-
-.add-reaction {
-  padding: 4px;
-}
-
-.message-input {
-  padding: 20px;
-  border-top: 1px solid #e0e0e0;
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background-color: #f8f9fa;
-}
-
-.input-actions {
-  display: flex;
-  gap: 8px;
-  padding-top: 8px;
-}
-
-.action-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: none;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.action-btn:hover {
-  background-color: #e9ecef;
-  color: #1976d2;
-}
-
-.input-container {
-  position: relative;
-  flex: 1;
-}
-
-textarea {
-  width: 100%;
-  min-height: 44px;
-  max-height: 120px;
-  border: 1px solid #e0e0e0;
-  border-radius: 20px;
-  padding: 12px 16px;
-  resize: none;
-  font-family: inherit;
-  font-size: 0.95rem;
-  line-height: 1.4;
-  overflow-y: auto;
-  background-color: white;
-}
-
-textarea:focus {
-  outline: none;
-  border-color: #1976d2;
-  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
-}
-
-.send-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: none;
-  background-color: #1976d2;
-  color: white;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 2px;
-}
-
-.send-btn:hover {
-  background-color: #1565c0;
-  transform: scale(1.05);
-}
-
-.send-btn:disabled {
-  background-color: #e0e0e0;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.send-btn svg {
-  font-size: 1.1rem;
-}
-
-.loading-more {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px;
-  color: #666;
-  gap: 8px;
-}
-
-.loading-more svg {
-  font-size: 1rem;
-}
-
+/* Sentinel for infinite scroll */
 #scroll-sentinel {
   height: 1px;
   width: 100%;
 }
 
-.message-confirmation {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 8px;
+/* Custom scrollbar styles for webkit browsers */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
 }
 
-.confirmation-placeholder {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #666;
+.overflow-y-auto::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
 }
 
-.confirmation-placeholder svg {
-  font-size: 1.2rem;
-  color: #1976d2;
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
 }
 
-.confirm-btn {
-  margin-left: auto;
-  padding: 8px 16px;
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.confirm-btn:hover {
-  background-color: #1565c0;
-}
-
-.confirmation-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  font-size: 0.9rem;
-  color: #4caf50;
-}
-
-.confirmation-status svg {
-  font-size: 1rem;
-}
-
-.action-btn.active {
-  background-color: #e3f2fd;
-  color: #1976d2;
-}
-
-.reply-banner {
-  background: #e3f2fd;
-  color: #1976d2;
-  padding: 8px 16px;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.cancel-reply-btn {
-  background: none;
-  border: none;
-  color: #1976d2;
-  font-size: 1.1rem;
-  cursor: pointer;
-}
-.thread-replies {
-  margin-left: 48px;
-  margin-top: 8px;
-  border-left: 2px solid #e3f2fd;
-  padding-left: 12px;
-}
-.reply-item {
-  background: #f8f9fa;
-  border-radius: 8px;
-  margin-bottom: 8px;
-}
-.reply-btn {
-  color: #1976d2;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 0.95rem;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: 8px;
-}
-.reply-btn:hover {
-  text-decoration: underline;
-}
-
-@media (max-width: 768px) {
-  .sync-container {
-    flex-direction: column;
-  }
-
-  .sync-sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #e0e0e0;
-  }
-
-  .messages-area {
-    height: 400px;
-  }
-}
-
-.inicio-panel {
-  padding: 40px 32px;
-  max-width: 600px;
-  margin: 0 auto;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  text-align: left;
-}
-.inicio-panel h2 {
-  color: #1976d2;
-  margin-bottom: 18px;
-}
-.instructions-list {
-  margin: 0 0 18px 0;
-  padding: 0 0 0 18px;
-  color: #333;
-  font-size: 1.05rem;
-}
-.instructions-list li {
-  margin-bottom: 8px;
-}
-.inicio-dica {
-  margin-top: 18px;
-  color: #1976d2;
-  background: #e3f2fd;
-  padding: 12px 16px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1rem;
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
 }
 </style>

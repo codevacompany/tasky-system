@@ -1,32 +1,83 @@
 <template>
   <div>
-    <div class="tickets-table-container">
-      <table class="tickets-table">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-scroll transition-all duration-200 mb-6"
+    >
+      <table class="w-full border-collapse min-w-[1000px]">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Título</th>
-            <th v-if="tableType === 'criados'">Destino</th>
-            <th v-else>Solicitante</th>
-            <th>Setor</th>
-            <th>Prioridade</th>
-            <th>Status</th>
-            <th>Criado em</th>
-            <th>Concluir até</th>
-            <th>Prazo</th>
-            <th>Ações</th>
+            <th
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+            >
+              ID
+            </th>
+            <th
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+            >
+              Título
+            </th>
+            <th
+              v-if="tableType === 'criados'"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+            >
+              Destino
+            </th>
+            <th
+              v-else
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+            >
+              Solicitante
+            </th>
+            <th
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+            >
+              Setor
+            </th>
+            <th
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+            >
+              Prioridade
+            </th>
+            <th
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+            >
+              Status
+            </th>
+            <th
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+            >
+              Criado em
+            </th>
+            <th
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+            >
+              Concluir até
+            </th>
+            <th
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+            >
+              Prazo
+            </th>
+            <th
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+            >
+              Ações
+            </th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="isLoading">
-            <td colspan="10" class="loading-cell">
-              <div class="loading-wrapper">
+            <td colspan="10" class="px-3 md:px-4 py-6 md:py-8 text-center">
+              <div class="flex justify-center items-center">
                 <LoadingSpinner :size="28" />
               </div>
             </td>
           </tr>
           <tr v-else-if="!displayedTickets || displayedTickets.length === 0">
-            <td colspan="10" class="empty-state">
+            <td
+              colspan="10"
+              class="px-3 md:px-4 py-6 md:py-8 text-center text-gray-500 dark:text-gray-400"
+            >
               <p>Nenhum ticket encontrado</p>
             </td>
           </tr>
@@ -34,97 +85,172 @@
             v-for="ticket in displayedTickets"
             :key="ticket.customId"
             @click="openTicketDetails(ticket)"
+            class="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200"
           >
-            <td>{{ ticket.customId }}</td>
-            <td>
-              {{ ticket.name }}
+            <td
+              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
+            >
+              {{ ticket.customId }}
+            </td>
+            <td
+              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="max-w-[150px] truncate" :title="ticket.name">
+                {{ ticket.name }}
+              </div>
               <font-awesome-icon
                 v-if="ticket.isPrivate"
                 icon="lock"
-                class="private-icon"
+                class="ml-2 text-gray-500 dark:text-gray-400 text-xs"
                 title="Ticket Privado"
               />
             </td>
-            <td v-if="tableType === 'criados'">
-              {{
-                ticket.targetUser
-                  ? ticket.targetUser.firstName + ' ' + ticket.targetUser.lastName
-                  : '-'
-              }}
-            </td>
-            <td v-else>{{ ticket.requester.firstName }} {{ ticket.requester.lastName }}</td>
-            <td>{{ ticket.department.name }}</td>
-            <td>
-              <div class="priority-wrapper">
-                <span :class="['priority-bars', priorityColor(ticket.priority)]">
-                  {{ getPriorityBars(ticket.priority) }}
-                </span>
-                <span class="priority-text">{{ ticket.priority }}</span>
+            <td
+              v-if="tableType === 'criados'"
+              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="max-w-[120px] truncate">
+                {{
+                  ticket.targetUser
+                    ? ticket.targetUser.firstName + ' ' + ticket.targetUser.lastName
+                    : '-'
+                }}
               </div>
             </td>
-            <td>
-              <span :class="['status-badge', getStatusClass(ticket.status)]">
-                {{ formatSnakeToNaturalCase(ticket.status).toUpperCase() }}
+            <td
+              v-else
+              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="max-w-[120px] truncate">
+                {{ ticket.requester.firstName }} {{ ticket.requester.lastName }}
+              </div>
+            </td>
+            <td
+              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="max-w-[100px] truncate" :title="ticket.department.name">
+                {{ ticket.department.name }}
+              </div>
+            </td>
+            <td
+              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="flex items-center justify-center gap-1 md:gap-2">
+                <span
+                  :class="[
+                    'font-bold tracking-tight text-xs md:text-sm',
+                    ticket.priority === TicketPriority.Low
+                      ? 'text-green-600 dark:text-green-400'
+                      : ticket.priority === TicketPriority.Medium
+                        ? 'text-orange-500 dark:text-orange-400'
+                        : 'text-red-600 dark:text-red-400',
+                  ]"
+                >
+                  {{ getPriorityBars(ticket.priority) }}
+                </span>
+                <span class="text-xs text-gray-500 dark:text-gray-400 hidden md:inline">{{
+                  ticket.priority
+                }}</span>
+              </div>
+            </td>
+            <td
+              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700"
+            >
+              <span
+                :class="[
+                  'inline-flex items-center px-1.5 md:px-2 py-0.5 md:py-1 rounded text-xs font-medium gap-1 md:gap-2',
+                  getStatusClass(ticket.status),
+                ]"
+              >
+                <span class="hidden md:inline">{{
+                  formatSnakeToNaturalCase(ticket.status).toUpperCase()
+                }}</span>
+                <span class="md:hidden">{{
+                  formatSnakeToNaturalCase(ticket.status).substring(0, 3).toUpperCase()
+                }}</span>
               </span>
             </td>
-            <td>{{ formatDate(ticket.createdAt) }}</td>
-            <td>{{ ticket.dueAt ? formatDate(ticket.dueAt) : '—' }}</td>
-            <td :class="calculateDeadline(ticket) === '—' ? '' : getDeadlineClass(ticket.dueAt)">
-              {{ calculateDeadline(ticket) }}
-              <font-awesome-icon
-                v-if="calculateDeadline(ticket) === 'Atrasado'"
-                icon="exclamation-triangle"
-                class="warning-icon"
-              />
+            <td
+              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="whitespace-nowrap">
+                {{ formatDate(ticket.createdAt) }}
+              </div>
             </td>
-            <td>
-              <div class="action-buttons">
+            <td
+              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="whitespace-nowrap">
+                {{ ticket.dueAt ? formatDate(ticket.dueAt) : '—' }}
+              </div>
+            </td>
+            <td
+              :class="[
+                'px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700',
+                calculateDeadline(ticket) === '—'
+                  ? 'text-gray-900 dark:text-gray-100'
+                  : getDeadlineClass(ticket.dueAt),
+              ]"
+            >
+              <div class="whitespace-nowrap">
+                {{ calculateDeadline(ticket) }}
+                <font-awesome-icon
+                  v-if="calculateDeadline(ticket) === 'Atrasado'"
+                  icon="exclamation-triangle"
+                  class="ml-1 text-red-500 text-xs"
+                />
+              </div>
+            </td>
+            <td
+              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700"
+            >
+              <div class="flex gap-0.5 md:gap-1 justify-center">
                 <!-- Botões para tabela de tickets recebidos -->
                 <template v-if="tableType === 'recebidos'">
                   <button
                     v-if="ticket.status === TicketStatus.Pending"
-                    class="action-btn accept"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors duration-200"
                     @click.stop="handleAcceptTicket(ticket)"
                     title="Aceitar"
                   >
-                    <font-awesome-icon icon="check" />
+                    <font-awesome-icon icon="check" class="text-xs md:text-sm" />
                   </button>
                   <button
                     v-else-if="ticket.status === TicketStatus.InProgress"
-                    class="action-btn verify"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duration-200"
                     @click.stop="handleVerifyTicket(ticket)"
                     title="Enviar para Verificação"
                   >
-                    <font-awesome-icon icon="arrow-right" />
+                    <font-awesome-icon icon="arrow-right" class="text-xs md:text-sm" />
                   </button>
                   <button
                     v-else-if="ticket.status === TicketStatus.Returned"
-                    class="action-btn correct"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 hover:bg-orange-600 text-white transition-colors duration-200"
                     @click.stop="handleCorrectTicket(ticket)"
                     title="Corrigir"
                   >
-                    <font-awesome-icon icon="wrench" />
+                    <font-awesome-icon icon="wrench" class="text-xs md:text-sm" />
                   </button>
                   <div
                     v-else-if="ticket.status === TicketStatus.AwaitingVerification"
-                    class="action-btn waiting"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 text-white"
                     title="Aguardando Verificação"
                   >
-                    <font-awesome-icon icon="hourglass-half" spin />
+                    <font-awesome-icon icon="hourglass-half" spin class="text-xs md:text-sm" />
                   </div>
                   <div
                     v-else-if="ticket.status === TicketStatus.Rejected"
-                    class="action-btn rejected"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 text-white"
                     title="Reprovado"
                   >
-                    <font-awesome-icon icon="xmark-circle" />
+                    <font-awesome-icon icon="xmark-circle" class="text-xs md:text-sm" />
                   </div>
                   <div
                     v-else-if="ticket.status === TicketStatus.Completed"
-                    class="action-btn completed"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-700 text-white"
                     title="Finalizado"
                   >
-                    <font-awesome-icon icon="check-circle" />
+                    <font-awesome-icon icon="check-circle" class="text-xs md:text-sm" />
                   </div>
                 </template>
 
@@ -132,74 +258,74 @@
                 <template v-else-if="tableType === 'criados'">
                   <div
                     v-if="ticket.status === TicketStatus.Pending"
-                    class="action-btn not-started"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 text-white"
                     title="Não Iniciado"
                   >
-                    <font-awesome-icon icon="clock" />
+                    <font-awesome-icon icon="clock" class="text-xs md:text-sm" />
                   </div>
                   <div
                     v-else-if="ticket.status === TicketStatus.InProgress"
-                    class="action-btn doing"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 text-white"
                     title="Fazendo"
                   >
-                    <font-awesome-icon icon="cog" />
+                    <font-awesome-icon icon="cog" class="text-xs md:text-sm" />
                   </div>
                   <div
                     v-else-if="ticket.status === TicketStatus.Returned"
-                    class="action-btn not-started"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 text-white"
                     title="Devolvido para Correção"
                   >
-                    <font-awesome-icon icon="wrench" />
+                    <font-awesome-icon icon="wrench" class="text-xs md:text-sm" />
                   </div>
                   <div
                     v-else-if="ticket.status === TicketStatus.Rejected"
-                    class="action-btn rejected"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 text-white"
                     title="Reprovado"
                   >
-                    <font-awesome-icon icon="xmark-circle" />
+                    <font-awesome-icon icon="xmark-circle" class="text-xs md:text-sm" />
                   </div>
                   <div
                     v-else-if="ticket.status === TicketStatus.Completed"
-                    class="action-btn completed"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-700 text-white"
                     title="Finalizado"
                   >
-                    <font-awesome-icon icon="check-circle" />
+                    <font-awesome-icon icon="check-circle" class="text-xs md:text-sm" />
                   </div>
                   <button
                     v-else-if="ticket.status === TicketStatus.AwaitingVerification"
-                    class="action-btn verify"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duration-200"
                     @click.stop="handleStartVerification(ticket)"
                     title="Verificar"
                   >
-                    <font-awesome-icon icon="search" />
+                    <font-awesome-icon icon="search" class="text-xs md:text-sm" />
                   </button>
                   <div
                     v-else-if="
                       ticket.status === TicketStatus.UnderVerification &&
                       userStore.user?.id === ticket.requester.id
                     "
-                    class="verification-actions"
+                    class="flex gap-0.5 md:gap-1"
                   >
                     <button
-                      class="action-btn approve"
+                      class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white transition-colors duration-200"
                       @click.stop="handleApproveTicket(ticket)"
                       title="Aprovar"
                     >
-                      <font-awesome-icon icon="check" />
+                      <font-awesome-icon icon="check" class="text-xs md:text-sm" />
                     </button>
                     <button
-                      class="action-btn request-correction"
+                      class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duration-200"
                       @click.stop="handleRequestCorrection(ticket)"
                       title="Solicitar Correção"
                     >
-                      <font-awesome-icon icon="exclamation-circle" />
+                      <font-awesome-icon icon="exclamation-circle" class="text-xs md:text-sm" />
                     </button>
                     <button
-                      class="action-btn reject"
+                      class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
                       @click.stop="handleRejectTicket(ticket)"
                       title="Reprovar"
                     >
-                      <font-awesome-icon icon="times" />
+                      <font-awesome-icon icon="times" class="text-xs md:text-sm" />
                     </button>
                   </div>
                 </template>
@@ -208,28 +334,28 @@
                 <template v-else-if="tableType === 'arquivados'">
                   <div
                     v-if="ticket.status === TicketStatus.Completed"
-                    class="action-btn completed"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-700 text-white"
                     title="Finalizado"
                   >
-                    <font-awesome-icon icon="check-circle" />
+                    <font-awesome-icon icon="check-circle" class="text-xs md:text-sm" />
                   </div>
                   <div
                     v-else-if="ticket.status === TicketStatus.Rejected"
-                    class="action-btn rejected"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 text-white"
                     title="Reprovado"
                   >
-                    <font-awesome-icon icon="xmark-circle" />
+                    <font-awesome-icon icon="xmark-circle" class="text-xs md:text-sm" />
                   </div>
                 </template>
 
                 <!-- Botões para tabela de tickets do setor -->
                 <template v-else-if="tableType === 'setor'">
                   <button
-                    class="action-btn view"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white transition-colors duration-200"
                     @click.stop="openTicketDetails(ticket)"
                     title="Visualizar"
                   >
-                    <font-awesome-icon icon="eye" />
+                    <font-awesome-icon icon="eye" class="text-xs md:text-sm" />
                   </button>
                 </template>
               </div>
@@ -238,19 +364,21 @@
         </tbody>
       </table>
     </div>
-    <div v-if="pagination" class="pagination">
+    <div v-if="pagination" class="flex items-center justify-center gap-4 mt-6">
       <button
-        class="btn btn-icon"
+        class="flex items-center justify-center w-9 h-9 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 hover:bg-blue-600 hover:border-blue-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 disabled:hover:text-gray-700 dark:disabled:hover:bg-gray-800 dark:disabled:hover:border-gray-600 dark:disabled:hover:text-gray-300"
         :disabled="currentPage === 1"
         @click="changePage(currentPage - 1)"
       >
         <font-awesome-icon icon="chevron-left" />
       </button>
 
-      <span>Página {{ currentPage }} de {{ totalPages }}</span>
+      <span class="text-sm text-gray-600 dark:text-gray-400"
+        >Página {{ currentPage }} de {{ totalPages }}</span
+      >
 
       <button
-        class="btn btn-icon"
+        class="flex items-center justify-center w-9 h-9 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 hover:bg-blue-600 hover:border-blue-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 disabled:hover:text-gray-700 dark:disabled:hover:bg-gray-800 dark:disabled:hover:border-gray-600 dark:disabled:hover:text-gray-300"
         :disabled="currentPage === totalPages"
         @click="changePage(currentPage + 1)"
       >
@@ -282,17 +410,27 @@
       @close="showVerificationAlert = false"
       :show-footer="false"
     >
-      <div class="verification-alert">
-        <div class="alert-icon">
+      <div class="p-6 text-center">
+        <div class="text-3xl text-purple-700 dark:text-purple-400 mb-4">
           <font-awesome-icon icon="info-circle" />
         </div>
-        <p>
+        <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed mb-6">
           Para visualizar os detalhes deste ticket, você precisa iniciar a verificação clicando no
           botão "Verificar".
         </p>
-        <div class="alert-actions">
-          <button class="action-btn cancel" @click="showVerificationAlert = false">Cancelar</button>
-          <button class="action-btn verify" @click="handleAlertVerification">Verificar</button>
+        <div class="flex justify-center gap-4">
+          <button
+            class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200"
+            @click="showVerificationAlert = false"
+          >
+            Cancelar
+          </button>
+          <button
+            class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 transition-colors duration-200"
+            @click="handleAlertVerification"
+          >
+            Verificar
+          </button>
         </div>
       </div>
     </BaseModal>
@@ -450,7 +588,7 @@ const refreshSelectedTicket = async () => {
 };
 
 const getDeadlineClass = (date?: string) => {
-  if (!date) return '';
+  if (!date) return 'text-gray-900 dark:text-gray-100';
   const deadline = new Date(date);
   const today = new Date();
 
@@ -461,19 +599,19 @@ const getDeadlineClass = (date?: string) => {
   const diffTime = deadline.getTime() - today.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  if (diffDays < 0) return 'deadline-danger';
-  if (diffDays <= 3) return 'deadline-warning';
-  return 'deadline-normal';
+  if (diffDays < 0) return 'text-red-600 dark:text-red-400 font-bold';
+  if (diffDays <= 3) return 'text-orange-500 dark:text-orange-400 font-bold';
+  return 'text-green-600 dark:text-green-400';
 };
 
 const priorityColor = (priority: TicketPriority) => {
   switch (priority) {
     case TicketPriority.Low:
-      return 'priority-low';
+      return 'text-green-600 dark:text-green-400';
     case TicketPriority.Medium:
-      return 'priority-medium';
+      return 'text-orange-500 dark:text-orange-400';
     case TicketPriority.High:
-      return 'priority-high';
+      return 'text-red-600 dark:text-red-400';
     default:
       return '';
   }
@@ -482,22 +620,22 @@ const priorityColor = (priority: TicketPriority) => {
 const getStatusClass = (status: string) => {
   switch (status) {
     case TicketStatus.Pending:
-      return 'status-pending';
+      return 'bg-orange-100 text-orange-500 border border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800';
     case TicketStatus.InProgress:
-      return 'status-in-progress';
+      return 'bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800';
     case TicketStatus.AwaitingVerification:
     case TicketStatus.UnderVerification:
-      return 'status-awaiting-verification';
+      return 'bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800';
     case TicketStatus.Completed:
-      return 'status-completed';
+      return 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800';
     case TicketStatus.Rejected:
-      return 'status-rejected';
+      return 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800';
     case TicketStatus.Returned:
-      return 'status-returned';
+      return 'bg-orange-100 text-orange-800 border border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800';
     case TicketStatus.Canceled:
-      return 'status-cancelled';
+      return 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800';
     default:
-      return '';
+      return 'bg-gray-100 text-gray-800 border border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800';
   }
 };
 
@@ -702,468 +840,5 @@ const handleCorrectTicket = async (ticket: Ticket) => {
 </script>
 
 <style scoped>
-.loading-cell {
-  margin: 2rem 0;
-}
-
-.loading-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
-
-.tickets-table-container {
-  background-color: var(--card-bg);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  transition: var(--transition);
-  margin-bottom: 1.5rem;
-}
-
-.tickets-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.tickets-table th,
-.tickets-table td {
-  padding: 1rem;
-  text-align: center;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.tickets-table th {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-light);
-  background-color: rgba(0, 0, 0, 0.02);
-  text-align: center;
-}
-
-.tickets-table tr:last-child td {
-  border-bottom: none;
-}
-
-.tickets-table tr:hover td {
-  background-color: rgba(0, 0, 0, 0.02);
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.btn-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
-  font-size: 0.9rem;
-  transition: var(--transition);
-}
-
-.btn-icon:hover {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
-}
-
-.btn-icon:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-#paginationInfo {
-  font-size: 0.9rem;
-  color: var(--text-light);
-}
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  gap: 0.5rem;
-}
-
-.status-badge.status-pending {
-  background-color: #fff3e0;
-  color: #f57c00;
-  border: 1px solid rgba(245, 124, 0, 0.3);
-}
-
-.status-badge.status-in-progress {
-  background-color: #e3f2fd;
-  color: #1976d2;
-  border: 1px solid rgba(25, 118, 210, 0.3);
-}
-
-.status-badge.status-awaiting-verification,
-.status-badge.status-under-verification {
-  background-color: #f3e5f5;
-  color: #7b1fa2;
-  border: 1px solid rgba(123, 31, 162, 0.3);
-}
-
-.status-badge.status-overdue {
-  background-color: #ffebee;
-  color: #c62828;
-  border: 1px solid rgba(198, 40, 40, 0.3);
-}
-
-.status-badge.status-completed {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid rgba(46, 125, 50, 0.3);
-}
-
-.status-badge.status-rejected {
-  background-color: #ffebee;
-  color: #c62828;
-  border: 1px solid rgba(198, 40, 40, 0.3);
-}
-
-.status-badge.status-returned {
-  background-color: #fff3e0;
-  color: #f57c00;
-  border: 1px solid rgba(245, 124, 0, 0.3);
-}
-
-.status-badge.status-cancelled {
-  background-color: #fef2f2;
-  color: #991b1b;
-  border: 1px solid rgba(153, 27, 27, 0.3);
-}
-
-.priority-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
-.priority-bars {
-  font-weight: bold;
-  letter-spacing: -1px;
-}
-
-.priority-bars.priority-low {
-  color: #63b900;
-}
-
-.priority-bars.priority-medium {
-  color: #f57c00;
-}
-
-.priority-bars.priority-high {
-  color: #dc2626;
-}
-
-.priority-text {
-  color: var(--text-light);
-  font-size: 0.85rem;
-}
-
-.deadline-warning {
-  color: #f57c00;
-  font-weight: bold;
-}
-
-.deadline-danger {
-  color: #dc3545;
-  font-weight: bold;
-}
-
-.deadline-normal {
-  color: #28a745;
-}
-
-td {
-  color: var(--text-color);
-}
-
-.warning-icon {
-  margin-left: 5px;
-  color: #dc3545;
-}
-
-.loading-state,
-.empty-state {
-  text-align: center;
-  padding: 32px 16px;
-}
-
-.loading-spinner {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  border: 2px solid #e2e8f0;
-  border-radius: 50%;
-  border-top-color: #4f46e5;
-  animation: spin 1s linear infinite;
-  margin-bottom: 8px;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Dark mode */
-:deep(body.dark-mode) .tickets-table th {
-  background: #1a2233;
-  color: #94a3b8;
-  border-color: #2d3748;
-}
-
-:deep(body.dark-mode) .tickets-table td {
-  color: #e2e8f0;
-  border-color: #2d3748;
-}
-
-:deep(body.dark-mode) .tickets-table tr:hover td {
-  background-color: #1e293b;
-}
-
-:deep(body.dark-mode) .loading-spinner {
-  border-color: #2d3748;
-  border-top-color: #818cf8;
-}
-
-.notification-text {
-  font-size: 12px;
-  color: #1a2233;
-  margin: 0;
-  line-height: 1.4;
-  flex: 1;
-  text-align: center;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 0.25rem;
-  justify-content: center;
-}
-
-.action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  border: none;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: white;
-}
-
-.action-btn.accept {
-  background-color: #16a34a;
-}
-
-.action-btn.accept:hover {
-  background-color: #15803d;
-}
-
-.action-btn.verify {
-  background-color: #7e22ce;
-}
-
-.action-btn.verify:hover {
-  background-color: #6b21a8;
-}
-
-.action-btn.waiting {
-  background-color: #7e22ce;
-  color: white;
-  cursor: default;
-}
-
-.verification-actions {
-  display: flex;
-  gap: 4px;
-}
-
-.action-btn.approve {
-  background-color: #059669;
-  color: white;
-}
-
-.action-btn.approve:hover {
-  background-color: #047857;
-}
-
-.action-btn.request-correction {
-  background-color: #7b1fa2;
-  color: white;
-}
-
-.action-btn.request-correction:hover {
-  background-color: #6a1b9a;
-}
-
-.action-btn.reject {
-  background-color: #dc2626;
-  color: white;
-}
-
-.action-btn.reject:hover {
-  background-color: #b91c1c;
-}
-
-.action-btn.not-started {
-  background-color: #f57c00;
-  color: white;
-  cursor: default;
-}
-
-.action-btn.not-started svg {
-  color: white;
-}
-
-.action-btn.doing {
-  background-color: #1976d2;
-  color: white;
-  cursor: default;
-}
-
-.action-btn.doing svg {
-  color: white;
-}
-
-.action-btn.rejected {
-  background-color: #c62828;
-  color: white;
-  cursor: default;
-}
-
-.action-btn.rejected svg {
-  color: white;
-}
-
-.action-btn.completed {
-  background-color: #2e7d32;
-  color: white;
-  cursor: default;
-}
-
-.action-btn.completed svg {
-  color: white;
-}
-
-.action-btn.view {
-  background-color: #6366f1;
-  color: white;
-}
-
-.action-btn.view:hover {
-  background-color: #4f46e5;
-}
-
-.action-btn.comment {
-  background-color: #0ea5e9;
-  color: white;
-}
-
-.action-btn.comment:hover {
-  background-color: #0284c7;
-}
-
-.private-icon {
-  margin-left: 0.5rem;
-  color: var(--text-light);
-  font-size: 0.9rem;
-}
-
-.verification-alert {
-  padding: 1.5rem;
-  text-align: center;
-}
-
-.alert-icon {
-  font-size: 2rem;
-  color: #7e22ce;
-  margin-bottom: 1rem;
-}
-
-.verification-alert p {
-  color: #4a5568;
-  font-size: 1rem;
-  line-height: 1.5;
-  margin-bottom: 1.5rem;
-}
-
-.alert-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-}
-
-.alert-actions .action-btn {
-  padding: 0.75rem 2rem;
-  min-width: 120px;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s ease;
-  width: auto;
-  height: auto;
-}
-
-.alert-actions .action-btn.cancel {
-  background-color: #64748b;
-  color: white;
-}
-
-.alert-actions .action-btn.cancel:hover {
-  background-color: #475569;
-}
-
-.alert-actions .action-btn.verify {
-  background-color: #7e22ce;
-  color: white;
-}
-
-.alert-actions .action-btn.verify:hover {
-  background-color: #6b21a8;
-}
-
-/* Dark mode */
-:deep(body.dark-mode) .verification-alert p {
-  color: #e2e8f0;
-}
-
-:deep(body.dark-mode) .alert-icon {
-  color: #9333ea;
-}
-
-.action-btn.rejected {
-  color: #dc2626;
-}
-
-.action-btn.correct {
-  background-color: #f57c00;
-  color: white;
-}
-
-.action-btn.correct svg {
-  color: white;
-}
+/* All styles have been converted to Tailwind classes */
 </style>
