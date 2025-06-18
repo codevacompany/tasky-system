@@ -29,7 +29,7 @@
                 <li>
                   <div
                     :class="{ 'btn btn-primary text-white': isActive('/') }"
-                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
+                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item"
                   >
                     <font-awesome-icon icon="tachometer-alt-average" /> Dashboard
                   </div>
@@ -39,7 +39,7 @@
                 <li>
                   <div
                     :class="{ 'btn btn-primary text-white': isActive('/meus-tickets') }"
-                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
+                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item"
                   >
                     <font-awesome-icon icon="ticket" />Tickets
                   </div>
@@ -49,7 +49,7 @@
                 <li>
                   <div
                     :class="{ 'btn btn-primary text-white': isActive('/admin/relatorios') }"
-                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
+                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item cursor-pointer"
                   >
                     <font-awesome-icon icon="chart-line" />
                     Relatórios
@@ -74,7 +74,7 @@
                       isActive('/admin/clientes') ||
                       isActive('/admin/cadastros'),
                   }"
-                  class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
+                  class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item cursor-pointer"
                   @click="toggleAdminDropdown"
                 >
                   <font-awesome-icon icon="cog" />
@@ -239,7 +239,7 @@
               <li>
                 <div
                   :class="{ 'primary-gradient text-white': isActive('/') }"
-                  class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
+                  class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item"
                 >
                   <font-awesome-icon icon="tachometer-alt-average" />
                   Dashboard
@@ -254,7 +254,7 @@
               <li>
                 <div
                   :class="{ 'primary-gradient text-white': isActive('/meus-tickets') }"
-                  class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
+                  class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item"
                 >
                   <font-awesome-icon icon="ticket" />
                   Tickets
@@ -269,7 +269,7 @@
               <li>
                 <div
                   :class="{ 'primary-gradient text-white': isActive('/admin/relatorios') }"
-                  class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
+                  class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item"
                 >
                   <font-awesome-icon icon="chart-line" />
                   Relatórios
@@ -292,7 +292,7 @@
                     isActive('/admin/clientes') ||
                     isActive('/admin/cadastros'),
                 }"
-                class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover cursor-pointer"
+                class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item cursor-pointer"
                 @click="toggleMobileAdminDropdown"
               >
                 <font-awesome-icon icon="cog" />
@@ -556,12 +556,12 @@ onUnmounted(() => {
   @apply absolute -top-2 -right-1 bg-red-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-bold min-w-[16px];
 }
 
-.menu-item-hover:hover {
+.menu-item:hover {
   background: var(--button-primary-color);
   color: white;
 }
 
-.dark-mode .menu-item-hover:hover {
+.dark-mode .menu-item:hover {
   background: var(--primary-dark);
   color: white;
 }
