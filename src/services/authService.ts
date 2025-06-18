@@ -24,7 +24,6 @@ export const authService = {
 
       const userstore = useUserStore();
       userstore.setUser(response.data.user);
-      localStorageService.setUser(response.data.user);
       localStorageService.setAccessToken(response.data.token.accessToken);
       localStorageService.setRefreshToken(response.data.token.refreshToken);
 
@@ -32,10 +31,6 @@ export const authService = {
     } catch (error) {
       throw error;
     }
-  },
-
-  logout() {
-    localStorageService.clear();
   },
 
   async changePassword(data: ChangePasswordDto): Promise<AxiosResponse<{ message: string }>> {

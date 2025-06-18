@@ -338,7 +338,8 @@ const emit = defineEmits<{
   (event: 'close'): void;
 }>();
 
-const user = useUserStore().user;
+const userStore = useUserStore();
+const user = computed(() => userStore.user);
 const userPreferencesStore = useUserPreferencesStore();
 
 const showThemeModal = ref(false);
@@ -362,7 +363,7 @@ const closeModal = () => {
 };
 
 const handleLogout = () => {
-  authService.logout();
+  userStore.logout();
   router.push('/login');
 };
 
@@ -498,8 +499,9 @@ const changePassword = async () => {
 };
 
 const userInitials = computed(() => {
-  if (user?.firstName && user?.lastName) {
-    return user.firstName.charAt(0) + user.lastName.charAt(0);
+  const currentUser = user.value;
+  if (currentUser?.firstName && currentUser?.lastName) {
+    return currentUser.firstName.charAt(0) + currentUser.lastName.charAt(0);
   }
   return '';
 });

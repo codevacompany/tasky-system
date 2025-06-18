@@ -17,6 +17,7 @@ import LandingPage from '@/pages/public/LandingPage.vue';
 import { localStorageService } from '@/utils/localStorageService';
 import SignUpManagement from '@/pages/admin/SignUpManagement.vue';
 import { RoleName } from '@/models';
+import { useUserStore } from '@/stores/user';
 
 const routes: RouteRecordRaw[] = [
   // Public Routes (No Layout)
@@ -126,9 +127,20 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  const userStore = useUserStore();
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
-  const loggedIn = localStorageService.getAccessToken() && localStorageService.getUser()?.role;
+  const hasTokens = localStorageService.getAccessToken() && localStorageService.getRefreshToken();
+
+  if (hasTokens && !userStore.user) {
+    try {
+      await userStore.whoami();
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+    }
+  }
+
+  const loggedIn = hasTokens && userStore.user?.role;
 
   if (requiresAuth && !loggedIn) {
     return next('/login');
@@ -137,7 +149,7 @@ router.beforeEach((to, from, next) => {
   const hasRequiredRole = to.matched.every((record) => {
     if (!record.meta.roles) return true;
 
-    const userRole = localStorageService.getUser()?.role.name;
+    const userRole = userStore.user?.role.name;
 
     return Array.isArray(record.meta.roles) && userRole
       ? record.meta.roles.includes(userRole)

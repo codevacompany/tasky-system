@@ -28,8 +28,8 @@
               <router-link to="/">
                 <li>
                   <div
-                    :class="{ 'btn btn-primary text-white': isActive('/') }"
-                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item"
+                    :class="{ 'primary-gradient text-white': isActive('/') }"
+                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
                   >
                     <font-awesome-icon icon="tachometer-alt-average" /> Dashboard
                   </div>
@@ -38,8 +38,8 @@
               <router-link v-if="user?.role.name !== RoleName.GlobalAdmin" to="/meus-tickets">
                 <li>
                   <div
-                    :class="{ 'btn btn-primary text-white': isActive('/meus-tickets') }"
-                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item"
+                    :class="{ 'primary-gradient text-white': isActive('/meus-tickets') }"
+                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
                   >
                     <font-awesome-icon icon="ticket" />Tickets
                   </div>
@@ -48,8 +48,8 @@
               <router-link v-if="user?.role.name === RoleName.TenantAdmin" to="/admin/relatorios">
                 <li>
                   <div
-                    :class="{ 'btn btn-primary text-white': isActive('/admin/relatorios') }"
-                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item cursor-pointer"
+                    :class="{ 'primary-gradient text-white': isActive('/admin/relatorios') }"
+                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
                   >
                     <font-awesome-icon icon="chart-line" />
                     Relatórios
@@ -67,14 +67,14 @@
               >
                 <div
                   :class="{
-                    'btn btn-primary text-white':
+                    'primary-gradient text-white':
                       isActive('/admin/usuarios') ||
                       isActive('/admin/setores') ||
                       isActive('/admin/categorias') ||
                       isActive('/admin/clientes') ||
                       isActive('/admin/cadastros'),
                   }"
-                  class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item cursor-pointer"
+                  class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
                   @click="toggleAdminDropdown"
                 >
                   <font-awesome-icon icon="cog" />
@@ -95,8 +95,8 @@
                     @click="showAdminDropdown = false"
                   >
                     <div
-                      :class="{ 'text-blue-600': isActive('/admin/usuarios') }"
-                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      :class="isActive('/admin/usuarios') ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
+                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="users" />
                       Usuários
@@ -108,8 +108,8 @@
                     @click="showAdminDropdown = false"
                   >
                     <div
-                      :class="{ 'text-blue-600': isActive('/admin/setores') }"
-                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      :class="isActive('/admin/setores') ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
+                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="building" />
                       Setores
@@ -121,8 +121,8 @@
                     @click="showAdminDropdown = false"
                   >
                     <div
-                      :class="{ 'text-blue-600': isActive('/admin/categorias') }"
-                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      :class="isActive('/admin/categorias') ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
+                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="tag" />
                       Categorias
@@ -134,7 +134,10 @@
                     v-if="user?.role.name === RoleName.GlobalAdmin"
                   >
                     <div
-                      :class="{ 'text-blue-600': isActive('/admin/clientes') }"
+                      :class="{
+                        'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                          isActive('/admin/clientes'),
+                      }"
                       class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="building" />
@@ -147,7 +150,10 @@
                     v-if="user?.role.name === RoleName.GlobalAdmin"
                   >
                     <div
-                      :class="{ 'text-blue-600': isActive('/admin/cadastros') }"
+                      :class="{
+                        'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                          isActive('/admin/cadastros'),
+                      }"
                       class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="user-plus" />
@@ -239,7 +245,7 @@
               <li>
                 <div
                   :class="{ 'primary-gradient text-white': isActive('/') }"
-                  class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item"
+                  class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
                 >
                   <font-awesome-icon icon="tachometer-alt-average" />
                   Dashboard
@@ -254,7 +260,7 @@
               <li>
                 <div
                   :class="{ 'primary-gradient text-white': isActive('/meus-tickets') }"
-                  class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item"
+                  class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
                 >
                   <font-awesome-icon icon="ticket" />
                   Tickets
@@ -269,7 +275,7 @@
               <li>
                 <div
                   :class="{ 'primary-gradient text-white': isActive('/admin/relatorios') }"
-                  class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item"
+                  class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
                 >
                   <font-awesome-icon icon="chart-line" />
                   Relatórios
@@ -292,7 +298,7 @@
                     isActive('/admin/clientes') ||
                     isActive('/admin/cadastros'),
                 }"
-                class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item cursor-pointer"
+                class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover cursor-pointer"
                 @click="toggleMobileAdminDropdown"
               >
                 <font-awesome-icon icon="cog" />
@@ -310,7 +316,10 @@
                   @click="closeMobileMenu"
                 >
                   <div
-                    :class="{ 'text-blue-600': isActive('/admin/usuarios') }"
+                    :class="{
+                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                        isActive('/admin/usuarios'),
+                    }"
                     class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="users" />
@@ -323,7 +332,10 @@
                   @click="closeMobileMenu"
                 >
                   <div
-                    :class="{ 'text-blue-600': isActive('/admin/setores') }"
+                    :class="{
+                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                        isActive('/admin/setores'),
+                    }"
                     class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="building" />
@@ -336,7 +348,10 @@
                   @click="closeMobileMenu"
                 >
                   <div
-                    :class="{ 'text-blue-600': isActive('/admin/categorias') }"
+                    :class="{
+                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                        isActive('/admin/categorias'),
+                    }"
                     class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="tag" />
@@ -349,7 +364,10 @@
                   v-if="user?.role.name === RoleName.GlobalAdmin"
                 >
                   <div
-                    :class="{ 'text-blue-600': isActive('/admin/clientes') }"
+                    :class="{
+                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                        isActive('/admin/clientes'),
+                    }"
                     class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="building" />
@@ -362,7 +380,10 @@
                   v-if="user?.role.name === RoleName.GlobalAdmin"
                 >
                   <div
-                    :class="{ 'text-blue-600': isActive('/admin/cadastros') }"
+                    :class="{
+                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                        isActive('/admin/cadastros'),
+                    }"
                     class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="user-plus" />
@@ -556,12 +577,12 @@ onUnmounted(() => {
   @apply absolute -top-2 -right-1 bg-red-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-bold min-w-[16px];
 }
 
-.menu-item:hover {
+.menu-item-hover:hover {
   background: var(--button-primary-color);
   color: white;
 }
 
-.dark-mode .menu-item:hover {
+.dark-mode .menu-item-hover:hover {
   background: var(--primary-dark);
   color: white;
 }
