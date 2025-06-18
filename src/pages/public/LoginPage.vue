@@ -33,7 +33,7 @@
                   placeholder="Seu e-mail"
                   v-model="email"
                   required
-                  class="block w-full pl-10 pr-3 py-2.5 sm:py-3 border border-gray-300 rounded-md bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm sm:text-base"
+                  class="block w-full pl-10 pr-3 py-2.5 sm:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm sm:text-base"
                 />
               </div>
             </div>
@@ -53,7 +53,7 @@
                   placeholder="Sua senha"
                   v-model="password"
                   required
-                  class="block w-full pl-10 pr-3 py-2.5 sm:py-3 border border-gray-300 rounded-md bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm sm:text-base"
+                  class="block w-full pl-10 pr-3 py-2.5 sm:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm sm:text-base"
                 />
               </div>
             </div>
@@ -84,7 +84,7 @@
             <button
               type="submit"
               :disabled="isLoading"
-              class="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm sm:text-base font-medium text-white btn-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-[4px] shadow-sm text-sm sm:text-base font-medium text-white btn-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <LoadingSpinner v-if="isLoading" :size="20" class="mr-2" />
               <span v-if="!isLoading">Entrar</span>
