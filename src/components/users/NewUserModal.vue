@@ -102,8 +102,8 @@
           required
           class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         >
-          <option value="false">Não</option>
-          <option value="true">Sim</option>
+          <option :value="false">Não</option>
+          <option :value="true">Sim</option>
         </select>
       </div>
 
@@ -175,7 +175,8 @@ const createUser = async () => {
     emit('userCreated');
     toast.success('Colaborador criado com sucesso!');
     closeModal();
-  } catch {
+  } catch (error) {
+    console.error(error);
     toast.error('Algo deu errado. Tente novamente.');
   } finally {
     isLoading.value = false;

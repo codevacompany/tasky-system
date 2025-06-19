@@ -41,6 +41,7 @@ import {
   faSitemap,
   faCalendarDay,
   faUserCheck,
+  faUserSlash,
   faHourglassEnd,
   faArrowDown,
   faMinus,
@@ -138,6 +139,7 @@ const icons = [
   faSitemap,
   faCalendarDay,
   faUserCheck,
+  faUserSlash,
   faHourglassEnd,
   faArrowDown,
   faMinus,
@@ -180,7 +182,7 @@ const icons = [
   faCalendar,
   faFileCsv,
   faFileExcel,
-  faBars
+  faBars,
 ];
 
 library.add(...icons);
