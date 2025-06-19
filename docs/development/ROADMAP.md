@@ -15,7 +15,7 @@
 
 #### Funcionalidades Principais
 - [x] Sistema de autenticação básico
-- [x] CRUD de chamados
+- [x] CRUD de tickets
 - [x] Fluxo básico de aprovação
 - [x] Dashboard simples
 - [x] Notificações básicas

@@ -85,6 +85,8 @@ import {
   faFileCsv,
   faFileExcel,
   faBars,
+  faCreditCard,
+  faHandshake,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -180,7 +182,9 @@ const icons = [
   faCalendar,
   faFileCsv,
   faFileExcel,
-  faBars
+  faBars,
+  faCreditCard,
+  faHandshake,
 ];
 
 library.add(...icons);

@@ -162,6 +162,17 @@
                   </router-link>
                 </div>
               </li>
+              <!-- Novo item: Assinaturas -->
+              <router-link to="/admin/assinaturas">
+                <li>
+                  <div
+                    :class="{ 'primary-gradient text-white': isActive('/admin/assinaturas') }"
+                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
+                  >
+                    <font-awesome-icon icon="credit-card" /> Assinaturas
+                  </div>
+                </li>
+              </router-link>
             </ul>
           </nav>
         </div>

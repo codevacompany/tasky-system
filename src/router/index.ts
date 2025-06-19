@@ -16,6 +16,7 @@ import SyncPage from '@/pages/user/SyncPage.vue';
 import LandingPage from '@/pages/public/LandingPage.vue';
 import { localStorageService } from '@/utils/localStorageService';
 import SignUpManagement from '@/pages/admin/SignUpManagement.vue';
+import BillingPage from '@/pages/admin/BillingPage.vue';
 import { RoleName } from '@/models';
 import { useUserStore } from '@/stores/user';
 
@@ -100,6 +101,11 @@ const routes: RouteRecordRaw[] = [
         path: 'cadastros',
         component: SignUpManagement,
         meta: { roles: [RoleName.GlobalAdmin] },
+      },
+      {
+        path: 'assinaturas',
+        component: BillingPage,
+        meta: { requiresAuth: true },
       },
     ],
     meta: { requiresAuth: true },
