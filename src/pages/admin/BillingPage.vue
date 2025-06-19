@@ -258,7 +258,12 @@
           </p>
           <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
             <p class="text-gray-700 dark:text-gray-300">
-              Valor mensal: <span class="font-semibold">R$ {{ selectedPlan.price.toFixed(2) }}</span>
+              <span v-if="selectedPlan.price !== null">
+                Valor mensal: <span class="font-semibold">R$ {{ selectedPlan.price.toFixed(2) }}</span>
+              </span>
+              <span v-else>
+                Valor a ser definido após contato
+              </span>
             </p>
           </div>
           <p class="text-sm text-gray-500 dark:text-gray-400">
@@ -302,7 +307,7 @@ interface Payment {
 interface Plan {
   id: string;
   name: string;
-  price: number;
+  price: number | null;
 }
 
 const showSubscriptionModal = ref(false);
@@ -393,14 +398,17 @@ const confirmSubscription = async () => {
     // await subscriptionService.subscribe(selectedPlan.value.id);
     toast.success(`Assinatura do ${selectedPlan.value.name} realizada com sucesso!`);
     showSubscriptionModal.value = false;
-    // Adicionar novo pagamento ao histórico (mock)
-    payments.value.unshift({
-      id: Date.now(),
-      date: new Date(),
-      plan: selectedPlan.value.name,
-      amount: selectedPlan.value.price,
-      status: 'Pago'
-    });
+    
+    // Adicionar novo pagamento ao histórico apenas se o preço não for null
+    if (selectedPlan.value.price !== null) {
+      payments.value.unshift({
+        id: Date.now(),
+        date: new Date(),
+        plan: selectedPlan.value.name,
+        amount: selectedPlan.value.price,
+        status: 'Pago'
+      });
+    }
   } catch (error) {
     toast.error('Erro ao realizar assinatura. Tente novamente.');
     console.error('Subscription error:', error);
