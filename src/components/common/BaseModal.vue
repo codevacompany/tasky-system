@@ -9,7 +9,7 @@
       <LoadingSpinner v-if="isLoading" :size="50" :color="'white'" />
       <div
         v-else
-        class="bg-white dark:bg-gray-800 rounded-md shadow-lg w-auto max-w-[80%] max-h-[90vh] flex flex-col overflow-hidden animate-modalSlideIn"
+        class="bg-white dark:bg-gray-800 rounded-md shadow-lg w-auto max-w-[95%] sm:max-w-[80%] max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden animate-modalSlideIn"
       >
         <div
           class="primary-gradient flex items-center justify-between p-4 border-b border-gray-200 text-white"
@@ -24,7 +24,7 @@
             <font-awesome-icon icon="times" />
           </button>
         </div>
-        <div class="p-6 overflow-y-auto overflow-x-hidden min-w-[500px] max-h-[calc(90vh-72px)]">
+        <div class="p-6 overflow-y-auto overflow-x-hidden sm:min-w-[500px] max-h-[calc(90vh-72px)]">
           <slot></slot>
         </div>
         <div v-if="showFooter" class="p-4 flex justify-end gap-3 border-t border-gray-200">
