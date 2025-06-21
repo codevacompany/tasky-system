@@ -34,4 +34,12 @@ export const userService = {
   async update(id: number, data: UpdateUserDto): Promise<AxiosResponse<User>> {
     return apiClient.patch<User>(`/users/${id}`, data);
   },
+
+  async deactivate(id: number): Promise<AxiosResponse<User>> {
+    return apiClient.patch<User>(`/users/${id}/deactivate`);
+  },
+
+  async activate(id: number): Promise<AxiosResponse<User>> {
+    return apiClient.patch<User>(`/users/${id}/activate`);
+  },
 };
