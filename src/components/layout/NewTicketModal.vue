@@ -9,8 +9,8 @@
     :cancelButtonText="'Limpar'"
   >
     <form @submit.prevent="handleSubmit" class="w-full">
-      <div class="grid grid-cols-3 gap-5 mb-6">
-        <div class="col-span-2 flex flex-col gap-1.5">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-6">
+        <div class="col-span-1 md:col-span-2 flex flex-col gap-1.5">
           <label for="title" class="text-sm text-gray-800 dark:text-gray-200"
             >Assunto: <span class="text-red-500">*</span></label
           >
@@ -25,7 +25,7 @@
 
         <div class="col-span-1 flex flex-col gap-1.5">
           <label class="text-sm text-gray-800 dark:text-gray-200">É privado?</label>
-          <div class="flex gap-4 pt-1">
+          <div class="flex sm:flex-row gap-2 sm:gap-4 pt-1">
             <label
               class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200 cursor-pointer"
             >
@@ -34,7 +34,7 @@
                 v-model="formData.isPrivate"
                 :value="true"
                 name="isPrivate"
-                class="cursor-pointer"
+                class="cursor-pointer w-4"
               />
               Sim
             </label>
@@ -46,7 +46,7 @@
                 v-model="formData.isPrivate"
                 :value="false"
                 name="isPrivate"
-                class="cursor-pointer"
+                class="cursor-pointer w-4"
               />
               Não
             </label>
@@ -105,11 +105,11 @@
           </select>
         </div>
 
-        <div class="col-span-1 flex flex-col gap-1.5">
+        <div class="col-span-1 md:col-span-2 flex flex-col gap-1.5">
           <label class="text-sm text-gray-800 dark:text-gray-200"
             >Prioridade: <span class="text-red-500">*</span></label
           >
-          <div class="flex gap-4 pt-1">
+          <div class="flex sm:flex-row gap-2 sm:gap-4 pt-1">
             <label
               class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200 cursor-pointer"
             >
@@ -119,7 +119,7 @@
                 :value="TicketPriority.Low"
                 name="priority"
                 required
-                class="cursor-pointer"
+                class="cursor-pointer w-4"
               />
               {{ formatSnakeToNaturalCase(TicketPriority.Low) }}
             </label>
@@ -131,7 +131,7 @@
                 v-model="formData.priority"
                 :value="TicketPriority.Medium"
                 name="priority"
-                class="cursor-pointer"
+                class="cursor-pointer w-4"
               />
               {{ formatSnakeToNaturalCase(TicketPriority.Medium) }}
             </label>
@@ -143,7 +143,7 @@
                 v-model="formData.priority"
                 :value="TicketPriority.High"
                 name="priority"
-                class="cursor-pointer"
+                class="cursor-pointer w-4"
               />
               {{ formatSnakeToNaturalCase(TicketPriority.High) }}
             </label>
@@ -160,7 +160,7 @@
           />
         </div>
 
-        <div class="col-span-3 flex flex-col gap-1.5">
+        <div class="col-span-1 md:col-span-3 flex flex-col gap-1.5">
           <label for="description" class="text-sm text-gray-800 dark:text-gray-200"
             >Descrição: <span class="text-red-500">*</span></label
           >
@@ -180,10 +180,10 @@
             rows="4"
           ></textarea>
         </div>
-        <div class="col-span-3 flex flex-col gap-1.5">
+        <div class="mt-20 sm:mt-0 col-span-1 md:col-span-3 flex flex-col gap-1.5">
           <div class="flex">
             <label
-              class="primary-gradient text-white flex justify-center items-center gap-[5px] rounded cursor-pointer mb-1.5 py-2 px-4"
+              class="primary-gradient text-white flex justify-center items-center gap-[5px] rounded cursor-pointer mb-1.5 py-2 px-4 text-sm"
               for="fileUpload"
             >
               <font-awesome-icon icon="paperclip" /> Anexar Arquivos
@@ -191,10 +191,10 @@
           </div>
 
           <input class="hidden" type="file" id="fileUpload" multiple @change="handleFileChange" />
-          <ul v-if="selectedFiles.length">
-            <li v-for="(file, i) in selectedFiles" :key="i" class="flex mb-1">
-              <font-awesome-icon icon="file" class="mr-[5px]" />
-              <p class="text-sm">{{ file.name }}</p>
+          <ul v-if="selectedFiles.length" class="space-y-1">
+            <li v-for="(file, i) in selectedFiles" :key="i" class="flex items-center gap-2">
+              <font-awesome-icon icon="file" class="text-gray-500 text-xs" />
+              <p class="text-sm text-gray-700 dark:text-gray-300 truncate">{{ file.name }}</p>
             </li>
           </ul>
         </div>
@@ -443,5 +443,86 @@ const handleSubmit = async () => {
 <style scoped>
 .quill-wrapper {
   margin-bottom: 50px;
+}
+
+/* Mobile responsive Quill editor */
+@media (max-width: 640px) {
+  .quill-wrapper {
+    margin-bottom: 30px;
+  }
+
+  :deep(.ql-toolbar) {
+    border-radius: 4px 4px 0 0;
+    padding: 8px;
+  }
+
+  :deep(.ql-container) {
+    border-radius: 0 0 4px 4px;
+    font-size: 14px;
+  }
+
+  :deep(.ql-editor) {
+    min-height: 120px;
+    padding: 12px;
+  }
+
+  :deep(.ql-toolbar .ql-formats) {
+    margin-right: 8px;
+  }
+
+  :deep(.ql-toolbar button) {
+    padding: 4px;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* Dark mode styles for Quill editor */
+:deep(.dark) .ql-toolbar {
+  border-color: #374151;
+  background: #1f2937;
+}
+
+:deep(.dark) .ql-container {
+  border-color: #374151;
+  background: #1f2937;
+}
+
+:deep(.dark) .ql-editor {
+  color: #e5e7eb;
+  background: #1f2937;
+}
+
+:deep(.dark) .ql-toolbar button:hover {
+  color: #e5e7eb;
+}
+
+:deep(.dark) .ql-toolbar button.ql-active {
+  color: #60a5fa;
+}
+
+:deep(.dark) .ql-snow .ql-stroke {
+  stroke: #9ca3af;
+}
+
+:deep(.dark) .ql-snow .ql-fill {
+  fill: #9ca3af;
+}
+
+:deep(.dark) .ql-snow .ql-picker-label {
+  color: #9ca3af;
+}
+
+:deep(.dark) .ql-snow .ql-picker-options {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+:deep(.dark) .ql-snow .ql-picker-item {
+  color: #e5e7eb;
+}
+
+:deep(.dark) .ql-snow .ql-picker-item:hover {
+  background: #374151;
 }
 </style>

@@ -242,7 +242,6 @@ const openTicketDetails = (ticket: Ticket) => {
 </script>
 
 <style scoped>
-/* All styles have been converted to Tailwind classes */
 
 /* Custom scrollbar for column content */
 .overflow-y-auto::-webkit-scrollbar {

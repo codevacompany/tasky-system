@@ -9,30 +9,33 @@
       <LoadingSpinner v-if="isLoading" :size="50" :color="'white'" />
       <div
         v-else
-        class="bg-white dark:bg-gray-800 rounded-md shadow-lg w-auto max-w-[95%] sm:max-w-[80%] max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden animate-modalSlideIn"
+        class="bg-white dark:bg-gray-800 rounded-md shadow-lg w-full max-w-[95%] sm:max-w-[90%] lg:max-w-[80%] xl:max-w-[70%] max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden animate-modalSlideIn mx-4"
       >
-        <div
-          class="primary-gradient flex items-center justify-between p-4 border-b border-gray-200 text-white"
-        >
+        <div class="primary-gradient flex items-center justify-between p-3 sm:p-4 text-white">
           <slot name="header">
-            <h2 class="text-lg font-semibold">{{ title }}</h2>
+            <h2 class="text-base sm:text-lg font-semibold">{{ title }}</h2>
           </slot>
           <button
-            class="bg-transparent border-none text-white opacity-80 text-xl cursor-pointer p-2 rounded-full flex items-center justify-center transition-opacity hover:opacity-100"
+            class="bg-transparent border-none text-white opacity-80 text-lg sm:text-xl cursor-pointer p-1 sm:p-2 rounded-full flex items-center justify-center transition-opacity hover:opacity-100"
             @click="close"
           >
             <font-awesome-icon icon="times" />
           </button>
         </div>
-        <div class="p-6 overflow-y-auto overflow-x-hidden sm:min-w-[500px] max-h-[calc(90vh-72px)]">
+        <div
+          class="p-4 sm:p-6 overflow-y-auto overflow-x-hidden sm:min-w-[500px] lg:min-w-[600px] max-h-[calc(90vh-100px)] sm:max-h-[calc(90vh-120px)]"
+        >
           <slot></slot>
         </div>
-        <div v-if="showFooter" class="p-4 flex justify-end gap-3 border-t border-gray-200">
+        <div
+          v-if="showFooter"
+          class="p-3 sm:p-4 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 border-t border-gray-200 dark:border-gray-700"
+        >
           <slot name="footer">
             <button
               v-if="showCancelButton"
               type="button"
-              class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors"
+              class="w-full sm:w-auto px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
               @click="handleCancel"
             >
               {{ cancelButtonText }}
@@ -40,7 +43,7 @@
             <button
               v-if="showConfirmButton"
               type="button"
-              class="px-4 py-2 primary-gradient hover:opacity-95 text-white rounded transition-colors"
+              class="w-full sm:w-auto px-4 py-2 primary-gradient hover:opacity-95 text-white rounded transition-colors"
               @click="handleConfirm"
             >
               {{ confirmButtonText }}
