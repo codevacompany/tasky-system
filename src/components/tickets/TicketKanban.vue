@@ -61,8 +61,18 @@
           <div class="flex flex-col gap-2">
             <div class="flex items-center justify-between gap-3 mb-0">
               <div class="text-xs text-gray-500 dark:text-gray-400">
-                {{ ticket.requester.firstName }} {{ ticket.requester.lastName }} /
-                {{ ticket.department.name }}
+                <div class="flex items-center gap-1">
+                  <span>{{ ticket.targetUser.firstName }} {{ ticket.targetUser.lastName }}</span>
+                  <font-awesome-icon
+                    v-if="!ticket.targetUser.isActive"
+                    icon="exclamation-triangle"
+                    class="text-orange-500 text-xs"
+                    title="Conta desativada"
+                  />
+                </div>
+                <div class="text-xs text-gray-400 dark:text-gray-500">
+                  {{ ticket.department.name }}
+                </div>
               </div>
               <div
                 :class="[
