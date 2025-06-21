@@ -57,52 +57,34 @@
           <label for="targetDepartment" class="text-sm text-gray-800 dark:text-gray-200"
             >Setor Destino: <span class="text-red-500">*</span></label
           >
-          <select
-            id="targetDepartment"
-            v-model="selectedDepartment"
-            required
-            @change="updateUsersList"
-            class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-          >
-            <option :value="null">Selecione um setor</option>
-            <option v-for="department in departments" :key="department.id" :value="department.id">
-              {{ department.name }}
-            </option>
-          </select>
+          <Select
+            :options="departmentOptions"
+            :modelValue="selectedDepartment?.toString() || ''"
+            @update:modelValue="updateSelectedDepartment"
+          />
         </div>
 
         <div class="col-span-1 flex flex-col gap-1.5">
           <label for="targetUser" class="text-sm text-gray-800 dark:text-gray-200"
             >Usuário Destino:</label
           >
-          <select
-            id="targetUser"
-            v-model="selectedUser"
+          <Select
+            :options="userOptions"
+            :modelValue="selectedUser?.toString() || ''"
+            @update:modelValue="updateSelectedUser"
             :disabled="!selectedDepartment"
-            class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            <option :value="null">Selecione um setor primeiro</option>
-            <option v-for="user in availableUsers" :key="user.id" :value="user.id">
-              {{ user.firstName }} {{ user.lastName }}
-            </option>
-          </select>
+          />
         </div>
 
         <div class="col-span-1 flex flex-col gap-1.5">
           <label for="category" class="text-sm text-gray-800 dark:text-gray-200"
             >Categoria: <span class="text-red-500">*</span></label
           >
-          <select
-            id="category"
-            v-model="selectedCategory"
-            required
-            class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-          >
-            <option :value="null">Selecione uma categoria</option>
-            <option v-for="category in categories" :key="category.id" :value="category.id">
-              {{ category.name }}
-            </option>
-          </select>
+          <Select
+            :options="categoryOptions"
+            :modelValue="selectedCategory?.toString() || ''"
+            @update:modelValue="updateSelectedCategory"
+          />
         </div>
 
         <div class="col-span-1 md:col-span-2 flex flex-col gap-1.5">
@@ -204,7 +186,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { ticketService } from '@/services/ticketService';
 import { departmentService } from '@/services/departmentService';
 import { userService } from '@/services/userService';
@@ -219,6 +201,7 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import axios from 'axios';
 import { awsService } from '@/services/awsService';
 import BaseModal from '@/components/common/BaseModal.vue';
+import Select from '@/components/common/Select.vue';
 
 defineProps<{
   isOpen: boolean;
@@ -237,6 +220,34 @@ const selectedUser = ref<number | null>(null);
 const categories = ref<Category[]>([]);
 const selectedCategory = ref<number | null>(null);
 const selectedFiles = ref<File[]>([]);
+
+// Computed properties for Select component options
+const departmentOptions = computed(() => [
+  { value: '', label: 'Selecione um setor' },
+  ...departments.value.map((dept) => ({
+    value: dept.id.toString(),
+    label: dept.name,
+  })),
+]);
+
+const userOptions = computed(() => [
+  {
+    value: '',
+    label: selectedDepartment.value ? 'Selecione um usuário' : 'Selecione um setor primeiro',
+  },
+  ...availableUsers.value.map((user) => ({
+    value: user.id.toString(),
+    label: `${user.firstName} ${user.lastName}`,
+  })),
+]);
+
+const categoryOptions = computed(() => [
+  { value: '', label: 'Selecione uma categoria' },
+  ...categories.value.map((category) => ({
+    value: category.id.toString(),
+    label: category.name,
+  })),
+]);
 
 const editorOptions = {
   modules: {
@@ -263,6 +274,21 @@ const formData = ref({
   categoryId: null as number | null,
   isPrivate: false,
 });
+
+// Update handlers for Select components
+const updateSelectedDepartment = (value: string) => {
+  selectedDepartment.value = value ? parseInt(value) : null;
+  selectedUser.value = null; // Reset user selection when department changes
+  updateUsersList();
+};
+
+const updateSelectedUser = (value: string) => {
+  selectedUser.value = value ? parseInt(value) : null;
+};
+
+const updateSelectedCategory = (value: string) => {
+  selectedCategory.value = value ? parseInt(value) : null;
+};
 
 const loadDepartments = async () => {
   try {

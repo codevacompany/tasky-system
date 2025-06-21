@@ -7,7 +7,7 @@
     >
       <h2 class="text-base font-semibold text-gray-900 dark:text-white m-0">{{ title }}</h2>
       <router-link
-        to="/meus-tickets"
+        :to="viewAllUrl"
         class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors duration-200"
         >Ver todos</router-link
       >
@@ -125,6 +125,7 @@ import { useTicketsStore } from '@/stores/tickets';
 const props = defineProps<{
   title: string;
   type: 'received' | 'created' | 'department';
+  viewAllUrl: string;
 }>();
 
 const ticketsStore = useTicketsStore();

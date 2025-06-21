@@ -9,7 +9,7 @@
       <LoadingSpinner v-if="isLoading" :size="50" :color="'white'" />
       <div
         v-else
-        class="bg-white dark:bg-gray-800 rounded-md shadow-lg w-full max-w-[95%] sm:max-w-[90%] lg:max-w-[80%] xl:max-w-[70%] max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden animate-modalSlideIn mx-4"
+        class="bg-white dark:bg-gray-800 rounded-md shadow-lg min-w-[90vw] sm:min-w-[500px] max-w-[95%] sm:max-w-[90%] lg:max-w-[80%] xl:max-w-[70%] max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden animate-modalSlideIn mx-4"
       >
         <div class="primary-gradient flex items-center justify-between p-3 sm:p-4 text-white">
           <slot name="header">
@@ -23,7 +23,7 @@
           </button>
         </div>
         <div
-          class="p-4 sm:p-6 overflow-y-auto overflow-x-hidden sm:min-w-[500px] lg:min-w-[600px] max-h-[calc(90vh-100px)] sm:max-h-[calc(90vh-120px)]"
+          class="p-2 sm:p-6 overflow-y-auto overflow-x-hidden max-h-[calc(90vh-100px)] sm:max-h-[calc(90vh-120px)]"
         >
           <slot></slot>
         </div>

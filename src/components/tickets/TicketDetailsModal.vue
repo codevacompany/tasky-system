@@ -7,7 +7,7 @@
     @close="closeModal"
     :showFooter="false"
   >
-    <div v-if="loadedTicket" class="min-w-[900px] p-6">
+    <div v-if="loadedTicket" class="min-w-full sm:min-w-[900px] max-w-none p-3 sm:p-6">
       <!-- Assunto em largura total -->
       <div
         class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg flex items-center gap-3 transition-all duration-300 mb-2 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-500"
@@ -17,7 +17,7 @@
         >
           <font-awesome-icon icon="file-alt" />
         </div>
-        <div class="flex-1 flex items-center gap-2">
+        <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
           <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Assunto</div>
           <div class="text-sm text-gray-800 dark:text-gray-100 flex-1" v-if="!isEditingName">
             <span
@@ -57,7 +57,7 @@
         </div>
       </div>
 
-      <div class="flex gap-6">
+      <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
         <!-- Coluna da Esquerda - Informações -->
         <div class="flex-1">
           <!-- ID -->
@@ -69,9 +69,9 @@
             >
               <font-awesome-icon icon="hashtag" />
             </div>
-            <div class="flex-1 flex items-center gap-2">
+            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
               <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">ID</div>
-              <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
+              <div class="text-sm text-gray-800 dark:text-gray-100 flex-1 break-all">
                 {{ loadedTicket.customId }}
               </div>
             </div>
@@ -86,7 +86,7 @@
             >
               <font-awesome-icon icon="exclamation-circle" />
             </div>
-            <div class="flex-1 flex items-center gap-2">
+            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
               <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Prioridade</div>
               <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
                 <span
@@ -114,7 +114,7 @@
             >
               <font-awesome-icon icon="clock" />
             </div>
-            <div class="flex-1 flex items-center gap-2">
+            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
               <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Status</div>
               <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
                 <span
@@ -139,11 +139,11 @@
             >
               <font-awesome-icon icon="user-tie" />
             </div>
-            <div class="flex-1 flex items-center gap-2">
+            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
               <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">
                 Solicitante / Setor
               </div>
-              <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
+              <div class="text-sm text-gray-800 dark:text-gray-100 flex-1 break-words">
                 {{ loadedTicket.requester.firstName }} {{ loadedTicket.requester.lastName }} /
                 {{ loadedTicket.department.name }}
               </div>
@@ -159,11 +159,11 @@
             >
               <font-awesome-icon icon="user" />
             </div>
-            <div class="flex-1 flex items-center gap-2">
+            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
               <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Responsável</div>
               <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
-                <div class="flex gap-2">
-                  <span
+                <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <span class="break-words"
                     >{{ loadedTicket.targetUser.firstName }}
                     {{ loadedTicket.targetUser.lastName }}</span
                   >
@@ -192,7 +192,7 @@
             >
               <font-awesome-icon icon="calendar-check" />
             </div>
-            <div class="flex-1 flex items-center gap-2">
+            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
               <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Concluir até</div>
               <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
                 {{ formatDate(loadedTicket.dueAt) }}
@@ -210,7 +210,7 @@
             >
               <font-awesome-icon icon="hourglass-end" />
             </div>
-            <div class="flex-1 flex items-center gap-2">
+            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
               <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Prazo</div>
               <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
                 {{ calculateDeadline(loadedTicket) }}
@@ -232,7 +232,7 @@
             >
               <font-awesome-icon icon="lock" />
             </div>
-            <div class="flex-1 flex items-center gap-2">
+            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
               <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Privacidade</div>
               <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
                 {{ loadedTicket.isPrivate ? 'Privado' : 'Público' }}
@@ -249,7 +249,7 @@
             >
               <font-awesome-icon icon="user-check" />
             </div>
-            <div class="flex-1 flex items-center gap-2">
+            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
               <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Aceite em</div>
               <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
                 {{ formatDate(loadedTicket.acceptedAt) }}
@@ -266,7 +266,7 @@
             >
               <font-awesome-icon icon="folder" />
             </div>
-            <div class="flex-1 flex items-center gap-2">
+            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
               <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Categoria</div>
               <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
                 {{ loadedTicket.category?.name || '-' }}
@@ -332,49 +332,49 @@
       </div>
 
       <div
-        class="flex justify-end gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-600"
+        class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-600"
         v-if="
           isTargetUser || (isRequester && loadedTicket.status === TicketStatus.UnderVerification)
         "
       >
         <button
           v-if="isTargetUser && loadedTicket?.status === TicketStatus.Pending"
-          class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
           @click="acceptTicket(loadedTicket?.customId)"
         >
           <font-awesome-icon icon="check" /> Aceitar
         </button>
         <button
           v-if="isTargetUser && loadedTicket?.status === TicketStatus.InProgress"
-          class="inline-flex items-center gap-2 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
           @click="sendForReview(loadedTicket.customId)"
         >
           <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
         </button>
         <button
           v-if="isTargetUser && loadedTicket?.status === TicketStatus.AwaitingVerification"
-          class="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
           @click="cancelVerificationRequest(loadedTicket.customId)"
         >
           <font-awesome-icon icon="undo" /> Cancelar envio para verificação
         </button>
         <button
           v-if="isTargetUser && loadedTicket?.status === TicketStatus.Returned"
-          class="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
           @click="correctTicket(loadedTicket.customId)"
         >
           <font-awesome-icon icon="wrench" /> Corrigir
         </button>
         <button
           v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
-          class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
           @click="approveTicket(loadedTicket.customId)"
         >
           <font-awesome-icon icon="check-double" /> Aprovar
         </button>
         <button
           v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
-          class="inline-flex items-center gap-2 px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
           @click="requestCorrection(loadedTicket.customId)"
         >
           <font-awesome-icon icon="undo" /> Solicitar Correção
@@ -382,14 +382,14 @@
 
         <button
           v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
-          class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
           @click="rejectTicket(loadedTicket.customId)"
         >
           <font-awesome-icon icon="undo" /> Reprovar
         </button>
       </div>
 
-      <div class="flex items-center justify-between mt-6">
+      <div class="flex items-center justify-between mt-6 gap-4">
         <div class="flex items-center gap-3">
           <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Anexos</p>
           <div
@@ -442,7 +442,7 @@
 
       <!-- Nova div separada para o botão de cancelar -->
       <div
-        class="flex justify-end gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-600"
+        class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-600"
         v-if="
           isRequester &&
           loadedTicket.status !== TicketStatus.Completed &&
@@ -451,14 +451,14 @@
         "
       >
         <button
-          class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5"
+          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
           @click="cancelTicket(loadedTicket.customId)"
         >
           <font-awesome-icon icon="ban" /> Cancelar
         </button>
       </div>
 
-      <div class="mt-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+      <div class="mt-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 sm:p-6">
         <div class="flex items-center gap-2 mb-4 text-gray-600 dark:text-gray-400">
           <font-awesome-icon icon="comments" />
           <h3 class="text-lg font-semibold">Comentários</h3>
@@ -484,7 +484,7 @@
           </div>
           <button
             @click="comment()"
-            class="inline-flex items-center gap-2 px-4 py-2 primary-gradient hover:bg-blue-700 text-white text-sm font-medium rounded transition-all hover:-translate-y-0.5 self-end"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2 primary-gradient hover:bg-blue-700 text-white text-sm font-medium rounded transition-all hover:-translate-y-0.5 w-full sm:w-auto sm:self-end"
           >
             <font-awesome-icon icon="paper-plane" /> Enviar
           </button>
@@ -500,77 +500,88 @@
         </div>
 
         <div class="mt-6 relative">
-          <div class="absolute left-5 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-600 z-0"></div>
+          <div
+            class="absolute left-5 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-600 z-0 hidden sm:block"
+          ></div>
           <div v-for="event in timeline" :key="event.data.id">
             <div
-              class="flex gap-4 p-4 bg-white dark:bg-gray-700 rounded-lg mb-4 shadow-sm relative z-10"
+              class="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-gray-700 rounded-lg mb-4 shadow-sm relative z-10"
               v-if="event.type === 'comment'"
             >
               <div
-                class="w-10 h-10 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-lg border-2 border-white dark:border-gray-700 z-20"
+                class="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-lg border-2 border-white dark:border-gray-700 z-20 flex-shrink-0"
               >
                 <font-awesome-icon icon="user-circle" />
               </div>
-              <div class="flex-1">
-                <div class="flex justify-between items-center mb-2">
-                  <span class="font-medium text-gray-900 dark:text-gray-100"
+              <div class="flex-1 min-w-0">
+                <div
+                  class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 gap-1"
+                >
+                  <span
+                    class="font-medium text-gray-900 dark:text-gray-100 text-sm sm:text-base truncate"
                     >{{ event.data.user.firstName }} {{ event.data.user.lastName }}</span
                   >
-                  <span class="text-xs text-gray-500 dark:text-gray-400">{{
+                  <span class="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">{{
                     formatRelativeTime(event.createdAt)
                   }}</span>
                 </div>
                 <div
-                  class="text-gray-600 dark:text-gray-300 comment-text"
+                  class="text-gray-600 dark:text-gray-300 comment-text text-sm"
                   v-html="event.data.content"
                 ></div>
               </div>
             </div>
 
             <div
-              class="flex gap-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg mb-4 border border-gray-200 dark:border-gray-600 relative z-10"
+              class="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg mb-4 border border-gray-200 dark:border-gray-600 relative z-10"
               v-else-if="event.type === 'specialUpdate'"
               :class="event.subType"
             >
               <div
-                class="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm border-2 border-white dark:border-gray-700 z-20"
+                class="w-6 h-6 sm:w-8 sm:h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-xs sm:text-sm border-2 border-white dark:border-gray-700 z-20 flex-shrink-0"
                 :class="event.subType"
               >
                 <span class="text-xs font-medium">{{
                   getUserInitials(loadedTicket?.requester)
                 }}</span>
               </div>
-              <div class="flex-1">
-                <div class="flex justify-between items-center mb-1">
+              <div class="flex-1 min-w-0">
+                <div
+                  class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-1 gap-1"
+                >
                   <span
-                    class="font-medium text-sm text-gray-700 dark:text-gray-300"
+                    class="font-medium text-sm text-gray-700 dark:text-gray-300 truncate"
                     :class="event.subType"
                     >{{ getSpecialUpdateTitle(event.subType, event) }}</span
                   >
-                  <span class="text-xs text-gray-500 dark:text-gray-400">{{
+                  <span class="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">{{
                     formatRelativeTime(event.createdAt)
                   }}</span>
                 </div>
-                <div class="text-sm text-gray-600 dark:text-gray-400">{{ event.data.content }}</div>
+                <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                  {{ event.data.content }}
+                </div>
               </div>
             </div>
 
             <div
-              class="flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg mb-4 border border-gray-200 dark:border-gray-600 relative z-10 shadow-sm"
+              class="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg mb-4 border border-gray-200 dark:border-gray-600 relative z-10 shadow-sm"
               v-else
             >
               <div
-                class="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-xl border-2 border-white dark:border-gray-700 z-20"
+                class="w-6 h-6 sm:w-8 sm:h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm sm:text-xl border-2 border-white dark:border-gray-700 z-20 flex-shrink-0"
               >
                 <font-awesome-icon :icon="getEventIcon(event.data.description)" />
               </div>
-              <div class="flex-1">
-                <div class="flex justify-between items-center w-full">
+              <div class="flex-1 min-w-0">
+                <div
+                  class="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full gap-1"
+                >
                   <div
-                    class="text-sm text-gray-600 dark:text-gray-400"
+                    class="text-xs sm:text-sm text-gray-600 dark:text-gray-400"
                     v-html="formatTicketUpdateDescription(event.data)"
                   ></div>
-                  <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">{{
+                  <span class="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">{{
                     formatRelativeTime(event.createdAt)
                   }}</span>
                 </div>

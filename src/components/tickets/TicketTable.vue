@@ -7,59 +7,59 @@
         <thead>
           <tr>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               ID
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Título
             </th>
             <th
               v-if="tableType === 'criados'"
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Destino
             </th>
             <th
               v-else
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Solicitante
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Setor
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Prioridade
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Status
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Criado em
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Concluir até
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Prazo
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Ações
             </th>
