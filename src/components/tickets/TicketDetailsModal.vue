@@ -7,301 +7,326 @@
     @close="closeModal"
     :showFooter="false"
   >
-    <div v-if="loadedTicket" class="min-w-full sm:min-w-[900px] max-w-none p-3 sm:p-6">
-      <!-- Assunto em largura total -->
-      <div
-        class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg flex items-center gap-3 transition-all duration-300 mb-2 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-500"
-      >
-        <div
-          class="w-8 h-8 min-w-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm"
-        >
-          <font-awesome-icon icon="file-alt" />
-        </div>
-        <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
-          <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Assunto</div>
-          <div class="text-sm text-gray-800 dark:text-gray-100 flex-1" v-if="!isEditingName">
-            <span
-              @click="startEditingName"
-              :class="{
-                'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded transition-colors':
-                  isRequester,
-              }"
-              :title="isRequester ? 'Clique para editar' : ''"
-            >
-              {{ loadedTicket.name }}
-            </span>
-          </div>
-          <div class="text-sm text-gray-800 dark:text-gray-100 flex-1 flex flex-col gap-2" v-else>
-            <input
-              v-model="editingName"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all"
-              @keyup.enter="saveTicketName"
-              @keyup.escape="cancelEditingName"
-              ref="nameInput"
-            />
-            <div class="flex gap-2">
-              <button
-                @click="saveTicketName"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-all hover:-translate-y-0.5"
-              >
-                Salvar
-              </button>
-              <button
-                @click="cancelEditingName"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-md transition-all hover:-translate-y-0.5"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
-        <!-- Coluna da Esquerda - Informações -->
-        <div class="flex-1">
-          <!-- ID -->
+    <div
+      v-if="loadedTicket"
+      class="w-full max-w-7xl mx-auto p-3 sm:p-0 h-[calc(100vh-200px)] flex flex-col"
+    >
+      <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
+        <!-- Left Sidebar -->
+        <div class="lg:col-span-1 overflow-y-auto pr-2 space-y-4">
           <div
-            class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg flex items-center gap-3 transition-all duration-300 mb-2 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-500"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-5 shadow-sm"
           >
-            <div
-              class="w-8 h-8 min-w-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm"
+            <h3
+              class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2"
             >
-              <font-awesome-icon icon="hashtag" />
-            </div>
-            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
-              <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">ID</div>
-              <div class="text-sm text-gray-800 dark:text-gray-100 flex-1 break-all">
-                {{ loadedTicket.customId }}
+              <font-awesome-icon icon="info-circle" class="text-blue-600 dark:text-blue-400" />
+              Informações do Ticket
+            </h3>
+
+            <div class="space-y-4">
+              <!-- Ticket ID -->
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                >
+                  <font-awesome-icon
+                    icon="hashtag"
+                    class="text-gray-600 dark:text-gray-400 text-sm"
+                  />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    ID do Ticket
+                  </p>
+                  <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                    #{{ loadedTicket.customId }}
+                  </p>
+                </div>
               </div>
-            </div>
-          </div>
 
-          <!-- Prioridade -->
-          <div
-            class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg flex items-center gap-3 transition-all duration-300 mb-2 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-500"
-          >
-            <div
-              class="w-8 h-8 min-w-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm"
-            >
-              <font-awesome-icon icon="exclamation-circle" />
-            </div>
-            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
-              <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Prioridade</div>
-              <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
-                <span
-                  :class="[
-                    'inline-flex items-center px-2 py-1 rounded text-sm font-medium gap-2',
-                    getPriorityClass(loadedTicket.priority),
-                  ]"
+              <!-- Status -->
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                >
+                  <font-awesome-icon
+                    :icon="getStatusIcon(loadedTicket.status)"
+                    class="text-gray-600 dark:text-gray-400 text-sm"
+                  />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Status</p>
+                  <span
+                    :class="[
+                      'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium gap-1.5',
+                      getStatusClass(loadedTicket.status),
+                    ]"
+                  >
+                    <font-awesome-icon :icon="getStatusIcon(loadedTicket.status)" class="text-xs" />
+                    {{ formatSnakeToNaturalCase(loadedTicket?.status!).toUpperCase() }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Priority -->
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
                 >
                   <font-awesome-icon
                     :icon="getPriorityIcon(loadedTicket.priority)"
-                    class="text-sm"
+                    class="text-gray-600 dark:text-gray-400 text-sm"
                   />
-                  {{ formatSnakeToNaturalCase(loadedTicket.priority) }}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Status -->
-          <div
-            class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg flex items-center gap-3 transition-all duration-300 mb-2 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-500"
-          >
-            <div
-              class="w-8 h-8 min-w-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm"
-            >
-              <font-awesome-icon icon="clock" />
-            </div>
-            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
-              <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Status</div>
-              <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
-                <span
-                  :class="[
-                    'inline-flex items-center px-2 py-1 rounded text-sm font-medium gap-2',
-                    getStatusClass(loadedTicket.status),
-                  ]"
-                >
-                  <font-awesome-icon :icon="getStatusIcon(loadedTicket.status)" class="text-sm" />
-                  {{ formatSnakeToNaturalCase(loadedTicket?.status!).toUpperCase() }}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Solicitante e Setor -->
-          <div
-            class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg flex items-center gap-3 transition-all duration-300 mb-2 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-500"
-          >
-            <div
-              class="w-8 h-8 min-w-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm"
-            >
-              <font-awesome-icon icon="user-tie" />
-            </div>
-            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
-              <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">
-                Solicitante / Setor
-              </div>
-              <div class="text-sm text-gray-800 dark:text-gray-100 flex-1 break-words">
-                {{ loadedTicket.requester.firstName }} {{ loadedTicket.requester.lastName }} /
-                {{ loadedTicket.department.name }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Responsável -->
-          <div
-            class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg flex items-center gap-3 transition-all duration-300 mb-2 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-500"
-          >
-            <div
-              class="w-8 h-8 min-w-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm"
-            >
-              <font-awesome-icon icon="user" />
-            </div>
-            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
-              <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Responsável</div>
-              <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
-                <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <span class="break-words"
-                    >{{ loadedTicket.targetUser.firstName }}
-                    {{ loadedTicket.targetUser.lastName }}</span
-                  >
-                  <div
-                    v-if="!loadedTicket.targetUser.isActive"
-                    class="flex items-center gap-1.5"
-                    title="Conta desativada"
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Prioridade
+                  </p>
+                  <span
+                    :class="[
+                      'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium gap-1.5',
+                      getPriorityClass(loadedTicket.priority),
+                    ]"
                   >
                     <font-awesome-icon
-                      icon="exclamation-triangle"
-                      class="text-orange-500 text-sm"
+                      :icon="getPriorityIcon(loadedTicket.priority)"
+                      class="text-xs"
                     />
-                    <span class="text-orange-500 text-xs font-medium">Desativado</span>
+                    {{ formatSnakeToNaturalCase(loadedTicket.priority) }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Requester -->
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                >
+                  <font-awesome-icon
+                    icon="user-tie"
+                    class="text-gray-600 dark:text-gray-400 text-sm"
+                  />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Solicitante
+                  </p>
+                  <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                    {{ loadedTicket.requester.firstName }} {{ loadedTicket.requester.lastName }}
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    {{ loadedTicket.department.name }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Assignee -->
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                >
+                  <font-awesome-icon icon="user" class="text-gray-600 dark:text-gray-400 text-sm" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Responsável
+                  </p>
+                  <div class="flex items-center gap-2">
+                    <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                      {{ loadedTicket.targetUser.firstName }} {{ loadedTicket.targetUser.lastName }}
+                    </p>
+                    <div
+                      v-if="!loadedTicket.targetUser.isActive"
+                      class="flex items-center gap-1"
+                      title="Conta desativada"
+                    >
+                      <font-awesome-icon
+                        icon="exclamation-triangle"
+                        class="text-orange-500 text-xs"
+                      />
+                      <span class="text-orange-500 text-xs">Desativado</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Category -->
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                >
+                  <font-awesome-icon
+                    icon="folder"
+                    class="text-gray-600 dark:text-gray-400 text-sm"
+                  />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Categoria</p>
+                  <p class="text-sm text-gray-900 dark:text-gray-100">
+                    {{ loadedTicket.category?.name || '-' }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="space-y-4">
+                <!-- Due Date -->
+                <div class="flex items-start gap-3">
+                  <div
+                    class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                  >
+                    <font-awesome-icon
+                      icon="calendar-check"
+                      class="text-gray-600 dark:text-gray-400 text-sm"
+                    />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                      Concluir até
+                    </p>
+                    <p class="text-sm text-gray-900 dark:text-gray-100">
+                      {{ formatDate(loadedTicket.dueAt) }}
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Deadline Status -->
+                <div class="flex items-start gap-3" :class="getDeadlineClass(loadedTicket.dueAt)">
+                  <div
+                    class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                  >
+                    <font-awesome-icon
+                      icon="hourglass-end"
+                      class="text-gray-600 dark:text-gray-400 text-sm"
+                    />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Prazo</p>
+                    <div class="flex items-center gap-2">
+                      <p class="text-sm text-gray-900 dark:text-gray-100">
+                        {{ calculateDeadline(loadedTicket) }}
+                      </p>
+                      <font-awesome-icon
+                        v-if="isPastDeadline(loadedTicket.dueAt)"
+                        icon="exclamation-triangle"
+                        class="text-orange-500 text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Accepted Date -->
+                <div class="flex items-start gap-3">
+                  <div
+                    class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                  >
+                    <font-awesome-icon
+                      icon="user-check"
+                      class="text-gray-600 dark:text-gray-400 text-sm"
+                    />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                      Aceite em
+                    </p>
+                    <p class="text-sm text-gray-900 dark:text-gray-100">
+                      {{ formatDate(loadedTicket.acceptedAt) }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3">
+                  <div
+                    class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                  >
+                    <font-awesome-icon
+                      icon="lock"
+                      class="text-gray-600 dark:text-gray-400 text-sm"
+                    />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                      Privacidade
+                    </p>
+                    <p class="text-sm text-gray-900 dark:text-gray-100">
+                      {{ loadedTicket.isPrivate ? 'Privado' : 'Público' }}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
-          <!-- Concluir até -->
-          <div
-            class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg flex items-center gap-3 transition-all duration-300 mb-2 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-500"
-          >
-            <div
-              class="w-8 h-8 min-w-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm"
-            >
-              <font-awesome-icon icon="calendar-check" />
-            </div>
-            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
-              <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Concluir até</div>
-              <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
-                {{ formatDate(loadedTicket.dueAt) }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Prazo -->
-          <div
-            class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg flex items-center gap-3 transition-all duration-300 mb-2 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-500"
-            :class="getDeadlineClass(loadedTicket.dueAt)"
-          >
-            <div
-              class="w-8 h-8 min-w-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm"
-            >
-              <font-awesome-icon icon="hourglass-end" />
-            </div>
-            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
-              <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Prazo</div>
-              <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
-                {{ calculateDeadline(loadedTicket) }}
-                <font-awesome-icon
-                  v-if="isPastDeadline(loadedTicket.dueAt)"
-                  icon="exclamation-triangle"
-                  class="text-sm text-orange-500 ml-1"
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- Privacidade -->
-          <div
-            class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg flex items-center gap-3 transition-all duration-300 mb-2 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-500"
-          >
-            <div
-              class="w-8 h-8 min-w-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm"
-            >
-              <font-awesome-icon icon="lock" />
-            </div>
-            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
-              <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Privacidade</div>
-              <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
-                {{ loadedTicket.isPrivate ? 'Privado' : 'Público' }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Aceite em -->
-          <div
-            class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg flex items-center gap-3 transition-all duration-300 mb-2 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-500"
-          >
-            <div
-              class="w-8 h-8 min-w-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm"
-            >
-              <font-awesome-icon icon="user-check" />
-            </div>
-            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
-              <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Aceite em</div>
-              <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
-                {{ formatDate(loadedTicket.acceptedAt) }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Categoria -->
-          <div
-            class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg flex items-center gap-3 transition-all duration-300 mb-2 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-500"
-          >
-            <div
-              class="w-8 h-8 min-w-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm"
-            >
-              <font-awesome-icon icon="folder" />
-            </div>
-            <div class="flex-1 flex flex-col sm:flex-row sm:items-center gap-2">
-              <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Categoria</div>
-              <div class="text-sm text-gray-800 dark:text-gray-100 flex-1">
-                {{ loadedTicket.category?.name || '-' }}
-              </div>
-            </div>
-          </div>
         </div>
 
-        <!-- Coluna da Direita - Descrição -->
-        <div class="flex-1">
+        <!-- Right Content -->
+        <div class="lg:col-span-2 overflow-y-auto pl-2">
           <div
-            class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg transition-all duration-300 mb-2 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-500"
+            class="bg-white dark:bg-gray-800 pr-4 rounded-lg shadow-sm overflow-hidden"
           >
-            <div class="flex items-center gap-3">
-              <div
-                class="w-8 h-8 min-w-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm"
-              >
-                <font-awesome-icon icon="file-alt" />
+
+          <div class="p-4 flex-1 min-w-0">
+              <div v-if="!isEditingName">
+                <h1
+                  class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100 leading-tight"
+                  @click="startEditingName"
+                  :class="{
+                    'cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors':
+                      isRequester,
+                  }"
+                  :title="isRequester ? 'Clique para editar' : ''"
+                >
+                  {{ loadedTicket.name }}
+                </h1>
               </div>
-              <div class="text-xs text-gray-500 dark:text-gray-400 min-w-[85px]">Descrição</div>
+
+              <div v-else class="space-y-3">
+                <input
+                  v-model="editingName"
+                  class="w-full text-xl sm:text-2xl font-semibold px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                  @keyup.enter="saveTicketName"
+                  @keyup.escape="cancelEditingName"
+                  ref="nameInput"
+                />
+                <div class="flex gap-2">
+                  <button
+                    @click="saveTicketName"
+                    class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Salvar
+                  </button>
+                  <button
+                    @click="cancelEditingName"
+                    class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
             </div>
-            <div class="mt-2">
-              <div class="text-sm text-gray-800 dark:text-gray-100" v-if="!isEditingDescription">
+
+            <!-- Description Section -->
+            <div class="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+              <h3
+                class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2"
+              >
+                <font-awesome-icon icon="file-text" class="text-blue-600 dark:text-blue-400" />
+                Descrição
+              </h3>
+
+              <div v-if="!isEditingDescription">
                 <div
-                  class="description-text"
+                  class="description-text prose prose-sm max-w-none dark:prose-invert"
                   v-html="loadedTicket.description"
                   @click="startEditingDescription"
                   :class="{
-                    'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded transition-colors':
+                    'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-3 rounded-lg transition-colors':
                       isRequester,
                   }"
                   :title="isRequester ? 'Clique para editar' : ''"
                 ></div>
               </div>
-              <div class="text-sm text-gray-800 dark:text-gray-100 flex flex-col gap-2" v-else>
+
+              <div v-else class="space-y-4">
                 <div class="quill-wrapper">
                   <QuillEditor
                     :key="descriptionEditorKey"
@@ -311,283 +336,328 @@
                     :options="editorOptions"
                   />
                 </div>
-                <div class="flex gap-2">
+                <div class="flex gap-3">
                   <button
                     @click="saveTicketDescription"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-all hover:-translate-y-0.5"
+                    class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
                   >
                     Salvar
                   </button>
                   <button
                     @click="cancelEditingDescription"
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-md transition-all hover:-translate-y-0.5"
+                    class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
                   >
                     Cancelar
                   </button>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div
-        class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-600"
-        v-if="
-          isTargetUser || (isRequester && loadedTicket.status === TicketStatus.UnderVerification)
-        "
-      >
-        <button
-          v-if="isTargetUser && loadedTicket?.status === TicketStatus.Pending"
-          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
-          @click="acceptTicket(loadedTicket?.customId)"
-        >
-          <font-awesome-icon icon="check" /> Aceitar
-        </button>
-        <button
-          v-if="isTargetUser && loadedTicket?.status === TicketStatus.InProgress"
-          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
-          @click="sendForReview(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
-        </button>
-        <button
-          v-if="isTargetUser && loadedTicket?.status === TicketStatus.AwaitingVerification"
-          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
-          @click="cancelVerificationRequest(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="undo" /> Cancelar envio para verificação
-        </button>
-        <button
-          v-if="isTargetUser && loadedTicket?.status === TicketStatus.Returned"
-          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
-          @click="correctTicket(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="wrench" /> Corrigir
-        </button>
-        <button
-          v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
-          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
-          @click="approveTicket(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="check-double" /> Aprovar
-        </button>
-        <button
-          v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
-          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
-          @click="requestCorrection(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="undo" /> Solicitar Correção
-        </button>
+            <!-- Attachments Section -->
+            <div class="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+              <div class="flex items-center justify-between mb-4">
+                <h3
+                  class="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2"
+                >
+                  <font-awesome-icon icon="paperclip" class="text-blue-600 dark:text-blue-400" />
+                  Anexos
+                  <span
+                    class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full text-xs font-medium"
+                  >
+                    {{ loadedTicket.files.length }}
+                  </span>
+                </h3>
+                <button
+                  v-if="canEditTicket"
+                  class="inline-flex items-center justify-center w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                  @click="openFileInput"
+                  title="Adicionar anexos"
+                >
+                  <font-awesome-icon icon="plus" />
+                </button>
+              </div>
 
-        <button
-          v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
-          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
-          @click="rejectTicket(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="undo" /> Reprovar
-        </button>
-      </div>
+              <input
+                class="hidden"
+                type="file"
+                ref="fileInput"
+                multiple
+                @change="handleFileChange"
+              />
 
-      <div class="flex items-center justify-between mt-6 gap-4">
-        <div class="flex items-center gap-3">
-          <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Anexos</p>
-          <div
-            class="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-2 py-1 rounded-full text-xs font-medium"
-          >
-            {{ loadedTicket.files.length }}
-          </div>
-        </div>
-        <button
-          v-if="canEditTicket"
-          class="inline-flex items-center justify-center w-8 h-8 primary-gradient text-white rounded-full transition-colors"
-          @click="openFileInput"
-          title="Adicionar anexos"
-        >
-          <font-awesome-icon icon="plus" />
-        </button>
-        <input class="hidden" type="file" ref="fileInput" multiple @change="handleFileChange" />
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-        <div
-          v-for="file in loadedTicket.files"
-          :key="file.id"
-          class="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
-          @click="downloadFile(file)"
-        >
-          <div class="text-blue-600 dark:text-blue-400">
-            <font-awesome-icon icon="file" size="xl" />
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-              {{ file.name }}
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div
+                  v-for="file in loadedTicket.files"
+                  :key="file.id"
+                  class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer transition-colors"
+                  @click="downloadFile(file)"
+                >
+                  <div class="text-blue-600 dark:text-blue-400">
+                    <font-awesome-icon icon="file" size="lg" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                      {{ file.name }}
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  v-for="(file, i) in selectedFiles"
+                  :key="`new-${i}`"
+                  class="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg"
+                >
+                  <div class="text-yellow-600 dark:text-yellow-400">
+                    <font-awesome-icon icon="file-upload" size="lg" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                      {{ file.name }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Activities Section -->
+            <div class="p-4 sm:p-6">
+              <h3
+                class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2"
+              >
+                <font-awesome-icon icon="comments" class="text-blue-600 dark:text-blue-400" />
+                Atividade
+              </h3>
+
+              <!-- Add Comment Form -->
+              <div
+                v-if="
+                  loadedTicket?.status === TicketStatus.InProgress ||
+                  loadedTicket?.status === TicketStatus.UnderVerification
+                "
+                class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+              >
+                <div class="space-y-4">
+                  <div
+                    class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden"
+                  >
+                    <QuillEditor
+                      :key="editorKey"
+                      ref="quillEditor"
+                      v-model:content="newComment"
+                      contentType="html"
+                      theme="snow"
+                      :options="editorOptions"
+                    />
+                  </div>
+                  <div class="flex justify-end">
+                    <button
+                      @click="comment()"
+                      class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                      <font-awesome-icon icon="paper-plane" />
+                      Enviar Comentário
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                v-else
+                class="mb-6 flex items-center gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300 rounded-lg border border-yellow-200 dark:border-yellow-800"
+              >
+                <font-awesome-icon icon="info-circle" />
+                <p class="text-sm">
+                  Comentários permitidos apenas para tickets em andamento ou em verificação
+                </p>
+              </div>
+
+              <!-- Timeline -->
+              <div class="space-y-4 relative">
+                <div
+                  class="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-600 hidden sm:block"
+                ></div>
+
+                <div v-for="event in timeline" :key="event.data.id" class="relative">
+                  <!-- Comment -->
+                  <div v-if="event.type === 'comment'" class="flex gap-4 relative">
+                    <div
+                      class="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 border-4 border-white dark:border-gray-800 relative z-10 flex-shrink-0"
+                    >
+                      <font-awesome-icon icon="comment" />
+                    </div>
+                    <div class="flex-1 min-w-0 pb-4">
+                      <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                          <span class="font-medium text-gray-900 dark:text-gray-100">
+                            {{ event.data.user.firstName }} {{ event.data.user.lastName }}
+                          </span>
+                          <span class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ formatRelativeTime(event.createdAt) }}
+                          </span>
+                        </div>
+                        <div
+                          class="comment-text prose prose-sm max-w-none dark:prose-invert"
+                          v-html="event.data.content"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- System Updates -->
+                  <div
+                    v-else-if="event.type === 'specialUpdate'"
+                    class="flex gap-4 relative"
+                    :class="event.subType"
+                  >
+                    <div
+                      class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center border-4 border-white dark:border-gray-800 relative z-10 flex-shrink-0"
+                      :class="event.subType"
+                    >
+                      <span class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                        {{ getUserInitials(loadedTicket?.requester) }}
+                      </span>
+                    </div>
+                    <div class="flex-1 min-w-0 pb-4">
+                      <div
+                        class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+                      >
+                        <div class="flex items-center justify-between mb-2">
+                          <span
+                            class="font-medium text-gray-700 dark:text-gray-300"
+                            :class="event.subType"
+                          >
+                            {{ getSpecialUpdateTitle(event.subType, event) }}
+                          </span>
+                          <span class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ formatRelativeTime(event.createdAt) }}
+                          </span>
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                          {{ event.data.content }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Regular Events -->
+                  <div v-else class="flex gap-4 relative">
+                    <div
+                      class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 border-4 border-white dark:border-gray-800 relative z-10 flex-shrink-0"
+                    >
+                      <font-awesome-icon :icon="getEventIcon(event.data.description)" />
+                    </div>
+                    <div class="flex-1 min-w-0 pb-4">
+                      <div
+                        class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+                      >
+                        <div class="flex items-center justify-between">
+                          <div
+                            class="text-sm text-gray-600 dark:text-gray-400 flex-1"
+                            v-html="formatTicketUpdateDescription(event.data)"
+                          ></div>
+                          <span class="text-sm text-gray-500 dark:text-gray-400 ml-4 flex-shrink-0">
+                            {{ formatRelativeTime(event.createdAt) }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div
-          v-for="(file, i) in selectedFiles"
-          :key="`new-${i}`"
-          class="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg"
-        >
-          <div class="text-yellow-600 dark:text-yellow-400">
-            <font-awesome-icon icon="file-upload" size="xl" />
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-              {{ file.name }}
-            </div>
-          </div>
-        </div>
       </div>
 
-      <!-- Nova div separada para o botão de cancelar -->
-      <div
-        class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-600"
-        v-if="
-          isRequester &&
-          loadedTicket.status !== TicketStatus.Completed &&
-          loadedTicket.status !== TicketStatus.Rejected &&
-          loadedTicket.status !== TicketStatus.Canceled
-        "
-      >
-        <button
-          class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded cursor-pointer transition-all hover:-translate-y-0.5 w-full sm:w-auto"
-          @click="cancelTicket(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="ban" /> Cancelar
-        </button>
-      </div>
-
-      <div class="mt-8 bg-gray-50 dark:bg-gray-700 rounded-lg p-4 sm:p-6">
-        <div class="flex items-center gap-2 mb-4 text-gray-600 dark:text-gray-400">
-          <font-awesome-icon icon="comments" />
-          <h3 class="text-lg font-semibold">Comentários</h3>
-        </div>
+      <!-- Action Buttons - Fixed at Bottom -->
+      <div class="flex-shrink-0 mt-6">
         <div
+          class="flex flex-wrap gap-3 justify-end"
           v-if="
-            loadedTicket?.status === TicketStatus.InProgress ||
-            loadedTicket?.status === TicketStatus.UnderVerification
+            isTargetUser || (isRequester && loadedTicket.status === TicketStatus.UnderVerification)
           "
-          class="flex flex-col gap-4"
         >
-          <div
-            class="bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden"
-          >
-            <QuillEditor
-              :key="editorKey"
-              ref="quillEditor"
-              v-model:content="newComment"
-              contentType="html"
-              theme="snow"
-              :options="editorOptions"
-            />
-          </div>
           <button
-            @click="comment()"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2 primary-gradient hover:bg-blue-700 text-white text-sm font-medium rounded transition-all hover:-translate-y-0.5 w-full sm:w-auto sm:self-end"
+            v-if="isTargetUser && loadedTicket?.status === TicketStatus.Pending"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"
+            @click="acceptTicket(loadedTicket?.customId)"
           >
-            <font-awesome-icon icon="paper-plane" /> Enviar
+            <font-awesome-icon icon="check" />
+            Aceitar
+          </button>
+
+          <button
+            v-if="isTargetUser && loadedTicket?.status === TicketStatus.InProgress"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+            @click="sendForReview(loadedTicket.customId)"
+          >
+            <font-awesome-icon icon="arrow-right" />
+            Enviar para Verificação
+          </button>
+
+          <button
+            v-if="isTargetUser && loadedTicket?.status === TicketStatus.AwaitingVerification"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg transition-colors"
+            @click="cancelVerificationRequest(loadedTicket.customId)"
+          >
+            <font-awesome-icon icon="undo" />
+            Cancelar Verificação
+          </button>
+
+          <button
+            v-if="isTargetUser && loadedTicket?.status === TicketStatus.Returned"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors"
+            @click="correctTicket(loadedTicket.customId)"
+          >
+            <font-awesome-icon icon="wrench" />
+            Corrigir
+          </button>
+
+          <button
+            v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors"
+            @click="approveTicket(loadedTicket.customId)"
+          >
+            <font-awesome-icon icon="check-double" />
+            Aprovar
+          </button>
+
+          <button
+            v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-colors"
+            @click="requestCorrection(loadedTicket.customId)"
+          >
+            <font-awesome-icon icon="undo" />
+            Solicitar Correção
+          </button>
+
+          <button
+            v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
+            @click="rejectTicket(loadedTicket.customId)"
+          >
+            <font-awesome-icon icon="times" />
+            Reprovar
           </button>
         </div>
+
+        <!-- Cancel Button -->
         <div
-          v-else
-          class="flex items-center gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300 rounded-lg border border-yellow-200 dark:border-yellow-800"
+          class="mt-4 flex justify-end"
+          v-if="
+            isRequester &&
+            loadedTicket.status !== TicketStatus.Completed &&
+            loadedTicket.status !== TicketStatus.Rejected &&
+            loadedTicket.status !== TicketStatus.Canceled
+          "
         >
-          <font-awesome-icon icon="ban" />
-          <p class="text-sm">
-            Comentários permitidos apenas para tickets em andamento ou em verificação
-          </p>
-        </div>
-
-        <div class="mt-6 relative">
-          <div
-            class="absolute left-5 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-600 z-0 hidden sm:block"
-          ></div>
-          <div v-for="event in timeline" :key="event.data.id">
-            <div
-              class="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-gray-700 rounded-lg mb-4 shadow-sm relative z-10"
-              v-if="event.type === 'comment'"
-            >
-              <div
-                class="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-lg border-2 border-white dark:border-gray-700 z-20 flex-shrink-0"
-              >
-                <font-awesome-icon icon="user-circle" />
-              </div>
-              <div class="flex-1 min-w-0">
-                <div
-                  class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 gap-1"
-                >
-                  <span
-                    class="font-medium text-gray-900 dark:text-gray-100 text-sm sm:text-base truncate"
-                    >{{ event.data.user.firstName }} {{ event.data.user.lastName }}</span
-                  >
-                  <span class="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">{{
-                    formatRelativeTime(event.createdAt)
-                  }}</span>
-                </div>
-                <div
-                  class="text-gray-600 dark:text-gray-300 comment-text text-sm"
-                  v-html="event.data.content"
-                ></div>
-              </div>
-            </div>
-
-            <div
-              class="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg mb-4 border border-gray-200 dark:border-gray-600 relative z-10"
-              v-else-if="event.type === 'specialUpdate'"
-              :class="event.subType"
-            >
-              <div
-                class="w-6 h-6 sm:w-8 sm:h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-xs sm:text-sm border-2 border-white dark:border-gray-700 z-20 flex-shrink-0"
-                :class="event.subType"
-              >
-                <span class="text-xs font-medium">{{
-                  getUserInitials(loadedTicket?.requester)
-                }}</span>
-              </div>
-              <div class="flex-1 min-w-0">
-                <div
-                  class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-1 gap-1"
-                >
-                  <span
-                    class="font-medium text-sm text-gray-700 dark:text-gray-300 truncate"
-                    :class="event.subType"
-                    >{{ getSpecialUpdateTitle(event.subType, event) }}</span
-                  >
-                  <span class="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">{{
-                    formatRelativeTime(event.createdAt)
-                  }}</span>
-                </div>
-                <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                  {{ event.data.content }}
-                </div>
-              </div>
-            </div>
-
-            <div
-              class="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 rounded-lg mb-4 border border-gray-200 dark:border-gray-600 relative z-10 shadow-sm"
-              v-else
-            >
-              <div
-                class="w-6 h-6 sm:w-8 sm:h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 text-sm sm:text-xl border-2 border-white dark:border-gray-700 z-20 flex-shrink-0"
-              >
-                <font-awesome-icon :icon="getEventIcon(event.data.description)" />
-              </div>
-              <div class="flex-1 min-w-0">
-                <div
-                  class="flex flex-col sm:flex-row sm:justify-between sm:items-center w-full gap-1"
-                >
-                  <div
-                    class="text-xs sm:text-sm text-gray-600 dark:text-gray-400"
-                    v-html="formatTicketUpdateDescription(event.data)"
-                  ></div>
-                  <span class="text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">{{
-                    formatRelativeTime(event.createdAt)
-                  }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <button
+            class="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
+            @click="cancelTicket(loadedTicket.customId)"
+          >
+            <font-awesome-icon icon="ban" />
+            Cancelar Ticket
+          </button>
         </div>
       </div>
     </div>
