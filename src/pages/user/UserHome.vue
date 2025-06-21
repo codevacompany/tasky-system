@@ -211,8 +211,16 @@
 
     <!-- Últimos Tickets Recebidos e Criados -->
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-      <CompactTicketTable title="Últimos Tickets Recebidos" type="received" />
-      <CompactTicketTable title="Últimos Tickets Criados" type="created" />
+      <CompactTicketTable
+        title="Últimos Tickets Recebidos"
+        type="received"
+        :viewAllUrl="'/meus-tickets?tab=recebidos'"
+      />
+      <CompactTicketTable
+        title="Últimos Tickets Criados"
+        type="created"
+        :viewAllUrl="'/meus-tickets?tab=criados'"
+      />
     </div>
   </section>
 </template>
