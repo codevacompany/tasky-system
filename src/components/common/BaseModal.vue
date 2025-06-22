@@ -9,9 +9,16 @@
       <LoadingSpinner v-if="isLoading" :size="50" :color="'white'" />
       <div
         v-else
-        class="bg-white dark:bg-gray-800 rounded-md shadow-lg min-w-[95vw] sm:min-w-[500px] max-w-[95%] sm:max-w-[90%] lg:max-w-[80%] xl:max-w-[70%] max-h-[95vh] sm:max-h-[90vh] flex flex-col overflow-hidden animate-modalSlideIn mx-4"
+        class="bg-white dark:bg-gray-800 rounded-md shadow-lg min-w-[95vw] sm:min-w-[500px] flex flex-col overflow-hidden animate-modalSlideIn mx-4"
       >
-        <div class="primary-gradient flex items-center justify-between p-3 sm:p-4 text-white">
+        <div v-if="hasCustomHeader">
+          <slot name="custom-header"></slot>
+        </div>
+
+        <div
+          v-else
+          class="primary-gradient flex items-center justify-between p-3 sm:p-4 text-white"
+        >
           <slot name="header">
             <h2 class="text-base sm:text-lg font-semibold">{{ title }}</h2>
           </slot>
@@ -22,8 +29,9 @@
             <font-awesome-icon icon="times" />
           </button>
         </div>
+
         <div
-          class="p-3 sm:p-6 overflow-y-auto overflow-x-hidden max-h-[calc(90vh-100px)] sm:max-h-[calc(90vh-120px)]"
+          class="p-3 sm:p-6 overflow-y-auto overflow-x-hidden max-h-[calc(90vh-100px)] sm:max-h-[95vh]"
         >
           <slot></slot>
         </div>
@@ -68,6 +76,7 @@ const props = defineProps({
   showConfirmButton: { type: Boolean, default: true },
   cancelButtonText: { type: String, default: 'Cancelar' },
   confirmButtonText: { type: String, default: 'Confirmar' },
+  hasCustomHeader: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['close', 'cancel', 'confirm']);
