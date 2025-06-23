@@ -1,12 +1,10 @@
 <template>
   <Teleport to="body">
     <div
-      v-if="showProfileModal"
       class="fixed inset-0 bg-transparent z-[999] pointer-events-auto"
       @click="closeModal"
     ></div>
     <div
-      v-if="showProfileModal"
       class="fixed top-[calc(var(--header-height)+6px)] right-5 w-[310px] bg-white dark:bg-gray-800 rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.1)] z-[1000] overflow-hidden transition-all duration-300 pointer-events-auto border border-gray-200 dark:border-gray-700"
       id="profileModal"
       @click.stop
@@ -183,7 +181,7 @@
     </div>
 
     <BaseModal
-      :is-open="showChangePasswordModal"
+      v-if="showChangePasswordModal"
       title="Alterar Senha"
       :show-footer="true"
       confirm-text="Alterar Senha"
@@ -329,10 +327,6 @@ import { toast } from 'vue3-toastify';
 import BaseModal from '@/components/common/BaseModal.vue';
 
 const router = useRouter();
-
-defineProps({
-  showProfileModal: Boolean,
-});
 
 const emit = defineEmits<{
   (event: 'close'): void;

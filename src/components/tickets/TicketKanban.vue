@@ -136,7 +136,6 @@
 
   <TicketDetailsModal
     v-if="isModalOpen"
-    :isOpen="isModalOpen"
     :ticket="selectedTicket"
     @close="isModalOpen = false"
   />

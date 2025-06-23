@@ -1,7 +1,5 @@
 <template>
   <BaseModal
-    v-if="isOpen"
-    :isOpen="isOpen"
     :title="title"
     @close="handleCancel"
     @cancel="handleCancel"
@@ -70,7 +68,6 @@ import { ref, watch } from 'vue';
 import BaseModal from './BaseModal.vue';
 
 const props = defineProps<{
-  isOpen: boolean;
   title: string;
   message: string;
   hasInput?: boolean;
@@ -85,17 +82,6 @@ const emit = defineEmits<{
 const showErrors = ref(false);
 const inputReason = ref('');
 const inputDescription = ref('');
-
-watch(
-  () => props.isOpen,
-  (newValue) => {
-    if (!newValue) {
-      resetForm();
-    } else {
-      showErrors.value = false;
-    }
-  },
-);
 
 const validateForm = (): boolean => {
   if (!props.hasInput) return true;

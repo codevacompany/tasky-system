@@ -3,6 +3,7 @@ import {
   faHome,
   faUsers,
   faChevronDown,
+  faChevronUp,
   faUserPlus,
   faBuilding,
   faTags,
@@ -86,6 +87,7 @@ import {
   faFileCsv,
   faFileExcel,
   faBars,
+  faUndo,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -97,6 +99,7 @@ const icons = [
   faHome,
   faUsers,
   faChevronDown,
+  faChevronUp,
   faChevronLeft,
   faChevronRight,
   faUserPlus,
@@ -183,6 +186,7 @@ const icons = [
   faFileCsv,
   faFileExcel,
   faBars,
+  faUndo,
 ];
 
 library.add(...icons);

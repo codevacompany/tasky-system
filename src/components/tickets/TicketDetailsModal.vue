@@ -1,7 +1,5 @@
 <template>
   <BaseModal
-    v-if="isOpen"
-    :isOpen="isOpen"
     title="Detalhes do Ticket"
     :isLoading="loadedTicket ? false : true"
     @close="closeModal"
@@ -17,7 +15,7 @@
             <h2 class="text-lg sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
               Detalhes do Ticket
             </h2>
-            <p class="text-blue-700 font-semibold dark:text-gray-400">
+            <p class="text-gray-600 font-medium dark:text-gray-400">
               {{ loadedTicket.customId }}
             </p>
           </div>
@@ -47,7 +45,7 @@
               @click="sendForReview(loadedTicket.customId)"
             >
               <font-awesome-icon icon="arrow-right" class="text-xs" />
-              Enviar
+              Enviar Para Verificação
             </button>
 
             <button
@@ -56,7 +54,7 @@
               @click="cancelVerificationRequest(loadedTicket.customId)"
             >
               <font-awesome-icon icon="undo" class="text-xs" />
-              Cancelar Verificação
+              Cancelar Envio
             </button>
 
             <button
@@ -122,7 +120,7 @@
 
     <div
       v-if="loadedTicket"
-      class="w-full max-w-7xl mx-auto p-3 sm:p-0 h-[calc(100vh-200px)] flex flex-col"
+      class="w-[85vw] max-w-[1280px] mx-auto p-3 sm:p-0 h-[calc(100vh-200px)] max-h-[650px] flex flex-col"
     >
       <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
         <!-- Left Sidebar -->
@@ -155,12 +153,17 @@
                 </div>
                 <span
                   :class="[
-                    'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium gap-1.5',
+                    'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium max-w-[140px] sm:max-w-[220px]',
                     getStatusClass(loadedTicket.status),
                   ]"
                 >
-                  <font-awesome-icon :icon="getStatusIcon(loadedTicket.status)" class="text-xs" />
-                  {{ formatSnakeToNaturalCase(loadedTicket?.status!).toUpperCase() }}
+                  <font-awesome-icon
+                    :icon="getStatusIcon(loadedTicket.status)"
+                    class="text-xs mr-1.5 flex-shrink-0"
+                  />
+                  <span class="truncate">{{
+                    formatSnakeToNaturalCase(loadedTicket?.status!).toUpperCase()
+                  }}</span>
                 </span>
               </div>
 
@@ -209,20 +212,51 @@
                     Responsável
                   </p>
                 </div>
-                <div class="flex items-center gap-2">
-                  <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
-                    {{ loadedTicket.targetUser.firstName }} {{ loadedTicket.targetUser.lastName }}
-                  </p>
-                  <div
-                    v-if="!loadedTicket.targetUser.isActive"
-                    class="flex items-center gap-1"
-                    title="Conta desativada"
-                  >
-                    <font-awesome-icon
-                      icon="exclamation-triangle"
-                      class="text-orange-500 text-xs"
+                <div class="flex-1 min-w-0">
+                  <div v-if="!isEditingAssignee">
+                    <div
+                      class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 -m-2 rounded-lg transition-colors"
+                      @click="startEditingAssignee"
+                      :class="{ 'cursor-default': !canEditTicket }"
+                      :title="canEditTicket ? 'Clique para alterar responsável' : ''"
+                    >
+                      <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                        {{ loadedTicket.targetUser.firstName }}
+                        {{ loadedTicket.targetUser.lastName }}
+                      </p>
+                      <div
+                        v-if="!loadedTicket.targetUser.isActive"
+                        class="flex items-center gap-1"
+                        title="Conta desativada"
+                      >
+                        <font-awesome-icon
+                          icon="exclamation-triangle"
+                          class="text-orange-500 text-xs"
+                        />
+                        <span class="text-orange-500 text-xs">Desativado</span>
+                      </div>
+                      <font-awesome-icon
+                        v-if="canEditTicket && isRequester"
+                        icon="edit"
+                        class="text-gray-400 text-xs ml-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div v-else class="space-y-3">
+                    <DepartmentUserSelector
+                      v-model="assigneeSelection"
+                      @change="saveAssigneeChange"
+                      placeholder="Selecionar responsável..."
                     />
-                    <span class="text-orange-500 text-xs">Desativado</span>
+                    <div class="flex gap-2">
+                      <button
+                        @click="cancelEditingAssignee"
+                        class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -241,7 +275,7 @@
 
               <div class="flex items-start gap-3">
                 <div class="w-[40%]">
-                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                     Concluir até
                   </p>
                 </div>
@@ -252,7 +286,7 @@
 
               <div class="flex items-start gap-3" :class="getDeadlineClass(loadedTicket.dueAt)">
                 <div class="w-[40%]">
-                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Prazo</p>
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Prazo</p>
                 </div>
                 <div class="flex items-center gap-2">
                   <p class="text-sm text-gray-900 dark:text-gray-100">
@@ -269,7 +303,7 @@
               <!-- Accepted Date -->
               <div class="flex items-start gap-3">
                 <div class="w-[40%]">
-                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Aceite em</p>
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Aceite em</p>
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm text-gray-900 dark:text-gray-100">
@@ -280,7 +314,7 @@
 
               <div class="flex items-start gap-3">
                 <div class="w-[40%]">
-                  <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                     Privacidade
                   </p>
                 </div>
@@ -302,7 +336,7 @@
                   class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100 leading-tight"
                   @click="startEditingName"
                   :class="{
-                    'cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors':
+                    'cursor-text hover:text-gray-600 dark:hover:text-gray-400 transition-colors':
                       isRequester,
                   }"
                   :title="isRequester ? 'Clique para editar' : ''"
@@ -337,16 +371,16 @@
               </div>
               <button
                 v-if="canEditTicket"
-                class="inline-flex items-center justify-center mt-3 px-2 py-1.5 border border-gray-300 gap-2 hover:bg-blue-500 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors"
+                class="inline-flex items-center justify-center mt-3 px-2 py-1.5 border border-gray-300 gap-2 hover:bg-gray-100 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
                 @click="openFileInput"
-                title="Adicionar anexos"
+                title="Anexar arquivo"
               >
-                <font-awesome-icon icon="plus" class="text-sm" /> Adicionar
+                <font-awesome-icon icon="paperclip" class="text-sm" /> Anexo
               </button>
             </div>
 
             <!-- Description Section -->
-            <div class="mt-2 px-4 sm:px-6 dark:border-gray-700">
+            <div class="my-2 px-4 sm:px-6 dark:border-gray-700">
               <h3 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                 <font-awesome-icon icon="file-text" class="text-blue-600 dark:text-blue-400" />
                 Descrição
@@ -358,7 +392,7 @@
                   v-html="loadedTicket.description"
                   @click="startEditingDescription"
                   :class="{
-                    'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-3 rounded-lg transition-colors':
+                    'cursor-text hover:bg-gray-50 dark:hover:bg-gray-700 p-3 rounded-lg transition-colors':
                       isRequester,
                   }"
                   :title="isRequester ? 'Clique para editar' : ''"
@@ -392,6 +426,9 @@
               </div>
             </div>
 
+            <!-- File Input (always present for functionality) -->
+            <input class="hidden" type="file" ref="fileInput" multiple @change="handleFileChange" />
+
             <!-- Attachments Section -->
             <div
               v-if="loadedTicket.files.length > 0"
@@ -416,14 +453,6 @@
                   <font-awesome-icon icon="plus" />
                 </button>
               </div>
-
-              <input
-                class="hidden"
-                type="file"
-                ref="fileInput"
-                multiple
-                @change="handleFileChange"
-              />
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div
@@ -512,7 +541,7 @@
               </div>
 
               <!-- Timeline -->
-              <div class="space-y-4 relative">
+              <div class="space-y-1 relative">
                 <div
                   class="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-600 hidden sm:block"
                 ></div>
@@ -520,23 +549,27 @@
                 <div v-for="event in timeline" :key="event.data.id" class="relative">
                   <!-- Comment -->
                   <div v-if="event.type === 'comment'" class="flex gap-4 relative">
-                    <div
-                      class="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 border-4 border-white dark:border-gray-800 relative z-10 flex-shrink-0"
-                    >
-                      <font-awesome-icon icon="comment" />
-                    </div>
                     <div class="flex-1 min-w-0 pb-4">
-                      <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                        <div class="flex items-center justify-between mb-3">
-                          <span class="font-medium text-gray-900 dark:text-gray-100">
-                            {{ event.data.user.firstName }} {{ event.data.user.lastName }}
-                          </span>
-                          <span class="text-sm text-gray-500 dark:text-gray-400">
-                            {{ formatRelativeTime(event.createdAt) }}
-                          </span>
+                      <div
+                        class="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+                      >
+                        <div class="flex items-center gap-3 mb-3">
+                          <div
+                            class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 border-2 border-gray-200 dark:border-gray-600 flex-shrink-0"
+                          >
+                            <font-awesome-icon icon="user-circle" />
+                          </div>
+                          <div class="flex items-center justify-between flex-1">
+                            <span class="font-medium text-gray-900 dark:text-gray-100">
+                              {{ event.data.user.firstName }} {{ event.data.user.lastName }}
+                            </span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                              {{ formatRelativeTime(event.createdAt) }}
+                            </span>
+                          </div>
                         </div>
                         <div
-                          class="comment-text prose prose-sm max-w-none dark:prose-invert"
+                          class="comment-text prose prose-sm max-w-none dark:prose-invert ml-11"
                           v-html="event.data.content"
                         ></div>
                       </div>
@@ -549,30 +582,32 @@
                     class="flex gap-4 relative"
                     :class="event.subType"
                   >
-                    <div
-                      class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center border-4 border-white dark:border-gray-800 relative z-10 flex-shrink-0"
-                      :class="event.subType"
-                    >
-                      <span class="text-sm font-medium text-gray-600 dark:text-gray-400">
-                        {{ getUserInitials(loadedTicket?.requester) }}
-                      </span>
-                    </div>
                     <div class="flex-1 min-w-0 pb-4">
                       <div
                         class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
                       >
-                        <div class="flex items-center justify-between mb-2">
-                          <span
-                            class="font-medium text-gray-700 dark:text-gray-300"
+                        <div class="flex items-center gap-3 mb-2">
+                          <div
+                            class="w-7 h-7 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center border-2 border-gray-200 dark:border-gray-600 flex-shrink-0"
                             :class="event.subType"
                           >
-                            {{ getSpecialUpdateTitle(event.subType, event) }}
-                          </span>
-                          <span class="text-sm text-gray-500 dark:text-gray-400">
-                            {{ formatRelativeTime(event.createdAt) }}
-                          </span>
+                            <span class="text-xs font-medium text-gray-600 dark:text-gray-400">
+                              {{ getUserInitials(loadedTicket?.requester) }}
+                            </span>
+                          </div>
+                          <div class="flex items-center justify-between flex-1">
+                            <span
+                              class="font-medium text-gray-700 dark:text-gray-300"
+                              :class="event.subType"
+                            >
+                              {{ getSpecialUpdateTitle(event.subType, event) }}
+                            </span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                              {{ formatRelativeTime(event.createdAt) }}
+                            </span>
+                          </div>
                         </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                        <div class="text-sm text-gray-600 dark:text-gray-400 ml-11">
                           {{ event.data.content }}
                         </div>
                       </div>
@@ -581,23 +616,27 @@
 
                   <!-- Regular Events -->
                   <div v-else class="flex gap-4 relative">
-                    <div
-                      class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 border-4 border-white dark:border-gray-800 relative z-10 flex-shrink-0"
-                    >
-                      <font-awesome-icon :icon="getEventIcon(event.data.description)" />
-                    </div>
                     <div class="flex-1 min-w-0 pb-4">
                       <div
                         class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
                       >
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
                           <div
-                            class="text-sm text-gray-600 dark:text-gray-400 flex-1"
-                            v-html="formatTicketUpdateDescription(event.data)"
-                          ></div>
-                          <span class="text-sm text-gray-500 dark:text-gray-400 ml-4 flex-shrink-0">
-                            {{ formatRelativeTime(event.createdAt) }}
-                          </span>
+                            class="w-7 h-7 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 border-2 border-gray-200 dark:border-gray-600 flex-shrink-0"
+                          >
+                            <font-awesome-icon :icon="getEventIcon(event.data.description)" />
+                          </div>
+                          <div class="flex items-center justify-between flex-1">
+                            <div
+                              class="text-sm text-gray-600 dark:text-gray-400 flex-1"
+                              v-html="formatTicketUpdateDescription(event.data)"
+                            ></div>
+                            <span
+                              class="text-sm text-gray-500 dark:text-gray-400 ml-4 flex-shrink-0"
+                            >
+                              {{ formatRelativeTime(event.createdAt) }}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -613,7 +652,6 @@
 
   <ConfirmationModal
     v-if="confirmationModal.isOpen"
-    :isOpen="confirmationModal.isOpen"
     :title="confirmationModal.title"
     :message="confirmationModal.message"
     :hasInput="confirmationModal.hasInput"
@@ -648,6 +686,7 @@ import axios from 'axios';
 import { CorrectionReason, DisapprovalReason } from '@/models';
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import DepartmentUserSelector from '@/components/common/DepartmentUserSelector.vue';
 
 interface SpecialUpdateEvent {
   data?: {
@@ -658,11 +697,10 @@ interface SpecialUpdateEvent {
 }
 
 const props = defineProps<{
-  isOpen: boolean;
   ticket: Ticket | null;
 }>();
 
-const emit = defineEmits(['close', 'refresh']);
+const emit = defineEmits(['close']);
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
 const newComment = ref('');
@@ -823,7 +861,7 @@ const acceptTicket = async (ticketId: string) => {
         await ticketService.accept(ticketId);
         toast.success('Ticket aceito com sucesso');
 
-        emit('refresh');
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao aceitar o ticket');
       }
@@ -840,7 +878,7 @@ const sendForReview = async (ticketId: string) => {
         await ticketService.updateStatus(ticketId, { status: TicketStatus.AwaitingVerification });
         toast.success('Ticket enviado para revisão');
 
-        emit('refresh');
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao enviar o ticket para revisão');
       }
@@ -858,7 +896,7 @@ const approveTicket = async (ticketId: string) => {
         toast.success('Ticket aprovado com sucesso');
 
         if (props.ticket) {
-          emit('refresh');
+          refreshSelectedTicket();
         } else {
           await ticketsStore.fetchTicketDetails(ticketId);
         }
@@ -883,7 +921,7 @@ const requestCorrection = async (ticketId: string) => {
 
         toast.success('Correção solicitada com sucesso');
 
-        emit('refresh');
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao solicitar correção');
       }
@@ -901,7 +939,7 @@ const correctTicket = async (ticketId: string) => {
       try {
         await ticketService.updateStatus(ticketId, { status: TicketStatus.InProgress });
         toast.success('Ticket em correção');
-        emit('refresh');
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao iniciar correção');
       }
@@ -923,7 +961,7 @@ const rejectTicket = async (ticketId: string) => {
 
         toast.success('Ticket reprovado com sucesso');
 
-        emit('refresh');
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao reprovar o ticket');
       }
@@ -1163,15 +1201,6 @@ const getSpecialUpdateTitle = (subType: string, event?: SpecialUpdateEvent) => {
   return baseTitle;
 };
 
-watch(
-  () => props.isOpen,
-  (isOpen) => {
-    if (isOpen && props.ticket?.customId) {
-      fetchComments();
-      fetchTicketUpdates();
-    }
-  },
-);
 
 watch(
   () => props.ticket,
@@ -1185,14 +1214,6 @@ watch(
   { immediate: true },
 );
 
-watch(
-  () => props.isOpen,
-  (isOpen) => {
-    if (!isOpen) {
-      loadedTicket.value = null;
-    }
-  },
-);
 
 const openFileInput = () => {
   if (fileInput.value) {
@@ -1237,7 +1258,7 @@ const handleFileChange = async (event: Event) => {
       }
 
       toast.success('Arquivos anexados com sucesso!');
-      emit('refresh');
+      refreshSelectedTicket();
     }
   } catch (error) {
     console.error('Erro ao fazer upload:', error);
@@ -1278,7 +1299,7 @@ const refreshSelectedTicket = async () => {
 };
 
 const startEditingName = () => {
-  if (!isRequester.value) return;
+  if (!isRequester.value || loadedTicket.value?.status !== TicketStatus.Pending) return;
   isEditingName.value = true;
   editingName.value = loadedTicket.value?.name || '';
   nextTick(() => {
@@ -1304,7 +1325,7 @@ const saveTicketName = async () => {
     }
 
     toast.success('Assunto do ticket atualizado com sucesso');
-    emit('refresh');
+    refreshSelectedTicket();
   } catch {
     toast.error('Erro ao atualizar nome do ticket');
   }
@@ -1316,7 +1337,7 @@ const cancelEditingName = () => {
 };
 
 const startEditingDescription = () => {
-  if (!isRequester.value) return;
+  if (!isRequester.value || loadedTicket.value?.status !== TicketStatus.Pending) return;
   isEditingDescription.value = true;
   editingDescription.value = loadedTicket.value?.description || '';
   descriptionEditorKey.value += 1;
@@ -1345,7 +1366,7 @@ const saveTicketDescription = async () => {
     }
 
     toast.success('Descrição do ticket atualizada com sucesso');
-    emit('refresh');
+    refreshSelectedTicket();
   } catch {
     toast.error('Erro ao atualizar descrição do ticket');
   }
@@ -1366,12 +1387,63 @@ const cancelVerificationRequest = async (ticketId: string) => {
         await ticketService.updateStatus(ticketId, { status: TicketStatus.InProgress });
         toast.success('Envio para verificação cancelado');
 
-        emit('refresh');
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao cancelar envio para verificação');
       }
     },
   );
+};
+
+const showAddMenu = ref(false);
+
+
+const selectAttachFile = () => {
+  closeAddMenu();
+  openFileInput();
+};
+
+const closeAddMenu = () => {
+  showAddMenu.value = false;
+};
+
+const isEditingAssignee = ref(false);
+const assigneeSelection = ref<{ departmentId: number | null; userId: number | null }>({
+  departmentId: null,
+  userId: null,
+});
+
+const startEditingAssignee = () => {
+  if (!canEditTicket.value || !isRequester.value) return;
+
+  assigneeSelection.value = {
+    departmentId: loadedTicket.value?.targetUser?.departmentId || null,
+    userId: loadedTicket.value?.targetUser?.id || null,
+  };
+  isEditingAssignee.value = true;
+};
+
+const cancelEditingAssignee = () => {
+  isEditingAssignee.value = false;
+  assigneeSelection.value = {
+    departmentId: null,
+    userId: null,
+  };
+};
+
+const saveAssigneeChange = async (selection: { department: any; user: any }) => {
+  if (!selection.user || !loadedTicket.value) return;
+
+  try {
+    await ticketService.updateAssignee(loadedTicket.value.customId, selection.user.id);
+
+    await refreshSelectedTicket();
+    isEditingAssignee.value = false;
+    toast.success('Responsável alterado com sucesso!');
+  } catch (error) {
+    console.error('Erro ao alterar responsável:', error);
+    toast.error('Erro ao alterar responsável');
+  }
 };
 </script>
 

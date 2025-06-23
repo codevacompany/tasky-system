@@ -1,7 +1,6 @@
 <template>
   <Teleport to="body">
     <div
-      v-if="isOpen"
       class="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]"
       id="newTicketModal"
       @click.self="close"
@@ -9,7 +8,7 @@
       <LoadingSpinner v-if="isLoading" :size="50" :color="'white'" />
       <div
         v-else
-        class="bg-white dark:bg-gray-800 rounded-md shadow-lg min-w-[95vw] sm:min-w-[500px] flex flex-col overflow-hidden animate-modalSlideIn mx-4"
+        class="bg-white dark:bg-gray-800 rounded-md shadow-lg min-w-[95vw] sm:min-w-[500px] max-h-[calc(90vh-100px)] sm:max-h-[90vh] flex flex-col overflow-hidden animate-modalSlideIn mx-4"
       >
         <div v-if="hasCustomHeader">
           <slot name="custom-header"></slot>
@@ -31,7 +30,7 @@
         </div>
 
         <div
-          class="p-3 sm:p-6 overflow-y-auto overflow-x-hidden max-h-[calc(90vh-100px)] sm:max-h-[95vh]"
+          class="p-3 sm:p-6 overflow-y-auto overflow-x-hidden"
         >
           <slot></slot>
         </div>
@@ -68,7 +67,6 @@ import { defineProps, defineEmits } from 'vue';
 import LoadingSpinner from './LoadingSpinner.vue';
 
 const props = defineProps({
-  isOpen: Boolean,
   title: { type: String, default: 'Modal Title' },
   isLoading: { type: Boolean, default: false },
   showFooter: { type: Boolean, default: true },

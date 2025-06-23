@@ -1,5 +1,5 @@
-import type { TicketStatus } from "./ticket";
-import type { User } from "./user";
+import type { TicketStatus } from './ticket';
+import type { User } from './user';
 
 export enum TicketActionType {
   Creation = 'criação',
@@ -7,6 +7,7 @@ export enum TicketActionType {
   Completion = 'finalização',
   Update = 'atualização',
   Cancellation = 'cancelamento',
+  AssigneeChange = 'mudança_de_responsável',
 }
 
 export interface TicketUpdate {
