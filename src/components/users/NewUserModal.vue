@@ -1,6 +1,5 @@
 <template>
   <BaseModal
-    :isOpen="isOpen"
     title="Novo Colaborador"
     @close="closeModal"
     @cancel="closeModal"
@@ -123,10 +122,6 @@ import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
 const isLoading = ref(false);
-
-defineProps({
-  isOpen: Boolean,
-});
 
 const emit = defineEmits(['close', 'userCreated']);
 

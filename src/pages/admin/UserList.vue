@@ -204,10 +204,10 @@
       </button>
     </div>
 
-    <NewUserModal :isOpen="isModalOpen" @close="closeModal" @userCreated="loadUsers" />
+    <NewUserModal v-if="isModalOpen" @close="closeModal" @userCreated="loadUsers" />
 
     <ConfirmationModal
-      :isOpen="isConfirmationModalOpen"
+      v-if="isConfirmationModalOpen"
       :title="confirmationTitle"
       :message="confirmationMessage"
       @confirm="handleConfirmAction"

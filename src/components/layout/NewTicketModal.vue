@@ -1,6 +1,5 @@
 <template>
   <BaseModal
-    :isOpen="isOpen"
     title="Novo Ticket"
     @close="closeModal"
     @cancel="resetForm"
@@ -202,10 +201,6 @@ import axios from 'axios';
 import { awsService } from '@/services/awsService';
 import BaseModal from '@/components/common/BaseModal.vue';
 import Select from '@/components/common/Select.vue';
-
-defineProps<{
-  isOpen: boolean;
-}>();
 
 const emit = defineEmits<{
   (e: 'close'): void;

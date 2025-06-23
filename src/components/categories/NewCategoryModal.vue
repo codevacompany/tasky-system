@@ -1,6 +1,5 @@
 <template>
   <BaseModal
-    :isOpen="isOpen"
     title="Nova Categoria"
     @close="closeModal"
     @cancel="closeModal"
@@ -40,10 +39,6 @@ import BaseModal from '../common/BaseModal.vue';
 import { categoryService } from '@/services/categoryService';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
-
-defineProps({
-  isOpen: Boolean,
-});
 
 const emit = defineEmits(['close', 'categoryCreated']);
 

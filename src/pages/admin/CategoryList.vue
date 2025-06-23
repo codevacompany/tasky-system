@@ -93,17 +93,17 @@
       </button>
     </div>
 
-    <NewCategoryModal :isOpen="isModalOpen" @close="closeModal" @categoryCreated="loadCategories" />
+    <NewCategoryModal v-if="isModalOpen" @close="closeModal" @categoryCreated="loadCategories" />
 
     <EditCategoryModal
-      :isOpen="isEditModalOpen"
+      v-if="isEditModalOpen"
       :category="categoryToEdit"
       @close="closeEditModal"
       @categoryUpdated="loadCategories"
     />
 
     <ConfirmationModal
-      :isOpen="showDeleteConfirmation"
+      v-if="showDeleteConfirmation"
       title="Excluir Categoria"
       :message="`Tem certeza que deseja excluir a categoria '${categoryToDelete?.name}'?`"
       @confirm="deleteCategory"

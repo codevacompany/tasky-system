@@ -399,15 +399,9 @@
       </button>
     </div>
 
-    <TicketDetailsModal
-      :isOpen="isModalOpen"
-      :ticket="selectedTicket!"
-      @close="closeModal"
-      @refresh="refreshSelectedTicket"
-    />
+    <TicketDetailsModal v-if="isModalOpen" :ticket="selectedTicket!" @close="closeModal" />
     <ConfirmationModal
       v-if="confirmationModal.isOpen"
-      :isOpen="confirmationModal.isOpen"
       :title="confirmationModal.title"
       :message="confirmationModal.message"
       :hasInput="confirmationModal.hasInput"
@@ -418,7 +412,7 @@
 
     <!-- Modal de Aviso de Verificação -->
     <BaseModal
-      :isOpen="showVerificationAlert"
+      v-if="showVerificationAlert"
       title="Ação Necessária"
       @close="showVerificationAlert = false"
       :show-footer="false"
@@ -586,17 +580,6 @@ const refreshTickets = async () => {
     case 'arquivados':
       await ticketsStore.fetchArchivedTickets(currentPage.value);
       break;
-  }
-};
-
-const refreshSelectedTicket = async () => {
-  if (!selectedTicket.value?.customId) return;
-
-  try {
-    const updatedTicket = await ticketsStore.fetchTicketDetails(selectedTicket.value.customId);
-    selectedTicket.value = updatedTicket;
-  } catch {
-    toast.error('Erro ao atualizar o ticket');
   }
 };
 

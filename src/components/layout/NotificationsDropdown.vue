@@ -1,7 +1,6 @@
 <template>
   <div
     class="fixed inset-0 bg-transparent z-[999] pointer-events-auto"
-    v-if="isOpen"
     @click="closeModal"
   >
     <div
@@ -77,7 +76,7 @@
     </div>
   </div>
 
-  <TicketDetailsModal :isOpen="openTicket" :ticket="selectedTicket" @close="openTicket = false" />
+  <TicketDetailsModal v-if="openTicket" :ticket="selectedTicket" @close="openTicket = false" />
 </template>
 
 <script setup lang="ts">
@@ -91,10 +90,6 @@ import TicketDetailsModal from '../tickets/TicketDetailsModal.vue';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from '@/stores/user';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
-
-defineProps<{
-  isOpen: boolean;
-}>();
 
 const emit = defineEmits<{
   (e: 'close'): void;

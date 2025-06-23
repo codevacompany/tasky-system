@@ -1,6 +1,5 @@
 <template>
   <BaseModal
-    :isOpen="isOpen"
     title="Novo Setor"
     @close="closeModal"
     @cancel="closeModal"
@@ -38,10 +37,6 @@ import BaseModal from '../common/BaseModal.vue';
 import { departmentService } from '@/services/departmentService';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
-
-defineProps({
-  isOpen: Boolean,
-});
 
 const emit = defineEmits(['close', 'departmentCreated']);
 

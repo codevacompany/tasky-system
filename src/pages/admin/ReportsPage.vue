@@ -1671,7 +1671,7 @@
   </div>
 
   <BaseModal
-    :isOpen="showExportModal"
+    v-if="showExportModal"
     title="Exportar Relatório"
     @close="closeExportModal"
     @cancel="closeExportModal"
