@@ -3,6 +3,7 @@ import {
   faHome,
   faUsers,
   faChevronDown,
+  faChevronUp,
   faUserPlus,
   faBuilding,
   faTags,
@@ -41,6 +42,7 @@ import {
   faSitemap,
   faCalendarDay,
   faUserCheck,
+  faUserSlash,
   faHourglassEnd,
   faArrowDown,
   faMinus,
@@ -87,6 +89,7 @@ import {
   faBars,
   faCreditCard,
   faHandshake,
+  faUndo,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -98,6 +101,7 @@ const icons = [
   faHome,
   faUsers,
   faChevronDown,
+  faChevronUp,
   faChevronLeft,
   faChevronRight,
   faUserPlus,
@@ -140,6 +144,7 @@ const icons = [
   faSitemap,
   faCalendarDay,
   faUserCheck,
+  faUserSlash,
   faHourglassEnd,
   faArrowDown,
   faMinus,
@@ -185,6 +190,7 @@ const icons = [
   faBars,
   faCreditCard,
   faHandshake,
+  faUndo,
 ];
 
 library.add(...icons);

@@ -1,6 +1,5 @@
 <template>
   <BaseModal
-    :isOpen="isOpen"
     title="Editar Setor"
     @close="closeModal"
     @cancel="closeModal"
@@ -43,7 +42,6 @@ import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import type { Department } from '@/models';
 
 const props = defineProps<{
-  isOpen: boolean;
   department: Department | null;
 }>();
 

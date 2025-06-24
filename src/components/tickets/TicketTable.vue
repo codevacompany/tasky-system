@@ -7,59 +7,59 @@
         <thead>
           <tr>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               ID
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Título
             </th>
             <th
               v-if="tableType === 'criados'"
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Destino
             </th>
             <th
               v-else
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Solicitante
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Setor
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Prioridade
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Status
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Criado em
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Concluir até
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Prazo
             </th>
             <th
-              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-3 text-center text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Ações
             </th>
@@ -109,12 +109,25 @@
               v-if="tableType === 'criados'"
               class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
             >
-              <div class="max-w-[120px] truncate">
-                {{
-                  ticket.targetUser
-                    ? ticket.targetUser.firstName + ' ' + ticket.targetUser.lastName
-                    : '-'
-                }}
+              <div class="max-w-[120px]">
+                <div class="truncate">
+                  {{
+                    ticket.targetUser
+                      ? ticket.targetUser.firstName + ' ' + ticket.targetUser.lastName
+                      : '-'
+                  }}
+                </div>
+                <div
+                  v-if="ticket.targetUser && !ticket.targetUser.isActive"
+                  class="flex items-center justify-center gap-1 mt-1"
+                >
+                  <font-awesome-icon
+                    icon="exclamation-triangle"
+                    class="text-orange-500 text-xs"
+                    title="Conta desativada"
+                  />
+                  <span class="text-orange-500 text-xs font-medium">Desativado</span>
+                </div>
               </div>
             </td>
             <td
@@ -386,15 +399,9 @@
       </button>
     </div>
 
-    <TicketDetailsModal
-      :isOpen="isModalOpen"
-      :ticket="selectedTicket!"
-      @close="closeModal"
-      @refresh="refreshSelectedTicket"
-    />
+    <TicketDetailsModal v-if="isModalOpen" :ticket="selectedTicket!" @close="closeModal" />
     <ConfirmationModal
       v-if="confirmationModal.isOpen"
-      :isOpen="confirmationModal.isOpen"
       :title="confirmationModal.title"
       :message="confirmationModal.message"
       :hasInput="confirmationModal.hasInput"
@@ -405,7 +412,7 @@
 
     <!-- Modal de Aviso de Verificação -->
     <BaseModal
-      :isOpen="showVerificationAlert"
+      v-if="showVerificationAlert"
       title="Ação Necessária"
       @close="showVerificationAlert = false"
       :show-footer="false"
@@ -573,17 +580,6 @@ const refreshTickets = async () => {
     case 'arquivados':
       await ticketsStore.fetchArchivedTickets(currentPage.value);
       break;
-  }
-};
-
-const refreshSelectedTicket = async () => {
-  if (!selectedTicket.value?.customId) return;
-
-  try {
-    const updatedTicket = await ticketsStore.fetchTicketDetails(selectedTicket.value.customId);
-    selectedTicket.value = updatedTicket;
-  } catch {
-    toast.error('Erro ao atualizar o ticket');
   }
 };
 

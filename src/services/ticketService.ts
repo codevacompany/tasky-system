@@ -126,4 +126,8 @@ export const ticketService = {
   async addFiles(id: string, fileUrls: string[]): Promise<AxiosResponse<Ticket>> {
     return apiClient.post(`/tickets/${id}/files`, { fileUrls });
   },
+
+  async updateAssignee(id: string, targetUserId: number): Promise<AxiosResponse<Ticket>> {
+    return apiClient.patch(`/tickets/${id}/assignee`, { targetUserId });
+  },
 };

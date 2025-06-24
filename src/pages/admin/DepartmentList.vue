@@ -94,20 +94,20 @@
     </div>
 
     <NewDepartmentModal
-      :isOpen="isModalOpen"
+      v-if="isModalOpen"
       @close="closeModal"
       @departmentCreated="loadDepartments"
     />
 
     <EditDepartmentModal
-      :isOpen="isEditModalOpen"
+      v-if="isEditModalOpen"
       :department="departmentToEdit"
       @close="closeEditModal"
       @departmentUpdated="loadDepartments"
     />
 
     <ConfirmationModal
-      :isOpen="showDeleteConfirmation"
+      v-if="showDeleteConfirmation"
       title="Excluir Setor"
       :message="`Tem certeza que deseja excluir o setor '${departmentToDelete?.name}'?`"
       @confirm="deleteDepartment"

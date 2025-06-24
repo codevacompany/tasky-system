@@ -1,413 +1,646 @@
 <template>
   <BaseModal
-    v-if="isOpen"
-    :isOpen="isOpen"
     title="Detalhes do Ticket"
     :isLoading="loadedTicket ? false : true"
     @close="closeModal"
     :showFooter="false"
+    :hasCustomHeader="true"
   >
-    <div v-if="loadedTicket" class="content">
-      <!-- Assunto em largura total -->
-      <div class="details-item full-width-subject">
-        <div class="detail-icon">
-          <font-awesome-icon icon="file-alt" />
+    <template #custom-header>
+      <div
+        class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between p-3 sm:px-6 sm:py-4"
+      >
+        <div class="flex items-center gap-3">
+          <div v-if="loadedTicket">
+            <h2 class="text-lg sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
+              Detalhes do Ticket
+            </h2>
+            <p class="text-gray-600 font-medium dark:text-gray-400">
+              {{ loadedTicket.customId }}
+            </p>
+          </div>
         </div>
-        <div class="detail-content">
-          <div class="detail-label">Assunto</div>
-          <div class="detail-value" v-if="!isEditingName">
-            <span
-              @click="startEditingName"
-              :class="{ 'editable-field': isRequester }"
-              :title="isRequester ? 'Clique para editar' : ''"
+
+        <!-- Action Buttons in Header -->
+        <div class="flex items-center gap-2 ml-4" v-if="loadedTicket">
+          <div
+            class="flex items-center gap-2"
+            v-if="
+              isTargetUser ||
+              (isRequester && loadedTicket.status === TicketStatus.UnderVerification)
+            "
+          >
+            <button
+              v-if="isTargetUser && loadedTicket?.status === TicketStatus.Pending"
+              class="inline-flex items-center gap-1.5 px-3 py-2 bg-green-600 hover:bg-green-700 text-sm text-white font-medium rounded-md transition-colors"
+              @click="acceptTicket(loadedTicket?.customId)"
             >
-              {{ loadedTicket.name }}
-            </span>
+              <font-awesome-icon icon="check" class="text-xs" />
+              Aceitar
+            </button>
+
+            <button
+              v-if="isTargetUser && loadedTicket?.status === TicketStatus.InProgress"
+              class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-sm text-white font-medium rounded-md transition-colors"
+              @click="sendForReview(loadedTicket.customId)"
+            >
+              <font-awesome-icon icon="arrow-right" class="text-xs" />
+              Enviar Para Verificação
+            </button>
+
+            <button
+              v-if="isTargetUser && loadedTicket?.status === TicketStatus.AwaitingVerification"
+              class="inline-flex items-center gap-1.5 px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-sm text-white font-medium rounded-md transition-colors"
+              @click="cancelVerificationRequest(loadedTicket.customId)"
+            >
+              <font-awesome-icon icon="undo" class="text-xs" />
+              Cancelar Envio
+            </button>
+
+            <button
+              v-if="isTargetUser && loadedTicket?.status === TicketStatus.Returned"
+              class="inline-flex items-center gap-1.5 px-3 py-2 bg-orange-600 hover:bg-orange-700 text-sm text-white font-medium rounded-md transition-colors"
+              @click="correctTicket(loadedTicket.customId)"
+            >
+              <font-awesome-icon icon="wrench" class="text-xs" />
+              Corrigir
+            </button>
+
+            <button
+              v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
+              class="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-sm text-white font-medium rounded-md transition-colors"
+              @click="approveTicket(loadedTicket.customId)"
+            >
+              <font-awesome-icon icon="check-double" class="text-xs" />
+              Aprovar
+            </button>
+
+            <button
+              v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
+              class="inline-flex items-center gap-1.5 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-sm text-white font-medium rounded-md transition-colors"
+              @click="requestCorrection(loadedTicket.customId)"
+            >
+              <font-awesome-icon icon="undo" class="text-xs" />
+              Correção
+            </button>
+
+            <button
+              v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
+              class="inline-flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-sm text-white font-medium rounded-md transition-colors"
+              @click="rejectTicket(loadedTicket.customId)"
+            >
+              <font-awesome-icon icon="times" class="text-xs" />
+              Reprovar
+            </button>
           </div>
-          <div class="detail-value editing-container" v-else>
-            <input
-              v-model="editingName"
-              class="edit-input"
-              @keyup.enter="saveTicketName"
-              @keyup.escape="cancelEditingName"
-              ref="nameInput"
-            />
-            <div class="edit-buttons">
-              <button @click="saveTicketName" class="btn btn-save">Salvar</button>
-              <button @click="cancelEditingName" class="btn btn-cancel">Cancelar</button>
-            </div>
-          </div>
+
+          <button
+            v-if="
+              isRequester &&
+              loadedTicket?.status !== TicketStatus.Completed &&
+              loadedTicket?.status !== TicketStatus.Rejected &&
+              loadedTicket?.status !== TicketStatus.Canceled
+            "
+            class="inline-flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-sm text-white font-medium rounded-md transition-colors"
+            @click="cancelTicket(loadedTicket.customId)"
+          >
+            <font-awesome-icon icon="ban" class="text-xs" />
+            Cancelar Ticket
+          </button>
+
+          <button
+            class="bg-transparent border-none text-xl text-gray-400 ml-8 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer p-1.5 rounded-full flex items-center justify-center transition-colors ml-2"
+            @click="closeModal"
+          >
+            <font-awesome-icon icon="times" />
+          </button>
         </div>
       </div>
+    </template>
 
-      <div class="ticket-details-container">
-        <!-- Coluna da Esquerda - Informações -->
-        <div class="left-column">
-          <!-- ID -->
-          <div class="details-item">
-            <div class="detail-icon">
-              <font-awesome-icon icon="hashtag" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">ID</div>
-              <div class="detail-value">{{ loadedTicket.customId }}</div>
-            </div>
-          </div>
+    <div
+      v-if="loadedTicket"
+      class="w-[85vw] max-w-[1280px] mx-auto p-3 sm:p-0 h-[calc(100vh-200px)] max-h-[650px] flex flex-col"
+    >
+      <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
+        <!-- Left Sidebar -->
+        <div class="lg:col-span-1 overflow-y-auto pr-4 space-y-4">
+          <div
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-5 shadow-sm"
+          >
+            <h3
+              class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2"
+            >
+              <font-awesome-icon icon="info-circle" class="text-blue-600 dark:text-blue-400" />
+              Informações do Ticket
+            </h3>
 
-          <!-- Prioridade -->
-          <div class="details-item">
-            <div class="detail-icon">
-              <font-awesome-icon icon="exclamation-circle" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">Prioridade</div>
-              <div class="detail-value">
-                <span :class="['priority-label', getPriorityClass(loadedTicket.priority)]">
+            <div class="space-y-6">
+              <div class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    ID do Ticket
+                  </p>
+                </div>
+                <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                  {{ loadedTicket.customId }}
+                </p>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Status</p>
+                </div>
+                <span
+                  :class="[
+                    'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium max-w-[140px] sm:max-w-[220px]',
+                    getStatusClass(loadedTicket.status),
+                  ]"
+                >
+                  <font-awesome-icon
+                    :icon="getStatusIcon(loadedTicket.status)"
+                    class="text-xs mr-1.5 flex-shrink-0"
+                  />
+                  <span class="truncate">{{
+                    formatSnakeToNaturalCase(loadedTicket?.status!).toUpperCase()
+                  }}</span>
+                </span>
+              </div>
+
+              <!-- Priority -->
+              <div class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Prioridade
+                  </p>
+                </div>
+                <span
+                  :class="[
+                    'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium gap-1.5',
+                    getPriorityClass(loadedTicket.priority),
+                  ]"
+                >
                   <font-awesome-icon
                     :icon="getPriorityIcon(loadedTicket.priority)"
-                    class="badge-icon"
+                    class="text-xs"
                   />
                   {{ formatSnakeToNaturalCase(loadedTicket.priority) }}
                 </span>
               </div>
-            </div>
-          </div>
 
-          <!-- Status -->
-          <div class="details-item">
-            <div class="detail-icon">
-              <font-awesome-icon icon="clock" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">Status</div>
-              <div class="detail-value">
-                <span :class="['status-label', getStatusClass(loadedTicket.status)]">
+              <!-- Requester -->
+              <div class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Solicitante
+                  </p>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                    {{ loadedTicket.requester.firstName }} {{ loadedTicket.requester.lastName }}
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    {{ loadedTicket.department.name }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Assignee -->
+              <div class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Responsável
+                  </p>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div v-if="!isEditingAssignee">
+                    <div
+                      class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 -m-2 rounded-lg transition-colors"
+                      @click="startEditingAssignee"
+                      :class="{ 'cursor-default': !canEditTicket }"
+                      :title="canEditTicket ? 'Clique para alterar responsável' : ''"
+                    >
+                      <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                        {{ loadedTicket.targetUser.firstName }}
+                        {{ loadedTicket.targetUser.lastName }}
+                      </p>
+                      <div
+                        v-if="!loadedTicket.targetUser.isActive"
+                        class="flex items-center gap-1"
+                        title="Conta desativada"
+                      >
+                        <font-awesome-icon
+                          icon="exclamation-triangle"
+                          class="text-orange-500 text-xs"
+                        />
+                        <span class="text-orange-500 text-xs">Desativado</span>
+                      </div>
+                      <font-awesome-icon
+                        v-if="canEditTicket && isRequester"
+                        icon="edit"
+                        class="text-gray-400 text-xs ml-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div v-else class="space-y-3">
+                    <DepartmentUserSelector
+                      v-model="assigneeSelection"
+                      @change="saveAssigneeChange"
+                      placeholder="Selecionar responsável..."
+                    />
+                    <div class="flex gap-2">
+                      <button
+                        @click="cancelEditingAssignee"
+                        class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Category -->
+              <div class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Categoria</p>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm text-gray-900 dark:text-gray-100">
+                    {{ loadedTicket.category?.name || '-' }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Concluir até
+                  </p>
+                </div>
+                <p class="text-sm text-gray-900 dark:text-gray-100">
+                  {{ formatDate(loadedTicket.dueAt) }}
+                </p>
+              </div>
+
+              <div class="flex items-start gap-3" :class="getDeadlineClass(loadedTicket.dueAt)">
+                <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Prazo</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <p class="text-sm text-gray-900 dark:text-gray-100">
+                    {{ calculateDeadline(loadedTicket) }}
+                  </p>
                   <font-awesome-icon
-                    :icon="getStatusIcon(loadedTicket.status)"
-                    class="badge-icon"
+                    v-if="isPastDeadline(loadedTicket.dueAt)"
+                    icon="exclamation-triangle"
+                    class="text-orange-500 text-sm"
                   />
-                  {{ formatSnakeToNaturalCase(loadedTicket?.status!).toUpperCase() }}
-                </span>
+                </div>
+              </div>
+
+              <!-- Accepted Date -->
+              <div class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Aceite em</p>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm text-gray-900 dark:text-gray-100">
+                    {{ formatDate(loadedTicket.acceptedAt) }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Privacidade
+                  </p>
+                </div>
+                <p class="text-sm text-gray-900 dark:text-gray-100">
+                  {{ loadedTicket.isPrivate ? 'Privado' : 'Público' }}
+                </p>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Solicitante e Setor -->
-          <div class="details-item">
-            <div class="detail-icon">
-              <font-awesome-icon icon="user-tie" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">Solicitante / Setor</div>
-              <div class="detail-value">
-                {{ loadedTicket.requester.firstName }} {{ loadedTicket.requester.lastName }} /
-                {{ loadedTicket.department.name }}
+        <!-- Right Content -->
+        <div class="lg:col-span-2 overflow-y-auto pl-2">
+          <div class="bg-white dark:bg-gray-800 pr-4 rounded-lg shadow-sm overflow-hidden">
+            <!-- Ticket Title Section -->
+            <div class="p-4">
+              <div v-if="!isEditingName">
+                <h1
+                  class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100 leading-tight"
+                  @click="startEditingName"
+                  :class="{
+                    'cursor-text hover:text-gray-600 dark:hover:text-gray-400 transition-colors':
+                      isRequester,
+                  }"
+                  :title="isRequester ? 'Clique para editar' : ''"
+                >
+                  {{ loadedTicket.name }}
+                </h1>
               </div>
-            </div>
-          </div>
 
-          <!-- Responsável -->
-          <div class="details-item">
-            <div class="detail-icon">
-              <font-awesome-icon icon="user" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">Responsável</div>
-              <div class="detail-value">
-                {{ loadedTicket.targetUser.firstName }} {{ loadedTicket.targetUser.lastName }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Concluir até -->
-          <div class="details-item">
-            <div class="detail-icon">
-              <font-awesome-icon icon="calendar-check" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">Concluir até</div>
-              <div class="detail-value">{{ formatDate(loadedTicket.dueAt) }}</div>
-            </div>
-          </div>
-
-          <!-- Prazo -->
-          <div class="details-item" :class="getDeadlineClass(loadedTicket.dueAt)">
-            <div class="detail-icon">
-              <font-awesome-icon icon="hourglass-end" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">Prazo</div>
-              <div class="detail-value">
-                {{ calculateDeadline(loadedTicket) }}
-                <font-awesome-icon
-                  v-if="isPastDeadline(loadedTicket.dueAt)"
-                  icon="exclamation-triangle"
-                  class="warning-icon"
+              <div v-else class="space-y-4">
+                <input
+                  v-model="editingName"
+                  class="w-full text-2xl sm:text-3xl font-bold px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  @keyup.enter="saveTicketName"
+                  @keyup.escape="cancelEditingName"
+                  ref="nameInput"
+                  placeholder="Nome do ticket"
                 />
-              </div>
-            </div>
-          </div>
-
-          <!-- Privacidade -->
-          <div class="details-item">
-            <div class="detail-icon">
-              <font-awesome-icon icon="lock" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">Privacidade</div>
-              <div class="detail-value">{{ loadedTicket.isPrivate ? 'Privado' : 'Público' }}</div>
-            </div>
-          </div>
-
-          <!-- Aceite em -->
-          <div class="details-item">
-            <div class="detail-icon">
-              <font-awesome-icon icon="user-check" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">Aceite em</div>
-              <div class="detail-value">{{ formatDate(loadedTicket.acceptedAt) }}</div>
-            </div>
-          </div>
-
-          <!-- Categoria -->
-          <div class="details-item">
-            <div class="detail-icon">
-              <font-awesome-icon icon="folder" />
-            </div>
-            <div class="detail-content">
-              <div class="detail-label">Categoria</div>
-              <div class="detail-value">{{ loadedTicket.category?.name || '-' }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Coluna da Direita - Descrição -->
-        <div class="right-column">
-          <div class="description-header">
-            <div class="detail-icon">
-              <font-awesome-icon icon="file-alt" />
-            </div>
-            <div class="detail-label">Descrição</div>
-          </div>
-          <div class="description-box" v-if="!isEditingDescription">
-            <div
-              class="description-text"
-              v-html="loadedTicket.description"
-              @click="startEditingDescription"
-              :class="{ 'editable-field': isRequester }"
-              :title="isRequester ? 'Clique para editar' : ''"
-            ></div>
-          </div>
-          <div class="description-box editing-container" v-else>
-            <div class="quill-wrapper">
-              <QuillEditor
-                :key="descriptionEditorKey"
-                v-model:content="editingDescription"
-                contentType="html"
-                theme="snow"
-                :options="editorOptions"
-              />
-            </div>
-            <div class="edit-buttons">
-              <button @click="saveTicketDescription" class="btn btn-save">Salvar</button>
-              <button @click="cancelEditingDescription" class="btn btn-cancel">Cancelar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="ticket-actions"
-        v-if="
-          isTargetUser || (isRequester && loadedTicket.status === TicketStatus.UnderVerification)
-        "
-      >
-        <button
-          v-if="isTargetUser && loadedTicket?.status === TicketStatus.Pending"
-          class="action-button accept"
-          @click="acceptTicket(loadedTicket?.customId)"
-        >
-          <font-awesome-icon icon="check" /> Aceitar
-        </button>
-        <button
-          v-if="isTargetUser && loadedTicket?.status === TicketStatus.InProgress"
-          class="action-button verify"
-          @click="sendForReview(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="arrow-right" /> Enviar para Verificação
-        </button>
-        <button
-          v-if="isTargetUser && loadedTicket?.status === TicketStatus.AwaitingVerification"
-          class="action-button cancel-verification"
-          @click="cancelVerificationRequest(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="undo" /> Cancelar envio para verificação
-        </button>
-        <button
-          v-if="isTargetUser && loadedTicket?.status === TicketStatus.Returned"
-          class="action-button correct"
-          @click="correctTicket(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="wrench" /> Corrigir
-        </button>
-        <button
-          v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
-          class="action-button approve"
-          @click="approveTicket(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="check-double" /> Aprovar
-        </button>
-        <button
-          v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
-          class="action-button request-correction"
-          @click="requestCorrection(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="undo" /> Solicitar Correção
-        </button>
-
-        <button
-          v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
-          class="action-button reject"
-          @click="rejectTicket(loadedTicket.customId)"
-        >
-          <font-awesome-icon icon="undo" /> Reprovar
-        </button>
-      </div>
-
-      <div class="files-section-title">
-        <p class="files-label">Anexos</p>
-        <div class="files-count">{{ loadedTicket.files.length }}</div>
-        <button
-          v-if="canEditTicket"
-          class="btn add-file-button"
-          @click="openFileInput"
-          title="Adicionar anexos"
-        >
-          <font-awesome-icon icon="plus" />
-        </button>
-        <input class="hidden" type="file" ref="fileInput" multiple @change="handleFileChange" />
-      </div>
-      <div class="files-container">
-        <div
-          v-for="file in loadedTicket.files"
-          :key="file.id"
-          class="file-item"
-          @click="downloadFile(file)"
-        >
-          <div class="file-preview">
-            <font-awesome-icon icon="file" size="xl" />
-          </div>
-          <div class="file-name-container">
-            <div class="file-name">{{ file.name }}</div>
-          </div>
-        </div>
-        <div v-for="(file, i) in selectedFiles" :key="`new-${i}`" class="file-item pending">
-          <div class="file-preview">
-            <font-awesome-icon icon="file-upload" size="xl" />
-          </div>
-          <div class="file-name-container">
-            <div class="file-name">{{ file.name }}</div>
-          </div>
-          <div class="file-uploading">
-            <font-awesome-icon icon="spinner" spin />
-          </div>
-        </div>
-      </div>
-
-      <!-- Nova div separada para o botão de cancelar -->
-      <div
-        class="ticket-actions"
-        v-if="
-          isRequester &&
-          loadedTicket.status !== TicketStatus.Completed &&
-          loadedTicket.status !== TicketStatus.Rejected &&
-          loadedTicket.status !== TicketStatus.Canceled
-        "
-      >
-        <button class="action-button cancel" @click="cancelTicket(loadedTicket.customId)">
-          <font-awesome-icon icon="ban" /> Cancelar
-        </button>
-      </div>
-
-      <div class="comment-section">
-        <div class="section-header">
-          <font-awesome-icon icon="comments" />
-          <h3>Comentários</h3>
-        </div>
-        <div
-          v-if="
-            loadedTicket?.status === TicketStatus.InProgress ||
-            loadedTicket?.status === TicketStatus.UnderVerification
-          "
-          class="comment-input"
-        >
-          <div class="quill-wrapper">
-            <QuillEditor
-              :key="editorKey"
-              ref="quillEditor"
-              v-model:content="newComment"
-              contentType="html"
-              theme="snow"
-              :options="editorOptions"
-            />
-          </div>
-          <button @click="comment()" class="btn btn-primary">
-            <font-awesome-icon icon="paper-plane" /> Enviar
-          </button>
-        </div>
-        <div v-else class="comment-disabled">
-          <font-awesome-icon icon="ban" />
-          <p>Comentários permitidos apenas para tickets em andamento ou em verificação</p>
-        </div>
-
-        <div class="event-list">
-          <div v-for="event in timeline" :key="event.data.id">
-            <div class="event-item" v-if="event.type === 'comment'">
-              <div class="comment-avatar">
-                <font-awesome-icon icon="user-circle" />
-              </div>
-              <div class="comment-content">
-                <div class="comment-header">
-                  <span class="comment-author"
-                    >{{ event.data.user.firstName }} {{ event.data.user.lastName }}</span
+                <div class="flex gap-3">
+                  <button
+                    @click="saveTicketName"
+                    class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
                   >
-                  <span class="comment-time">{{ formatRelativeTime(event.createdAt) }}</span>
+                    Salvar
+                  </button>
+                  <button
+                    @click="cancelEditingName"
+                    class="px-4 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Cancelar
+                  </button>
                 </div>
-                <div class="comment-text" v-html="event.data.content"></div>
+              </div>
+              <button
+                v-if="canEditTicket"
+                class="inline-flex items-center justify-center mt-3 px-2 py-1.5 border border-gray-300 gap-2 hover:bg-gray-100 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
+                @click="openFileInput"
+                title="Anexar arquivo"
+              >
+                <font-awesome-icon icon="paperclip" class="text-sm" /> Anexo
+              </button>
+            </div>
+
+            <!-- Description Section -->
+            <div class="my-2 px-4 sm:px-6 dark:border-gray-700">
+              <h3 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <font-awesome-icon icon="file-text" class="text-blue-600 dark:text-blue-400" />
+                Descrição
+              </h3>
+
+              <div v-if="!isEditingDescription">
+                <div
+                  class="description-text prose prose-sm max-w-none dark:prose-invert"
+                  v-html="loadedTicket.description"
+                  @click="startEditingDescription"
+                  :class="{
+                    'cursor-text hover:bg-gray-50 dark:hover:bg-gray-700 p-3 rounded-lg transition-colors':
+                      isRequester,
+                  }"
+                  :title="isRequester ? 'Clique para editar' : ''"
+                ></div>
+              </div>
+
+              <div v-else class="space-y-4">
+                <div class="quill-wrapper">
+                  <QuillEditor
+                    :key="descriptionEditorKey"
+                    v-model:content="editingDescription"
+                    contentType="html"
+                    theme="snow"
+                    :options="editorOptions"
+                  />
+                </div>
+                <div class="flex gap-3">
+                  <button
+                    @click="saveTicketDescription"
+                    class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Salvar
+                  </button>
+                  <button
+                    @click="cancelEditingDescription"
+                    class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
               </div>
             </div>
 
+            <!-- File Input (always present for functionality) -->
+            <input class="hidden" type="file" ref="fileInput" multiple @change="handleFileChange" />
+
+            <!-- Attachments Section -->
             <div
-              class="event-item special-update"
-              v-else-if="event.type === 'specialUpdate'"
-              :class="event.subType"
+              v-if="loadedTicket.files.length > 0"
+              class="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700"
             >
-              <div class="comment-avatar special-avatar" :class="event.subType">
-                <span class="user-initials">{{ getUserInitials(loadedTicket?.requester) }}</span>
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                  <font-awesome-icon icon="paperclip" class="text-blue-600 dark:text-blue-400" />
+                  Anexos
+                  <span
+                    class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full text-xs font-medium"
+                  >
+                    {{ loadedTicket.files.length }}
+                  </span>
+                </h3>
+                <button
+                  v-if="canEditTicket"
+                  class="inline-flex items-center justify-center w-8 h-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors"
+                  @click="openFileInput"
+                  title="Adicionar anexos"
+                >
+                  <font-awesome-icon icon="plus" />
+                </button>
               </div>
-              <div class="comment-content">
-                <div class="comment-header">
-                  <span class="comment-author special-title" :class="event.subType">{{
-                    getSpecialUpdateTitle(event.subType, event)
-                  }}</span>
-                  <span class="comment-time">{{ formatRelativeTime(event.createdAt) }}</span>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div
+                  v-for="file in loadedTicket.files"
+                  :key="file.id"
+                  class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer transition-colors"
+                  @click="downloadFile(file)"
+                >
+                  <div class="text-blue-600 dark:text-blue-400">
+                    <font-awesome-icon icon="file" size="lg" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                      {{ file.name }}
+                    </div>
+                  </div>
                 </div>
-                <div class="comment-text">{{ event.data.content }}</div>
+
+                <div
+                  v-for="(file, i) in selectedFiles"
+                  :key="`new-${i}`"
+                  class="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg"
+                >
+                  <div class="text-yellow-600 dark:text-yellow-400">
+                    <font-awesome-icon icon="file-upload" size="lg" />
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                      {{ file.name }}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="event-item system-event" v-else>
-              <div class="comment-avatar system-avatar">
-                <font-awesome-icon :icon="getEventIcon(event.data.description)" />
-              </div>
-              <div class="update-content">
-                <div class="update-description-header">
+            <!-- Activities Section -->
+            <div class="p-4 sm:p-6 border-t border-gray-200">
+              <h3
+                class="font-semibold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2"
+              >
+                <font-awesome-icon icon="comments" class="text-blue-600 dark:text-blue-400" />
+                Atividade
+              </h3>
+
+              <!-- Add Comment Form -->
+              <div
+                v-if="
+                  loadedTicket?.status === TicketStatus.InProgress ||
+                  loadedTicket?.status === TicketStatus.UnderVerification
+                "
+                class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+              >
+                <div class="space-y-4">
                   <div
-                    class="ticket-update-description"
-                    v-html="formatTicketUpdateDescription(event.data)"
-                  ></div>
-                  <span class="comment-time">{{ formatRelativeTime(event.createdAt) }}</span>
+                    class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden"
+                  >
+                    <QuillEditor
+                      :key="editorKey"
+                      ref="quillEditor"
+                      v-model:content="newComment"
+                      contentType="html"
+                      theme="snow"
+                      :options="editorOptions"
+                    />
+                  </div>
+                  <div class="flex justify-end">
+                    <button
+                      @click="comment()"
+                      class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                      <font-awesome-icon icon="paper-plane" />
+                      Enviar Comentário
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                v-else
+                class="mb-6 flex items-center gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300 rounded-lg border border-yellow-200 dark:border-yellow-800"
+              >
+                <font-awesome-icon icon="info-circle" />
+                <p class="text-sm">
+                  Comentários permitidos apenas para tickets em andamento ou em verificação
+                </p>
+              </div>
+
+              <!-- Timeline -->
+              <div class="space-y-1 relative">
+                <div
+                  class="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-600 hidden sm:block"
+                ></div>
+
+                <div v-for="event in timeline" :key="event.data.id" class="relative">
+                  <!-- Comment -->
+                  <div v-if="event.type === 'comment'" class="flex gap-4 relative">
+                    <div class="flex-1 min-w-0 pb-4">
+                      <div
+                        class="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+                      >
+                        <div class="flex items-center gap-3 mb-3">
+                          <div
+                            class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 border-2 border-gray-200 dark:border-gray-600 flex-shrink-0"
+                          >
+                            <font-awesome-icon icon="user-circle" />
+                          </div>
+                          <div class="flex items-center justify-between flex-1">
+                            <span class="font-medium text-gray-900 dark:text-gray-100">
+                              {{ event.data.user.firstName }} {{ event.data.user.lastName }}
+                            </span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                              {{ formatRelativeTime(event.createdAt) }}
+                            </span>
+                          </div>
+                        </div>
+                        <div
+                          class="comment-text prose prose-sm max-w-none dark:prose-invert ml-11"
+                          v-html="event.data.content"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- System Updates -->
+                  <div
+                    v-else-if="event.type === 'specialUpdate'"
+                    class="flex gap-4 relative"
+                    :class="event.subType"
+                  >
+                    <div class="flex-1 min-w-0 pb-4">
+                      <div
+                        class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+                      >
+                        <div class="flex items-center gap-3 mb-2">
+                          <div
+                            class="w-7 h-7 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center border-2 border-gray-200 dark:border-gray-600 flex-shrink-0"
+                            :class="event.subType"
+                          >
+                            <span class="text-xs font-medium text-gray-600 dark:text-gray-400">
+                              {{ getUserInitials(loadedTicket?.requester) }}
+                            </span>
+                          </div>
+                          <div class="flex items-center justify-between flex-1">
+                            <span
+                              class="font-medium text-gray-700 dark:text-gray-300"
+                              :class="event.subType"
+                            >
+                              {{ getSpecialUpdateTitle(event.subType, event) }}
+                            </span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                              {{ formatRelativeTime(event.createdAt) }}
+                            </span>
+                          </div>
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400 ml-11">
+                          {{ event.data.content }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Regular Events -->
+                  <div v-else class="flex gap-4 relative">
+                    <div class="flex-1 min-w-0 pb-4">
+                      <div
+                        class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+                      >
+                        <div class="flex items-center gap-3">
+                          <div
+                            class="w-7 h-7 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-400 border-2 border-gray-200 dark:border-gray-600 flex-shrink-0"
+                          >
+                            <font-awesome-icon :icon="getEventIcon(event.data.description)" />
+                          </div>
+                          <div class="flex items-center justify-between flex-1">
+                            <div
+                              class="text-sm text-gray-600 dark:text-gray-400 flex-1"
+                              v-html="formatTicketUpdateDescription(event.data)"
+                            ></div>
+                            <span
+                              class="text-sm text-gray-500 dark:text-gray-400 ml-4 flex-shrink-0"
+                            >
+                              {{ formatRelativeTime(event.createdAt) }}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -419,7 +652,6 @@
 
   <ConfirmationModal
     v-if="confirmationModal.isOpen"
-    :isOpen="confirmationModal.isOpen"
     :title="confirmationModal.title"
     :message="confirmationModal.message"
     :hasInput="confirmationModal.hasInput"
@@ -454,6 +686,7 @@ import axios from 'axios';
 import { CorrectionReason, DisapprovalReason } from '@/models';
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
+import DepartmentUserSelector from '@/components/common/DepartmentUserSelector.vue';
 
 interface SpecialUpdateEvent {
   data?: {
@@ -464,11 +697,10 @@ interface SpecialUpdateEvent {
 }
 
 const props = defineProps<{
-  isOpen: boolean;
   ticket: Ticket | null;
 }>();
 
-const emit = defineEmits(['close', 'refresh']);
+const emit = defineEmits(['close']);
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
 const newComment = ref('');
@@ -521,34 +753,35 @@ const formatDate = (date?: string) => (date ? new Date(date).toLocaleDateString(
 const getPriorityClass = (priority: string) => {
   switch (priority) {
     case 'baixa':
-      return 'priority-baixa';
+      return 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
     case 'média':
-      return 'priority-media';
+      return 'bg-orange-100 text-orange-600 border border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800';
     case 'alta':
-      return 'priority-alta';
+      return 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800';
     default:
-      return '';
+      return 'bg-gray-100 text-gray-800 border border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
   }
 };
 
 const getStatusClass = (status: string) => {
   switch (status) {
     case TicketStatus.Pending:
-      return 'status-pendente';
+      return 'bg-orange-100 text-orange-800 border border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800';
     case TicketStatus.InProgress:
-      return 'status-em-andamento';
+      return 'bg-blue-100 text-blue-800 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800';
     case TicketStatus.AwaitingVerification:
-      return 'status-aguardando-verificacao';
     case TicketStatus.UnderVerification:
-      return 'status-em-verificacao';
+      return 'bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800';
     case TicketStatus.Completed:
-      return 'status-finalizado';
+      return 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
     case TicketStatus.Rejected:
-      return 'status-cancelado';
+      return 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800';
     case TicketStatus.Returned:
-      return 'status-devolvido';
+      return 'bg-orange-100 text-orange-800 border border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800';
+    case TicketStatus.Canceled:
+      return 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800';
     default:
-      return '';
+      return 'bg-gray-100 text-gray-800 border border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
   }
 };
 
@@ -628,7 +861,7 @@ const acceptTicket = async (ticketId: string) => {
         await ticketService.accept(ticketId);
         toast.success('Ticket aceito com sucesso');
 
-        emit('refresh');
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao aceitar o ticket');
       }
@@ -645,7 +878,7 @@ const sendForReview = async (ticketId: string) => {
         await ticketService.updateStatus(ticketId, { status: TicketStatus.AwaitingVerification });
         toast.success('Ticket enviado para revisão');
 
-        emit('refresh');
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao enviar o ticket para revisão');
       }
@@ -663,7 +896,7 @@ const approveTicket = async (ticketId: string) => {
         toast.success('Ticket aprovado com sucesso');
 
         if (props.ticket) {
-          emit('refresh');
+          refreshSelectedTicket();
         } else {
           await ticketsStore.fetchTicketDetails(ticketId);
         }
@@ -688,7 +921,7 @@ const requestCorrection = async (ticketId: string) => {
 
         toast.success('Correção solicitada com sucesso');
 
-        emit('refresh');
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao solicitar correção');
       }
@@ -706,7 +939,7 @@ const correctTicket = async (ticketId: string) => {
       try {
         await ticketService.updateStatus(ticketId, { status: TicketStatus.InProgress });
         toast.success('Ticket em correção');
-        emit('refresh');
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao iniciar correção');
       }
@@ -728,7 +961,7 @@ const rejectTicket = async (ticketId: string) => {
 
         toast.success('Ticket reprovado com sucesso');
 
-        emit('refresh');
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao reprovar o ticket');
       }
@@ -968,15 +1201,6 @@ const getSpecialUpdateTitle = (subType: string, event?: SpecialUpdateEvent) => {
   return baseTitle;
 };
 
-watch(
-  () => props.isOpen,
-  (isOpen) => {
-    if (isOpen && props.ticket?.customId) {
-      fetchComments();
-      fetchTicketUpdates();
-    }
-  },
-);
 
 watch(
   () => props.ticket,
@@ -990,14 +1214,6 @@ watch(
   { immediate: true },
 );
 
-watch(
-  () => props.isOpen,
-  (isOpen) => {
-    if (!isOpen) {
-      loadedTicket.value = null;
-    }
-  },
-);
 
 const openFileInput = () => {
   if (fileInput.value) {
@@ -1042,7 +1258,7 @@ const handleFileChange = async (event: Event) => {
       }
 
       toast.success('Arquivos anexados com sucesso!');
-      emit('refresh');
+      refreshSelectedTicket();
     }
   } catch (error) {
     console.error('Erro ao fazer upload:', error);
@@ -1083,7 +1299,7 @@ const refreshSelectedTicket = async () => {
 };
 
 const startEditingName = () => {
-  if (!isRequester.value) return;
+  if (!isRequester.value || loadedTicket.value?.status !== TicketStatus.Pending) return;
   isEditingName.value = true;
   editingName.value = loadedTicket.value?.name || '';
   nextTick(() => {
@@ -1109,7 +1325,7 @@ const saveTicketName = async () => {
     }
 
     toast.success('Assunto do ticket atualizado com sucesso');
-    emit('refresh');
+    refreshSelectedTicket();
   } catch {
     toast.error('Erro ao atualizar nome do ticket');
   }
@@ -1121,7 +1337,7 @@ const cancelEditingName = () => {
 };
 
 const startEditingDescription = () => {
-  if (!isRequester.value) return;
+  if (!isRequester.value || loadedTicket.value?.status !== TicketStatus.Pending) return;
   isEditingDescription.value = true;
   editingDescription.value = loadedTicket.value?.description || '';
   descriptionEditorKey.value += 1;
@@ -1150,7 +1366,7 @@ const saveTicketDescription = async () => {
     }
 
     toast.success('Descrição do ticket atualizada com sucesso');
-    emit('refresh');
+    refreshSelectedTicket();
   } catch {
     toast.error('Erro ao atualizar descrição do ticket');
   }
@@ -1171,16 +1387,240 @@ const cancelVerificationRequest = async (ticketId: string) => {
         await ticketService.updateStatus(ticketId, { status: TicketStatus.InProgress });
         toast.success('Envio para verificação cancelado');
 
-        emit('refresh');
+        refreshSelectedTicket();
       } catch {
         toast.error('Erro ao cancelar envio para verificação');
       }
     },
   );
 };
+
+const showAddMenu = ref(false);
+
+
+const selectAttachFile = () => {
+  closeAddMenu();
+  openFileInput();
+};
+
+const closeAddMenu = () => {
+  showAddMenu.value = false;
+};
+
+const isEditingAssignee = ref(false);
+const assigneeSelection = ref<{ departmentId: number | null; userId: number | null }>({
+  departmentId: null,
+  userId: null,
+});
+
+const startEditingAssignee = () => {
+  if (!canEditTicket.value || !isRequester.value) return;
+
+  assigneeSelection.value = {
+    departmentId: loadedTicket.value?.targetUser?.departmentId || null,
+    userId: loadedTicket.value?.targetUser?.id || null,
+  };
+  isEditingAssignee.value = true;
+};
+
+const cancelEditingAssignee = () => {
+  isEditingAssignee.value = false;
+  assigneeSelection.value = {
+    departmentId: null,
+    userId: null,
+  };
+};
+
+const saveAssigneeChange = async (selection: { department: any; user: any }) => {
+  if (!selection.user || !loadedTicket.value) return;
+
+  try {
+    await ticketService.updateAssignee(loadedTicket.value.customId, selection.user.id);
+
+    await refreshSelectedTicket();
+    isEditingAssignee.value = false;
+    toast.success('Responsável alterado com sucesso!');
+  } catch (error) {
+    console.error('Erro ao alterar responsável:', error);
+    toast.error('Erro ao alterar responsável');
+  }
+};
 </script>
 
 <style scoped>
+/* Quill Editor specific styles */
+:deep(.ql-container) {
+  border: none !important;
+  border-radius: 0 0 8px 8px !important;
+  min-height: 120px;
+}
+
+:deep(.ql-toolbar) {
+  border: none !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-radius: 8px 8px 0 0 !important;
+}
+
+/* Dark mode for Quill Editor */
+.dark :deep(.ql-toolbar) {
+  border-bottom-color: #4b5563 !important;
+  background-color: #374151 !important;
+}
+
+.dark :deep(.ql-container) {
+  background-color: #374151 !important;
+  color: #f3f4f6 !important;
+}
+
+:deep(.ql-editor.ql-blank::before) {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.dark :deep(.ql-editor) {
+  color: #f3f4f6 !important;
+}
+
+.dark :deep(.ql-editor.ql-blank::before) {
+  color: #9ca3af !important;
+}
+
+/* Content text styling for description and comments */
+:deep(.description-text),
+:deep(.comment-text) {
+  line-height: 1.6;
+}
+
+:deep(.description-text p),
+:deep(.comment-text p) {
+  margin-bottom: 0.75rem;
+}
+
+:deep(.description-text ul),
+:deep(.description-text ol),
+:deep(.comment-text ul),
+:deep(.comment-text ol) {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+:deep(.description-text ul li),
+:deep(.comment-text ul li) {
+  list-style-type: disc;
+  margin-bottom: 0.25rem;
+}
+
+:deep(.description-text ol li),
+:deep(.comment-text ol li) {
+  list-style-type: decimal;
+  margin-bottom: 0.25rem;
+}
+
+:deep(.description-text h1),
+:deep(.description-text h2),
+:deep(.description-text h3),
+:deep(.comment-text h1),
+:deep(.comment-text h2),
+:deep(.comment-text h3) {
+  font-weight: 600;
+  margin: 1rem 0 0.5rem 0;
+}
+
+:deep(.description-text h1),
+:deep(.comment-text h1) {
+  font-size: 1.25rem;
+}
+
+:deep(.description-text h2),
+:deep(.comment-text h2) {
+  font-size: 1.125rem;
+}
+
+:deep(.description-text h3),
+:deep(.comment-text h3) {
+  font-size: 1rem;
+}
+
+:deep(.description-text strong),
+:deep(.comment-text strong) {
+  font-weight: 600;
+}
+
+:deep(.description-text em),
+:deep(.comment-text em) {
+  font-style: italic;
+}
+
+:deep(.description-text blockquote),
+:deep(.comment-text blockquote) {
+  border-left: 4px solid #d1d5db;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+}
+
+.dark :deep(.description-text blockquote),
+.dark :deep(.comment-text blockquote) {
+  border-left-color: #6b7280;
+}
+
+:deep(.description-text a),
+:deep(.comment-text a) {
+  color: #2563eb;
+}
+
+.dark :deep(.description-text a),
+.dark :deep(.comment-text a) {
+  color: #60a5fa;
+}
+
+/* Editable field styles */
+.editable-field {
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.editable-field:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 0 0 1px #e9ecef;
+}
+
+.dark .editable-field:hover {
+  background-color: #374151;
+  box-shadow: 0 0 0 1px #4b5563;
+}
+
+.edit-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid #4f46e5;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: white;
+  color: #212529;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.edit-input:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+}
+
+.dark .edit-input {
+  background: #374151;
+  color: #f9fafb;
+  border-color: #818cf8;
+}
+
+.dark .edit-input:focus {
+  background: #1f2937;
+  border-color: #a5b4fc;
+}
+
 .content {
   min-width: 900px;
   min-height: 90vh;
@@ -1237,7 +1677,7 @@ const cancelVerificationRequest = async (ticketId: string) => {
 .description-text {
   white-space: pre-wrap;
   line-height: 1.5;
-  min-height: 200px;
+  min-height: 80px;
   font-size: 0.9rem;
   color: #212529;
 }
@@ -2005,20 +2445,40 @@ const cancelVerificationRequest = async (ticketId: string) => {
 }
 
 .deadline-danger {
-  background: #fff3f3 !important;
+  background: #fff3f3 important;
 }
 
 .deadline-danger .detail-value {
-  color: #dc3545 !important;
-  font-weight: bold !important;
+  color: #dc3545 important;
+  font-weight: bold important;
 }
 
 .deadline-normal {
-  background: #f0fff4 !important;
+  background: #f0fff4 important;
 }
 
 .deadline-normal .detail-value {
-  color: #28a745 !important;
+  color: #28a745 important;
+}
+
+/* Dark mode deadline styles */
+:deep(body.dark-mode) .deadline-danger {
+  background: #2d1b1b !important;
+  border-color: #dc3545 !important;
+}
+
+:deep(body.dark-mode) .deadline-danger .detail-value {
+  color: #ef5350 !important;
+  font-weight: bold !important;
+}
+
+:deep(body.dark-mode) .deadline-normal {
+  background: #1a2e1a !important;
+  border-color: #28a745 !important;
+}
+
+:deep(body.dark-mode) .deadline-normal .detail-value {
+  color: #4ade80 !important;
 }
 
 .warning-icon {
@@ -2869,5 +3329,667 @@ const cancelVerificationRequest = async (ticketId: string) => {
 
 .action-button.cancel-verification:hover {
   background-color: #d97706;
+}
+
+.target-user-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inactive-user-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+}
+
+.inactive-user-indicator .text-orange-500 {
+  color: #f97316;
+}
+
+.inactive-user-indicator .text-sm {
+  font-size: 0.875rem;
+}
+
+.inactive-user-indicator .font-medium {
+  font-weight: 500;
+}
+
+/* Dark mode styles for inactive user indicator */
+:deep(body.dark-mode) .inactive-user-indicator .text-orange-500 {
+  color: #fb923c;
+}
+
+:deep(body.dark-mode) .description-text {
+  color: #e5e7eb;
+}
+
+/* Add comprehensive dark mode styles for v-html content */
+:deep(body.dark-mode) .description-text :deep(p),
+:deep(body.dark-mode) .description-text :deep(div),
+:deep(body.dark-mode) .description-text :deep(span) {
+  color: #e5e7eb !important;
+}
+
+:deep(body.dark-mode) .description-text :deep(h1),
+:deep(body.dark-mode) .description-text :deep(h2),
+:deep(body.dark-mode) .description-text :deep(h3),
+:deep(body.dark-mode) .description-text :deep(h4),
+:deep(body.dark-mode) .description-text :deep(h5),
+:deep(body.dark-mode) .description-text :deep(h6) {
+  color: #f9fafb;
+}
+
+:deep(body.dark-mode) .description-text :deep(blockquote) {
+  border-left-color: #4b5563;
+  background: #1f2937;
+}
+
+:deep(body.dark-mode) .description-text :deep(code) {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .description-text :deep(pre) {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .description-text :deep(.ql-syntax) {
+  background: #1f2937;
+  color: #e5e7eb;
+  border-color: #374151;
+}
+
+:deep(body.dark-mode) .description-text :deep(.ql-size-small),
+:deep(body.dark-mode) .description-text :deep(.ql-size-large),
+:deep(body.dark-mode) .description-text :deep(.ql-size-huge) {
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .description-text :deep(a) {
+  color: #60a5fa;
+}
+
+/* Dark mode checkbox styling */
+:deep(body.dark-mode) .description-text :deep(ul[data-checked='false'] li::before) {
+  color: #9ca3af;
+}
+
+:deep(body.dark-mode) .description-text :deep(ul[data-checked='true'] li::before) {
+  color: #10b981;
+}
+
+:deep(body.dark-mode) .description-text :deep(ul[data-checked='true'] li) {
+  color: #9ca3af;
+}
+
+/* Dark mode image styling */
+:deep(body.dark-mode) .description-text :deep(img) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+:deep(body.dark-mode) .comment-text :deep(a) {
+  color: #60a5fa;
+}
+
+/* Dark mode checkbox styling */
+:deep(body.dark-mode) .comment-text :deep(ul[data-checked='false'] li::before) {
+  color: #9ca3af;
+}
+
+:deep(body.dark-mode) .comment-text :deep(ul[data-checked='true'] li::before) {
+  color: #10b981;
+}
+
+:deep(body.dark-mode) .comment-text :deep(ul[data-checked='true'] li) {
+  color: #9ca3af;
+}
+
+:deep(body.dark-mode) .comment-text :deep(img) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+:deep(body.dark-mode) .comment-text :deep(img) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.editable-field {
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.editable-field:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 0 0 1px #e9ecef;
+}
+
+.editing-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Edit input styling */
+.edit-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid #4f46e5;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: white;
+  color: #212529;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.edit-input:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-save {
+  background: #10b981;
+  color: white;
+}
+
+.btn-save:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.btn-cancel {
+  background: #6b7280;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+/* Dark mode editing styles */
+:deep(body.dark-mode) .editable-field:hover {
+  background-color: #374151;
+  box-shadow: 0 0 0 1px #4b5563;
+}
+
+:deep(body.dark-mode) .edit-input {
+  background: #374151;
+  color: #f9fafb;
+  border-color: #818cf8;
+}
+
+:deep(body.dark-mode) .edit-input:focus {
+  background: #1f2937;
+  border-color: #a5b4fc;
+}
+
+:deep(body.dark-mode) .btn-save {
+  background: #059669;
+}
+
+:deep(body.dark-mode) .btn-save:hover {
+  background: #047857;
+}
+
+:deep(body.dark-mode) .btn-cancel {
+  background: #4b5563;
+}
+
+:deep(body.dark-mode) .btn-cancel:hover {
+  background: #374151;
+}
+
+.action-button.cancel {
+  background-color: #dc2626;
+}
+
+.action-button.cancel:hover {
+  background-color: #b91c1c;
+}
+
+.action-button.cancel-verification {
+  background-color: #f59e0b;
+}
+
+.action-button.cancel-verification:hover {
+  background-color: #d97706;
+}
+
+.target-user-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inactive-user-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+}
+
+.inactive-user-indicator .text-orange-500 {
+  color: #f97316;
+}
+
+.inactive-user-indicator .text-sm {
+  font-size: 0.875rem;
+}
+
+.inactive-user-indicator .font-medium {
+  font-weight: 500;
+}
+
+/* Dark mode styles for inactive user indicator */
+:deep(body.dark-mode) .inactive-user-indicator .text-orange-500 {
+  color: #fb923c;
+}
+
+:deep(body.dark-mode) .description-text {
+  color: #e5e7eb;
+}
+
+/* Add comprehensive dark mode styles for v-html content */
+:deep(body.dark-mode) .description-text :deep(p),
+:deep(body.dark-mode) .description-text :deep(div),
+:deep(body.dark-mode) .description-text :deep(span) {
+  color: #e5e7eb !important;
+}
+
+:deep(body.dark-mode) .description-text :deep(h1),
+:deep(body.dark-mode) .description-text :deep(h2),
+:deep(body.dark-mode) .description-text :deep(h3),
+:deep(body.dark-mode) .description-text :deep(h4),
+:deep(body.dark-mode) .description-text :deep(h5),
+:deep(body.dark-mode) .description-text :deep(h6) {
+  color: #f9fafb;
+}
+
+:deep(body.dark-mode) .description-text :deep(blockquote) {
+  border-left-color: #4b5563;
+  background: #1f2937;
+}
+
+:deep(body.dark-mode) .description-text :deep(code) {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .description-text :deep(pre) {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .description-text :deep(.ql-syntax) {
+  background: #1f2937;
+  color: #e5e7eb;
+  border-color: #374151;
+}
+
+:deep(body.dark-mode) .description-text :deep(.ql-size-small),
+:deep(body.dark-mode) .description-text :deep(.ql-size-large),
+:deep(body.dark-mode) .description-text :deep(.ql-size-huge) {
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .description-text :deep(a) {
+  color: #60a5fa;
+}
+
+/* Dark mode comment text styles */
+:deep(body.dark-mode) .comment-text {
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .comment-text :deep(p),
+:deep(body.dark-mode) .comment-text :deep(div),
+:deep(body.dark-mode) .comment-text :deep(span) {
+  color: #e5e7eb !important;
+}
+
+:deep(body.dark-mode) .comment-text :deep(h1),
+:deep(body.dark-mode) .comment-text :deep(h2),
+:deep(body.dark-mode) .comment-text :deep(h3),
+:deep(body.dark-mode) .comment-text :deep(h4),
+:deep(body.dark-mode) .comment-text :deep(h5),
+:deep(body.dark-mode) .comment-text :deep(h6) {
+  color: #f9fafb;
+}
+
+:deep(body.dark-mode) .comment-text :deep(blockquote) {
+  border-left-color: #4b5563;
+  background: #1f2937;
+}
+
+:deep(body.dark-mode) .comment-text :deep(code) {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .comment-text :deep(pre) {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .comment-text :deep(strong) {
+  color: #f3f4f6;
+}
+
+:deep(body.dark-mode) .comment-text :deep(em) {
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .comment-text :deep(ul),
+:deep(body.dark-mode) .comment-text :deep(ol) {
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) .comment-text :deep(li) {
+  color: #e5e7eb;
+}
+
+/* General dark mode styles for any v-html content */
+:deep(body.dark-mode) [v-html] {
+  color: #e5e7eb;
+}
+
+:deep(body.dark-mode) [v-html] :deep(p),
+:deep(body.dark-mode) [v-html] :deep(div),
+:deep(body.dark-mode) [v-html] :deep(span) {
+  color: inherit !important;
+}
+
+:deep(body.dark-mode) [v-html] :deep(strong) {
+  color: #f3f4f6;
+}
+
+:deep(body.dark-mode) [v-html] :deep(em) {
+  color: inherit;
+}
+
+:deep(body.dark-mode) [v-html] :deep(a) {
+  color: #60a5fa;
+}
+
+/* Ensure system update descriptions have proper dark mode styling */
+:deep(body.dark-mode) .text-gray-600[v-html],
+:deep(body.dark-mode) .text-gray-600 [v-html] {
+  color: #d1d5db !important;
+}
+
+:deep(body.dark-mode) .text-gray-600[v-html] :deep(p),
+:deep(body.dark-mode) .text-gray-600[v-html] :deep(div),
+:deep(body.dark-mode) .text-gray-600[v-html] :deep(span),
+:deep(body.dark-mode) .text-gray-600 [v-html] :deep(p),
+:deep(body.dark-mode) .text-gray-600 [v-html] :deep(div),
+:deep(body.dark-mode) .text-gray-600 [v-html] :deep(span) {
+  color: #d1d5db !important;
+}
+
+/* Add comprehensive dark mode styles for v-html content */
+.dark .description-text,
+.dark .description-text *,
+:deep(.dark) .description-text,
+:deep(.dark) .description-text * {
+  color: #e5e7eb !important;
+}
+
+.dark .description-text p,
+.dark .description-text div,
+.dark .description-text span,
+:deep(.dark) .description-text p,
+:deep(.dark) .description-text div,
+:deep(.dark) .description-text span {
+  color: #e5e7eb !important;
+}
+
+.dark .description-text h1,
+.dark .description-text h2,
+.dark .description-text h3,
+.dark .description-text h4,
+.dark .description-text h5,
+.dark .description-text h6,
+:deep(.dark) .description-text h1,
+:deep(.dark) .description-text h2,
+:deep(.dark) .description-text h3,
+:deep(.dark) .description-text h4,
+:deep(.dark) .description-text h5,
+:deep(.dark) .description-text h6 {
+  color: #f9fafb !important;
+}
+
+.dark .description-text strong,
+:deep(.dark) .description-text strong {
+  color: #f3f4f6 !important;
+}
+
+.dark .description-text a,
+:deep(.dark) .description-text a {
+  color: #60a5fa !important;
+}
+
+/* Dark mode comment text styles */
+.dark .comment-text,
+.dark .comment-text *,
+:deep(.dark) .comment-text,
+:deep(.dark) .comment-text * {
+  color: #e5e7eb !important;
+}
+
+.dark .comment-text p,
+.dark .comment-text div,
+.dark .comment-text span,
+:deep(.dark) .comment-text p,
+:deep(.dark) .comment-text div,
+:deep(.dark) .comment-text span {
+  color: #e5e7eb !important;
+}
+
+.dark .comment-text h1,
+.dark .comment-text h2,
+.dark .comment-text h3,
+.dark .comment-text h4,
+.dark .comment-text h5,
+.dark .comment-text h6,
+:deep(.dark) .comment-text h1,
+:deep(.dark) .comment-text h2,
+:deep(.dark) .comment-text h3,
+:deep(.dark) .comment-text h4,
+:deep(.dark) .comment-text h5,
+:deep(.dark) .comment-text h6 {
+  color: #f9fafb !important;
+}
+
+.dark .comment-text strong,
+:deep(.dark) .comment-text strong {
+  color: #f3f4f6 !important;
+}
+
+.dark .comment-text a,
+:deep(.dark) .comment-text a {
+  color: #60a5fa !important;
+}
+
+/* Force override for v-html content in dark mode */
+:deep(.dark) .text-gray-800 .description-text,
+:deep(.dark) .text-gray-800 .description-text *,
+:deep(.dark) .text-gray-800 .comment-text,
+:deep(.dark) .text-gray-800 .comment-text * {
+  color: #e5e7eb !important;
+}
+
+/* Also support body.dark-mode pattern */
+:deep(body.dark-mode) .description-text,
+:deep(body.dark-mode) .description-text *,
+body.dark-mode .description-text,
+body.dark-mode .description-text * {
+  color: #e5e7eb !important;
+}
+
+:deep(body.dark-mode) .comment-text,
+:deep(body.dark-mode) .comment-text *,
+body.dark-mode .comment-text,
+body.dark-mode .comment-text * {
+  color: #e5e7eb !important;
+}
+
+:deep(body.dark-mode) .text-gray-800 .description-text,
+:deep(body.dark-mode) .text-gray-800 .description-text *,
+:deep(body.dark-mode) .text-gray-800 .comment-text,
+:deep(body.dark-mode) .text-gray-800 .comment-text *,
+body.dark-mode .text-gray-800 .description-text,
+body.dark-mode .text-gray-800 .description-text *,
+body.dark-mode .text-gray-800 .comment-text,
+body.dark-mode .text-gray-800 .comment-text * {
+  color: #e5e7eb !important;
+}
+
+/* Force text color for v-html content in dark mode */
+.dark .description-text,
+.dark .description-text *,
+.dark .comment-text,
+.dark .comment-text * {
+  color: #e5e7eb !important;
+}
+
+/* Ensure text remains visible with proper contrast */
+:deep(.description-text),
+:deep(.comment-text) {
+  color: inherit;
+}
+
+.dark :deep(.description-text),
+.dark :deep(.comment-text) {
+  color: #e5e7eb !important;
+}
+
+.dark :deep(.description-text *),
+.dark :deep(.comment-text *) {
+  color: #e5e7eb !important;
+}
+
+/* Force override for v-html content in dark mode */
+:deep(.dark) .text-gray-800 .description-text,
+:deep(.dark) .text-gray-800 .description-text *,
+:deep(.dark) .text-gray-800 .comment-text,
+:deep(.dark) .text-gray-800 .comment-text * {
+  color: #e5e7eb !important;
+}
+
+/* Also support body.dark-mode pattern */
+:deep(body.dark-mode) .description-text,
+:deep(body.dark-mode) .description-text *,
+body.dark-mode .description-text,
+body.dark-mode .description-text * {
+  color: #e5e7eb !important;
+}
+
+:deep(body.dark-mode) .comment-text,
+:deep(body.dark-mode) .comment-text *,
+body.dark-mode .comment-text,
+body.dark-mode .comment-text * {
+  color: #e5e7eb !important;
+}
+
+:deep(body.dark-mode) .text-gray-800 .description-text,
+:deep(body.dark-mode) .text-gray-800 .description-text *,
+:deep(body.dark-mode) .text-gray-800 .comment-text,
+:deep(body.dark-mode) .text-gray-800 .comment-text *,
+body.dark-mode .text-gray-800 .description-text,
+body.dark-mode .text-gray-800 .description-text *,
+body.dark-mode .text-gray-800 .comment-text,
+body.dark-mode .text-gray-800 .comment-text * {
+  color: #e5e7eb !important;
+}
+
+/* Force text color for v-html content in dark mode - comprehensive solution */
+.dark .description-text,
+.dark .description-text *,
+.dark .comment-text,
+.dark .comment-text *,
+:deep(.dark) .description-text,
+:deep(.dark) .description-text *,
+:deep(.dark) .comment-text,
+:deep(.dark) .comment-text *,
+.dark :deep(.description-text),
+.dark :deep(.description-text *),
+.dark :deep(.comment-text),
+.dark :deep(.comment-text *) {
+  color: #e5e7eb !important;
+}
+
+/* Override any parent container text color in dark mode */
+.dark .text-gray-800 .description-text,
+.dark .text-gray-800 .description-text *,
+.dark .text-gray-800 .comment-text,
+.dark .text-gray-800 .comment-text * {
+  color: #e5e7eb !important;
+}
+
+/* Dark mode styles for descriptions and comments */
+.dark .description-text,
+.dark .description-text *,
+.dark .comment-text,
+.dark .comment-text *,
+:deep(.dark) .description-text,
+:deep(.dark) .description-text *,
+:deep(.dark) .comment-text,
+:deep(.dark) .comment-text * {
+  color: #e5e7eb !important;
+}
+
+/* Override parent container styles in dark mode */
+.dark .text-gray-800 .description-text,
+.dark .text-gray-800 .description-text *,
+.dark .text-gray-800 .comment-text,
+.dark .text-gray-800 .comment-text * {
+  color: #e5e7eb !important;
+}
+
+/* Headings should be slightly brighter */
+.dark .description-text h1,
+.dark .description-text h2,
+.dark .description-text h3,
+.dark .description-text h4,
+.dark .description-text h5,
+.dark .description-text h6,
+.dark .comment-text h1,
+.dark .comment-text h2,
+.dark .comment-text h3,
+.dark .comment-text h4,
+.dark .comment-text h5,
+.dark .comment-text h6 {
+  color: #f9fafb !important;
+}
+
+/* Links should be blue in dark mode */
+.dark .description-text a,
+.dark .comment-text a {
+  color: #60a5fa !important;
 }
 </style>

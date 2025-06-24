@@ -1,6 +1,5 @@
 <template>
   <BaseModal
-    :isOpen="isOpen"
     title="Novo Colaborador"
     @close="closeModal"
     @cancel="closeModal"
@@ -8,7 +7,7 @@
     :confirmButtonText="isLoading ? '' : 'Cadastrar'"
     :cancelButtonText="'Cancelar'"
   >
-    <form id="cadastroColaboradorForm" class="grid grid-cols-2 gap-5" @submit.prevent="createUser">
+    <form id="cadastroColaboradorForm" class="w-[100%] sm:min-w-[500px] grid grid-cols-1 sm:grid-cols-2 gap-5" @submit.prevent="createUser">
       <div class="col-span-1">
         <label
           for="nomeColaborador"
@@ -102,8 +101,8 @@
           required
           class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         >
-          <option value="false">Não</option>
-          <option value="true">Sim</option>
+          <option :value="false">Não</option>
+          <option :value="true">Sim</option>
         </select>
       </div>
 
@@ -123,10 +122,6 @@ import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
 const isLoading = ref(false);
-
-defineProps({
-  isOpen: Boolean,
-});
 
 const emit = defineEmits(['close', 'userCreated']);
 
@@ -175,7 +170,8 @@ const createUser = async () => {
     emit('userCreated');
     toast.success('Colaborador criado com sucesso!');
     closeModal();
-  } catch {
+  } catch (error) {
+    console.error(error);
     toast.error('Algo deu errado. Tente novamente.');
   } finally {
     isLoading.value = false;

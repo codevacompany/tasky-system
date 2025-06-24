@@ -426,19 +426,16 @@
 
     <NewTicketModal
       v-if="isTicketModalOpen"
-      :isOpen="isTicketModalOpen"
       @close="closeTicketModal"
     />
 
     <ProfileModal
       v-if="showProfileModal"
-      :showProfileModal="showProfileModal"
       @close="toggleProfileModal"
     />
 
     <NotificationsDropdown
       v-if="showNotificationsModal"
-      :isOpen="showNotificationsModal"
       @close="toggleNotificationsModal"
       @notifications-read="fetchUnreadCount"
     />
