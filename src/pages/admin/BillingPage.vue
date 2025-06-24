@@ -435,4 +435,4 @@ const downloadInvoice = async (id: number) => {
     console.error('Download error:', error);
   }
 };
-</script>
+</script> 
