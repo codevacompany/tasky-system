@@ -31,7 +31,7 @@
                     :class="{ 'primary-gradient text-white': isActive('/') }"
                     class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
                   >
-                    <font-awesome-icon icon="tachometer-alt-average" /> Dashboard
+                   Dashboard
                   </div>
                 </li>
               </router-link>
@@ -41,7 +41,7 @@
                     :class="{ 'primary-gradient text-white': isActive('/meus-tickets') }"
                     class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
                   >
-                    <font-awesome-icon icon="ticket" />Tickets
+                    Tickets
                   </div>
                 </li>
               </router-link>
@@ -51,7 +51,6 @@
                     :class="{ 'primary-gradient text-white': isActive('/admin/relatorios') }"
                     class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
                   >
-                    <font-awesome-icon icon="chart-line" />
                     Relatórios
                   </div>
                 </li>
@@ -77,7 +76,6 @@
                   class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
                   @click="toggleAdminDropdown"
                 >
-                  <font-awesome-icon icon="cog" />
                   Administração
                   <font-awesome-icon
                     icon="chevron-down"
@@ -95,8 +93,8 @@
                     @click="showAdminDropdown = false"
                   >
                     <div
-                      :class="isActive('/admin/usuarios') ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
-                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      :class="isActive('/admin/usuarios') ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
+                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="users" />
                       Usuários
@@ -108,8 +106,8 @@
                     @click="showAdminDropdown = false"
                   >
                     <div
-                      :class="isActive('/admin/setores') ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
-                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      :class="isActive('/admin/setores') ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
+                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="building" />
                       Setores
@@ -121,8 +119,8 @@
                     @click="showAdminDropdown = false"
                   >
                     <div
-                      :class="isActive('/admin/categorias') ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
-                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      :class="isActive('/admin/categorias') ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
+                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="tag" />
                       Categorias
@@ -135,10 +133,10 @@
                   >
                     <div
                       :class="{
-                        'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                        'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                           isActive('/admin/clientes'),
                       }"
-                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="building" />
                       Clientes
@@ -151,10 +149,10 @@
                   >
                     <div
                       :class="{
-                        'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                        'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                           isActive('/admin/cadastros'),
                       }"
-                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="user-plus" />
                       Cadastros
@@ -195,7 +193,7 @@
 
           <router-link
             to="/sync"
-            class="hidden sm:flex text-slate-500 dark:text-slate-400 p-2 rounded cursor-pointer transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-600"
+            class="hidden sm:flex text-slate-500 dark:text-slate-400 p-2 rounded cursor-pointer transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary"
           >
             <div class="flex flex-col items-center gap-0.5">
               <font-awesome-icon icon="comments" />
@@ -208,7 +206,7 @@
             @click="toggleProfileModal"
           >
             <div
-              class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-blue-600 text-white text-base font-bold"
+              class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-primary text-white text-base font-bold"
             >
               <span>{{ userInitials }}</span>
             </div>
@@ -328,10 +326,10 @@
                 >
                   <div
                     :class="{
-                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                      'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/usuarios'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="users" />
                     Usuários
@@ -344,10 +342,10 @@
                 >
                   <div
                     :class="{
-                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                      'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/setores'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="building" />
                     Setores
@@ -360,10 +358,10 @@
                 >
                   <div
                     :class="{
-                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                      'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/categorias'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="tag" />
                     Categorias
@@ -376,10 +374,10 @@
                 >
                   <div
                     :class="{
-                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                      'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/clientes'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="building" />
                     Clientes
@@ -392,10 +390,10 @@
                 >
                   <div
                     :class="{
-                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                      'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/cadastros'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="user-plus" />
                     Cadastros

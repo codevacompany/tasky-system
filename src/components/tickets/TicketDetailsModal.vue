@@ -41,7 +41,7 @@
 
             <button
               v-if="isTargetUser && loadedTicket?.status === TicketStatus.InProgress"
-              class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-sm text-white font-medium rounded-md transition-colors"
+              class="inline-flex items-center gap-1.5 px-3 py-2 bg-primary hover:bg-blue-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="sendForReview(loadedTicket.customId)"
             >
               <font-awesome-icon icon="arrow-right" class="text-xs" />
@@ -131,7 +131,7 @@
             <h3
               class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2"
             >
-              <font-awesome-icon icon="info-circle" class="text-blue-600 dark:text-blue-400" />
+              <font-awesome-icon icon="info-circle" class="text-primary dark:text-blue-400" />
               Informações do Ticket
             </h3>
 
@@ -382,7 +382,7 @@
             <!-- Description Section -->
             <div class="my-2 px-4 sm:px-6 dark:border-gray-700">
               <h3 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                <font-awesome-icon icon="file-text" class="text-blue-600 dark:text-blue-400" />
+                <font-awesome-icon icon="file-text" class="text-primary dark:text-blue-400" />
                 Descrição
               </h3>
 
@@ -436,7 +436,7 @@
             >
               <div class="flex items-center justify-between mb-4">
                 <h3 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                  <font-awesome-icon icon="paperclip" class="text-blue-600 dark:text-blue-400" />
+                  <font-awesome-icon icon="paperclip" class="text-primary dark:text-blue-400" />
                   Anexos
                   <span
                     class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full text-xs font-medium"
@@ -446,7 +446,7 @@
                 </h3>
                 <button
                   v-if="canEditTicket"
-                  class="inline-flex items-center justify-center w-8 h-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors"
+                  class="inline-flex items-center justify-center w-8 h-8 bg-primary hover:bg-blue-700 text-white rounded-full transition-colors"
                   @click="openFileInput"
                   title="Adicionar anexos"
                 >
@@ -461,7 +461,7 @@
                   class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer transition-colors"
                   @click="downloadFile(file)"
                 >
-                  <div class="text-blue-600 dark:text-blue-400">
+                  <div class="text-primary dark:text-blue-400">
                     <font-awesome-icon icon="file" size="lg" />
                   </div>
                   <div class="flex-1 min-w-0">
@@ -493,7 +493,7 @@
               <h3
                 class="font-semibold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2"
               >
-                <font-awesome-icon icon="comments" class="text-blue-600 dark:text-blue-400" />
+                <font-awesome-icon icon="comments" class="text-primary dark:text-blue-400" />
                 Atividade
               </h3>
 
@@ -521,7 +521,7 @@
                   <div class="flex justify-end">
                     <button
                       @click="comment()"
-                      class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                      class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
                     >
                       <font-awesome-icon icon="paper-plane" />
                       Enviar Comentário

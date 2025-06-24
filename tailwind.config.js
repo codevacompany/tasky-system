@@ -11,6 +11,7 @@ export default {
           light: '#6c86f2', // rgb(108, 134, 242)
         },
         secondary: {
+          DEFAULT: '#091940',
           dark: '#00143b',
           darker: '#142046',
         },
