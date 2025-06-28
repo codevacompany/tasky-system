@@ -29,9 +29,9 @@
                 <li>
                   <div
                     :class="{ 'primary-gradient text-white': isActive('/') }"
-                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
+                    class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
                   >
-                   Dashboard
+                    <font-awesome-icon icon="tachometer-alt-average" /> Dashboard
                   </div>
                 </li>
               </router-link>
@@ -39,9 +39,9 @@
                 <li>
                   <div
                     :class="{ 'primary-gradient text-white': isActive('/meus-tickets') }"
-                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
+                    class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
                   >
-                    Tickets
+                    <font-awesome-icon icon="ticket" />Tickets
                   </div>
                 </li>
               </router-link>
@@ -49,8 +49,9 @@
                 <li>
                   <div
                     :class="{ 'primary-gradient text-white': isActive('/admin/relatorios') }"
-                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
+                    class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
                   >
+                    <font-awesome-icon icon="chart-line" />
                     Relatórios
                   </div>
                 </li>
@@ -73,19 +74,20 @@
                       isActive('/admin/clientes') ||
                       isActive('/admin/cadastros'),
                   }"
-                  class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
+                  class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
                   @click="toggleAdminDropdown"
                 >
+                  <font-awesome-icon icon="user-cog" />
                   Administração
                   <font-awesome-icon
                     icon="chevron-down"
-                    class="ml-2 transition-transform duration-200"
+                    class="transition-transform duration-200"
                     :class="{ 'rotate-180': showAdminDropdown }"
                   />
                 </div>
                 <div
                   v-show="showAdminDropdown"
-                  class="absolute top-full left-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] z-50 mt-1 flex flex-col"
+                  class="absolute top-full left-0 text-[15px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] z-50 mt-1 flex flex-col"
                 >
                   <router-link
                     v-if="user?.role.name === RoleName.TenantAdmin"
@@ -93,7 +95,11 @@
                     @click="showAdminDropdown = false"
                   >
                     <div
-                      :class="isActive('/admin/usuarios') ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
+                      :class="
+                        isActive('/admin/usuarios')
+                          ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
+                          : 'text-gray-700'
+                      "
                       class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="users" />
@@ -106,7 +112,11 @@
                     @click="showAdminDropdown = false"
                   >
                     <div
-                      :class="isActive('/admin/setores') ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
+                      :class="
+                        isActive('/admin/setores')
+                          ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
+                          : 'text-gray-700'
+                      "
                       class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="building" />
@@ -119,7 +129,11 @@
                     @click="showAdminDropdown = false"
                   >
                     <div
-                      :class="isActive('/admin/categorias') ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
+                      :class="
+                        isActive('/admin/categorias')
+                          ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
+                          : 'text-gray-700'
+                      "
                       class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="tag" />
@@ -160,23 +174,15 @@
                   </router-link>
                 </div>
               </li>
-              <!-- Novo item: Assinaturas -->
-              <router-link to="/admin/assinaturas">
-                <li>
-                  <div
-                    :class="{ 'primary-gradient text-white': isActive('/admin/assinaturas') }"
-                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
-                  >
-                    <font-awesome-icon icon="credit-card" /> Assinaturas
-                  </div>
-                </li>
-              </router-link>
             </ul>
           </nav>
         </div>
 
         <div class="flex items-center gap-6">
-          <button class="btn btn-primary flex items-center gap-2" @click="openTicketModal">
+          <button
+            class="btn btn-primary flex items-center gap-2 text-[15px]"
+            @click="openTicketModal"
+          >
             <font-awesome-icon icon="plus" />
             <span class="hidden sm:inline">Novo Ticket</span>
           </button>
@@ -195,7 +201,7 @@
             to="/sync"
             class="hidden sm:flex text-slate-500 dark:text-slate-400 p-2 rounded cursor-pointer transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary"
           >
-            <div class="flex flex-col items-center gap-0.5">
+            <div class="flex flex-col items-center gap-0.5 text-[15px]">
               <font-awesome-icon icon="comments" />
               <span class="text-xs font-medium">Sync</span>
             </div>
@@ -211,7 +217,7 @@
               <span>{{ userInitials }}</span>
             </div>
             <div class="ml-3 mr-3 hidden sm:block">
-              <span class="text-gray-800 dark:text-gray-200 font-medium">{{
+              <span class="text-gray-800 dark:text-gray-200 font-medium text-[15px]">{{
                 user?.firstName
               }}</span>
               <font-awesome-icon icon="chevron-down" class="text-sm font-bold ml-2" />
@@ -310,7 +316,7 @@
                 class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover cursor-pointer"
                 @click="toggleMobileAdminDropdown"
               >
-                <font-awesome-icon icon="cog" />
+                <font-awesome-icon icon="user-cog" />
                 Administração
                 <font-awesome-icon
                   icon="chevron-down"
@@ -422,15 +428,9 @@
       </main>
     </div>
 
-    <NewTicketModal
-      v-if="isTicketModalOpen"
-      @close="closeTicketModal"
-    />
+    <NewTicketModal v-if="isTicketModalOpen" @close="closeTicketModal" />
 
-    <ProfileModal
-      v-if="showProfileModal"
-      @close="toggleProfileModal"
-    />
+    <ProfileModal v-if="showProfileModal" @close="toggleProfileModal" />
 
     <NotificationsDropdown
       v-if="showNotificationsModal"
