@@ -159,17 +159,17 @@
         <div v-if="activeTab === 'arquivados'" class="flex flex-col gap-8">
           <!-- Horizontal scroll wrapper for table -->
           <div class="overflow-x-auto">
-            <TicketTable
-              :tickets="tickets"
-              :isLoading="isLoading"
-              :tableType="activeTab"
-              :currentPage="currentPage"
-              :totalPages="totalPages"
-              :pagination="true"
-              @changePage="(page) => (currentPage = page)"
-              @viewTicket="handleViewTicket"
-              @refresh="fetchTicketsWithFilters"
-            />
+          <TicketTable
+            :tickets="tickets"
+            :isLoading="isLoading"
+            :tableType="activeTab"
+            :currentPage="currentPage"
+            :totalPages="totalPages"
+            :pagination="true"
+            @changePage="(page) => (currentPage = page)"
+            @viewTicket="handleViewTicket"
+            @refresh="fetchTicketsWithFilters"
+          />
           </div>
         </div>
 
@@ -183,7 +183,7 @@
                   <div
                     class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white"
                   >
-                    <font-awesome-icon icon="ticket" />
+                  <font-awesome-icon icon="ticket" />
                   </div>
                   <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total</span>
                 </div>
@@ -200,7 +200,7 @@
                   <div
                     class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white"
                   >
-                    <font-awesome-icon icon="clock" />
+                  <font-awesome-icon icon="clock" />
                   </div>
                   <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
                     >Pendentes</span
@@ -219,7 +219,7 @@
                   <div
                     class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white"
                   >
-                    <font-awesome-icon icon="spinner" />
+                  <font-awesome-icon icon="spinner" />
                   </div>
                   <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
                     >Em Andamento</span
@@ -234,26 +234,26 @@
 
           <!-- Horizontal scroll wrapper for table -->
           <div class="overflow-x-auto">
-            <TicketTable
-              v-if="!isKanbanView"
-              :tickets="tickets"
-              :isLoading="isLoading"
-              :tableType="activeTab"
-              :currentPage="currentPage"
-              :totalPages="totalPages"
-              :pagination="true"
-              @changePage="(page) => (currentPage = page)"
-              @viewTicket="handleViewTicket"
-              @editTicket="handleEditTicket"
-              @cancelTicket="handleCancelTicket"
-              @acceptTicket="handleAcceptTicket"
-              @verifyTicket="handleVerifyTicket"
-              @approveTicket="handleApproveTicket"
-              @requestCorrection="handleRequestCorrection"
-              @rejectTicket="handleRejectTicket"
-              @refresh="fetchTicketsWithFilters"
-            />
-            <TicketKanban v-else :tickets="tickets" @viewTicket="handleViewTicket" />
+          <TicketTable
+            v-if="!isKanbanView"
+            :tickets="tickets"
+            :isLoading="isLoading"
+            :tableType="activeTab"
+            :currentPage="currentPage"
+            :totalPages="totalPages"
+            :pagination="true"
+            @changePage="(page) => (currentPage = page)"
+            @viewTicket="handleViewTicket"
+            @editTicket="handleEditTicket"
+            @cancelTicket="handleCancelTicket"
+            @acceptTicket="handleAcceptTicket"
+            @verifyTicket="handleVerifyTicket"
+            @approveTicket="handleApproveTicket"
+            @requestCorrection="handleRequestCorrection"
+            @rejectTicket="handleRejectTicket"
+            @refresh="fetchTicketsWithFilters"
+          />
+          <TicketKanban v-else :tickets="tickets" @viewTicket="handleViewTicket" />
           </div>
         </div>
       </div>

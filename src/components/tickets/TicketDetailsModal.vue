@@ -1201,7 +1201,6 @@ const getSpecialUpdateTitle = (subType: string, event?: SpecialUpdateEvent) => {
   return baseTitle;
 };
 
-
 watch(
   () => props.ticket,
   (newTicket) => {
@@ -1213,7 +1212,6 @@ watch(
   },
   { immediate: true },
 );
-
 
 const openFileInput = () => {
   if (fileInput.value) {
@@ -1396,7 +1394,6 @@ const cancelVerificationRequest = async (ticketId: string) => {
 };
 
 const showAddMenu = ref(false);
-
 
 const selectAttachFile = () => {
   closeAddMenu();

@@ -62,6 +62,7 @@
           </div>
           <div class="flex gap-2 sm:gap-3">
             <button
+              v-permission="PERMISSIONS.VIEW_BASIC_ANALYTICS"
               @click="openExportModal"
               class="flex items-center gap-2 px-3 sm:px-4 py-2 btn btn-primary text-xs sm:text-sm text-white rounded-md font-medium transition-colors"
             >
@@ -1027,7 +1028,11 @@
           </div>
 
           <!-- Setores Tab -->
-          <div v-if="currentTab === 'department'" class="space-y-6">
+          <div
+            v-if="currentTab === 'department'"
+            v-permission="PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS"
+            class="space-y-6"
+          >
             <!-- Department Summary Card -->
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3">
               <div class="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -1727,6 +1732,7 @@ import { Line, Doughnut, Bar } from 'vue-chartjs';
 import { formatDate, formatDateToPortuguese } from '@/utils/date';
 import { reportService } from '@/services/reportService';
 import { ticketService } from '@/services/ticketService';
+import { PERMISSIONS, usePermissions } from '@/utils/permissions';
 import type {
   TenantStatistics,
   StatusDurationDto,
@@ -2980,6 +2986,13 @@ const formatStatsPeriod = (period: string): string => {
 };
 
 const openExportModal = () => {
+  const { hasPermission } = usePermissions();
+
+  if (!hasPermission(PERMISSIONS.EXPORT_REPORTS)) {
+    toast.error('Você não tem permissão para exportar relatórios');
+    return;
+  }
+
   showExportModal.value = true;
 };
 

@@ -368,14 +368,14 @@ const mockPayments = [
     id: 1,
     date: new Date('2024-02-29'),
     plan: 'Plano Crescer',
-    amount: 199.00,
+    amount: 199.0,
     status: 'Pago',
   },
   {
     id: 2,
     date: new Date('2024-01-31'),
     plan: 'Plano Crescer',
-    amount: 199.00,
+    amount: 199.0,
     status: 'Suspenso',
   },
 ];

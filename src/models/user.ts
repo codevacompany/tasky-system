@@ -12,6 +12,7 @@ export interface User {
   isActive: boolean;
   role: Role;
   status?: 'online' | 'offline' | 'away';
+  permissions?: string[];
 }
 
 export interface CreateUserDto {
