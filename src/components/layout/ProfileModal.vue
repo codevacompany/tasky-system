@@ -1,9 +1,6 @@
 <template>
   <Teleport to="body">
-    <div
-      class="fixed inset-0 bg-transparent z-[999] pointer-events-auto"
-      @click="closeModal"
-    ></div>
+    <div class="fixed inset-0 bg-transparent z-[999] pointer-events-auto" @click="closeModal"></div>
     <div
       class="fixed top-[calc(var(--header-height)+6px)] right-5 w-[310px] bg-white dark:bg-gray-800 rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.1)] z-[1000] overflow-hidden transition-all duration-300 pointer-events-auto border border-gray-200 dark:border-gray-700"
       id="profileModal"
@@ -53,6 +50,18 @@
                   <font-awesome-icon icon="question-circle" />
                 </div>
                 <span class="flex-1 text-sm text font-medium">Ajuda</span>
+              </router-link>
+
+              <router-link
+                v-if="isTenantAdmin"
+                to="/assinaturas"
+                @click="closeModal"
+                class="flex items-center gap-3 px-6 py-3.5 text-gray-900 hover:text-gray-900 dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
+                  <font-awesome-icon icon="credit-card" />
+                </div>
+                <span class="flex-1 text-sm text font-medium">Assinaturas</span>
               </router-link>
 
               <div
@@ -325,6 +334,7 @@ import { userService } from '@/services/userService';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import BaseModal from '@/components/common/BaseModal.vue';
+import { useRoles } from '@/composables';
 
 const router = useRouter();
 
@@ -335,6 +345,9 @@ const emit = defineEmits<{
 const userStore = useUserStore();
 const user = computed(() => userStore.user);
 const userPreferencesStore = useUserPreferencesStore();
+
+// Use the roles composable
+const { isTenantAdmin } = useRoles();
 
 const showThemeModal = ref(false);
 

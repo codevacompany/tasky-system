@@ -10,6 +10,7 @@ import Vue3Toastify, { type ToastContainerOptions } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import './assets/icons';
 import { localStorageService } from './utils/localStorageService';
+import { vPermission, vAnyPermission, vAllPermissions } from './directives/permission';
 
 // Initialize dark mode at startup
 if (localStorageService.isDarkMode()) {
@@ -20,6 +21,11 @@ if (localStorageService.isDarkMode()) {
 const app = createApp(App);
 
 app.component('font-awesome-icon', FontAwesomeIcon);
+
+// Register permission directives
+app.directive('permission', vPermission);
+app.directive('any-permission', vAnyPermission);
+app.directive('all-permissions', vAllPermissions);
 
 app.use(Vue3Toastify, {
   autoClose: 3000,

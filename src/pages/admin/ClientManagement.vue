@@ -211,18 +211,18 @@
                   @change="toggleAllSelection"
                   class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
                 />
-              </th>
+            </th>
               <th
                 @click="sortBy('name')"
                 class="px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
-                Cliente
-                <font-awesome-icon
+              Cliente
+              <font-awesome-icon
                   :icon="getSortIcon('name')"
                   v-if="sortField === 'name'"
                   class="ml-1"
-                />
-              </th>
+              />
+            </th>
               <th
                 @click="sortBy('cnpj')"
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
@@ -233,94 +233,94 @@
                   v-if="sortField === 'cnpj'"
                   class="ml-1"
                 />
-              </th>
+            </th>
               <th
                 @click="sortBy('plan')"
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
-                Plano
+              Plano
                 <font-awesome-icon
                   :icon="getSortIcon('plan')"
                   v-if="sortField === 'plan'"
                   class="ml-1"
                 />
-              </th>
+            </th>
               <th
                 @click="sortBy('status')"
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
-                Status
+              Status
                 <font-awesome-icon
                   :icon="getSortIcon('status')"
                   v-if="sortField === 'status'"
                   class="ml-1"
                 />
-              </th>
+            </th>
               <th
                 @click="sortBy('activeUsers')"
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
-                Usuários
-                <font-awesome-icon
+              Usuários
+              <font-awesome-icon
                   :icon="getSortIcon('activeUsers')"
                   v-if="sortField === 'activeUsers'"
                   class="ml-1"
-                />
-              </th>
+              />
+            </th>
               <th
                 @click="sortBy('ticketsThisMonth')"
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
-                Tickets/Mês
-                <font-awesome-icon
+              Tickets/Mês
+              <font-awesome-icon
                   :icon="getSortIcon('ticketsThisMonth')"
                   v-if="sortField === 'ticketsThisMonth'"
                   class="ml-1"
-                />
-              </th>
+              />
+            </th>
               <th
                 @click="sortBy('nextInvoice')"
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
-                Próx. Fatura
-                <font-awesome-icon
+              Próx. Fatura
+              <font-awesome-icon
                   :icon="getSortIcon('nextInvoice')"
                   v-if="sortField === 'nextInvoice'"
                   class="ml-1"
-                />
-              </th>
+              />
+            </th>
               <th
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100"
               >
                 Ações
               </th>
-            </tr>
-          </thead>
+          </tr>
+        </thead>
           <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            <template v-for="client in sortedClients" :key="client.id">
-              <!-- Linha principal do cliente -->
-              <tr
+          <template v-for="client in sortedClients" :key="client.id">
+            <!-- Linha principal do cliente -->
+            <tr
                 :class="[
                   'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors',
                   { 'bg-blue-50 dark:bg-blue-900/20': expandedClient === client.id },
                 ]"
-                @click="toggleClientExpansion(client.id)"
-              >
+              @click="toggleClientExpansion(client.id)"
+            >
                 <td class="px-4 py-4 text-center" @click.stop>
-                  <input
-                    type="checkbox"
-                    :checked="isSelected(client)"
-                    @change="toggleSelection(client)"
+                <input
+                  type="checkbox"
+                  :checked="isSelected(client)"
+                  @change="toggleSelection(client)"
                     class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
-                  />
-                </td>
+                />
+              </td>
                 <td class="px-4 py-4">
-                  <div>
+                <div>
                     <span class="font-medium text-gray-900 dark:text-white">{{
                       client.companyName
                     }}</span>
-                  </div>
-                </td>
+                </div>
+              </td>
                 <td class="px-4 py-4 text-center text-gray-900 dark:text-gray-100">
                   {{ formatCNPJ(client.cnpj) }}
                 </td>
@@ -341,8 +341,8 @@
                     ]"
                   >
                     {{ client.plan }}
-                  </span>
-                </td>
+                </span>
+              </td>
                 <td class="px-4 py-4 text-center">
                   <span
                     :class="[
@@ -357,9 +357,9 @@
                       },
                     ]"
                   >
-                    {{ client.status }}
-                  </span>
-                </td>
+                  {{ client.status }}
+                </span>
+              </td>
                 <td class="px-4 py-4 text-center">
                   <div
                     class="text-sm text-gray-900 dark:text-gray-100 flex flex-col items-center gap-1"
@@ -372,13 +372,13 @@
                           'bg-blue-600': client.activeUsers / client.userLimit <= 0.8,
                           'bg-orange-500': client.activeUsers / client.userLimit > 0.8,
                         }"
-                        :style="{
+                      :style="{
                           width: `${(client.activeUsers / client.userLimit) * 100}%`,
-                        }"
-                      ></div>
-                    </div>
+                      }"
+                    ></div>
                   </div>
-                </td>
+                </div>
+              </td>
                 <td class="px-4 py-4 text-center">
                   <div
                     class="text-sm text-gray-900 dark:text-gray-100 flex flex-col items-center gap-1"
@@ -392,10 +392,10 @@
                           'bg-orange-500': client.monthlyTickets / client.ticketLimit > 0.8,
                         }"
                         :style="{ width: `${(client.monthlyTickets / client.ticketLimit) * 100}%` }"
-                      ></div>
-                    </div>
+                    ></div>
                   </div>
-                </td>
+                </div>
+              </td>
                 <td class="px-4 py-4 text-center">
                   <div
                     class="text-sm text-gray-900 dark:text-gray-100 flex flex-col items-center gap-1"
@@ -403,9 +403,9 @@
                     <span>{{ formatDate(client.nextInvoice) }}</span>
                     <span class="text-xs text-gray-500 dark:text-gray-400">
                       {{ client.paymentStatus }}
-                    </span>
-                  </div>
-                </td>
+                  </span>
+                </div>
+              </td>
                 <td class="px-4 py-4">
                   <div class="flex items-center justify-center gap-1">
                     <button
@@ -413,34 +413,34 @@
                       title="Editar"
                       @click.stop="editClient(client)"
                     >
-                      <font-awesome-icon icon="edit" />
-                    </button>
+                    <font-awesome-icon icon="edit" />
+                  </button>
                     <button
                       class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                       title="Usuários"
                       @click.stop="manageUsers(client)"
                     >
-                      <font-awesome-icon icon="users" />
-                    </button>
-                    <button
+                    <font-awesome-icon icon="users" />
+                  </button>
+                  <button
                       class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                      title="Configurações"
-                      @click.stop="manageSettings(client)"
-                    >
-                      <font-awesome-icon icon="cog" />
-                    </button>
+                    title="Configurações"
+                    @click.stop="manageSettings(client)"
+                  >
+                    <font-awesome-icon icon="cog" />
+                  </button>
                     <button
                       class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                       title="Mais opções"
                       @click.stop="showOptions(client)"
                     >
-                      <font-awesome-icon icon="ellipsis-v" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
+                    <font-awesome-icon icon="ellipsis-v" />
+                  </button>
+                </div>
+              </td>
+            </tr>
 
-              <!-- Linha expandida com detalhes dos usuários -->
+            <!-- Linha expandida com detalhes dos usuários -->
               <tr v-if="expandedClient === client.id" class="bg-gray-50 dark:bg-gray-800">
                 <td colspan="9" class="px-4 py-4">
                   <div class="overflow-x-auto">
@@ -482,8 +482,8 @@
                           >
                             Ações
                           </th>
-                        </tr>
-                      </thead>
+                      </tr>
+                    </thead>
                       <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                         <tr
                           v-for="user in client.users"
@@ -501,7 +501,7 @@
                                 >{{ user.firstName }} {{ user.lastName }}</span
                               >
                             </div>
-                          </td>
+                        </td>
                           <td
                             class="px-3 py-2 text-center text-sm text-gray-900 dark:text-gray-100"
                           >
@@ -525,8 +525,8 @@
                               ]"
                             >
                               {{ user.profile }}
-                            </span>
-                          </td>
+                          </span>
+                        </td>
                           <td class="px-3 py-2 text-center">
                             <span
                               :class="[
@@ -539,9 +539,9 @@
                                 },
                               ]"
                             >
-                              {{ user.status }}
-                            </span>
-                          </td>
+                            {{ user.status }}
+                          </span>
+                        </td>
                           <td
                             class="px-3 py-2 text-center text-sm text-gray-900 dark:text-gray-100"
                           >
@@ -554,35 +554,35 @@
                                 title="Editar"
                                 @click="editUser(user)"
                               >
-                                <font-awesome-icon icon="edit" />
-                              </button>
-                              <button
+                              <font-awesome-icon icon="edit" />
+                            </button>
+                            <button
                                 class="w-6 h-6 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                                title="Alterar Status"
-                                @click="toggleUserStatus(user)"
-                              >
-                                <font-awesome-icon
-                                  :icon="user.status === 'ATIVO' ? 'ban' : 'check'"
-                                />
-                              </button>
-                              <button
+                              title="Alterar Status"
+                              @click="toggleUserStatus(user)"
+                            >
+                              <font-awesome-icon
+                                :icon="user.status === 'ATIVO' ? 'ban' : 'check'"
+                              />
+                            </button>
+                            <button
                                 class="w-6 h-6 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                                title="Resetar Senha"
-                                @click="resetPassword(user)"
-                              >
-                                <font-awesome-icon icon="key" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </td>
-              </tr>
-            </template>
-          </tbody>
-        </table>
+                              title="Resetar Senha"
+                              @click="resetPassword(user)"
+                            >
+                              <font-awesome-icon icon="key" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
       </div>
     </div>
 

@@ -3,7 +3,7 @@
 ## 🤔 Geral
 
 ### O que é o Tasky System?
-O Tasky System é uma plataforma de gerenciamento de chamados (tickets) que ajuda empresas a organizarem e acompanharem suas solicitações internas de forma eficiente.
+O Tasky System é uma plataforma de gerenciamento de tickets que ajuda empresas a organizarem e acompanharem suas solicitações internas de forma eficiente.
 
 ### Quem pode usar o sistema?
 O sistema é ideal para empresas de médio e grande porte que necessitam gerenciar fluxos de trabalho entre diferentes setores e equipes.
@@ -15,19 +15,20 @@ O sistema é ideal para empresas de médio e grande porte que necessitam gerenci
 
 ## 💻 Funcionalidades
 
-### Como criar um novo chamado?
-1. Clique em "Novo Chamado"
+### Como criar um novo ticket?
+1. Clique em "Novo Ticket"
 2. Preencha os campos obrigatórios
 3. Defina a prioridade e prazo (opcional)
 4. Clique em "Criar"
 
-### Como acompanhar meus chamados?
+### Como acompanhar meus tickets?
 - Use o dashboard para visão geral
-- Acesse "Meus Chamados" para lista detalhada
-- Configure notificações para atualizações
+- Acesse "Meus Tickets" para lista detalhada
+- Visualize status, prioridade e prazos
+- Receba notificações de atualizações
 
-### Posso anexar arquivos aos chamados?
-Sim, você pode anexar arquivos de até 10MB por chamado. Formatos suportados: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG.
+### Posso anexar arquivos aos tickets?
+Sim, você pode anexar arquivos de até 10MB por ticket. Formatos suportados: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG.
 
 ### Como funciona o sistema de prioridades?
 - Baixa: Prazo de 7 dias
@@ -127,10 +128,11 @@ Sim, todas as atualizações são aplicadas automaticamente, sem necessidade de 
 ## 📊 Relatórios
 
 ### Quais tipos de relatórios estão disponíveis?
-- Relatório de chamados por status
-- Relatório de tempo de resposta
+- Relatório de tickets por status
+- Relatório de tempo médio de resolução
 - Relatório de satisfação
 - Relatório de produtividade
+- Relatório de tickets por departamento
 
 ### Como exportar relatórios?
 - Clique em "Relatórios"

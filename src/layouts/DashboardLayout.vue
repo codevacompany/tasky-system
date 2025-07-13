@@ -29,27 +29,27 @@
                 <li>
                   <div
                     :class="{ 'primary-gradient text-white': isActive('/') }"
-                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
+                    class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
                   >
                     <font-awesome-icon icon="tachometer-alt-average" /> Dashboard
                   </div>
                 </li>
               </router-link>
-              <router-link v-if="user?.role.name !== RoleName.GlobalAdmin" to="/meus-tickets">
+              <router-link v-if="!isGlobalAdmin" to="/meus-tickets">
                 <li>
                   <div
                     :class="{ 'primary-gradient text-white': isActive('/meus-tickets') }"
-                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
+                    class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
                   >
                     <font-awesome-icon icon="ticket" />Tickets
                   </div>
                 </li>
               </router-link>
-              <router-link v-if="user?.role.name === RoleName.TenantAdmin" to="/admin/relatorios">
+              <router-link v-if="isTenantAdmin" to="/admin/relatorios">
                 <li>
                   <div
                     :class="{ 'primary-gradient text-white': isActive('/admin/relatorios') }"
-                    class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
+                    class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
                   >
                     <font-awesome-icon icon="chart-line" />
                     Relatórios
@@ -57,14 +57,7 @@
                 </li>
               </router-link>
 
-              <li
-                v-if="
-                  user?.role.name === RoleName.GlobalAdmin ||
-                  user?.role.name === RoleName.TenantAdmin
-                "
-                class="relative"
-                ref="adminDropdownRef"
-              >
+              <li v-if="isAdmin" class="relative" ref="adminDropdownRef">
                 <div
                   :class="{
                     'primary-gradient text-white':
@@ -74,55 +67,67 @@
                       isActive('/admin/clientes') ||
                       isActive('/admin/cadastros'),
                   }"
-                  class="flex items-center px-4 py-2 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
+                  class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
                   @click="toggleAdminDropdown"
                 >
-                  <font-awesome-icon icon="cog" />
+                  <font-awesome-icon icon="user-cog" />
                   Administração
                   <font-awesome-icon
                     icon="chevron-down"
-                    class="ml-2 transition-transform duration-200"
+                    class="transition-transform duration-200"
                     :class="{ 'rotate-180': showAdminDropdown }"
                   />
                 </div>
                 <div
                   v-show="showAdminDropdown"
-                  class="absolute top-full left-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] z-50 mt-1 flex flex-col"
+                  class="absolute top-full left-0 text-[15px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] z-50 mt-1 flex flex-col"
                 >
                   <router-link
-                    v-if="user?.role.name === RoleName.TenantAdmin"
+                    v-if="isTenantAdmin"
                     to="/admin/usuarios"
                     @click="showAdminDropdown = false"
                   >
                     <div
-                      :class="isActive('/admin/usuarios') ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
-                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      :class="
+                        isActive('/admin/usuarios')
+                          ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
+                          : 'text-gray-700'
+                      "
+                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="users" />
                       Usuários
                     </div>
                   </router-link>
                   <router-link
-                    v-if="user?.role.name === RoleName.TenantAdmin"
+                    v-if="isTenantAdmin"
                     to="/admin/setores"
                     @click="showAdminDropdown = false"
                   >
                     <div
-                      :class="isActive('/admin/setores') ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
-                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      :class="
+                        isActive('/admin/setores')
+                          ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
+                          : 'text-gray-700'
+                      "
+                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="building" />
                       Setores
                     </div>
                   </router-link>
                   <router-link
-                    v-if="user?.role.name === RoleName.TenantAdmin"
+                    v-if="isTenantAdmin"
                     to="/admin/categorias"
                     @click="showAdminDropdown = false"
                   >
                     <div
-                      :class="isActive('/admin/categorias') ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400' : 'text-gray-700'"
-                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      :class="
+                        isActive('/admin/categorias')
+                          ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
+                          : 'text-gray-700'
+                      "
+                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="tag" />
                       Categorias
@@ -131,14 +136,14 @@
                   <router-link
                     to="/admin/clientes"
                     @click="showAdminDropdown = false"
-                    v-if="user?.role.name === RoleName.GlobalAdmin"
+                    v-if="isGlobalAdmin"
                   >
                     <div
                       :class="{
-                        'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                        'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                           isActive('/admin/clientes'),
                       }"
-                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="building" />
                       Clientes
@@ -147,14 +152,14 @@
                   <router-link
                     to="/admin/cadastros"
                     @click="showAdminDropdown = false"
-                    v-if="user?.role.name === RoleName.GlobalAdmin"
+                    v-if="isGlobalAdmin"
                   >
                     <div
                       :class="{
-                        'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                        'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                           isActive('/admin/cadastros'),
                       }"
-                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="user-plus" />
                       Cadastros
@@ -167,7 +172,10 @@
         </div>
 
         <div class="flex items-center gap-6">
-          <button class="btn btn-primary flex items-center gap-2" @click="openTicketModal">
+          <button
+            class="btn btn-primary flex items-center gap-2 text-[15px]"
+            @click="openTicketModal"
+          >
             <font-awesome-icon icon="plus" />
             <span class="hidden sm:inline">Novo Ticket</span>
           </button>
@@ -184,9 +192,9 @@
 
           <router-link
             to="/sync"
-            class="hidden sm:flex text-slate-500 dark:text-slate-400 p-2 rounded cursor-pointer transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-600"
+            class="hidden sm:flex text-slate-500 dark:text-slate-400 p-2 rounded cursor-pointer transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary"
           >
-            <div class="flex flex-col items-center gap-0.5">
+            <div class="flex flex-col items-center gap-0.5 text-[15px]">
               <font-awesome-icon icon="comments" />
               <span class="text-xs font-medium">Sync</span>
             </div>
@@ -197,12 +205,12 @@
             @click="toggleProfileModal"
           >
             <div
-              class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-blue-600 text-white text-base font-bold"
+              class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-primary text-white text-base font-bold"
             >
               <span>{{ userInitials }}</span>
             </div>
             <div class="ml-3 mr-3 hidden sm:block">
-              <span class="text-gray-800 dark:text-gray-200 font-medium">{{
+              <span class="text-gray-800 dark:text-gray-200 font-medium text-[15px]">{{
                 user?.firstName
               }}</span>
               <font-awesome-icon icon="chevron-down" class="text-sm font-bold ml-2" />
@@ -252,11 +260,7 @@
                 </div>
               </li>
             </router-link>
-            <router-link
-              v-if="user?.role.name !== RoleName.GlobalAdmin"
-              to="/meus-tickets"
-              @click="closeMobileMenu"
-            >
+            <router-link v-if="!isGlobalAdmin" to="/meus-tickets" @click="closeMobileMenu">
               <li>
                 <div
                   :class="{ 'primary-gradient text-white': isActive('/meus-tickets') }"
@@ -267,11 +271,7 @@
                 </div>
               </li>
             </router-link>
-            <router-link
-              v-if="user?.role.name === RoleName.TenantAdmin"
-              to="/admin/relatorios"
-              @click="closeMobileMenu"
-            >
+            <router-link v-if="isTenantAdmin" to="/admin/relatorios" @click="closeMobileMenu">
               <li>
                 <div
                   :class="{ 'primary-gradient text-white': isActive('/admin/relatorios') }"
@@ -284,11 +284,7 @@
             </router-link>
 
             <!-- Mobile Admin Section -->
-            <li
-              v-if="
-                user?.role.name === RoleName.GlobalAdmin || user?.role.name === RoleName.TenantAdmin
-              "
-            >
+            <li v-if="isAdmin">
               <div
                 :class="{
                   'primary-gradient text-white':
@@ -301,7 +297,7 @@
                 class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover cursor-pointer"
                 @click="toggleMobileAdminDropdown"
               >
-                <font-awesome-icon icon="cog" />
+                <font-awesome-icon icon="user-cog" />
                 Administração
                 <font-awesome-icon
                   icon="chevron-down"
@@ -310,81 +306,61 @@
                 />
               </div>
               <div v-show="showMobileAdminDropdown" class="ml-4 mt-2 space-y-1">
-                <router-link
-                  v-if="user?.role.name === RoleName.TenantAdmin"
-                  to="/admin/usuarios"
-                  @click="closeMobileMenu"
-                >
+                <router-link v-if="isTenantAdmin" to="/admin/usuarios" @click="closeMobileMenu">
                   <div
                     :class="{
-                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                      'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/usuarios'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="users" />
                     Usuários
                   </div>
                 </router-link>
-                <router-link
-                  v-if="user?.role.name === RoleName.TenantAdmin"
-                  to="/admin/setores"
-                  @click="closeMobileMenu"
-                >
+                <router-link v-if="isTenantAdmin" to="/admin/setores" @click="closeMobileMenu">
                   <div
                     :class="{
-                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                      'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/setores'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="building" />
                     Setores
                   </div>
                 </router-link>
-                <router-link
-                  v-if="user?.role.name === RoleName.TenantAdmin"
-                  to="/admin/categorias"
-                  @click="closeMobileMenu"
-                >
+                <router-link v-if="isTenantAdmin" to="/admin/categorias" @click="closeMobileMenu">
                   <div
                     :class="{
-                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                      'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/categorias'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="tag" />
                     Categorias
                   </div>
                 </router-link>
-                <router-link
-                  to="/admin/clientes"
-                  @click="closeMobileMenu"
-                  v-if="user?.role.name === RoleName.GlobalAdmin"
-                >
+                <router-link to="/admin/clientes" @click="closeMobileMenu" v-if="isGlobalAdmin">
                   <div
                     :class="{
-                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                      'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/clientes'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="building" />
                     Clientes
                   </div>
                 </router-link>
-                <router-link
-                  to="/admin/cadastros"
-                  @click="closeMobileMenu"
-                  v-if="user?.role.name === RoleName.GlobalAdmin"
-                >
+                <router-link to="/admin/cadastros" @click="closeMobileMenu" v-if="isGlobalAdmin">
                   <div
                     :class="{
-                      'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                      'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/cadastros'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-blue-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="user-plus" />
                     Cadastros
@@ -413,15 +389,9 @@
       </main>
     </div>
 
-    <NewTicketModal
-      v-if="isTicketModalOpen"
-      @close="closeTicketModal"
-    />
+    <NewTicketModal v-if="isTicketModalOpen" @close="closeTicketModal" />
 
-    <ProfileModal
-      v-if="showProfileModal"
-      @close="toggleProfileModal"
-    />
+    <ProfileModal v-if="showProfileModal" @close="toggleProfileModal" />
 
     <NotificationsDropdown
       v-if="showNotificationsModal"
@@ -441,7 +411,7 @@ import { useUserPreferencesStore } from '@/stores/userPreferences';
 import { useTicketsStore } from '@/stores/tickets';
 import { useRoute } from 'vue-router';
 import { notificationService } from '@/services/notificationService';
-import { RoleName } from '@/models';
+import { useRoles } from '@/composables';
 import taskyLogo from '@/assets/images/tasky.png';
 import taskyWhiteLogo from '@/assets/images/tasky-white-large.png';
 
@@ -449,6 +419,9 @@ const user = useUserStore().user;
 const userPreferencesStore = useUserPreferencesStore();
 const ticketsStore = useTicketsStore();
 const route = useRoute();
+
+// Use the roles composable
+const { isGlobalAdmin, isTenantAdmin, isAdmin } = useRoles();
 
 const isTicketModalOpen = ref(false);
 const showProfileModal = ref(false);
