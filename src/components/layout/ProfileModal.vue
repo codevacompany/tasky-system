@@ -53,6 +53,7 @@
               </router-link>
 
               <router-link
+                v-if="isTenantAdmin"
                 to="/assinaturas"
                 @click="closeModal"
                 class="flex items-center gap-3 px-6 py-3.5 text-gray-900 hover:text-gray-900 dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -333,6 +334,7 @@ import { userService } from '@/services/userService';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import BaseModal from '@/components/common/BaseModal.vue';
+import { useRoles } from '@/composables';
 
 const router = useRouter();
 
@@ -343,6 +345,9 @@ const emit = defineEmits<{
 const userStore = useUserStore();
 const user = computed(() => userStore.user);
 const userPreferencesStore = useUserPreferencesStore();
+
+// Use the roles composable
+const { isTenantAdmin } = useRoles();
 
 const showThemeModal = ref(false);
 

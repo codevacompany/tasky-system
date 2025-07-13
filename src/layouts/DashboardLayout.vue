@@ -35,7 +35,7 @@
                   </div>
                 </li>
               </router-link>
-              <router-link v-if="user?.role.name !== RoleName.GlobalAdmin" to="/meus-tickets">
+              <router-link v-if="!isGlobalAdmin" to="/meus-tickets">
                 <li>
                   <div
                     :class="{ 'primary-gradient text-white': isActive('/meus-tickets') }"
@@ -45,7 +45,7 @@
                   </div>
                 </li>
               </router-link>
-              <router-link v-if="user?.role.name === RoleName.TenantAdmin" to="/admin/relatorios">
+              <router-link v-if="isTenantAdmin" to="/admin/relatorios">
                 <li>
                   <div
                     :class="{ 'primary-gradient text-white': isActive('/admin/relatorios') }"
@@ -57,14 +57,7 @@
                 </li>
               </router-link>
 
-              <li
-                v-if="
-                  user?.role.name === RoleName.GlobalAdmin ||
-                  user?.role.name === RoleName.TenantAdmin
-                "
-                class="relative"
-                ref="adminDropdownRef"
-              >
+              <li v-if="isAdmin" class="relative" ref="adminDropdownRef">
                 <div
                   :class="{
                     'primary-gradient text-white':
@@ -90,7 +83,7 @@
                   class="absolute top-full left-0 text-[15px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] z-50 mt-1 flex flex-col"
                 >
                   <router-link
-                    v-if="user?.role.name === RoleName.TenantAdmin"
+                    v-if="isTenantAdmin"
                     to="/admin/usuarios"
                     @click="showAdminDropdown = false"
                   >
@@ -107,7 +100,7 @@
                     </div>
                   </router-link>
                   <router-link
-                    v-if="user?.role.name === RoleName.TenantAdmin"
+                    v-if="isTenantAdmin"
                     to="/admin/setores"
                     @click="showAdminDropdown = false"
                   >
@@ -124,7 +117,7 @@
                     </div>
                   </router-link>
                   <router-link
-                    v-if="user?.role.name === RoleName.TenantAdmin"
+                    v-if="isTenantAdmin"
                     to="/admin/categorias"
                     @click="showAdminDropdown = false"
                   >
@@ -143,7 +136,7 @@
                   <router-link
                     to="/admin/clientes"
                     @click="showAdminDropdown = false"
-                    v-if="user?.role.name === RoleName.GlobalAdmin"
+                    v-if="isGlobalAdmin"
                   >
                     <div
                       :class="{
@@ -159,7 +152,7 @@
                   <router-link
                     to="/admin/cadastros"
                     @click="showAdminDropdown = false"
-                    v-if="user?.role.name === RoleName.GlobalAdmin"
+                    v-if="isGlobalAdmin"
                   >
                     <div
                       :class="{
@@ -267,11 +260,7 @@
                 </div>
               </li>
             </router-link>
-            <router-link
-              v-if="user?.role.name !== RoleName.GlobalAdmin"
-              to="/meus-tickets"
-              @click="closeMobileMenu"
-            >
+            <router-link v-if="!isGlobalAdmin" to="/meus-tickets" @click="closeMobileMenu">
               <li>
                 <div
                   :class="{ 'primary-gradient text-white': isActive('/meus-tickets') }"
@@ -282,11 +271,7 @@
                 </div>
               </li>
             </router-link>
-            <router-link
-              v-if="user?.role.name === RoleName.TenantAdmin"
-              to="/admin/relatorios"
-              @click="closeMobileMenu"
-            >
+            <router-link v-if="isTenantAdmin" to="/admin/relatorios" @click="closeMobileMenu">
               <li>
                 <div
                   :class="{ 'primary-gradient text-white': isActive('/admin/relatorios') }"
@@ -299,11 +284,7 @@
             </router-link>
 
             <!-- Mobile Admin Section -->
-            <li
-              v-if="
-                user?.role.name === RoleName.GlobalAdmin || user?.role.name === RoleName.TenantAdmin
-              "
-            >
+            <li v-if="isAdmin">
               <div
                 :class="{
                   'primary-gradient text-white':
@@ -325,11 +306,7 @@
                 />
               </div>
               <div v-show="showMobileAdminDropdown" class="ml-4 mt-2 space-y-1">
-                <router-link
-                  v-if="user?.role.name === RoleName.TenantAdmin"
-                  to="/admin/usuarios"
-                  @click="closeMobileMenu"
-                >
+                <router-link v-if="isTenantAdmin" to="/admin/usuarios" @click="closeMobileMenu">
                   <div
                     :class="{
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
@@ -341,11 +318,7 @@
                     Usuários
                   </div>
                 </router-link>
-                <router-link
-                  v-if="user?.role.name === RoleName.TenantAdmin"
-                  to="/admin/setores"
-                  @click="closeMobileMenu"
-                >
+                <router-link v-if="isTenantAdmin" to="/admin/setores" @click="closeMobileMenu">
                   <div
                     :class="{
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
@@ -357,11 +330,7 @@
                     Setores
                   </div>
                 </router-link>
-                <router-link
-                  v-if="user?.role.name === RoleName.TenantAdmin"
-                  to="/admin/categorias"
-                  @click="closeMobileMenu"
-                >
+                <router-link v-if="isTenantAdmin" to="/admin/categorias" @click="closeMobileMenu">
                   <div
                     :class="{
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
@@ -373,11 +342,7 @@
                     Categorias
                   </div>
                 </router-link>
-                <router-link
-                  to="/admin/clientes"
-                  @click="closeMobileMenu"
-                  v-if="user?.role.name === RoleName.GlobalAdmin"
-                >
+                <router-link to="/admin/clientes" @click="closeMobileMenu" v-if="isGlobalAdmin">
                   <div
                     :class="{
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
@@ -389,11 +354,7 @@
                     Clientes
                   </div>
                 </router-link>
-                <router-link
-                  to="/admin/cadastros"
-                  @click="closeMobileMenu"
-                  v-if="user?.role.name === RoleName.GlobalAdmin"
-                >
+                <router-link to="/admin/cadastros" @click="closeMobileMenu" v-if="isGlobalAdmin">
                   <div
                     :class="{
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
@@ -450,7 +411,7 @@ import { useUserPreferencesStore } from '@/stores/userPreferences';
 import { useTicketsStore } from '@/stores/tickets';
 import { useRoute } from 'vue-router';
 import { notificationService } from '@/services/notificationService';
-import { RoleName } from '@/models';
+import { useRoles } from '@/composables';
 import taskyLogo from '@/assets/images/tasky.png';
 import taskyWhiteLogo from '@/assets/images/tasky-white-large.png';
 
@@ -458,6 +419,9 @@ const user = useUserStore().user;
 const userPreferencesStore = useUserPreferencesStore();
 const ticketsStore = useTicketsStore();
 const route = useRoute();
+
+// Use the roles composable
+const { isGlobalAdmin, isTenantAdmin, isAdmin } = useRoles();
 
 const isTicketModalOpen = ref(false);
 const showProfileModal = ref(false);

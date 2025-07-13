@@ -91,6 +91,7 @@ import {
   faHandshake,
   faUndo,
   faUserCog,
+  faStar,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -193,6 +194,7 @@ const icons = [
   faHandshake,
   faUndo,
   faUserCog,
+  faStar,
 ];
 
 library.add(...icons);
