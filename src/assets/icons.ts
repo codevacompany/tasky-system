@@ -93,6 +93,7 @@ import {
   faUserCog,
   faStar,
   faRedo,
+  faPlay,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -197,6 +198,7 @@ const icons = [
   faUserCog,
   faStar,
   faRedo,
+  faPlay
 ];
 
 library.add(...icons);
