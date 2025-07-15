@@ -17,6 +17,7 @@ export interface SubscriptionInfo {
   planSlug?: string;
   maxUsers?: number;
   status?: string;
+  trialEndDate?: string;
 }
 
 export interface TenantWithStats {

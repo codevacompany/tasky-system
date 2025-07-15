@@ -362,6 +362,9 @@
                           client.status === 'NO_SUBSCRIPTION',
                       },
                     ]"
+                    :title="
+                      client.status === 'trial' ? getTrialEndDateTooltip(client.trialEndDate) : ''
+                    "
                   >
                     {{ client.statusLabel }}
                   </span>
@@ -398,20 +401,10 @@
                     class="text-sm text-gray-900 dark:text-gray-100 flex flex-col items-center gap-1"
                   >
                     <span>{{ formatDate(client.nextInvoice) }}</span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                      {{ client.paymentStatus }}
-                    </span>
                   </div>
                 </td>
                 <td class="px-4 py-4">
-                  <div class="flex items-center justify-center gap-1">
-                    <button
-                      class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                      title="Editar"
-                      @click.stop="editClient(client)"
-                    >
-                      <font-awesome-icon icon="edit" />
-                    </button>
+                  <div class="flex items-center justify-center gap-1 relative">
                     <button
                       class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                       title="Usuários"
@@ -421,18 +414,46 @@
                     </button>
                     <button
                       class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                      title="Configurações"
-                      @click.stop="manageSettings(client)"
-                    >
-                      <font-awesome-icon icon="cog" />
-                    </button>
-                    <button
-                      class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                       title="Mais opções"
-                      @click.stop="showOptions(client)"
+                      @click.stop="toggleDropdown(client.id, $event)"
                     >
                       <font-awesome-icon icon="ellipsis-v" />
                     </button>
+
+                    <!-- Dropdown Menu -->
+                    <div
+                      v-if="openDropdown === client.id"
+                      class="absolute right-12 top-5 mt-0 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50"
+                      @click.stop
+                    >
+                      <div class="py-1">
+                        <button
+                          v-if="
+                            isGlobalAdmin &&
+                            (client.status === 'trial' || client.status === 'suspended')
+                          "
+                          class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                          @click="renewTrial(client)"
+                        >
+                          <font-awesome-icon icon="redo" />
+                          Renovar Trial
+                        </button>
+                        <button
+                          class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                          @click="editClient(client)"
+                        >
+                          <font-awesome-icon icon="edit" />
+                          Editar Cliente
+                        </button>
+                        <button
+                          class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                          @click="manageUsers(client)"
+                        >
+                          <font-awesome-icon icon="users" />
+                          Gerenciar Usuários
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -689,7 +710,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { getUserInitials, formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import {
   tenantService,
@@ -697,6 +718,10 @@ import {
   type TenantStatsResponse,
 } from '@/services/tenantService';
 import { toast } from 'vue3-toastify';
+import { useRoles } from '@/composables/useRoles';
+import apiClient from '@/utils/axiosInstance';
+
+const { isGlobalAdmin } = useRoles();
 
 type SortableClientField =
   | 'name'
@@ -726,6 +751,20 @@ const dateFilter = ref({
   start: '',
   end: '',
 });
+
+// Add state for dropdown menu
+const openDropdown = ref<number | null>(null);
+
+// Add method to toggle dropdown
+const toggleDropdown = (clientId: number, event: Event) => {
+  event.stopPropagation();
+  openDropdown.value = openDropdown.value === clientId ? null : clientId;
+};
+
+// Add method to close dropdown when clicking outside
+const closeDropdown = () => {
+  openDropdown.value = null;
+};
 
 // Loading state
 const isLoading = ref(true);
@@ -758,6 +797,11 @@ const stats = computed(() => {
   };
 });
 
+const getTrialEndDateTooltip = (trialEndDate?: string) => {
+  if (!trialEndDate) return '';
+  return `Trial termina em: ${formatDate(trialEndDate)}`;
+};
+
 const clients = computed(() => {
   return tenants.value.map((tenant) => ({
     id: tenant.id,
@@ -768,11 +812,11 @@ const clients = computed(() => {
       : 'Sem Plano',
     status: tenant.subscription?.status || 'NO_SUBSCRIPTION',
     statusLabel: getStatusLabel(tenant.subscription?.status),
+    trialEndDate: tenant.subscription?.trialEndDate,
     activeUsers: tenant.activeUsers,
-    userLimit: tenant.subscription?.maxUsers || tenant.totalUsers + 10, // Use real limit or fallback
+    userLimit: tenant.subscription?.maxUsers || tenant.totalUsers + 10,
     monthlyTickets: tenant.ticketsThisMonth,
-    nextInvoice: '2024-04-15', // Mocked as per user requirement
-    paymentStatus: 'EM_DIA', // Mocked as per user requirement
+    nextInvoice: '2024-04-15',
     users: tenant.users.map((user) => ({
       id: user.id,
       firstName: user.firstName,
@@ -835,6 +879,14 @@ const createNewClient = async () => {
 
 onMounted(async () => {
   await loadTenants();
+
+  // Add click outside handler for dropdown
+  document.addEventListener('click', closeDropdown);
+});
+
+onUnmounted(() => {
+  // Remove click outside handler
+  document.removeEventListener('click', closeDropdown);
 });
 
 const filteredClients = computed(() => {
@@ -977,6 +1029,17 @@ const toggleUserStatus = (user: any) => {
 const resetPassword = (user: any) => {
   // Implementar reset de senha
   console.log('Resetar senha do usuário:', user);
+};
+
+const renewTrial = async (client: any) => {
+  try {
+    await apiClient.patch(`/tenant-subscriptions/tenant/${client.id}/renew-trial`);
+    toast.success('Trial renovado por mais 14 dias!');
+    await loadTenants();
+    closeDropdown();
+  } catch (error: any) {
+    toast.error(error?.response?.data?.message || 'Erro ao renovar trial');
+  }
 };
 
 const toggleSelection = (client: any) => {
