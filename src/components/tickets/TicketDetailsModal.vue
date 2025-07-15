@@ -31,7 +31,16 @@
             "
           >
             <button
-              v-if="isTargetUser && loadedTicket?.status === TicketStatus.Pending"
+              v-if="isTargetUser && loadedTicket?.status === TicketStatus.Pending && isSelfAssigned"
+              class="inline-flex items-center gap-1.5 px-3 py-2 bg-green-600 hover:bg-green-700 text-sm text-white font-medium rounded-md transition-colors"
+              @click="startTicket(loadedTicket?.customId)"
+            >
+              <font-awesome-icon icon="play" class="text-xs" />
+              Iniciar
+            </button>
+
+            <button
+              v-else-if="isTargetUser && loadedTicket?.status === TicketStatus.Pending"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-green-600 hover:bg-green-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="acceptTicket(loadedTicket?.customId)"
             >
@@ -261,6 +270,20 @@
                 </div>
               </div>
 
+              <div class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Revisor</p>
+                </div>
+                <div v-if="loadedTicket.reviewer" class="flex-1 min-w-0">
+                  <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                    {{ loadedTicket.reviewer.firstName }} {{ loadedTicket.reviewer.lastName }}
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    {{ loadedTicket.reviewer.department?.name }}
+                  </p>
+                </div>
+              </div>
+
               <!-- Category -->
               <div class="flex items-start gap-3">
                 <div class="w-[40%]">
@@ -381,7 +404,9 @@
 
             <!-- Description Section -->
             <div class="my-2 px-4 sm:px-6 dark:border-gray-700">
-              <h3 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <h3
+                class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-2"
+              >
                 <font-awesome-icon icon="file-text" class="text-primary dark:text-blue-400" />
                 Descrição
               </h3>
@@ -1441,6 +1466,26 @@ const saveAssigneeChange = async (selection: { department: any; user: any }) => 
     console.error('Erro ao alterar responsável:', error);
     toast.error('Erro ao alterar responsável');
   }
+};
+
+const isSelfAssigned = computed(
+  () => loadedTicket.value && loadedTicket.value.requester.id === loadedTicket.value.targetUser.id,
+);
+
+const startTicket = async (ticketId: string) => {
+  openConfirmationModal(
+    'Iniciar Ticket',
+    'Tem certeza que deseja iniciar este ticket?',
+    async () => {
+      try {
+        await ticketService.accept(ticketId);
+        toast.success('Ticket iniciado com sucesso');
+        refreshSelectedTicket();
+      } catch {
+        toast.error('Erro ao iniciar o ticket');
+      }
+    },
+  );
 };
 </script>
 

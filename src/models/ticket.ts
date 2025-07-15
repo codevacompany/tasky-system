@@ -34,6 +34,7 @@ export interface Ticket {
   department: Department;
   requester: User;
   targetUser: User;
+  reviewer?: User;
   status: TicketStatus;
   completedAt?: string;
   acceptedAt?: string;

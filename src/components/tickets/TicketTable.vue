@@ -96,7 +96,7 @@
               class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
             >
               <div class="max-w-[150px] truncate" :title="ticket.name">
-              {{ ticket.name }}
+                {{ ticket.name }}
               </div>
               <font-awesome-icon
                 v-if="ticket.isPrivate"
@@ -111,11 +111,11 @@
             >
               <div class="max-w-[120px]">
                 <div class="truncate">
-              {{
-                ticket.targetUser
-                  ? ticket.targetUser.firstName + ' ' + ticket.targetUser.lastName
-                  : '-'
-              }}
+                  {{
+                    ticket.targetUser
+                      ? ticket.targetUser.firstName + ' ' + ticket.targetUser.lastName
+                      : '-'
+                  }}
                 </div>
                 <div
                   v-if="ticket.targetUser && !ticket.targetUser.isActive"
@@ -206,12 +206,12 @@
               ]"
             >
               <div class="whitespace-nowrap">
-              {{ calculateDeadline(ticket) }}
-              <font-awesome-icon
-                v-if="calculateDeadline(ticket) === 'Atrasado'"
-                icon="exclamation-triangle"
+                {{ calculateDeadline(ticket) }}
+                <font-awesome-icon
+                  v-if="calculateDeadline(ticket) === 'Atrasado'"
+                  icon="exclamation-triangle"
                   class="ml-1 text-red-500 text-xs"
-              />
+                />
               </div>
             </td>
             <td
@@ -270,12 +270,20 @@
                 <!-- Botões para tabela de tickets criados -->
                 <template v-else-if="tableType === 'criados'">
                   <div
-                    v-if="ticket.status === TicketStatus.Pending"
+                    v-if="ticket.status === TicketStatus.Pending && isSelfAssigned(ticket)"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
+                    @click.stop="handleStartTicket(ticket)"
+                    title="Iniciar"
+                  >
+                    <font-awesome-icon icon="play" class="text-xs md:text-sm" />
+                  </div>
+                  <button
+                    v-else-if="ticket.status === TicketStatus.Pending"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 text-white"
                     title="Não Iniciado"
                   >
                     <font-awesome-icon icon="clock" class="text-xs md:text-sm" />
-                  </div>
+                  </button>
                   <div
                     v-else-if="ticket.status === TicketStatus.InProgress"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 text-white"
@@ -313,10 +321,7 @@
                     <font-awesome-icon icon="search" class="text-xs md:text-sm" />
                   </button>
                   <div
-                    v-else-if="
-                      ticket.status === TicketStatus.UnderVerification &&
-                      userStore.user?.id === ticket.requester.id
-                    "
+                    v-if="isReviewer(ticket) && ticket.status === TicketStatus.UnderVerification"
                     class="flex gap-0.5 md:gap-1"
                   >
                     <button
@@ -829,6 +834,27 @@ const handleCorrectTicket = async (ticket: Ticket) => {
         await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
         toast.error('Erro ao iniciar correção');
+      }
+    },
+  );
+};
+
+const isReviewer = (ticket: Ticket) => userStore.user?.id === ticket.reviewer?.id;
+
+const isSelfAssigned = (ticket: Ticket) => ticket.requester.id === ticket.targetUser.id;
+
+const handleStartTicket = async (ticket: Ticket) => {
+  openConfirmationModal(
+    'Iniciar Ticket',
+    'Tem certeza que deseja iniciar este ticket?',
+    async () => {
+      try {
+        await ticketService.accept(ticket.customId);
+        toast.success('Ticket iniciado com sucesso');
+        await refreshTickets();
+        await ticketsStore.fetchTicketDetails(ticket.customId);
+      } catch {
+        toast.error('Erro ao iniciar o ticket');
       }
     },
   );
