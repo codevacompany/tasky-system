@@ -96,7 +96,7 @@
               class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
             >
               <div class="max-w-[150px] truncate" :title="ticket.name">
-              {{ ticket.name }}
+                {{ ticket.name }}
               </div>
               <font-awesome-icon
                 v-if="ticket.isPrivate"
@@ -111,11 +111,11 @@
             >
               <div class="max-w-[120px]">
                 <div class="truncate">
-              {{
-                ticket.targetUser
-                  ? ticket.targetUser.firstName + ' ' + ticket.targetUser.lastName
-                  : '-'
-              }}
+                  {{
+                    ticket.targetUser
+                      ? ticket.targetUser.firstName + ' ' + ticket.targetUser.lastName
+                      : '-'
+                  }}
                 </div>
                 <div
                   v-if="ticket.targetUser && !ticket.targetUser.isActive"
@@ -206,12 +206,12 @@
               ]"
             >
               <div class="whitespace-nowrap">
-              {{ calculateDeadline(ticket) }}
-              <font-awesome-icon
-                v-if="calculateDeadline(ticket) === 'Atrasado'"
-                icon="exclamation-triangle"
+                {{ calculateDeadline(ticket) }}
+                <font-awesome-icon
+                  v-if="calculateDeadline(ticket) === 'Atrasado'"
+                  icon="exclamation-triangle"
                   class="ml-1 text-red-500 text-xs"
-              />
+                />
               </div>
             </td>
             <td
@@ -313,10 +313,7 @@
                     <font-awesome-icon icon="search" class="text-xs md:text-sm" />
                   </button>
                   <div
-                    v-else-if="
-                      ticket.status === TicketStatus.UnderVerification &&
-                      userStore.user?.id === ticket.requester.id
-                    "
+                    v-if="isReviewer(ticket) && ticket.status === TicketStatus.UnderVerification"
                     class="flex gap-0.5 md:gap-1"
                   >
                     <button
@@ -833,6 +830,8 @@ const handleCorrectTicket = async (ticket: Ticket) => {
     },
   );
 };
+
+const isReviewer = (ticket: Ticket) => userStore.user?.id === ticket.reviewer?.id;
 </script>
 
 <style scoped>

@@ -261,6 +261,20 @@
                 </div>
               </div>
 
+              <div v-if="loadedTicket.reviewer" class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Revisor</p>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                    {{ loadedTicket.reviewer.firstName }} {{ loadedTicket.reviewer.lastName }}
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    {{ loadedTicket.reviewer.department?.name }}
+                  </p>
+                </div>
+              </div>
+
               <!-- Category -->
               <div class="flex items-start gap-3">
                 <div class="w-[40%]">
@@ -1129,6 +1143,7 @@ const timeline = computed(() => {
 
 const isTargetUser = computed(() => userStore.user?.id === loadedTicket.value?.targetUser.id);
 const isRequester = computed(() => userStore.user?.id === loadedTicket.value?.requester.id);
+const isReviewer = computed(() => userStore.user?.id === loadedTicket.value?.reviewer?.id);
 
 const formatTicketUpdateDescription = (ticketUpdate: TicketUpdate) => {
   return `${ticketUpdate.description.replace('user', `${ticketUpdate.performedBy.firstName} ${ticketUpdate.performedBy.lastName}`)}`;
