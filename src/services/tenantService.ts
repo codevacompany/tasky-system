@@ -12,6 +12,14 @@ export interface UserWithStats {
   lastAccess?: string;
 }
 
+export interface SubscriptionInfo {
+  planName?: string;
+  planSlug?: string;
+  maxUsers?: number;
+  status?: string;
+  trialEndDate?: string;
+}
+
 export interface TenantWithStats {
   id: number;
   name: string;
@@ -32,6 +40,9 @@ export interface TenantWithStats {
 
   // Users list
   users: UserWithStats[];
+
+  // Subscription info
+  subscription?: SubscriptionInfo;
 }
 
 export interface GlobalStats {

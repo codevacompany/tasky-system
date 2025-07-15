@@ -112,9 +112,11 @@
           class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
         >
           <option value="">Todos os Status</option>
-          <option value="ATIVO">Ativo</option>
-          <option value="SUSPENSO">Suspenso</option>
-          <option value="CANCELADO">Cancelado</option>
+          <option value="trial">Trial</option>
+          <option value="active">Ativo</option>
+          <option value="suspended">Suspenso</option>
+          <option value="cancelled">Cancelado</option>
+          <option value="NO_SUBSCRIPTION">Sem Assinatura</option>
         </select>
 
         <select
@@ -122,10 +124,10 @@
           class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
         >
           <option value="">Todos os Planos</option>
-          <option value="BASICO">Básico</option>
-          <option value="PROFISSIONAL">Profissional</option>
-          <option value="EMPRESARIAL">Empresarial</option>
-          <option value="PERSONALIZADO">Personalizado</option>
+          <option value="Iniciante">Iniciante</option>
+          <option value="Crescer">Crescer</option>
+          <option value="Profissional">Profissional</option>
+          <option value="Sem Plano">Sem Plano</option>
         </select>
 
         <select
@@ -211,18 +213,18 @@
                   @change="toggleAllSelection"
                   class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
                 />
-            </th>
+              </th>
               <th
                 @click="sortBy('name')"
                 class="px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
-              Cliente
-              <font-awesome-icon
+                Cliente
+                <font-awesome-icon
                   :icon="getSortIcon('name')"
                   v-if="sortField === 'name'"
                   class="ml-1"
-              />
-            </th>
+                />
+              </th>
               <th
                 @click="sortBy('cnpj')"
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
@@ -233,94 +235,94 @@
                   v-if="sortField === 'cnpj'"
                   class="ml-1"
                 />
-            </th>
+              </th>
               <th
                 @click="sortBy('plan')"
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
-              Plano
+                Plano
                 <font-awesome-icon
                   :icon="getSortIcon('plan')"
                   v-if="sortField === 'plan'"
                   class="ml-1"
                 />
-            </th>
+              </th>
               <th
                 @click="sortBy('status')"
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
-              Status
+                Status
                 <font-awesome-icon
                   :icon="getSortIcon('status')"
                   v-if="sortField === 'status'"
                   class="ml-1"
                 />
-            </th>
+              </th>
               <th
                 @click="sortBy('activeUsers')"
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
-              Usuários
-              <font-awesome-icon
+                Usuários
+                <font-awesome-icon
                   :icon="getSortIcon('activeUsers')"
                   v-if="sortField === 'activeUsers'"
                   class="ml-1"
-              />
-            </th>
+                />
+              </th>
               <th
                 @click="sortBy('ticketsThisMonth')"
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
-              Tickets/Mês
-              <font-awesome-icon
+                Tickets/Mês
+                <font-awesome-icon
                   :icon="getSortIcon('ticketsThisMonth')"
                   v-if="sortField === 'ticketsThisMonth'"
                   class="ml-1"
-              />
-            </th>
+                />
+              </th>
               <th
                 @click="sortBy('nextInvoice')"
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
-              Próx. Fatura
-              <font-awesome-icon
+                Próx. Fatura
+                <font-awesome-icon
                   :icon="getSortIcon('nextInvoice')"
                   v-if="sortField === 'nextInvoice'"
                   class="ml-1"
-              />
-            </th>
+                />
+              </th>
               <th
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100"
               >
                 Ações
               </th>
-          </tr>
-        </thead>
+            </tr>
+          </thead>
           <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-          <template v-for="client in sortedClients" :key="client.id">
-            <!-- Linha principal do cliente -->
-            <tr
+            <template v-for="client in sortedClients" :key="client.id">
+              <!-- Linha principal do cliente -->
+              <tr
                 :class="[
                   'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors',
                   { 'bg-blue-50 dark:bg-blue-900/20': expandedClient === client.id },
                 ]"
-              @click="toggleClientExpansion(client.id)"
-            >
+                @click="toggleClientExpansion(client.id)"
+              >
                 <td class="px-4 py-4 text-center" @click.stop>
-                <input
-                  type="checkbox"
-                  :checked="isSelected(client)"
-                  @change="toggleSelection(client)"
+                  <input
+                    type="checkbox"
+                    :checked="isSelected(client)"
+                    @change="toggleSelection(client)"
                     class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
-                />
-              </td>
+                  />
+                </td>
                 <td class="px-4 py-4">
-                <div>
+                  <div>
                     <span class="font-medium text-gray-900 dark:text-white">{{
                       client.companyName
                     }}</span>
-                </div>
-              </td>
+                  </div>
+                </td>
                 <td class="px-4 py-4 text-center text-gray-900 dark:text-gray-100">
                   {{ formatCNPJ(client.cnpj) }}
                 </td>
@@ -330,36 +332,43 @@
                       'inline-flex items-center justify-center px-2 py-1 rounded text-xs font-medium',
                       {
                         'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200':
-                          client.plan.toLowerCase() === 'basico',
+                          client.plan.toLowerCase() === 'iniciante',
                         'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200':
-                          client.plan.toLowerCase() === 'profissional',
+                          client.plan.toLowerCase() === 'crescer',
                         'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200':
-                          client.plan.toLowerCase() === 'empresarial',
-                        'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200':
-                          client.plan.toLowerCase() === 'personalizado',
+                          client.plan.toLowerCase() === 'profissional',
+                        'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200':
+                          client.plan.toLowerCase() === 'sem plano',
                       },
                     ]"
                   >
                     {{ client.plan }}
-                </span>
-              </td>
+                  </span>
+                </td>
                 <td class="px-4 py-4 text-center">
                   <span
                     :class="[
                       'inline-flex items-center justify-center px-2 py-1 rounded text-xs font-medium',
                       {
+                        'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200':
+                          client.status === 'trial',
                         'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200':
-                          client.status.toLowerCase() === 'ativo',
+                          client.status === 'active',
                         'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200':
-                          client.status.toLowerCase() === 'suspenso',
+                          client.status === 'suspended',
                         'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200':
-                          client.status.toLowerCase() === 'cancelado',
+                          client.status === 'cancelled',
+                        'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200':
+                          client.status === 'NO_SUBSCRIPTION',
                       },
                     ]"
+                    :title="
+                      client.status === 'trial' ? getTrialEndDateTooltip(client.trialEndDate) : ''
+                    "
                   >
-                  {{ client.status }}
-                </span>
-              </td>
+                    {{ client.statusLabel }}
+                  </span>
+                </td>
                 <td class="px-4 py-4 text-center">
                   <div
                     class="text-sm text-gray-900 dark:text-gray-100 flex flex-col items-center gap-1"
@@ -372,75 +381,84 @@
                           'bg-blue-600': client.activeUsers / client.userLimit <= 0.8,
                           'bg-orange-500': client.activeUsers / client.userLimit > 0.8,
                         }"
-                      :style="{
+                        :style="{
                           width: `${(client.activeUsers / client.userLimit) * 100}%`,
-                      }"
-                    ></div>
+                        }"
+                      ></div>
+                    </div>
                   </div>
-                </div>
-              </td>
+                </td>
                 <td class="px-4 py-4 text-center">
                   <div
                     class="text-sm text-gray-900 dark:text-gray-100 flex flex-col items-center gap-1"
                   >
-                    {{ client.monthlyTickets }}/{{ client.ticketLimit }}
-                    <div class="w-20 h-1 bg-gray-200 dark:bg-gray-700 rounded-full">
-                      <div
-                        class="h-full rounded-full transition-all duration-300"
-                        :class="{
-                          'bg-blue-600': client.monthlyTickets / client.ticketLimit <= 0.8,
-                          'bg-orange-500': client.monthlyTickets / client.ticketLimit > 0.8,
-                        }"
-                        :style="{ width: `${(client.monthlyTickets / client.ticketLimit) * 100}%` }"
-                    ></div>
+                    {{ client.monthlyTickets }}
+                    <span class="text-xs text-gray-500 dark:text-gray-400">tickets este mês</span>
                   </div>
-                </div>
-              </td>
+                </td>
                 <td class="px-4 py-4 text-center">
                   <div
                     class="text-sm text-gray-900 dark:text-gray-100 flex flex-col items-center gap-1"
                   >
                     <span>{{ formatDate(client.nextInvoice) }}</span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                      {{ client.paymentStatus }}
-                  </span>
-                </div>
-              </td>
+                  </div>
+                </td>
                 <td class="px-4 py-4">
-                  <div class="flex items-center justify-center gap-1">
-                    <button
-                      class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                      title="Editar"
-                      @click.stop="editClient(client)"
-                    >
-                    <font-awesome-icon icon="edit" />
-                  </button>
+                  <div class="flex items-center justify-center gap-1 relative">
                     <button
                       class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                       title="Usuários"
                       @click.stop="manageUsers(client)"
                     >
-                    <font-awesome-icon icon="users" />
-                  </button>
-                  <button
-                      class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                    title="Configurações"
-                    @click.stop="manageSettings(client)"
-                  >
-                    <font-awesome-icon icon="cog" />
-                  </button>
+                      <font-awesome-icon icon="users" />
+                    </button>
                     <button
                       class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                       title="Mais opções"
-                      @click.stop="showOptions(client)"
+                      @click.stop="toggleDropdown(client.id, $event)"
                     >
-                    <font-awesome-icon icon="ellipsis-v" />
-                  </button>
-                </div>
-              </td>
-            </tr>
+                      <font-awesome-icon icon="ellipsis-v" />
+                    </button>
 
-            <!-- Linha expandida com detalhes dos usuários -->
+                    <!-- Dropdown Menu -->
+                    <div
+                      v-if="openDropdown === client.id"
+                      class="absolute right-12 top-5 mt-0 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50"
+                      @click.stop
+                    >
+                      <div class="py-1">
+                        <button
+                          v-if="
+                            isGlobalAdmin &&
+                            (client.status === 'trial' || client.status === 'suspended')
+                          "
+                          class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                          @click="renewTrial(client)"
+                        >
+                          <font-awesome-icon icon="redo" />
+                          Renovar Trial
+                        </button>
+                        <button
+                          class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                          @click="editClient(client)"
+                        >
+                          <font-awesome-icon icon="edit" />
+                          Editar Cliente
+                        </button>
+                        <button
+                          class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
+                          @click="manageUsers(client)"
+                        >
+                          <font-awesome-icon icon="users" />
+                          Gerenciar Usuários
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Linha expandida com detalhes dos usuários -->
               <tr v-if="expandedClient === client.id" class="bg-gray-50 dark:bg-gray-800">
                 <td colspan="9" class="px-4 py-4">
                   <div class="overflow-x-auto">
@@ -482,8 +500,8 @@
                           >
                             Ações
                           </th>
-                      </tr>
-                    </thead>
+                        </tr>
+                      </thead>
                       <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                         <tr
                           v-for="user in client.users"
@@ -501,7 +519,7 @@
                                 >{{ user.firstName }} {{ user.lastName }}</span
                               >
                             </div>
-                        </td>
+                          </td>
                           <td
                             class="px-3 py-2 text-center text-sm text-gray-900 dark:text-gray-100"
                           >
@@ -525,8 +543,8 @@
                               ]"
                             >
                               {{ user.profile }}
-                          </span>
-                        </td>
+                            </span>
+                          </td>
                           <td class="px-3 py-2 text-center">
                             <span
                               :class="[
@@ -539,9 +557,9 @@
                                 },
                               ]"
                             >
-                            {{ user.status }}
-                          </span>
-                        </td>
+                              {{ user.status }}
+                            </span>
+                          </td>
                           <td
                             class="px-3 py-2 text-center text-sm text-gray-900 dark:text-gray-100"
                           >
@@ -554,35 +572,35 @@
                                 title="Editar"
                                 @click="editUser(user)"
                               >
-                              <font-awesome-icon icon="edit" />
-                            </button>
-                            <button
+                                <font-awesome-icon icon="edit" />
+                              </button>
+                              <button
                                 class="w-6 h-6 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                              title="Alterar Status"
-                              @click="toggleUserStatus(user)"
-                            >
-                              <font-awesome-icon
-                                :icon="user.status === 'ATIVO' ? 'ban' : 'check'"
-                              />
-                            </button>
-                            <button
+                                title="Alterar Status"
+                                @click="toggleUserStatus(user)"
+                              >
+                                <font-awesome-icon
+                                  :icon="user.status === 'ATIVO' ? 'ban' : 'check'"
+                                />
+                              </button>
+                              <button
                                 class="w-6 h-6 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                              title="Resetar Senha"
-                              @click="resetPassword(user)"
-                            >
-                              <font-awesome-icon icon="key" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
-          </template>
-        </tbody>
-      </table>
+                                title="Resetar Senha"
+                                @click="resetPassword(user)"
+                              >
+                                <font-awesome-icon icon="key" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -692,14 +710,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { getUserInitials } from '@/utils/generic-helper';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { getUserInitials, formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import {
   tenantService,
   type TenantWithStats,
   type TenantStatsResponse,
 } from '@/services/tenantService';
 import { toast } from 'vue3-toastify';
+import { useRoles } from '@/composables/useRoles';
+import apiClient from '@/utils/axiosInstance';
+
+const { isGlobalAdmin } = useRoles();
 
 type SortableClientField =
   | 'name'
@@ -729,6 +751,20 @@ const dateFilter = ref({
   start: '',
   end: '',
 });
+
+// Add state for dropdown menu
+const openDropdown = ref<number | null>(null);
+
+// Add method to toggle dropdown
+const toggleDropdown = (clientId: number, event: Event) => {
+  event.stopPropagation();
+  openDropdown.value = openDropdown.value === clientId ? null : clientId;
+};
+
+// Add method to close dropdown when clicking outside
+const closeDropdown = () => {
+  openDropdown.value = null;
+};
 
 // Loading state
 const isLoading = ref(true);
@@ -761,19 +797,26 @@ const stats = computed(() => {
   };
 });
 
+const getTrialEndDateTooltip = (trialEndDate?: string) => {
+  if (!trialEndDate) return '';
+  return `Trial termina em: ${formatDate(trialEndDate)}`;
+};
+
 const clients = computed(() => {
   return tenants.value.map((tenant) => ({
     id: tenant.id,
     companyName: tenant.name,
     cnpj: tenant.cnpj || '',
-    plan: 'PROFISSIONAL', // Mocked as per user requirement
-    status: tenant.isActive ? 'ATIVO' : 'SUSPENSO',
+    plan: tenant.subscription?.planSlug
+      ? formatSnakeToNaturalCase(tenant.subscription.planSlug)
+      : 'Sem Plano',
+    status: tenant.subscription?.status || 'NO_SUBSCRIPTION',
+    statusLabel: getStatusLabel(tenant.subscription?.status),
+    trialEndDate: tenant.subscription?.trialEndDate,
     activeUsers: tenant.activeUsers,
-    userLimit: tenant.totalUsers + 10, // Mocked limit
+    userLimit: tenant.subscription?.maxUsers || tenant.totalUsers + 10,
     monthlyTickets: tenant.ticketsThisMonth,
-    ticketLimit: tenant.totalTickets + 50, // Mocked limit
-    nextInvoice: '2024-04-15', // Mocked as per user requirement
-    paymentStatus: 'EM_DIA', // Mocked as per user requirement
+    nextInvoice: '2024-04-15',
     users: tenant.users.map((user) => ({
       id: user.id,
       firstName: user.firstName,
@@ -836,6 +879,14 @@ const createNewClient = async () => {
 
 onMounted(async () => {
   await loadTenants();
+
+  // Add click outside handler for dropdown
+  document.addEventListener('click', closeDropdown);
+});
+
+onUnmounted(() => {
+  // Remove click outside handler
+  document.removeEventListener('click', closeDropdown);
 });
 
 const filteredClients = computed(() => {
@@ -844,7 +895,8 @@ const filteredClients = computed(() => {
       !searchTerm.value ||
       client.companyName.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
       client.cnpj.includes(searchTerm.value) ||
-      client.plan.toLowerCase().includes(searchTerm.value.toLowerCase());
+      client.plan.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+      client.statusLabel.toLowerCase().includes(searchTerm.value.toLowerCase());
 
     const matchStatus = !statusFilter.value || client.status === statusFilter.value;
     const matchPlan = !planFilter.value || client.plan === planFilter.value;
@@ -930,6 +982,21 @@ const formatCurrency = (value: number) => {
   });
 };
 
+const getStatusLabel = (status?: string) => {
+  switch (status) {
+    case 'trial':
+      return 'Trial';
+    case 'active':
+      return 'Ativo';
+    case 'suspended':
+      return 'Suspenso';
+    case 'cancelled':
+      return 'Cancelado';
+    default:
+      return 'Sem Assinatura';
+  }
+};
+
 const editClient = (client: any) => {
   console.log('Editar cliente:', client);
 };
@@ -962,6 +1029,17 @@ const toggleUserStatus = (user: any) => {
 const resetPassword = (user: any) => {
   // Implementar reset de senha
   console.log('Resetar senha do usuário:', user);
+};
+
+const renewTrial = async (client: any) => {
+  try {
+    await apiClient.patch(`/tenant-subscriptions/tenant/${client.id}/renew-trial`);
+    toast.success('Trial renovado por mais 14 dias!');
+    await loadTenants();
+    closeDropdown();
+  } catch (error: any) {
+    toast.error(error?.response?.data?.message || 'Erro ao renovar trial');
+  }
 };
 
 const toggleSelection = (client: any) => {
