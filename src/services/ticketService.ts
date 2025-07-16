@@ -130,4 +130,8 @@ export const ticketService = {
   async updateAssignee(id: string, targetUserId: number): Promise<AxiosResponse<Ticket>> {
     return apiClient.patch(`/tickets/${id}/assignee`, { targetUserId });
   },
+
+  async updateReviewer(ticketId: string, reviewerId: number) {
+    return apiClient.patch(`/tickets/${ticketId}/reviewer`, { reviewerId });
+  },
 };

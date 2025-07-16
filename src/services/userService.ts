@@ -42,4 +42,8 @@ export const userService = {
   async activate(id: number): Promise<AxiosResponse<User>> {
     return apiClient.patch<User>(`/users/${id}/activate`);
   },
+
+  async getTenantAdmins(): Promise<AxiosResponse<User[]>> {
+    return apiClient.get('/users/tenant-admins');
+  },
 };
