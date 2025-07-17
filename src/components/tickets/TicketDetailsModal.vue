@@ -26,8 +26,7 @@
           <div
             class="flex items-center gap-2"
             v-if="
-              isTargetUser ||
-              (isRequester && loadedTicket.status === TicketStatus.UnderVerification)
+              isTargetUser || (isReviewer && loadedTicket.status === TicketStatus.UnderVerification)
             "
           >
             <button
@@ -76,7 +75,7 @@
             </button>
 
             <button
-              v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
+              v-if="isReviewer && loadedTicket?.status === TicketStatus.UnderVerification"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="approveTicket(loadedTicket.customId)"
             >
@@ -85,7 +84,7 @@
             </button>
 
             <button
-              v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
+              v-if="isReviewer && loadedTicket?.status === TicketStatus.UnderVerification"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="requestCorrection(loadedTicket.customId)"
             >
@@ -94,7 +93,7 @@
             </button>
 
             <button
-              v-if="isRequester && loadedTicket?.status === TicketStatus.UnderVerification"
+              v-if="isReviewer && loadedTicket?.status === TicketStatus.UnderVerification"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="rejectTicket(loadedTicket.customId)"
             >
@@ -405,7 +404,7 @@
             <!-- Description Section -->
             <div class="my-2 px-4 sm:px-6 dark:border-gray-700">
               <h3
-                class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-2"
+                class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-1"
               >
                 <font-awesome-icon icon="file-text" class="text-primary dark:text-blue-400" />
                 Descrição
@@ -786,6 +785,7 @@ const confirmationModal = ref({
   action: null as ((data?: { reason: string; description: string }) => Promise<void>) | null,
   hasInput: false,
   reasonOptions: [] as { value: string; label: string }[],
+  context: '', // add context property
 });
 
 const editorOptions = {
@@ -879,6 +879,7 @@ const openConfirmationModal = (
   action: (data?: { reason: string; description: string }) => Promise<void>,
   hasInput = false,
   reasonOptions: { value: string; label: string }[] = [],
+  context = '',
 ) => {
   confirmationModal.value = {
     isOpen: true,
@@ -887,6 +888,7 @@ const openConfirmationModal = (
     action,
     hasInput,
     reasonOptions,
+    context,
   };
 };
 
@@ -907,7 +909,13 @@ const handleConfirm = async (data?: { reason: string; description: string }) => 
 };
 
 const handleCancel = () => {
-  closeConfirmationModal();
+  if (confirmationModal.value.context === 'start-verification') {
+    closeConfirmationModal();
+    closeModal(); // Also close the ticket details modal
+  } else {
+    closeConfirmationModal();
+  }
+  confirmationModal.value.context = '';
 };
 
 const acceptTicket = async (ticketId: string) => {
@@ -1196,6 +1204,7 @@ const timeline = computed(() => {
 
 const isTargetUser = computed(() => userStore.user?.id === loadedTicket.value?.targetUser.id);
 const isRequester = computed(() => userStore.user?.id === loadedTicket.value?.requester.id);
+const isReviewer = computed(() => userStore.user?.id === loadedTicket.value?.reviewer?.id);
 
 const formatTicketUpdateDescription = (ticketUpdate: TicketUpdate) => {
   return `${ticketUpdate.description.replace('user', `${ticketUpdate.performedBy.firstName} ${ticketUpdate.performedBy.lastName}`)}`;
@@ -1275,6 +1284,30 @@ watch(
       loadedTicket.value = newTicket;
       fetchComments();
       fetchTicketUpdates();
+
+      if (
+        userStore.user?.id === newTicket.reviewer?.id &&
+        newTicket.status === TicketStatus.AwaitingVerification &&
+        !confirmationModal.value.isOpen
+      ) {
+        openConfirmationModal(
+          'Iniciar Verificação',
+          'Você tem certeza que deseja iniciar a verificação deste ticket?',
+          async () => {
+            try {
+              await ticketService.updateStatus(newTicket.customId, {
+                status: TicketStatus.UnderVerification,
+              });
+              loadedTicket.value = await ticketsStore.fetchTicketDetails(newTicket.customId);
+            } catch {
+              toast.error('Erro ao iniciar verificação');
+            }
+          },
+          false,
+          [],
+          'start-verification', // pass context
+        );
+      }
     }
   },
   { immediate: true },

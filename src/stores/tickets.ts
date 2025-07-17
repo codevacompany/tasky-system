@@ -188,7 +188,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
       }
 
-      const response = await ticketService.getByTargetUser(userStore.user.id, params);
+      const response = await ticketService.getReceivedTickets(userStore.user.id, params);
       receivedTickets.value.data = response.data.items;
       receivedTickets.value.totalCount = response.data.total;
       receivedTickets.value.lastFetched = new Date();

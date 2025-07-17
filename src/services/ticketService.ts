@@ -74,6 +74,21 @@ export const ticketService = {
     });
   },
 
+  async getReceivedTickets(
+    userId: number,
+    params?: {
+      name?: string;
+      status?: TicketStatus;
+      priority?: TicketPriority;
+      page?: number;
+      limit?: number;
+    },
+  ): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
+    return apiClient.get(`/tickets/received/${userId}`, {
+      params,
+    });
+  },
+
   async getArchived(params?: {
     name?: string;
     priority?: TicketPriority;

@@ -244,6 +244,16 @@
                   >
                     <font-awesome-icon icon="wrench" class="text-xs md:text-sm" />
                   </button>
+                  <button
+                    v-else-if="
+                      ticket.status === TicketStatus.AwaitingVerification && isReviewer(ticket)
+                    "
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duration-200"
+                    @click.stop="handleStartVerification(ticket)"
+                    title="Iniciar Verificação"
+                  >
+                    <font-awesome-icon icon="search" class="text-xs md:text-sm" />
+                  </button>
                   <div
                     v-else-if="ticket.status === TicketStatus.AwaitingVerification"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 text-white"
@@ -264,6 +274,32 @@
                     title="Finalizado"
                   >
                     <font-awesome-icon icon="check-circle" class="text-xs md:text-sm" />
+                  </div>
+                  <div
+                    v-if="isReviewer(ticket) && ticket.status === TicketStatus.UnderVerification"
+                    class="flex gap-0.5 md:gap-1"
+                  >
+                    <button
+                      class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white transition-colors duration-200"
+                      @click.stop="handleApproveTicket(ticket)"
+                      title="Aprovar"
+                    >
+                      <font-awesome-icon icon="check" class="text-xs md:text-sm" />
+                    </button>
+                    <button
+                      class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duration-200"
+                      @click.stop="handleRequestCorrection(ticket)"
+                      title="Solicitar Correção"
+                    >
+                      <font-awesome-icon icon="exclamation-circle" class="text-xs md:text-sm" />
+                    </button>
+                    <button
+                      class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
+                      @click.stop="handleRejectTicket(ticket)"
+                      title="Reprovar"
+                    >
+                      <font-awesome-icon icon="times" class="text-xs md:text-sm" />
+                    </button>
                   </div>
                 </template>
 
@@ -553,9 +589,9 @@ function changePage(page: number) {
 const openTicketDetails = (ticket: Ticket) => {
   // Se for o solicitante e o ticket estiver aguardando verificação
   if (
-    props.tableType === 'criados' &&
+    (props.tableType === 'criados' || props.tableType === 'recebidos') &&
     ticket.status === TicketStatus.AwaitingVerification &&
-    userStore.user?.id === ticket.requester.id
+    userStore.user?.id === ticket.reviewer?.id
   ) {
     pendingVerificationTicket.value = ticket;
     showVerificationAlert.value = true;
