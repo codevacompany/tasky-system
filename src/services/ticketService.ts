@@ -74,6 +74,21 @@ export const ticketService = {
     });
   },
 
+  async getReceivedTickets(
+    userId: number,
+    params?: {
+      name?: string;
+      status?: TicketStatus;
+      priority?: TicketPriority;
+      page?: number;
+      limit?: number;
+    },
+  ): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
+    return apiClient.get(`/tickets/received/${userId}`, {
+      params,
+    });
+  },
+
   async getArchived(params?: {
     name?: string;
     priority?: TicketPriority;
@@ -129,5 +144,9 @@ export const ticketService = {
 
   async updateAssignee(id: string, targetUserId: number): Promise<AxiosResponse<Ticket>> {
     return apiClient.patch(`/tickets/${id}/assignee`, { targetUserId });
+  },
+
+  async updateReviewer(ticketId: string, reviewerId: number) {
+    return apiClient.patch(`/tickets/${ticketId}/reviewer`, { reviewerId });
   },
 };

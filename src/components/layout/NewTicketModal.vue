@@ -24,7 +24,7 @@
 
         <div class="col-span-1 flex flex-col gap-1.5">
           <label class="text-sm text-gray-800 dark:text-gray-200">É privado?</label>
-          <div class="flex sm:flex-row gap-2 sm:gap-4 pt-1">
+          <div class="flex sm:flex-row gap-2 sm:gap-4 pt-1" :key="privateRadioKey">
             <label
               class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200 cursor-pointer"
             >
@@ -185,7 +185,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch, nextTick } from 'vue';
 import { ticketService } from '@/services/ticketService';
 import { departmentService } from '@/services/departmentService';
 import { userService } from '@/services/userService';
@@ -215,6 +215,7 @@ const selectedUser = ref<number | null>(null);
 const categories = ref<Category[]>([]);
 const selectedCategory = ref<number | null>(null);
 const selectedFiles = ref<File[]>([]);
+const privateRadioKey = ref(0);
 
 // Computed properties for Select component options
 const departmentOptions = computed(() => [
@@ -225,16 +226,48 @@ const departmentOptions = computed(() => [
   })),
 ]);
 
-const userOptions = computed(() => [
-  {
-    value: '',
-    label: selectedDepartment.value ? 'Selecione um usuário' : 'Selecione um setor primeiro',
+const formData = ref({
+  name: '',
+  priority: TicketPriority.Low,
+  description: '',
+  departmentId: null as number | null,
+  targetUserId: null as number | null,
+  dueAt: '',
+  requesterId: useUserStore().user?.id || null,
+  categoryId: null as number | null,
+  isPrivate: false,
+});
+
+const currentUserId = useUserStore().user?.id;
+
+const userOptions = computed(() => {
+  let users = availableUsers.value;
+  if (formData.value.isPrivate && currentUserId) {
+    users = users.filter((user) => user.id !== currentUserId);
+  }
+  return [
+    {
+      value: '',
+      label: selectedDepartment.value ? 'Selecione um usuário' : 'Selecione um setor primeiro',
+    },
+    ...users.map((user) => ({
+      value: user.id.toString(),
+      label: `${user.firstName} ${user.lastName}`,
+    })),
+  ];
+});
+
+watch(
+  () => formData.value.isPrivate,
+  (isPrivate, wasPrivate) => {
+    if (isPrivate && selectedUser.value && Number(selectedUser.value) === currentUserId) {
+      formData.value.isPrivate = false;
+      selectedUser.value = null;
+      toast.warning('Você não pode criar um ticket privado para si mesmo.');
+      privateRadioKey.value++;
+    }
   },
-  ...availableUsers.value.map((user) => ({
-    value: user.id.toString(),
-    label: `${user.firstName} ${user.lastName}`,
-  })),
-]);
+);
 
 const categoryOptions = computed(() => [
   { value: '', label: 'Selecione uma categoria' },
@@ -257,18 +290,6 @@ const editorOptions = {
   },
   placeholder: 'Adicione uma descrição aqui...',
 };
-
-const formData = ref({
-  name: '',
-  priority: TicketPriority.Low,
-  description: '',
-  departmentId: null as number | null,
-  targetUserId: null as number | null,
-  dueAt: '',
-  requesterId: useUserStore().user?.id || null,
-  categoryId: null as number | null,
-  isPrivate: false,
-});
 
 // Update handlers for Select components
 const updateSelectedDepartment = (value: string) => {
@@ -352,6 +373,14 @@ onMounted(() => {
 });
 
 const validateForm = () => {
+  if (
+    formData.value.isPrivate &&
+    selectedUser.value &&
+    Number(selectedUser.value) === currentUserId
+  ) {
+    toast.error('Você não pode criar um ticket privado para si mesmo.');
+    return false;
+  }
   if (!formData.value.name.trim()) {
     toast.error('O campo Assunto é obrigatório');
     return false;
