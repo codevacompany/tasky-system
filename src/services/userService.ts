@@ -36,11 +36,11 @@ export const userService = {
   },
 
   async deactivate(id: number): Promise<AxiosResponse<User>> {
-    return apiClient.patch<User>(`/users/${id}/deactivate`);
+    return apiClient.patch<User>(`/users/${id}`, { isActive: false });
   },
 
   async activate(id: number): Promise<AxiosResponse<User>> {
-    return apiClient.patch<User>(`/users/${id}/activate`);
+    return apiClient.patch<User>(`/users/${id}`, { isActive: true });
   },
 
   async getTenantAdmins(): Promise<AxiosResponse<User[]>> {
