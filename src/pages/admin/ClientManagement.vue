@@ -106,7 +106,7 @@
       </div>
 
       <!-- Filtros -->
-      <div class="flex flex-wrap gap-4 items-center mb-4">
+      <div class="flex flex-wrap gap-4 items-center mb-4 w-[50%]">
         <select
           v-model="statusFilter"
           class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
@@ -130,7 +130,8 @@
           <option value="Sem Plano">Sem Plano</option>
         </select>
 
-        <select
+        <!-- TODO: Adicionar filtro de status de pagamento -->
+        <!-- <select
           v-model="paymentFilter"
           class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
         >
@@ -138,9 +139,9 @@
           <option value="EM_DIA">Em dia</option>
           <option value="ATRASADO">Atrasado</option>
           <option value="PENDENTE">Pendente</option>
-        </select>
+        </select> -->
 
-        <div class="flex items-center gap-2 flex-[2] min-w-[200px]">
+        <!-- <div class="flex items-center gap-2 flex-[2] min-w-[200px]">
           <input
             type="date"
             v-model="dateFilter.start"
@@ -154,7 +155,7 @@
             class="flex-1 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
             placeholder="Data final"
           />
-        </div>
+        </div> -->
       </div>
 
       <!-- Ações em Massa -->
@@ -280,7 +281,9 @@
                   class="ml-1"
                 />
               </th>
-              <th
+
+              <!-- TODO: Adicionar função de próxima fatura -->
+              <!-- <th
                 @click="sortBy('nextInvoice')"
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
@@ -290,7 +293,7 @@
                   v-if="sortField === 'nextInvoice'"
                   class="ml-1"
                 />
-              </th>
+              </th> -->
               <th
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100"
               >
@@ -396,19 +399,21 @@
                     <span class="text-xs text-gray-500 dark:text-gray-400">tickets este mês</span>
                   </div>
                 </td>
-                <td class="px-4 py-4 text-center">
+
+                <!-- TODO: Adicionar função de próxima fatura -->
+                <!-- <td class="px-4 py-4 text-center">
                   <div
                     class="text-sm text-gray-900 dark:text-gray-100 flex flex-col items-center gap-1"
                   >
                     <span>{{ formatDate(client.nextInvoice) }}</span>
                   </div>
-                </td>
+                </td> -->
                 <td class="px-4 py-4">
                   <div class="flex items-center justify-center gap-1 relative">
                     <button
                       class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                       title="Usuários"
-                      @click.stop="manageUsers(client)"
+                      @click.stop="toggleClientExpansion(client.id)"
                     >
                       <font-awesome-icon icon="users" />
                     </button>
@@ -438,7 +443,9 @@
                           <font-awesome-icon icon="redo" />
                           Renovar Trial
                         </button>
-                        <button
+
+                        <!-- TODO: Adicionar função de editar cliente -->
+                        <!-- <button
                           class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2"
                           @click="editClient(client)"
                         >
@@ -451,7 +458,7 @@
                         >
                           <font-awesome-icon icon="users" />
                           Gerenciar Usuários
-                        </button>
+                        </button> -->
                       </div>
                     </div>
                   </div>
@@ -490,11 +497,12 @@
                           >
                             Status
                           </th>
-                          <th
+                          <!-- TODO: Adicionar função de resetar senha -->
+                          <!-- <th
                             class="px-3 py-2 text-center text-xs font-medium text-gray-900 dark:text-gray-100"
                           >
                             Último Acesso
-                          </th>
+                          </th> -->
                           <th
                             class="px-3 py-2 text-center text-xs font-medium text-gray-900 dark:text-gray-100"
                           >
@@ -560,11 +568,12 @@
                               {{ user.status }}
                             </span>
                           </td>
-                          <td
+                          <!-- TODO: Adicionar função de último acesso -->
+                          <!-- <td
                             class="px-3 py-2 text-center text-sm text-gray-900 dark:text-gray-100"
                           >
                             {{ user.lastAccess ? formatDateTime(user.lastAccess) : 'Nunca' }}
-                          </td>
+                          </td> -->
                           <td class="px-3 py-2">
                             <div class="flex items-center justify-center gap-1">
                               <button
