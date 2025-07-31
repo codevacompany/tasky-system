@@ -160,7 +160,7 @@
     </div>
 
     <div v-else class="flex justify-center mb-8">
-      <div class="flex gap-7 max-w-6xl w-full">
+      <div class="flex justify-center gap-7 max-w-6xl w-full">
         <div
           v-for="plan in availablePlans"
           :key="plan.slug"
@@ -228,27 +228,27 @@
       </div>
     </div>
 
-    <!-- Histórico de Pagamentos -->
-    <div
+    <!-- TODO: Implementar histórico de pagamentos -->
+    <!-- <div
       class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
     >
       <div class="p-6">
         <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Histórico de Pagamentos
-        </h2>
+        </h2> -->
 
         <!-- Loading State -->
-        <div v-if="isLoading" class="flex justify-center items-center py-8">
+        <!-- <div v-if="isLoading" class="flex justify-center items-center py-8">
           <LoadingSpinner />
-        </div>
+        </div> -->
 
         <!-- Empty State -->
-        <div v-else-if="payments.length === 0" class="text-center py-8">
+        <!-- <div v-else-if="payments.length === 0" class="text-center py-8">
           <p class="text-gray-500 dark:text-gray-400">Nenhum pagamento encontrado.</p>
-        </div>
+        </div> -->
 
         <!-- Payment History Table -->
-        <div v-else class="overflow-x-auto">
+        <!-- <div v-else class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-700">
               <tr>
@@ -324,7 +324,7 @@
           </table>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Modal de Confirmação de Assinatura -->
     <BaseModal

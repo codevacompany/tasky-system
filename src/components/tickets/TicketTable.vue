@@ -451,6 +451,50 @@
       @cancel="handleCancel"
     />
 
+    <!-- Due Date Modal -->
+    <BaseModal
+      v-if="showDueDateModal"
+      title="Definir Prazo de Conclusão"
+      :showFooter="true"
+      @close="showDueDateModal = false"
+    >
+      <div class="p-4">
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Este ticket não possui um prazo definido. Para aceitar o ticket, defina uma data estimada
+          de conclusão:
+        </p>
+        <div class="flex flex-col gap-2">
+          <label for="dueDate" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Data de Conclusão:
+          </label>
+          <input
+            type="datetime-local"
+            id="dueDate"
+            v-model="dueDateValue"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600"
+            required
+          />
+        </div>
+      </div>
+      <template #footer>
+        <div class="flex justify-end gap-2">
+          <button
+            class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200"
+            @click="showDueDateModal = false"
+          >
+            Cancelar
+          </button>
+          <button
+            class="px-4 py-2 bg-blue-600 text-white rounded"
+            @click="confirmDueDate"
+            :disabled="!dueDateValue"
+          >
+            Confirmar
+          </button>
+        </div>
+      </template>
+    </BaseModal>
+
     <!-- Modal de Aviso de Verificação -->
     <BaseModal
       v-if="showVerificationAlert"
@@ -525,6 +569,10 @@ const confirmationModal = ref({
   hasInput: false,
   reasonOptions: [] as { value: string; label: string }[],
 });
+
+const showDueDateModal = ref(false);
+const dueDateValue = ref('');
+const ticketForDueDate = ref<Ticket | null>(null);
 
 const displayedTickets = computed(() => {
   switch (props.tableType) {
@@ -723,6 +771,12 @@ const handleCancel = () => {
 };
 
 const handleAcceptTicket = async (ticket: Ticket) => {
+  if (!ticket.dueAt) {
+    ticketForDueDate.value = ticket;
+    showDueDateModal.value = true;
+    return;
+  }
+
   openConfirmationModal(
     'Aceitar Ticket',
     'Tem certeza que deseja aceitar este ticket?',
@@ -894,6 +948,24 @@ const handleStartTicket = async (ticket: Ticket) => {
       }
     },
   );
+};
+
+const confirmDueDate = async () => {
+  if (!dueDateValue.value || !ticketForDueDate.value) return;
+
+  try {
+    await ticketService.update(ticketForDueDate.value.customId, { dueAt: dueDateValue.value });
+
+    await ticketService.accept(ticketForDueDate.value.customId);
+
+    toast.success('Prazo definido e ticket aceito com sucesso');
+    showDueDateModal.value = false;
+    dueDateValue.value = '';
+    ticketForDueDate.value = null;
+    await refreshTickets();
+  } catch {
+    toast.error('Erro ao definir prazo e aceitar ticket');
+  }
 };
 </script>
 

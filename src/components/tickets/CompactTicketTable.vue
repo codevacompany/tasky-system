@@ -1,11 +1,11 @@
 <template>
   <div
-    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm flex-1 min-w-0"
+    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg flex-1 min-w-0"
   >
     <div
-      class="flex justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-gray-700"
+      class="flex justify-between items-center px-6 py-6 border-b border-gray-200 dark:border-gray-700"
     >
-      <h2 class="text-base font-semibold text-gray-900 dark:text-white m-0">{{ title }}</h2>
+      <h2 class="text-sm font-semibold text-gray-900 dark:text-white m-0">{{ title }}</h2>
       <router-link
         :to="viewAllUrl"
         class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors duration-200"
@@ -14,36 +14,6 @@
     </div>
     <div class="overflow-x-auto">
       <table class="w-full border-collapse min-w-[600px]">
-        <thead>
-          <tr>
-            <th
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50 whitespace-nowrap"
-            >
-              Assunto
-            </th>
-            <th
-              v-if="title !== 'Últimos Tickets Criados'"
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50 whitespace-nowrap"
-            >
-              Solicitante
-            </th>
-            <th
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50 whitespace-nowrap"
-            >
-              {{ title === 'Últimos Tickets Criados' ? 'Destino' : 'Setor' }}
-            </th>
-            <th
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50 whitespace-nowrap"
-            >
-              Prazo
-            </th>
-            <th
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm font-semibold text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-700/50 whitespace-nowrap"
-            >
-              Status
-            </th>
-          </tr>
-        </thead>
         <tbody>
           <tr v-if="isLoading">
             <td
@@ -60,40 +30,38 @@
             class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200"
           >
             <td
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]"
+              class="pl-8 py-3 border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis w-1/2"
               :title="ticket.name"
             >
-              {{ ticket.name }}
+              <div class="flex flex-col gap-1">
+                <p class="text-sm font-medium">{{ ticket.name }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ ticket.department.name }}</p>
+              </div>
             </td>
             <td
-              v-if="title !== 'Últimos Tickets Criados'"
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap"
-            >
-              {{ ticket.requester.firstName }}
-            </td>
-            <td
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap"
-            >
-              {{ ticket.department.name }}
-            </td>
-            <td
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap w-1/4"
             >
               <template
                 v-if="title === 'Últimos Tickets Criados' || title === 'Últimos Tickets Recebidos'"
               >
-                {{ calculateDeadlineCompact(ticket) }}
+                <span v-if="ticket.dueAt" class="flex items-center gap-2">
+                  <span
+                    :class="getDeadlineDotClass(ticket.dueAt)"
+                    class="inline-block w-[9px] h-[9px] rounded-full"
+                  ></span>
+                  {{ formatDeadlineRelative(ticket.dueAt) }}
+                </span>
               </template>
               <template v-else>
                 {{ formatDate(ticket.createdAt) }}
               </template>
             </td>
             <td
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap"
+              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap w-1/4"
             >
               <span
                 :class="[
-                  'inline-flex items-center px-2 py-1 rounded text-xs font-medium gap-2 whitespace-nowrap',
+                  'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium gap-2 whitespace-nowrap',
                   getStatusClasses(ticket.status),
                 ]"
                 >{{ formatSnakeToNaturalCase(ticket.status).toUpperCase() }}</span
@@ -216,6 +184,84 @@ function getStatusClasses(status: TicketStatus) {
       return 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
     default:
       return '';
+  }
+}
+
+function isDeadlineExceeded(dueAt: string) {
+  return new Date(dueAt) < new Date();
+}
+
+function formatDeadlineDate(dueAt: string) {
+  const date = new Date(dueAt);
+  return date
+    .toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+    .replace(',', '');
+}
+
+function getDeadlineDotClass(dueAt: string) {
+  const deadline = new Date(dueAt);
+  const now = new Date();
+  const diffTime = deadline.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+
+  if (diffDays < 0) {
+    return 'bg-red-500';
+  } else if (diffDays === 0 || (diffDays === 1 && diffHours < 8)) {
+    return 'bg-yellow-500';
+  } else {
+    return 'bg-emerald-400';
+  }
+}
+
+function formatDeadlineRelative(dueAt: string) {
+  const deadline = new Date(dueAt);
+  const now = new Date();
+  const diffTime = deadline.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+
+  if (diffDays < 0) {
+    const overdueHours = Math.abs(diffHours);
+    const overdueDays = Math.abs(diffDays);
+
+    if (overdueHours < 1) {
+      return 'Vencendo agora';
+    } else if (overdueDays === 0) {
+      // Overdue but less than 1 day
+      return overdueHours === 1 ? 'Atrasado há 1 hora' : `Atrasado há ${overdueHours} horas`;
+    } else {
+      // Overdue more than 1 day
+      return overdueDays === 1 ? 'Atrasado há 1 dia' : `Atrasado há ${overdueDays} dias`;
+    }
+  } else if (diffDays === 0) {
+    // Today
+    if (diffHours === 1) {
+      return '1 hora restante';
+    } else {
+      return `${diffHours} horas restantes`;
+    }
+  } else if (diffDays === 1) {
+    // Tomorrow
+    if (diffHours < 8) {
+      // Less than 8 hours until tomorrow
+      if (diffHours === 1) {
+        return '1 hora restante';
+      } else {
+        return `${diffHours} horas restantes`;
+      }
+    } else {
+      // More than 8 hours until tomorrow
+      return '1 dia restante';
+    }
+  } else {
+    // 2+ days
+    return `${diffDays} dias restantes`;
   }
 }
 </script>

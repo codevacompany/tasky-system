@@ -1,7 +1,5 @@
 <template>
-  <section id="dashboardSection" class="p-4 sm:p-6">
-    <h1 class="text-xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">Dashboard</h1>
-
+  <section id="dashboardSection" class="p-4 sm:px-6 sm:py-10">
     <WelcomeModal
       :isOpen="showWelcomeModal"
       @close="closeWelcomeModal"

@@ -477,8 +477,14 @@ const handleSubmit = async () => {
 
   try {
     const fileUrls = await uploadFilesToS3();
+    
+    const ticketData = {
+      ...formData.value,
+      dueAt: formData.value.dueAt || undefined,
+      files: fileUrls,
+    };
 
-    await ticketService.create({ ...formData.value, files: fileUrls });
+    await ticketService.create(ticketData);
     await Promise.all([ticketsStore.fetchMyTickets(), ticketsStore.fetchDepartmentTickets()]);
 
     toast.success('Ticket criado com sucesso!');

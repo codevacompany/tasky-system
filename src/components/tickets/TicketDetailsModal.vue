@@ -715,6 +715,50 @@
       </div>
     </template>
   </BaseModal>
+
+  <!-- Due Date Modal -->
+  <BaseModal
+    v-if="showDueDateModal"
+    title="Definir Prazo de Conclusão"
+    :showFooter="true"
+    @close="showDueDateModal = false"
+  >
+    <div class="p-4">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        Este ticket não possui um prazo definido. Para aceitar o ticket, defina uma data estimada de
+        conclusão:
+      </p>
+      <div class="flex flex-col gap-2">
+        <label for="dueDate" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+          Data de Conclusão:
+        </label>
+        <input
+          type="datetime-local"
+          id="dueDate"
+          v-model="dueDateValue"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600"
+          required
+        />
+      </div>
+    </div>
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <button
+          class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200"
+          @click="showDueDateModal = false"
+        >
+          Cancelar
+        </button>
+        <button
+          class="px-4 py-2 bg-blue-600 text-white rounded"
+          @click="confirmDueDate"
+          :disabled="!dueDateValue"
+        >
+          Confirmar
+        </button>
+      </div>
+    </template>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
@@ -919,6 +963,11 @@ const handleCancel = () => {
 };
 
 const acceptTicket = async (ticketId: string) => {
+  if (loadedTicket.value && !loadedTicket.value.dueAt) {
+    showDueDateModal.value = true;
+    return;
+  }
+
   openConfirmationModal(
     'Aceitar Ticket',
     'Tem certeza que deseja aceitar este ticket?',
@@ -1596,6 +1645,26 @@ const confirmReviewerSelection = async () => {
     refreshSelectedTicket();
   } catch {
     toast.error('Erro ao definir revisor ou enviar para revisão');
+  }
+};
+
+const showDueDateModal = ref(false);
+const dueDateValue = ref('');
+
+const confirmDueDate = async () => {
+  if (!dueDateValue.value || !loadedTicket.value) return;
+
+  try {
+    await ticketService.update(loadedTicket.value.customId, { dueAt: dueDateValue.value });
+    
+    await ticketService.accept(loadedTicket.value.customId);
+
+    toast.success('Prazo definido e ticket aceito com sucesso');
+    showDueDateModal.value = false;
+    dueDateValue.value = '';
+    refreshSelectedTicket();
+  } catch {
+    toast.error('Erro ao definir prazo e aceitar ticket');
   }
 };
 </script>
@@ -3274,255 +3343,6 @@ const confirmReviewerSelection = async () => {
 
 :deep(body.dark-mode) .description-text {
   color: #e5e7eb;
-}
-
-:deep(body.dark-mode) .description-text :deep(h1),
-:deep(body.dark-mode) .description-text :deep(h2),
-:deep(body.dark-mode) .description-text :deep(h3),
-:deep(body.dark-mode) .description-text :deep(h4),
-:deep(body.dark-mode) .description-text :deep(h5),
-:deep(body.dark-mode) .description-text :deep(h6) {
-  color: #f9fafb;
-}
-
-:deep(body.dark-mode) .description-text :deep(blockquote) {
-  border-left-color: #4b5563;
-  background: #1f2937;
-}
-
-:deep(body.dark-mode) .description-text :deep(code) {
-  background: #1f2937;
-  color: #e5e7eb;
-}
-
-:deep(body.dark-mode) .description-text :deep(pre) {
-  background: #1f2937;
-  color: #e5e7eb;
-}
-
-:deep(body.dark-mode) .description-text :deep(.ql-syntax) {
-  background: #1f2937;
-  color: #e5e7eb;
-  border-color: #374151;
-}
-
-:deep(body.dark-mode) .description-text :deep(.ql-size-small),
-:deep(body.dark-mode) .description-text :deep(.ql-size-large),
-:deep(body.dark-mode) .description-text :deep(.ql-size-huge) {
-  color: #e5e7eb;
-}
-
-:deep(body.dark-mode) .description-text :deep(a) {
-  color: #60a5fa;
-}
-
-/* Dark mode checkbox styling */
-:deep(body.dark-mode) .description-text :deep(ul[data-checked='false'] li::before) {
-  color: #9ca3af;
-}
-
-:deep(body.dark-mode) .description-text :deep(ul[data-checked='true'] li::before) {
-  color: #10b981;
-}
-
-:deep(body.dark-mode) .description-text :deep(ul[data-checked='true'] li) {
-  color: #9ca3af;
-}
-
-/* Dark mode image styling */
-:deep(body.dark-mode) .description-text :deep(img) {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-:deep(body.dark-mode) .comment-text :deep(a) {
-  color: #60a5fa;
-}
-
-/* Dark mode checkbox styling */
-:deep(body.dark-mode) .comment-text :deep(ul[data-checked='false'] li::before) {
-  color: #9ca3af;
-}
-
-:deep(body.dark-mode) .comment-text :deep(ul[data-checked='true'] li::before) {
-  color: #10b981;
-}
-
-:deep(body.dark-mode) .comment-text :deep(ul[data-checked='true'] li) {
-  color: #9ca3af;
-}
-
-:deep(body.dark-mode) .comment-text :deep(img) {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-:deep(body.dark-mode) .comment-text :deep(img) {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.editable-field {
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
-}
-
-.editable-field:hover {
-  background-color: #f8f9fa;
-  box-shadow: 0 0 0 1px #e9ecef;
-}
-
-.editing-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-/* Edit input styling */
-.edit-input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 2px solid #4f46e5;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-family: inherit;
-  background: white;
-  color: #212529;
-  outline: none;
-  transition: border-color 0.2s ease;
-}
-
-.edit-input:focus {
-  border-color: #818cf8;
-  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.1);
-}
-
-.edit-buttons {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.btn-save {
-  background: #10b981;
-  color: white;
-}
-
-.btn-save:hover {
-  background: #059669;
-  transform: translateY(-1px);
-}
-
-.btn-cancel {
-  background: #6b7280;
-  color: white;
-}
-
-.btn-cancel:hover {
-  background: #4b5563;
-  transform: translateY(-1px);
-}
-
-/* Dark mode editing styles */
-:deep(body.dark-mode) .editable-field:hover {
-  background-color: #374151;
-  box-shadow: 0 0 0 1px #4b5563;
-}
-
-:deep(body.dark-mode) .edit-input {
-  background: #374151;
-  color: #f9fafb;
-  border-color: #818cf8;
-}
-
-:deep(body.dark-mode) .edit-input:focus {
-  background: #1f2937;
-  border-color: #a5b4fc;
-}
-
-:deep(body.dark-mode) .btn-save {
-  background: #059669;
-}
-
-:deep(body.dark-mode) .btn-save:hover {
-  background: #047857;
-}
-
-:deep(body.dark-mode) .btn-cancel {
-  background: #4b5563;
-}
-
-:deep(body.dark-mode) .btn-cancel:hover {
-  background: #374151;
-}
-
-.action-button.cancel {
-  background-color: #dc2626;
-}
-
-.action-button.cancel:hover {
-  background-color: #b91c1c;
-}
-
-.action-button.cancel-verification {
-  background-color: #f59e0b;
-}
-
-.action-button.cancel-verification:hover {
-  background-color: #d97706;
-}
-
-.target-user-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.inactive-user-indicator {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  margin-top: 0.25rem;
-}
-
-.inactive-user-indicator .text-orange-500 {
-  color: #f97316;
-}
-
-.inactive-user-indicator .text-sm {
-  font-size: 0.875rem;
-}
-
-.inactive-user-indicator .font-medium {
-  font-weight: 500;
-}
-
-/* Dark mode styles for inactive user indicator */
-:deep(body.dark-mode) .inactive-user-indicator .text-orange-500 {
-  color: #fb923c;
-}
-
-:deep(body.dark-mode) .description-text {
-  color: #e5e7eb;
-}
-
-/* Add comprehensive dark mode styles for v-html content */
-:deep(body.dark-mode) .description-text :deep(p),
-:deep(body.dark-mode) .description-text :deep(div),
-:deep(body.dark-mode) .description-text :deep(span) {
-  color: #e5e7eb !important;
 }
 
 :deep(body.dark-mode) .description-text :deep(h1),

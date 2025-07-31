@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div class="min-h-screen bg-[#f4f5f8] dark:bg-gray-900">
       <header
         class="flex items-center justify-between p-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-16 sticky top-0 z-50 shadow-sm"
       >
@@ -31,7 +31,7 @@
                     :class="{ 'primary-gradient text-white': isActive('/') }"
                     class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
                   >
-                    <font-awesome-icon icon="tachometer-alt-average" /> Dashboard
+                    <font-awesome-icon icon="home" /> Início
                   </div>
                 </li>
               </router-link>
