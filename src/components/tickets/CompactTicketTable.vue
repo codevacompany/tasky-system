@@ -46,10 +46,10 @@
               >
                 <span v-if="ticket.dueAt" class="flex items-center gap-2">
                   <span
-                    :class="isDeadlineExceeded(ticket.dueAt) ? 'bg-red-500' : 'bg-emerald-400'"
+                    :class="getDeadlineDotClass(ticket.dueAt)"
                     class="inline-block w-[9px] h-[9px] rounded-full"
                   ></span>
-                  {{ formatDeadlineDate(ticket.dueAt) }}
+                  {{ formatDeadlineRelative(ticket.dueAt) }}
                 </span>
               </template>
               <template v-else>
@@ -201,5 +201,67 @@ function formatDeadlineDate(dueAt: string) {
       minute: '2-digit',
     })
     .replace(',', '');
+}
+
+function getDeadlineDotClass(dueAt: string) {
+  const deadline = new Date(dueAt);
+  const now = new Date();
+  const diffTime = deadline.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+
+  if (diffDays < 0) {
+    return 'bg-red-500';
+  } else if (diffDays === 0 || (diffDays === 1 && diffHours < 8)) {
+    return 'bg-yellow-500';
+  } else {
+    return 'bg-emerald-400';
+  }
+}
+
+function formatDeadlineRelative(dueAt: string) {
+  const deadline = new Date(dueAt);
+  const now = new Date();
+  const diffTime = deadline.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+
+  if (diffDays < 0) {
+    const overdueHours = Math.abs(diffHours);
+    const overdueDays = Math.abs(diffDays);
+
+    if (overdueHours < 1) {
+      return 'Vencendo agora';
+    } else if (overdueDays === 0) {
+      // Overdue but less than 1 day
+      return overdueHours === 1 ? 'Atrasado há 1 hora' : `Atrasado há ${overdueHours} horas`;
+    } else {
+      // Overdue more than 1 day
+      return overdueDays === 1 ? 'Atrasado há 1 dia' : `Atrasado há ${overdueDays} dias`;
+    }
+  } else if (diffDays === 0) {
+    // Today
+    if (diffHours === 1) {
+      return '1 hora restante';
+    } else {
+      return `${diffHours} horas restantes`;
+    }
+  } else if (diffDays === 1) {
+    // Tomorrow
+    if (diffHours < 8) {
+      // Less than 8 hours until tomorrow
+      if (diffHours === 1) {
+        return '1 hora restante';
+      } else {
+        return `${diffHours} horas restantes`;
+      }
+    } else {
+      // More than 8 hours until tomorrow
+      return '1 dia restante';
+    }
+  } else {
+    // 2+ days
+    return `${diffDays} dias restantes`;
+  }
 }
 </script>
