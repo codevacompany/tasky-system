@@ -12,6 +12,11 @@ interface TicketsState {
     totalCount: number;
     lastFetched: Date | null;
     currentPage: number;
+    currentFilters?: {
+      status?: TicketStatus | null;
+      priority?: TicketPriority | null;
+      name?: string;
+    };
   };
   receivedTickets: {
     data: Ticket[];
@@ -20,6 +25,11 @@ interface TicketsState {
     totalCount: number;
     lastFetched: Date | null;
     currentPage: number;
+    currentFilters?: {
+      status?: TicketStatus | null;
+      priority?: TicketPriority | null;
+      name?: string;
+    };
   };
   departmentTickets: {
     data: Ticket[];
@@ -28,6 +38,11 @@ interface TicketsState {
     totalCount: number;
     lastFetched: Date | null;
     currentPage: number;
+    currentFilters?: {
+      status?: TicketStatus | null;
+      priority?: TicketPriority | null;
+      name?: string;
+    };
   };
   archivedTickets: {
     data: Ticket[];
@@ -36,6 +51,10 @@ interface TicketsState {
     totalCount: number;
     lastFetched: Date | null;
     currentPage: number;
+    currentFilters?: {
+      priority?: TicketPriority | null;
+      name?: string;
+    };
   };
   recentReceivedTickets: Ticket[];
   recentCreatedTickets: Ticket[];
@@ -85,7 +104,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   const recentReceivedTickets = ref<Ticket[]>([]);
   const recentCreatedTickets = ref<Ticket[]>([]);
   const selectedTicket = ref<Ticket | null>(null);
-  const globalRefreshInterval = ref<number>(90000); // 1 minute default
+  const globalRefreshInterval = ref<number>(90000); // 90 seconds default
   const isPollingActive = ref<boolean>(false);
   let pollingTimerId: number | null = null;
 
@@ -121,6 +140,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
 
     myTickets.value.currentPage = page;
+    myTickets.value.currentFilters = filters;
     myTickets.value.error = null;
 
     try {
@@ -171,6 +191,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
 
     receivedTickets.value.currentPage = page;
+    receivedTickets.value.currentFilters = filters;
     receivedTickets.value.error = null;
 
     try {
@@ -221,6 +242,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
 
     departmentTickets.value.currentPage = page;
+    departmentTickets.value.currentFilters = filters;
     departmentTickets.value.error = null;
 
     try {
@@ -263,6 +285,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
 
     archivedTickets.value.currentPage = page;
+    archivedTickets.value.currentFilters = filters;
     archivedTickets.value.error = null;
 
     try {
@@ -332,10 +355,22 @@ export const useTicketsStore = defineStore('tickets', () => {
     const userStore = useUserStore();
     if (!userStore.user) return;
 
-    await fetchMyTickets(myTickets.value.currentPage);
-    await fetchReceivedTickets(receivedTickets.value.currentPage);
-    await fetchDepartmentTickets(departmentTickets.value.currentPage);
-    await fetchArchivedTickets(archivedTickets.value.currentPage);
+    await fetchMyTickets(myTickets.value.currentPage, 10, myTickets.value.currentFilters);
+    await fetchReceivedTickets(
+      receivedTickets.value.currentPage,
+      10,
+      receivedTickets.value.currentFilters,
+    );
+    await fetchDepartmentTickets(
+      departmentTickets.value.currentPage,
+      10,
+      departmentTickets.value.currentFilters,
+    );
+    await fetchArchivedTickets(
+      archivedTickets.value.currentPage,
+      10,
+      archivedTickets.value.currentFilters,
+    );
   }
 
   function startPolling() {
@@ -368,32 +403,6 @@ export const useTicketsStore = defineStore('tickets', () => {
 
   function $dispose() {
     stopPolling();
-  }
-
-  async function fetchTickets(
-    type: 'createdByMe' | 'received' | 'department' | 'archived' = 'createdByMe',
-    page = 1,
-    limit = 10,
-    filters?: {
-      status?: TicketStatus | null;
-      priority?: TicketPriority | null;
-      name?: string;
-    },
-  ) {
-    switch (type) {
-      case 'createdByMe':
-        await fetchMyTickets(page, limit, filters);
-        break;
-      case 'received':
-        await fetchReceivedTickets(page, limit, filters);
-        break;
-      case 'department':
-        await fetchDepartmentTickets(page, limit, filters);
-        break;
-      case 'archived':
-        await fetchArchivedTickets(page, limit, filters);
-        break;
-    }
   }
 
   function setMyTicketsPage(
@@ -493,7 +502,6 @@ export const useTicketsStore = defineStore('tickets', () => {
     startPolling,
     stopPolling,
     setRefreshInterval,
-    fetchTickets,
     $dispose,
 
     // Pagination control
