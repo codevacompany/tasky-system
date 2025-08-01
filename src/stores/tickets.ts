@@ -124,7 +124,7 @@ export const useTicketsStore = defineStore('tickets', () => {
 
   // Actions
   async function fetchMyTickets(
-    page = 1,
+    page?: number,
     limit = 10,
     filters?: {
       status?: TicketStatus | null;
@@ -135,26 +135,31 @@ export const useTicketsStore = defineStore('tickets', () => {
     const userStore = useUserStore();
     if (!userStore.user) return;
 
+    // Use current page if no page is provided
+    const currentPage = page ?? myTickets.value.currentPage;
+    // Use current filters if no filters are provided
+    const currentFilters = filters ?? myTickets.value.currentFilters;
+
     if (!isPollingActive.value) {
       myTickets.value.isLoading = true;
     }
 
-    myTickets.value.currentPage = page;
-    myTickets.value.currentFilters = filters;
+    myTickets.value.currentPage = currentPage;
+    myTickets.value.currentFilters = currentFilters;
     myTickets.value.error = null;
 
     try {
-      const params: any = { page, limit };
+      const params: any = { page: currentPage, limit };
 
-      if (filters) {
-        if (filters.status !== undefined && filters.status !== null) {
-          params.status = filters.status;
+      if (currentFilters) {
+        if (currentFilters.status !== undefined && currentFilters.status !== null) {
+          params.status = currentFilters.status;
         }
-        if (filters.priority !== undefined && filters.priority !== null) {
-          params.priority = filters.priority;
+        if (currentFilters.priority !== undefined && currentFilters.priority !== null) {
+          params.priority = currentFilters.priority;
         }
-        if (filters.name) {
-          params.name = filters.name;
+        if (currentFilters.name) {
+          params.name = currentFilters.name;
         }
       }
 
@@ -163,7 +168,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       myTickets.value.totalCount = response.data.total;
       myTickets.value.lastFetched = new Date();
 
-      if (page === 1) {
+      if (currentPage === 1) {
         recentCreatedTickets.value = response.data.items.slice(0, 5);
       }
     } catch (error) {
@@ -175,7 +180,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   async function fetchReceivedTickets(
-    page = 1,
+    page?: number,
     limit = 10,
     filters?: {
       status?: TicketStatus | null;
@@ -186,26 +191,31 @@ export const useTicketsStore = defineStore('tickets', () => {
     const userStore = useUserStore();
     if (!userStore.user) return;
 
+    // Use current page if no page is provided
+    const currentPage = page ?? receivedTickets.value.currentPage;
+    // Use current filters if no filters are provided
+    const currentFilters = filters ?? receivedTickets.value.currentFilters;
+
     if (!isPollingActive.value) {
       receivedTickets.value.isLoading = true;
     }
 
-    receivedTickets.value.currentPage = page;
-    receivedTickets.value.currentFilters = filters;
+    receivedTickets.value.currentPage = currentPage;
+    receivedTickets.value.currentFilters = currentFilters;
     receivedTickets.value.error = null;
 
     try {
-      const params: any = { page, limit };
+      const params: any = { page: currentPage, limit };
 
-      if (filters) {
-        if (filters.status !== undefined && filters.status !== null) {
-          params.status = filters.status;
+      if (currentFilters) {
+        if (currentFilters.status !== undefined && currentFilters.status !== null) {
+          params.status = currentFilters.status;
         }
-        if (filters.priority !== undefined && filters.priority !== null) {
-          params.priority = filters.priority;
+        if (currentFilters.priority !== undefined && currentFilters.priority !== null) {
+          params.priority = currentFilters.priority;
         }
-        if (filters.name) {
-          params.name = filters.name;
+        if (currentFilters.name) {
+          params.name = currentFilters.name;
         }
       }
 
@@ -214,7 +224,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       receivedTickets.value.totalCount = response.data.total;
       receivedTickets.value.lastFetched = new Date();
 
-      if (page === 1) {
+      if (currentPage === 1) {
         recentReceivedTickets.value = response.data.items.slice(0, 5);
       }
     } catch (error) {
@@ -226,7 +236,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   async function fetchDepartmentTickets(
-    page = 1,
+    page?: number,
     limit = 10,
     filters?: {
       status?: TicketStatus | null;
@@ -237,26 +247,31 @@ export const useTicketsStore = defineStore('tickets', () => {
     const userStore = useUserStore();
     if (!userStore.user?.departmentId) return;
 
+    // Use current page if no page is provided
+    const currentPage = page ?? departmentTickets.value.currentPage;
+    // Use current filters if no filters are provided
+    const currentFilters = filters ?? departmentTickets.value.currentFilters;
+
     if (!isPollingActive.value) {
       departmentTickets.value.isLoading = true;
     }
 
-    departmentTickets.value.currentPage = page;
-    departmentTickets.value.currentFilters = filters;
+    departmentTickets.value.currentPage = currentPage;
+    departmentTickets.value.currentFilters = currentFilters;
     departmentTickets.value.error = null;
 
     try {
-      const params: any = { page, limit };
+      const params: any = { page: currentPage, limit };
 
-      if (filters) {
-        if (filters.status !== undefined && filters.status !== null) {
-          params.status = filters.status;
+      if (currentFilters) {
+        if (currentFilters.status !== undefined && currentFilters.status !== null) {
+          params.status = currentFilters.status;
         }
-        if (filters.priority !== undefined && filters.priority !== null) {
-          params.priority = filters.priority;
+        if (currentFilters.priority !== undefined && currentFilters.priority !== null) {
+          params.priority = currentFilters.priority;
         }
-        if (filters.name) {
-          params.name = filters.name;
+        if (currentFilters.name) {
+          params.name = currentFilters.name;
         }
       }
 
@@ -273,30 +288,35 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   async function fetchArchivedTickets(
-    page = 1,
+    page?: number,
     limit = 10,
     filters?: {
       priority?: TicketPriority | null;
       name?: string;
     },
   ) {
+    // Use current page if no page is provided
+    const currentPage = page ?? archivedTickets.value.currentPage;
+    // Use current filters if no filters are provided
+    const currentFilters = filters ?? archivedTickets.value.currentFilters;
+
     if (!isPollingActive.value) {
       archivedTickets.value.isLoading = true;
     }
 
-    archivedTickets.value.currentPage = page;
-    archivedTickets.value.currentFilters = filters;
+    archivedTickets.value.currentPage = currentPage;
+    archivedTickets.value.currentFilters = currentFilters;
     archivedTickets.value.error = null;
 
     try {
-      const params: any = { page, limit };
+      const params: any = { page: currentPage, limit };
 
-      if (filters) {
-        if (filters.priority !== undefined && filters.priority !== null) {
-          params.priority = filters.priority;
+      if (currentFilters) {
+        if (currentFilters.priority !== undefined && currentFilters.priority !== null) {
+          params.priority = currentFilters.priority;
         }
-        if (filters.name) {
-          params.name = filters.name;
+        if (currentFilters.name) {
+          params.name = currentFilters.name;
         }
       }
 
@@ -355,22 +375,10 @@ export const useTicketsStore = defineStore('tickets', () => {
     const userStore = useUserStore();
     if (!userStore.user) return;
 
-    await fetchMyTickets(myTickets.value.currentPage, 10, myTickets.value.currentFilters);
-    await fetchReceivedTickets(
-      receivedTickets.value.currentPage,
-      10,
-      receivedTickets.value.currentFilters,
-    );
-    await fetchDepartmentTickets(
-      departmentTickets.value.currentPage,
-      10,
-      departmentTickets.value.currentFilters,
-    );
-    await fetchArchivedTickets(
-      archivedTickets.value.currentPage,
-      10,
-      archivedTickets.value.currentFilters,
-    );
+    await fetchMyTickets();
+    await fetchReceivedTickets();
+    await fetchDepartmentTickets();
+    await fetchArchivedTickets();
   }
 
   function startPolling() {
