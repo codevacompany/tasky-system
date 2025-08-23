@@ -1,39 +1,55 @@
 import type { Category } from './category';
+import type { CorrectionRequest } from './correctionRequest';
 import type { Department } from './department';
+import type { TicketCancellationReason } from './ticketCancellationReason';
 import type { TicketComment } from './ticketComment';
+import type { TicketDisapprovalReason } from './ticketDisapprovalReason';
+import type { TicketFile } from './ticketFile';
+import type { TicketUpdate } from './ticketUpdate';
 import type { User } from './user';
 
 export enum TicketPriority {
-  Low = 'Baixa',
-  Medium = 'Média',
-  High = 'Alta',
+  Low = 'baixa',
+  Medium = 'média',
+  High = 'alta',
 }
 
 export enum TicketStatus {
-  Pending = 'Pendente',
-  InProgress = 'Em andamento',
-  AwaitingVerification = 'Aguardando verificação',
-  Overdue = 'Atrasado',
-  Completed = 'Finalizado',
-  Returned = 'Devolvido',
-  Rejected = 'Reprovado',
+  Pending = 'pendente',
+  InProgress = 'em_andamento',
+  AwaitingVerification = 'aguardando_verificação',
+  UnderVerification = 'em_verificação',
+  Completed = 'finalizado',
+  Canceled = 'cancelado',
+  Returned = 'devolvido',
+  Rejected = 'reprovado',
 }
 
 export interface Ticket {
   id: number;
+  customId: string;
   name: string;
   priority: TicketPriority;
   description: string;
   department: Department;
   requester: User;
   targetUser: User;
+  reviewer?: User;
   status: TicketStatus;
-  completionDate?: string;
-  acceptanceDate?: string;
+  completedAt?: string;
+  acceptedAt?: string;
+  dueAt?: string;
+  canceledAt?: string;
   category?: Category;
   comments: TicketComment[];
-  disapprovalReason?: string;
+  updates: TicketUpdate[];
+  disapprovalReason?: TicketDisapprovalReason;
+  correctionRequests?: CorrectionRequest[];
+  cancellationReason?: TicketCancellationReason;
+  isPrivate: boolean;
+  files: TicketFile[];
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateTicketDto {
@@ -44,17 +60,23 @@ export interface CreateTicketDto {
   requesterId: number | null;
   targetUserId: number | null;
   categoryId: number | null;
-  completionDate?: string;
+  dueAt?: string;
+  canceledAt?: string;
+  isPrivate: boolean;
+  files?: string[];
 }
 
 export interface UpdateTicketDto {
   name?: string;
   priority?: TicketPriority;
   description?: string;
-  status?: TicketStatus;
   departmentId?: number;
   requesterId?: User;
   targetUserId?: User;
   categoryId?: number | null;
-  completionDate?: string;
+  dueAt?: string;
+}
+
+export interface UpdateTicketStatusDto {
+  status: TicketStatus;
 }

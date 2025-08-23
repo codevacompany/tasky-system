@@ -1,9 +1,11 @@
-import type { User } from "@/models";
+import type { User } from '@/models';
 
 class StorageService {
   private readonly accessTokenKey = 'accessToken';
   private readonly refreshTokenKey = 'refreshToken';
   private readonly userKey = 'user';
+  private readonly ticketsViewKey = 'ticketsViewPreference';
+  private readonly themeKey = 'theme';
 
   getAccessToken() {
     return localStorage.getItem(this.accessTokenKey);
@@ -40,6 +42,23 @@ class StorageService {
 
   removeUser() {
     localStorage.removeItem(this.userKey);
+  }
+
+  getTicketsViewPreference(): 'table' | 'kanban' {
+    const preference = localStorage.getItem(this.ticketsViewKey);
+    return preference === 'kanban' ? 'kanban' : 'table';
+  }
+
+  setTicketsViewPreference(view: 'table' | 'kanban') {
+    localStorage.setItem(this.ticketsViewKey, view);
+  }
+
+  isDarkMode(): boolean {
+    return localStorage.getItem(this.themeKey) === 'dark';
+  }
+
+  setTheme(theme: 'light' | 'dark') {
+    localStorage.setItem(this.themeKey, theme);
   }
 
   clear(): void {

@@ -1,4 +1,5 @@
 import type { Category, CreateCategoryDto, UpdateCategoryDto } from '@/models';
+import type { PaginatedResponse } from '@/types/http';
 import apiClient from '@/utils/axiosInstance';
 import type { AxiosResponse } from 'axios';
 
@@ -7,8 +8,12 @@ export const categoryService = {
     return apiClient.post<Category>('/categories', data);
   },
 
-  async fetch(): Promise<AxiosResponse<Category[]>> {
-    return apiClient.get<Category[]>('/categories');
+  async fetch(params?: {
+    name?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<AxiosResponse<PaginatedResponse<Category>>> {
+    return apiClient.get<PaginatedResponse<Category>>('/categories', { params });
   },
 
   async getById(id: number): Promise<AxiosResponse<Category>> {
@@ -17,5 +22,9 @@ export const categoryService = {
 
   async update(id: number, data: UpdateCategoryDto): Promise<AxiosResponse<Category>> {
     return apiClient.patch<Category>(`/categories/${id}`, data);
+  },
+
+  async delete(id: number): Promise<AxiosResponse<void>> {
+    return apiClient.delete(`/categories/${id}`);
   },
 };

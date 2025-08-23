@@ -1,140 +1,540 @@
 <template>
-  <section id="ticketsSection" class="section-content">
-    <h1>Tickets</h1>
-
-    <div class="tab-container">
-      <div class="tab-buttons">
+  <section id="ticketsSection" class="p-4 md:p-6">
+    <div class="mb-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Tickets</h1>
         <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'recebidos' }"
-          @click="fetchTickets('recebidos')"
+          class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
+          @click="toggleView"
+          :title="
+            isKanbanView ? 'Mudar para visualização em tabela' : 'Mudar para visualização Kanban'
+          "
+        >
+          <font-awesome-icon :icon="isKanbanView ? 'table' : 'columns'" class="w-4 h-4" />
+          <span class="hidden sm:inline">{{
+            isKanbanView ? 'Visualização em Tabela' : 'Visualização Kanban'
+          }}</span>
+          <span class="sm:hidden">{{ isKanbanView ? 'Tabela' : 'Kanban' }}</span>
+        </button>
+      </div>
+    </div>
+    <div class="mt-6">
+      <!-- Mobile-friendly tabs -->
+      <div
+        class="flex border-b border-gray-200 dark:border-gray-700 mb-6 overflow-x-auto overflow-y-hidden scrollbar-hide"
+        style="height: 48px"
+      >
+        <button
+          :class="[
+            'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
+            activeTab === 'recebidos'
+              ? 'text-blue-600 dark:text-blue-400'
+              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
+          ]"
+          :style="
+            activeTab === 'recebidos'
+              ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
+              : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
+          "
+          @click="switchTab('recebidos')"
         >
           Recebidos
         </button>
         <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'criados' }"
-          @click="fetchTickets('criados')"
+          :class="[
+            'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
+            activeTab === 'criados'
+              ? 'text-blue-600 dark:text-blue-400'
+              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
+          ]"
+          :style="
+            activeTab === 'criados'
+              ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
+              : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
+          "
+          @click="switchTab('criados')"
         >
-          Criados por Mim
+          <span class="hidden sm:inline">Criados por Mim</span>
+          <span class="sm:hidden">Criados</span>
         </button>
         <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'setor' }"
-          @click="fetchTickets('setor')"
+          :class="[
+            'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
+            activeTab === 'setor'
+              ? 'text-blue-600 dark:text-blue-400'
+              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
+          ]"
+          :style="
+            activeTab === 'setor'
+              ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
+              : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
+          "
+          @click="switchTab('setor')"
         >
-          Tickets do Setor
+          <span class="hidden sm:inline">Tickets do Setor</span>
+          <span class="sm:hidden">Setor</span>
+        </button>
+        <button
+          :class="[
+            'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
+            activeTab === 'arquivados'
+              ? 'text-blue-600 dark:text-blue-400'
+              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
+          ]"
+          :style="
+            activeTab === 'arquivados'
+              ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
+              : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
+          "
+          @click="switchTab('arquivados')"
+        >
+          Arquivados
         </button>
       </div>
 
-      <div class="tab-content">
-        <div class="ticket-filters">
-          <div class="filter-group">
-            <label for="statusFilter">Status:</label>
-            <select id="statusFilter">
-              <option value="all">Todos</option>
-              <option value="Pendente">Pendentes</option>
-              <option value="Em andamento">Em Andamento</option>
-              <option value="Finalizado">Resolvidos</option>
-              <option value="Cancelado">Cancelados</option>
-            </select>
+      <div class="min-h-[300px]">
+        <!-- Desktop filters -->
+        <div class="hidden md:flex items-center mb-6 gap-4 flex-wrap">
+          <div class="flex items-center gap-2">
+            <label for="statusFilter" class="text-sm font-medium text-gray-600 dark:text-gray-400"
+              >Status:</label
+            >
+            <div class="w-48">
+              <Select v-model="statusFilter" :options="statusOptions" />
+            </div>
           </div>
 
-          <div class="filter-group">
-            <label for="priorityFilter">Prioridade:</label>
-            <select id="priorityFilter">
-              <option value="all">Todas</option>
-              <option value="baixa">Baixa</option>
-              <option value="media">Média</option>
-              <option value="alta">Alta</option>
-            </select>
+          <div class="flex items-center gap-2">
+            <label for="priorityFilter" class="text-sm font-medium text-gray-600 dark:text-gray-400"
+              >Prioridade:</label
+            >
+            <div class="w-48">
+              <Select v-model="priorityFilter" :options="priorityOptions" />
+            </div>
           </div>
 
-          <div class="search-group">
-            <input type="text" id="searchTickets" placeholder="Buscar tickets..." />
-            <button class="btn-icon">
-              <font-awesome-icon icon="search" />
-            </button>
+          <div class="flex items-center gap-4">
+            <div class="relative w-full">
+              <font-awesome-icon
+                icon="search"
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 pointer-events-none"
+              />
+              <input
+                type="text"
+                id="searchTickets"
+                placeholder="Buscar tickets..."
+                v-model="searchTerm"
+                class="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
+              />
+            </div>
           </div>
         </div>
 
-        <div class="tickets-summary">
-          <div class="summary-item">
-            <div class="summary-item-content">
-              <div class="stat-icon">
-                <font-awesome-icon icon="ticket" />
-              </div>
-              <span class="summary-label">Total</span>
-            </div>
-            <span class="stat-number">{{ totalTickets }}</span>
-          </div>
-          <div class="summary-item">
-            <div class="summary-item-content">
-              <div class="stat-icon orange">
-                <font-awesome-icon icon="clock" />
-              </div>
-              <span class="summary-label">Pendentes</span>
-            </div>
-            <span class="stat-number">{{ pendingTickets }}</span>
-          </div>
-          <div class="summary-item">
-            <div class="summary-item-content">
-              <div class="stat-icon blue">
-                <font-awesome-icon icon="spinner" />
-              </div>
-              <span class="summary-label">Em Andamento</span>
-            </div>
-            <span class="stat-number">{{ inProgressTickets }}</span>
-          </div>
-          <div class="summary-item">
-            <div class="summary-item-content">
-              <div class="stat-icon green">
-                <font-awesome-icon icon="check-circle" />
-              </div>
-              <span class="summary-label">Resolvidos</span>
-            </div>
-            <span class="stat-number">{{ resolvedTickets }}</span>
+        <!-- Mobile filter button -->
+        <div class="md:hidden mb-4 flex items-center justify-between">
+          <button
+            class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+            @click="showFiltersModal = true"
+          >
+            <font-awesome-icon icon="filter" class="w-4 h-4" />
+            Filtros
+          </button>
+
+          <!-- Mobile search -->
+          <div class="relative flex-1 ml-4">
+            <font-awesome-icon
+              icon="search"
+              class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 pointer-events-none"
+            />
+            <input
+              type="text"
+              placeholder="Buscar..."
+              v-model="searchTerm"
+              class="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
+            />
           </div>
         </div>
 
-        <TicketTable :tickets="tickets" :isLoading="isLoading" @viewTicket="handleViewTicket" />
+        <!-- Tab Content -->
+        <div v-if="activeTab === 'arquivados'" class="flex flex-col gap-8">
+          <!-- Horizontal scroll wrapper for table -->
+          <div class="overflow-x-auto">
+            <TicketTable
+              :tickets="tickets"
+              :isLoading="isLoading"
+              :tableType="activeTab"
+              :currentPage="currentPage"
+              :totalPages="totalPages"
+              :pagination="true"
+              @changePage="(page) => (currentPage = page)"
+              @viewTicket="handleViewTicket"
+              @refresh="fetchTicketsWithFilters"
+            />
+          </div>
+        </div>
+
+        <div v-else>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div
+              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white"
+                  >
+                    <font-awesome-icon icon="ticket" />
+                  </div>
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total</span>
+                </div>
+                <span class="text-xl font-bold text-blue-600 dark:text-blue-400">{{
+                  totalTickets
+                }}</span>
+              </div>
+            </div>
+            <div
+              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white"
+                  >
+                    <font-awesome-icon icon="clock" />
+                  </div>
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >Pendentes</span
+                  >
+                </div>
+                <span class="text-xl font-bold text-orange-500 dark:text-orange-400">{{
+                  pendingTickets
+                }}</span>
+              </div>
+            </div>
+            <div
+              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm"
+            >
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white"
+                  >
+                    <font-awesome-icon icon="spinner" />
+                  </div>
+                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >Em Andamento</span
+                  >
+                </div>
+                <span class="text-xl font-bold text-blue-500 dark:text-blue-400">{{
+                  inProgressTickets
+                }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Horizontal scroll wrapper for table -->
+          <div class="overflow-x-auto">
+            <TicketTable
+              v-if="!isKanbanView"
+              :tickets="tickets"
+              :isLoading="isLoading"
+              :tableType="activeTab"
+              :currentPage="currentPage"
+              :totalPages="totalPages"
+              :pagination="true"
+              @changePage="(page) => (currentPage = page)"
+              @viewTicket="handleViewTicket"
+              @editTicket="handleEditTicket"
+              @cancelTicket="handleCancelTicket"
+              @acceptTicket="handleAcceptTicket"
+              @verifyTicket="handleVerifyTicket"
+              @approveTicket="handleApproveTicket"
+              @requestCorrection="handleRequestCorrection"
+              @rejectTicket="handleRejectTicket"
+              @refresh="fetchTicketsWithFilters"
+            />
+            <TicketKanban v-else :tickets="tickets" @viewTicket="handleViewTicket" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Filtros (Mobile) -->
+    <div
+      v-if="showFiltersModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+    >
+      <div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md shadow-xl">
+        <div
+          class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700"
+        >
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Filtros</h3>
+          <button
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            @click="showFiltersModal = false"
+          >
+            <font-awesome-icon icon="times" class="w-5 h-5" />
+          </button>
+        </div>
+        <div class="px-6 py-4 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >Status:</label
+            >
+            <Select v-model="statusFilter" :options="statusOptions" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >Prioridade:</label
+            >
+            <Select v-model="priorityFilter" :options="priorityOptions" />
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+          <button
+            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            @click="clearFilters"
+          >
+            Limpar
+          </button>
+          <button
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+            @click="showFiltersModal = false"
+          >
+            Aplicar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Correção -->
+    <div
+      v-if="showCorrectionModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white dark:bg-gray-800 rounded-lg w-[90%] max-w-md shadow-xl">
+        <div
+          class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700"
+        >
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white m-0">
+            Solicitar Correção
+          </h3>
+          <button
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            @click="cancelCorrection"
+          >
+            <font-awesome-icon icon="times" class="w-5 h-5" />
+          </button>
+        </div>
+        <div class="px-6 py-4">
+          <p class="mb-4 text-gray-700 dark:text-gray-300">
+            Por favor, defina uma nova data de conclusão para o ticket:
+          </p>
+          <div class="mb-4">
+            <label
+              for="newCompletionDate"
+              class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+              >Nova Data de Conclusão:</label
+            >
+            <input
+              type="date"
+              id="newCompletionDate"
+              v-model="newCompletionDate"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
+              :min="new Date().toISOString().split('T')[0]"
+              required
+            />
+          </div>
+        </div>
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+          <button
+            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            @click="cancelCorrection"
+          >
+            Cancelar
+          </button>
+          <button
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="confirmCorrection"
+            :disabled="!newCompletionDate"
+          >
+            Confirmar
+          </button>
+        </div>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { ticketService } from '@/services/ticketService';
+import { useTicketsStore } from '@/stores/tickets';
 import { useUserStore } from '@/stores/user';
 import type { Ticket } from '@/models';
-import { TicketStatus } from '@/models';
+import { TicketStatus, TicketPriority } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
+import TicketKanban from '@/components/tickets/TicketKanban.vue';
+import Select from '@/components/common/Select.vue';
 import { toast } from 'vue3-toastify';
+import { debounce, formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import { localStorageService } from '@/utils/localStorageService';
 
-const user = useUserStore().user;
-const activeTab = ref<'recebidos' | 'criados' | 'setor'>('recebidos');
-const tickets = ref<Ticket[]>([]);
-const isLoading = ref(false);
+const route = useRoute();
+const router = useRouter();
+const ticketsStore = useTicketsStore();
 
-const fetchTickets = async (tab: 'recebidos' | 'criados' | 'setor') => {
-  activeTab.value = tab;
-  isLoading.value = true;
-  try {
-    let response;
-    if (tab === 'recebidos') {
-      response = await ticketService.getByTargetUser(user!.id);
-    } else if (tab === 'criados') {
-      response = await ticketService.getByRequester(user!.id);
-    } else {
-      response = await ticketService.getByDepartment(user!.department.id);
-    }
-    tickets.value = response.data;
-  } catch {
-    toast.error('Erro ao carregar tickets. Tente novamente.');
-  } finally {
-    isLoading.value = false;
+const getInitialTab = (): 'recebidos' | 'criados' | 'setor' | 'arquivados' => {
+  const tabFromUrl = route.query.tab as string;
+  const validTabs = ['recebidos', 'criados', 'setor', 'arquivados'];
+
+  if (validTabs.includes(tabFromUrl)) {
+    return tabFromUrl as 'recebidos' | 'criados' | 'setor' | 'arquivados';
   }
+
+  return 'recebidos';
+};
+
+const activeTab = ref<'recebidos' | 'criados' | 'setor' | 'arquivados'>(getInitialTab());
+const searchTerm = ref('');
+const statusFilter = ref<string>('');
+const priorityFilter = ref<string>('');
+const currentPage = ref(1);
+
+const showCorrectionModal = ref(false);
+const selectedTicket = ref<Ticket | null>(null);
+const newCompletionDate = ref('');
+
+const isKanbanView = ref(false);
+
+const showFiltersModal = ref(false);
+
+onMounted(async () => {
+  const savedView = localStorageService.getTicketsViewPreference();
+  isKanbanView.value = savedView === 'kanban';
+
+  await fetchTicketsWithFilters();
+});
+
+const debouncedSearch = debounce(() => {
+  fetchTicketsWithFilters();
+}, 400);
+
+const tickets = computed(() => {
+  switch (activeTab.value) {
+    case 'recebidos':
+      return ticketsStore.receivedTickets.data;
+    case 'criados':
+      return ticketsStore.myTickets.data;
+    case 'setor':
+      return ticketsStore.departmentTickets.data;
+    case 'arquivados':
+      return ticketsStore.archivedTickets.data;
+    default:
+      return [];
+  }
+});
+
+// Get loading state from the store
+const isLoading = computed(() => {
+  switch (activeTab.value) {
+    case 'recebidos':
+      return ticketsStore.receivedTickets.isLoading;
+    case 'criados':
+      return ticketsStore.myTickets.isLoading;
+    case 'setor':
+      return ticketsStore.departmentTickets.isLoading;
+    case 'arquivados':
+      return ticketsStore.archivedTickets.isLoading;
+    default:
+      return false;
+  }
+});
+
+// Get total pages from the store
+const totalPages = computed(() => {
+  switch (activeTab.value) {
+    case 'recebidos':
+      return Math.ceil(ticketsStore.receivedTickets.totalCount / 10);
+    case 'criados':
+      return Math.ceil(ticketsStore.myTickets.totalCount / 10);
+    case 'setor':
+      return Math.ceil(ticketsStore.departmentTickets.totalCount / 10);
+    case 'arquivados':
+      return Math.ceil(ticketsStore.archivedTickets.totalCount / 10);
+    default:
+      return 1;
+  }
+});
+
+const statusOptions = computed(() => [
+  { value: '', label: 'Todos' },
+  { value: TicketStatus.Pending, label: formatSnakeToNaturalCase(TicketStatus.Pending) },
+  { value: TicketStatus.InProgress, label: formatSnakeToNaturalCase(TicketStatus.InProgress) },
+  { value: TicketStatus.Completed, label: formatSnakeToNaturalCase(TicketStatus.Completed) },
+  {
+    value: TicketStatus.AwaitingVerification,
+    label: formatSnakeToNaturalCase(TicketStatus.AwaitingVerification),
+  },
+  {
+    value: TicketStatus.UnderVerification,
+    label: formatSnakeToNaturalCase(TicketStatus.UnderVerification),
+  },
+]);
+
+const priorityOptions = computed(() => [
+  { value: '', label: 'Todas' },
+  { value: TicketPriority.Low, label: formatSnakeToNaturalCase(TicketPriority.Low) },
+  { value: TicketPriority.Medium, label: formatSnakeToNaturalCase(TicketPriority.Medium) },
+  { value: TicketPriority.High, label: formatSnakeToNaturalCase(TicketPriority.High) },
+]);
+
+const switchTab = (tab: 'recebidos' | 'criados' | 'setor' | 'arquivados') => {
+  statusFilter.value = '';
+  priorityFilter.value = '';
+  searchTerm.value = '';
+
+  activeTab.value = tab;
+  currentPage.value = 1;
+
+  router.push({
+    query: {
+      ...route.query,
+      tab: tab,
+    },
+  });
+};
+
+const fetchTicketsWithFilters = async () => {
+  const typeMap: Record<string, 'received' | 'createdByMe' | 'department' | 'archived'> = {
+    recebidos: 'received',
+    criados: 'createdByMe',
+    setor: 'department',
+    arquivo: 'archived',
+  };
+
+  const storeType = typeMap[activeTab.value];
+
+  const filters: {
+    priority?: TicketPriority | null;
+    status?: TicketStatus | null;
+    name?: string;
+  } = {};
+
+  if (priorityFilter.value && priorityFilter.value !== '') {
+    filters.priority = priorityFilter.value as TicketPriority;
+  }
+
+  if (statusFilter.value && statusFilter.value !== '') {
+    filters.status = statusFilter.value as TicketStatus;
+  }
+
+  if (searchTerm.value) {
+    filters.name = searchTerm.value;
+  }
+
+  await ticketsStore.setCurrentPage(storeType, currentPage.value, filters);
 };
 
 const totalTickets = computed(() => tickets.value.length);
@@ -144,313 +544,145 @@ const pendingTickets = computed(
 const inProgressTickets = computed(
   () => tickets.value.filter((ticket) => ticket.status === TicketStatus.InProgress).length,
 );
-const resolvedTickets = computed(
-  () => tickets.value.filter((ticket) => ticket.status === TicketStatus.Completed).length,
-);
 
 const handleViewTicket = (ticket: Ticket) => {
   console.log('Viewing ticket:', ticket);
 };
 
-onMounted(() => fetchTickets(activeTab.value));
+const handleEditTicket = (ticket: Ticket) => {
+  console.log('Editing ticket:', ticket);
+  // Implementar lógica de edição
+};
+
+const handleCancelTicket = async (ticket: Ticket) => {
+  if (confirm('Tem certeza que deseja excluir este ticket?')) {
+    try {
+      await ticketService.cancel(ticket.customId);
+      toast.success('Ticket excluído com sucesso!');
+      fetchTicketsWithFilters();
+    } catch {
+      toast.error('Erro ao excluir ticket. Tente novamente.');
+    }
+  }
+};
+
+const handleAcceptTicket = async (ticket: Ticket) => {
+  try {
+    await ticketService.accept(ticket.customId);
+    toast.success('Ticket aceito com sucesso!');
+    fetchTicketsWithFilters();
+  } catch {
+    toast.error('Erro ao aceitar ticket. Tente novamente.');
+  }
+};
+
+const handleVerifyTicket = async (ticketId: string) => {
+  try {
+    await ticketService.updateStatus(ticketId, { status: TicketStatus.AwaitingVerification });
+    toast.success('Ticket enviado para revisão');
+    fetchTicketsWithFilters();
+  } catch {
+    toast.error('Erro ao enviar o ticket para revisão');
+  }
+};
+
+const handleApproveTicket = async (ticket: Ticket) => {
+  try {
+    await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Completed });
+    toast.success('Ticket aprovado com sucesso!');
+    fetchTicketsWithFilters();
+  } catch {
+    toast.error('Erro ao aprovar ticket. Tente novamente.');
+  }
+};
+
+const handleRequestCorrection = async (ticket: Ticket) => {
+  selectedTicket.value = ticket;
+  showCorrectionModal.value = true;
+};
+
+const confirmCorrection = async () => {
+  if (!selectedTicket.value || !newCompletionDate.value) return;
+
+  try {
+    await ticketService.updateStatus(selectedTicket.value.customId, {
+      status: TicketStatus.InProgress,
+    });
+
+    await ticketService.update(selectedTicket.value.customId, { dueAt: newCompletionDate.value });
+    toast.success('Correção solicitada com sucesso!');
+    showCorrectionModal.value = false;
+    selectedTicket.value = null;
+    newCompletionDate.value = '';
+    fetchTicketsWithFilters();
+  } catch {
+    toast.error('Erro ao solicitar correção. Tente novamente.');
+  }
+};
+
+const cancelCorrection = () => {
+  showCorrectionModal.value = false;
+  selectedTicket.value = null;
+  newCompletionDate.value = '';
+};
+
+const handleRejectTicket = async (ticket: Ticket) => {
+  try {
+    await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Rejected });
+    toast.success('Ticket reprovado com sucesso!');
+    fetchTicketsWithFilters();
+  } catch {
+    toast.error('Erro ao reprovar ticket. Tente novamente.');
+  }
+};
+
+const toggleView = () => {
+  isKanbanView.value = !isKanbanView.value;
+  localStorageService.setTicketsViewPreference(isKanbanView.value ? 'kanban' : 'table');
+};
+
+const clearFilters = () => {
+  statusFilter.value = '';
+  priorityFilter.value = '';
+  fetchTicketsWithFilters();
+};
+
+watch(
+  () => route.query.tab,
+  (newTab) => {
+    const validTabs = ['recebidos', 'criados', 'setor', 'arquivados'];
+    if (newTab && validTabs.includes(newTab as string)) {
+      activeTab.value = newTab as 'recebidos' | 'criados' | 'setor' | 'arquivados';
+    }
+  },
+);
+
+watch(searchTerm, () => {
+  debouncedSearch();
+});
+
+watch([statusFilter, priorityFilter], () => {
+  fetchTicketsWithFilters();
+});
+
+watch(currentPage, () => {
+  fetchTicketsWithFilters();
+});
+
+watch(activeTab, () => {
+  fetchTicketsWithFilters();
+});
 </script>
 
 <style scoped>
-.tab-container {
-  margin-top: 1.5rem;
+/* All styles have been converted to Tailwind classes */
+
+/* Hide scrollbar for tabs */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
 }
-
-.tab-buttons {
-  display: flex;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 1.5rem;
-}
-
-.tab-btn {
-  background: none;
-  border: none;
-  padding: 1rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--text-light);
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.tab-btn:hover {
-  color: var(--primary-color);
-}
-
-.tab-btn.active {
-  color: var(--primary-color);
-  border-bottom-color: var(--primary-color);
-}
-
-.tab-content {
-  min-height: 300px;
-}
-
-/* .tab-pane {
-  display: none;
-} */
-
-.tab-pane.active {
-  display: block;
-  animation: fadeIn 0.3s ease;
-}
-
-/* Filtros */
-.ticket-filters {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.filter-group {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.filter-group label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-light);
-}
-
-.filter-group select {
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius);
-  border: 1px solid var(--border-color);
-  background-color: var(--card-bg);
-  color: var(--text-color);
-  font-size: 0.9rem;
-  transition: var(--transition);
-}
-
-.filter-group select:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.search-group {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-}
-
-.search-group input {
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius) 0 0 var(--radius);
-  border: 1px solid var(--border-color);
-  border-right: none;
-  background-color: var(--card-bg);
-  color: var(--text-color);
-  font-size: 0.9rem;
-  width: 250px;
-  transition: var(--transition);
-}
-
-.search-group input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
-
-.search-group .btn-icon {
-  border-radius: 0 var(--radius) var(--radius) 0;
-  border: 1px solid var(--border-color);
-  border-left: none;
-  height: 38px;
-}
-
-/* Status e Prioridade */
-.status-label,
-.priority-label {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.3rem 0.6rem;
-  border-radius: 50px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  gap: 0.3rem;
-}
-
-.status-pendente {
-  background-color: rgba(245, 158, 11, 0.1);
-  color: var(--warning-color);
-}
-
-.status-em_andamento {
-  background-color: rgba(14, 165, 233, 0.1);
-  color: var(--info-color);
-}
-
-.status-resolvido {
-  background-color: rgba(16, 185, 129, 0.1);
-  color: var(--success-color);
-}
-
-.status-cancelado {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: var(--danger-color);
-}
-
-.priority-alta {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: var(--danger-color);
-}
-
-.priority-media {
-  background-color: rgba(245, 158, 11, 0.1);
-  color: var(--warning-color);
-}
-
-.priority-baixa {
-  background-color: rgba(16, 185, 129, 0.1);
-  color: var(--success-color);
-}
-
-/* Prazo */
-.prazo-col {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-weight: 500;
-  font-size: 0.85rem;
-  white-space: nowrap;
-}
-
-.prazo-atrasado {
-  color: #dc2626;
-  font-weight: bold;
-}
-
-.prazo-urgente {
-  color: #ef4444;
-  font-weight: 600;
-}
-
-.prazo-proximo {
-  color: #f97316;
-}
-
-.prazo-ok {
-  color: #10b981;
-}
-
-/* Paginação */
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.pagination-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
-  font-size: 0.9rem;
-  transition: var(--transition);
-}
-
-.pagination-btn:hover {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
-}
-
-.pagination-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-#paginationInfo {
-  font-size: 0.9rem;
-  color: var(--text-light);
-}
-
-/* Estado Vazio */
-.no-tickets-message {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 1rem;
-  text-align: center;
-  color: var(--text-light);
-}
-
-.no-tickets-message i {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  opacity: 0.5;
-}
-
-.no-tickets-message p {
-  font-size: 1rem;
-}
-
-@media (max-width: 992px) {
-  .ticket-details {
-    grid-template-columns: 1fr;
-  }
-
-  .ticket-details p.full-width {
-    grid-column: span 1;
-  }
-
-  .search-group input {
-    width: 180px;
-  }
-}
-
-@media (max-width: 768px) {
-  .tab-btn {
-    padding: 0.8rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  .ticket-filters {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .filter-group {
-    width: 100%;
-  }
-
-  .filter-group select {
-    width: 100%;
-  }
-
-  .search-group {
-    width: 100%;
-    margin-left: 0;
-  }
-
-  .search-group input {
-    width: 100%;
-  }
-
-  .tickets-table-container {
-    overflow-x: auto;
-  }
-
-  .tickets-table th,
-  .tickets-table td {
-    padding: 0.8rem;
-  }
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
 }
 </style>

@@ -12,15 +12,22 @@ export interface LoginResponse {
   user: User;
 }
 
+interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+}
+
+interface WhoamiResponse {
+  user: User;
+}
+
 export const authService = {
   async login(data: { email: string; password: string }): Promise<AxiosResponse<LoginResponse>> {
     try {
       const response = await apiClient.post('/auth/login', data);
 
       const userstore = useUserStore();
-      console.log(response.data);
       userstore.setUser(response.data.user);
-      localStorageService.setUser(response.data.user);
       localStorageService.setAccessToken(response.data.token.accessToken);
       localStorageService.setRefreshToken(response.data.token.refreshToken);
 
@@ -30,7 +37,20 @@ export const authService = {
     }
   },
 
-  logout() {
-    localStorageService.clear();
+  async whoami(): Promise<AxiosResponse<WhoamiResponse>> {
+    try {
+      const response = await apiClient.get('/auth/whoami');
+
+      const userstore = useUserStore();
+      userstore.setUser(response.data.user);
+
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async changePassword(data: ChangePasswordDto): Promise<AxiosResponse<{ message: string }>> {
+    return apiClient.post<{ message: string }>('/auth/change-password', data);
   },
 };

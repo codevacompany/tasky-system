@@ -1,43 +1,82 @@
-# Tasky System - Sistema de Gerenciamento de Chamados
+# Tasky System - Sistema de Gerenciamento de Tickets
 
 ## 📋 Sobre o Projeto
 
-O Tasky System é uma aplicação web para gerenciamento de chamados (tickets) desenvolvida com Vue.js 3 e TypeScript. O sistema permite o acompanhamento e gerenciamento de solicitações entre diferentes setores e usuários de uma organização.
+O Tasky System é uma solução completa para gerenciamento de tickets desenvolvida com tecnologias modernas e escaláveis. O sistema foi projetado para otimizar o fluxo de trabalho entre diferentes setores e usuários de uma organização, oferecendo uma experiência intuitiva e eficiente.
+
+## 🎯 Objetivo
+
+O objetivo do Tasky System é proporcionar uma gestão eficiente de tickets, reduzindo o tempo de resposta, aumentando a produtividade e melhorando a comunicação entre equipes, através de uma plataforma moderna e fácil de usar.
 
 ## 🚀 Funcionalidades Principais
 
-- Criação e gerenciamento de chamados
-- Atribuição de chamados a usuários e setores
+### Gerenciamento de Tickets
+- Criação e acompanhamento de tickets
+- Atribuição automática ou manual de responsáveis
 - Controle de prioridades e prazos
-- Fluxo de trabalho com verificação e aprovação
-- Notificações de atualizações
-- Dashboard com visão geral dos chamados
+- Histórico completo de alterações
+- Anexos e comentários
 
-## 🛠️ Tecnologias Utilizadas
+### Fluxo de Trabalho
+- Fluxo personalizável de aprovações
+- Verificação e aprovação em múltiplos níveis
+- Notificações em tempo real
+- Dashboard interativo
+- Relatórios personalizados
 
-- Vue.js 3
+### Gestão de Usuários
+- Perfis de acesso personalizáveis
+- Controle de permissões granular
+- Gestão de equipes e departamentos
+- Integração com sistemas de autenticação
+
+### Analytics e Relatórios
+- Dashboard com KPIs em tempo real
+- Gráficos e visualizações interativas
+- Exportação de relatórios em múltiplos formatos
+- Análise de performance e métricas
+
+## 🛠️ Stack Tecnológica
+
+### Frontend
+- Vue.js 3 (Composition API)
 - TypeScript
 - Vite
 - Pinia (Gerenciamento de Estado)
 - Vue Router
-- Axios
-- FontAwesome
+- Chart.js (Visualizações)
+- Vue-Quill (Editor de Texto)
+- FontAwesome (Ícones)
+
+### Backend
+- Node.js
+- TypeScript
+- Arquitetura RESTful
+- MVC Pattern
+
+### Ferramentas de Desenvolvimento
+- ESLint
+- Prettier
+- TypeScript
+- Git
+- Vite
 
 ## 📚 Documentação
 
-A documentação do projeto está organizada nos seguintes diretórios:
+A documentação completa do projeto está organizada nos seguintes diretórios:
 
-- [Documentação Técnica](docs/technical/README.md)
-- [Documentação de Negócio](docs/business/README.md)
-- [Documentação de Desenvolvimento](docs/development/README.md)
-- [Documentação de Usuário](docs/user/README.md)
+- [Documentação Técnica](docs/technical/README.md) - Detalhes técnicos da implementação
+- [Documentação de Negócio](docs/business/README.md) - Fluxos de trabalho e regras de negócio
+- [Documentação de Desenvolvimento](docs/development/README.md) - Guias para desenvolvedores
+- [Documentação de Usuário](docs/user/README.md) - Manual do usuário final
 
 ## 🚀 Como Iniciar
 
 ### Pré-requisitos
 
-- Node.js (versão 16 ou superior)
+- Node.js (versão 18 ou superior)
 - npm ou yarn
+- Git
 
 ### Instalação
 
@@ -68,6 +107,7 @@ npm run dev
 - `npm run preview` - Visualiza a build de produção
 - `npm run lint` - Executa o linter
 - `npm run type-check` - Verifica os tipos TypeScript
+- `npm run format` - Formata o código
 
 ## 🤝 Contribuindo
 
@@ -79,4 +119,11 @@ Este projeto está sob a licença [MIT](LICENSE).
 
 ## 📞 Suporte
 
-Para suporte, entre em contato através do email: [email-de-suporte]
+Para suporte técnico ou comercial, entre em contato através do email: [email-de-suporte]
+
+## 🌐 Links Úteis
+
+- [Documentação Oficial](docs/)
+- [Roadmap do Projeto](docs/development/ROADMAP.md)
+- [Guia de Estilo](docs/development/STYLE_GUIDE.md)
+- [FAQ](docs/user/FAQ.md)
