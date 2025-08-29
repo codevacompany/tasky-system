@@ -4,13 +4,13 @@
       <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Tickets</h1>
         <button
-          class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
+          class="flex items-center gap-2 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[13px] font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
           @click="toggleView"
           :title="
             isKanbanView ? 'Mudar para visualização em tabela' : 'Mudar para visualização Kanban'
           "
         >
-          <font-awesome-icon :icon="isKanbanView ? 'table' : 'columns'" class="w-4 h-4" />
+          <font-awesome-icon :icon="isKanbanView ? 'table' : 'columns'" class="w-3 h-3" />
           <span class="hidden sm:inline">{{
             isKanbanView ? 'Visualização em Tabela' : 'Visualização Kanban'
           }}</span>
@@ -24,137 +24,107 @@
         class="flex border-b border-gray-200 dark:border-gray-700 mb-6 overflow-x-auto overflow-y-hidden scrollbar-hide"
         style="height: 48px"
       >
-        <button
-          :class="[
-            'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
-            activeTab === 'recebidos'
-              ? 'text-blue-600 dark:text-blue-400'
-              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
-          ]"
-          :style="
-            activeTab === 'recebidos'
-              ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
-              : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
-          "
-          @click="switchTab('recebidos')"
-        >
-          Recebidos
-        </button>
-        <button
-          :class="[
-            'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
-            activeTab === 'criados'
-              ? 'text-blue-600 dark:text-blue-400'
-              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
-          ]"
-          :style="
-            activeTab === 'criados'
-              ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
-              : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
-          "
-          @click="switchTab('criados')"
-        >
-          <span class="hidden sm:inline">Criados por Mim</span>
-          <span class="sm:hidden">Criados</span>
-        </button>
-        <button
-          :class="[
-            'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
-            activeTab === 'setor'
-              ? 'text-blue-600 dark:text-blue-400'
-              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
-          ]"
-          :style="
-            activeTab === 'setor'
-              ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
-              : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
-          "
-          @click="switchTab('setor')"
-        >
-          <span class="hidden sm:inline">Tickets do Setor</span>
-          <span class="sm:hidden">Setor</span>
-        </button>
-        <button
-          :class="[
-            'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
-            activeTab === 'arquivados'
-              ? 'text-blue-600 dark:text-blue-400'
-              : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
-          ]"
-          :style="
-            activeTab === 'arquivados'
-              ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
-              : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
-          "
-          @click="switchTab('arquivados')"
-        >
-          Arquivados
-        </button>
-      </div>
-
-      <div class="min-h-[300px]">
-        <!-- Desktop filters -->
-        <div class="hidden md:flex items-center mb-6 gap-4 flex-wrap">
-          <div class="flex items-center gap-2">
-            <label for="statusFilter" class="text-sm font-medium text-gray-600 dark:text-gray-400"
-              >Status:</label
-            >
-            <div class="w-48">
-              <Select v-model="statusFilter" :options="statusOptions" />
-            </div>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <label for="priorityFilter" class="text-sm font-medium text-gray-600 dark:text-gray-400"
-              >Prioridade:</label
-            >
-            <div class="w-48">
-              <Select v-model="priorityFilter" :options="priorityOptions" />
-            </div>
-          </div>
-
-          <div class="flex items-center gap-4">
-            <div class="relative w-full">
-              <font-awesome-icon
-                icon="search"
-                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 pointer-events-none"
-              />
-              <input
-                type="text"
-                id="searchTickets"
-                placeholder="Buscar tickets..."
-                v-model="searchTerm"
-                class="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
-              />
-            </div>
-          </div>
+        <div class="flex items-center gap-0 flex-shrink-0">
+          <button
+            :class="[
+              'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
+              activeTab === 'recebidos'
+                ? 'text-blue-600 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
+            ]"
+            :style="
+              activeTab === 'recebidos'
+                ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
+                : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
+            "
+            @click="switchTab('recebidos')"
+          >
+            Recebidos
+          </button>
+          <button
+            :class="[
+              'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
+              activeTab === 'criados'
+                ? 'text-blue-600 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
+            ]"
+            :style="
+              activeTab === 'criados'
+                ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
+                : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
+            "
+            @click="switchTab('criados')"
+          >
+            <span class="hidden sm:inline">Criados por Mim</span>
+            <span class="sm:hidden">Criados</span>
+          </button>
+          <button
+            :class="[
+              'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
+              activeTab === 'setor'
+                ? 'text-blue-600 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
+            ]"
+            :style="
+              activeTab === 'setor'
+                ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
+                : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
+            "
+            @click="switchTab('setor')"
+          >
+            <span class="hidden sm:inline">Tickets do Setor</span>
+            <span class="sm:hidden">Setor</span>
+          </button>
+          <button
+            :class="[
+              'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
+              activeTab === 'arquivados'
+                ? 'text-blue-600 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
+            ]"
+            :style="
+              activeTab === 'arquivados'
+                ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
+                : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
+            "
+            @click="switchTab('arquivados')"
+          >
+            Arquivados
+          </button>
         </div>
 
-        <!-- Mobile filter button -->
-        <div class="md:hidden mb-4 flex items-center justify-between">
-          <button
-            class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
-            @click="showFiltersModal = true"
-          >
-            <font-awesome-icon icon="filter" class="w-4 h-4" />
-            Filtros
-          </button>
-
-          <!-- Mobile search -->
-          <div class="relative flex-1 ml-4">
+        <!-- Desktop filters inline with tabs -->
+        <div class="ml-auto hidden md:flex items-center gap-2 pr-2 mb-2">
+          <div class="relative w-64">
             <font-awesome-icon
               icon="search"
               class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 pointer-events-none"
             />
             <input
               type="text"
-              placeholder="Buscar..."
+              id="searchTickets"
+              placeholder="Buscar tickets..."
               v-model="searchTerm"
               class="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
             />
           </div>
+          <button
+            class="relative flex items-center gap-2 px-3 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            @click="showFiltersModal = true"
+            :title="'Filtros'"
+          >
+            <font-awesome-icon icon="filter" class="w-4 h-4 text-gray-400 dark:text-gray-400" />
+            <span
+              v-if="activeFiltersCount > 0"
+              class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
+            >
+              {{ activeFiltersCount }}
+            </span>
+          </button>
         </div>
+      </div>
 
+      <div class="min-h-[300px]">
         <!-- Tab Content -->
         <div v-if="activeTab === 'arquivados'" class="flex flex-col gap-8">
           <!-- Horizontal scroll wrapper for table -->
@@ -174,9 +144,12 @@
         </div>
 
         <div v-else>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <!-- Summary cards - only visible in table view -->
+          <div v-if="!isKanbanView" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div
-              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm"
+              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
+              @click="setStatusFilter('')"
+              :title="'Mostrar todos os tickets'"
             >
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -193,7 +166,9 @@
               </div>
             </div>
             <div
-              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm"
+              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
+              @click="setStatusFilter(TicketStatus.Pending)"
+              :title="'Filtrar por tickets pendentes'"
             >
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -212,7 +187,9 @@
               </div>
             </div>
             <div
-              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm"
+              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
+              @click="setStatusFilter(TicketStatus.InProgress)"
+              :title="'Filtrar por tickets em andamento'"
             >
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -299,7 +276,7 @@
           </button>
           <button
             class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md hover:bg-blue-700 transition-colors"
-            @click="showFiltersModal = false"
+            @click="applyFilters"
           >
             Aplicar
           </button>
@@ -396,11 +373,20 @@ const getInitialTab = (): 'recebidos' | 'criados' | 'setor' | 'arquivados' => {
   return 'recebidos';
 };
 
+const getInitialFilters = () => {
+  return {
+    status: (route.query.status as string) || '',
+    priority: (route.query.priority as string) || '',
+    search: (route.query.search as string) || '',
+    page: parseInt(route.query.page as string) || 1,
+  };
+};
+
 const activeTab = ref<'recebidos' | 'criados' | 'setor' | 'arquivados'>(getInitialTab());
-const searchTerm = ref('');
-const statusFilter = ref<string>('');
-const priorityFilter = ref<string>('');
-const currentPage = ref(1);
+const searchTerm = ref(getInitialFilters().search);
+const statusFilter = ref<string>(getInitialFilters().status);
+const priorityFilter = ref<string>(getInitialFilters().priority);
+const currentPage = ref(getInitialFilters().page);
 
 const showCorrectionModal = ref(false);
 const selectedTicket = ref<Ticket | null>(null);
@@ -490,6 +476,14 @@ const priorityOptions = computed(() => [
   { value: TicketPriority.High, label: formatSnakeToNaturalCase(TicketPriority.High) },
 ]);
 
+const activeFiltersCount = computed(() => {
+  let count = 0;
+  if (statusFilter.value && statusFilter.value !== '') count++;
+  if (priorityFilter.value && priorityFilter.value !== '') count++;
+  if (searchTerm.value) count++;
+  return count;
+});
+
 const switchTab = (tab: 'recebidos' | 'criados' | 'setor' | 'arquivados') => {
   statusFilter.value = '';
   priorityFilter.value = '';
@@ -498,12 +492,7 @@ const switchTab = (tab: 'recebidos' | 'criados' | 'setor' | 'arquivados') => {
   activeTab.value = tab;
   currentPage.value = 1;
 
-  router.push({
-    query: {
-      ...route.query,
-      tab: tab,
-    },
-  });
+  updateUrlWithFilters();
 };
 
 const fetchTicketsWithFilters = async () => {
@@ -644,7 +633,33 @@ const toggleView = () => {
 const clearFilters = () => {
   statusFilter.value = '';
   priorityFilter.value = '';
+  searchTerm.value = '';
   fetchTicketsWithFilters();
+  updateUrlWithFilters();
+};
+
+const applyFilters = () => {
+  fetchTicketsWithFilters();
+  showFiltersModal.value = false;
+  updateUrlWithFilters();
+};
+
+const setStatusFilter = (status: TicketStatus | '') => {
+  statusFilter.value = status;
+  currentPage.value = 1; // Reset to first page when changing filters
+  fetchTicketsWithFilters();
+  updateUrlWithFilters();
+};
+
+const updateUrlWithFilters = () => {
+  const query: any = { tab: activeTab.value };
+
+  if (statusFilter.value) query.status = statusFilter.value;
+  if (priorityFilter.value) query.priority = priorityFilter.value;
+  if (searchTerm.value) query.search = searchTerm.value;
+  if (currentPage.value > 1) query.page = currentPage.value;
+
+  router.push({ query });
 };
 
 watch(
@@ -657,20 +672,42 @@ watch(
   },
 );
 
+watch(
+  () => route.query,
+  (newQuery) => {
+    // Update filters from URL
+    if (newQuery.status !== undefined) {
+      statusFilter.value = newQuery.status as string;
+    }
+    if (newQuery.priority !== undefined) {
+      priorityFilter.value = newQuery.priority as string;
+    }
+    if (newQuery.search !== undefined) {
+      searchTerm.value = newQuery.search as string;
+    }
+    if (newQuery.page !== undefined) {
+      currentPage.value = parseInt(newQuery.page as string) || 1;
+    }
+
+    // Fetch tickets with new filters
+    fetchTicketsWithFilters();
+  },
+  { deep: true },
+);
+
 watch(searchTerm, () => {
   debouncedSearch();
-});
-
-watch([statusFilter, priorityFilter], () => {
-  fetchTicketsWithFilters();
+  updateUrlWithFilters();
 });
 
 watch(currentPage, () => {
   fetchTicketsWithFilters();
+  updateUrlWithFilters();
 });
 
 watch(activeTab, () => {
   fetchTicketsWithFilters();
+  updateUrlWithFilters();
 });
 </script>
 
