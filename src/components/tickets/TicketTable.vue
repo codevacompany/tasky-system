@@ -1,55 +1,53 @@
 <template>
   <div>
-    <div
-      class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-scroll transition-all duration-200 mb-6"
-    >
-      <table class="w-full border-collapse min-w-[800px]">
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse min-w-[1000px]">
         <thead>
           <tr>
             <th
-              class="px-3 md:px-5 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               ID
             </th>
             <th
-              class="px-3 md:px-5 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Título
             </th>
             <th
               v-if="tableType === 'criados'"
-              class="px-3 md:px-5 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Destino
             </th>
             <th
               v-else
-              class="px-3 md:px-5 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Solicitante
             </th>
             <th
-              class="px-3 md:px-5 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Setor
             </th>
             <th
-              class="px-3 md:px-5 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Prioridade
             </th>
             <th
-              class="px-3 md:px-5 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Status
             </th>
             <th
-              class="px-3 md:px-5 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700"
+              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Prazo
             </th>
             <th
-              class="px-3 md:px-5 py-3 text-left text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
             >
               Ações
             </th>
@@ -78,14 +76,14 @@
             class="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200"
           >
             <td
-              class="px-3 md:px-4 py-2 md:py-3 whitespace-nowrap  text-xs md:text-sm text-left text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
+              class="px-4 py-3 text-sm text-center text-blue-600 dark:text-blue-400 border-b border-gray-200 dark:border-gray-700 whitespace-nowrap"
             >
               {{ ticket.customId }}
             </td>
             <td
-              class="max-w-[500px] px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-left text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
+              class="pl-4 pr-1 py-3 text-sm text-left text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
             >
-              <div class="truncate" :title="ticket.name">
+              <div class="truncate max-w-[550px]" :title="ticket.name">
                 {{ ticket.name }}
               </div>
               <font-awesome-icon
@@ -97,7 +95,7 @@
             </td>
             <td
               v-if="tableType === 'criados'"
-              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-left text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
+              class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
             >
               <div class="max-w-[120px]">
                 <div class="truncate">
@@ -122,23 +120,23 @@
             </td>
             <td
               v-else
-              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-left text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
+              class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
             >
               <div class="max-w-[120px] truncate">
                 {{ ticket.requester.firstName }} {{ ticket.requester.lastName }}
               </div>
             </td>
             <td
-              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-left text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
+              class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
             >
-              <div class="max-w-[100px] truncate" :title="ticket.department.name">
+              <div class="max-w-[150px] truncate" :title="ticket.department.name">
                 {{ ticket.department.name }}
               </div>
             </td>
             <td
-              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-left border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700"
             >
-              <div class="flex items-center gap-1 md:gap-2">
+              <div class="flex items-center justify-center gap-1 md:gap-2">
                 <span
                   :class="[
                     'font-bold tracking-tight text-xs md:text-sm',
@@ -157,7 +155,7 @@
               </div>
             </td>
             <td
-              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-left border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700"
             >
               <span
                 :class="[
@@ -175,8 +173,8 @@
             </td>
             <td
               :class="[
-                'px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-left border-b border-gray-200 dark:border-gray-700',
-                calculateDeadline(ticket) === '—'
+                'px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700',
+                calculateDeadline(ticket) === '---'
                   ? 'text-gray-900 dark:text-gray-100'
                   : getDeadlineClass(ticket.dueAt),
               ]"
@@ -191,9 +189,9 @@
               </div>
             </td>
             <td
-              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-left border-b border-gray-200 dark:border-gray-700"
+              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700"
             >
-              <div class="flex gap-0.5 md:gap-1">
+              <div class="flex gap-0.5 md:gap-1 justify-center">
                 <!-- Botões para tabela de tickets recebidos -->
                 <template v-if="tableType === 'recebidos'">
                   <button
@@ -394,26 +392,38 @@
         </tbody>
       </table>
     </div>
-    <div v-if="pagination" class="flex items-center justify-center gap-4 mt-6">
-      <button
-        class="flex items-center justify-center w-9 h-9 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 hover:bg-blue-600 hover:border-blue-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 disabled:hover:text-gray-700 dark:disabled:hover:bg-gray-800 dark:disabled:hover:border-gray-600 dark:disabled:hover:text-gray-300"
-        :disabled="currentPage === 1"
-        @click="changePage(currentPage - 1)"
-      >
-        <font-awesome-icon icon="chevron-left" />
-      </button>
-
+    <div
+      v-if="pagination"
+      class="flex items-center justify-between px-6 py-4 border-t border-gray-200 dark:border-gray-700"
+    >
       <span class="text-sm text-gray-600 dark:text-gray-400"
         >Página {{ currentPage }} de {{ totalPages }}</span
       >
 
-      <button
-        class="flex items-center justify-center w-9 h-9 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 hover:bg-blue-600 hover:border-blue-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 disabled:hover:text-gray-700 dark:disabled:hover:bg-gray-800 dark:disabled:hover:border-gray-600 dark:disabled:hover:text-gray-300"
-        :disabled="currentPage === totalPages"
-        @click="changePage(currentPage + 1)"
-      >
-        <font-awesome-icon icon="chevron-right" />
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-gray-800"
+          :disabled="currentPage === 1"
+          @click="changePage(currentPage - 1)"
+        >
+          Anterior
+        </button>
+
+        <button
+          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+          disabled
+        >
+          {{ currentPage }}
+        </button>
+
+        <button
+          class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-gray-800"
+          :disabled="currentPage === totalPages"
+          @click="changePage(currentPage + 1)"
+        >
+          Próximo
+        </button>
+      </div>
     </div>
 
     <TicketDetailsModal v-if="isModalOpen" :ticket="selectedTicket!" @close="closeModal" />

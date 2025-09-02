@@ -18,199 +18,166 @@
         </button>
       </div>
     </div>
-    <div class="mt-6">
-      <!-- Mobile-friendly tabs -->
-      <div
-        class="flex border-b border-gray-200 dark:border-gray-700 mb-6 overflow-x-auto overflow-y-hidden scrollbar-hide"
-        style="height: 48px"
-      >
-        <div class="flex items-center gap-0 flex-shrink-0">
-          <button
-            :class="[
-              'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
-              activeTab === 'recebidos'
-                ? 'text-blue-600 dark:text-blue-400'
-                : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
-            ]"
-            :style="
-              activeTab === 'recebidos'
-                ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
-                : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
-            "
-            @click="switchTab('recebidos')"
-          >
-            Recebidos
-          </button>
-          <button
-            :class="[
-              'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
-              activeTab === 'criados'
-                ? 'text-blue-600 dark:text-blue-400'
-                : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
-            ]"
-            :style="
-              activeTab === 'criados'
-                ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
-                : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
-            "
-            @click="switchTab('criados')"
-          >
-            <span class="hidden sm:inline">Criados por Mim</span>
-            <span class="sm:hidden">Criados</span>
-          </button>
-          <button
-            :class="[
-              'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
-              activeTab === 'setor'
-                ? 'text-blue-600 dark:text-blue-400'
-                : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
-            ]"
-            :style="
-              activeTab === 'setor'
-                ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
-                : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
-            "
-            @click="switchTab('setor')"
-          >
-            <span class="hidden sm:inline">Tickets do Setor</span>
-            <span class="sm:hidden">Setor</span>
-          </button>
-          <button
-            :class="[
-              'px-4 md:px-6 py-3 bg-transparent text-xs md:text-sm font-medium cursor-pointer transition-all duration-200 relative whitespace-nowrap',
-              activeTab === 'arquivados'
-                ? 'text-blue-600 dark:text-blue-400'
-                : 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400',
-            ]"
-            :style="
-              activeTab === 'arquivados'
-                ? 'border-bottom: 2px solid #2563eb; margin-bottom: -1px;'
-                : 'border-bottom: 2px solid transparent; margin-bottom: -1px;'
-            "
-            @click="switchTab('arquivados')"
-          >
-            Arquivados
-          </button>
-        </div>
 
-        <!-- Desktop filters inline with tabs -->
-        <div class="ml-auto hidden md:flex items-center gap-2 pr-2 mb-2">
-          <div class="relative w-64">
-            <font-awesome-icon
-              icon="search"
-              class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 pointer-events-none"
-            />
-            <input
-              type="text"
-              id="searchTickets"
-              placeholder="Buscar tickets..."
-              v-model="searchTerm"
-              class="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
-            />
-          </div>
-          <button
-            class="relative flex items-center gap-2 px-3 py-2.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            @click="showFiltersModal = true"
-            :title="'Filtros'"
-          >
-            <font-awesome-icon icon="filter" class="w-4 h-4 text-gray-400 dark:text-gray-400" />
-            <span
-              v-if="activeFiltersCount > 0"
-              class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
+    <!-- Summary cards - moved to top, only visible in table view -->
+    <div v-if="!isKanbanView" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
+        @click="setStatusFilter('')"
+        :title="'Mostrar todos os tickets'"
+      >
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white"
             >
-              {{ activeFiltersCount }}
-            </span>
-          </button>
+              <font-awesome-icon icon="ticket" />
+            </div>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total</span>
+          </div>
+          <span class="text-xl font-bold text-blue-600 dark:text-blue-400">{{ totalTickets }}</span>
         </div>
       </div>
-
-      <div class="min-h-[300px]">
-        <!-- Tab Content -->
-        <div v-if="activeTab === 'arquivados'" class="flex flex-col gap-8">
-          <!-- Horizontal scroll wrapper for table -->
-          <div class="overflow-x-auto">
-            <TicketTable
-              :tickets="tickets"
-              :isLoading="isLoading"
-              :tableType="activeTab"
-              :currentPage="currentPage"
-              :totalPages="totalPages"
-              :pagination="true"
-              @changePage="(page) => (currentPage = page)"
-              @viewTicket="handleViewTicket"
-              @refresh="fetchTicketsWithFilters"
-            />
+      <div
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
+        @click="setStatusFilter(TicketStatus.Pending)"
+        :title="'Filtrar por tickets pendentes'"
+      >
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white"
+            >
+              <font-awesome-icon icon="clock" />
+            </div>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Pendentes</span>
           </div>
+          <span class="text-xl font-bold text-orange-500 dark:text-orange-400">{{
+            pendingTickets
+          }}</span>
         </div>
+      </div>
+      <div
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
+        @click="setStatusFilter(TicketStatus.InProgress)"
+        :title="'Filtrar por tickets em andamento'"
+      >
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white"
+            >
+              <font-awesome-icon icon="spinner" />
+            </div>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Em Andamento</span>
+          </div>
+          <span class="text-xl font-bold text-blue-500 dark:text-blue-400">{{
+            inProgressTickets
+          }}</span>
+        </div>
+      </div>
+    </div>
 
-        <div v-else>
-          <!-- Summary cards - only visible in table view -->
-          <div v-if="!isKanbanView" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="mt-6">
+      <div class="min-h-[300px]">
+        <!-- Table Container with integrated tabs and controls -->
+        <div
+          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm"
+        >
+          <!-- Integrated Tab Bar -->
+          <div class="flex flex-col border-b-1 border-gray-200 dark:border-gray-700">
+            <!-- Mobile-friendly tabs -->
             <div
-              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
-              @click="setStatusFilter('')"
-              :title="'Mostrar todos os tickets'"
+              class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 px-6 gap-3 lg:gap-0"
             >
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white"
-                  >
-                    <font-awesome-icon icon="ticket" />
+              <!-- Tabs Row -->
+              <div class="flex items-center justify-start">
+                <div
+                  class="flex items-center justify-center p-0.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-x-auto"
+                  style="height: 36px; min-width: fit-content"
+                >
+                  <div class="flex items-center gap-0 flex-shrink-0">
+                    <button
+                      :class="[
+                        'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
+                        activeTab === 'recebidos'
+                          ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
+                      ]"
+                      style="font-size: 13px"
+                      @click="switchTab('recebidos')"
+                    >
+                      Recebidos
+                    </button>
+                    <button
+                      :class="[
+                        'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
+                        activeTab === 'criados'
+                          ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
+                      ]"
+                      style="font-size: 13px"
+                      @click="switchTab('criados')"
+                    >
+                      <span class="hidden sm:inline">Criados por Mim</span>
+                      <span class="sm:hidden">Criados</span>
+                    </button>
+                    <button
+                      :class="[
+                        'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
+                        activeTab === 'setor'
+                          ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
+                      ]"
+                      style="font-size: 13px"
+                      @click="switchTab('setor')"
+                    >
+                      <span class="hidden sm:inline">Tickets do Setor</span>
+                      <span class="sm:hidden">Setor</span>
+                    </button>
+                    <button
+                      :class="[
+                        'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
+                        activeTab === 'arquivados'
+                          ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
+                      ]"
+                      style="font-size: 13px"
+                      @click="switchTab('arquivados')"
+                    >
+                      Arquivados
+                    </button>
                   </div>
-                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total</span>
                 </div>
-                <span class="text-xl font-bold text-blue-600 dark:text-blue-400">{{
-                  totalTickets
-                }}</span>
               </div>
-            </div>
-            <div
-              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
-              @click="setStatusFilter(TicketStatus.Pending)"
-              :title="'Filtrar por tickets pendentes'"
-            >
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white"
-                  >
-                    <font-awesome-icon icon="clock" />
-                  </div>
-                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                    >Pendentes</span
-                  >
+
+              <!-- Search and Filters Row -->
+              <div class="flex items-center justify-start lg:justify-end gap-2 mt-4 lg:mt-0">
+                <div class="relative w-full max-w-xs lg:w-56">
+                  <font-awesome-icon
+                    icon="search"
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-3.5 h-3.5 pointer-events-none"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Buscar tickets..."
+                    v-model="searchTerm"
+                    class="pl-9 pr-3 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
+                  />
                 </div>
-                <span class="text-xl font-bold text-orange-500 dark:text-orange-400">{{
-                  pendingTickets
-                }}</span>
-              </div>
-            </div>
-            <div
-              class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
-              @click="setStatusFilter(TicketStatus.InProgress)"
-              :title="'Filtrar por tickets em andamento'"
-            >
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white"
-                  >
-                    <font-awesome-icon icon="spinner" />
-                  </div>
-                  <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
-                    >Em Andamento</span
-                  >
-                </div>
-                <span class="text-xl font-bold text-blue-500 dark:text-blue-400">{{
-                  inProgressTickets
-                }}</span>
+                <button
+                  class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
+                  @click="showFiltersModal = true"
+                >
+                  <font-awesome-icon icon="filter" class="w-3.5 h-3.5" />
+                  Filtros
+                </button>
               </div>
             </div>
           </div>
 
-          <!-- Horizontal scroll wrapper for table -->
-          <div class="overflow-x-auto">
+          <!-- Content Area -->
+          <div class="overflow-x-auto p-4">
             <TicketTable
               v-if="!isKanbanView"
               :tickets="tickets"
