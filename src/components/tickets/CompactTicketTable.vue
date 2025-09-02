@@ -30,21 +30,21 @@
             class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200"
           >
             <td
-              class="pl-8 py-3 border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis w-1/2"
+              class="max-w-[200px] pl-8 py-3 border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis w-1/2"
               :title="ticket.name"
             >
               <div class="flex flex-col gap-1">
-                <p class="text-sm font-medium">{{ ticket.name }}</p>
+                <p class="text-sm font-medium truncate">{{ ticket.name }}</p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ ticket.department.name }}</p>
               </div>
             </td>
             <td
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap w-1/4"
+              class="px-3 py-3 border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap w-1/4"
             >
               <template
                 v-if="title === 'Últimos Tickets Criados' || title === 'Últimos Tickets Recebidos'"
               >
-                <span v-if="ticket.dueAt" class="flex items-center gap-2">
+                <span v-if="ticket.dueAt" class="flex items-center gap-2 justify-end">
                   <span
                     :class="getDeadlineDotClass(ticket.dueAt)"
                     class="inline-block w-[9px] h-[9px] rounded-full"

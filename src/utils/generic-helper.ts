@@ -25,10 +25,10 @@ export function formatSnakeToNaturalCase(str: string): string {
 }
 
 export function calculateDeadline(ticket: Ticket) {
-  if (!ticket.dueAt) return '—';
+  if (!ticket.dueAt) return '---';
 
   if (ticket.status !== TicketStatus.Pending && ticket.status !== TicketStatus.InProgress) {
-    return '—';
+    return '---';
   }
 
   const deadline = new Date(ticket.dueAt);
