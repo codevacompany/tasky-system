@@ -57,7 +57,13 @@
                 </li>
               </router-link>
 
-              <li v-if="isAdmin" class="relative" ref="adminDropdownRef">
+              <li
+                v-if="isAdmin"
+                class="relative"
+                ref="adminDropdownRef"
+                @mouseenter="showAdminDropdown = true"
+                @mouseleave="showAdminDropdown = false"
+              >
                 <div
                   :class="{
                     'primary-gradient text-white':
@@ -68,7 +74,6 @@
                       isActive('/admin/cadastros'),
                   }"
                   class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
-                  @click="toggleAdminDropdown"
                 >
                   <font-awesome-icon icon="user-cog" />
                   Administração
@@ -80,7 +85,7 @@
                 </div>
                 <div
                   v-show="showAdminDropdown"
-                  class="absolute top-full left-0 text-[15px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] z-50 mt-1 flex flex-col"
+                  class="absolute top-[calc(100%-3px)] left-0 text-[15px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] z-50 mt-1 flex flex-col"
                 >
                   <router-link
                     v-if="isTenantAdmin"
@@ -190,7 +195,7 @@
             }}</span>
           </div>
 
-          <router-link
+          <!-- <router-link
             to="/sync"
             class="hidden sm:flex text-slate-500 dark:text-slate-400 p-2 rounded cursor-pointer transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary"
           >
@@ -198,7 +203,7 @@
               <font-awesome-icon icon="comments" />
               <span class="text-xs font-medium">Sync</span>
             </div>
-          </router-link>
+          </router-link> -->
 
           <div
             class="flex items-center cursor-pointer text-gray-800 dark:text-gray-200 mr-4"
@@ -370,7 +375,7 @@
             </li>
 
             <!-- Mobile Sync Link -->
-            <router-link to="/sync" @click="closeMobileMenu">
+            <!-- <router-link to="/sync" @click="closeMobileMenu">
               <li>
                 <div
                   class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -379,7 +384,7 @@
                   Sync
                 </div>
               </li>
-            </router-link>
+            </router-link> -->
           </ul>
         </nav>
       </div>
@@ -464,10 +469,6 @@ const toggleNotificationsModal = () => {
   showNotificationsModal.value = !showNotificationsModal.value;
 };
 
-const toggleAdminDropdown = () => {
-  showAdminDropdown.value = !showAdminDropdown.value;
-};
-
 const toggleMobileMenu = () => {
   showMobileMenu.value = !showMobileMenu.value;
 };
@@ -499,7 +500,7 @@ function playNotificationSound() {
   });
 }
 
-// Close dropdown when clicking outside
+// Close dropdown when clicking outside (for hover behavior, this helps with edge cases)
 const handleClickOutside = (event: MouseEvent) => {
   if (adminDropdownRef.value && !adminDropdownRef.value.contains(event.target as Node)) {
     showAdminDropdown.value = false;

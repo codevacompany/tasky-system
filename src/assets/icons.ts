@@ -77,6 +77,8 @@ import {
   faEnvelopeOpenText,
   faKey,
   faSortUp,
+  faSortDown,
+  faSort,
   faEdit,
   faEllipsisV,
   faTrash,
@@ -182,6 +184,8 @@ const icons = [
   faEnvelopeOpenText,
   faKey,
   faSortUp,
+  faSortDown,
+  faSort,
   faEdit,
   faEllipsisV,
   faTrash,
@@ -198,7 +202,7 @@ const icons = [
   faUserCog,
   faStar,
   faRedo,
-  faPlay
+  faPlay,
 ];
 
 library.add(...icons);

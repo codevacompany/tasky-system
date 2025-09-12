@@ -12,6 +12,8 @@ export const userService = {
     name?: string;
     page?: number;
     limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
   }): Promise<AxiosResponse<PaginatedResponse<User>>> {
     return apiClient.get<PaginatedResponse<User>>('/users', { params });
   },
