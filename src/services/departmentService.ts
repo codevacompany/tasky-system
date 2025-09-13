@@ -12,6 +12,8 @@ export const departmentService = {
     name?: string;
     page?: number;
     limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
   }): Promise<AxiosResponse<PaginatedResponse<Department>>> {
     return apiClient.get<PaginatedResponse<Department>>('/departments', { params });
   },

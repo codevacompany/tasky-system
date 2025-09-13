@@ -22,7 +22,7 @@
           <input
             type="text"
             id="searchTickets"
-            placeholder="Buscar usuários"
+            :placeholder="filterConfig.search.placeholder"
             v-model="searchTerm"
             class="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
           />
@@ -45,163 +45,109 @@
     <div
       class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden"
     >
-      <div class="overflow-x-auto">
-        <table class="w-full" id="colaboradoresTable">
-          <thead class="bg-gray-50 dark:bg-gray-700">
-            <tr>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600"
-              >
-                ID
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600"
-              >
-                Nome
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600"
-              >
-                Setor
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600"
-              >
-                Ativo
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600"
-              >
-                Email
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-600"
-              >
-                Ações
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-            <tr v-if="isLoading">
-              <td colspan="6" class="px-6 py-8">
-                <div class="flex justify-center items-center">
-                  <LoadingSpinner :size="28" />
-                </div>
-              </td>
-            </tr>
-            <tr v-else-if="filteredUsers.length === 0" class="hover:bg-transparent">
-              <td colspan="6" class="px-6 py-8 text-center">
-                <div
-                  class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
-                >
-                  <font-awesome-icon icon="users" class="text-3xl mb-3" />
-                  <p class="text-sm font-medium mb-1">
-                    {{
-                      users.length === 0
-                        ? 'Nenhum usuário encontrado'
-                        : 'Nenhum usuário ativo encontrado'
-                    }}
-                  </p>
-                  <p class="text-xs">
-                    {{
-                      users.length === 0
-                        ? searchTerm
-                          ? 'Tente ajustar os filtros de busca.'
-                          : 'Comece criando um novo usuário.'
-                        : 'Ative o toggle "Mostrar usuários inativos" para ver todos os usuários.'
-                    }}
-                  </p>
-                </div>
-              </td>
-            </tr>
-            <tr
-              v-else
-              v-for="user in filteredUsers"
-              :key="user.id"
-              class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+      <DataTable
+        :data="initialConfig.items"
+        :headers="initialConfig.headers"
+        :isLoading="initialConfig.isLoading"
+        :pagination="initialConfig.pagination"
+        :clickable="true"
+        :showActions="true"
+        :showDeleteButton="false"
+        minWidth="800px"
+        rowKey="id"
+        @pageChange="handlePageChange"
+        @rowClick="handleRowClick"
+        @sort="handleSort"
+      >
+        <template #column-name="{ item }">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-blue-600 text-white text-sm font-bold"
             >
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                {{ user.id }}
-              </td>
-              <td
-                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100"
-              >
-                {{ user.firstName }} {{ user.lastName }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-400">
-                {{ user.department?.name || 'N/A' }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span
-                  :class="[
-                    'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
-                    user.isActive
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                      : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-                  ]"
-                >
-                  {{ user.isActive ? 'Sim' : 'Não' }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-400">
-                {{ user.email }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <div class="flex items-center gap-2">
-                  <button
-                    v-if="user.isActive && userStore.user?.id !== user.id"
-                    @click="deactivateUser(user)"
-                    class="inline-flex items-center px-3 py-1.5 border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-xs font-medium rounded-md transition-colors"
-                    :disabled="isProcessing"
-                  >
-                    <font-awesome-icon icon="user-slash" class="w-3 h-3 mr-1" />
-                    Desativar
-                  </button>
-                  <span
-                    v-else-if="user.isActive && userStore.user?.id === user.id"
-                    class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 text-xs font-medium rounded-md cursor-not-allowed"
-                    title="Você não pode desativar sua própria conta"
-                  >
-                    <font-awesome-icon icon="user" class="w-3 h-3 mr-1" />
-                    Você
-                  </span>
-                  <button
-                    v-else-if="!user.isActive"
-                    @click="activateUser(user)"
-                    class="inline-flex items-center px-3 py-1.5 border border-green-300 dark:border-green-600 text-green-700 dark:text-green-400 bg-white dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-green-900/20 text-xs font-medium rounded-md transition-colors"
-                    :disabled="isProcessing"
-                  >
-                    <font-awesome-icon icon="user-check" class="w-3 h-3 mr-1" />
-                    Ativar
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+              <span>{{ getUserInitials(item) }}</span>
+            </div>
+            <div class="font-medium text-gray-900 dark:text-gray-100">
+              {{ item.firstName }} {{ item.lastName }}
+            </div>
+          </div>
+        </template>
 
-    <div class="flex items-center justify-center gap-4 mt-6">
-      <button
-        class="flex items-center justify-center w-9 h-9 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 hover:bg-blue-600 hover:border-blue-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 disabled:hover:text-gray-700 dark:disabled:hover:bg-gray-800 dark:disabled:hover:border-gray-600 dark:disabled:hover:text-gray-300"
-        :disabled="currentPage === 1"
-        @click="currentPage--"
-      >
-        <font-awesome-icon icon="chevron-left" />
-      </button>
+        <template #column-email="{ value }">
+          <span class="text-sm text-gray-900 dark:text-gray-100">
+            {{ value }}
+          </span>
+        </template>
 
-      <span class="text-sm text-gray-600 dark:text-gray-400"
-        >Página {{ currentPage }} de {{ totalPages }}</span
-      >
+        <template #column-department="{ value }">
+          <span class="text-sm text-gray-900 dark:text-gray-100">
+            {{ value?.name || 'N/A' }}
+          </span>
+        </template>
 
-      <button
-        class="flex items-center justify-center w-9 h-9 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 hover:bg-blue-600 hover:border-blue-600 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:border-gray-300 disabled:hover:text-gray-700 dark:disabled:hover:bg-gray-800 dark:disabled:hover:border-gray-600 dark:disabled:hover:text-gray-300"
-        :disabled="currentPage === totalPages"
-        @click="currentPage++"
-      >
-        <font-awesome-icon icon="chevron-right" />
-      </button>
+        <template #column-isActive="{ value }">
+          <span
+            :class="[
+              'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium',
+              value
+                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
+                : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
+            ]"
+          >
+            {{ value ? 'Ativo' : 'Inativo' }}
+          </span>
+        </template>
+
+        <template #actions="{ item }">
+          <div class="flex items-center gap-2">
+            <button
+              v-if="item.isActive && userStore.user?.id !== item.id"
+              @click.stop="deactivateUser(item)"
+              class="inline-flex items-center px-3 py-1.5 border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-xs font-medium rounded-md transition-colors"
+              :disabled="isProcessing"
+            >
+              <font-awesome-icon icon="user-slash" class="w-3 h-3 mr-1" />
+              Desativar
+            </button>
+            <span
+              v-else-if="item.isActive && userStore.user?.id === item.id"
+              class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 text-xs font-medium rounded-md cursor-not-allowed"
+              title="Você não pode desativar sua própria conta"
+            >
+              <font-awesome-icon icon="user" class="w-3 h-3 mr-1" />
+              Você
+            </span>
+            <button
+              v-else-if="!item.isActive"
+              @click.stop="activateUser(item)"
+              class="inline-flex items-center px-3 py-1.5 border border-green-300 dark:border-green-600 text-green-700 dark:text-green-400 bg-white dark:bg-gray-800 hover:bg-green-50 dark:hover:bg-green-900/20 text-xs font-medium rounded-md transition-colors"
+              :disabled="isProcessing"
+            >
+              <font-awesome-icon icon="user-check" class="w-3 h-3 mr-1" />
+              Ativar
+            </button>
+          </div>
+        </template>
+
+        <template #empty>
+          <div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+            <font-awesome-icon icon="users" class="text-3xl mb-3" />
+            <p class="text-sm font-medium mb-1">
+              {{
+                users.length === 0 ? 'Nenhum usuário encontrado' : 'Nenhum usuário ativo encontrado'
+              }}
+            </p>
+            <p class="text-xs">
+              {{
+                users.length === 0
+                  ? searchTerm
+                    ? 'Tente ajustar os filtros de busca.'
+                    : 'Comece criando um novo usuário.'
+                  : 'Ative o toggle "Mostrar usuários inativos" para ver todos os usuários.'
+              }}
+            </p>
+          </div>
+        </template>
+      </DataTable>
     </div>
 
     <NewUserModal v-if="isModalOpen" @close="closeModal" @userCreated="loadUsers" />
@@ -222,18 +168,20 @@ import { userService } from '@/services/userService';
 import type { User } from '@/models';
 import NewUserModal from '@/components/users/NewUserModal.vue';
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue';
+import DataTable from '@/components/common/DataTable.vue';
+import type { TableHeader, PaginationInfo } from '@/components/common/DataTable.vue';
 import { toast } from 'vue3-toastify';
-import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
-import { debounce } from '@/utils/generic-helper';
 import { useUserStore } from '@/stores/user';
+import { useFiltersStore } from '@/stores/filters';
 
 const userStore = useUserStore();
+const filtersStore = useFiltersStore();
+
 const users = ref<User[]>([]);
 const isModalOpen = ref(false);
 const isLoading = ref(false);
 const isProcessing = ref(false);
 const searchTerm = ref('');
-const currentPage = ref(1);
 const totalPages = ref(1);
 const showInactiveUsers = ref(false);
 
@@ -242,11 +190,6 @@ const confirmationTitle = ref('');
 const confirmationMessage = ref('');
 const pendingAction = ref<{ type: 'deactivate' | 'activate'; user: User } | null>(null);
 
-const debouncedSearch = debounce(() => {
-  currentPage.value = 1;
-  loadUsers();
-}, 400);
-
 const filteredUsers = computed(() => {
   if (showInactiveUsers.value) {
     return users.value;
@@ -254,11 +197,121 @@ const filteredUsers = computed(() => {
   return users.value.filter((user) => user.isActive);
 });
 
+const initialConfig = computed(() => ({
+  items: filteredUsers.value,
+  headers: [
+    {
+      key: 'id',
+      label: 'ID',
+      sortable: true,
+      sortKey: 'id',
+      sortDirection:
+        filtersStore.currentSortBy === 'id' ? filtersStore.currentSortDirection : 'none',
+      align: 'left' as const,
+      width: 0.08, // 8% - small for ID numbers
+    },
+    {
+      key: 'name',
+      label: 'Nome',
+      sortable: true,
+      sortKey: 'firstName',
+      sortDirection:
+        filtersStore.currentSortBy === 'firstName' ? filtersStore.currentSortDirection : 'none',
+      align: 'left' as const,
+      width: 0.25, // 25% - good space for names
+    },
+    {
+      key: 'department',
+      label: 'Setor',
+      sortable: false,
+      align: 'center' as const,
+      width: 0.2, // 20% - department names
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      sortable: false,
+      align: 'center' as const,
+      width: 0.3, // 30% - email addresses need more space
+    },
+    {
+      key: 'isActive',
+      label: 'Status',
+      sortable: false,
+      align: 'center' as const,
+      width: 0.17, // 17% - status column
+    },
+  ],
+  pagination: paginationInfo.value,
+  isLoading: isLoading.value,
+  currentSortKey: filtersStore.currentSortBy,
+  currentSortDirection: filtersStore.currentSortDirection,
+}));
+
+const filterConfig = computed(() => ({
+  search: {
+    label: 'Search',
+    placeholder: 'Buscar usuários...',
+    defaultValue: filtersStore.currentSearch || '',
+  },
+  sort: {
+    label: 'Sort By',
+    options: [
+      { value: 'id', label: 'ID' },
+      { value: 'firstName', label: 'Nome' },
+    ],
+    defaultValue: filtersStore.currentSortBy || '',
+  },
+  onFilterChange: (filterValues: Record<string, string>) => {
+    if (filterValues.search !== undefined) {
+      filtersStore.setSearch(filterValues.search);
+    }
+    if (filterValues.sort !== undefined) {
+      filtersStore.setSort(filterValues.sort);
+    }
+  },
+}));
+
+const paginationInfo = computed(
+  (): PaginationInfo => ({
+    currentPage: filtersStore.currentPage,
+    totalPages: totalPages.value,
+  }),
+);
+
+const getUserInitials = (user: User): string => {
+  if (user.firstName && user.lastName) {
+    return user.firstName.charAt(0) + user.lastName.charAt(0);
+  } else if (user.firstName) {
+    return user.firstName.substring(0, 2).toUpperCase();
+  }
+  return 'U';
+};
+
+const handlePageChange = (page: number) => {
+  filtersStore.setPage(page);
+};
+
+const handleRowClick = (user: User) => {
+  // Could open user details modal or navigate to user profile
+};
+
+const handleSort = (sortKey: string) => {
+  filtersStore.setSort(sortKey);
+};
+
 const loadUsers = async () => {
   isLoading.value = true;
-  const name = searchTerm.value.trim() || undefined;
 
-  const filters = { name, page: currentPage.value };
+  const filters: any = {
+    name: filtersStore.currentSearch,
+    page: filtersStore.currentPage,
+  };
+
+  if (filtersStore.currentSortBy) {
+    filters.sortBy = filtersStore.currentSortBy;
+    filters.sortOrder = filtersStore.currentSortOrder;
+  }
 
   try {
     const response = await userService.fetch(filters);
@@ -328,13 +381,33 @@ const closeModal = () => {
   isModalOpen.value = false;
 };
 
-onMounted(loadUsers);
+onMounted(() => {
+  filtersStore.initialize('UserList');
 
-watch(searchTerm, () => {
-  debouncedSearch();
-});
+  searchTerm.value = filtersStore.currentSearch || '';
 
-watch(currentPage, () => {
   loadUsers();
 });
+
+watch(
+  () => filtersStore.filters,
+  () => {
+    loadUsers();
+  },
+  { deep: true },
+);
+
+watch(searchTerm, (newValue) => {
+  filtersStore.setSearch(newValue);
+});
+
+// Sync store search value back to local ref when it changes (e.g., from URL)
+watch(
+  () => filtersStore.currentSearch,
+  (newValue) => {
+    if (searchTerm.value !== newValue) {
+      searchTerm.value = newValue || '';
+    }
+  },
+);
 </script>

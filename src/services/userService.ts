@@ -12,6 +12,8 @@ export const userService = {
     name?: string;
     page?: number;
     limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
   }): Promise<AxiosResponse<PaginatedResponse<User>>> {
     return apiClient.get<PaginatedResponse<User>>('/users', { params });
   },
@@ -45,5 +47,12 @@ export const userService = {
 
   async getTenantAdmins(): Promise<AxiosResponse<User[]>> {
     return apiClient.get('/users/tenant-admins');
+  },
+
+  async resetPassword(
+    id: number,
+    newPassword: string,
+  ): Promise<AxiosResponse<{ message: string }>> {
+    return apiClient.patch(`/auth/admin/reset-password/${id}`, { newPassword });
   },
 };
