@@ -715,6 +715,117 @@
         </div>
       </div>
     </div>
+
+    <!-- Password Reset Modal -->
+    <div
+      v-if="showPasswordResetModal"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+        <div class="flex items-center gap-3 mb-4">
+          <div
+            class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center"
+          >
+            <font-awesome-icon icon="key" class="text-orange-600 dark:text-orange-400" />
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Redefinir Senha</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">Confirmar redefinição de senha</p>
+          </div>
+        </div>
+
+        <div v-if="!resetPasswordResult" class="mb-6">
+          <p class="text-gray-700 dark:text-gray-300 mb-4">
+            Digite a nova senha para o usuário
+            <strong>{{ userToReset?.firstName }} {{ userToReset?.lastName }}</strong
+            >:
+          </p>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Nova Senha
+              </label>
+              <input
+                v-model="newPassword"
+                type="password"
+                placeholder="Digite a nova senha"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                :disabled="isResettingPassword"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Confirmar Senha
+              </label>
+              <input
+                v-model="confirmPassword"
+                type="password"
+                placeholder="Confirme a nova senha"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                :disabled="isResettingPassword"
+              />
+            </div>
+          </div>
+
+          <div
+            class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mt-4"
+          >
+            <p class="text-sm text-yellow-800 dark:text-yellow-200">
+              <font-awesome-icon icon="exclamation-triangle" class="mr-2" />
+              A nova senha será enviada por email para o usuário.
+            </p>
+          </div>
+        </div>
+
+        <div v-else class="mb-6">
+          <div
+            class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4"
+          >
+            <div class="flex items-center gap-2 mb-2">
+              <font-awesome-icon icon="check-circle" class="text-green-600 dark:text-green-400" />
+              <span class="text-sm font-medium text-green-800 dark:text-green-200"
+                >Senha redefinida com sucesso!</span
+              >
+            </div>
+            <p class="text-sm text-green-700 dark:text-green-300 mb-3">
+              A nova senha foi enviada por email para {{ userToReset?.email }}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3">
+          <button
+            v-if="!resetPasswordResult"
+            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+            @click="closePasswordResetModal"
+            :disabled="isResettingPassword"
+          >
+            Cancelar
+          </button>
+          <button
+            v-if="!resetPasswordResult"
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="confirmPasswordReset"
+            :disabled="isResettingPassword"
+          >
+            <span v-if="isResettingPassword">
+              <font-awesome-icon icon="spinner" class="animate-spin mr-2" />
+              Redefinindo...
+            </span>
+            <span v-else>Confirmar Redefinição</span>
+          </button>
+          <button
+            v-if="resetPasswordResult"
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+            @click="closePasswordResetModal"
+          >
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -726,6 +837,7 @@ import {
   type TenantWithStats,
   type TenantStatsResponse,
 } from '@/services/tenantService';
+import { userService } from '@/services/userService';
 import { toast } from 'vue3-toastify';
 import { useRoles } from '@/composables/useRoles';
 import apiClient from '@/utils/axiosInstance';
@@ -796,6 +908,14 @@ const newClient = ref({
   customKey: '',
   email: '',
 });
+
+// Password reset modal
+const showPasswordResetModal = ref(false);
+const userToReset = ref<any>(null);
+const isResettingPassword = ref(false);
+const newPassword = ref('');
+const confirmPassword = ref('');
+const resetPasswordResult = ref<{ message: string } | null>(null);
 
 const stats = computed(() => {
   return {
@@ -1036,8 +1156,47 @@ const toggleUserStatus = (user: any) => {
 };
 
 const resetPassword = (user: any) => {
-  // Implementar reset de senha
-  console.log('Resetar senha do usuário:', user);
+  userToReset.value = user;
+  showPasswordResetModal.value = true;
+};
+
+const confirmPasswordReset = async () => {
+  if (!userToReset.value) return;
+
+  // Validate passwords
+  if (!newPassword.value || !confirmPassword.value) {
+    toast.error('Por favor, preencha ambos os campos de senha');
+    return;
+  }
+
+  if (newPassword.value !== confirmPassword.value) {
+    toast.error('As senhas não coincidem');
+    return;
+  }
+
+  if (newPassword.value.length < 8) {
+    toast.error('A senha deve ter pelo menos 8 caracteres');
+    return;
+  }
+
+  try {
+    isResettingPassword.value = true;
+    const response = await userService.resetPassword(userToReset.value.id, newPassword.value);
+    resetPasswordResult.value = response.data;
+    toast.success('Senha redefinida com sucesso!');
+  } catch (error: any) {
+    toast.error(error?.response?.data?.message || 'Erro ao redefinir senha');
+  } finally {
+    isResettingPassword.value = false;
+  }
+};
+
+const closePasswordResetModal = () => {
+  showPasswordResetModal.value = false;
+  userToReset.value = null;
+  resetPasswordResult.value = null;
+  newPassword.value = '';
+  confirmPassword.value = '';
 };
 
 const renewTrial = async (client: any) => {
