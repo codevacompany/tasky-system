@@ -208,7 +208,7 @@ const initialConfig = computed(() => ({
       sortDirection:
         filtersStore.currentSortBy === 'id' ? filtersStore.currentSortDirection : 'none',
       align: 'left' as const,
-      width: 'w-1/6',
+      width: 0.08, // 8% - small for ID numbers
     },
     {
       key: 'name',
@@ -218,28 +218,28 @@ const initialConfig = computed(() => ({
       sortDirection:
         filtersStore.currentSortBy === 'firstName' ? filtersStore.currentSortDirection : 'none',
       align: 'left' as const,
-      width: 'w-1/6',
+      width: 0.25, // 25% - good space for names
     },
     {
       key: 'department',
       label: 'Setor',
       sortable: false,
       align: 'center' as const,
-      width: 'w-1/6',
+      width: 0.2, // 20% - department names
     },
     {
       key: 'email',
       label: 'Email',
       sortable: false,
       align: 'center' as const,
-      width: 'w-1/6',
+      width: 0.3, // 30% - email addresses need more space
     },
     {
       key: 'isActive',
       label: 'Status',
       sortable: false,
       align: 'center' as const,
-      width: 'w-1/6',
+      width: 0.17, // 17% - status column
     },
   ],
   pagination: paginationInfo.value,

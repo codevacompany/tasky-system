@@ -20,7 +20,7 @@
               v-for="(header, idx) in headers"
               :key="idx"
               scope="col"
-              :class="getHeaderClasses(header)"
+              :class="[getHeaderClasses(header), columnWidths[idx]]"
               @click="header.sortable && header.sortKey && handleSort(header.sortKey)"
             >
               <div :class="getHeaderContentClasses(header)">
@@ -49,12 +49,10 @@
               v-if="hasActions"
               scope="col"
               :class="[
-                'px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700',
+                'px-4 py-3 text-right text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700',
                 actionsColumnWidth,
               ]"
-            >
-              Ações
-            </th>
+            ></th>
           </tr>
         </thead>
         <tbody>
@@ -108,7 +106,7 @@
             <td
               v-for="(header, headerIdx) in headers"
               :key="headerIdx"
-              :class="getCellClasses(header, headerIdx)"
+              :class="[getCellClasses(header, headerIdx), columnWidths[headerIdx]]"
               @click="header.clickable && handleCellClick(item, header)"
             >
               <!-- Custom Column Content -->
@@ -133,11 +131,11 @@
             <td
               v-if="hasActions"
               :class="[
-                'px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700',
+                'px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-right border-b border-gray-200 dark:border-gray-700',
                 actionsColumnWidth,
               ]"
             >
-              <div class="flex gap-0.5 md:gap-1 justify-center">
+              <div class="flex gap-0.5 md:gap-1 justify-end">
                 <slot name="actions" :item="item" :index="idx" />
 
                 <button
@@ -202,7 +200,7 @@ export interface TableHeader<T = any> {
   sortKey?: string;
   sortDirection?: 'asc' | 'desc' | 'none';
   align?: 'left' | 'center' | 'right';
-  width?: string;
+  width?: string | number; // Support both Tailwind classes and fractional numbers
   clickable?: boolean;
   formatter?: (value: any) => string;
 }
@@ -268,15 +266,88 @@ const hasActions = computed(() => {
   return props.showActions || props.showDeleteButton;
 });
 
-const actionsColumnWidth = computed(() => {
-  // Calculate equal width for actions column based on total columns
+// Calculate column widths with flexible system
+const columnWidths = computed(() => {
+  const headers = props.headers || [];
   const totalColumns =
-    (props.headers?.length || 0) + (props.showBatchActions ? 1 : 0) + (hasActions.value ? 1 : 0);
-  if (totalColumns === 6) return 'w-1/6';
-  if (totalColumns === 5) return 'w-1/5';
-  if (totalColumns === 4) return 'w-1/4';
-  if (totalColumns === 3) return 'w-1/3';
-  return 'w-1/6'; // default
+    headers.length + (props.showBatchActions ? 1 : 0) + (hasActions.value ? 1 : 0);
+
+  // Calculate fixed widths and remaining space
+  let fixedWidthSum = 0;
+  let flexibleColumns = 0;
+
+  const widths: string[] = [];
+
+  // Process each header
+  headers.forEach((header) => {
+    if (header.width) {
+      if (typeof header.width === 'number') {
+        // Fractional width (e.g., 0.1 = 10%)
+        const percentage = Math.round(header.width * 100);
+        widths.push(`w-[${percentage}%]`);
+        fixedWidthSum += header.width;
+      } else {
+        // Tailwind class (e.g., 'w-1/6')
+        widths.push(header.width);
+        // Estimate width from Tailwind class
+        if (header.width.includes('1/12')) fixedWidthSum += 1 / 12;
+        else if (header.width.includes('1/6')) fixedWidthSum += 1 / 6;
+        else if (header.width.includes('1/5')) fixedWidthSum += 1 / 5;
+        else if (header.width.includes('1/4')) fixedWidthSum += 1 / 4;
+        else if (header.width.includes('1/3')) fixedWidthSum += 1 / 3;
+        else if (header.width.includes('1/2')) fixedWidthSum += 1 / 2;
+        else if (header.width.includes('2/3')) fixedWidthSum += 2 / 3;
+        else if (header.width.includes('3/4')) fixedWidthSum += 3 / 4;
+        else if (header.width.includes('4/5')) fixedWidthSum += 4 / 5;
+        else if (header.width.includes('5/6')) fixedWidthSum += 5 / 6;
+        else if (header.width.includes('11/12')) fixedWidthSum += 11 / 12;
+        else if (header.width.includes('w-')) {
+          // Custom width class, assume it's fixed
+          fixedWidthSum += 0.1; // Small fixed amount
+        }
+      }
+    } else {
+      flexibleColumns++;
+    }
+  });
+
+  // Calculate remaining space for flexible columns
+  const remainingSpace = Math.max(0, 1 - fixedWidthSum);
+  const flexibleWidth = flexibleColumns > 0 ? remainingSpace / flexibleColumns : 0;
+
+  // Fill in flexible widths
+  const result: string[] = [];
+  let flexibleIndex = 0;
+
+  headers.forEach((header, index) => {
+    if (header.width) {
+      if (typeof header.width === 'number') {
+        const percentage = Math.round(header.width * 100);
+        result.push(`w-[${percentage}%]`);
+      } else {
+        result.push(header.width);
+      }
+    } else {
+      // Flexible column - distribute remaining space equally
+      if (flexibleWidth > 0) {
+        const percentage = Math.round(flexibleWidth * 100);
+        result.push(`w-[${percentage}%]`);
+      } else {
+        // Fallback to equal distribution
+        const equalWidth = 1 / totalColumns;
+        const percentage = Math.round(equalWidth * 100);
+        result.push(`w-[${percentage}%]`);
+      }
+      flexibleIndex++;
+    }
+  });
+
+  return result;
+});
+
+const actionsColumnWidth = computed(() => {
+  // Actions column gets a fixed small width
+  return 'w-[8%]';
 });
 
 const colspan = computed(() => {
@@ -337,11 +408,6 @@ const getHeaderClasses = (header: TableHeader<T>) => {
     'px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700',
   ];
 
-  // Width (apply first to ensure proper column sizing)
-  if (header.width) {
-    baseClasses.push(header.width);
-  }
-
   // Sortable
   if (header.sortable) {
     baseClasses.push('cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700');
@@ -367,11 +433,6 @@ const getHeaderContentClasses = (header: TableHeader<T>) => {
 
 const getCellClasses = (header: TableHeader<T>, headerIdx: number) => {
   const baseClasses = ['px-4 py-3 text-sm border-b border-gray-200 dark:border-gray-700'];
-
-  // Width (apply first to ensure proper column sizing)
-  if (header.width) {
-    baseClasses.push(header.width);
-  }
 
   // Alignment
   if (header.align === 'left') {

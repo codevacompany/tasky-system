@@ -12,6 +12,8 @@ export const categoryService = {
     name?: string;
     page?: number;
     limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
   }): Promise<AxiosResponse<PaginatedResponse<Category>>> {
     return apiClient.get<PaginatedResponse<Category>>('/categories', { params });
   },
