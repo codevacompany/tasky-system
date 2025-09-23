@@ -260,6 +260,11 @@
                 />
               </th>
               <th
+                class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100"
+              >
+                Trial até
+              </th>
+              <th
                 @click="sortBy('activeUsers')"
                 class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
@@ -365,12 +370,12 @@
                           client.status === 'NO_SUBSCRIPTION',
                       },
                     ]"
-                    :title="
-                      client.status === 'trial' ? getTrialEndDateTooltip(client.trialEndDate) : ''
-                    "
                   >
                     {{ client.statusLabel }}
                   </span>
+                </td>
+                <td class="px-4 py-4 text-center text-gray-900 dark:text-gray-100">
+                  {{ client.trialEndDate ? formatDate(client.trialEndDate) : '-' }}
                 </td>
                 <td class="px-4 py-4 text-center">
                   <div
@@ -925,11 +930,6 @@ const stats = computed(() => {
     monthlyRevenue: 89500.0, // This remains mocked as per user requirement
   };
 });
-
-const getTrialEndDateTooltip = (trialEndDate?: string) => {
-  if (!trialEndDate) return '';
-  return `Trial termina em: ${formatDate(trialEndDate)}`;
-};
 
 const clients = computed(() => {
   return tenants.value.map((tenant) => ({

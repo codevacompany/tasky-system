@@ -1357,6 +1357,10 @@ watch(
           'start-verification', // pass context
         );
       }
+    } else {
+      loadedTicket.value = null;
+      comments.value = [];
+      ticketUpdates.value = [];
     }
   },
   { immediate: true },
@@ -1656,7 +1660,7 @@ const confirmDueDate = async () => {
 
   try {
     await ticketService.update(loadedTicket.value.customId, { dueAt: dueDateValue.value });
-    
+
     await ticketService.accept(loadedTicket.value.customId);
 
     toast.success('Prazo definido e ticket aceito com sucesso');

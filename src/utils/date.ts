@@ -46,7 +46,6 @@ export const formatRelativeTime = (dateString: string): string => {
 export const formatDateToPortuguese = (dateString: string): string => {
   const date = new Date(dateString);
 
-  // Portuguese month names
   const months = [
     'Janeiro',
     'Fevereiro',
