@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="fixed inset-0 bg-transparent z-[999] pointer-events-auto"
-    @click="closeModal"
-  >
+  <div class="fixed inset-0 bg-transparent z-[999] pointer-events-auto" @click="closeModal">
     <div
       class="fixed top-[calc(var(--header-height)+4px)] right-5 w-[90vw] sm:w-[420px] bg-white dark:bg-gray-800 rounded shadow-[0_2px_8px_rgba(0,0,0,0.15)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] z-[1000] overflow-hidden border border-gray-200 dark:border-gray-700"
       @click.stop
@@ -129,7 +126,10 @@ const fetchNotifications = async () => {
 const fetchSelectedTicket = async (notification: Notification) => {
   if (notification.resourceCustomId) {
     try {
+      // Clear previous ticket data and show loading state
+      selectedTicket.value = null;
       openTicket.value = true;
+
       const response = await ticketService.getById(notification.resourceCustomId);
       selectedTicket.value = response.data;
       notificationService.markAsRead(notification.id);
@@ -137,6 +137,8 @@ const fetchSelectedTicket = async (notification: Notification) => {
     } catch (err) {
       console.error(err);
       toast.error('Erro ao carregar ticket.');
+      // Close modal on error to prevent showing stale data
+      openTicket.value = false;
     }
   }
 };
