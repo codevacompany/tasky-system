@@ -175,7 +175,14 @@ const closeModal = () => {
 const updateUser = async () => {
   isLoading.value = true;
   try {
-    await userService.update(props.user.id, userData.value);
+    const payload = {
+      ...userData.value,
+      departmentId:
+        userData.value.departmentId === null || userData.value.departmentId === undefined
+          ? undefined
+          : userData.value.departmentId,
+    };
+    await userService.update(props.user.id, payload);
     emit('userUpdated');
     toast.success('Colaborador atualizado com sucesso!');
     closeModal();
@@ -200,4 +207,3 @@ watch(
   { immediate: true },
 );
 </script>
-
