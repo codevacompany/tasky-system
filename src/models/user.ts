@@ -32,4 +32,5 @@ export interface UpdateUserDto {
   password?: string;
   departmentId?: number;
   isAdmin?: boolean;
+  isActive?: boolean;
 }

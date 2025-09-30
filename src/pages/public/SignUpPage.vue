@@ -451,5 +451,162 @@ async function submitSignUp() {
 </script>
 
 <style scoped>
-/* Any custom styles needed beyond Tailwind can go here */
+/* Force light theme for signup page - override any dark mode styles */
+:deep(.bg-white) {
+  background-color: #ffffff !important;
+}
+
+:deep(.bg-gray-50) {
+  background-color: #f9fafb !important;
+}
+
+:deep(.bg-blue-50) {
+  background-color: #eff6ff !important;
+}
+
+:deep(.bg-gray-100) {
+  background-color: #f3f4f6 !important;
+}
+
+:deep(.bg-gray-200) {
+  background-color: #e5e7eb !important;
+}
+
+:deep(.bg-green-100) {
+  background-color: #dcfce7 !important;
+}
+
+:deep(.text-gray-900) {
+  color: #111827 !important;
+}
+
+:deep(.text-gray-700) {
+  color: #374151 !important;
+}
+
+:deep(.text-gray-600) {
+  color: #4b5563 !important;
+}
+
+:deep(.text-gray-500) {
+  color: #6b7280 !important;
+}
+
+:deep(.text-blue-600) {
+  color: #2563eb !important;
+}
+
+:deep(.text-green-600) {
+  color: #16a34a !important;
+}
+
+:deep(.text-red-600) {
+  color: #dc2626 !important;
+}
+
+:deep(.border-gray-300) {
+  border-color: #d1d5db !important;
+}
+
+:deep(.border-gray-100) {
+  border-color: #f3f4f6 !important;
+}
+
+:deep(.bg-blue-600) {
+  background-color: #2563eb !important;
+}
+
+:deep(.bg-blue-700) {
+  background-color: #1d4ed8 !important;
+}
+
+:deep(.bg-blue-400) {
+  background-color: #60a5fa !important;
+}
+
+:deep(.bg-green-500) {
+  background-color: #22c55e !important;
+}
+
+:deep(.bg-green-600) {
+  background-color: #16a34a !important;
+}
+
+:deep(.hover\:bg-blue-700:hover) {
+  background-color: #1d4ed8 !important;
+}
+
+:deep(.hover\:bg-gray-200:hover) {
+  background-color: #e5e7eb !important;
+}
+
+:deep(.hover\:bg-green-600:hover) {
+  background-color: #16a34a !important;
+}
+
+:deep(.hover\:text-blue-600:hover) {
+  color: #2563eb !important;
+}
+
+:deep(input) {
+  background-color: #f9fafb !important;
+  border-color: #d1d5db !important;
+  color: #111827 !important;
+}
+
+:deep(input::placeholder) {
+  color: #6b7280 !important;
+}
+
+:deep(button) {
+  color: inherit !important;
+}
+
+:deep(.text-white) {
+  color: #ffffff !important;
+}
+
+:deep(a) {
+  color: #374151 !important;
+}
+
+:deep(a:hover) {
+  color: #2563eb !important;
+}
+
+:deep(svg) {
+  color: inherit !important;
+}
+
+:deep(.bg-blue-600) {
+  background-color: #2563eb !important;
+}
+
+:deep(.bg-green-500) {
+  background-color: #22c55e !important;
+}
+
+:deep(.hover\:bg-green-600:hover) {
+  background-color: #16a34a !important;
+}
+
+:deep(.shadow-lg) {
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+:deep(.shadow-2xl) {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+:deep(.shadow-sm) {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+:deep(.shadow-xl) {
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
 </style>

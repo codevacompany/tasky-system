@@ -1,25 +1,49 @@
 <template>
-  <div class="modal-overlay" v-if="isOpen">
-    <div class="modal-container">
-      <div class="modal-close" @click="close">
+  <div
+    v-if="isOpen"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000] animate-in fade-in duration-300"
+  >
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] w-[90%] max-w-[550px] relative animate-in slide-in-from-bottom-4 duration-400"
+    >
+      <div
+        class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full cursor-pointer text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200"
+        @click="close"
+      >
         <font-awesome-icon icon="times" />
       </div>
 
-      <div class="welcome-content">
-        <div class="welcome-image">
-          <img src="@/assets/images/landing/management-drawing.png" alt="Task Management" />
+      <div class="flex flex-col items-center text-center px-6 py-6 pb-10">
+        <div class="w-[280px] flex items-center justify-center mb-6">
+          <img
+            src="@/assets/images/landing/management-drawing.png"
+            alt="Task Management"
+            class="w-full h-auto"
+          />
         </div>
 
-        <h2 class="welcome-title">Bem-vindo ao Tasky System!</h2>
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
+          Bem-vindo ao Tasky System!
+        </h2>
 
-        <p class="welcome-message">
+        <p class="text-base leading-6 mb-6 max-w-[450px] text-gray-700 dark:text-gray-300">
           Vamos começar! Você e sua equipe podem usar o Tasky System gratuitamente por 14 dias.
           Explore nosso guia ou comece agora mesmo a organizar suas tarefas.
         </p>
 
-        <div class="welcome-actions">
-          <button class="btn btn-secondary" @click="close">Ver Dashboard</button>
-          <button class="btn btn-primary" @click="openGuide">Abrir Guia</button>
+        <div class="flex gap-4 mt-2">
+          <button
+            class="px-5 py-3.5 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-600 rounded-md font-medium cursor-pointer transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-600"
+            @click="close"
+          >
+            Ver Dashboard
+          </button>
+          <button
+            class="px-5 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium cursor-pointer transition-all duration-200"
+            @click="openGuide"
+          >
+            Abrir Guia
+          </button>
         </div>
       </div>
     </div>
@@ -54,120 +78,7 @@ const openGuide = () => {
 </script>
 
 <style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease;
-}
-
-.modal-container {
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  width: 90%;
-  max-width: 550px;
-  position: relative;
-  animation: slideUp 0.4s ease;
-}
-
-.modal-close {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  cursor: pointer;
-  color: #666;
-  transition: all 0.2s;
-}
-
-.modal-close:hover {
-  background-color: #f5f5f5;
-  color: #333;
-}
-
-.welcome-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 1.5rem 2rem 2.5rem 2rem;
-}
-
-.welcome-image {
-  width: 280px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.welcome-image img {
-  width: 100%;
-  height: auto;
-}
-
-.welcome-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.welcome-message {
-  font-size: 1rem;
-  line-height: 1.5;
-  margin-bottom: 1.5rem;
-  max-width: 450px;
-  color: var(--text-color);
-}
-
-.welcome-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-.btn {
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-}
-
-.btn-primary {
-  background: var(--primary-color);
-  padding: 1.4rem 1.2rem;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: var(--primary-dark);
-}
-
-.btn-secondary {
-  background-color: #f5f5f5;
-  color: var(--text-color);
-  border: 1px solid #e0e0e0;
-  padding: 1.4rem 1.2rem;
-}
-
-.btn-secondary:hover {
-  background-color: #e8e8e8;
-}
-
+/* Custom animations for better compatibility */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -186,5 +97,17 @@ const openGuide = () => {
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+.animate-in {
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+.slide-in-from-bottom-4 {
+  animation: slideUp 0.4s ease;
 }
 </style>

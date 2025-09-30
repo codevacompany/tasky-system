@@ -84,6 +84,19 @@
           </span>
         </template>
 
+        <template #column-role="{ value }">
+          <span
+            :class="[
+              'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium',
+              value?.name === 'Tenant Admin'
+                ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300'
+                : 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+            ]"
+          >
+            {{ getRoleDisplayName(value?.name) }}
+          </span>
+        </template>
+
         <template #column-isActive="{ value }">
           <span
             :class="[
@@ -98,7 +111,14 @@
         </template>
 
         <template #actions="{ item }">
-          <div class="flex items-center gap-2">
+          <div class="flex items-center justify-center gap-2">
+            <button
+              class="w-8 h-8 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 transition-all duration-200"
+              @click.stop="openEditModal(item)"
+              title="Editar colaborador"
+            >
+              <font-awesome-icon icon="edit" />
+            </button>
             <button
               v-if="item.isActive && userStore.user?.id !== item.id"
               @click.stop="deactivateUser(item)"
@@ -152,6 +172,13 @@
 
     <NewUserModal v-if="isModalOpen" @close="closeModal" @userCreated="loadUsers" />
 
+    <EditUserModal
+      v-if="isEditModalOpen && userToEdit"
+      :user="userToEdit"
+      @close="closeEditModal"
+      @userUpdated="loadUsers"
+    />
+
     <ConfirmationModal
       v-if="isConfirmationModalOpen"
       :title="confirmationTitle"
@@ -167,6 +194,7 @@ import { ref, onMounted, watch, computed } from 'vue';
 import { userService } from '@/services/userService';
 import type { User } from '@/models';
 import NewUserModal from '@/components/users/NewUserModal.vue';
+import EditUserModal from '@/components/users/EditUserModal.vue';
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue';
 import DataTable from '@/components/common/DataTable.vue';
 import type { TableHeader, PaginationInfo } from '@/components/common/DataTable.vue';
@@ -179,11 +207,13 @@ const filtersStore = useFiltersStore();
 
 const users = ref<User[]>([]);
 const isModalOpen = ref(false);
+const isEditModalOpen = ref(false);
 const isLoading = ref(false);
 const isProcessing = ref(false);
 const searchTerm = ref('');
 const totalPages = ref(1);
 const showInactiveUsers = ref(false);
+const userToEdit = ref<User | null>(null);
 
 const isConfirmationModalOpen = ref(false);
 const confirmationTitle = ref('');
@@ -225,21 +255,28 @@ const initialConfig = computed(() => ({
       label: 'Setor',
       sortable: false,
       align: 'center' as const,
-      width: 0.2, // 20% - department names
+      width: 0.15, // 15% - department names
+    },
+    {
+      key: 'role',
+      label: 'Perfil',
+      sortable: false,
+      align: 'center' as const,
+      width: 0.15, // 15% - role column
     },
     {
       key: 'email',
       label: 'Email',
       sortable: false,
       align: 'center' as const,
-      width: 0.3, // 30% - email addresses need more space
+      width: 0.25, // 25% - email addresses need more space
     },
     {
       key: 'isActive',
       label: 'Status',
       sortable: false,
       align: 'center' as const,
-      width: 0.17, // 17% - status column
+      width: 0.12, // 12% - status column
     },
   ],
   pagination: paginationInfo.value,
@@ -286,6 +323,17 @@ const getUserInitials = (user: User): string => {
     return user.firstName.substring(0, 2).toUpperCase();
   }
   return 'U';
+};
+
+const getRoleDisplayName = (roleName?: string): string => {
+  switch (roleName) {
+    case 'Tenant Admin':
+      return 'Admin';
+    case 'User':
+      return 'Usuário';
+    default:
+      return 'N/A';
+  }
 };
 
 const handlePageChange = (page: number) => {
@@ -379,6 +427,16 @@ const openModal = () => {
 
 const closeModal = () => {
   isModalOpen.value = false;
+};
+
+const openEditModal = (user: User) => {
+  userToEdit.value = user;
+  isEditModalOpen.value = true;
+};
+
+const closeEditModal = () => {
+  isEditModalOpen.value = false;
+  userToEdit.value = null;
 };
 
 onMounted(() => {

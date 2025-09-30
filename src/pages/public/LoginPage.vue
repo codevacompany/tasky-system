@@ -151,4 +151,72 @@ const login = async () => {
 .animate-fade-in {
   animation: fade-in 0.6s ease-out;
 }
+
+/* Force light theme for login page - override any dark mode styles */
+:deep(.bg-white) {
+  background-color: #ffffff !important;
+}
+
+:deep(.text-gray-700) {
+  color: #374151 !important;
+}
+
+:deep(.text-gray-900) {
+  color: #111827 !important;
+}
+
+:deep(.text-gray-600) {
+  color: #4b5563 !important;
+}
+
+:deep(.text-gray-800) {
+  color: #1f2937 !important;
+}
+
+:deep(.border-gray-300) {
+  border-color: #d1d5db !important;
+}
+
+:deep(.bg-gray-50) {
+  background-color: #f9fafb !important;
+}
+
+:deep(.text-gray-500) {
+  color: #6b7280 !important;
+}
+
+:deep(.text-gray-400) {
+  color: #9ca3af !important;
+}
+
+:deep(.btn-primary) {
+  background: linear-gradient(135deg, #00143b 0%, #142046 100%) !important;
+  color: #ffffff !important;
+}
+
+:deep(.btn-primary:hover) {
+  opacity: 0.9 !important;
+}
+
+:deep(input) {
+  background-color: #f9fafb !important;
+  border-color: #d1d5db !important;
+  color: #111827 !important;
+}
+
+:deep(input::placeholder) {
+  color: #6b7280 !important;
+}
+
+:deep(label) {
+  color: #374151 !important;
+}
+
+:deep(a) {
+  color: #1f2937 !important;
+}
+
+:deep(a:hover) {
+  color: #4b5563 !important;
+}
 </style>
