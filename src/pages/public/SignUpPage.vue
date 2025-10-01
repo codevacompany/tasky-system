@@ -4,16 +4,44 @@
     <div
       class="flex-1 lg:flex-2 bg-white flex flex-col justify-center items-center px-4 py-8 lg:px-8 lg:py-0 shadow-lg lg:shadow-2xl relative"
     >
-      <div
-        class="absolute top-6 left-4 right-4 lg:top-12 lg:left-8 lg:right-8 h-1.5 bg-gray-200 rounded-full overflow-hidden"
-      >
-        <div
-          class="h-full bg-blue-600 rounded-full transition-all duration-300 ease-out"
-          :style="{ width: progressWidth }"
-        ></div>
+      <!-- Steps Indicator -->
+      <div class="absolute top-6 left-1/2 -translate-x-1/2 w-full max-w-md lg:max-w-lg px-1 z-30">
+        <ol class="flex items-center justify-between w-full list-none p-0 m-0">
+          <li v-for="(s, idx) in steps" :key="s.key" class="flex items-center">
+            <!-- Step with label below -->
+            <div class="flex flex-col items-center gap-2 min-w-[56px]">
+              <div
+                :class="[
+                  'w-9 h-9 rounded-full flex items-center justify-center border-2 text-sm font-semibold',
+                  step > idx + 1
+                    ? 'bg-blue-600 border-blue-600 text-white'
+                    : step === idx + 1
+                      ? 'border-blue-400 text-blue-600'
+                      : 'border-gray-300 text-gray-400',
+                ]"
+              >
+                <font-awesome-icon v-if="step > idx + 1" icon="check" />
+                <span v-else>{{ idx + 1 }}</span>
+              </div>
+              <span
+                class="text-[11px] sm:text-xs font-medium whitespace-nowrap"
+                :class="[step >= idx + 1 ? 'text-gray-900' : 'text-gray-400']"
+              >
+                {{ idx === 0 ? 'Dados da Empresa' : idx === 1 ? 'Responsável' : 'Concluir' }}
+              </span>
+            </div>
+
+            <!-- Connector -->
+            <div v-if="idx < steps.length - 1" class="mx-3 w-12 sm:w-20 md:w-28">
+              <div
+                :class="['h-0.5 w-full rounded', step > idx + 1 ? 'bg-blue-600' : 'bg-gray-200']"
+              ></div>
+            </div>
+          </li>
+        </ol>
       </div>
 
-      <div class="w-full max-w-md lg:max-w-lg space-y-6 mt-8 lg:mt-0">
+      <div class="w-full max-w-md lg:max-w-lg space-y-6 mt-8 lg:mt-10">
         <div class="text-center lg:text-left">
           <h2 v-if="step === 1" class="text-blue-600 text-sm lg:text-base font-semibold mb-2">
             Vamos começar!
@@ -38,7 +66,7 @@
               type="text"
               required
               placeholder="Nome da empresa"
-              class="w-full px-4 py-3 lg:py-3.5 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+              class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
             />
           </div>
 
@@ -52,7 +80,7 @@
                 placeholder="CNPJ (12.345.678/0001-99)"
                 @input="form.cnpj = maskCNPJ(form.cnpj)"
                 @blur="cnpjTouched = true"
-                class="w-full px-4 py-3 lg:py-3.5 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
               <span
                 v-if="cnpjTouched && cnpjError"
@@ -69,7 +97,7 @@
                 placeholder="Telefone ((11) 91234-5678)"
                 @input="form.companyPhone = maskPhone(form.companyPhone)"
                 maxlength="15"
-                class="w-full px-4 py-3 lg:py-3.5 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
             </div>
           </div>
@@ -94,7 +122,7 @@
 
           <button
             type="submit"
-            class="w-full py-3 lg:py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-[4px] transition-colors text-sm lg:text-base mt-6"
+            class="w-full py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-[4px] transition-colors text-sm lg:text-base mt-6"
           >
             Avançar
           </button>
@@ -108,7 +136,7 @@
               type="text"
               required
               placeholder="Nome do responsável"
-              class="w-full px-4 py-3 lg:py-3.5 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+              class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
             />
           </div>
 
@@ -121,7 +149,7 @@
               placeholder="CPF (123.456.789-00)"
               @input="form.contactCpf = maskCPF(form.contactCpf)"
               @blur="contactCpfTouched = true"
-              class="w-full px-4 py-3 lg:py-3.5 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+              class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
             />
             <span
               v-if="contactCpfTouched && contactCpfError"
@@ -139,7 +167,7 @@
               placeholder="E-mail (nome@email.com)"
               @input="form.contactEmail = maskEmail(form.contactEmail)"
               @blur="contactEmailTouched = true"
-              class="w-full px-4 py-3 lg:py-3.5 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+              class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
             />
             <span
               v-if="contactEmailTouched && contactEmailError"
@@ -157,14 +185,14 @@
               placeholder="Telefone ((11) 91234-5678)"
               @input="form.contactPhone = maskPhone(form.contactPhone)"
               maxlength="15"
-              class="w-full px-4 py-3 lg:py-3.5 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+              class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
             />
           </div>
 
           <div class="flex flex-col gap-3 mt-6">
             <button
               type="button"
-              class="w-full sm:w-auto px-6 py-3 lg:py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-[4px] transition-colors text-sm lg:text-base"
+              class="w-full sm:w-auto px-6 py-2.5 lg:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-[4px] transition-colors text-sm lg:text-base"
               @click="prevStep"
             >
               Voltar
@@ -172,7 +200,7 @@
             <button
               type="submit"
               :disabled="isSubmitting"
-              class="w-full sm:flex-1 py-3 lg:py-3.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-[4px] transition-colors text-sm lg:text-base"
+              class="w-full sm:flex-1 py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-[4px] transition-colors text-sm lg:text-base"
             >
               <span v-if="isSubmitting">Enviando...</span>
               <span v-else>Concluir Cadastro</span>
@@ -210,13 +238,13 @@
 
             <div class="flex flex-col sm:flex-row gap-3">
               <button
-                class="w-full sm:w-auto px-6 py-3 lg:py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors text-sm lg:text-base"
+                class="w-full sm:w-auto px-6 py-2.5 lg:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors text-sm lg:text-base"
                 @click="goToLanding"
               >
                 Página Inicial
               </button>
               <button
-                class="w-full sm:flex-1 py-3 lg:py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm lg:text-base"
+                class="w-full sm:flex-1 py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm lg:text-base"
                 @click="goToLogin"
               >
                 Fazer Login
@@ -308,6 +336,7 @@ import { AxiosError } from 'axios';
 
 const router = useRouter();
 const step = ref(1);
+const steps = [{ key: 'company' }, { key: 'owner' }, { key: 'done' }];
 
 const form = reactive({
   // Step 1
@@ -504,10 +533,6 @@ async function submitSignUp() {
   color: #dc2626 !important;
 }
 
-:deep(.border-gray-300) {
-  border-color: #d1d5db !important;
-}
-
 :deep(.border-gray-100) {
   border-color: #f3f4f6 !important;
 }
@@ -552,6 +577,12 @@ async function submitSignUp() {
   background-color: #f9fafb !important;
   border-color: #d1d5db !important;
   color: #111827 !important;
+}
+
+:deep(input:focus) {
+  border-color: var(--primary-color) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2) !important;
 }
 
 :deep(input::placeholder) {

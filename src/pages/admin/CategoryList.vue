@@ -119,21 +119,11 @@ const categoryToEdit = ref<Category | null>(null);
 
 const headers = computed((): TableHeader[] => [
   {
-    key: 'id',
-    label: 'ID',
-    sortable: true,
-    sortKey: 'id',
-    align: 'left',
-    width: 0.08, // 8% - small for ID numbers
-    sortDirection: filtersStore.currentSortBy === 'id' ? filtersStore.currentSortDirection : 'none',
-  },
-  {
     key: 'name',
     label: 'Nome',
     sortable: true,
     sortKey: 'name',
     align: 'left',
-    // No width specified - will take remaining space automatically
     sortDirection:
       filtersStore.currentSortBy === 'name' ? filtersStore.currentSortDirection : 'none',
   },

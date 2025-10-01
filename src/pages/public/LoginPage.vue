@@ -173,10 +173,6 @@ const login = async () => {
   color: #1f2937 !important;
 }
 
-:deep(.border-gray-300) {
-  border-color: #d1d5db !important;
-}
-
 :deep(.bg-gray-50) {
   background-color: #f9fafb !important;
 }
@@ -202,6 +198,12 @@ const login = async () => {
   background-color: #f9fafb !important;
   border-color: #d1d5db !important;
   color: #111827 !important;
+}
+
+:deep(input:focus) {
+  border-color: var(--primary-color) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2) !important;
 }
 
 :deep(input::placeholder) {
