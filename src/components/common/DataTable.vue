@@ -20,7 +20,7 @@
               v-for="(header, idx) in headers"
               :key="idx"
               scope="col"
-              :class="[getHeaderClasses(header), columnWidths[idx]]"
+              :class="[getHeaderClasses(header), columnWidths[idx], idx === 0 ? 'pl-6' : '']"
               @click="header.sortable && header.sortKey && handleSort(header.sortKey)"
             >
               <div :class="getHeaderContentClasses(header)">
@@ -106,7 +106,11 @@
             <td
               v-for="(header, headerIdx) in headers"
               :key="headerIdx"
-              :class="[getCellClasses(header, headerIdx), columnWidths[headerIdx]]"
+              :class="[
+                getCellClasses(header, headerIdx),
+                columnWidths[headerIdx],
+                headerIdx === 0 ? 'pl-6' : '',
+              ]"
               @click="header.clickable && handleCellClick(item, header)"
             >
               <!-- Custom Column Content -->

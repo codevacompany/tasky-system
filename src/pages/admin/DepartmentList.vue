@@ -123,15 +123,6 @@ const departmentToEdit = ref<Department | null>(null);
 
 const headers = computed((): TableHeader[] => [
   {
-    key: 'id',
-    label: 'ID',
-    sortable: true,
-    sortKey: 'id',
-    align: 'left',
-    width: 0.08, // 8% - small for ID numbers
-    sortDirection: filtersStore.currentSortBy === 'id' ? filtersStore.currentSortDirection : 'none',
-  },
-  {
     key: 'name',
     label: 'Nome',
     sortable: true,

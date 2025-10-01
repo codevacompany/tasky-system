@@ -60,7 +60,7 @@
 
           <div class="flex flex-col gap-2">
             <div class="flex items-center justify-between gap-3 mb-0">
-              <div class="text-xs text-gray-500 dark:text-gray-400">
+              <div class="text-xs text-gray-500 dark:text-gray-100">
                 <div class="flex items-center gap-1">
                   <span>{{ ticket.targetUser.firstName }} {{ ticket.targetUser.lastName }}</span>
                   <font-awesome-icon
@@ -70,7 +70,7 @@
                     title="Conta desativada"
                   />
                 </div>
-                <div class="text-xs text-gray-400 dark:text-gray-500">
+                <div class="text-xs text-gray-400 dark:text-gray-400">
                   {{ ticket.department.name }}
                 </div>
               </div>
@@ -100,7 +100,7 @@
             </div>
             <div class="flex items-center justify-between gap-3 mb-0">
               <div
-                class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 opacity-70"
+                class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-300 opacity-70"
                 title="Última atualização"
               >
                 <font-awesome-icon icon="clock-rotate-left" />

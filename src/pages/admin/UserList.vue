@@ -231,16 +231,6 @@ const initialConfig = computed(() => ({
   items: filteredUsers.value,
   headers: [
     {
-      key: 'id',
-      label: 'ID',
-      sortable: true,
-      sortKey: 'id',
-      sortDirection:
-        filtersStore.currentSortBy === 'id' ? filtersStore.currentSortDirection : 'none',
-      align: 'left' as const,
-      width: 0.08, // 8% - small for ID numbers
-    },
-    {
       key: 'name',
       label: 'Nome',
       sortable: true,
