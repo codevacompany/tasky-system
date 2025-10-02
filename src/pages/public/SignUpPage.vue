@@ -41,222 +41,236 @@
         </ol>
       </div>
 
-      <div class="w-full max-w-md lg:max-w-lg space-y-6 mt-8 lg:mt-10">
-        <div class="text-center lg:text-left">
-          <h2 v-if="step === 1" class="text-blue-600 text-sm lg:text-base font-semibold mb-2">
-            Vamos começar!
-          </h2>
-          <h2 v-else-if="step === 2" class="text-blue-600 text-sm lg:text-base font-semibold mb-2">
-            Estamos quase lá
-          </h2>
+      <div
+        class="w-full max-w-md lg:max-w-lg mt-8 lg:mt-10 h-[70%] flex items-center"
+      >
+        <div class="w-full max-w-md lg:max-w-lg space-y-6">
+          <div class="text-center lg:text-left">
+            <h2 v-if="step === 1" class="text-blue-600 text-sm lg:text-base font-semibold mb-2">
+              Vamos começar!
+            </h2>
+            <h2
+              v-else-if="step === 2"
+              class="text-blue-600 text-sm lg:text-base font-semibold mb-2"
+            >
+              Estamos quase lá
+            </h2>
 
-          <h1 v-if="step === 1" class="text-xl lg:text-2xl font-bold text-gray-900">
-            Informações da empresa
-          </h1>
-          <h1 v-else-if="step === 2" class="text-xl lg:text-2xl font-bold text-gray-900">
-            Informações do Responsável
-          </h1>
-        </div>
-
-        <!-- Step 1 Form -->
-        <form v-if="step === 1" @submit.prevent="nextStep" class="space-y-4 lg:space-y-5">
-          <div>
-            <input
-              v-model="form.companyName"
-              type="text"
-              required
-              placeholder="Nome da empresa"
-              class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
-            />
+            <h1 v-if="step === 1" class="text-xl lg:text-2xl font-bold text-gray-900">
+              Informações da empresa
+            </h1>
+            <h1 v-else-if="step === 2" class="text-xl lg:text-2xl font-bold text-gray-900">
+              Informações do Responsável
+            </h1>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Step 1 Form -->
+          <form v-if="step === 1" @submit.prevent="nextStep" class="space-y-4 lg:space-y-5">
             <div>
               <input
-                v-model="form.cnpj"
+                v-model="form.companyName"
                 type="text"
                 required
-                maxlength="18"
-                placeholder="CNPJ (12.345.678/0001-99)"
-                @input="form.cnpj = maskCNPJ(form.cnpj)"
-                @blur="cnpjTouched = true"
+                placeholder="Nome da empresa"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <input
+                  v-model="form.cnpj"
+                  type="text"
+                  required
+                  maxlength="18"
+                  placeholder="CNPJ (12.345.678/0001-99)"
+                  @input="form.cnpj = maskCNPJ(form.cnpj)"
+                  @blur="cnpjTouched = true"
+                  class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+                />
+                <span
+                  v-if="cnpjTouched && cnpjError"
+                  class="text-red-600 text-xs lg:text-sm mt-1 block"
+                >
+                  {{ cnpjError }}
+                </span>
+              </div>
+              <div>
+                <input
+                  v-model="form.companyPhone"
+                  type="tel"
+                  required
+                  placeholder="Telefone ((11) 91234-5678)"
+                  @input="form.companyPhone = maskPhone(form.companyPhone)"
+                  maxlength="15"
+                  class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+                />
+              </div>
+            </div>
+
+            <div>
+              <input
+                v-model="form.companyEmail"
+                type="email"
+                required
+                placeholder="E-mail (empresa@email.com)"
+                @input="form.companyEmail = maskEmail(form.companyEmail)"
+                @blur="companyEmailTouched = true"
+                class="w-full px-4 py-3 lg:py-3.5 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+              />
+              <span
+                v-if="companyEmailTouched && companyEmailError"
+                class="text-red-600 text-xs lg:text-sm mt-1 block"
+              >
+                {{ companyEmailError }}
+              </span>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-[4px] transition-colors text-sm lg:text-base mt-6"
+            >
+              Avançar
+            </button>
+          </form>
+
+          <!-- Step 2 Form -->
+          <form
+            v-else-if="step === 2"
+            @submit.prevent="submitSignUp"
+            class="space-y-4 lg:space-y-5"
+          >
+            <div>
+              <input
+                v-model="form.contactName"
+                type="text"
+                required
+                placeholder="Nome do responsável"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+              />
+            </div>
+
+            <div>
+              <input
+                v-model="form.contactCpf"
+                type="text"
+                required
+                maxlength="14"
+                placeholder="CPF (123.456.789-00)"
+                @input="form.contactCpf = maskCPF(form.contactCpf)"
+                @blur="contactCpfTouched = true"
                 class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
               <span
-                v-if="cnpjTouched && cnpjError"
+                v-if="contactCpfTouched && contactCpfError"
                 class="text-red-600 text-xs lg:text-sm mt-1 block"
               >
-                {{ cnpjError }}
+                {{ contactCpfError }}
               </span>
             </div>
+
             <div>
               <input
-                v-model="form.companyPhone"
+                v-model="form.contactEmail"
+                type="email"
+                required
+                placeholder="E-mail (nome@email.com)"
+                @input="form.contactEmail = maskEmail(form.contactEmail)"
+                @blur="contactEmailTouched = true"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+              />
+              <span
+                v-if="contactEmailTouched && contactEmailError"
+                class="text-red-600 text-xs lg:text-sm mt-1 block"
+              >
+                {{ contactEmailError }}
+              </span>
+            </div>
+
+            <div>
+              <input
+                v-model="form.contactPhone"
                 type="tel"
                 required
                 placeholder="Telefone ((11) 91234-5678)"
-                @input="form.companyPhone = maskPhone(form.companyPhone)"
+                @input="form.contactPhone = maskPhone(form.contactPhone)"
                 maxlength="15"
                 class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
             </div>
+
+            <div class="flex flex-col gap-3 mt-6">
+              <button
+                type="button"
+                class="w-full sm:w-auto px-6 py-2.5 lg:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-[4px] transition-colors text-sm lg:text-base"
+                @click="prevStep"
+              >
+                Voltar
+              </button>
+              <button
+                type="submit"
+                :disabled="isSubmitting"
+                class="w-full sm:flex-1 py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-[4px] transition-colors text-sm lg:text-base"
+              >
+                <span v-if="isSubmitting">Enviando...</span>
+                <span v-else>Concluir Cadastro</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Success Step -->
+          <div v-else class="text-center space-y-6">
+            <div class="bg-white rounded-xl p-6 lg:p-8 shadow-sm border border-gray-100">
+              <div
+                class="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center"
+              >
+                <svg
+                  class="w-8 h-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+
+              <h2 class="text-xl lg:text-2xl font-bold text-gray-900 mb-3">
+                Cadastro realizado com sucesso!
+              </h2>
+              <p class="text-gray-600 text-sm lg:text-base mb-6">
+                Obrigado por se cadastrar.<br />Em breve entraremos em contato com você.
+              </p>
+
+              <div class="flex flex-col sm:flex-row gap-3">
+                <button
+                  class="w-full sm:w-auto px-6 py-2.5 lg:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors text-sm lg:text-base"
+                  @click="goToLanding"
+                >
+                  Página Inicial
+                </button>
+                <button
+                  class="w-full sm:flex-1 py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm lg:text-base"
+                  @click="goToLogin"
+                >
+                  Fazer Login
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <input
-              v-model="form.companyEmail"
-              type="email"
-              required
-              placeholder="E-mail (empresa@email.com)"
-              @input="form.companyEmail = maskEmail(form.companyEmail)"
-              @blur="companyEmailTouched = true"
-              class="w-full px-4 py-3 lg:py-3.5 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
-            />
-            <span
-              v-if="companyEmailTouched && companyEmailError"
-              class="text-red-600 text-xs lg:text-sm mt-1 block"
-            >
-              {{ companyEmailError }}
-            </span>
-          </div>
-
-          <button
-            type="submit"
-            class="w-full py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-[4px] transition-colors text-sm lg:text-base mt-6"
+          <!-- Terms Text -->
+          <p
+            v-if="step < 3"
+            class="text-xs lg:text-sm text-gray-500 text-center mt-6 mb-8 lg:mb-12"
           >
-            Avançar
-          </button>
-        </form>
-
-        <!-- Step 2 Form -->
-        <form v-else-if="step === 2" @submit.prevent="submitSignUp" class="space-y-4 lg:space-y-5">
-          <div>
-            <input
-              v-model="form.contactName"
-              type="text"
-              required
-              placeholder="Nome do responsável"
-              class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
-            />
-          </div>
-
-          <div>
-            <input
-              v-model="form.contactCpf"
-              type="text"
-              required
-              maxlength="14"
-              placeholder="CPF (123.456.789-00)"
-              @input="form.contactCpf = maskCPF(form.contactCpf)"
-              @blur="contactCpfTouched = true"
-              class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
-            />
-            <span
-              v-if="contactCpfTouched && contactCpfError"
-              class="text-red-600 text-xs lg:text-sm mt-1 block"
-            >
-              {{ contactCpfError }}
-            </span>
-          </div>
-
-          <div>
-            <input
-              v-model="form.contactEmail"
-              type="email"
-              required
-              placeholder="E-mail (nome@email.com)"
-              @input="form.contactEmail = maskEmail(form.contactEmail)"
-              @blur="contactEmailTouched = true"
-              class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
-            />
-            <span
-              v-if="contactEmailTouched && contactEmailError"
-              class="text-red-600 text-xs lg:text-sm mt-1 block"
-            >
-              {{ contactEmailError }}
-            </span>
-          </div>
-
-          <div>
-            <input
-              v-model="form.contactPhone"
-              type="tel"
-              required
-              placeholder="Telefone ((11) 91234-5678)"
-              @input="form.contactPhone = maskPhone(form.contactPhone)"
-              maxlength="15"
-              class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
-            />
-          </div>
-
-          <div class="flex flex-col gap-3 mt-6">
-            <button
-              type="button"
-              class="w-full sm:w-auto px-6 py-2.5 lg:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-[4px] transition-colors text-sm lg:text-base"
-              @click="prevStep"
-            >
-              Voltar
-            </button>
-            <button
-              type="submit"
-              :disabled="isSubmitting"
-              class="w-full sm:flex-1 py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-[4px] transition-colors text-sm lg:text-base"
-            >
-              <span v-if="isSubmitting">Enviando...</span>
-              <span v-else>Concluir Cadastro</span>
-            </button>
-          </div>
-        </form>
-
-        <!-- Success Step -->
-        <div v-else class="text-center space-y-6">
-          <div class="bg-white rounded-xl p-6 lg:p-8 shadow-sm border border-gray-100">
-            <div
-              class="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center"
-            >
-              <svg
-                class="w-8 h-8 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-
-            <h2 class="text-xl lg:text-2xl font-bold text-gray-900 mb-3">
-              Cadastro realizado com sucesso!
-            </h2>
-            <p class="text-gray-600 text-sm lg:text-base mb-6">
-              Obrigado por se cadastrar.<br />Em breve entraremos em contato com você.
-            </p>
-
-            <div class="flex flex-col sm:flex-row gap-3">
-              <button
-                class="w-full sm:w-auto px-6 py-2.5 lg:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors text-sm lg:text-base"
-                @click="goToLanding"
-              >
-                Página Inicial
-              </button>
-              <button
-                class="w-full sm:flex-1 py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm lg:text-base"
-                @click="goToLogin"
-              >
-                Fazer Login
-              </button>
-            </div>
-          </div>
+            Ao cadastrar, você concorda com nossa Política de Privacidade e Termos de Uso.
+          </p>
         </div>
-
-        <!-- Terms Text -->
-        <p v-if="step < 3" class="text-xs lg:text-sm text-gray-500 text-center mt-6 mb-8 lg:mb-12">
-          Ao cadastrar, você concorda com nossa Política de Privacidade e Termos de Uso.
-        </p>
       </div>
     </div>
 
