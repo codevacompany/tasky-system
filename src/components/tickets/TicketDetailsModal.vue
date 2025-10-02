@@ -847,6 +847,25 @@ const editorOptions = {
 };
 
 const closeModal = () => {
+  // Check if ticket is returned and user is target user
+  if (
+    loadedTicket.value?.status === TicketStatus.Returned &&
+    isTargetUser.value &&
+    !confirmationModal.value.isOpen
+  ) {
+    openConfirmationModal(
+      'Iniciar Correção',
+      'Este ticket foi devolvido para correção. Deseja iniciar as correções agora?',
+      async () => {
+        await startCorrectionDirectly(loadedTicket.value!.customId);
+      },
+      false,
+      [],
+      'start-correction',
+    );
+    return;
+  }
+
   emit('close');
 };
 
@@ -956,6 +975,9 @@ const handleCancel = () => {
   if (confirmationModal.value.context === 'start-verification') {
     closeConfirmationModal();
     closeModal(); // Also close the ticket details modal
+  } else if (confirmationModal.value.context === 'start-correction') {
+    closeConfirmationModal();
+    emit('close'); // Close the ticket details modal without starting correction
   } else {
     closeConfirmationModal();
   }
@@ -1069,6 +1091,16 @@ const correctTicket = async (ticketId: string) => {
       }
     },
   );
+};
+
+const startCorrectionDirectly = async (ticketId: string) => {
+  try {
+    await ticketService.updateStatus(ticketId, { status: TicketStatus.InProgress });
+    toast.success('Ticket em correção');
+    refreshSelectedTicket();
+  } catch {
+    toast.error('Erro ao iniciar correção');
+  }
 };
 
 const rejectTicket = async (ticketId: string) => {
