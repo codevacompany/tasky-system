@@ -26,20 +26,35 @@
         <div
           v-for="ticket in getTicketsByStatus(status)"
           :key="ticket.customId"
-          class="bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border border-gray-200 dark:border-gray-600 shadow-sm mb-3.5 flex flex-col hover:-translate-y-0.5 hover:shadow-md hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-black/8 dark:hover:shadow-black/30"
+          :class="[
+            'bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border shadow-sm mb-3.5 flex flex-col hover:-translate-y-0.5 hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
+            ticket.status === TicketStatus.Returned
+              ? 'border-orange-300 dark:border-orange-600 dark:bg-orange-900/10 hover:border-orange-400 dark:hover:border-orange-500'
+              : 'border-gray-200 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500',
+          ]"
           @click="openTicketDetails(ticket)"
         >
-          <div class="flex justify-between items-start gap-3 mb-2 w-full p-0">
+          <div class="flex justify-between items-start mb-2 w-full p-0">
             <div class="flex-1 min-w-0 flex items-start">
-              <div
-                class="font-semibold text-sm leading-5 text-gray-900 dark:text-white overflow-hidden text-left w-full break-words m-0 p-0"
-                style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical"
-              >
-                {{ ticket.name }}
+              <div class="flex items-start gap-2 w-full">
+                <div
+                  class="font-semibold text-sm leading-5 text-gray-900 dark:text-white overflow-hidden text-left flex-1 break-words m-0 p-0"
+                  style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical"
+                >
+                  {{ ticket.name }}
+                </div>
+                <div
+                  v-if="ticket.status === TicketStatus.Returned"
+                  class="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 flex-shrink-0"
+                  title="Ticket devolvido"
+                >
+                  <font-awesome-icon icon="undo" class="text-xs" />
+                </div>
               </div>
             </div>
             <div class="flex items-center gap-2 ml-auto flex-shrink-0">
               <div
+                v-if="(ticket.comments?.length || 0) > 0"
                 class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 opacity-80"
                 title="Comentários"
               >
@@ -47,6 +62,7 @@
                 <span class="text-xs min-w-4">{{ ticket.comments?.length || 0 }}</span>
               </div>
               <div
+                v-if="(ticket.files?.length || 0) > 0"
                 class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 opacity-80"
                 title="Anexos"
               >
@@ -99,12 +115,20 @@
               </div>
             </div>
             <div class="flex items-center justify-between gap-3 mb-0">
-              <div
-                class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-300 opacity-70"
-                title="Última atualização"
-              >
-                <font-awesome-icon icon="clock-rotate-left" />
-                {{ formatRelativeTime(ticket.updatedAt) }}
+              <div class="flex items-center gap-3">
+                <div
+                  class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300 font-medium"
+                  title="ID do Ticket"
+                >
+                  {{ ticket.customId }}
+                </div>
+                <div
+                  class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-300 opacity-70"
+                  title="Última atualização"
+                >
+                  <font-awesome-icon icon="clock-rotate-left" />
+                  {{ formatRelativeTime(ticket.updatedAt) }}
+                </div>
               </div>
               <div
                 v-if="ticket.dueAt"
@@ -134,11 +158,39 @@
     </div>
   </div>
 
-  <TicketDetailsModal
-    v-if="isModalOpen"
-    :ticket="selectedTicket"
-    @close="isModalOpen = false"
-  />
+  <TicketDetailsModal v-if="isModalOpen" :ticket="selectedTicket" @close="isModalOpen = false" />
+
+  <!-- Verification Confirmation Modal -->
+  <BaseModal
+    v-if="showVerificationAlert"
+    :is-open="showVerificationAlert"
+    @close="showVerificationAlert = false"
+    :show-footer="false"
+  >
+    <div class="p-6 text-center">
+      <div class="text-3xl text-purple-700 dark:text-purple-400 mb-4">
+        <font-awesome-icon icon="info-circle" />
+      </div>
+      <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed mb-6">
+        Para visualizar os detalhes deste ticket, você precisa iniciar a verificação clicando no
+        botão "Verificar".
+      </p>
+      <div class="flex justify-center gap-4">
+        <button
+          class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200"
+          @click="showVerificationAlert = false"
+        >
+          Cancelar
+        </button>
+        <button
+          class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 transition-colors duration-200"
+          @click="handleAlertVerification"
+        >
+          Verificar
+        </button>
+      </div>
+    </div>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
@@ -148,6 +200,11 @@ import { TicketStatus, TicketPriority } from '@/models';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { formatDate, formatRelativeTime } from '@/utils/date';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
+import { useUserStore } from '@/stores/user';
+import { useTicketsStore } from '@/stores/tickets';
+import { ticketService } from '@/services/ticketService';
+import { toast } from 'vue3-toastify';
+import BaseModal from '@/components/common/BaseModal.vue';
 
 const props = defineProps<{
   tickets: Ticket[];
@@ -162,8 +219,18 @@ const statusColumns = [
 
 const selectedTicket = ref<Ticket | null>(null);
 const isModalOpen = ref(false);
+const showVerificationAlert = ref(false);
+const pendingVerificationTicket = ref<Ticket | null>(null);
+
+const userStore = useUserStore();
+const ticketsStore = useTicketsStore();
 
 const getTicketsByStatus = (status: string) => {
+  if (status === TicketStatus.Pending) {
+    return props.tickets.filter(
+      (ticket) => ticket.status === status || ticket.status === TicketStatus.Returned,
+    );
+  }
   return props.tickets.filter((ticket) => ticket.status === status);
 };
 
@@ -235,13 +302,45 @@ const getDeadlineIcon = (ticket: Ticket) => {
 };
 
 const openTicketDetails = (ticket: Ticket) => {
+  // If ticket is awaiting verification and user is the reviewer, show confirmation first
+  if (
+    ticket.status === TicketStatus.AwaitingVerification &&
+    ticket.reviewer?.id === userStore.user?.id
+  ) {
+    pendingVerificationTicket.value = ticket;
+    showVerificationAlert.value = true;
+    return;
+  }
+
   selectedTicket.value = ticket;
   isModalOpen.value = true;
+};
+
+const handleStartVerification = async (ticket: Ticket) => {
+  try {
+    const ticketResponse = await ticketService.updateStatus(ticket.customId, {
+      status: TicketStatus.UnderVerification,
+    });
+
+    selectedTicket.value = ticketResponse.data.ticketData;
+    isModalOpen.value = true;
+
+    await ticketsStore.fetchTicketDetails(ticket.customId);
+  } catch {
+    toast.error('Erro ao iniciar verificação');
+  }
+};
+
+const handleAlertVerification = () => {
+  if (pendingVerificationTicket.value) {
+    handleStartVerification(pendingVerificationTicket.value);
+    showVerificationAlert.value = false;
+    pendingVerificationTicket.value = null;
+  }
 };
 </script>
 
 <style scoped>
-
 /* Custom scrollbar for column content */
 .overflow-y-auto::-webkit-scrollbar {
   width: 8px;
