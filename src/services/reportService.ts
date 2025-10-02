@@ -191,8 +191,10 @@ export const reportService = {
     return response.data;
   },
 
-  async getTopUsers(limit = 5): Promise<UserRankingResponseDto> {
-    const response = await apiClient.get(`/stats/top-users?limit=${limit}`);
+  async getTopUsers(limit = 5, all = false, sort = 'top'): Promise<UserRankingResponseDto> {
+    const response = await apiClient.get(
+      `/stats/top-users?limit=${limit}${all ? '&all=true' : ''}&sort=${sort}`,
+    );
     return response.data;
   },
 };
