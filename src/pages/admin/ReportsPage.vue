@@ -176,7 +176,7 @@
             <button
               v-for="tab in tabs"
               :key="tab.id"
-              @click="currentTab = tab.id"
+              @click="setReportsTab(tab.id)"
               :class="[
                 'flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0',
                 currentTab === tab.id
@@ -517,9 +517,9 @@
                   </div>
 
                   <!-- Table Content -->
-                  <div v-if="topUsers && topUsers.users.length > 0" class="space-y-4 mt-4">
+                  <div v-if="topFiveUsers && topFiveUsers.users.length > 0" class="space-y-4 mt-4">
                     <div
-                      v-for="user in topUsers.users"
+                      v-for="user in topFiveUsers.users"
                       :key="user.userId"
                       class="grid grid-cols-4 gap-4 items-center py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-2 -mx-2 transition-colors"
                     >
@@ -571,7 +571,7 @@
                   </div>
 
                   <div
-                    v-else-if="!topUsers"
+                    v-else-if="!topFiveUsers"
                     class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400"
                   >
                     <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
@@ -939,7 +939,10 @@
             </div>
 
             <!-- In Progress Time Analysis -->
-            <div v-permission="PERMISSIONS.VIEW_BASIC_ANALYTICS" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+            <div
+              v-permission="PERMISSIONS.VIEW_BASIC_ANALYTICS"
+              class="bg-white dark:bg-gray-800 rounded-lg shadow-lg"
+            >
               <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                   Análise de Tempo em Andamento
@@ -1295,6 +1298,266 @@
                 <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
                   Acesse estatísticas detalhadas por departamento, performance de setores e análises
                   comparativas de produtividade.
+                </p>
+                <router-link
+                  to="/assinaturas"
+                  class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
+                >
+                  <font-awesome-icon icon="arrow-up" />
+                  Fazer Upgrade do Plano
+                </router-link>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="currentTab === 'users'" class="space-y-6">
+            <template v-if="hasPermission(PERMISSIONS.VIEW_USERS_ANALYTICS)">
+              <!-- Users Summary Card -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3">
+                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                      <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                        Estatísticas por Colaborador
+                      </h2>
+                      <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Análise detalhada de desempenho por colaborador
+                      </p>
+                    </div>
+                    <div class="w-full sm:w-auto">
+                      <input
+                        v-model="userSearch"
+                        type="text"
+                        placeholder="Buscar colaborador..."
+                        class="w-full sm:w-80 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  v-if="topUsers && topUsers.users"
+                  class="p-6 border-b border-gray-200 dark:border-gray-700"
+                >
+                  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                        {{ topUsers.users.reduce((acc, u) => acc + (u.totalTickets || 0), 0) }}
+                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">Tickets (amostra)</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-green-600 dark:text-green-400">
+                        {{ topUsers.users.reduce((acc, u) => acc + (u.resolvedTickets || 0), 0) }}
+                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">
+                        Resolvidos (amostra)
+                      </div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                        {{
+                          formatTimeInSecondsCompact(
+                            Math.round(statistics?.averageResolutionTimeSeconds || 0),
+                          )
+                        }}
+                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">
+                        Tempo Médio (tenant)
+                      </div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                        {{ topUsers.users.length }}
+                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">
+                        Colaboradores (amostra)
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Users Table -->
+                <div class="p-6">
+                  <div class="overflow-x-auto max-h-[520px] overflow-y-auto">
+                    <table class="w-full">
+                      <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                          <th
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                          >
+                            Colaborador
+                          </th>
+                          <th
+                            class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                          >
+                            Tickets Resolvidos
+                          </th>
+                          <th
+                            class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                          >
+                            Taxa de Resolução
+                          </th>
+                          <th
+                            class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                          >
+                            Tickets Totais
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody
+                        class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
+                      >
+                        <tr
+                          v-for="user in filteredUsers"
+                          :key="user.userId"
+                          class="hover:bg-gray-50 dark:hover:bg-gray-700"
+                        >
+                          <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center gap-3">
+                              <div
+                                :class="[
+                                  'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold',
+                                  getAvatarColorClass(user.userId),
+                                ]"
+                              >
+                                <div v-if="!user.avatarUrl">
+                                  {{ getInitials(user.firstName, user.lastName) }}
+                                </div>
+                                <img
+                                  v-else
+                                  :src="user.avatarUrl"
+                                  :alt="`${user.firstName} ${user.lastName}`"
+                                  class="w-full h-full object-cover rounded-full"
+                                />
+                              </div>
+                              <div class="min-w-0">
+                                <p
+                                  class="text-sm font-medium text-gray-900 dark:text-white truncate"
+                                >
+                                  {{ user.firstName }} {{ user.lastName }}
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                  {{ user.departmentName }}
+                                </p>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <div class="text-sm text-gray-900 dark:text-white">
+                              {{ user.resolvedTickets }}
+                            </div>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span
+                              :class="[
+                                'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
+                                getResolutionRateBadgeClass(user.resolutionRate),
+                              ]"
+                            >
+                              {{ formatPercentage(user.resolutionRate) }}
+                            </span>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <div class="text-sm text-gray-900 dark:text-white">
+                              {{ user.totalTickets }}
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Top vs Underperforming Users -->
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                  <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                      Melhor Desempenho
+                    </h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      Colaboradores com maior taxa de resolução
+                    </p>
+                  </div>
+                  <div class="p-6">
+                    <div class="space-y-4">
+                      <template v-if="topPerformers.length > 0">
+                        <div
+                          v-for="user in topPerformers"
+                          :key="`best-${user.userId}`"
+                          class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
+                        >
+                          <div>
+                            <div class="font-medium text-gray-900 dark:text-white">
+                              {{ user.firstName }} {{ user.lastName }}
+                            </div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                              {{ user.resolvedTickets }}/{{ user.totalTickets }} tickets
+                            </div>
+                          </div>
+                          <div class="text-lg font-bold text-green-600 dark:text-green-400">
+                            {{ formatPercentage(user.resolutionRate) }}
+                          </div>
+                        </div>
+                      </template>
+                      <div v-else class="text-sm text-gray-500 dark:text-gray-400 text-center py-2">
+                        Não há colaboradores com bom desempenho
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                  <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                      Pior Desempenho
+                    </h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                      Colaboradores com menor taxa de resolução
+                    </p>
+                  </div>
+                  <div class="p-6">
+                    <div class="space-y-4">
+                      <div
+                        v-for="user in worstPerformers"
+                        :key="`worst-${user.userId}`"
+                        class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
+                      >
+                        <div>
+                          <div class="font-medium text-gray-900 dark:text-white">
+                            {{ user.firstName }} {{ user.lastName }}
+                          </div>
+                          <div class="text-sm text-gray-600 dark:text-gray-400">
+                            {{ user.resolvedTickets }}/{{ user.totalTickets }} tickets
+                          </div>
+                        </div>
+                        <div class="text-lg font-bold text-red-600 dark:text-red-400">
+                          {{ formatPercentage(user.resolutionRate) }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div class="p-12 text-center">
+                <div
+                  class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
+                >
+                  <font-awesome-icon
+                    icon="lock"
+                    class="text-2xl text-blue-600 dark:text-blue-400"
+                  />
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  Analytics de Colaboradores Necessários
+                </h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                  Acesse estatísticas detalhadas por colaborador e rankings de produtividade.
                 </p>
                 <router-link
                   to="/assinaturas"
@@ -1806,11 +2069,11 @@ import { formatDate, formatDateToPortuguese } from '@/utils/date';
 import { reportService } from '@/services/reportService';
 import { ticketService } from '@/services/ticketService';
 import { PERMISSIONS, usePermissions } from '@/utils/permissions';
+import { useRoute, useRouter } from 'vue-router';
 import type {
   TenantStatistics,
   StatusDurationDto,
   DepartmentStats,
-  ResolutionTimeResponseDto,
   ResolutionTimeDataDto,
   ResolutionTimeAverageDto,
   StatusDurationTimeSeriesResponseDto,
@@ -1836,7 +2099,6 @@ import BaseModal from '@/components/common/BaseModal.vue';
 import JSZip from 'jszip';
 ChartJS.register(ChartDataLabels);
 
-// Define the StatsPeriod enum
 enum StatsPeriod {
   ANNUAL = 'annual',
   SEMESTRAL = 'semestral',
@@ -1845,11 +2107,35 @@ enum StatsPeriod {
   WEEKLY = 'weekly',
 }
 
-// Default to 3 months period
 const selectedStatsPeriod = ref<string>(StatsPeriod.TRIMESTRAL);
 const showExportModal = ref(false);
 
-// Chart.js setup
+const route = useRoute();
+const router = useRouter();
+
+const tabUrlSlugMap: Record<string, string> = {
+  overview: 'visao-geral',
+  'in-progress': 'em-andamento',
+  department: 'setores',
+  users: 'colaboradores',
+  trends: 'tendencias',
+};
+const slugToTabId: Record<string, string> = {
+  'visao-geral': 'overview',
+  'em-andamento': 'in-progress',
+  setores: 'department',
+  colaboradores: 'users',
+  tendencias: 'trends',
+};
+
+const getInitialReportsTab = (): string => {
+  const tabFromUrl = (route.query.tab as string) || '';
+  if (tabFromUrl && slugToTabId[tabFromUrl]) return slugToTabId[tabFromUrl];
+  const validTabs = ['overview', 'in-progress', 'department', 'users', 'trends'];
+  if (validTabs.includes(tabFromUrl)) return tabFromUrl; // fallback if already english
+  return 'overview';
+};
+
 ChartJS.register(
   Title,
   Tooltip,
@@ -1864,7 +2150,6 @@ ChartJS.register(
   Filler,
 );
 
-// Local type definitions
 interface ChartData {
   labels: string[];
   datasets: {
@@ -1934,7 +2219,6 @@ interface ChartOptions {
   };
 }
 
-// Ordem e cores fixas para status
 const statusOrder = [
   { key: 'pendente', label: 'Pendente', color: '#eab308' },
   { key: 'em_andamento', label: 'Em andamento', color: '#2563eb' },
@@ -1945,14 +2229,13 @@ const statusOrder = [
   { key: 'reprovado', label: 'Reprovado', color: '#c62828' },
 ];
 
-// Ordem e cores fixas para prioridade
 const priorityOrder = [
   { key: 'baixa', label: 'Baixa', color: '#22c55e' },
   { key: 'media', label: 'Média', color: '#eab308' },
   { key: 'alta', label: 'Alta', color: '#ef4444' },
 ];
 
-// Chart options - garantir percentuais
+// Chart options
 const chartOptions = ref<ChartOptions>({
   responsive: true,
   maintainAspectRatio: false,
@@ -2069,6 +2352,26 @@ const statistics = ref<TenantStatistics | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const topUsers = ref<UserRankingResponseDto | null>(null);
+const topFiveUsers = ref<UserRankingResponseDto | null>(null);
+const worstFiveUsers = ref<UserRankingResponseDto | null>(null);
+const userSearch = ref('');
+const filteredUsers = computed(() => {
+  const users = topUsers.value?.users || [];
+  const q = userSearch.value.trim().toLowerCase();
+  if (!q) return users;
+  return users.filter((u) => `${u.firstName} ${u.lastName}`.toLowerCase().includes(q));
+});
+const topPerformers = computed(() => {
+  const users = topUsers.value?.users || [];
+  return users
+    .filter((u) => (u.resolutionRate || 0) > 0.5)
+    .sort((a, b) => b.resolutionRate - a.resolutionRate)
+    .slice(0, 5);
+});
+
+const worstPerformers = computed(() => {
+  return worstFiveUsers.value?.users || [];
+});
 
 const ticketsByStatus = ref<ChartData>({
   labels: [],
@@ -2132,7 +2435,6 @@ const getPriorityClass = (priority: string): string => {
   return priorityClassMap[priority] || 'bg-blue-100 text-blue-800';
 };
 
-// Add ref for status durations
 const statusDurations = ref<StatusDurationDto[]>([]);
 const departmentData = ref<DepartmentStats[]>([]);
 
@@ -2151,7 +2453,9 @@ const loadData = async () => {
       departmentStatsResult,
       resolutionTimeResult,
       inProgressTimeSeriesResult,
-      topUsersResult, // Add this new result
+      allUsersResult,
+      topFiveUsersResult,
+      worstFiveUsersResult,
     ] = await Promise.all([
       reportService.getTenantStatistics(),
       reportService.getTicketTrends(selectedTrendPeriod.value),
@@ -2162,7 +2466,9 @@ const loadData = async () => {
       reportService.getTenantDepartmentsStatistics(),
       reportService.getResolutionTimeData(),
       reportService.getStatusDurationTimeSeries(TicketStatus.InProgress),
-      reportService.getTopUsers(5), // Add this new API call
+      reportService.getTopUsers(undefined, true), // fetch all users with stats for Colaboradores tab
+      reportService.getTopUsers(5, false), // fetch top 5 for Visão Geral tab
+      reportService.getTopUsers(5, false, 'bottom'), // fetch worst 5 for Pior Desempenho section
     ]);
 
     // Initialize trendData with the current period data
@@ -2177,7 +2483,7 @@ const loadData = async () => {
     // Store department data - directly from the API response
     departmentData.value = departmentStatsResult.map((dept) => ({
       ...dept,
-      departmentId: dept.departmentId, // manter como number
+      departmentId: dept.departmentId,
       totalTickets: dept.totalTickets || 0,
       resolvedTickets: dept.resolvedTickets || 0,
       resolutionRate: dept.resolutionRate || 0,
@@ -2229,11 +2535,11 @@ const loadData = async () => {
     cycleTimeData.value = resolutionTimeResult.data;
     cycleTimeAverage.value = resolutionTimeResult.average;
 
-    // Store the result in the reactive property
     inProgressTimeSeries.value = inProgressTimeSeriesResult;
 
-    // Store the top users
-    topUsers.value = topUsersResult;
+    topUsers.value = allUsersResult; // All users for Colaboradores tab
+    topFiveUsers.value = topFiveUsersResult; // Top 5 for Visão Geral tab
+    worstFiveUsers.value = worstFiveUsersResult; // Worst 5 for Pior Desempenho section
   } catch (err: unknown) {
     console.error('Erro ao carregar dados dos relatórios:', err);
     error.value = 'Ocorreu um erro ao carregar os dados. Por favor, tente novamente.';
@@ -2251,18 +2557,25 @@ onMounted(() => {
   }
 });
 
+const setReportsTab = (tabId: string) => {
+  currentTab.value = tabId;
+  const slug = tabUrlSlugMap[tabId] || tabId;
+  const query: any = { ...route.query, tab: slug };
+  router.push({ query });
+};
+
 const tabs = [
   { id: 'overview', name: 'Visão Geral', shortName: 'Visão Geral', icon: 'chart-pie' },
   { id: 'in-progress', name: 'Em Andamento', shortName: 'Andamento', icon: 'clock' },
   { id: 'department', name: 'Setores', shortName: 'Setores', icon: 'building' },
+  { id: 'users', name: 'Colaboradores', shortName: 'Colab.', icon: 'users' },
   { id: 'trends', name: 'Tendências', shortName: 'Tendências', icon: 'chart-line' },
   //lets not use this yet { id: 'custom', name: 'Análise por Período', icon: 'calendar' },
 ];
 
-const currentTab = ref('overview');
+const currentTab = ref<string>(getInitialReportsTab());
 const pollingInterval = ref<number | null>(null);
 
-// Permissions
 const { hasPermission } = usePermissions();
 
 const startPolling = () => {
@@ -2292,7 +2605,21 @@ watch(currentTab, (newTab) => {
   }
 });
 
-// Clean up on component unmount
+// Sync tab with URL changes (back/forward navigation)
+watch(
+  () => route.query.tab,
+  (newTab) => {
+    if (!newTab) return;
+    const slug = newTab as string;
+    if (slugToTabId[slug]) {
+      currentTab.value = slugToTabId[slug];
+      return;
+    }
+    const validTabs = ['overview', 'in-progress', 'department', 'users', 'trends'];
+    if (validTabs.includes(slug)) currentTab.value = slug;
+  },
+);
+
 onUnmounted(() => {
   stopPolling();
 });
@@ -2583,7 +2910,6 @@ const loadInProgressTasks = async () => {
       }
     }
 
-    // Sort the tasks by time in progress (descending order)
     transformedTasks.sort((a, b) => b.timeInProgressSeconds - a.timeInProgressSeconds);
 
     inProgressTasks.value = transformedTasks;
@@ -2634,13 +2960,6 @@ const departmentStatsSummary = computed(() => {
 const sortedStatusDurations = computed(() => {
   return [...statusDurations.value].sort(
     (a, b) => b.averageDurationSeconds - a.averageDurationSeconds,
-  );
-});
-
-const inProgressDuration = computed(() => {
-  return (
-    statusDurations.value.find((duration) => duration.status.toLowerCase() === 'em_andamento') ||
-    null
   );
 });
 
