@@ -15,12 +15,26 @@
     <div class="overflow-x-auto">
       <table class="w-full border-collapse min-w-[600px]">
         <tbody>
-          <tr v-if="isLoading">
-            <td
-              :colspan="title === 'Últimos Tickets Criados' ? 4 : 5"
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white"
-            >
-              <LoadingSpinner :size="28" />
+          <tr v-if="isLoading" v-for="n in 5" :key="`skeleton-${n}`">
+            <td class="max-w-[200px] pl-8 py-3 border-b border-gray-200 dark:border-gray-700">
+              <div class="flex flex-col gap-1">
+                <div
+                  class="h-4 w-32 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"
+                ></div>
+                <div
+                  class="h-3 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"
+                ></div>
+              </div>
+            </td>
+            <td class="px-3 py-3 border-b border-gray-200 dark:border-gray-700">
+              <div
+                class="h-4 w-16 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom ml-auto"
+              ></div>
+            </td>
+            <td class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700">
+              <div
+                class="h-6 w-20 bg-gray-300 dark:bg-gray-600 rounded-full animate-pulse-custom mx-auto"
+              ></div>
             </td>
           </tr>
           <tr
@@ -265,3 +279,19 @@ function formatDeadlineRelative(dueAt: string) {
   }
 }
 </script>
+
+<style scoped>
+@keyframes fadeInOut {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-pulse-custom {
+  animation: fadeInOut 2s ease-in-out infinite;
+}
+</style>
