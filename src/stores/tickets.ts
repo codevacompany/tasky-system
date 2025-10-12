@@ -149,7 +149,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     myTickets.value.error = null;
 
     try {
-      const params: any = { page: currentPage, limit };
+      const params: Record<string, unknown> = { page: currentPage, limit };
 
       if (currentFilters) {
         if (currentFilters.status !== undefined && currentFilters.status !== null) {
@@ -205,7 +205,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     receivedTickets.value.error = null;
 
     try {
-      const params: any = { page: currentPage, limit };
+      const params: Record<string, unknown> = { page: currentPage, limit };
 
       if (currentFilters) {
         if (currentFilters.status !== undefined && currentFilters.status !== null) {
@@ -261,7 +261,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     departmentTickets.value.error = null;
 
     try {
-      const params: any = { page: currentPage, limit };
+      const params: Record<string, unknown> = { page: currentPage, limit };
 
       if (currentFilters) {
         if (currentFilters.status !== undefined && currentFilters.status !== null) {
@@ -309,7 +309,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     archivedTickets.value.error = null;
 
     try {
-      const params: any = { page: currentPage, limit };
+      const params: Record<string, unknown> = { page: currentPage, limit };
 
       if (currentFilters) {
         if (currentFilters.priority !== undefined && currentFilters.priority !== null) {
@@ -375,16 +375,18 @@ export const useTicketsStore = defineStore('tickets', () => {
     const userStore = useUserStore();
     if (!userStore.user) return;
 
-    await fetchMyTickets();
-    await fetchReceivedTickets();
-    await fetchDepartmentTickets();
-    await fetchArchivedTickets();
+    await Promise.all([
+      fetchMyTickets(),
+      fetchReceivedTickets(),
+      fetchDepartmentTickets(),
+      fetchArchivedTickets(),
+    ]);
   }
 
-  function startPolling() {
+  async function startPolling() {
     if (isPollingActive.value) return;
 
-    refreshAllTickets();
+    await refreshAllTickets();
 
     isPollingActive.value = true;
 

@@ -41,9 +41,7 @@
         </ol>
       </div>
 
-      <div
-        class="w-full max-w-md lg:max-w-lg mt-8 lg:mt-10 h-[70%] flex items-center"
-      >
+      <div class="w-full max-w-md lg:max-w-lg mt-8 lg:mt-10 h-[70%] flex items-center">
         <div class="w-full max-w-md lg:max-w-lg space-y-6">
           <div class="text-center lg:text-left">
             <h2 v-if="step === 1" class="text-blue-600 text-sm lg:text-base font-semibold mb-2">
