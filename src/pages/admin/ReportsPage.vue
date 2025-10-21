@@ -394,105 +394,6 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <!-- Recent Tickets Table -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3">
-                <div
-                  class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-6 border-b border-gray-200 dark:border-gray-700"
-                >
-                  <div>
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                      Últimos Tickets
-                    </h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      Acompanhe os tickets mais recentes do sistema
-                    </p>
-                  </div>
-                  <button
-                    class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors mt-4 sm:mt-0"
-                  >
-                    <font-awesome-icon icon="download" />
-                    Exportar
-                  </button>
-                </div>
-
-                <div class="overflow-x-auto">
-                  <table class="w-full">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
-                      <tr>
-                        <th
-                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                        >
-                          ID
-                        </th>
-                        <th
-                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                        >
-                          Assunto
-                        </th>
-                        <th
-                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                        >
-                          Status
-                        </th>
-                        <th
-                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                        >
-                          Prioridade
-                        </th>
-                        <th
-                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                        >
-                          Data
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody
-                      class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
-                    >
-                      <tr
-                        v-for="ticket in recentTickets"
-                        :key="ticket.customId"
-                        class="hover:bg-gray-50 dark:hover:bg-gray-700"
-                      >
-                        <td
-                          class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white"
-                        >
-                          {{ ticket.customId }}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">
-                          {{ ticket.name }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <span
-                            :class="[
-                              'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
-                              getStatusClass(ticket.status),
-                            ]"
-                          >
-                            {{ formatSnakeToNaturalCase(ticket.status) }}
-                          </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <span
-                            :class="[
-                              'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
-                              getPriorityClass(ticket.priority),
-                            ]"
-                          >
-                            {{ formatSnakeToNaturalCase(ticket.priority) }}
-                          </span>
-                        </td>
-                        <td
-                          class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400"
-                        >
-                          {{ formatDate(ticket.createdAt) }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
               <!-- Top Contributors -->
               <div
                 v-permission="PERMISSIONS.VIEW_USERS_ANALYTICS"
@@ -584,6 +485,77 @@
                   >
                     <font-awesome-icon icon="info-circle" class="mr-2" />
                     <p class="text-sm">Nenhum colaborador encontrado</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Top Setores -->
+              <div
+                v-permission="PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS"
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-lg"
+              >
+                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                    Top Setores
+                  </h2>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">Últimos 3 meses</p>
+                </div>
+
+                <div class="p-6">
+                  <!-- Table Headers -->
+                  <div
+                    class="grid grid-cols-3 gap-4 pb-3 border-b border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                  >
+                    <div>Setor</div>
+                    <div class="text-center">Taxa de resolução</div>
+                    <div class="text-center">Tickets resolvidos</div>
+                  </div>
+
+                  <!-- Table Content -->
+                  <div
+                    v-if="topFiveDepartments && topFiveDepartments.length > 0"
+                    class="space-y-4 mt-4"
+                  >
+                    <div
+                      v-for="dept in topFiveDepartments"
+                      :key="dept.departmentId"
+                      class="grid grid-cols-3 gap-4 items-center py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-2 -mx-2 transition-colors"
+                    >
+                      <div class="min-w-0">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          {{ dept.departmentName }}
+                        </p>
+                      </div>
+                      <div class="text-center">
+                        <span
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          :class="getResolutionRateBadgeClass(dept.resolutionRate)"
+                        >
+                          {{ formatPercentage(dept.resolutionRate) }}
+                        </span>
+                      </div>
+                      <div class="text-center">
+                        <span class="text-lg font-semibold text-gray-900 dark:text-white">{{
+                          dept.resolvedTickets
+                        }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    v-else-if="!departmentStats || departmentStats.length === 0"
+                    class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400"
+                  >
+                    <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
+                    <p class="text-sm">Carregando setores...</p>
+                  </div>
+
+                  <div
+                    v-else
+                    class="flex items-center justify-center py-8 text-gray-500 dark:text-gray-400"
+                  >
+                    <font-awesome-icon icon="info-circle" class="mr-2" />
+                    <p class="text-sm">Nenhum setor encontrado</p>
                   </div>
                 </div>
               </div>
@@ -1336,23 +1308,21 @@
                 </div>
 
                 <div
-                  v-if="topUsers && topUsers.users"
+                  v-if="filteredUsers && filteredUsers.length > 0"
                   class="p-6 border-b border-gray-200 dark:border-gray-700"
                 >
                   <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div class="text-center">
                       <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                        {{ topUsers.users.reduce((acc, u) => acc + (u.totalTickets || 0), 0) }}
+                        {{ filteredUsers.reduce((acc, u) => acc + (u.totalTickets || 0), 0) }}
                       </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">Tickets (amostra)</div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">Tickets</div>
                     </div>
                     <div class="text-center">
                       <div class="text-2xl font-bold text-green-600 dark:text-green-400">
-                        {{ topUsers.users.reduce((acc, u) => acc + (u.resolvedTickets || 0), 0) }}
+                        {{ filteredUsers.reduce((acc, u) => acc + (u.resolvedTickets || 0), 0) }}
                       </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">
-                        Resolvidos (amostra)
-                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">Resolvidos</div>
                     </div>
                     <div class="text-center">
                       <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
@@ -1362,17 +1332,13 @@
                           )
                         }}
                       </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">
-                        Tempo Médio (tenant)
-                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">Tempo Médio</div>
                     </div>
                     <div class="text-center">
                       <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                        {{ topUsers.users.length }}
+                        {{ filteredUsers.length }}
                       </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">
-                        Colaboradores (amostra)
-                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">Colaboradores</div>
                     </div>
                   </div>
                 </div>
@@ -2770,6 +2736,12 @@ const dateRange = ref({
 // Computed Properties para Métricas
 const departmentStats = computed(() => departmentData.value);
 
+const topFiveDepartments = computed(() => {
+  if (!departmentStats.value) return [];
+
+  return [...departmentStats.value].sort((a, b) => b.resolutionRate - a.resolutionRate).slice(0, 5);
+});
+
 const sortedDepartmentsByResolutionTime = computed(() => {
   if (!departmentStats.value) return [];
 
@@ -3340,17 +3312,7 @@ const getInitials = (firstName: string, lastName: string): string => {
 };
 
 const getAvatarColorClass = (userId: number): string => {
-  const colors = [
-    'avatar-pink',
-    'avatar-orange',
-    'avatar-blue',
-    'avatar-green',
-    'avatar-purple',
-    'avatar-teal',
-    'avatar-indigo',
-    'avatar-red',
-  ];
-  return colors[userId % colors.length];
+  return 'avatar-blue';
 };
 
 const getResolutionRateClass = (resolutionRate: number): string => {
@@ -3756,7 +3718,7 @@ const exportToCSV = async () => {
 <style scoped>
 /* Avatar color classes - light backgrounds with colored text */
 .avatar-blue {
-  @apply bg-sky-100 text-sky-600;
+  @apply bg-blue-600 text-white;
 }
 
 .avatar-green {
