@@ -48,7 +48,22 @@
             </button>
 
             <button
-              v-if="isTargetUser && loadedTicket?.status === TicketStatus.InProgress"
+              v-if="
+                isTargetUser &&
+                loadedTicket?.status === TicketStatus.InProgress &&
+                !isLastTargetUser
+              "
+              class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-sm text-white font-medium rounded-md transition-colors"
+              @click="sendToNextDepartment(loadedTicket.customId)"
+            >
+              <font-awesome-icon icon="arrow-right" class="text-xs" />
+              Enviar Para Próximo Setor
+            </button>
+
+            <button
+              v-if="
+                isTargetUser && loadedTicket?.status === TicketStatus.InProgress && isLastTargetUser
+              "
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-primary hover:bg-blue-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="sendForReview(loadedTicket.customId)"
             >
@@ -220,29 +235,58 @@
                     Responsável
                   </p>
                 </div>
-                <div class="flex-1 min-w-0">
+                <div class="flex-1 min-w-0 -mt-1.5">
                   <div v-if="!isEditingAssignee">
+                    <div v-if="sortedTargetUsers && sortedTargetUsers.length > 0">
+                      <div
+                        v-for="targetUser in sortedTargetUsers"
+                        :key="targetUser.userId"
+                        class="flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
+                        @click="() => startEditingAssignee(targetUser.userId)"
+                        :class="{ 'cursor-default': !canEditTicket }"
+                        :title="canEditTicket ? 'Clique para alterar responsável' : ''"
+                      >
+                        <div
+                          class="flex items-center gap-2"
+                          :class="{
+                            'font-semibold text-blue-600 dark:text-blue-400':
+                              sortedTargetUsers.length > 1 &&
+                              targetUser.userId === loadedTicket.currentTargetUserId,
+                          }"
+                        >
+                          <span class="text-sm"
+                            >{{ targetUser.user.firstName }} {{ targetUser.user.lastName }}</span
+                          >
+                          <div
+                            v-if="!targetUser.user.isActive"
+                            class="flex items-center gap-1"
+                            title="Conta desativada"
+                          >
+                            <font-awesome-icon
+                              icon="exclamation-triangle"
+                              class="text-orange-500 text-xs"
+                            />
+                            <span class="text-orange-500 text-xs">Desativado</span>
+                          </div>
+                        </div>
+                        <font-awesome-icon
+                          v-if="canEditTicket && isRequester"
+                          icon="edit"
+                          class="text-gray-400 text-xs"
+                        />
+                      </div>
+                    </div>
                     <div
+                      v-else
                       class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 -m-2 rounded-lg transition-colors"
-                      @click="startEditingAssignee"
+                      @click="() => startEditingAssignee()"
                       :class="{ 'cursor-default': !canEditTicket }"
                       :title="canEditTicket ? 'Clique para alterar responsável' : ''"
                     >
                       <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
-                        {{ loadedTicket.targetUser.firstName }}
-                        {{ loadedTicket.targetUser.lastName }}
+                        {{ loadedTicket.currentTargetUser?.firstName }}
+                        {{ loadedTicket.currentTargetUser?.lastName }}
                       </p>
-                      <div
-                        v-if="!loadedTicket.targetUser.isActive"
-                        class="flex items-center gap-1"
-                        title="Conta desativada"
-                      >
-                        <font-awesome-icon
-                          icon="exclamation-triangle"
-                          class="text-orange-500 text-xs"
-                        />
-                        <span class="text-orange-500 text-xs">Desativado</span>
-                      </div>
                       <font-awesome-icon
                         v-if="canEditTicket && isRequester"
                         icon="edit"
@@ -256,6 +300,7 @@
                       v-model="assigneeSelection"
                       @change="saveAssigneeChange"
                       placeholder="Selecionar responsável..."
+                      :excludedDepartmentIds="excludedDepartmentIds"
                     />
                     <div class="flex gap-2">
                       <button
@@ -680,6 +725,8 @@
     :message="confirmationModal.message"
     :hasInput="confirmationModal.hasInput"
     :reasonOptions="confirmationModal.reasonOptions"
+    :showUserSelector="confirmationModal.showUserSelector"
+    :targetUsers="confirmationModal.targetUsers"
     @confirm="handleConfirm"
     @cancel="handleCancel"
   />
@@ -826,10 +873,14 @@ const confirmationModal = ref({
   isOpen: false,
   title: '',
   message: '',
-  action: null as ((data?: { reason: string; description: string }) => Promise<void>) | null,
+  action: null as
+    | ((data?: { reason: string; description: string; targetUserId?: number }) => Promise<void>)
+    | null,
   hasInput: false,
   reasonOptions: [] as { value: string; label: string }[],
   context: '', // add context property
+  showUserSelector: false,
+  targetUsers: [] as Array<{ userId: number; userName: string; order: number }>,
 });
 
 const editorOptions = {
@@ -939,10 +990,12 @@ const getDeadlineClass = (date?: string) => {
 const openConfirmationModal = (
   title: string,
   message: string,
-  action: (data?: { reason: string; description: string }) => Promise<void>,
+  action: (data?: { reason: string; description: string; targetUserId?: number }) => Promise<void>,
   hasInput = false,
   reasonOptions: { value: string; label: string }[] = [],
   context = '',
+  showUserSelector = false,
+  targetUsers: Array<{ userId: number; userName: string; order: number }> = [],
 ) => {
   confirmationModal.value = {
     isOpen: true,
@@ -952,6 +1005,8 @@ const openConfirmationModal = (
     hasInput,
     reasonOptions,
     context,
+    showUserSelector,
+    targetUsers,
   };
 };
 
@@ -960,7 +1015,11 @@ const closeConfirmationModal = () => {
   confirmationModal.value.action = null;
 };
 
-const handleConfirm = async (data?: { reason: string; description: string }) => {
+const handleConfirm = async (data?: {
+  reason: string;
+  description: string;
+  targetUserId?: number;
+}) => {
   if (confirmationModal.value.action) {
     if (data) {
       await confirmationModal.value.action(data);
@@ -1006,10 +1065,27 @@ const acceptTicket = async (ticketId: string) => {
   );
 };
 
+const sendToNextDepartment = async (ticketId: string) => {
+  openConfirmationModal(
+    'Enviar para Próximo Setor',
+    'Tem certeza que deseja enviar este ticket para o próximo setor?',
+    async () => {
+      try {
+        await ticketService.sendToNextDepartment(ticketId);
+        toast.success('Ticket enviado para o próximo setor');
+
+        refreshSelectedTicket();
+      } catch {
+        toast.error('Erro ao enviar o ticket para o próximo setor');
+      }
+    },
+  );
+};
+
 const sendForReview = async (ticketId: string) => {
   if (
     loadedTicket.value &&
-    loadedTicket.value.requester.id === loadedTicket.value.targetUser.id &&
+    loadedTicket.value.requester.id === loadedTicket.value.currentTargetUserId &&
     !loadedTicket.value.reviewer
   ) {
     await fetchTenantAdmins();
@@ -1054,15 +1130,33 @@ const approveTicket = async (ticketId: string) => {
 };
 
 const requestCorrection = async (ticketId: string) => {
+  if (!loadedTicket.value) return;
+
   const reasonOptions = enumToOptions(CorrectionReason);
+
+  // Prepare target users for the selector if multiple users exist
+  const showUserSelector =
+    loadedTicket.value.targetUsers && loadedTicket.value.targetUsers.length > 1;
+  const targetUsers = showUserSelector
+    ? [...loadedTicket.value.targetUsers]
+        .sort((a, b) => a.order - b.order)
+        .map((tu) => ({
+          userId: tu.userId,
+          userName: `${tu.user.firstName} ${tu.user.lastName}`,
+          order: tu.order,
+          departmentName: tu.user.department?.name || '',
+        }))
+    : [];
+
   openConfirmationModal(
     'Solicitar Correção',
     'Por favor, preencha os detalhes da correção necessária:',
-    async (data?: { reason: string; description: string }) => {
+    async (data?: { reason: string; description: string; targetUserId?: number }) => {
       try {
         await ticketService.requestCorrection(ticketId, {
           reason: data?.reason ?? '',
           details: data?.description ?? '',
+          targetUserId: data?.targetUserId,
         });
 
         toast.success('Correção solicitada com sucesso');
@@ -1074,6 +1168,9 @@ const requestCorrection = async (ticketId: string) => {
     },
     true,
     reasonOptions,
+    '',
+    showUserSelector,
+    targetUsers,
   );
 };
 
@@ -1283,9 +1380,24 @@ const timeline = computed(() => {
   );
 });
 
-const isTargetUser = computed(() => userStore.user?.id === loadedTicket.value?.targetUser.id);
+const isTargetUser = computed(() => userStore.user?.id === loadedTicket.value?.currentTargetUserId);
 const isRequester = computed(() => userStore.user?.id === loadedTicket.value?.requester.id);
 const isReviewer = computed(() => userStore.user?.id === loadedTicket.value?.reviewer?.id);
+
+const sortedTargetUsers = computed(() => {
+  if (!loadedTicket.value?.targetUsers) return [];
+
+  return [...loadedTicket.value.targetUsers].sort((a, b) => a.order - b.order);
+});
+
+const isLastTargetUser = computed(() => {
+  if (!loadedTicket.value?.targetUsers || !isTargetUser.value) return false;
+
+  const sortedTargetUsersList = sortedTargetUsers.value;
+  const lastUser = sortedTargetUsersList[sortedTargetUsersList.length - 1];
+
+  return lastUser.userId === loadedTicket.value.currentTargetUserId;
+});
 
 const formatTicketUpdateDescription = (ticketUpdate: TicketUpdate) => {
   return `${ticketUpdate.description.replace('user', `${ticketUpdate.performedBy.firstName} ${ticketUpdate.performedBy.lastName}`)}`;
@@ -1461,7 +1573,7 @@ const canEditTicket = computed(() => {
 
   const isUserInvolved =
     userStore.user?.id === loadedTicket.value.requester.id ||
-    userStore.user?.id === loadedTicket.value.targetUser.id;
+    userStore.user?.id === loadedTicket.value.currentTargetUserId;
 
   const isTicketActive =
     loadedTicket.value.status !== TicketStatus.Completed &&
@@ -1590,23 +1702,42 @@ const closeAddMenu = () => {
 };
 
 const isEditingAssignee = ref(false);
+const currentlyEditingUser = ref<number | null>(null);
 const assigneeSelection = ref<{ departmentId: number | null; userId: number | null }>({
   departmentId: null,
   userId: null,
 });
 
-const startEditingAssignee = () => {
+// Compute excluded department IDs - departments that already have other users assigned
+const excludedDepartmentIds = computed(() => {
+  if (!loadedTicket.value?.targetUsers || !currentlyEditingUser.value) return [];
+
+  return loadedTicket.value.targetUsers
+    .filter((tu) => tu.userId !== currentlyEditingUser.value)
+    .map((tu) => tu.user?.departmentId)
+    .filter((id): id is number => id !== null && id !== undefined);
+});
+
+const startEditingAssignee = (targetUserId?: number) => {
   if (!canEditTicket.value || !isRequester.value) return;
 
+  // Determine which user to edit - either the passed targetUserId or currentTargetUserId
+  const userIdToEdit = targetUserId ?? loadedTicket.value?.currentTargetUserId ?? null;
+  currentlyEditingUser.value = userIdToEdit;
+
+  // Find the target user to populate the selector
+  const targetUser = loadedTicket.value?.targetUsers?.find((tu) => tu.userId === userIdToEdit);
+
   assigneeSelection.value = {
-    departmentId: loadedTicket.value?.targetUser?.departmentId || null,
-    userId: loadedTicket.value?.targetUser?.id || null,
+    departmentId: targetUser?.user?.departmentId || null,
+    userId: userIdToEdit,
   };
   isEditingAssignee.value = true;
 };
 
 const cancelEditingAssignee = () => {
   isEditingAssignee.value = false;
+  currentlyEditingUser.value = null;
   assigneeSelection.value = {
     departmentId: null,
     userId: null,
@@ -1617,10 +1748,17 @@ const saveAssigneeChange = async (selection: { department: any; user: any }) => 
   if (!selection.user || !loadedTicket.value) return;
 
   try {
-    await ticketService.updateAssignee(loadedTicket.value.customId, selection.user.id);
+    // Find the order of the user being edited - order is 1-based in the database
+    const editingUser = loadedTicket.value.targetUsers?.find(
+      (tu) => tu.userId === currentlyEditingUser.value,
+    );
+    const order = editingUser?.order || 1;
+
+    await ticketService.updateAssignee(loadedTicket.value.customId, selection.user.id, order);
 
     await refreshSelectedTicket();
     isEditingAssignee.value = false;
+    currentlyEditingUser.value = null;
     toast.success('Responsável alterado com sucesso!');
   } catch (error) {
     console.error('Erro ao alterar responsável:', error);
@@ -1629,7 +1767,9 @@ const saveAssigneeChange = async (selection: { department: any; user: any }) => 
 };
 
 const isSelfAssigned = computed(
-  () => loadedTicket.value && loadedTicket.value.requester.id === loadedTicket.value.targetUser.id,
+  () =>
+    loadedTicket.value &&
+    loadedTicket.value.requester.id === loadedTicket.value.currentTargetUserId,
 );
 
 const startTicket = async (ticketId: string) => {

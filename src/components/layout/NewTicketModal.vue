@@ -51,30 +51,15 @@
             </label>
           </div>
         </div>
+      </div>
 
-        <div class="col-span-1 flex flex-col gap-1.5">
-          <label for="targetDepartment" class="text-sm text-gray-800 dark:text-gray-200"
-            >Setor Destino: <span class="text-red-500">*</span></label
-          >
-          <Select
-            :options="departmentOptions"
-            :modelValue="selectedDepartment?.toString() || ''"
-            @update:modelValue="updateSelectedDepartment"
-          />
-        </div>
+      <TargetUsersSelector
+        :departments="departments"
+        :allUsers="allUsers"
+        v-model:targetUsers="targetUsers"
+      />
 
-        <div class="col-span-1 flex flex-col gap-1.5">
-          <label for="targetUser" class="text-sm text-gray-800 dark:text-gray-200"
-            >Usuário Destino:</label
-          >
-          <Select
-            :options="userOptions"
-            :modelValue="selectedUser?.toString() || ''"
-            @update:modelValue="updateSelectedUser"
-            :disabled="!selectedDepartment"
-          />
-        </div>
-
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-6 mt-4">
         <div class="col-span-1 flex flex-col gap-1.5">
           <label for="category" class="text-sm text-gray-800 dark:text-gray-200"
             >Categoria: <span class="text-red-500">*</span></label
@@ -86,11 +71,11 @@
           />
         </div>
 
-        <div class="col-span-1 md:col-span-2 flex flex-col gap-1.5">
-          <label class="text-sm text-gray-800 dark:text-gray-200"
+        <div class="col-span-1 flex flex-col gap-1.5">
+          <label class="text-sm text-gray-800 dark:text-gray-200 mt-1"
             >Prioridade: <span class="text-red-500">*</span></label
           >
-          <div class="flex sm:flex-row gap-2 sm:gap-4 pt-1">
+          <div class="flex sm:flex-row gap-2 sm:gap-4 pt-2">
             <label
               class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200 cursor-pointer"
             >
@@ -201,6 +186,7 @@ import axios from 'axios';
 import { awsService } from '@/services/awsService';
 import BaseModal from '@/components/common/BaseModal.vue';
 import Select from '@/components/common/Select.vue';
+import TargetUsersSelector from '@/components/common/TargetUsersSelector.vue';
 
 const emit = defineEmits<{
   (e: 'close'): void;
@@ -210,12 +196,24 @@ const emit = defineEmits<{
 const ticketsStore = useTicketsStore();
 const departments = ref<Department[]>([]);
 const availableUsers = ref<User[]>([]);
+const allUsers = ref<User[]>([]);
 const selectedDepartment = ref<number | null>(null);
 const selectedUser = ref<number | null>(null);
 const categories = ref<Category[]>([]);
 const selectedCategory = ref<number | null>(null);
 const selectedFiles = ref<File[]>([]);
 const privateRadioKey = ref(0);
+const targetUsers = ref<
+  Array<{
+    departmentId: number | null;
+    userId: number | null;
+  }>
+>([
+  {
+    departmentId: null,
+    userId: null,
+  },
+]);
 
 // Computed properties for Select component options
 const departmentOptions = computed(() => [
@@ -231,7 +229,6 @@ const formData = ref({
   priority: TicketPriority.Low,
   description: '',
   departmentId: null as number | null,
-  targetUserId: null as number | null,
   dueAt: '',
   requesterId: useUserStore().user?.id || null,
   categoryId: null as number | null,
@@ -324,6 +321,15 @@ const loadCategories = async () => {
   }
 };
 
+const loadAllUsers = async () => {
+  try {
+    const { data } = await userService.fetch({ limit: 100 });
+    allUsers.value = data.items;
+  } catch {
+    toast.error('Erro ao carregar usuários');
+  }
+};
+
 const updateUsersList = async () => {
   if (!selectedDepartment.value) {
     availableUsers.value = [];
@@ -354,7 +360,6 @@ const resetForm = () => {
     priority: TicketPriority.Low,
     description: '',
     departmentId: null,
-    targetUserId: null,
     dueAt: '',
     requesterId: useUserStore().user!.id,
     categoryId: null,
@@ -365,11 +370,18 @@ const resetForm = () => {
   availableUsers.value = [];
   selectedCategory.value = null;
   selectedFiles.value = [];
+  targetUsers.value = [
+    {
+      departmentId: null,
+      userId: null,
+    },
+  ];
 };
 
 onMounted(() => {
   loadDepartments();
   loadCategories();
+  loadAllUsers();
 });
 
 const validateForm = () => {
@@ -389,12 +401,9 @@ const validateForm = () => {
     toast.error('O campo Categoria é obrigatório');
     return false;
   }
-  if (!selectedDepartment.value) {
-    toast.error('O campo Setor Destino é obrigatório');
-    return false;
-  }
-  if (!selectedUser.value) {
-    toast.error('O campo Usuário Destino é obrigatório');
+  const hasValidTargetUsers = targetUsers.value.some((tu) => tu.userId !== null);
+  if (!hasValidTargetUsers) {
+    toast.error('Selecione pelo menos um usuário destino');
     return false;
   }
   if (!formData.value.priority) {
@@ -471,17 +480,32 @@ const handleSubmit = async () => {
 
   formData.value.description = doc.body.innerHTML;
 
-  formData.value.departmentId = selectedDepartment.value;
-  formData.value.targetUserId = selectedUser.value;
   formData.value.categoryId = selectedCategory.value;
+
+  // Extract target user IDs from targetUsers array
+  const targetUserIds = targetUsers.value
+    .filter((tu) => tu.userId !== null)
+    .map((tu) => tu.userId!);
+
+  if (targetUserIds.length === 0) {
+    toast.error('Selecione pelo menos um usuário destino');
+    return;
+  }
 
   try {
     const fileUrls = await uploadFilesToS3();
 
     const ticketData = {
-      ...formData.value,
+      name: formData.value.name,
+      priority: formData.value.priority,
+      description: formData.value.description,
+      requesterId: formData.value.requesterId!,
+      departmentId: targetUsers.value[0].departmentId!,
       dueAt: formData.value.dueAt || undefined,
+      categoryId: selectedCategory.value ?? null,
+      isPrivate: formData.value.isPrivate,
       files: fileUrls,
+      targetUserIds,
     };
 
     await ticketService.create(ticketData);
