@@ -13,6 +13,15 @@
 
       <!-- Campos adicionais para entrada de dados -->
       <div v-if="hasInput" class="input-fields">
+        <div v-if="showUserSelector && targetUsers && targetUsers.length > 0" class="form-group">
+          <label for="targetUser">Enviar para:</label>
+          <select id="targetUser" v-model="selectedTargetUserId" class="select-input">
+            <option :value="null" disabled selected>Selecione o usuário</option>
+            <option v-for="user in targetUsers" :key="user.userId" :value="user.userId">
+              {{ user.userName }} {{ user.departmentName ? `(${user.departmentName})` : '' }}
+            </option>
+          </select>
+        </div>
         <div class="form-group">
           <label for="reason">Motivo:</label>
           <select
@@ -72,16 +81,19 @@ const props = defineProps<{
   message: string;
   hasInput?: boolean;
   reasonOptions?: { value: string; label: string }[];
+  showUserSelector?: boolean;
+  targetUsers?: Array<{ userId: number; userName: string; order: number; departmentName?: string }>;
 }>();
 
 const emit = defineEmits<{
-  (e: 'confirm', data?: { reason: string; description: string }): void;
+  (e: 'confirm', data?: { reason: string; description: string; targetUserId?: number }): void;
   (e: 'cancel'): void;
 }>();
 
 const showErrors = ref(false);
 const inputReason = ref('');
 const inputDescription = ref('');
+const selectedTargetUserId = ref<number | null>(null);
 
 const validateForm = (): boolean => {
   if (!props.hasInput) return true;
@@ -99,6 +111,7 @@ const resetForm = () => {
   showErrors.value = false;
   inputReason.value = '';
   inputDescription.value = '';
+  selectedTargetUserId.value = null;
 };
 
 const handleConfirm = () => {
@@ -108,6 +121,9 @@ const handleConfirm = () => {
     emit('confirm', {
       reason: inputReason.value,
       description: inputDescription.value,
+      ...(props.showUserSelector && selectedTargetUserId.value
+        ? { targetUserId: selectedTargetUserId.value }
+        : {}),
     });
   } else {
     emit('confirm');

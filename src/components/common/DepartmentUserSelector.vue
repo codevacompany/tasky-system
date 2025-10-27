@@ -29,7 +29,11 @@
             class="w-full bg-transparent border-none focus:outline-none text-sm text-gray-900 dark:text-gray-100"
           >
             <option value="">Selecione um departamento</option>
-            <option v-for="department in departments" :key="department.id" :value="department.id">
+            <option
+              v-for="department in availableDepartments"
+              :key="department.id"
+              :value="department.id"
+            >
               {{ department.name }}
             </option>
           </select>
@@ -108,6 +112,7 @@ import { toast } from 'vue3-toastify';
 interface Props {
   modelValue?: { departmentId: number | null; userId: number | null };
   placeholder?: string;
+  excludedDepartmentIds?: number[]; // Excluded departments (already have users assigned)
 }
 
 interface Emits {
@@ -156,6 +161,12 @@ const filteredUsers = computed(() => {
       `${user.firstName} ${user.lastName}`.toLowerCase().includes(term) ||
       (user.email && user.email.toLowerCase().includes(term)),
   );
+});
+
+const availableDepartments = computed(() => {
+  if (!props.excludedDepartmentIds?.length) return departments.value;
+
+  return departments.value.filter((dept) => !props.excludedDepartmentIds?.includes(dept.id));
 });
 
 const toggleDropdown = () => {

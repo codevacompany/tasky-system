@@ -76,18 +76,40 @@
 
           <div class="flex flex-col gap-2">
             <div class="flex items-center justify-between gap-3 mb-0">
-              <div class="text-xs text-gray-500 dark:text-gray-100">
-                <div class="flex items-center gap-1">
-                  <span>{{ ticket.targetUser.firstName }} {{ ticket.targetUser.lastName }}</span>
-                  <font-awesome-icon
-                    v-if="!ticket.targetUser.isActive"
-                    icon="exclamation-triangle"
-                    class="text-orange-500 text-xs"
-                    title="Conta desativada"
-                  />
+              <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1.5">
+                  <div
+                    v-if="ticket.targetUsers && ticket.targetUsers.length > 0"
+                    v-for="targetUser in ticket.targetUsers"
+                    :key="targetUser.userId"
+                    :class="[
+                      'w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold',
+                      ticket.targetUsers.length > 1 &&
+                      targetUser.userId === ticket.currentTargetUserId
+                        ? 'ring-2 ring-blue-500'
+                        : '',
+                    ]"
+                    :style="{
+                      backgroundColor: getAvatarColor(
+                        targetUser.user.firstName + ' ' + targetUser.user.lastName,
+                      ),
+                    }"
+                    :title="targetUser.user.firstName + ' ' + targetUser.user.lastName"
+                  >
+                    {{ getUserInitials(targetUser.user.firstName, targetUser.user.lastName) }}
+                  </div>
                 </div>
-                <div class="text-xs text-gray-400 dark:text-gray-400">
-                  {{ ticket.department.name }}
+                <div class="flex flex-col">
+                  <div class="text-xs text-gray-400 dark:text-gray-400">
+                    {{
+                      ticket.currentTargetUser?.department?.name ||
+                      (ticket.currentTargetUserId && ticket.targetUsers?.length > 0
+                        ? ticket.targetUsers.find((tu) => tu.userId === ticket.currentTargetUserId)
+                            ?.user?.department?.name
+                        : '') ||
+                      ticket.department.name
+                    }}
+                  </div>
                 </div>
               </div>
               <div
@@ -224,6 +246,30 @@ const pendingVerificationTicket = ref<Ticket | null>(null);
 
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
+
+const getUserInitials = (firstName: string, lastName: string) => {
+  return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+};
+
+const getAvatarColor = (name: string) => {
+  const colors = [
+    '#ef4444', // red
+    '#f97316', // orange
+    '#eab308', // yellow
+    '#84cc16', // green
+    '#06b6d4', // cyan
+    '#3b82f6', // blue
+    '#6366f1', // indigo
+    '#8b5cf6', // violet
+    '#d946ef', // fuchsia
+    '#ec4899', // pink
+  ];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+};
 
 const getTicketsByStatus = (status: string) => {
   if (status === TicketStatus.Pending) {

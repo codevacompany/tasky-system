@@ -97,40 +97,62 @@
               v-if="tableType === 'criados'"
               class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
             >
-              <div class="max-w-[120px]">
-                <div class="truncate">
-                  {{
-                    ticket.targetUser
-                      ? ticket.targetUser.firstName + ' ' + ticket.targetUser.lastName
-                      : '-'
-                  }}
+              <div>
+                <div v-if="ticket.targetUsers && ticket.targetUsers.length > 0" class="space-y-1">
+                  <div
+                    v-for="targetUser in ticket.targetUsers"
+                    :key="targetUser.userId"
+                    :class="[
+                      ticket.targetUsers.length > 1 &&
+                      targetUser.userId === ticket.currentTargetUserId
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : 'text-gray-900 dark:text-gray-100',
+                    ]"
+                  >
+                    {{ targetUser.user.firstName }} {{ targetUser.user.lastName }}
+                  </div>
+                  <div
+                    v-if="ticket.targetUsers.some((tu) => tu.user && !tu.user.isActive)"
+                    class="flex items-center justify-center gap-1 mt-1"
+                  >
+                    <font-awesome-icon
+                      icon="exclamation-triangle"
+                      class="text-orange-500 text-xs"
+                      title="Conta desativada"
+                    />
+                    <span class="text-orange-500 text-xs font-medium">Desativado</span>
+                  </div>
                 </div>
-                <div
-                  v-if="ticket.targetUser && !ticket.targetUser.isActive"
-                  class="flex items-center justify-center gap-1 mt-1"
-                >
-                  <font-awesome-icon
-                    icon="exclamation-triangle"
-                    class="text-orange-500 text-xs"
-                    title="Conta desativada"
-                  />
-                  <span class="text-orange-500 text-xs font-medium">Desativado</span>
-                </div>
+                <div v-else>-</div>
               </div>
             </td>
             <td
               v-else
               class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
             >
-              <div class="max-w-[120px] truncate">
-                {{ ticket.requester.firstName }} {{ ticket.requester.lastName }}
-              </div>
+              <div>{{ ticket.requester.firstName }} {{ ticket.requester.lastName }}</div>
             </td>
             <td
               class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
             >
-              <div class="max-w-[150px] truncate" :title="ticket.department.name">
-                {{ ticket.department.name }}
+              <div>
+                <div v-if="ticket.targetUsers && ticket.targetUsers.length > 0" class="space-y-1">
+                  <div
+                    v-for="targetUser in ticket.targetUsers"
+                    :key="targetUser.userId"
+                    :class="[
+                      ticket.targetUsers.length > 1 &&
+                      targetUser.userId === ticket.currentTargetUserId
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : 'text-gray-900 dark:text-gray-100',
+                    ]"
+                  >
+                    {{ targetUser.user.department?.name || '-' }}
+                  </div>
+                </div>
+                <div v-else class="truncate" :title="ticket.department.name">
+                  {{ ticket.department.name }}
+                </div>
               </div>
             </td>
             <td
@@ -215,7 +237,19 @@
                     <font-awesome-icon icon="check" class="text-xs md:text-sm" />
                   </button>
                   <button
-                    v-else-if="ticket.status === TicketStatus.InProgress"
+                    v-else-if="
+                      ticket.status === TicketStatus.InProgress && !isLastTargetUser(ticket)
+                    "
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
+                    @click.stop="handleSendToNextDepartment(ticket)"
+                    title="Enviar para Próximo Setor"
+                  >
+                    <font-awesome-icon icon="arrow-right" class="text-xs md:text-sm" />
+                  </button>
+                  <button
+                    v-else-if="
+                      ticket.status === TicketStatus.InProgress && isLastTargetUser(ticket)
+                    "
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duration-200"
                     @click.stop="handleVerifyTicket(ticket)"
                     title="Enviar para Verificação"
@@ -790,6 +824,25 @@ const handleAcceptTicket = async (ticket: Ticket) => {
   );
 };
 
+const handleSendToNextDepartment = async (ticket: Ticket) => {
+  openConfirmationModal(
+    'Enviar para Próximo Setor',
+    'Tem certeza que deseja enviar este ticket para o próximo setor?',
+    async () => {
+      try {
+        await ticketService.sendToNextDepartment(ticket.customId);
+        toast.success('Ticket enviado para o próximo setor');
+
+        await refreshTickets();
+
+        await ticketsStore.fetchTicketDetails(ticket.customId);
+      } catch {
+        toast.error('Erro ao enviar o ticket para o próximo setor');
+      }
+    },
+  );
+};
+
 const handleVerifyTicket = async (ticket: Ticket) => {
   openConfirmationModal(
     'Enviar para Verificação',
@@ -926,7 +979,18 @@ const handleCorrectTicket = async (ticket: Ticket) => {
 
 const isReviewer = (ticket: Ticket) => userStore.user?.id === ticket.reviewer?.id;
 
-const isSelfAssigned = (ticket: Ticket) => ticket.requester.id === ticket.targetUser.id;
+const isSelfAssigned = (ticket: Ticket) =>
+  ticket.targetUsers && ticket.targetUsers.some((tu) => tu.userId === ticket.requester.id);
+
+const isLastTargetUser = (ticket: Ticket) => {
+  if (!ticket.targetUsers || ticket.targetUsers.length === 0) return true;
+  if (!userStore.user?.id) return false;
+
+  const sortedTargetUsers = [...ticket.targetUsers].sort((a, b) => a.order - b.order);
+  const lastUser = sortedTargetUsers[sortedTargetUsers.length - 1];
+
+  return lastUser.userId === ticket.currentTargetUserId;
+};
 
 const handleStartTicket = async (ticket: Ticket) => {
   openConfirmationModal(

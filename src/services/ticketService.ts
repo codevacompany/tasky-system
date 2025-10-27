@@ -134,7 +134,10 @@ export const ticketService = {
     return apiClient.post(`/tickets/${id}/reject`, data);
   },
 
-  async requestCorrection(id: string, data?: { reason: string; details: string }) {
+  async requestCorrection(
+    id: string,
+    data?: { reason: string; details: string; targetUserId?: number },
+  ) {
     return apiClient.post(`/tickets/${id}/request-correction`, data);
   },
 
@@ -142,11 +145,19 @@ export const ticketService = {
     return apiClient.post(`/tickets/${id}/files`, { fileUrls });
   },
 
-  async updateAssignee(id: string, targetUserId: number): Promise<AxiosResponse<Ticket>> {
-    return apiClient.patch(`/tickets/${id}/assignee`, { targetUserId });
+  async updateAssignee(
+    id: string,
+    targetUserId: number,
+    order: number,
+  ): Promise<AxiosResponse<Ticket>> {
+    return apiClient.patch(`/tickets/${id}/assignee`, { targetUserId, order });
   },
 
   async updateReviewer(ticketId: string, reviewerId: number) {
     return apiClient.patch(`/tickets/${ticketId}/reviewer`, { reviewerId });
+  },
+
+  async sendToNextDepartment(id: string): Promise<AxiosResponse<Ticket>> {
+    return apiClient.post(`/tickets/${id}/send-to-next-department`);
   },
 };

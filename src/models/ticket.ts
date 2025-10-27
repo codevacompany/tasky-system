@@ -25,6 +25,14 @@ export enum TicketStatus {
   Rejected = 'reprovado',
 }
 
+export interface TicketTargetUser {
+  id: number;
+  userId: number;
+  ticketId: number;
+  order: number;
+  user: User;
+}
+
 export interface Ticket {
   id: number;
   customId: string;
@@ -33,7 +41,9 @@ export interface Ticket {
   description: string;
   department: Department;
   requester: User;
-  targetUser: User;
+  targetUsers: TicketTargetUser[];
+  currentTargetUser?: User;
+  currentTargetUserId?: number;
   reviewer?: User;
   status: TicketStatus;
   completedAt?: string;
@@ -58,7 +68,7 @@ export interface CreateTicketDto {
   description: string;
   departmentId: number | null;
   requesterId: number | null;
-  targetUserId: number | null;
+  targetUserIds: number[];
   categoryId: number | null;
   dueAt?: string;
   canceledAt?: string;
@@ -72,7 +82,7 @@ export interface UpdateTicketDto {
   description?: string;
   departmentId?: number;
   requesterId?: User;
-  targetUserId?: User;
+  targetUserIds?: number[];
   categoryId?: number | null;
   dueAt?: string;
 }
