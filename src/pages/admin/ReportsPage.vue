@@ -2848,10 +2848,10 @@ const loadInProgressTasks = async () => {
           initials: 'NA',
         };
 
-        if (ticket.targetUser) {
+        if (ticket.currentTargetUser) {
           const name =
-            `${ticket.targetUser.firstName} ${ticket.targetUser.lastName}` ||
-            ticket.targetUser.email ||
+            `${ticket.currentTargetUser.firstName} ${ticket.currentTargetUser.lastName}` ||
+            ticket.currentTargetUser.email ||
             'Anônimo';
           const initials = name
             .split(' ')
@@ -3459,8 +3459,8 @@ const exportToExcel = async () => {
           ticket.status,
           ticket.priority,
           `${ticket.requester.firstName} ${ticket.requester.lastName}`,
-          ticket.targetUser
-            ? `${ticket.targetUser.firstName} ${ticket.targetUser.lastName}`
+          ticket.currentTargetUser
+            ? `${ticket.currentTargetUser.firstName} ${ticket.currentTargetUser.lastName}`
             : 'Não atribuído',
           ticket.department.name,
           new Date(ticket.createdAt).toLocaleDateString('pt-BR'),
@@ -3683,8 +3683,8 @@ const exportToCSV = async () => {
 
     allTickets.forEach((ticket) => {
       const requesterName = `${ticket.requester.firstName} ${ticket.requester.lastName}`;
-      const targetUserName = ticket.targetUser
-        ? `${ticket.targetUser.firstName} ${ticket.targetUser.lastName}`
+      const targetUserName = ticket.currentTargetUser
+        ? `${ticket.currentTargetUser.firstName} ${ticket.currentTargetUser.lastName}`
         : 'Não atribuído';
       const createdDate = new Date(ticket.createdAt).toLocaleDateString('pt-BR');
       const updatedDate = new Date(ticket.updatedAt).toLocaleDateString('pt-BR');
