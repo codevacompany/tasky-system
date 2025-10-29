@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex gap-6 p-6 overflow-x-auto min-h-[70vh] bg-white dark:bg-gray-900 rounded-lg relative w-full"
+    class="flex gap-4 p-6 overflow-x-auto min-h-[70vh] bg-white dark:bg-gray-900 rounded-lg relative w-full"
   >
     <div
       v-for="status in statusColumns"
@@ -22,12 +22,12 @@
         </h3>
       </div>
 
-      <div class="p-4 flex flex-col min-h-[100px] max-h-[calc(100vh-200px)] overflow-y-auto">
+      <div class="p-1.5 flex flex-col min-h-[100px] max-h-[calc(100vh-200px)] overflow-y-auto">
         <div
           v-for="ticket in getTicketsByStatus(status)"
           :key="ticket.customId"
           :class="[
-            'bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border shadow-sm mb-3.5 flex flex-col hover:-translate-y-0.5 hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
+            'min-h-[100px] bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border shadow-sm mb-3.5 flex flex-col hover:-translate-y-0.5 hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
             ticket.status === TicketStatus.Returned
               ? 'border-orange-300 dark:border-orange-600 dark:bg-orange-900/10 hover:border-orange-400 dark:hover:border-orange-500'
               : 'border-gray-200 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500',
@@ -237,6 +237,7 @@ const statusColumns = [
   TicketStatus.InProgress,
   TicketStatus.AwaitingVerification,
   TicketStatus.UnderVerification,
+  TicketStatus.Completed,
 ];
 
 const selectedTicket = ref<Ticket | null>(null);
@@ -277,6 +278,7 @@ const getTicketsByStatus = (status: string) => {
       (ticket) => ticket.status === status || ticket.status === TicketStatus.Returned,
     );
   }
+
   return props.tickets.filter((ticket) => ticket.status === status);
 };
 

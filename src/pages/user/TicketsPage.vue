@@ -177,7 +177,7 @@
           </div>
 
           <!-- Content Area -->
-          <div class="overflow-x-auto p-4">
+          <div class="overflow-x-auto px-2 pt-3 pb-2">
             <TicketTable
               v-if="!isKanbanView"
               :tickets="tickets"

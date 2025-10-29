@@ -196,9 +196,7 @@
             <td
               :class="[
                 'px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700',
-                calculateDeadline(ticket) === '---'
-                  ? 'text-gray-900 dark:text-gray-100'
-                  : getDeadlineClass(ticket.dueAt),
+                !ticket.dueAt ? 'text-gray-900 dark:text-gray-100' : getDeadlineClass(ticket.dueAt),
               ]"
             >
               <div class="whitespace-nowrap">
@@ -704,17 +702,16 @@ const refreshTickets = async () => {
 const getDeadlineClass = (date?: string) => {
   if (!date) return 'text-gray-900 dark:text-gray-100';
   const deadline = new Date(date);
-  const today = new Date();
+  const now = new Date();
 
-  // Reset hours to compare just dates
-  deadline.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
+  const diffTime = deadline.getTime() - now.getTime();
+  const diffDays =
+    diffTime < 0
+      ? Math.floor(diffTime / (1000 * 60 * 60 * 24))
+      : Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  const diffTime = deadline.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 0) return 'text-red-600 dark:text-red-400 font-bold';
-  if (diffDays <= 3) return 'text-orange-500 dark:text-orange-400 font-bold';
+  if (diffDays < 0) return 'text-red-600 dark:text-red-400 font-semibold';
+  if (diffDays <= 3) return 'text-orange-500 dark:text-orange-400 font-semibold';
   return 'text-green-600 dark:text-green-400';
 };
 
@@ -1031,8 +1028,13 @@ const getDeadlineDotClass = (dueAt: string) => {
   const deadline = new Date(dueAt);
   const now = new Date();
   const diffTime = deadline.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+
+  const diffDays =
+    diffTime < 0
+      ? Math.floor(diffTime / (1000 * 60 * 60 * 24))
+      : Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffHours =
+    diffTime < 0 ? Math.floor(diffTime / (1000 * 60 * 60)) : Math.ceil(diffTime / (1000 * 60 * 60));
 
   if (diffDays < 0) {
     return 'bg-red-500';
@@ -1047,8 +1049,13 @@ const formatDeadlineRelative = (dueAt: string) => {
   const deadline = new Date(dueAt);
   const now = new Date();
   const diffTime = deadline.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+
+  const diffDays =
+    diffTime < 0
+      ? Math.floor(diffTime / (1000 * 60 * 60 * 24))
+      : Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffHours =
+    diffTime < 0 ? Math.floor(diffTime / (1000 * 60 * 60)) : Math.ceil(diffTime / (1000 * 60 * 60));
 
   if (diffDays < 0) {
     const overdueHours = Math.abs(diffHours);
@@ -1067,6 +1074,9 @@ const formatDeadlineRelative = (dueAt: string) => {
     // Today
     if (diffHours === 1) {
       return '1 hora restante';
+    } else if (diffHours < 0) {
+      const overdueHours = Math.abs(diffHours);
+      return overdueHours === 1 ? 'Atrasado há 1 hora' : `Atrasado há ${overdueHours} horas`;
     } else {
       return `${diffHours} horas restantes`;
     }
