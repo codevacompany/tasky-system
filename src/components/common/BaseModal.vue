@@ -3,7 +3,7 @@
     <div
       class="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]"
       id="newTicketModal"
-      @click.self="close"
+      @click.self="closeOnClickOutside ? close() : null"
     >
       <LoadingSpinner v-if="isLoading" :size="50" :color="'white'" />
       <div
@@ -29,9 +29,7 @@
           </button>
         </div>
 
-        <div
-          class="p-3 sm:p-6 overflow-y-auto overflow-x-hidden"
-        >
+        <div class="p-3 sm:p-6 overflow-y-auto overflow-x-hidden">
           <slot></slot>
         </div>
         <div
@@ -75,6 +73,7 @@ const props = defineProps({
   cancelButtonText: { type: String, default: 'Cancelar' },
   confirmButtonText: { type: String, default: 'Confirmar' },
   hasCustomHeader: { type: Boolean, default: false },
+  closeOnClickOutside: { type: Boolean, default: true },
 });
 
 const emit = defineEmits(['close', 'cancel', 'confirm']);

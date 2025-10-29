@@ -46,6 +46,7 @@ class StorageService {
 
   getTicketsViewPreference(): 'table' | 'kanban' {
     const preference = localStorage.getItem(this.ticketsViewKey);
+    if (!preference) return 'kanban';
     return preference === 'kanban' ? 'kanban' : 'table';
   }
 

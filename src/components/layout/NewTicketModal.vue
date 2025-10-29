@@ -5,7 +5,8 @@
     @cancel="resetForm"
     @confirm="handleSubmit"
     :confirmButtonText="'Criar Ticket'"
-    :cancelButtonText="'Limpar'"
+    :cancelButtonText="'Cancelar'"
+    :closeOnClickOutside="false"
   >
     <form @submit.prevent="handleSubmit" class="w-full">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-6">
@@ -126,7 +127,7 @@
           />
         </div>
 
-        <div class="col-span-1 md:col-span-3 flex flex-col gap-1.5">
+        <div class="col-span-1 md:col-span-3 flex flex-col gap-1.5 w-full sm:w-[850px]">
           <label for="description" class="text-sm text-gray-800 dark:text-gray-200"
             >Descrição: <span class="text-red-500">*</span></label
           >

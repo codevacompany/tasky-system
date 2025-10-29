@@ -221,8 +221,12 @@ function getDeadlineDotClass(dueAt: string) {
   const deadline = new Date(dueAt);
   const now = new Date();
   const diffTime = deadline.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+  const diffDays =
+    diffTime < 0
+      ? Math.floor(diffTime / (1000 * 60 * 60 * 24))
+      : Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffHours =
+    diffTime < 0 ? Math.floor(diffTime / (1000 * 60 * 60)) : Math.ceil(diffTime / (1000 * 60 * 60));
 
   if (diffDays < 0) {
     return 'bg-red-500';
@@ -237,8 +241,13 @@ function formatDeadlineRelative(dueAt: string) {
   const deadline = new Date(dueAt);
   const now = new Date();
   const diffTime = deadline.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+
+  const diffDays =
+    diffTime < 0
+      ? Math.floor(diffTime / (1000 * 60 * 60 * 24))
+      : Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const diffHours =
+    diffTime < 0 ? Math.floor(diffTime / (1000 * 60 * 60)) : Math.ceil(diffTime / (1000 * 60 * 60));
 
   if (diffDays < 0) {
     const overdueHours = Math.abs(diffHours);
@@ -257,6 +266,9 @@ function formatDeadlineRelative(dueAt: string) {
     // Today
     if (diffHours === 1) {
       return '1 hora restante';
+    } else if (diffHours < 0) {
+      const overdueHours = Math.abs(diffHours);
+      return overdueHours === 1 ? 'Atrasado há 1 hora' : `Atrasado há ${overdueHours} horas`;
     } else {
       return `${diffHours} horas restantes`;
     }
