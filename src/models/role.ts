@@ -1,7 +1,8 @@
 export enum RoleName {
-  GlobalAdmin = 'Global Admin',
-  TenantAdmin = 'Tenant Admin',
-  User = 'User',
+  GlobalAdmin = 'Administrador Global',
+  TenantAdmin = 'Administrador',
+  Supervisor = 'Supervisor',
+  User = 'Usuário',
 }
 
 export interface Role {

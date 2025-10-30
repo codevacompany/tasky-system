@@ -162,7 +162,7 @@ const initializeForm = () => {
       lastName: props.user.lastName,
       email: props.user.email,
       departmentId: props.user.department?.id || null,
-      isAdmin: props.user.role?.name === 'Tenant Admin',
+      isAdmin: props.user.role?.name === 'Administrador',
       isActive: props.user.isActive,
     };
   }
