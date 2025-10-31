@@ -1,14 +1,14 @@
 <template>
   <div
-    class="flex gap-4 p-6 overflow-x-auto min-h-[70vh] bg-white dark:bg-gray-900 rounded-lg relative w-full"
+    class="flex gap-4 p-6 overflow-x-auto h-[calc(100vh-120px)] bg-white dark:bg-gray-900 rounded-lg relative w-full"
   >
     <div
       v-for="status in statusColumns"
       :key="status"
-      class="flex-1 min-w-[300px] w-0 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm relative"
+      class="flex-1 min-w-[310px] w-0 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm relative flex flex-col h-full"
     >
       <div
-        class="p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 rounded-t-xl text-center"
+        class="p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 rounded-t-xl text-center flex-shrink-0"
       >
         <h3
           class="m-0 inline-flex items-center gap-3 text-base font-semibold text-gray-900 dark:text-white py-2"
@@ -22,12 +22,12 @@
         </h3>
       </div>
 
-      <div class="p-1.5 flex flex-col min-h-[100px] max-h-[calc(100vh-200px)] overflow-y-auto">
+      <div class="p-1.5 flex flex-col flex-1 overflow-y-auto min-h-0">
         <div
           v-for="ticket in getTicketsByStatus(status)"
           :key="ticket.customId"
           :class="[
-            'min-h-[100px] bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border shadow-sm mb-3.5 flex flex-col hover:-translate-y-0.5 hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
+            'min-h-[100px] flex-shrink-0 bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border shadow-sm mb-3.5 flex flex-col hover:-translate-y-0.5 hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
             ticket.status === TicketStatus.Returned
               ? 'border-orange-300 dark:border-orange-600 dark:bg-orange-900/10 hover:border-orange-400 dark:hover:border-orange-500'
               : 'border-gray-200 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500',
@@ -80,7 +80,7 @@
                 <div class="flex items-center gap-1.5">
                   <div
                     v-if="ticket.targetUsers && ticket.targetUsers.length > 0"
-                    v-for="targetUser in ticket.targetUsers"
+                    v-for="targetUser in getSortedTargetUsers(ticket)"
                     :key="targetUser.userId"
                     :class="[
                       'w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold',
@@ -139,13 +139,13 @@
             <div class="flex items-center justify-between gap-3 mb-0">
               <div class="flex items-center gap-3">
                 <div
-                  class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300 font-medium"
+                  class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300 font-medium whitespace-nowrap"
                   title="ID do Ticket"
                 >
                   {{ ticket.customId }}
                 </div>
                 <div
-                  class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-300 opacity-70"
+                  class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-300 opacity-70 whitespace-nowrap"
                   title="Última atualização"
                 >
                   <font-awesome-icon icon="clock-rotate-left" />
@@ -270,6 +270,12 @@ const getAvatarColor = (name: string) => {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
   return colors[Math.abs(hash) % colors.length];
+};
+
+const getSortedTargetUsers = (ticket: Ticket) => {
+  if (!ticket?.targetUsers || ticket.targetUsers.length === 0)
+    return [] as NonNullable<Ticket['targetUsers']>;
+  return [...ticket.targetUsers].sort((a, b) => a.order - b.order);
 };
 
 const getTicketsByStatus = (status: string) => {

@@ -22,7 +22,7 @@ export interface CreateUserDto {
   email: string;
   password: string;
   departmentId: number | null;
-  isAdmin?: boolean;
+  roleId: number | null;
 }
 
 export interface UpdateUserDto {

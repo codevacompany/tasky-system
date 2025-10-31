@@ -93,7 +93,7 @@
                 : 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
             ]"
           >
-            {{ getRoleDisplayName(value?.name) }}
+            {{ value?.name || 'N/A' }}
           </span>
         </template>
 
@@ -313,17 +313,6 @@ const getUserInitials = (user: User): string => {
     return user.firstName.substring(0, 2).toUpperCase();
   }
   return 'U';
-};
-
-const getRoleDisplayName = (roleName?: string): string => {
-  switch (roleName) {
-    case 'Tenant Admin':
-      return 'Admin';
-    case 'User':
-      return 'Usuário';
-    default:
-      return 'N/A';
-  }
 };
 
 const handlePageChange = (page: number) => {

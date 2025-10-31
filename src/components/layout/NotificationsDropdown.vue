@@ -147,10 +147,8 @@ const markAllAsRead = async () => {
   try {
     await notificationService.markAllAsRead();
     await fetchNotifications();
-
-    toast.success('Notificações marcadas como lidas.');
   } catch {
-    toast.error('Erro ao marcar notificações como lidas.');
+    toast.error('Erro inesperado. Tente novamente.');
   }
 };
 
