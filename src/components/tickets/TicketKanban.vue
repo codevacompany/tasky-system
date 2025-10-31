@@ -5,7 +5,7 @@
     <div
       v-for="status in statusColumns"
       :key="status"
-      class="flex-1 min-w-[300px] w-0 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm relative flex flex-col h-full"
+      class="flex-1 min-w-[310px] w-0 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm relative flex flex-col h-full"
     >
       <div
         class="p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 rounded-t-xl text-center flex-shrink-0"
@@ -139,13 +139,13 @@
             <div class="flex items-center justify-between gap-3 mb-0">
               <div class="flex items-center gap-3">
                 <div
-                  class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300 font-medium"
+                  class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300 font-medium whitespace-nowrap"
                   title="ID do Ticket"
                 >
                   {{ ticket.customId }}
                 </div>
                 <div
-                  class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-300 opacity-70"
+                  class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-300 opacity-70 whitespace-nowrap"
                   title="Última atualização"
                 >
                   <font-awesome-icon icon="clock-rotate-left" />
