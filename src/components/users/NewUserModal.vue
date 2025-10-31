@@ -7,7 +7,11 @@
     :confirmButtonText="isLoading ? '' : 'Cadastrar'"
     :cancelButtonText="'Cancelar'"
   >
-    <form id="cadastroColaboradorForm" class="w-[100%] sm:min-w-[500px] grid grid-cols-1 sm:grid-cols-2 gap-5" @submit.prevent="createUser">
+    <form
+      id="cadastroColaboradorForm"
+      class="w-[100%] sm:min-w-[600px] grid grid-cols-1 sm:grid-cols-2 gap-5"
+      @submit.prevent="createUser"
+    >
       <div class="col-span-1">
         <label
           for="nomeColaborador"
@@ -67,6 +71,7 @@
           required
           class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         >
+          <option :value="null" disabled>Selecione um setor</option>
           <option v-for="department in departments" :key="department.id" :value="department.id">
             {{ department.name }}
           </option>
@@ -91,18 +96,18 @@
 
       <div class="col-span-1">
         <label
-          for="isAdminColaborador"
+          for="roleColaborador"
           class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
-          >Administrador</label
+          >Função</label
         >
         <select
-          id="isAdminColaborador"
-          v-model="userData.isAdmin"
+          id="roleColaborador"
+          v-model="userData.roleId"
           required
           class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         >
-          <option :value="false">Não</option>
-          <option :value="true">Sim</option>
+          <option :value="null" disabled>Selecione uma função</option>
+          <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
         </select>
       </div>
 
@@ -120,21 +125,24 @@ import BaseModal from '../common/BaseModal.vue';
 import { userService } from '@/services/userService';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
+import { roleService } from '@/services/roleService';
+import type { CreateUserDto } from '@/models';
 
 const isLoading = ref(false);
 
 const emit = defineEmits(['close', 'userCreated']);
 
-const userData = ref({
+const userData = ref<CreateUserDto>({
   firstName: '',
   lastName: '',
   email: '',
   password: '',
   departmentId: null as number | null,
-  isAdmin: false,
+  roleId: null as number | null,
 });
 
 const departments = ref<{ id: number; name: string }[]>([]);
+const roles = ref<{ id: number; name: string }[]>([]);
 const selectedDepartment = ref<number | null>(null);
 
 const fetchDepartments = async () => {
@@ -146,6 +154,15 @@ const fetchDepartments = async () => {
   }
 };
 
+const fetchRoles = async () => {
+  try {
+    const response = await roleService.fetchAssignable({ limit: 100 });
+    roles.value = response.data.items;
+  } catch {
+    toast.error('Erro ao carregar funções.');
+  }
+};
+
 const resetForm = () => {
   userData.value = {
     firstName: '',
@@ -153,7 +170,7 @@ const resetForm = () => {
     email: '',
     password: '',
     departmentId: null,
-    isAdmin: false,
+    roleId: null,
   };
   selectedDepartment.value = null;
 };
@@ -178,5 +195,7 @@ const createUser = async () => {
   }
 };
 
-onMounted(fetchDepartments);
+onMounted(async () => {
+  await Promise.all([fetchDepartments(), fetchRoles()]);
+});
 </script>
