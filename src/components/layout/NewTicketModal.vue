@@ -501,7 +501,6 @@ const handleSubmit = async () => {
       priority: formData.value.priority,
       description: formData.value.description,
       requesterId: formData.value.requesterId!,
-      departmentId: targetUsers.value[0].departmentId!,
       dueAt: formData.value.dueAt || undefined,
       categoryId: selectedCategory.value ?? null,
       isPrivate: formData.value.isPrivate,

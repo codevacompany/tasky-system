@@ -107,7 +107,9 @@
                         ? ticket.targetUsers.find((tu) => tu.userId === ticket.currentTargetUserId)
                             ?.user?.department?.name
                         : '') ||
-                      ticket.department.name
+                      (ticket.targetUsers && ticket.targetUsers.length > 0
+                        ? ticket.targetUsers[0]?.user?.department?.name
+                        : '-')
                     }}
                   </div>
                 </div>
@@ -153,7 +155,7 @@
                 </div>
               </div>
               <div
-                v-if="ticket.dueAt"
+                v-if="ticket.dueAt && ticket.status !== TicketStatus.Completed"
                 :class="[
                   'flex items-center gap-1 px-2 py-1 rounded text-xs font-medium whitespace-nowrap',
                   getDeadlineClass(ticket.dueAt) === 'normal'

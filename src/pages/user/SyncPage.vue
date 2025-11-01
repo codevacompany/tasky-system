@@ -78,7 +78,7 @@
                 <input
                   type="text"
                   v-model="userSearchTerm"
-                  placeholder="Buscar usuário..."
+                  placeholder="Buscar usuário"
                   class="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
                 />
               </div>

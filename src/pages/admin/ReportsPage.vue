@@ -1300,7 +1300,7 @@
                       <input
                         v-model="userSearch"
                         type="text"
-                        placeholder="Buscar colaborador..."
+                        placeholder="Buscar colaborador"
                         class="w-full sm:w-80 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
@@ -2036,6 +2036,7 @@ import { reportService } from '@/services/reportService';
 import { ticketService } from '@/services/ticketService';
 import { PERMISSIONS, usePermissions } from '@/utils/permissions';
 import { useRoute, useRouter } from 'vue-router';
+import { useRoles } from '@/composables';
 import type {
   TenantStatistics,
   StatusDurationDto,
@@ -2079,6 +2080,8 @@ const showExportModal = ref(false);
 const route = useRoute();
 const router = useRouter();
 
+const { isSupervisor } = useRoles();
+
 const tabUrlSlugMap: Record<string, string> = {
   overview: 'visao-geral',
   'in-progress': 'em-andamento',
@@ -2099,7 +2102,9 @@ const getInitialReportsTab = (): string => {
   if (tabFromUrl && slugToTabId[tabFromUrl]) return slugToTabId[tabFromUrl];
   const validTabs = ['overview', 'in-progress', 'department', 'users', 'trends'];
   if (validTabs.includes(tabFromUrl)) return tabFromUrl; // fallback if already english
-  return 'overview';
+
+  // If Supervisor, default to 'in-progress', otherwise 'overview'
+  return isSupervisor.value ? 'in-progress' : 'overview';
 };
 
 ChartJS.register(
@@ -2517,6 +2522,12 @@ const loadData = async () => {
 onMounted(() => {
   loadData();
 
+  // If Supervisor is on a restricted tab, redirect to em-andamento
+  if (isSupervisor.value && currentTab.value !== 'in-progress' && currentTab.value !== 'users') {
+    setReportsTab('in-progress');
+    return;
+  }
+
   // If starting on the in-progress tab, load those tickets too
   if (currentTab.value === 'in-progress') {
     loadInProgressTasks();
@@ -2530,7 +2541,7 @@ const setReportsTab = (tabId: string) => {
   router.push({ query });
 };
 
-const tabs = [
+const allTabs = [
   { id: 'overview', name: 'Visão Geral', shortName: 'Visão Geral', icon: 'chart-pie' },
   { id: 'in-progress', name: 'Em Andamento', shortName: 'Andamento', icon: 'clock' },
   { id: 'department', name: 'Setores', shortName: 'Setores', icon: 'building' },
@@ -2538,6 +2549,13 @@ const tabs = [
   { id: 'trends', name: 'Tendências', shortName: 'Tendências', icon: 'chart-line' },
   //lets not use this yet { id: 'custom', name: 'Análise por Período', icon: 'calendar' },
 ];
+
+const tabs = computed(() => {
+  if (isSupervisor.value) {
+    return allTabs.filter((tab) => tab.id === 'in-progress' || tab.id === 'users');
+  }
+  return allTabs;
+});
 
 const currentTab = ref<string>(getInitialReportsTab());
 const pollingInterval = ref<number | null>(null);
@@ -2563,6 +2581,12 @@ const stopPolling = () => {
 
 // Watch for tab changes to load tab-specific data
 watch(currentTab, (newTab) => {
+  // If Supervisor tries to access a restricted tab, redirect to 'in-progress'
+  if (isSupervisor.value && newTab !== 'in-progress' && newTab !== 'users') {
+    setReportsTab('in-progress');
+    return;
+  }
+
   if (newTab === 'in-progress') {
     loadInProgressTasks();
     startPolling();
@@ -2575,14 +2599,32 @@ watch(currentTab, (newTab) => {
 watch(
   () => route.query.tab,
   (newTab) => {
-    if (!newTab) return;
-    const slug = newTab as string;
-    if (slugToTabId[slug]) {
-      currentTab.value = slugToTabId[slug];
+    if (!newTab) {
+      if (isSupervisor.value) {
+        setReportsTab('in-progress');
+      }
       return;
     }
-    const validTabs = ['overview', 'in-progress', 'department', 'users', 'trends'];
-    if (validTabs.includes(slug)) currentTab.value = slug;
+    const slug = newTab as string;
+    let tabId: string;
+
+    if (slugToTabId[slug]) {
+      tabId = slugToTabId[slug];
+    } else {
+      const validTabs = ['overview', 'in-progress', 'department', 'users', 'trends'];
+      if (validTabs.includes(slug)) {
+        tabId = slug;
+      } else {
+        return;
+      }
+    }
+
+    if (isSupervisor.value && tabId !== 'in-progress' && tabId !== 'users') {
+      setReportsTab('in-progress');
+      return;
+    }
+
+    currentTab.value = tabId;
   },
 );
 
@@ -3462,7 +3504,9 @@ const exportToExcel = async () => {
           ticket.currentTargetUser
             ? `${ticket.currentTargetUser.firstName} ${ticket.currentTargetUser.lastName}`
             : 'Não atribuído',
-          ticket.department.name,
+          ticket.currentTargetUser?.department?.name ||
+            ticket.targetUsers?.[0]?.user?.department?.name ||
+            '-',
           new Date(ticket.createdAt).toLocaleDateString('pt-BR'),
           new Date(ticket.updatedAt).toLocaleDateString('pt-BR'),
         ]),
@@ -3689,7 +3733,11 @@ const exportToCSV = async () => {
       const createdDate = new Date(ticket.createdAt).toLocaleDateString('pt-BR');
       const updatedDate = new Date(ticket.updatedAt).toLocaleDateString('pt-BR');
 
-      ticketsCsvContent += `${ticket.customId},"${ticket.name.replace(/"/g, '""')}",${ticket.status},${ticket.priority},"${requesterName}","${targetUserName}","${ticket.department.name}",${createdDate},${updatedDate}\n`;
+      const departmentName =
+        ticket.currentTargetUser?.department?.name ||
+        ticket.targetUsers?.[0]?.user?.department?.name ||
+        '-';
+      ticketsCsvContent += `${ticket.customId},"${ticket.name.replace(/"/g, '""')}",${ticket.status},${ticket.priority},"${requesterName}","${targetUserName}","${departmentName}",${createdDate},${updatedDate}\n`;
     });
 
     const zip = new JSZip();

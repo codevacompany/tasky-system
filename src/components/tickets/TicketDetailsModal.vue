@@ -243,28 +243,36 @@
                         :class="{ 'cursor-default': !canEditTicket }"
                         :title="canEditTicket ? 'Clique para alterar responsável' : ''"
                       >
-                        <div
-                          class="flex items-center gap-2 -ml-2"
-                          :class="{
-                            'font-semibold text-blue-600 dark:text-blue-400':
-                              sortedTargetUsers.length > 1 &&
-                              targetUser.userId === loadedTicket.currentTargetUserId,
-                          }"
-                        >
-                          <span class="text-sm"
-                            >{{ targetUser.user.firstName }} {{ targetUser.user.lastName }}</span
-                          >
+                        <div class="flex-1 min-w-0">
                           <div
-                            v-if="!targetUser.user.isActive"
-                            class="flex items-center gap-1"
-                            title="Conta desativada"
+                            class="flex items-center gap-2 -ml-2"
+                            :class="{
+                              'font-semibold text-blue-600 dark:text-blue-400':
+                                sortedTargetUsers.length > 1 &&
+                                targetUser.userId === loadedTicket.currentTargetUserId,
+                            }"
                           >
-                            <font-awesome-icon
-                              icon="exclamation-triangle"
-                              class="text-orange-500 text-xs"
-                            />
-                            <span class="text-orange-500 text-xs">Desativado</span>
+                            <span class="text-sm"
+                              >{{ targetUser.user.firstName }} {{ targetUser.user.lastName }}</span
+                            >
+                            <div
+                              v-if="!targetUser.user.isActive"
+                              class="flex items-center gap-1"
+                              title="Conta desativada"
+                            >
+                              <font-awesome-icon
+                                icon="exclamation-triangle"
+                                class="text-orange-500 text-xs"
+                              />
+                              <span class="text-orange-500 text-xs">Desativado</span>
+                            </div>
                           </div>
+                          <p
+                            v-if="targetUser.user.department?.name"
+                            class="text-xs text-gray-500 dark:text-gray-400 -ml-2 mt-0.5"
+                          >
+                            {{ targetUser.user.department.name }}
+                          </p>
                         </div>
                         <font-awesome-icon
                           v-if="canEditTicket && isRequester"
@@ -275,15 +283,23 @@
                     </div>
                     <div
                       v-else
-                      class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 -m-2 rounded-lg transition-colors"
+                      class="flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 -m-2 rounded-lg transition-colors"
                       @click="() => startEditingAssignee()"
                       :class="{ 'cursor-default': !canEditTicket }"
                       :title="canEditTicket ? 'Clique para alterar responsável' : ''"
                     >
-                      <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
-                        {{ loadedTicket.currentTargetUser?.firstName }}
-                        {{ loadedTicket.currentTargetUser?.lastName }}
-                      </p>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                          {{ loadedTicket.currentTargetUser?.firstName }}
+                          {{ loadedTicket.currentTargetUser?.lastName }}
+                        </p>
+                        <p
+                          v-if="loadedTicket.currentTargetUser?.department?.name"
+                          class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"
+                        >
+                          {{ loadedTicket.currentTargetUser.department.name }}
+                        </p>
+                      </div>
                       <font-awesome-icon
                         v-if="canEditTicket && isRequester"
                         icon="edit"
@@ -296,7 +312,7 @@
                     <DepartmentUserSelector
                       v-model="assigneeSelection"
                       @change="saveAssigneeChange"
-                      placeholder="Selecionar responsável..."
+                      placeholder="Selecionar responsável"
                       :excludedDepartmentIds="excludedDepartmentIds"
                     />
                     <div class="flex gap-2">

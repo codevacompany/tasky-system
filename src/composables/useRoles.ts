@@ -17,6 +17,7 @@ export function useRoles() {
 
   const isGlobalAdmin = computed(() => hasRole(RoleName.GlobalAdmin));
   const isTenantAdmin = computed(() => hasRole(RoleName.TenantAdmin));
+  const isSupervisor = computed(() => hasRole(RoleName.Supervisor));
   const isUser = computed(() => hasRole(RoleName.User));
   const isAdmin = computed(() => hasAnyRole([RoleName.GlobalAdmin, RoleName.TenantAdmin]));
 
@@ -29,6 +30,7 @@ export function useRoles() {
     hasAnyRole,
     isGlobalAdmin,
     isTenantAdmin,
+    isSupervisor,
     isUser,
     isAdmin,
     getUserRole,

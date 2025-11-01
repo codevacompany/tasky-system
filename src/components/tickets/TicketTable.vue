@@ -150,8 +150,12 @@
                     {{ targetUser.user.department?.name || '-' }}
                   </div>
                 </div>
-                <div v-else class="truncate" :title="ticket.department.name">
-                  {{ ticket.department.name }}
+                <div
+                  v-else
+                  class="truncate"
+                  :title="ticket.targetUsers?.[0]?.user?.department?.name || '-'"
+                >
+                  {{ ticket.targetUsers?.[0]?.user?.department?.name || '-' }}
                 </div>
               </div>
             </td>

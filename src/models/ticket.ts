@@ -39,7 +39,6 @@ export interface Ticket {
   name: string;
   priority: TicketPriority;
   description: string;
-  department: Department;
   requester: User;
   targetUsers: TicketTargetUser[];
   currentTargetUser?: User;
@@ -66,7 +65,6 @@ export interface CreateTicketDto {
   name: string;
   priority: TicketPriority;
   description: string;
-  departmentId: number | null;
   requesterId: number | null;
   targetUserIds: number[];
   categoryId: number | null;
@@ -80,7 +78,6 @@ export interface UpdateTicketDto {
   name?: string;
   priority?: TicketPriority;
   description?: string;
-  departmentId?: number;
   requesterId?: User;
   targetUserIds?: number[];
   categoryId?: number | null;

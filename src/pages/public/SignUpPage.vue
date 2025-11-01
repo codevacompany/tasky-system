@@ -262,12 +262,22 @@
           </div>
 
           <!-- Terms Text -->
-          <p
-            v-if="step < 3"
-            class="text-xs lg:text-sm text-gray-500 text-center mt-6 mb-8 lg:mb-12"
-          >
+          <p v-if="step < 3" class="text-xs lg:text-sm text-gray-500 text-center mt-6">
             Ao cadastrar, você concorda com nossa Política de Privacidade e Termos de Uso.
           </p>
+
+          <!-- Login Link -->
+          <div v-if="step < 3" class="text-center mt-4 mb-8 lg:mb-12">
+            <p class="text-sm text-gray-600">
+              Já tem uma conta?
+              <router-link
+                to="/login"
+                class="text-blue-600 hover:text-blue-700 hover:underline transition-colors font-medium"
+              >
+                Ir para login
+              </router-link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -293,15 +303,17 @@
       </div>
     </div>
 
-    <router-link
-      to="/landing"
+    <a
+      href="https://taskypro.com.br/"
+      target="_blank"
+      rel="noopener noreferrer"
       class="fixed bottom-4 left-4 lg:bottom-8 lg:left-8 z-10 flex items-center gap-2 text-gray-700 hover:text-blue-600 font-semibold text-sm lg:text-base transition-colors"
     >
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
       </svg>
       Voltar
-    </router-link>
+    </a>
   </div>
 
   <!-- WhatsApp Button -->

@@ -3,7 +3,7 @@
     <div class="login-container">
       <div class="login-header">
         <img
-          src="@/assets/images/tasky-white.png"
+          src="@/assets/images/tasky-pro-white.png"
           alt="Tasky Logo"
           class="login-logo"
           id="loginLogo"

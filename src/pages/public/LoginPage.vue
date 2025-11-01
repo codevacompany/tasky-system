@@ -9,7 +9,7 @@
           class="h-32 sm:h-40 px-4 py-6 flex justify-center items-center primary-gradient relative"
         >
           <img
-            src="@/assets/images/tasky-white.png"
+            src="@/assets/images/tasky-pro-white.png"
             alt="Tasky Logo"
             class="h-auto w-28 sm:w-36 mx-auto"
           />

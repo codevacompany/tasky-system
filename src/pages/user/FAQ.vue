@@ -14,7 +14,7 @@
         <input
           v-model="searchTerm"
           type="text"
-          placeholder="Digite sua dúvida..."
+          placeholder="Digite sua dúvida"
           class="w-full py-2.5 sm:py-3 pr-10 sm:pr-12 pl-3 sm:pl-4 border border-gray-300 dark:border-gray-600 rounded-md text-sm sm:text-base bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-200 focus:outline-none focus:border-blue-600 dark:focus:border-blue-400"
         />
         <font-awesome-icon

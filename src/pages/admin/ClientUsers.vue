@@ -35,7 +35,7 @@
           <input
             type="text"
             v-model="searchTerm"
-            placeholder="Buscar por nome, email ou perfil..."
+            placeholder="Buscar por nome, email ou perfil"
             class="w-full sm:w-[300px] pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
           />
         </div>

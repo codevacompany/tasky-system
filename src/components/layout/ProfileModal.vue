@@ -31,9 +31,15 @@
                 <span class="initials">{{ userInitials }}</span>
               </div>
               <div class="flex-1 min-w-0">
-                <h4 class="m-0 mb-1 text-base font-semibold text-gray-900 dark:text-white">
+                <h4 class="m-0 text-base font-semibold text-gray-900 dark:text-white">
                   {{ user?.firstName }} {{ user?.lastName }}
                 </h4>
+                <p
+                  v-if="user?.department?.name"
+                  class="m-0 mb-0.5 text-xs text-gray-500 dark:text-gray-400"
+                >
+                  {{ user.department.name }}
+                </p>
                 <p class="m-0 text-sm text-gray-600 dark:text-gray-400">{{ user?.email }}</p>
               </div>
             </div>
