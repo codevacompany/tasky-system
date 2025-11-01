@@ -50,7 +50,7 @@
           <input
             v-model="searchTerm"
             type="text"
-            placeholder="Buscar usuários..."
+            placeholder="Buscar usuários"
             class="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>

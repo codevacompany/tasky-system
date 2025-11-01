@@ -14,7 +14,7 @@
             <input
               type="text"
               v-model="searchTerm"
-              placeholder="Buscar por nome, CNPJ ou e-mail..."
+              placeholder="Buscar por nome, CNPJ ou e-mail"
               class="w-full py-2 pr-4 pl-10 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
             />
           </div>

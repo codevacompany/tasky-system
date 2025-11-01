@@ -43,7 +43,7 @@
         <textarea
           v-model="newMessage"
           class="flex-1 border border-gray-300 rounded-2xl px-4 py-2 text-sm resize-none h-10 max-h-20 outline-none font-sans focus:border-blue-500 transition-colors"
-          placeholder="Digite sua mensagem..."
+          placeholder="Digite sua mensagem"
           @keydown.enter.prevent="sendMessage"
         ></textarea>
         <button

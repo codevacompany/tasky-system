@@ -5,7 +5,7 @@
       <nav class="navbar">
         <div class="menu">
           <div class="logo">
-            <img src="@/assets/images/tasky-white.png" alt="Tasky Logo" />
+            <img src="@/assets/images/tasky-pro-white.png" alt="Tasky Logo" />
           </div>
           <div class="nav-links">
             <a href="#features">Produto</a>
@@ -207,7 +207,7 @@
     <footer class="site-footer">
       <div class="container footer-content">
         <div class="footer-brand">
-          <img src="@/assets/images/tasky-white.png" alt="Tasky Logo" class="footer-logo" />
+          <img src="@/assets/images/tasky-pro-white.png" alt="Tasky Logo" class="footer-logo" />
           <div class="social-icons">
             <img src="@/assets/images/landing/x-logo.svg" alt="X Logo" />
             <img src="@/assets/images/landing/youtube.svg" alt="Youtube Logo" />

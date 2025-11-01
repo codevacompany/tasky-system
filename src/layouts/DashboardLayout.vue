@@ -10,7 +10,7 @@
           <img
             :src="userPreferencesStore.isDarkMode ? taskyWhiteLogo : taskyLogo"
             alt="Tasky Logo"
-            class="w-[70px] h-[70px] block mx-auto relative top-2 object-contain"
+            class="h-[34px] block mx-auto"
           />
         </div>
 
@@ -45,7 +45,7 @@
                   </div>
                 </li>
               </router-link>
-              <router-link v-if="isTenantAdmin" to="/admin/relatorios">
+              <router-link v-if="isTenantAdmin || isSupervisor" to="/admin/relatorios">
                 <li>
                   <div
                     :class="{ 'primary-gradient text-white': isActive('/admin/relatorios') }"
@@ -276,7 +276,11 @@
                 </div>
               </li>
             </router-link>
-            <router-link v-if="isTenantAdmin" to="/admin/relatorios" @click="closeMobileMenu">
+            <router-link
+              v-if="isTenantAdmin || isSupervisor"
+              to="/admin/relatorios"
+              @click="closeMobileMenu"
+            >
               <li>
                 <div
                   :class="{ 'primary-gradient text-white': isActive('/admin/relatorios') }"
@@ -417,8 +421,8 @@ import { useTicketsStore } from '@/stores/tickets';
 import { useRoute } from 'vue-router';
 import { notificationService } from '@/services/notificationService';
 import { useRoles } from '@/composables';
-import taskyLogo from '@/assets/images/tasky.png';
-import taskyWhiteLogo from '@/assets/images/tasky-white-large.png';
+import taskyLogo from '@/assets/images/tasky-pro-black.png';
+import taskyWhiteLogo from '@/assets/images/tasky-pro-white.png';
 
 const user = useUserStore().user;
 const userPreferencesStore = useUserPreferencesStore();
@@ -426,7 +430,7 @@ const ticketsStore = useTicketsStore();
 const route = useRoute();
 
 // Use the roles composable
-const { isGlobalAdmin, isTenantAdmin, isAdmin } = useRoles();
+const { isGlobalAdmin, isTenantAdmin, isSupervisor, isAdmin } = useRoles();
 
 const isTicketModalOpen = ref(false);
 const showProfileModal = ref(false);

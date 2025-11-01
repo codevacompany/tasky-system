@@ -49,7 +49,9 @@
             >
               <div class="flex flex-col gap-1">
                 <p class="text-sm font-medium truncate">{{ ticket.name }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">{{ ticket.department.name }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  {{ ticket.targetUsers?.[0]?.user?.department?.name || '-' }}
+                </p>
               </div>
             </td>
             <td

@@ -88,10 +88,12 @@
           <div class="flex flex-col border-b-1 border-gray-200 dark:border-gray-700">
             <!-- Mobile-friendly tabs -->
             <div
-              class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 px-6 gap-3 lg:gap-0"
+              class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-4 px-6 gap-3 lg:gap-0 relative"
             >
-              <!-- Tabs Row -->
-              <div class="flex items-center justify-start">
+              <!-- Tabs Row - Centered -->
+              <div
+                class="flex items-center justify-center lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2 w-full lg:w-auto"
+              >
                 <div
                   class="flex items-center justify-center p-0.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-x-auto"
                   style="height: 36px; min-width: fit-content"
@@ -102,7 +104,7 @@
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'recebidos'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
                       @click="switchTab('recebidos')"
@@ -114,7 +116,7 @@
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'criados'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
                       @click="switchTab('criados')"
@@ -127,7 +129,7 @@
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'setor'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
                       @click="switchTab('setor')"
@@ -140,7 +142,7 @@
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'arquivados'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
                       @click="switchTab('arquivados')"
@@ -152,7 +154,9 @@
               </div>
 
               <!-- Search and Filters Row -->
-              <div class="flex items-center justify-start lg:justify-end gap-2 mt-4 lg:mt-0">
+              <div
+                class="flex items-center justify-start lg:justify-end gap-2 mt-4 lg:mt-0 lg:ml-auto"
+              >
                 <div class="relative w-full max-w-xs lg:w-56">
                   <font-awesome-icon
                     icon="search"
@@ -160,7 +164,7 @@
                   />
                   <input
                     type="text"
-                    placeholder="Buscar tickets..."
+                    placeholder="Buscar tickets"
                     v-model="searchTerm"
                     class="pl-9 pr-3 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
                   />
@@ -177,7 +181,7 @@
           </div>
 
           <!-- Content Area -->
-          <div class="overflow-x-auto px-2 pt-3 pb-2">
+          <div class="overflow-x-auto px-2 pt-1.5 pb-2">
             <TicketTable
               v-if="!isKanbanView"
               :tickets="tickets"

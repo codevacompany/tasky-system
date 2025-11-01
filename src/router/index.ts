@@ -66,7 +66,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'relatorios',
         component: ReportsPage,
-        meta: { roles: [RoleName.TenantAdmin] },
+        meta: { roles: [RoleName.TenantAdmin, RoleName.Supervisor] },
       },
       {
         path: 'usuarios',
