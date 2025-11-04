@@ -17,3 +17,4 @@ export interface StatusColumn {
   createdAt: string;
   updatedAt: string;
 }
+

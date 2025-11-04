@@ -2,8 +2,33 @@
   <div
     class="flex gap-4 p-6 overflow-x-auto h-[calc(100vh-120px)] bg-white dark:bg-gray-900 rounded-lg relative w-full"
   >
+    <!-- Skeleton while loading columns -->
+    <template v-if="ticketsStore.statusColumns.isLoading || kanbanColumns.length === 0">
+      <div
+        v-for="n in 5"
+        :key="`col-skeleton-${n}`"
+        class="flex-1 min-w-[310px] w-0 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm relative flex flex-col h-full"
+      >
+        <div
+          class="p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 rounded-t-xl"
+        >
+          <div class="h-6 w-40 bg-gray-200 dark:bg-gray-600 rounded mx-auto my-2"></div>
+        </div>
+        <div class="p-1.5 flex flex-col gap-3 flex-1 overflow-y-auto min-h-0">
+          <div
+            v-for="m in 3"
+            :key="`card-skeleton-${n}-${m}`"
+            class="bg-white dark:bg-gray-700 rounded-lg p-3.5 border border-gray-200 dark:border-gray-600 shadow-sm"
+          >
+            <div class="h-4 bg-gray-200 dark:bg-gray-600 rounded w-3/4 mb-2"></div>
+            <div class="h-4 bg-gray-200 dark:bg-gray-600 rounded w-1/2 mb-3"></div>
+            <div class="h-3 bg-gray-200 dark:bg-gray-600 rounded w-1/3"></div>
+          </div>
+        </div>
+      </div>
+    </template>
     <div
-      v-for="column in statusColumns"
+      v-for="column in kanbanColumns"
       :key="column.id"
       class="flex-1 min-w-[310px] w-0 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm relative flex flex-col h-full"
     >
@@ -225,7 +250,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import type { Ticket, StatusColumn } from '@/models';
+import type { Ticket } from '@/models';
+import type { StatusColumn, TicketStatus as ColumnTicketStatus } from '@/models/statusColumn';
 import { DefaultTicketStatus, TicketPriority } from '@/models';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { formatDate, formatRelativeTime } from '@/utils/date';
@@ -233,7 +259,6 @@ import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import { ticketService } from '@/services/ticketService';
-import { statusColumnService } from '@/services/statusColumnService';
 import { toast } from 'vue3-toastify';
 import BaseModal from '@/components/common/BaseModal.vue';
 
@@ -241,7 +266,7 @@ const props = defineProps<{
   tickets: Ticket[];
 }>();
 
-const statusColumns = ref<StatusColumn[]>([]);
+const kanbanColumns = computed(() => ticketsStore.statusColumns.data);
 
 const selectedTicket = ref<Ticket | null>(null);
 const isModalOpen = ref(false);
@@ -282,11 +307,11 @@ const getSortedTargetUsers = (ticket: Ticket) => {
 };
 
 const getTicketsByColumn = (column: StatusColumn) => {
-  const statusKeys = column.statuses.map((status) => status.key);
+  const statusKeys = column.statuses.map((status: ColumnTicketStatus) => status.key);
 
   // Special handling for "Pendente" column - also include "devolvido" status
   const isPendenteColumn = column.statuses.some(
-    (status) => status.key === DefaultTicketStatus.Pending,
+    (status: ColumnTicketStatus) => status.key === DefaultTicketStatus.Pending,
   );
 
   if (isPendenteColumn) {
@@ -409,20 +434,8 @@ const handleAlertVerification = () => {
   }
 };
 
-const fetchStatusColumns = async () => {
-  try {
-    const response = await statusColumnService.fetch({ limit: 100 });
-    statusColumns.value = response.data.items;
-  } catch (error) {
-    console.error('Error fetching status columns:', error);
-    toast.error('Erro ao carregar colunas do kanban');
-    // Fallback to default columns if fetch fails
-    statusColumns.value = [];
-  }
-};
-
 onMounted(() => {
-  fetchStatusColumns();
+  ticketsStore.fetchStatusColumns();
 });
 </script>
 
