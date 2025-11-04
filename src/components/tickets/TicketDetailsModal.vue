@@ -25,12 +25,10 @@
         <div class="flex items-center gap-2 ml-4" v-if="loadedTicket">
           <div
             class="flex items-center gap-2"
-            v-if="
-              isTargetUser || (isReviewer && loadedTicket.status === TicketStatus.UnderVerification)
-            "
+            v-if="isTargetUser || (isReviewer && ticketStatus === TicketStatus.UnderVerification)"
           >
             <button
-              v-if="isTargetUser && loadedTicket?.status === TicketStatus.Pending && isSelfAssigned"
+              v-if="isTargetUser && ticketStatus === TicketStatus.Pending && isSelfAssigned"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-green-600 hover:bg-green-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="startTicket(loadedTicket?.customId)"
             >
@@ -39,7 +37,7 @@
             </button>
 
             <button
-              v-else-if="isTargetUser && loadedTicket?.status === TicketStatus.Pending"
+              v-else-if="isTargetUser && ticketStatus === TicketStatus.Pending"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-green-600 hover:bg-green-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="acceptTicket(loadedTicket?.customId)"
             >
@@ -48,11 +46,7 @@
             </button>
 
             <button
-              v-if="
-                isTargetUser &&
-                loadedTicket?.status === TicketStatus.InProgress &&
-                !isLastTargetUser
-              "
+              v-if="isTargetUser && ticketStatus === TicketStatus.InProgress && !isLastTargetUser"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="sendToNextDepartment(loadedTicket.customId)"
             >
@@ -61,9 +55,7 @@
             </button>
 
             <button
-              v-if="
-                isTargetUser && loadedTicket?.status === TicketStatus.InProgress && isLastTargetUser
-              "
+              v-if="isTargetUser && ticketStatus === TicketStatus.InProgress && isLastTargetUser"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-primary hover:bg-blue-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="sendForReview(loadedTicket.customId)"
             >
@@ -72,7 +64,7 @@
             </button>
 
             <button
-              v-if="isTargetUser && loadedTicket?.status === TicketStatus.AwaitingVerification"
+              v-if="isTargetUser && ticketStatus === TicketStatus.AwaitingVerification"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="cancelVerificationRequest(loadedTicket.customId)"
             >
@@ -81,7 +73,7 @@
             </button>
 
             <button
-              v-if="isTargetUser && loadedTicket?.status === TicketStatus.Returned"
+              v-if="isTargetUser && ticketStatus === TicketStatus.Returned"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-orange-600 hover:bg-orange-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="correctTicket(loadedTicket.customId)"
             >
@@ -90,7 +82,7 @@
             </button>
 
             <button
-              v-if="isReviewer && loadedTicket?.status === TicketStatus.UnderVerification"
+              v-if="isReviewer && ticketStatus === TicketStatus.UnderVerification"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="approveTicket(loadedTicket.customId)"
             >
@@ -99,7 +91,7 @@
             </button>
 
             <button
-              v-if="isReviewer && loadedTicket?.status === TicketStatus.UnderVerification"
+              v-if="isReviewer && ticketStatus === TicketStatus.UnderVerification"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="requestCorrection(loadedTicket.customId)"
             >
@@ -108,7 +100,7 @@
             </button>
 
             <button
-              v-if="isReviewer && loadedTicket?.status === TicketStatus.UnderVerification"
+              v-if="isReviewer && ticketStatus === TicketStatus.UnderVerification"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="rejectTicket(loadedTicket.customId)"
             >
@@ -120,9 +112,9 @@
           <button
             v-if="
               isRequester &&
-              loadedTicket?.status !== TicketStatus.Completed &&
-              loadedTicket?.status !== TicketStatus.Rejected &&
-              loadedTicket?.status !== TicketStatus.Canceled
+              ticketStatus !== TicketStatus.Completed &&
+              ticketStatus !== TicketStatus.Rejected &&
+              ticketStatus !== TicketStatus.Canceled
             "
             class="inline-flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-sm text-white font-medium rounded-md transition-colors"
             @click="cancelTicket(loadedTicket.customId)"
@@ -177,15 +169,15 @@
                 <span
                   :class="[
                     'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium max-w-[140px] sm:max-w-[220px]',
-                    getStatusClass(loadedTicket.status),
+                    getStatusClass(ticketStatus),
                   ]"
                 >
                   <font-awesome-icon
-                    :icon="getStatusIcon(loadedTicket.status)"
+                    :icon="getStatusIcon(ticketStatus)"
                     class="text-xs mr-1.5 flex-shrink-0"
                   />
                   <span class="truncate">{{
-                    formatSnakeToNaturalCase(loadedTicket?.status!).toUpperCase()
+                    ticketStatus ? formatSnakeToNaturalCase(ticketStatus).toUpperCase() : '-'
                   }}</span>
                 </span>
               </div>
@@ -582,8 +574,8 @@
               <!-- Add Comment Form -->
               <div
                 v-if="
-                  loadedTicket?.status === TicketStatus.InProgress ||
-                  loadedTicket?.status === TicketStatus.UnderVerification
+                  ticketStatus === TicketStatus.InProgress ||
+                  ticketStatus === TicketStatus.UnderVerification
                 "
                 class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
               >
@@ -913,7 +905,7 @@ const editorOptions = {
 const closeModal = () => {
   // Check if ticket is returned and user is target user
   if (
-    loadedTicket.value?.status === TicketStatus.Returned &&
+    ticketStatus.value === TicketStatus.Returned &&
     isTargetUser.value &&
     !confirmationModal.value.isOpen
   ) {
@@ -1393,6 +1385,11 @@ const timeline = computed(() => {
   );
 });
 
+// Helper computed to get status from ticketStatus.key or fallback to status (for backward compatibility)
+const ticketStatus = computed(() => {
+  return loadedTicket.value?.ticketStatus?.key || loadedTicket.value?.status || '';
+});
+
 const isTargetUser = computed(() => userStore.user?.id === loadedTicket.value?.currentTargetUserId);
 const isRequester = computed(() => userStore.user?.id === loadedTicket.value?.requester.id);
 const isReviewer = computed(() => userStore.user?.id === loadedTicket.value?.reviewer?.id);
@@ -1493,7 +1490,8 @@ watch(
 
       if (
         userStore.user?.id === newTicket.reviewer?.id &&
-        newTicket.status === TicketStatus.AwaitingVerification &&
+        (newTicket.ticketStatus?.key === TicketStatus.AwaitingVerification ||
+          newTicket.status === TicketStatus.AwaitingVerification) &&
         !confirmationModal.value.isOpen
       ) {
         openConfirmationModal(
@@ -1588,10 +1586,11 @@ const canEditTicket = computed(() => {
     userStore.user?.id === loadedTicket.value.requester.id ||
     userStore.user?.id === loadedTicket.value.currentTargetUserId;
 
+  const currentStatus = loadedTicket.value?.ticketStatus?.key || loadedTicket.value?.status || '';
   const isTicketActive =
-    loadedTicket.value.status !== TicketStatus.Completed &&
-    loadedTicket.value.status !== TicketStatus.Rejected &&
-    loadedTicket.value.status !== TicketStatus.Canceled;
+    currentStatus !== TicketStatus.Completed &&
+    currentStatus !== TicketStatus.Rejected &&
+    currentStatus !== TicketStatus.Canceled;
 
   return isUserInvolved && isTicketActive;
 });
@@ -1607,7 +1606,8 @@ const refreshSelectedTicket = async () => {
 };
 
 const startEditingName = () => {
-  if (!isRequester.value || loadedTicket.value?.status !== TicketStatus.Pending) return;
+  const currentStatus = loadedTicket.value?.ticketStatus?.key || loadedTicket.value?.status || '';
+  if (!isRequester.value || currentStatus !== TicketStatus.Pending) return;
   isEditingName.value = true;
   editingName.value = loadedTicket.value?.name || '';
   nextTick(() => {
@@ -1645,7 +1645,8 @@ const cancelEditingName = () => {
 };
 
 const startEditingDescription = () => {
-  if (!isRequester.value || loadedTicket.value?.status !== TicketStatus.Pending) return;
+  const currentStatus = loadedTicket.value?.ticketStatus?.key || loadedTicket.value?.status || '';
+  if (!isRequester.value || currentStatus !== TicketStatus.Pending) return;
   isEditingDescription.value = true;
   editingDescription.value = loadedTicket.value?.description || '';
   descriptionEditorKey.value += 1;

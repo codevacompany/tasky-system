@@ -1,6 +1,5 @@
 import type { Category } from './category';
 import type { CorrectionRequest } from './correctionRequest';
-import type { Department } from './department';
 import type { TicketCancellationReason } from './ticketCancellationReason';
 import type { TicketComment } from './ticketComment';
 import type { TicketDisapprovalReason } from './ticketDisapprovalReason';
@@ -45,6 +44,12 @@ export interface Ticket {
   currentTargetUserId?: number;
   reviewer?: User;
   status: TicketStatus;
+  ticketStatus?: {
+    id: number;
+    key: string;
+    name: string;
+    statusColumnId: number;
+  };
   completedAt?: string;
   acceptedAt?: string;
   dueAt?: string;

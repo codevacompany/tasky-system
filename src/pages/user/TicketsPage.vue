@@ -379,18 +379,36 @@ const debouncedSearch = debounce(() => {
 }, 400);
 
 const tickets = computed(() => {
+  let ticketsData: Ticket[] = [];
+
   switch (activeTab.value) {
     case 'recebidos':
-      return ticketsStore.receivedTickets.data;
+      ticketsData = ticketsStore.receivedTickets.data;
+      break;
     case 'criados':
-      return ticketsStore.myTickets.data;
+      ticketsData = ticketsStore.myTickets.data;
+      break;
     case 'setor':
-      return ticketsStore.departmentTickets.data;
+      ticketsData = ticketsStore.departmentTickets.data;
+      break;
     case 'arquivados':
       return ticketsStore.archivedTickets.data;
     default:
       return [];
   }
+
+  // Filter out canceled and rejected tickets for non-archived tabs
+  if (activeTab.value !== 'arquivados') {
+    return ticketsData.filter(
+      (ticket) =>
+        ticket.ticketStatus?.key !== TicketStatus.Canceled &&
+        ticket.status !== TicketStatus.Canceled &&
+        ticket.ticketStatus?.key !== TicketStatus.Rejected &&
+        ticket.status !== TicketStatus.Rejected,
+    );
+  }
+
+  return ticketsData;
 });
 
 // Get loading state from the store
