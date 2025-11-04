@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed, type Ref } from 'vue';
 import type { Ticket, DefaultTicketStatus, TicketPriority } from '@/models';
+import type { StatusColumn } from '@/models/statusColumn';
+import { statusColumnService } from '@/services/statusColumnService';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from './user';
 
@@ -61,6 +63,12 @@ interface TicketsState {
   selectedTicket: Ticket | null;
   globalRefreshInterval: number;
   isPollingActive: boolean;
+  statusColumns: {
+    data: StatusColumn[];
+    isLoading: boolean;
+    error: string | null;
+    lastFetched: Date | null;
+  };
 }
 
 export const useTicketsStore = defineStore('tickets', () => {
@@ -107,6 +115,14 @@ export const useTicketsStore = defineStore('tickets', () => {
   const globalRefreshInterval = ref<number>(90000); // 90 seconds default
   const isPollingActive = ref<boolean>(false);
   let pollingTimerId: number | null = null;
+
+  // Status columns cache
+  const statusColumns = ref<TicketsState['statusColumns']>({
+    data: [],
+    isLoading: false,
+    error: null,
+    lastFetched: null,
+  });
 
   // Getters
   const getTicketById = computed(() => {
@@ -383,6 +399,22 @@ export const useTicketsStore = defineStore('tickets', () => {
     ]);
   }
 
+  async function fetchStatusColumns(force = false) {
+    if (!force && statusColumns.value.data.length > 0) return;
+    statusColumns.value.isLoading = true;
+    statusColumns.value.error = null;
+    try {
+      const { data } = await statusColumnService.fetch({ limit: 100 });
+      statusColumns.value.data = data.items;
+      statusColumns.value.lastFetched = new Date();
+    } catch (err) {
+      console.error('Error fetching status columns:', err);
+      statusColumns.value.error = 'Failed to fetch status columns';
+    } finally {
+      statusColumns.value.isLoading = false;
+    }
+  }
+
   async function startPolling() {
     if (isPollingActive.value) return;
 
@@ -492,6 +524,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     selectedTicket,
     globalRefreshInterval,
     isPollingActive,
+    statusColumns,
 
     // Recent tickets
     recentReceivedTickets,
@@ -509,6 +542,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     refreshAllTickets,
     updateTicketInCollections,
     removeTicketFromCollections,
+    fetchStatusColumns,
     startPolling,
     stopPolling,
     setRefreshInterval,

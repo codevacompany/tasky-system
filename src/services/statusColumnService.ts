@@ -11,3 +11,4 @@ export const statusColumnService = {
     return apiClient.get<PaginatedResponse<StatusColumn>>('/status-columns', { params });
   },
 };
+
