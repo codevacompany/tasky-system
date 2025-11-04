@@ -1,4 +1,4 @@
-import type { TicketStatus } from './ticket';
+import type { DefaultTicketStatus } from './ticket';
 import type { User } from './user';
 
 export enum TicketActionType {
@@ -16,8 +16,8 @@ export interface TicketUpdate {
   ticketCustomId: string;
   description: string;
   performedBy: User;
-  fromStatus: TicketStatus;
-  toStatus: TicketStatus;
+  fromStatus: DefaultTicketStatus;
+  toStatus: DefaultTicketStatus;
   action: TicketActionType;
   createdAt: string;
 }

@@ -101,7 +101,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
-import { TicketStatus, type Ticket } from '@/models';
+import { DefaultTicketStatus, type Ticket } from '@/models';
 import { formatDate } from '@/utils/date';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { useTicketsStore } from '@/stores/tickets';
@@ -140,20 +140,20 @@ const isLoading = computed(() => {
   }
 });
 
-const statusColor = (status: TicketStatus) => {
+const statusColor = (status: DefaultTicketStatus) => {
   switch (status) {
-    case TicketStatus.Pending:
+    case DefaultTicketStatus.Pending:
       return 'status-pending';
-    case TicketStatus.InProgress:
+    case DefaultTicketStatus.InProgress:
       return 'status-in-progress';
-    case TicketStatus.AwaitingVerification:
-    case TicketStatus.UnderVerification:
+    case DefaultTicketStatus.AwaitingVerification:
+    case DefaultTicketStatus.UnderVerification:
       return 'status-awaiting-verification';
-    case TicketStatus.Completed:
+    case DefaultTicketStatus.Completed:
       return 'status-completed';
-    case TicketStatus.Returned:
+    case DefaultTicketStatus.Returned:
       return 'status-returned';
-    case TicketStatus.Rejected:
+    case DefaultTicketStatus.Rejected:
       return 'status-rejected';
     default:
       return '';
@@ -162,7 +162,10 @@ const statusColor = (status: TicketStatus) => {
 
 function calculateDeadlineCompact(ticket: Ticket) {
   if (!ticket.dueAt) return '—';
-  if (ticket.status !== TicketStatus.Pending && ticket.status !== TicketStatus.InProgress) {
+  if (
+    ticket.status !== DefaultTicketStatus.Pending &&
+    ticket.status !== DefaultTicketStatus.InProgress
+  ) {
     return '—';
   }
   const deadline = new Date(ticket.dueAt);
@@ -183,20 +186,20 @@ function calculateDeadlineCompact(ticket: Ticket) {
   return `${diffDays}d`;
 }
 
-function getStatusClasses(status: TicketStatus) {
+function getStatusClasses(status: DefaultTicketStatus) {
   switch (status) {
-    case TicketStatus.Pending:
+    case DefaultTicketStatus.Pending:
       return 'bg-orange-50 text-orange-500 border border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800';
-    case TicketStatus.InProgress:
+    case DefaultTicketStatus.InProgress:
       return 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800';
-    case TicketStatus.AwaitingVerification:
-    case TicketStatus.UnderVerification:
+    case DefaultTicketStatus.AwaitingVerification:
+    case DefaultTicketStatus.UnderVerification:
       return 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800';
-    case TicketStatus.Completed:
+    case DefaultTicketStatus.Completed:
       return 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800';
-    case TicketStatus.Returned:
+    case DefaultTicketStatus.Returned:
       return 'bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800';
-    case TicketStatus.Rejected:
+    case DefaultTicketStatus.Rejected:
       return 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
     default:
       return '';

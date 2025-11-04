@@ -1,6 +1,5 @@
 import type { Category } from './category';
 import type { CorrectionRequest } from './correctionRequest';
-import type { Department } from './department';
 import type { TicketCancellationReason } from './ticketCancellationReason';
 import type { TicketComment } from './ticketComment';
 import type { TicketDisapprovalReason } from './ticketDisapprovalReason';
@@ -14,7 +13,7 @@ export enum TicketPriority {
   High = 'alta',
 }
 
-export enum TicketStatus {
+export enum DefaultTicketStatus {
   Pending = 'pendente',
   InProgress = 'em_andamento',
   AwaitingVerification = 'aguardando_verificação',
@@ -44,7 +43,13 @@ export interface Ticket {
   currentTargetUser?: User;
   currentTargetUserId?: number;
   reviewer?: User;
-  status: TicketStatus;
+  status: DefaultTicketStatus;
+  ticketStatus?: {
+    id: number;
+    key: string;
+    name: string;
+    statusColumnId: number;
+  };
   completedAt?: string;
   acceptedAt?: string;
   dueAt?: string;
@@ -85,5 +90,5 @@ export interface UpdateTicketDto {
 }
 
 export interface UpdateTicketStatusDto {
-  status: TicketStatus;
+  status: DefaultTicketStatus;
 }

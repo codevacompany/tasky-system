@@ -40,7 +40,7 @@
       </div>
       <div
         class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
-        @click="setStatusFilter(TicketStatus.Pending)"
+        @click="setStatusFilter(DefaultTicketStatus.Pending)"
         :title="'Filtrar por tickets pendentes'"
       >
         <div class="flex items-center justify-between">
@@ -59,7 +59,7 @@
       </div>
       <div
         class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
-        @click="setStatusFilter(TicketStatus.InProgress)"
+        @click="setStatusFilter(DefaultTicketStatus.InProgress)"
         :title="'Filtrar por tickets em andamento'"
       >
         <div class="flex items-center justify-between">
@@ -321,7 +321,7 @@ import { ticketService } from '@/services/ticketService';
 import { useTicketsStore } from '@/stores/tickets';
 import { useUserStore } from '@/stores/user';
 import type { Ticket } from '@/models';
-import { TicketStatus, TicketPriority } from '@/models';
+import { DefaultTicketStatus, TicketPriority } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
 import TicketKanban from '@/components/tickets/TicketKanban.vue';
 import Select from '@/components/common/Select.vue';
@@ -379,18 +379,32 @@ const debouncedSearch = debounce(() => {
 }, 400);
 
 const tickets = computed(() => {
+  let ticketsData: Ticket[] = [];
+
   switch (activeTab.value) {
     case 'recebidos':
-      return ticketsStore.receivedTickets.data;
+      ticketsData = ticketsStore.receivedTickets.data;
+      break;
     case 'criados':
-      return ticketsStore.myTickets.data;
+      ticketsData = ticketsStore.myTickets.data;
+      break;
     case 'setor':
-      return ticketsStore.departmentTickets.data;
+      ticketsData = ticketsStore.departmentTickets.data;
+      break;
     case 'arquivados':
       return ticketsStore.archivedTickets.data;
     default:
       return [];
   }
+
+  // Filter out canceled and rejected tickets (we only reach here for non-archived tabs)
+  return ticketsData.filter(
+    (ticket) =>
+      ticket.ticketStatus?.key !== DefaultTicketStatus.Canceled &&
+      ticket.status !== DefaultTicketStatus.Canceled &&
+      ticket.ticketStatus?.key !== DefaultTicketStatus.Rejected &&
+      ticket.status !== DefaultTicketStatus.Rejected,
+  );
 });
 
 // Get loading state from the store
@@ -427,16 +441,25 @@ const totalPages = computed(() => {
 
 const statusOptions = computed(() => [
   { value: '', label: 'Todos' },
-  { value: TicketStatus.Pending, label: formatSnakeToNaturalCase(TicketStatus.Pending) },
-  { value: TicketStatus.InProgress, label: formatSnakeToNaturalCase(TicketStatus.InProgress) },
-  { value: TicketStatus.Completed, label: formatSnakeToNaturalCase(TicketStatus.Completed) },
   {
-    value: TicketStatus.AwaitingVerification,
-    label: formatSnakeToNaturalCase(TicketStatus.AwaitingVerification),
+    value: DefaultTicketStatus.Pending,
+    label: formatSnakeToNaturalCase(DefaultTicketStatus.Pending),
   },
   {
-    value: TicketStatus.UnderVerification,
-    label: formatSnakeToNaturalCase(TicketStatus.UnderVerification),
+    value: DefaultTicketStatus.InProgress,
+    label: formatSnakeToNaturalCase(DefaultTicketStatus.InProgress),
+  },
+  {
+    value: DefaultTicketStatus.Completed,
+    label: formatSnakeToNaturalCase(DefaultTicketStatus.Completed),
+  },
+  {
+    value: DefaultTicketStatus.AwaitingVerification,
+    label: formatSnakeToNaturalCase(DefaultTicketStatus.AwaitingVerification),
+  },
+  {
+    value: DefaultTicketStatus.UnderVerification,
+    label: formatSnakeToNaturalCase(DefaultTicketStatus.UnderVerification),
   },
 ]);
 
@@ -478,7 +501,7 @@ const fetchTicketsWithFilters = async () => {
 
   const filters: {
     priority?: TicketPriority | null;
-    status?: TicketStatus | null;
+    status?: DefaultTicketStatus | null;
     name?: string;
   } = {};
 
@@ -487,7 +510,7 @@ const fetchTicketsWithFilters = async () => {
   }
 
   if (statusFilter.value && statusFilter.value !== '') {
-    filters.status = statusFilter.value as TicketStatus;
+    filters.status = statusFilter.value as DefaultTicketStatus;
   }
 
   if (searchTerm.value) {
@@ -499,10 +522,10 @@ const fetchTicketsWithFilters = async () => {
 
 const totalTickets = computed(() => tickets.value.length);
 const pendingTickets = computed(
-  () => tickets.value.filter((ticket) => ticket.status === TicketStatus.Pending).length,
+  () => tickets.value.filter((ticket) => ticket.status === DefaultTicketStatus.Pending).length,
 );
 const inProgressTickets = computed(
-  () => tickets.value.filter((ticket) => ticket.status === TicketStatus.InProgress).length,
+  () => tickets.value.filter((ticket) => ticket.status === DefaultTicketStatus.InProgress).length,
 );
 
 const handleViewTicket = (ticket: Ticket) => {
@@ -538,7 +561,9 @@ const handleAcceptTicket = async (ticket: Ticket) => {
 
 const handleVerifyTicket = async (ticketId: string) => {
   try {
-    await ticketService.updateStatus(ticketId, { status: TicketStatus.AwaitingVerification });
+    await ticketService.updateStatus(ticketId, {
+      status: DefaultTicketStatus.AwaitingVerification,
+    });
     toast.success('Ticket enviado para revisão');
     fetchTicketsWithFilters();
   } catch {
@@ -548,7 +573,7 @@ const handleVerifyTicket = async (ticketId: string) => {
 
 const handleApproveTicket = async (ticket: Ticket) => {
   try {
-    await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Completed });
+    await ticketService.updateStatus(ticket.customId, { status: DefaultTicketStatus.Completed });
     toast.success('Ticket aprovado com sucesso!');
     fetchTicketsWithFilters();
   } catch {
@@ -566,7 +591,7 @@ const confirmCorrection = async () => {
 
   try {
     await ticketService.updateStatus(selectedTicket.value.customId, {
-      status: TicketStatus.InProgress,
+      status: DefaultTicketStatus.InProgress,
     });
 
     await ticketService.update(selectedTicket.value.customId, { dueAt: newCompletionDate.value });
@@ -588,7 +613,7 @@ const cancelCorrection = () => {
 
 const handleRejectTicket = async (ticket: Ticket) => {
   try {
-    await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Rejected });
+    await ticketService.updateStatus(ticket.customId, { status: DefaultTicketStatus.Rejected });
     toast.success('Ticket reprovado com sucesso!');
     fetchTicketsWithFilters();
   } catch {
@@ -615,7 +640,7 @@ const applyFilters = () => {
   updateUrlWithFilters();
 };
 
-const setStatusFilter = (status: TicketStatus | '') => {
+const setStatusFilter = (status: DefaultTicketStatus | '') => {
   statusFilter.value = status;
   currentPage.value = 1; // Reset to first page when changing filters
   fetchTicketsWithFilters();

@@ -1,4 +1,5 @@
-import { TicketStatus, type Ticket } from '@/models';
+import type { Ticket } from '@/models';
+import { DefaultTicketStatus } from '@/models';
 
 export function debounce<T extends (...args: unknown[]) => void>(func: T, wait: number) {
   let timeout: ReturnType<typeof setTimeout>;
@@ -16,7 +17,8 @@ export function formatSnakeToCamelCase(str: string): string {
   return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
 }
 
-export function formatSnakeToNaturalCase(str: string): string {
+export function formatSnakeToNaturalCase(str: string | undefined | null): string {
+  if (!str) return '';
   // Replace all underscores with spaces and capitalize each word
   return str
     .split('_')
@@ -27,7 +29,11 @@ export function formatSnakeToNaturalCase(str: string): string {
 export function calculateDeadline(ticket: Ticket) {
   if (!ticket.dueAt) return '---';
 
-  if (ticket.status !== TicketStatus.Pending && ticket.status !== TicketStatus.InProgress) {
+  const currentStatus = ticket.ticketStatus?.key || ticket.status || '';
+  if (
+    currentStatus !== DefaultTicketStatus.Pending &&
+    currentStatus !== DefaultTicketStatus.InProgress
+  ) {
     return '---';
   }
 

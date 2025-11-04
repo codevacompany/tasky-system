@@ -705,7 +705,10 @@
                         >
                           <div class="flex justify-between items-center text-sm">
                             <span class="text-gray-700 dark:text-gray-300">{{
-                              formatSnakeToNaturalCase(duration.status)
+                              formatSnakeToNaturalCase(
+                                (duration.status as any)?.key ??
+                                  (duration.status as unknown as string),
+                              )
                             }}</span>
                             <span class="font-medium text-gray-900 dark:text-white">
                               {{ formatTimeInSecondsCompact(duration.averageDurationSeconds) }}
@@ -977,16 +980,18 @@
                       <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <div class="text-lg font-semibold text-gray-900 dark:text-white">
                           {{
-                            inProgressTasks.length > 0
-                              ? Math.round(
-                                  inProgressTasks.reduce(
-                                    (sum, task) => sum + task.timeInProgressSeconds,
-                                    0,
-                                  ) /
-                                    inProgressTasks.length /
-                                    3600,
-                                )
-                              : 0
+                            (() => {
+                              const tasksWithTime = inProgressTasks.filter(
+                                (t) => t.timeInProgressSeconds > 0,
+                              );
+                              if (tasksWithTime.length === 0) return 0;
+                              const averageSeconds =
+                                tasksWithTime.reduce(
+                                  (sum, task) => sum + task.timeInProgressSeconds,
+                                  0,
+                                ) / tasksWithTime.length;
+                              return Math.round(averageSeconds / 3600);
+                            })()
                           }}h
                         </div>
                         <div class="text-xs text-gray-500 dark:text-gray-400">Tempo médio</div>
@@ -994,12 +999,16 @@
                       <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <div class="text-lg font-semibold text-gray-900 dark:text-white">
                           {{
-                            inProgressTasks.length > 0
-                              ? Math.round(
-                                  Math.max(...inProgressTasks.map((t) => t.timeInProgressSeconds)) /
-                                    3600,
-                                )
-                              : 0
+                            (() => {
+                              const tasksWithTime = inProgressTasks.filter(
+                                (t) => t.timeInProgressSeconds > 0,
+                              );
+                              if (tasksWithTime.length === 0) return 0;
+                              const maxSeconds = Math.max(
+                                ...tasksWithTime.map((t) => t.timeInProgressSeconds),
+                              );
+                              return Math.round(maxSeconds / 3600);
+                            })()
                           }}h
                         </div>
                         <div class="text-xs text-gray-500 dark:text-gray-400">Tempo máximo</div>
@@ -1825,7 +1834,10 @@
                           >
                             <div class="flex justify-between items-center text-sm">
                               <span class="text-gray-700 dark:text-gray-300">{{
-                                formatSnakeToNaturalCase(duration.status)
+                                formatSnakeToNaturalCase(
+                                  (duration.status as any)?.key ??
+                                    (duration.status as unknown as string),
+                                )
                               }}</span>
                               <span class="font-medium text-gray-900 dark:text-white">
                                 {{ formatTimeInSecondsCompact(duration.averageDurationSeconds) }}
@@ -2047,7 +2059,7 @@ import type {
   StatusDurationTimePointDto,
   UserRankingResponseDto,
 } from '@/services/reportService';
-import { TicketActionType, TicketStatus, type TicketUpdate } from '@/models';
+import { TicketActionType, DefaultTicketStatus, type TicketUpdate } from '@/models';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import {
@@ -2436,7 +2448,7 @@ const loadData = async () => {
       reportService.getStatusDurations(selectedStatsPeriod.value),
       reportService.getTenantDepartmentsStatistics(),
       reportService.getResolutionTimeData(),
-      reportService.getStatusDurationTimeSeries(TicketStatus.InProgress),
+      reportService.getStatusDurationTimeSeries(DefaultTicketStatus.InProgress),
       reportService.getTopUsers(undefined, true), // fetch all users with stats for Colaboradores tab
       reportService.getTopUsers(5, false), // fetch top 5 for Visão Geral tab
       reportService.getTopUsers(5, false, 'bottom'), // fetch worst 5 for Pior Desempenho section
@@ -2826,7 +2838,7 @@ const loadInProgressTasks = async () => {
   loadingInProgressTasks.value = true;
   try {
     const response = await ticketService.fetch({
-      status: TicketStatus.InProgress, // Using type assertion for now
+      status: DefaultTicketStatus.InProgress, // Using type assertion for now
       limit: 10,
     });
 
@@ -2839,29 +2851,43 @@ const loadInProgressTasks = async () => {
 
     for (const ticket of response.data.items) {
       try {
-        // Find status updates in the ticket history
-        const statusUpdates =
-          ticket.updates?.filter(
-            (update: TicketUpdate) =>
-              update.action === TicketActionType.StatusUpdate &&
-              update.toStatus === TicketStatus.InProgress,
-          ) || [];
-
-        const lastStatusUpdate =
-          statusUpdates.length > 0
-            ? statusUpdates.sort(
-                (a: TicketUpdate, b: TicketUpdate) =>
-                  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-              )[0]
-            : null;
-
         let timeInProgress = 'Desconhecido';
         let isOverdue = false;
         let overdueReason: string | undefined = undefined;
         let diffInSeconds = 0;
 
-        if (lastStatusUpdate) {
-          const startDate = new Date(lastStatusUpdate.createdAt);
+        // Determine the start date for time calculation
+        let startDate: Date | null = null;
+
+        // First, try to use acceptedAt (most accurate for when ticket actually started)
+        if (ticket.acceptedAt) {
+          startDate = new Date(ticket.acceptedAt);
+        } else {
+          // Fall back to finding status updates in the ticket history
+          const statusUpdates =
+            ticket.updates?.filter(
+              (update: TicketUpdate) =>
+                update.action === TicketActionType.StatusUpdate &&
+                update.toStatus === DefaultTicketStatus.InProgress,
+            ) || [];
+
+          const lastStatusUpdate =
+            statusUpdates.length > 0
+              ? statusUpdates.sort(
+                  (a: TicketUpdate, b: TicketUpdate) =>
+                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+                )[0]
+              : null;
+
+          if (lastStatusUpdate) {
+            startDate = new Date(lastStatusUpdate.createdAt);
+          } else {
+            // Last resort: use createdAt (though less accurate)
+            startDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
+          }
+        }
+
+        if (startDate) {
           const now = new Date();
           diffInSeconds = Math.floor((now.getTime() - startDate.getTime()) / 1000);
 
@@ -2913,7 +2939,7 @@ const loadInProgressTasks = async () => {
           customId: ticket.customId || `TK-${ticket.id}`,
           name: ticket.name,
           assignee,
-          status: formatSnakeToNaturalCase(ticket.status),
+          status: formatSnakeToNaturalCase(ticket.ticketStatus?.key || ticket.status || ''),
           timeInProgress,
           isOverdue,
           overdueReason,
@@ -3337,7 +3363,7 @@ const getInProgressTrend = (): number => {
 const loadInProgressDuration = async () => {
   try {
     inProgressTimeSeries.value = await reportService.getStatusDurationTimeSeries(
-      TicketStatus.InProgress,
+      DefaultTicketStatus.InProgress,
     );
   } catch (err) {
     console.error('Error loading in-progress duration data:', err);

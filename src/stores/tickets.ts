@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed, type Ref } from 'vue';
-import type { Ticket, TicketStatus, TicketPriority } from '@/models';
+import type { Ticket, DefaultTicketStatus, TicketPriority } from '@/models';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from './user';
 
@@ -13,7 +13,7 @@ interface TicketsState {
     lastFetched: Date | null;
     currentPage: number;
     currentFilters?: {
-      status?: TicketStatus | null;
+      status?: DefaultTicketStatus | null;
       priority?: TicketPriority | null;
       name?: string;
     };
@@ -26,7 +26,7 @@ interface TicketsState {
     lastFetched: Date | null;
     currentPage: number;
     currentFilters?: {
-      status?: TicketStatus | null;
+      status?: DefaultTicketStatus | null;
       priority?: TicketPriority | null;
       name?: string;
     };
@@ -39,7 +39,7 @@ interface TicketsState {
     lastFetched: Date | null;
     currentPage: number;
     currentFilters?: {
-      status?: TicketStatus | null;
+      status?: DefaultTicketStatus | null;
       priority?: TicketPriority | null;
       name?: string;
     };
@@ -127,7 +127,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     page?: number,
     limit = 10,
     filters?: {
-      status?: TicketStatus | null;
+      status?: DefaultTicketStatus | null;
       priority?: TicketPriority | null;
       name?: string;
     },
@@ -183,7 +183,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     page?: number,
     limit = 10,
     filters?: {
-      status?: TicketStatus | null;
+      status?: DefaultTicketStatus | null;
       priority?: TicketPriority | null;
       name?: string;
     },
@@ -239,7 +239,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     page?: number,
     limit = 10,
     filters?: {
-      status?: TicketStatus | null;
+      status?: DefaultTicketStatus | null;
       priority?: TicketPriority | null;
       name?: string;
     },
@@ -418,7 +418,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   function setMyTicketsPage(
     page: number,
     filters?: {
-      status?: TicketStatus | null;
+      status?: DefaultTicketStatus | null;
       priority?: TicketPriority | null;
       name?: string;
     },
@@ -430,7 +430,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   function setReceivedTicketsPage(
     page: number,
     filters?: {
-      status?: TicketStatus | null;
+      status?: DefaultTicketStatus | null;
       priority?: TicketPriority | null;
       name?: string;
     },
@@ -442,7 +442,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   function setDepartmentTicketsPage(
     page: number,
     filters?: {
-      status?: TicketStatus | null;
+      status?: DefaultTicketStatus | null;
       priority?: TicketPriority | null;
       name?: string;
     },
@@ -466,7 +466,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     type: 'createdByMe' | 'received' | 'department' | 'archived',
     page: number,
     filters?: {
-      status?: TicketStatus | null;
+      status?: DefaultTicketStatus | null;
       priority?: TicketPriority | null;
       name?: string;
     },

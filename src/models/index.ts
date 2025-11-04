@@ -10,3 +10,4 @@ export * from './role';
 export * from './correctionRequest';
 export * from './ticketCancellationReason';
 export * from './ticketDisapprovalReason';
+export * from './statusColumn';

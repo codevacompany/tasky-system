@@ -3,8 +3,8 @@
     class="flex gap-4 p-6 overflow-x-auto h-[calc(100vh-120px)] bg-white dark:bg-gray-900 rounded-lg relative w-full"
   >
     <div
-      v-for="status in statusColumns"
-      :key="status"
+      v-for="column in statusColumns"
+      :key="column.id"
       class="flex-1 min-w-[310px] w-0 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm relative flex flex-col h-full"
     >
       <div
@@ -13,22 +13,23 @@
         <h3
           class="m-0 inline-flex items-center gap-3 text-base font-semibold text-gray-900 dark:text-white py-2"
         >
-          {{ formatSnakeToNaturalCase(status) }}
+          {{ column.name }}
           <span
             class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded-xl text-xs text-gray-600 dark:text-gray-300"
           >
-            {{ getTicketsByStatus(status).length }}
+            {{ getTicketsByColumn(column).length }}
           </span>
         </h3>
       </div>
 
       <div class="p-1.5 flex flex-col flex-1 overflow-y-auto min-h-0">
         <div
-          v-for="ticket in getTicketsByStatus(status)"
+          v-for="ticket in getTicketsByColumn(column)"
           :key="ticket.customId"
           :class="[
             'min-h-[100px] flex-shrink-0 bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border shadow-sm mb-3.5 flex flex-col hover:-translate-y-0.5 hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
-            ticket.status === TicketStatus.Returned
+            ticket.ticketStatus?.key === DefaultTicketStatus.Returned ||
+            ticket.status === DefaultTicketStatus.Returned
               ? 'border-orange-300 dark:border-orange-600 dark:bg-orange-900/10 hover:border-orange-400 dark:hover:border-orange-500'
               : 'border-gray-200 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500',
           ]"
@@ -36,20 +37,11 @@
         >
           <div class="flex justify-between items-start mb-2 w-full p-0">
             <div class="flex-1 min-w-0 flex items-start">
-              <div class="flex items-start gap-2 w-full">
-                <div
-                  class="font-semibold text-sm leading-5 text-gray-900 dark:text-white overflow-hidden text-left flex-1 break-words m-0 p-0"
-                  style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical"
-                >
-                  {{ ticket.name }}
-                </div>
-                <div
-                  v-if="ticket.status === TicketStatus.Returned"
-                  class="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 flex-shrink-0"
-                  title="Ticket devolvido"
-                >
-                  <font-awesome-icon icon="undo" class="text-xs" />
-                </div>
+              <div
+                class="font-semibold text-sm leading-5 text-gray-900 dark:text-white overflow-hidden text-left flex-1 break-words m-0 p-0"
+                style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical"
+              >
+                {{ ticket.name }}
               </div>
             </div>
             <div class="flex items-center gap-2 ml-auto flex-shrink-0">
@@ -59,7 +51,7 @@
                 title="Comentários"
               >
                 <font-awesome-icon icon="comment" />
-                <span class="text-xs min-w-4">{{ ticket.comments?.length || 0 }}</span>
+                <span class="text-xs min-w-2">{{ ticket.comments?.length || 0 }}</span>
               </div>
               <div
                 v-if="(ticket.files?.length || 0) > 0"
@@ -68,6 +60,16 @@
               >
                 <font-awesome-icon icon="paperclip" />
                 <span class="text-xs min-w-4">{{ ticket.files?.length || 0 }}</span>
+              </div>
+              <div
+                v-if="
+                  ticket.ticketStatus?.key === DefaultTicketStatus.Returned ||
+                  ticket.status === DefaultTicketStatus.Returned
+                "
+                class="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 flex-shrink-0"
+                title="Ticket devolvido"
+              >
+                <font-awesome-icon icon="undo" class="text-xs" />
               </div>
             </div>
           </div>
@@ -155,7 +157,11 @@
                 </div>
               </div>
               <div
-                v-if="ticket.dueAt && ticket.status !== TicketStatus.Completed"
+                v-if="
+                  ticket.dueAt &&
+                  ticket.ticketStatus?.key !== DefaultTicketStatus.Completed &&
+                  ticket.status !== DefaultTicketStatus.Completed
+                "
                 :class="[
                   'flex items-center gap-1 px-2 py-1 rounded text-xs font-medium whitespace-nowrap',
                   getDeadlineClass(ticket.dueAt) === 'normal'
@@ -218,15 +224,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { Ticket } from '@/models';
-import { TicketStatus, TicketPriority } from '@/models';
+import { ref, onMounted, computed } from 'vue';
+import type { Ticket, StatusColumn } from '@/models';
+import { DefaultTicketStatus, TicketPriority } from '@/models';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { formatDate, formatRelativeTime } from '@/utils/date';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import { ticketService } from '@/services/ticketService';
+import { statusColumnService } from '@/services/statusColumnService';
 import { toast } from 'vue3-toastify';
 import BaseModal from '@/components/common/BaseModal.vue';
 
@@ -234,13 +241,7 @@ const props = defineProps<{
   tickets: Ticket[];
 }>();
 
-const statusColumns = [
-  TicketStatus.Pending,
-  TicketStatus.InProgress,
-  TicketStatus.AwaitingVerification,
-  TicketStatus.UnderVerification,
-  TicketStatus.Completed,
-];
+const statusColumns = ref<StatusColumn[]>([]);
 
 const selectedTicket = ref<Ticket | null>(null);
 const isModalOpen = ref(false);
@@ -280,14 +281,26 @@ const getSortedTargetUsers = (ticket: Ticket) => {
   return [...ticket.targetUsers].sort((a, b) => a.order - b.order);
 };
 
-const getTicketsByStatus = (status: string) => {
-  if (status === TicketStatus.Pending) {
+const getTicketsByColumn = (column: StatusColumn) => {
+  const statusKeys = column.statuses.map((status) => status.key);
+
+  // Special handling for "Pendente" column - also include "devolvido" status
+  const isPendenteColumn = column.statuses.some(
+    (status) => status.key === DefaultTicketStatus.Pending,
+  );
+
+  if (isPendenteColumn) {
     return props.tickets.filter(
-      (ticket) => ticket.status === status || ticket.status === TicketStatus.Returned,
+      (ticket) =>
+        statusKeys.includes(ticket.ticketStatus?.key || ticket.status) ||
+        ticket.status === DefaultTicketStatus.Returned ||
+        ticket.ticketStatus?.key === DefaultTicketStatus.Returned,
     );
   }
 
-  return props.tickets.filter((ticket) => ticket.status === status);
+  return props.tickets.filter((ticket) =>
+    statusKeys.includes(ticket.ticketStatus?.key || ticket.status),
+  );
 };
 
 const calculateDeadline = (ticket: Ticket) => {
@@ -359,8 +372,9 @@ const getDeadlineIcon = (ticket: Ticket) => {
 
 const openTicketDetails = (ticket: Ticket) => {
   // If ticket is awaiting verification and user is the reviewer, show confirmation first
+  const currentStatus = ticket.ticketStatus?.key || ticket.status || '';
   if (
-    ticket.status === TicketStatus.AwaitingVerification &&
+    currentStatus === DefaultTicketStatus.AwaitingVerification &&
     ticket.reviewer?.id === userStore.user?.id
   ) {
     pendingVerificationTicket.value = ticket;
@@ -375,7 +389,7 @@ const openTicketDetails = (ticket: Ticket) => {
 const handleStartVerification = async (ticket: Ticket) => {
   try {
     const ticketResponse = await ticketService.updateStatus(ticket.customId, {
-      status: TicketStatus.UnderVerification,
+      status: DefaultTicketStatus.UnderVerification,
     });
 
     selectedTicket.value = ticketResponse.data.ticketData;
@@ -394,6 +408,22 @@ const handleAlertVerification = () => {
     pendingVerificationTicket.value = null;
   }
 };
+
+const fetchStatusColumns = async () => {
+  try {
+    const response = await statusColumnService.fetch({ limit: 100 });
+    statusColumns.value = response.data.items;
+  } catch (error) {
+    console.error('Error fetching status columns:', error);
+    toast.error('Erro ao carregar colunas do kanban');
+    // Fallback to default columns if fetch fails
+    statusColumns.value = [];
+  }
+};
+
+onMounted(() => {
+  fetchStatusColumns();
+});
 </script>
 
 <style scoped>

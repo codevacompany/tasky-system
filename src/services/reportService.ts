@@ -1,5 +1,5 @@
 import apiClient from '@/utils/axiosInstance';
-import type { TicketPriority, TicketStatus } from '@/models';
+import type { TicketPriority, DefaultTicketStatus } from '@/models';
 
 export interface TenantStatistics {
   totalTickets: number;
@@ -50,7 +50,7 @@ export interface TimeSeriesData {
 }
 
 export interface TicketStatusCountDto {
-  status: TicketStatus;
+  status: DefaultTicketStatus;
   count: number;
 }
 
@@ -70,7 +70,9 @@ export interface TicketStatusCountResponseDto {
 }
 
 export interface StatusDurationDto {
-  status: TicketStatus;
+  status:
+    | DefaultTicketStatus
+    | { id: number; key: string; name: string; statusColumnId: number; isDefault: boolean };
   averageDurationSeconds: number;
   totalDurationSeconds: number;
   count: number;
@@ -109,7 +111,7 @@ export interface StatusDurationTimePointDto {
 }
 
 export interface StatusDurationTimeSeriesResponseDto {
-  status: TicketStatus;
+  status: DefaultTicketStatus;
   data: StatusDurationTimePointDto[];
   averageDuration: number;
 }
@@ -183,7 +185,7 @@ export const reportService = {
   },
 
   async getStatusDurationTimeSeries(
-    status: TicketStatus,
+    status: DefaultTicketStatus,
   ): Promise<StatusDurationTimeSeriesResponseDto> {
     const response = await apiClient.get<StatusDurationTimeSeriesResponseDto>(
       `/stats/status-duration-time-series?status=${status}`,
