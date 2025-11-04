@@ -25,10 +25,12 @@
         <div class="flex items-center gap-2 ml-4" v-if="loadedTicket">
           <div
             class="flex items-center gap-2"
-            v-if="isTargetUser || (isReviewer && ticketStatus === TicketStatus.UnderVerification)"
+            v-if="
+              isTargetUser || (isReviewer && ticketStatus === DefaultTicketStatus.UnderVerification)
+            "
           >
             <button
-              v-if="isTargetUser && ticketStatus === TicketStatus.Pending && isSelfAssigned"
+              v-if="isTargetUser && ticketStatus === DefaultTicketStatus.Pending && isSelfAssigned"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-green-600 hover:bg-green-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="startTicket(loadedTicket?.customId)"
             >
@@ -37,7 +39,7 @@
             </button>
 
             <button
-              v-else-if="isTargetUser && ticketStatus === TicketStatus.Pending"
+              v-else-if="isTargetUser && ticketStatus === DefaultTicketStatus.Pending"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-green-600 hover:bg-green-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="acceptTicket(loadedTicket?.customId)"
             >
@@ -46,7 +48,9 @@
             </button>
 
             <button
-              v-if="isTargetUser && ticketStatus === TicketStatus.InProgress && !isLastTargetUser"
+              v-if="
+                isTargetUser && ticketStatus === DefaultTicketStatus.InProgress && !isLastTargetUser
+              "
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="sendToNextDepartment(loadedTicket.customId)"
             >
@@ -55,7 +59,9 @@
             </button>
 
             <button
-              v-if="isTargetUser && ticketStatus === TicketStatus.InProgress && isLastTargetUser"
+              v-if="
+                isTargetUser && ticketStatus === DefaultTicketStatus.InProgress && isLastTargetUser
+              "
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-primary hover:bg-blue-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="sendForReview(loadedTicket.customId)"
             >
@@ -64,7 +70,7 @@
             </button>
 
             <button
-              v-if="isTargetUser && ticketStatus === TicketStatus.AwaitingVerification"
+              v-if="isTargetUser && ticketStatus === DefaultTicketStatus.AwaitingVerification"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="cancelVerificationRequest(loadedTicket.customId)"
             >
@@ -73,7 +79,7 @@
             </button>
 
             <button
-              v-if="isTargetUser && ticketStatus === TicketStatus.Returned"
+              v-if="isTargetUser && ticketStatus === DefaultTicketStatus.Returned"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-orange-600 hover:bg-orange-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="correctTicket(loadedTicket.customId)"
             >
@@ -82,7 +88,7 @@
             </button>
 
             <button
-              v-if="isReviewer && ticketStatus === TicketStatus.UnderVerification"
+              v-if="isReviewer && ticketStatus === DefaultTicketStatus.UnderVerification"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="approveTicket(loadedTicket.customId)"
             >
@@ -91,7 +97,7 @@
             </button>
 
             <button
-              v-if="isReviewer && ticketStatus === TicketStatus.UnderVerification"
+              v-if="isReviewer && ticketStatus === DefaultTicketStatus.UnderVerification"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="requestCorrection(loadedTicket.customId)"
             >
@@ -100,7 +106,7 @@
             </button>
 
             <button
-              v-if="isReviewer && ticketStatus === TicketStatus.UnderVerification"
+              v-if="isReviewer && ticketStatus === DefaultTicketStatus.UnderVerification"
               class="inline-flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-sm text-white font-medium rounded-md transition-colors"
               @click="rejectTicket(loadedTicket.customId)"
             >
@@ -112,9 +118,9 @@
           <button
             v-if="
               isRequester &&
-              ticketStatus !== TicketStatus.Completed &&
-              ticketStatus !== TicketStatus.Rejected &&
-              ticketStatus !== TicketStatus.Canceled
+              ticketStatus !== DefaultTicketStatus.Completed &&
+              ticketStatus !== DefaultTicketStatus.Rejected &&
+              ticketStatus !== DefaultTicketStatus.Canceled
             "
             class="inline-flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-sm text-white font-medium rounded-md transition-colors"
             @click="cancelTicket(loadedTicket.customId)"
@@ -574,8 +580,8 @@
               <!-- Add Comment Form -->
               <div
                 v-if="
-                  ticketStatus === TicketStatus.InProgress ||
-                  ticketStatus === TicketStatus.UnderVerification
+                  ticketStatus === DefaultTicketStatus.InProgress ||
+                  ticketStatus === DefaultTicketStatus.UnderVerification
                 "
                 class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
               >
@@ -815,7 +821,7 @@
 
 <script setup lang="ts">
 import BaseModal from '../common/BaseModal.vue';
-import { CancellationReason, TicketStatus, type Ticket, type TicketComment } from '@/models';
+import { CancellationReason, DefaultTicketStatus, type Ticket, type TicketComment } from '@/models';
 import { ref, computed, watch, nextTick } from 'vue';
 import { ticketCommentService } from '@/services/ticketCommentService';
 import { ticketService } from '@/services/ticketService';
@@ -905,7 +911,7 @@ const editorOptions = {
 const closeModal = () => {
   // Check if ticket is returned and user is target user
   if (
-    ticketStatus.value === TicketStatus.Returned &&
+    ticketStatus.value === DefaultTicketStatus.Returned &&
     isTargetUser.value &&
     !confirmationModal.value.isOpen
   ) {
@@ -942,20 +948,20 @@ const getPriorityClass = (priority: string) => {
 
 const getStatusClass = (status: string) => {
   switch (status) {
-    case TicketStatus.Pending:
+    case DefaultTicketStatus.Pending:
       return 'bg-orange-100 text-orange-800 border border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800';
-    case TicketStatus.InProgress:
+    case DefaultTicketStatus.InProgress:
       return 'bg-blue-100 text-blue-800 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800';
-    case TicketStatus.AwaitingVerification:
-    case TicketStatus.UnderVerification:
+    case DefaultTicketStatus.AwaitingVerification:
+    case DefaultTicketStatus.UnderVerification:
       return 'bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800';
-    case TicketStatus.Completed:
+    case DefaultTicketStatus.Completed:
       return 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
-    case TicketStatus.Rejected:
+    case DefaultTicketStatus.Rejected:
       return 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800';
-    case TicketStatus.Returned:
+    case DefaultTicketStatus.Returned:
       return 'bg-orange-100 text-orange-800 border border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800';
-    case TicketStatus.Canceled:
+    case DefaultTicketStatus.Canceled:
       return 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800';
     default:
       return 'bg-gray-100 text-gray-800 border border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
@@ -1102,7 +1108,9 @@ const sendForReview = async (ticketId: string) => {
     'Tem certeza que deseja enviar este ticket para revisão?',
     async () => {
       try {
-        await ticketService.updateStatus(ticketId, { status: TicketStatus.AwaitingVerification });
+        await ticketService.updateStatus(ticketId, {
+          status: DefaultTicketStatus.AwaitingVerification,
+        });
         toast.success('Ticket enviado para revisão');
 
         refreshSelectedTicket();
@@ -1185,7 +1193,7 @@ const correctTicket = async (ticketId: string) => {
     'Tem certeza que deseja iniciar as correções deste ticket?',
     async () => {
       try {
-        await ticketService.updateStatus(ticketId, { status: TicketStatus.InProgress });
+        await ticketService.updateStatus(ticketId, { status: DefaultTicketStatus.InProgress });
         toast.success('Ticket em correção');
         refreshSelectedTicket();
       } catch {
@@ -1197,7 +1205,7 @@ const correctTicket = async (ticketId: string) => {
 
 const startCorrectionDirectly = async (ticketId: string) => {
   try {
-    await ticketService.updateStatus(ticketId, { status: TicketStatus.InProgress });
+    await ticketService.updateStatus(ticketId, { status: DefaultTicketStatus.InProgress });
     toast.success('Ticket em correção');
     refreshSelectedTicket();
   } catch {
@@ -1428,19 +1436,19 @@ const getPriorityIcon = (priority: string) => {
 
 const getStatusIcon = (status: string) => {
   switch (status) {
-    case TicketStatus.Pending:
+    case DefaultTicketStatus.Pending:
       return 'clock';
-    case TicketStatus.InProgress:
+    case DefaultTicketStatus.InProgress:
       return 'spinner';
-    case TicketStatus.AwaitingVerification:
+    case DefaultTicketStatus.AwaitingVerification:
       return 'hourglass-half';
-    case TicketStatus.UnderVerification:
+    case DefaultTicketStatus.UnderVerification:
       return 'search';
-    case TicketStatus.Completed:
+    case DefaultTicketStatus.Completed:
       return 'check-circle';
-    case TicketStatus.Rejected:
+    case DefaultTicketStatus.Rejected:
       return 'times-circle';
-    case TicketStatus.Returned:
+    case DefaultTicketStatus.Returned:
       return 'exclamation-circle';
     default:
       return 'question-circle';
@@ -1490,8 +1498,8 @@ watch(
 
       if (
         userStore.user?.id === newTicket.reviewer?.id &&
-        (newTicket.ticketStatus?.key === TicketStatus.AwaitingVerification ||
-          newTicket.status === TicketStatus.AwaitingVerification) &&
+        (newTicket.ticketStatus?.key === DefaultTicketStatus.AwaitingVerification ||
+          newTicket.status === DefaultTicketStatus.AwaitingVerification) &&
         !confirmationModal.value.isOpen
       ) {
         openConfirmationModal(
@@ -1500,7 +1508,7 @@ watch(
           async () => {
             try {
               await ticketService.updateStatus(newTicket.customId, {
-                status: TicketStatus.UnderVerification,
+                status: DefaultTicketStatus.UnderVerification,
               });
               loadedTicket.value = await ticketsStore.fetchTicketDetails(newTicket.customId);
             } catch {
@@ -1588,9 +1596,9 @@ const canEditTicket = computed(() => {
 
   const currentStatus = loadedTicket.value?.ticketStatus?.key || loadedTicket.value?.status || '';
   const isTicketActive =
-    currentStatus !== TicketStatus.Completed &&
-    currentStatus !== TicketStatus.Rejected &&
-    currentStatus !== TicketStatus.Canceled;
+    currentStatus !== DefaultTicketStatus.Completed &&
+    currentStatus !== DefaultTicketStatus.Rejected &&
+    currentStatus !== DefaultTicketStatus.Canceled;
 
   return isUserInvolved && isTicketActive;
 });
@@ -1607,7 +1615,7 @@ const refreshSelectedTicket = async () => {
 
 const startEditingName = () => {
   const currentStatus = loadedTicket.value?.ticketStatus?.key || loadedTicket.value?.status || '';
-  if (!isRequester.value || currentStatus !== TicketStatus.Pending) return;
+  if (!isRequester.value || currentStatus !== DefaultTicketStatus.Pending) return;
   isEditingName.value = true;
   editingName.value = loadedTicket.value?.name || '';
   nextTick(() => {
@@ -1646,7 +1654,7 @@ const cancelEditingName = () => {
 
 const startEditingDescription = () => {
   const currentStatus = loadedTicket.value?.ticketStatus?.key || loadedTicket.value?.status || '';
-  if (!isRequester.value || currentStatus !== TicketStatus.Pending) return;
+  if (!isRequester.value || currentStatus !== DefaultTicketStatus.Pending) return;
   isEditingDescription.value = true;
   editingDescription.value = loadedTicket.value?.description || '';
   descriptionEditorKey.value += 1;
@@ -1693,7 +1701,7 @@ const cancelVerificationRequest = async (ticketId: string) => {
     'Tem certeza que deseja cancelar o envio para verificação?',
     async () => {
       try {
-        await ticketService.updateStatus(ticketId, { status: TicketStatus.InProgress });
+        await ticketService.updateStatus(ticketId, { status: DefaultTicketStatus.InProgress });
         toast.success('Envio para verificação cancelado');
 
         refreshSelectedTicket();
@@ -1829,7 +1837,7 @@ const confirmReviewerSelection = async () => {
     );
     showReviewerModal.value = false;
     await ticketService.updateStatus(loadedTicket.value.customId, {
-      status: TicketStatus.AwaitingVerification,
+      status: DefaultTicketStatus.AwaitingVerification,
     });
     toast.success('Ticket enviado para revisão');
     refreshSelectedTicket();

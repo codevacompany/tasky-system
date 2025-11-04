@@ -231,7 +231,7 @@
                 <!-- Botões para tabela de tickets recebidos -->
                 <template v-if="tableType === 'recebidos'">
                   <button
-                    v-if="ticket.status === TicketStatus.Pending"
+                    v-if="ticket.status === DefaultTicketStatus.Pending"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors duration-200"
                     @click.stop="handleAcceptTicket(ticket)"
                     title="Aceitar"
@@ -240,7 +240,7 @@
                   </button>
                   <button
                     v-else-if="
-                      ticket.status === TicketStatus.InProgress && !isLastTargetUser(ticket)
+                      ticket.status === DefaultTicketStatus.InProgress && !isLastTargetUser(ticket)
                     "
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
                     @click.stop="handleSendToNextDepartment(ticket)"
@@ -250,7 +250,7 @@
                   </button>
                   <button
                     v-else-if="
-                      ticket.status === TicketStatus.InProgress && isLastTargetUser(ticket)
+                      ticket.status === DefaultTicketStatus.InProgress && isLastTargetUser(ticket)
                     "
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duration-200"
                     @click.stop="handleVerifyTicket(ticket)"
@@ -259,7 +259,7 @@
                     <font-awesome-icon icon="arrow-right" class="text-xs md:text-sm" />
                   </button>
                   <button
-                    v-else-if="ticket.status === TicketStatus.Returned"
+                    v-else-if="ticket.status === DefaultTicketStatus.Returned"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 hover:bg-orange-600 text-white transition-colors duration-200"
                     @click.stop="handleCorrectTicket(ticket)"
                     title="Corrigir"
@@ -268,7 +268,8 @@
                   </button>
                   <button
                     v-else-if="
-                      ticket.status === TicketStatus.AwaitingVerification && isReviewer(ticket)
+                      ticket.status === DefaultTicketStatus.AwaitingVerification &&
+                      isReviewer(ticket)
                     "
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duration-200"
                     @click.stop="handleStartVerification(ticket)"
@@ -277,28 +278,30 @@
                     <font-awesome-icon icon="search" class="text-xs md:text-sm" />
                   </button>
                   <div
-                    v-else-if="ticket.status === TicketStatus.AwaitingVerification"
+                    v-else-if="ticket.status === DefaultTicketStatus.AwaitingVerification"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 text-white"
                     title="Aguardando Verificação"
                   >
                     <font-awesome-icon icon="hourglass-half" spin class="text-xs md:text-sm" />
                   </div>
                   <div
-                    v-else-if="ticket.status === TicketStatus.Rejected"
+                    v-else-if="ticket.status === DefaultTicketStatus.Rejected"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 text-white"
                     title="Reprovado"
                   >
                     <font-awesome-icon icon="xmark-circle" class="text-xs md:text-sm" />
                   </div>
                   <div
-                    v-else-if="ticket.status === TicketStatus.Completed"
+                    v-else-if="ticket.status === DefaultTicketStatus.Completed"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-700 text-white"
                     title="Finalizado"
                   >
                     <font-awesome-icon icon="check-circle" class="text-xs md:text-sm" />
                   </div>
                   <div
-                    v-if="isReviewer(ticket) && ticket.status === TicketStatus.UnderVerification"
+                    v-if="
+                      isReviewer(ticket) && ticket.status === DefaultTicketStatus.UnderVerification
+                    "
                     class="flex gap-0.5 md:gap-1"
                   >
                     <button
@@ -328,7 +331,7 @@
                 <!-- Botões para tabela de tickets criados -->
                 <template v-else-if="tableType === 'criados'">
                   <div
-                    v-if="ticket.status === TicketStatus.Pending && isSelfAssigned(ticket)"
+                    v-if="ticket.status === DefaultTicketStatus.Pending && isSelfAssigned(ticket)"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
                     @click.stop="handleStartTicket(ticket)"
                     title="Iniciar"
@@ -336,42 +339,42 @@
                     <font-awesome-icon icon="play" class="text-xs md:text-sm" />
                   </div>
                   <button
-                    v-else-if="ticket.status === TicketStatus.Pending"
+                    v-else-if="ticket.status === DefaultTicketStatus.Pending"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 text-white"
                     title="Não Iniciado"
                   >
                     <font-awesome-icon icon="clock" class="text-xs md:text-sm" />
                   </button>
                   <div
-                    v-else-if="ticket.status === TicketStatus.InProgress"
+                    v-else-if="ticket.status === DefaultTicketStatus.InProgress"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 text-white"
                     title="Fazendo"
                   >
                     <font-awesome-icon icon="cog" class="text-xs md:text-sm" />
                   </div>
                   <div
-                    v-else-if="ticket.status === TicketStatus.Returned"
+                    v-else-if="ticket.status === DefaultTicketStatus.Returned"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 text-white"
                     title="Devolvido para Correção"
                   >
                     <font-awesome-icon icon="wrench" class="text-xs md:text-sm" />
                   </div>
                   <div
-                    v-else-if="ticket.status === TicketStatus.Rejected"
+                    v-else-if="ticket.status === DefaultTicketStatus.Rejected"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 text-white"
                     title="Reprovado"
                   >
                     <font-awesome-icon icon="xmark-circle" class="text-xs md:text-sm" />
                   </div>
                   <div
-                    v-else-if="ticket.status === TicketStatus.Completed"
+                    v-else-if="ticket.status === DefaultTicketStatus.Completed"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-700 text-white"
                     title="Finalizado"
                   >
                     <font-awesome-icon icon="check-circle" class="text-xs md:text-sm" />
                   </div>
                   <button
-                    v-else-if="ticket.status === TicketStatus.AwaitingVerification"
+                    v-else-if="ticket.status === DefaultTicketStatus.AwaitingVerification"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duration-200"
                     @click.stop="handleStartVerification(ticket)"
                     title="Verificar"
@@ -379,7 +382,9 @@
                     <font-awesome-icon icon="search" class="text-xs md:text-sm" />
                   </button>
                   <div
-                    v-if="isReviewer(ticket) && ticket.status === TicketStatus.UnderVerification"
+                    v-if="
+                      isReviewer(ticket) && ticket.status === DefaultTicketStatus.UnderVerification
+                    "
                     class="flex gap-0.5 md:gap-1"
                   >
                     <button
@@ -409,14 +414,14 @@
                 <!-- Botões para tabela de tickets arquivados -->
                 <template v-else-if="tableType === 'arquivados'">
                   <div
-                    v-if="ticket.status === TicketStatus.Completed"
+                    v-if="ticket.status === DefaultTicketStatus.Completed"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-700 text-white"
                     title="Finalizado"
                   >
                     <font-awesome-icon icon="check-circle" class="text-xs md:text-sm" />
                   </div>
                   <div
-                    v-else-if="ticket.status === TicketStatus.Rejected"
+                    v-else-if="ticket.status === DefaultTicketStatus.Rejected"
                     class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 text-white"
                     title="Reprovado"
                   >
@@ -563,7 +568,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import type { Ticket } from '@/models';
-import { TicketPriority, TicketStatus, DisapprovalReason, CorrectionReason } from '@/models';
+import { TicketPriority, DefaultTicketStatus, DisapprovalReason, CorrectionReason } from '@/models';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { ticketService } from '@/services/ticketService';
@@ -669,7 +674,7 @@ const openTicketDetails = (ticket: Ticket) => {
   // Se for o solicitante e o ticket estiver aguardando verificação
   if (
     (props.tableType === 'criados' || props.tableType === 'recebidos') &&
-    ticket.status === TicketStatus.AwaitingVerification &&
+    ticket.status === DefaultTicketStatus.AwaitingVerification &&
     userStore.user?.id === ticket.reviewer?.id
   ) {
     pendingVerificationTicket.value = ticket;
@@ -734,20 +739,20 @@ const priorityColor = (priority: TicketPriority) => {
 
 const getStatusClass = (status: string) => {
   switch (status) {
-    case TicketStatus.Pending:
+    case DefaultTicketStatus.Pending:
       return 'bg-orange-100 text-orange-500 border border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800';
-    case TicketStatus.InProgress:
+    case DefaultTicketStatus.InProgress:
       return 'bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800';
-    case TicketStatus.AwaitingVerification:
-    case TicketStatus.UnderVerification:
+    case DefaultTicketStatus.AwaitingVerification:
+    case DefaultTicketStatus.UnderVerification:
       return 'bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800';
-    case TicketStatus.Completed:
+    case DefaultTicketStatus.Completed:
       return 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800';
-    case TicketStatus.Rejected:
+    case DefaultTicketStatus.Rejected:
       return 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800';
-    case TicketStatus.Returned:
+    case DefaultTicketStatus.Returned:
       return 'bg-orange-100 text-orange-800 border border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800';
-    case TicketStatus.Canceled:
+    case DefaultTicketStatus.Canceled:
       return 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800';
     default:
       return 'bg-gray-100 text-gray-800 border border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800';
@@ -851,7 +856,7 @@ const handleVerifyTicket = async (ticket: Ticket) => {
     async () => {
       try {
         await ticketService.updateStatus(ticket.customId, {
-          status: TicketStatus.AwaitingVerification,
+          status: DefaultTicketStatus.AwaitingVerification,
         });
         toast.success('Ticket enviado para revisão');
 
@@ -895,7 +900,9 @@ const handleRequestCorrection = async (ticket: Ticket) => {
             details: data.description,
           });
         } else {
-          await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Returned });
+          await ticketService.updateStatus(ticket.customId, {
+            status: DefaultTicketStatus.Returned,
+          });
         }
 
         toast.success('Correção solicitada com sucesso');
@@ -923,7 +930,9 @@ const handleRejectTicket = async (ticket: Ticket) => {
             details: data.description,
           });
         } else {
-          await ticketService.updateStatus(ticket.customId, { status: TicketStatus.Rejected });
+          await ticketService.updateStatus(ticket.customId, {
+            status: DefaultTicketStatus.Rejected,
+          });
         }
 
         toast.success('Ticket reprovado com sucesso');
@@ -941,7 +950,7 @@ const handleRejectTicket = async (ticket: Ticket) => {
 const handleStartVerification = async (ticket: Ticket) => {
   try {
     const ticketResponse = await ticketService.updateStatus(ticket.customId, {
-      status: TicketStatus.UnderVerification,
+      status: DefaultTicketStatus.UnderVerification,
     });
 
     selectedTicket.value = ticketResponse.data.ticketData;
@@ -967,7 +976,9 @@ const handleCorrectTicket = async (ticket: Ticket) => {
     'Tem certeza que deseja iniciar as correções deste ticket?',
     async () => {
       try {
-        await ticketService.updateStatus(ticket.customId, { status: TicketStatus.InProgress });
+        await ticketService.updateStatus(ticket.customId, {
+          status: DefaultTicketStatus.InProgress,
+        });
         toast.success('Ticket em correção');
 
         await ticketsStore.fetchTicketDetails(ticket.customId);

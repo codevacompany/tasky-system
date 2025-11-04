@@ -2,7 +2,7 @@ import type {
   CreateTicketDto,
   Ticket,
   TicketPriority,
-  TicketStatus,
+  DefaultTicketStatus,
   UpdateTicketDto,
   UpdateTicketStatusDto,
 } from '@/models';
@@ -17,7 +17,7 @@ export const ticketService = {
 
   async fetch(params?: {
     name?: string;
-    status?: TicketStatus;
+    status?: DefaultTicketStatus;
     priority?: TicketPriority;
     page?: number;
     limit?: number;
@@ -33,7 +33,7 @@ export const ticketService = {
     departmentId: number,
     params?: {
       name?: string;
-      status?: TicketStatus;
+      status?: DefaultTicketStatus;
       priority?: TicketPriority;
       page?: number;
       limit?: number;
@@ -48,7 +48,7 @@ export const ticketService = {
     requesterId: number,
     params?: {
       name?: string;
-      status?: TicketStatus;
+      status?: DefaultTicketStatus;
       priority?: TicketPriority;
       page?: number;
       limit?: number;
@@ -63,7 +63,7 @@ export const ticketService = {
     targetUserId: number,
     params?: {
       name?: string;
-      status?: TicketStatus;
+      status?: DefaultTicketStatus;
       priority?: TicketPriority;
       page?: number;
       limit?: number;
@@ -78,7 +78,7 @@ export const ticketService = {
     userId: number,
     params?: {
       name?: string;
-      status?: TicketStatus;
+      status?: DefaultTicketStatus;
       priority?: TicketPriority;
       page?: number;
       limit?: number;

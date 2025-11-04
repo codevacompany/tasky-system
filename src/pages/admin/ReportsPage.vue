@@ -705,7 +705,10 @@
                         >
                           <div class="flex justify-between items-center text-sm">
                             <span class="text-gray-700 dark:text-gray-300">{{
-                              formatSnakeToNaturalCase(duration.status)
+                              formatSnakeToNaturalCase(
+                                (duration.status as any)?.key ??
+                                  (duration.status as unknown as string),
+                              )
                             }}</span>
                             <span class="font-medium text-gray-900 dark:text-white">
                               {{ formatTimeInSecondsCompact(duration.averageDurationSeconds) }}
@@ -1831,7 +1834,10 @@
                           >
                             <div class="flex justify-between items-center text-sm">
                               <span class="text-gray-700 dark:text-gray-300">{{
-                                formatSnakeToNaturalCase(duration.status)
+                                formatSnakeToNaturalCase(
+                                  (duration.status as any)?.key ??
+                                    (duration.status as unknown as string),
+                                )
                               }}</span>
                               <span class="font-medium text-gray-900 dark:text-white">
                                 {{ formatTimeInSecondsCompact(duration.averageDurationSeconds) }}
@@ -2053,7 +2059,7 @@ import type {
   StatusDurationTimePointDto,
   UserRankingResponseDto,
 } from '@/services/reportService';
-import { TicketActionType, TicketStatus, type TicketUpdate } from '@/models';
+import { TicketActionType, DefaultTicketStatus, type TicketUpdate } from '@/models';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import {
@@ -2442,7 +2448,7 @@ const loadData = async () => {
       reportService.getStatusDurations(selectedStatsPeriod.value),
       reportService.getTenantDepartmentsStatistics(),
       reportService.getResolutionTimeData(),
-      reportService.getStatusDurationTimeSeries(TicketStatus.InProgress),
+      reportService.getStatusDurationTimeSeries(DefaultTicketStatus.InProgress),
       reportService.getTopUsers(undefined, true), // fetch all users with stats for Colaboradores tab
       reportService.getTopUsers(5, false), // fetch top 5 for Visão Geral tab
       reportService.getTopUsers(5, false, 'bottom'), // fetch worst 5 for Pior Desempenho section
@@ -2832,7 +2838,7 @@ const loadInProgressTasks = async () => {
   loadingInProgressTasks.value = true;
   try {
     const response = await ticketService.fetch({
-      status: TicketStatus.InProgress, // Using type assertion for now
+      status: DefaultTicketStatus.InProgress, // Using type assertion for now
       limit: 10,
     });
 
@@ -2862,7 +2868,7 @@ const loadInProgressTasks = async () => {
             ticket.updates?.filter(
               (update: TicketUpdate) =>
                 update.action === TicketActionType.StatusUpdate &&
-                (update.toStatus === TicketStatus.InProgress || update.toStatus === 'em_andamento'),
+                update.toStatus === DefaultTicketStatus.InProgress,
             ) || [];
 
           const lastStatusUpdate =
@@ -3357,7 +3363,7 @@ const getInProgressTrend = (): number => {
 const loadInProgressDuration = async () => {
   try {
     inProgressTimeSeries.value = await reportService.getStatusDurationTimeSeries(
-      TicketStatus.InProgress,
+      DefaultTicketStatus.InProgress,
     );
   } catch (err) {
     console.error('Error loading in-progress duration data:', err);

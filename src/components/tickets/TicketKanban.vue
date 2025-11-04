@@ -28,8 +28,8 @@
           :key="ticket.customId"
           :class="[
             'min-h-[100px] flex-shrink-0 bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border shadow-sm mb-3.5 flex flex-col hover:-translate-y-0.5 hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
-            ticket.ticketStatus?.key === TicketStatus.Returned ||
-            ticket.status === TicketStatus.Returned
+            ticket.ticketStatus?.key === DefaultTicketStatus.Returned ||
+            ticket.status === DefaultTicketStatus.Returned
               ? 'border-orange-300 dark:border-orange-600 dark:bg-orange-900/10 hover:border-orange-400 dark:hover:border-orange-500'
               : 'border-gray-200 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500',
           ]"
@@ -63,8 +63,8 @@
               </div>
               <div
                 v-if="
-                  ticket.ticketStatus?.key === TicketStatus.Returned ||
-                  ticket.status === TicketStatus.Returned
+                  ticket.ticketStatus?.key === DefaultTicketStatus.Returned ||
+                  ticket.status === DefaultTicketStatus.Returned
                 "
                 class="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 flex-shrink-0"
                 title="Ticket devolvido"
@@ -159,8 +159,8 @@
               <div
                 v-if="
                   ticket.dueAt &&
-                  ticket.ticketStatus?.key !== TicketStatus.Completed &&
-                  ticket.status !== TicketStatus.Completed
+                  ticket.ticketStatus?.key !== DefaultTicketStatus.Completed &&
+                  ticket.status !== DefaultTicketStatus.Completed
                 "
                 :class="[
                   'flex items-center gap-1 px-2 py-1 rounded text-xs font-medium whitespace-nowrap',
@@ -226,7 +226,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import type { Ticket, StatusColumn } from '@/models';
-import { TicketStatus, TicketPriority } from '@/models';
+import { DefaultTicketStatus, TicketPriority } from '@/models';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { formatDate, formatRelativeTime } from '@/utils/date';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
@@ -285,14 +285,16 @@ const getTicketsByColumn = (column: StatusColumn) => {
   const statusKeys = column.statuses.map((status) => status.key);
 
   // Special handling for "Pendente" column - also include "devolvido" status
-  const isPendenteColumn = column.statuses.some((status) => status.key === TicketStatus.Pending);
+  const isPendenteColumn = column.statuses.some(
+    (status) => status.key === DefaultTicketStatus.Pending,
+  );
 
   if (isPendenteColumn) {
     return props.tickets.filter(
       (ticket) =>
         statusKeys.includes(ticket.ticketStatus?.key || ticket.status) ||
-        ticket.status === TicketStatus.Returned ||
-        ticket.ticketStatus?.key === TicketStatus.Returned,
+        ticket.status === DefaultTicketStatus.Returned ||
+        ticket.ticketStatus?.key === DefaultTicketStatus.Returned,
     );
   }
 
@@ -372,7 +374,7 @@ const openTicketDetails = (ticket: Ticket) => {
   // If ticket is awaiting verification and user is the reviewer, show confirmation first
   const currentStatus = ticket.ticketStatus?.key || ticket.status || '';
   if (
-    currentStatus === TicketStatus.AwaitingVerification &&
+    currentStatus === DefaultTicketStatus.AwaitingVerification &&
     ticket.reviewer?.id === userStore.user?.id
   ) {
     pendingVerificationTicket.value = ticket;
@@ -387,7 +389,7 @@ const openTicketDetails = (ticket: Ticket) => {
 const handleStartVerification = async (ticket: Ticket) => {
   try {
     const ticketResponse = await ticketService.updateStatus(ticket.customId, {
-      status: TicketStatus.UnderVerification,
+      status: DefaultTicketStatus.UnderVerification,
     });
 
     selectedTicket.value = ticketResponse.data.ticketData;

@@ -1,4 +1,5 @@
-import { TicketStatus, type Ticket } from '@/models';
+import type { Ticket } from '@/models';
+import { DefaultTicketStatus } from '@/models';
 
 export function debounce<T extends (...args: unknown[]) => void>(func: T, wait: number) {
   let timeout: ReturnType<typeof setTimeout>;
@@ -29,7 +30,10 @@ export function calculateDeadline(ticket: Ticket) {
   if (!ticket.dueAt) return '---';
 
   const currentStatus = ticket.ticketStatus?.key || ticket.status || '';
-  if (currentStatus !== TicketStatus.Pending && currentStatus !== TicketStatus.InProgress) {
+  if (
+    currentStatus !== DefaultTicketStatus.Pending &&
+    currentStatus !== DefaultTicketStatus.InProgress
+  ) {
     return '---';
   }
 

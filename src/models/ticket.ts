@@ -13,7 +13,7 @@ export enum TicketPriority {
   High = 'alta',
 }
 
-export enum TicketStatus {
+export enum DefaultTicketStatus {
   Pending = 'pendente',
   InProgress = 'em_andamento',
   AwaitingVerification = 'aguardando_verificação',
@@ -43,7 +43,7 @@ export interface Ticket {
   currentTargetUser?: User;
   currentTargetUserId?: number;
   reviewer?: User;
-  status: TicketStatus;
+  status: DefaultTicketStatus;
   ticketStatus?: {
     id: number;
     key: string;
@@ -90,5 +90,5 @@ export interface UpdateTicketDto {
 }
 
 export interface UpdateTicketStatusDto {
-  status: TicketStatus;
+  status: DefaultTicketStatus;
 }

@@ -349,7 +349,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { reportService, type UserStatistics } from '@/services/reportService';
-import { TicketStatus } from '@/models';
+import { DefaultTicketStatus } from '@/models';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import { toast } from 'vue3-toastify';
@@ -374,26 +374,32 @@ const totalTickets = computed(() => ({
 
 const ticketsPendentes = computed(() => ({
   total:
-    latestReceivedTickets.value.filter((t) => t.status === TicketStatus.Pending).length +
-    latestCreatedTickets.value.filter((t) => t.status === TicketStatus.Pending).length,
-  recebidos: latestReceivedTickets.value.filter((t) => t.status === TicketStatus.Pending).length,
-  criados: latestCreatedTickets.value.filter((t) => t.status === TicketStatus.Pending).length,
+    latestReceivedTickets.value.filter((t) => t.status === DefaultTicketStatus.Pending).length +
+    latestCreatedTickets.value.filter((t) => t.status === DefaultTicketStatus.Pending).length,
+  recebidos: latestReceivedTickets.value.filter((t) => t.status === DefaultTicketStatus.Pending)
+    .length,
+  criados: latestCreatedTickets.value.filter((t) => t.status === DefaultTicketStatus.Pending)
+    .length,
 }));
 
 const ticketsEmAndamento = computed(() => ({
   total:
-    latestReceivedTickets.value.filter((t) => t.status === TicketStatus.InProgress).length +
-    latestCreatedTickets.value.filter((t) => t.status === TicketStatus.InProgress).length,
-  recebidos: latestReceivedTickets.value.filter((t) => t.status === TicketStatus.InProgress).length,
-  criados: latestCreatedTickets.value.filter((t) => t.status === TicketStatus.InProgress).length,
+    latestReceivedTickets.value.filter((t) => t.status === DefaultTicketStatus.InProgress).length +
+    latestCreatedTickets.value.filter((t) => t.status === DefaultTicketStatus.InProgress).length,
+  recebidos: latestReceivedTickets.value.filter((t) => t.status === DefaultTicketStatus.InProgress)
+    .length,
+  criados: latestCreatedTickets.value.filter((t) => t.status === DefaultTicketStatus.InProgress)
+    .length,
 }));
 
 const ticketsFinalizados = computed(() => ({
   total:
-    latestReceivedTickets.value.filter((t) => t.status === TicketStatus.Completed).length +
-    latestCreatedTickets.value.filter((t) => t.status === TicketStatus.Completed).length,
-  recebidos: latestReceivedTickets.value.filter((t) => t.status === TicketStatus.Completed).length,
-  criados: latestCreatedTickets.value.filter((t) => t.status === TicketStatus.Completed).length,
+    latestReceivedTickets.value.filter((t) => t.status === DefaultTicketStatus.Completed).length +
+    latestCreatedTickets.value.filter((t) => t.status === DefaultTicketStatus.Completed).length,
+  recebidos: latestReceivedTickets.value.filter((t) => t.status === DefaultTicketStatus.Completed)
+    .length,
+  criados: latestCreatedTickets.value.filter((t) => t.status === DefaultTicketStatus.Completed)
+    .length,
 }));
 
 const resolutionRate = computed(() => {
