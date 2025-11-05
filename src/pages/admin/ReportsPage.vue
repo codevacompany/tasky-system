@@ -310,7 +310,7 @@
                 <div class="flex flex-col md:flex-row p-6">
                   <div class="w-full md:w-2/3 h-64">
                     <Doughnut
-                      v-if="ticketsByStatus.labels.length"
+                      v-if="ticketsByStatus.labels.length && hasStatusData"
                       :data="statusChartData"
                       :options="chartOptions"
                     />
@@ -318,8 +318,11 @@
                       v-else
                       class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
                     >
-                      <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
-                      <p class="text-sm">Carregando dados...</p>
+                      <font-awesome-icon icon="circle-info" class="text-xl mb-2" />
+                      <p class="text-sm font-medium">Sem dados para exibir</p>
+                      <p class="text-xs mt-1">
+                        Ajuste filtros ou período para visualizar resultados
+                      </p>
                     </div>
                   </div>
 
@@ -359,7 +362,7 @@
                 <div class="flex flex-col md:flex-row p-6">
                   <div class="w-full md:w-2/3 h-64">
                     <Doughnut
-                      v-if="ticketsByPriority.labels.length"
+                      v-if="ticketsByPriority.labels.length && hasPriorityData"
                       :data="priorityChartData"
                       :options="chartOptions"
                     />
@@ -367,8 +370,11 @@
                       v-else
                       class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
                     >
-                      <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
-                      <p class="text-sm">Carregando dados...</p>
+                      <font-awesome-icon icon="circle-info" class="text-xl mb-2" />
+                      <p class="text-sm font-medium">Sem dados para exibir</p>
+                      <p class="text-xs mt-1">
+                        Ajuste filtros ou período para visualizar resultados
+                      </p>
                     </div>
                   </div>
 
@@ -666,6 +672,17 @@
                               }"
                             ></div>
                           </div>
+                        </div>
+                      </template>
+                      <template v-else>
+                        <div
+                          class="h-40 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                        >
+                          <font-awesome-icon icon="circle-info" class="text-xl mb-2" />
+                          <p class="text-sm font-medium">Sem dados para exibir</p>
+                          <p class="text-xs mt-1">
+                            Ainda não há durações registradas no período selecionado
+                          </p>
                         </div>
                       </template>
                     </div>
@@ -2463,6 +2480,18 @@ const loadData = async () => {
       averageDuration: duration.averageDurationSeconds / 3600, // Converter segundos para horas
     }));
 
+    if (!statusDurations.value.length) {
+      statusDurations.value = statusOrder
+        .filter((s) => !['finalizado', 'cancelado', 'reprovado'].includes(s.key))
+        .map((s) => ({
+          status: s.key as DefaultTicketStatus,
+          averageDurationSeconds: 0,
+          averageDuration: 0,
+          totalDurationSeconds: 0,
+          count: 0,
+        }));
+    }
+
     // Store department data - directly from the API response
     departmentData.value = departmentStatsResult.map((dept) => ({
       ...dept,
@@ -2662,6 +2691,9 @@ const statusChartData = computed(() => ({
     },
   ],
 }));
+const hasStatusData = computed(() =>
+  (statusChartData.value.datasets?.[0]?.data || []).some((n: number) => Number(n) > 0),
+);
 
 const priorityChartData = computed(() => ({
   labels: ticketsByPriority.value.labels,
@@ -2677,6 +2709,9 @@ const priorityChartData = computed(() => ({
     },
   ],
 }));
+const hasPriorityData = computed(() =>
+  (priorityChartData.value.datasets?.[0]?.data || []).some((n: number) => Number(n) > 0),
+);
 
 // Keep selectedTrendPeriod for chart trend data
 const selectedTrendPeriod = ref<'daily' | 'weekly' | 'monthly'>('weekly');
@@ -2998,9 +3033,13 @@ const departmentStatsSummary = computed(() => {
 });
 
 const sortedStatusDurations = computed(() => {
-  return [...statusDurations.value].sort(
-    (a, b) => b.averageDurationSeconds - a.averageDurationSeconds,
-  );
+  const excluded = new Set(['finalizado', 'cancelado', 'reprovado']);
+  return [...statusDurations.value]
+    .filter((d) => {
+      const key = (d as any)?.status?.key ?? (d.status as unknown as string);
+      return !excluded.has(key);
+    })
+    .sort((a, b) => b.averageDurationSeconds - a.averageDurationSeconds);
 });
 
 const handlePeriodChange = () => {
