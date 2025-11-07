@@ -738,6 +738,7 @@
     :reasonOptions="confirmationModal.reasonOptions"
     :showUserSelector="confirmationModal.showUserSelector"
     :targetUsers="confirmationModal.targetUsers"
+    :loading="confirmationModal.isLoading"
     @confirm="handleConfirm"
     @cancel="handleCancel"
   />
@@ -762,13 +763,19 @@
     <template #footer>
       <div class="flex justify-end gap-2">
         <button
-          class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200"
+          class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
           @click="showReviewerModal = false"
+          :disabled="isReviewerModalLoading"
         >
           Cancelar
         </button>
-        <button class="px-4 py-2 bg-blue-600 text-white rounded" @click="confirmReviewerSelection">
-          Confirmar
+        <button
+          class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[100px]"
+          @click="confirmReviewerSelection"
+          :disabled="isReviewerModalLoading"
+        >
+          <LoadingSpinner v-if="isReviewerModalLoading" :size="16" />
+          <span v-if="!isReviewerModalLoading">Confirmar</span>
         </button>
       </div>
     </template>
@@ -802,17 +809,19 @@
     <template #footer>
       <div class="flex justify-end gap-2">
         <button
-          class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200"
+          class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
           @click="showDueDateModal = false"
+          :disabled="isDueDateModalLoading"
         >
           Cancelar
         </button>
         <button
-          class="px-4 py-2 bg-blue-600 text-white rounded"
+          class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[100px]"
           @click="confirmDueDate"
-          :disabled="!dueDateValue"
+          :disabled="!dueDateValue || isDueDateModalLoading"
         >
-          Confirmar
+          <LoadingSpinner v-if="isDueDateModalLoading" :size="16" />
+          <span v-if="!isDueDateModalLoading">Confirmar</span>
         </button>
       </div>
     </template>
@@ -846,6 +855,7 @@ import { CorrectionReason, DisapprovalReason } from '@/models';
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import DepartmentUserSelector from '@/components/common/DepartmentUserSelector.vue';
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
 interface SpecialUpdateEvent {
   data?: {
@@ -892,6 +902,7 @@ const confirmationModal = ref({
   context: '', // add context property
   showUserSelector: false,
   targetUsers: [] as Array<{ userId: number; userName: string; order: number }>,
+  isLoading: false,
 });
 
 const editorOptions = {
@@ -1018,12 +1029,14 @@ const openConfirmationModal = (
     context,
     showUserSelector,
     targetUsers,
+    isLoading: false,
   };
 };
 
 const closeConfirmationModal = () => {
   confirmationModal.value.isOpen = false;
   confirmationModal.value.action = null;
+  confirmationModal.value.isLoading = false;
 };
 
 const handleConfirm = async (data?: {
@@ -1032,10 +1045,16 @@ const handleConfirm = async (data?: {
   targetUserId?: number;
 }) => {
   if (confirmationModal.value.action) {
-    if (data) {
-      await confirmationModal.value.action(data);
-    } else {
-      await confirmationModal.value.action();
+    confirmationModal.value.isLoading = true;
+    
+    try {
+      if (data) {
+        await confirmationModal.value.action(data);
+      } else {
+        await confirmationModal.value.action();
+      }
+    } finally {
+      confirmationModal.value.isLoading = false;
     }
   }
   closeConfirmationModal();
@@ -1813,6 +1832,7 @@ const startTicket = async (ticketId: string) => {
 const showReviewerModal = ref(false);
 const reviewerSelection = ref<string | number>('');
 const tenantAdmins = ref<any[]>([]);
+const isReviewerModalLoading = ref(false);
 
 const fetchTenantAdmins = async () => {
   try {
@@ -1830,6 +1850,7 @@ const confirmReviewerSelection = async () => {
     toast.error('Selecione um revisor');
     return;
   }
+  isReviewerModalLoading.value = true;
   try {
     await ticketService.updateReviewer(
       loadedTicket.value.customId,
@@ -1843,15 +1864,19 @@ const confirmReviewerSelection = async () => {
     refreshSelectedTicket();
   } catch {
     toast.error('Erro ao definir revisor ou enviar para revisão');
+  } finally {
+    isReviewerModalLoading.value = false;
   }
 };
 
 const showDueDateModal = ref(false);
 const dueDateValue = ref('');
+const isDueDateModalLoading = ref(false);
 
 const confirmDueDate = async () => {
   if (!dueDateValue.value || !loadedTicket.value) return;
 
+  isDueDateModalLoading.value = true;
   try {
     await ticketService.update(loadedTicket.value.customId, { dueAt: dueDateValue.value });
 
@@ -1863,6 +1888,8 @@ const confirmDueDate = async () => {
     refreshSelectedTicket();
   } catch {
     toast.error('Erro ao definir prazo e aceitar ticket');
+  } finally {
+    isDueDateModalLoading.value = false;
   }
 };
 </script>

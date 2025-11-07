@@ -297,7 +297,7 @@
           <img
             src="@/assets/images/landing/hero-image.png"
             alt="Dashboard Tasky"
-            class="max-w-full h-auto rounded-lg shadow-lg max-w-xs lg:max-w-md"
+            class="max-w-full h-auto rounded-lg max-w-xs lg:max-w-md"
           />
         </div>
       </div>

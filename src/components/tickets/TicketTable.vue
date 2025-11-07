@@ -490,6 +490,7 @@
       :message="confirmationModal.message"
       :hasInput="confirmationModal.hasInput"
       :reasonOptions="confirmationModal.reasonOptions"
+      :loading="confirmationModal.isLoading"
       @confirm="handleConfirm"
       @cancel="handleCancel"
     />
@@ -522,17 +523,19 @@
       <template #footer>
         <div class="flex justify-end gap-2">
           <button
-            class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200"
+            class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
             @click="showDueDateModal = false"
+            :disabled="isDueDateModalLoading"
           >
             Cancelar
           </button>
           <button
-            class="px-4 py-2 bg-blue-600 text-white rounded"
+            class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[100px]"
             @click="confirmDueDate"
-            :disabled="!dueDateValue"
+            :disabled="!dueDateValue || isDueDateModalLoading"
           >
-            Confirmar
+            <LoadingSpinner v-if="isDueDateModalLoading" :size="16" />
+            <span v-if="!isDueDateModalLoading">Confirmar</span>
           </button>
         </div>
       </template>
@@ -555,16 +558,19 @@
         </p>
         <div class="flex justify-center gap-4">
           <button
-            class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200"
+            class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             @click="showVerificationAlert = false"
+            :disabled="isVerificationAlertLoading"
           >
             Cancelar
           </button>
           <button
-            class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 transition-colors duration-200"
+            class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             @click="handleAlertVerification"
+            :disabled="isVerificationAlertLoading"
           >
-            Verificar
+            <LoadingSpinner v-if="isVerificationAlertLoading" :size="16" />
+            <span v-if="!isVerificationAlertLoading">Verificar</span>
           </button>
         </div>
       </div>
@@ -611,11 +617,15 @@ const confirmationModal = ref({
   action: null as ((data?: { reason: string; description: string }) => Promise<void>) | null,
   hasInput: false,
   reasonOptions: [] as { value: string; label: string }[],
+  isLoading: false,
 });
 
 const showDueDateModal = ref(false);
 const dueDateValue = ref('');
 const ticketForDueDate = ref<Ticket | null>(null);
+const isDueDateModalLoading = ref(false);
+
+const isVerificationAlertLoading = ref(false);
 
 const displayedTickets = computed(() => {
   switch (props.tableType) {
@@ -793,17 +803,24 @@ const openConfirmationModal = (
     action,
     hasInput,
     reasonOptions,
+    isLoading: false,
   };
 };
 
 const closeConfirmationModal = () => {
   confirmationModal.value.isOpen = false;
   confirmationModal.value.action = null;
+  confirmationModal.value.isLoading = false;
 };
 
 const handleConfirm = async (data?: { reason: string; description: string }) => {
   if (confirmationModal.value.action) {
-    await confirmationModal.value.action(data);
+    confirmationModal.value.isLoading = true;
+    try {
+      await confirmationModal.value.action(data);
+    } finally {
+      confirmationModal.value.isLoading = false;
+    }
   }
   closeConfirmationModal();
 };
@@ -969,11 +986,16 @@ const handleStartVerification = async (ticket: Ticket) => {
   }
 };
 
-const handleAlertVerification = () => {
+const handleAlertVerification = async () => {
   if (pendingVerificationTicket.value) {
-    handleStartVerification(pendingVerificationTicket.value);
-    showVerificationAlert.value = false;
-    pendingVerificationTicket.value = null;
+    isVerificationAlertLoading.value = true;
+    try {
+      await handleStartVerification(pendingVerificationTicket.value);
+      showVerificationAlert.value = false;
+      pendingVerificationTicket.value = null;
+    } finally {
+      isVerificationAlertLoading.value = false;
+    }
   }
 };
 
@@ -1031,6 +1053,7 @@ const handleStartTicket = async (ticket: Ticket) => {
 const confirmDueDate = async () => {
   if (!dueDateValue.value || !ticketForDueDate.value) return;
 
+  isDueDateModalLoading.value = true;
   try {
     await ticketService.update(ticketForDueDate.value.customId, { dueAt: dueDateValue.value });
 
@@ -1043,6 +1066,8 @@ const confirmDueDate = async () => {
     await refreshTickets();
   } catch {
     toast.error('Erro ao definir prazo e aceitar ticket');
+  } finally {
+    isDueDateModalLoading.value = false;
   }
 };
 
@@ -1055,13 +1080,11 @@ const getDeadlineDotClass = (dueAt: string) => {
     diffTime < 0
       ? Math.floor(diffTime / (1000 * 60 * 60 * 24))
       : Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  const diffHours =
-    diffTime < 0 ? Math.floor(diffTime / (1000 * 60 * 60)) : Math.ceil(diffTime / (1000 * 60 * 60));
 
   if (diffDays < 0) {
     return 'bg-red-500';
-  } else if (diffDays === 0 || (diffDays === 1 && diffHours < 8)) {
-    return 'bg-yellow-500';
+  } else if (diffDays <= 3) {
+    return 'bg-orange-500';
   } else {
     return 'bg-emerald-400';
   }

@@ -94,15 +94,10 @@
 
         <!-- Footer -->
         <div class="px-6 pb-6 sm:px-8 sm:pb-8 text-center">
-          <p class="text-sm text-gray-600">
-            Não tem uma conta?
-            <router-link
-              to="/cadastrar"
-              class="text-gray-800 hover:text-gray-600 hover:underline transition-colors font-medium"
-            >
-              Cadastre-se
-            </router-link>
-          </p>
+          <p class="text-sm text-gray-600">Quer o Tasky Pro na sua empresa?</p>
+          <router-link to="/cadastrar" class="text-sm text-gray-800 hover:underline font-medium">
+            Cadastre aqui
+          </router-link>
         </div>
       </div>
     </div>

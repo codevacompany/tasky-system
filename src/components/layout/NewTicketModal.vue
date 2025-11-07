@@ -7,10 +7,11 @@
     :confirmButtonText="'Criar Ticket'"
     :cancelButtonText="'Cancelar'"
     :closeOnClickOutside="false"
+    :confirmButtonLoading="isLoading"
   >
-    <form @submit.prevent="handleSubmit" class="w-full">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-6">
-        <div class="col-span-1 md:col-span-2 flex flex-col gap-1.5">
+    <form @submit.prevent="handleSubmit" class="w-full -mt-2.5 -mb-1">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5 mb-4">
+        <div class="col-span-1 md:col-span-3 flex flex-col gap-1.5">
           <label for="title" class="text-sm text-gray-800 dark:text-gray-200"
             >Assunto: <span class="text-red-500">*</span></label
           >
@@ -24,154 +25,136 @@
         </div>
 
         <div class="col-span-1 flex flex-col gap-1.5">
+          <label class="text-sm text-gray-800 dark:text-gray-200 mt-1"
+            >Prioridade: <span class="text-red-500">*</span></label
+          >
+          <Select
+            :options="priorityOptions"
+            :modelValue="priorityValue"
+            @update:modelValue="updatePriority"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5 mb-4">
+        <TargetUsersSelector
+          :departments="departments"
+          :allUsers="allUsers"
+          v-model:targetUsers="targetUsers"
+          class="col-span-3"
+        />
+        <div class="col-span-1 flex flex-col gap-1.5">
           <label class="text-sm text-gray-800 dark:text-gray-200">É privado?</label>
-          <div class="flex sm:flex-row gap-2 sm:gap-4 pt-1" :key="privateRadioKey">
-            <label
-              class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200 cursor-pointer"
+          <Select
+            :options="privateOptions"
+            :modelValue="isPrivateValue"
+            @update:modelValue="updateIsPrivate"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5 mb-4">
+        <div class="col-span-3 grid grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1.5">
+            <label for="category" class="text-sm text-gray-800 dark:text-gray-200"
+              >Categoria: <span class="text-red-500">*</span></label
             >
-              <input
-                type="radio"
-                v-model="formData.isPrivate"
-                :value="true"
-                name="isPrivate"
-                class="cursor-pointer w-4"
-              />
-              Sim
-            </label>
-            <label
-              class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200 cursor-pointer"
+            <Select
+              :options="categoryOptions"
+              :modelValue="selectedCategory?.toString() || ''"
+              @update:modelValue="updateSelectedCategory"
+            />
+          </div>
+
+          <div class="flex flex-col gap-1.5 w-full">
+            <label for="dueAt" class="text-sm text-gray-800 dark:text-gray-200"
+              >Concluir até:</label
             >
-              <input
-                type="radio"
-                v-model="formData.isPrivate"
-                :value="false"
-                name="isPrivate"
-                class="cursor-pointer w-4"
+            <div class="w-full">
+              <DatePicker
+                :value="formData.dueAt"
+                type="datetime"
+                format="DD/MM/YYYY HH:mm"
+                value-type="format"
+                lang="pt-br"
+                :placeholder="'Selecione data e hora'"
+                :clearable="true"
+                :editable="false"
+                @change="handleDatePickerChange"
+                @input="
+                  (val: any) => {
+                    console.log('@input event:', val);
+                    formData.dueAt = val || null;
+                  }
+                "
+                :input-class="'w-full px-[14px] py-2.5 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-800 dark:text-white bg-white dark:bg-gray-800'"
+                :placeholder-class="'text-gray-500 dark:text-gray-400'"
+                :time-picker-options="{
+                  start: '00:00',
+                  step: '00:15',
+                  end: '23:45',
+                }"
               />
-              Não
-            </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-end gap-2 relative">
+          <label
+            class="primary-gradient text-white flex justify-center items-center gap-[5px] rounded cursor-pointer py-2 px-4 text-sm h-[40px]"
+            for="fileUpload"
+          >
+            <font-awesome-icon icon="paperclip" /> Anexar Arquivos
+          </label>
+          <button
+            v-if="selectedFiles.length > 0"
+            type="button"
+            @click="clearSelectedFiles"
+            class="flex justify-center items-center gap-[5px] rounded cursor-pointer py-2 px-4 text-sm h-[40px] bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-colors"
+            title="Limpar arquivos selecionados"
+          >
+            <font-awesome-icon icon="times" />
+          </button>
+          <div class="mt-20 sm:mt-0 col-span-1 md:col-span-3 flex flex-col">
+            <input class="hidden" type="file" id="fileUpload" multiple @change="handleFileChange" />
+            <div v-if="selectedFiles.length" class="absolute top-[74px] left-0">
+              <div class="flex items-center gap-2">
+                <font-awesome-icon icon="file" class="text-gray-500 text-xs" />
+                <p class="text-sm text-gray-700 dark:text-gray-300">
+                  {{ getFileDisplayText() }}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <TargetUsersSelector
-        :departments="departments"
-        :allUsers="allUsers"
-        v-model:targetUsers="targetUsers"
-      />
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-6 mt-4">
-        <div class="col-span-1 flex flex-col gap-1.5">
-          <label for="category" class="text-sm text-gray-800 dark:text-gray-200"
-            >Categoria: <span class="text-red-500">*</span></label
-          >
-          <Select
-            :options="categoryOptions"
-            :modelValue="selectedCategory?.toString() || ''"
-            @update:modelValue="updateSelectedCategory"
+      <div class="col-span-1 md:col-span-3 flex flex-col gap-1.5 w-full sm:w-[930px]">
+        <label for="description" class="text-sm text-gray-800 dark:text-gray-200"
+          >Descrição: <span class="text-red-500">*</span></label
+        >
+        <div class="quill-wrapper" ref="quillWrapperRef">
+          <QuillEditor
+            v-model:content="formData.description"
+            contentType="html"
+            theme="snow"
+            :options="editorOptions"
           />
         </div>
-
-        <div class="col-span-1 flex flex-col gap-1.5">
-          <label class="text-sm text-gray-800 dark:text-gray-200 mt-1"
-            >Prioridade: <span class="text-red-500">*</span></label
-          >
-          <div class="flex sm:flex-row gap-2 sm:gap-4 pt-2">
-            <label
-              class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200 cursor-pointer"
-            >
-              <input
-                type="radio"
-                v-model="formData.priority"
-                :value="TicketPriority.Low"
-                name="priority"
-                required
-                class="cursor-pointer w-4"
-              />
-              {{ formatSnakeToNaturalCase(TicketPriority.Low) }}
-            </label>
-            <label
-              class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200 cursor-pointer"
-            >
-              <input
-                type="radio"
-                v-model="formData.priority"
-                :value="TicketPriority.Medium"
-                name="priority"
-                class="cursor-pointer w-4"
-              />
-              {{ formatSnakeToNaturalCase(TicketPriority.Medium) }}
-            </label>
-            <label
-              class="flex items-center gap-1.5 text-sm text-gray-800 dark:text-gray-200 cursor-pointer"
-            >
-              <input
-                type="radio"
-                v-model="formData.priority"
-                :value="TicketPriority.High"
-                name="priority"
-                class="cursor-pointer w-4"
-              />
-              {{ formatSnakeToNaturalCase(TicketPriority.High) }}
-            </label>
-          </div>
-        </div>
-
-        <div class="col-span-1 flex flex-col gap-1.5">
-          <label for="dueAt" class="text-sm text-gray-800 dark:text-gray-200">Concluir até:</label>
-          <input
-            type="datetime-local"
-            id="dueAt"
-            v-model="formData.dueAt"
-            class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-          />
-        </div>
-
-        <div class="col-span-1 md:col-span-3 flex flex-col gap-1.5 w-full sm:w-[850px]">
-          <label for="description" class="text-sm text-gray-800 dark:text-gray-200"
-            >Descrição: <span class="text-red-500">*</span></label
-          >
-          <div class="quill-wrapper">
-            <QuillEditor
-              v-model:content="formData.description"
-              contentType="html"
-              theme="snow"
-              :options="editorOptions"
-            />
-          </div>
-          <textarea
-            class="hidden"
-            id="description"
-            v-model="formData.description"
-            required
-            rows="4"
-          ></textarea>
-        </div>
-        <div class="mt-20 sm:mt-0 col-span-1 md:col-span-3 flex flex-col gap-1.5">
-          <div class="flex">
-            <label
-              class="primary-gradient text-white flex justify-center items-center gap-[5px] rounded cursor-pointer mb-1.5 py-2 px-4 text-sm"
-              for="fileUpload"
-            >
-              <font-awesome-icon icon="paperclip" /> Anexar Arquivos
-            </label>
-          </div>
-
-          <input class="hidden" type="file" id="fileUpload" multiple @change="handleFileChange" />
-          <ul v-if="selectedFiles.length" class="space-y-1">
-            <li v-for="(file, i) in selectedFiles" :key="i" class="flex items-center gap-2">
-              <font-awesome-icon icon="file" class="text-gray-500 text-xs" />
-              <p class="text-sm text-gray-700 dark:text-gray-300 truncate">{{ file.name }}</p>
-            </li>
-          </ul>
-        </div>
+        <textarea
+          class="hidden"
+          id="description"
+          v-model="formData.description"
+          required
+          rows="4"
+        ></textarea>
       </div>
     </form>
   </BaseModal>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue';
 import { ticketService } from '@/services/ticketService';
 import { departmentService } from '@/services/departmentService';
 import { userService } from '@/services/userService';
@@ -188,6 +171,9 @@ import { awsService } from '@/services/awsService';
 import BaseModal from '@/components/common/BaseModal.vue';
 import Select from '@/components/common/Select.vue';
 import TargetUsersSelector from '@/components/common/TargetUsersSelector.vue';
+import DatePicker from 'vue-datepicker-next';
+import 'vue-datepicker-next/index.css';
+import 'vue-datepicker-next/locale/pt-br';
 
 const emit = defineEmits<{
   (e: 'close'): void;
@@ -203,7 +189,8 @@ const selectedUser = ref<number | null>(null);
 const categories = ref<Category[]>([]);
 const selectedCategory = ref<number | null>(null);
 const selectedFiles = ref<File[]>([]);
-const privateRadioKey = ref(0);
+const isLoading = ref(false);
+const quillWrapperRef = ref<HTMLElement | null>(null);
 const targetUsers = ref<
   Array<{
     departmentId: number | null;
@@ -230,11 +217,41 @@ const formData = ref({
   priority: TicketPriority.Low,
   description: '',
   departmentId: null as number | null,
-  dueAt: '',
+  dueAt: null as string | null,
   requesterId: useUserStore().user?.id || null,
   categoryId: null as number | null,
   isPrivate: false,
 });
+
+// Separate ref for DatePicker (Date object)
+const dueAtDate = ref<Date | null>(null);
+
+// Handle DatePicker change event
+const handleDatePickerChange = (value: any) => {
+  // Ensure we set the value
+  if (value) {
+    formData.value.dueAt = value;
+    dueAtDate.value = parseDateTime(value);
+  } else {
+    formData.value.dueAt = null;
+    dueAtDate.value = null;
+  }
+};
+
+// Watch formData.dueAt to sync with dueAtDate
+watch(
+  () => formData.value.dueAt,
+  (newValue) => {
+    if (newValue) {
+      const parsed = parseDateTime(newValue);
+      if (parsed) {
+        dueAtDate.value = parsed;
+      }
+    } else {
+      dueAtDate.value = null;
+    }
+  },
+);
 
 const currentUserId = useUserStore().user?.id;
 
@@ -262,7 +279,6 @@ watch(
       formData.value.isPrivate = false;
       selectedUser.value = null;
       toast.warning('Você não pode criar um ticket privado para si mesmo.');
-      privateRadioKey.value++;
     }
   },
 );
@@ -274,6 +290,33 @@ const categoryOptions = computed(() => [
     label: category.name,
   })),
 ]);
+
+const priorityOptions = computed(() => [
+  { value: TicketPriority.Low, label: formatSnakeToNaturalCase(TicketPriority.Low) },
+  { value: TicketPriority.Medium, label: formatSnakeToNaturalCase(TicketPriority.Medium) },
+  { value: TicketPriority.High, label: formatSnakeToNaturalCase(TicketPriority.High) },
+]);
+
+const priorityValue = computed(() => {
+  return formData.value.priority;
+});
+
+const updatePriority = (value: string) => {
+  formData.value.priority = value as TicketPriority;
+};
+
+const privateOptions = computed(() => [
+  { value: 'false', label: 'Não' },
+  { value: 'true', label: 'Sim' },
+]);
+
+const isPrivateValue = computed(() => {
+  return formData.value.isPrivate.toString();
+});
+
+const updateIsPrivate = (value: string) => {
+  formData.value.isPrivate = value === 'true';
+};
 
 const editorOptions = {
   modules: {
@@ -302,6 +345,24 @@ const updateSelectedUser = (value: string) => {
 
 const updateSelectedCategory = (value: string) => {
   selectedCategory.value = value ? parseInt(value) : null;
+};
+
+const parseDateTime = (dateString: string): Date | null => {
+  if (!dateString) return null;
+  try {
+    const [datePart, timePart] = dateString.split(' ');
+    const [day, month, year] = datePart.split('/');
+    const [hours, minutes] = timePart.split(':');
+    return new Date(
+      parseInt(year),
+      parseInt(month) - 1,
+      parseInt(day),
+      parseInt(hours),
+      parseInt(minutes),
+    );
+  } catch {
+    return null;
+  }
 };
 
 const loadDepartments = async () => {
@@ -355,22 +416,51 @@ const handleFileChange = (event: Event) => {
   }
 };
 
+const getFileDisplayText = () => {
+  if (selectedFiles.value.length === 0) return '';
+
+  const firstName = selectedFiles.value[0].name;
+  const maxLength = 22; // Maximum characters before truncation
+
+  let displayName = firstName;
+  if (displayName.length > maxLength) {
+    displayName = displayName.substring(0, maxLength) + '...';
+  }
+
+  if (selectedFiles.value.length === 1) {
+    return displayName;
+  }
+
+  const additionalCount = selectedFiles.value.length - 1;
+  return `${displayName} e +${additionalCount}`;
+};
+
+const clearSelectedFiles = () => {
+  selectedFiles.value = [];
+  const fileInput = document.getElementById('fileUpload') as HTMLInputElement;
+  if (fileInput) {
+    fileInput.value = '';
+  }
+};
+
 const resetForm = () => {
   formData.value = {
     name: '',
     priority: TicketPriority.Low,
     description: '',
     departmentId: null,
-    dueAt: '',
+    dueAt: null as string | null,
     requesterId: useUserStore().user!.id,
     categoryId: null,
     isPrivate: false,
   };
+  dueAtDate.value = null;
   selectedDepartment.value = null;
   selectedUser.value = null;
   availableUsers.value = [];
   selectedCategory.value = null;
   selectedFiles.value = [];
+  isLoading.value = false;
   targetUsers.value = [
     {
       departmentId: null,
@@ -379,10 +469,116 @@ const resetForm = () => {
   ];
 };
 
+let quillObserver: MutationObserver | null = null;
+
+const moveQuillDropdownToBody = (dropdown: HTMLElement) => {
+  // Don't move if already moved
+  if (dropdown.dataset.movedToBody === 'true') {
+    return;
+  }
+
+  // Get the position of the dropdown relative to viewport before moving
+  const rect = dropdown.getBoundingClientRect();
+
+  // Find the parent picker to maintain alignment
+  const picker = dropdown.closest('.ql-picker');
+  const pickerRect = picker ? picker.getBoundingClientRect() : rect;
+
+  // Move to body
+  document.body.appendChild(dropdown);
+  dropdown.dataset.movedToBody = 'true';
+
+  // Set fixed positioning
+  dropdown.style.position = 'fixed';
+  dropdown.style.top = `${pickerRect.bottom + 4}px`;
+  dropdown.style.left = `${pickerRect.left}px`;
+  dropdown.style.zIndex = '10001';
+
+  // Update position when scrolling or resizing
+  const updatePosition = () => {
+    if (!document.body.contains(dropdown)) {
+      return;
+    }
+
+    const currentPicker = document.querySelector('.ql-picker.ql-expanded');
+    if (currentPicker) {
+      const currentPickerRect = currentPicker.getBoundingClientRect();
+      dropdown.style.top = `${currentPickerRect.bottom + 4}px`;
+      dropdown.style.left = `${currentPickerRect.left}px`;
+    }
+  };
+
+  // Listen for scroll and resize events
+  const scrollHandler = () => updatePosition();
+  const resizeHandler = () => updatePosition();
+
+  window.addEventListener('scroll', scrollHandler, true);
+  window.addEventListener('resize', resizeHandler);
+
+  // Clean up when dropdown is removed
+  const cleanupObserver = new MutationObserver(() => {
+    if (!document.body.contains(dropdown)) {
+      window.removeEventListener('scroll', scrollHandler, true);
+      window.removeEventListener('resize', resizeHandler);
+      cleanupObserver.disconnect();
+      delete dropdown.dataset.movedToBody;
+    }
+  });
+  cleanupObserver.observe(document.body, { childList: true, subtree: true });
+};
+
 onMounted(() => {
   loadDepartments();
   loadCategories();
   loadAllUsers();
+
+  // Set up MutationObserver to detect Quill dropdowns
+  nextTick(() => {
+    if (quillWrapperRef.value) {
+      quillObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach((node) => {
+            if (node instanceof HTMLElement) {
+              // Check if it's a Quill picker options dropdown
+              let pickerOptions: HTMLElement | null = null;
+
+              if (node.classList && node.classList.contains('ql-picker-options')) {
+                pickerOptions = node;
+              } else {
+                const found = node.querySelector('.ql-picker-options');
+                if (found instanceof HTMLElement) {
+                  pickerOptions = found;
+                }
+              }
+
+              if (pickerOptions) {
+                moveQuillDropdownToBody(pickerOptions);
+              }
+            }
+          });
+        });
+      });
+
+      quillObserver.observe(quillWrapperRef.value, {
+        childList: true,
+        subtree: true,
+      });
+    }
+  });
+});
+
+onUnmounted(() => {
+  if (quillObserver) {
+    quillObserver.disconnect();
+  }
+
+  // Clean up any remaining dropdowns in body
+  const remainingDropdowns = document.body.querySelectorAll('.ql-picker-options');
+  remainingDropdowns.forEach((dropdown) => {
+    if (dropdown.parentElement === document.body) {
+      document.body.removeChild(dropdown);
+    }
+  });
 });
 
 const validateForm = () => {
@@ -449,59 +645,66 @@ const uploadFilesToS3 = async () => {
 const handleSubmit = async () => {
   if (!validateForm()) return;
 
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(formData.value.description, 'text/html');
-  const images = Array.from(doc.querySelectorAll('img'));
-
-  for (const img of images) {
-    const base64 = img.src;
-
-    if (!base64.startsWith('data:image/')) continue;
-
-    try {
-      const blob = await fetch(base64).then((res) => res.blob());
-      const ext = blob.type.split('/')[1];
-
-      const { data } = await awsService.getSignedUrl(ext);
-      const signedUrl = data.url;
-
-      await axios.put(signedUrl, blob, {
-        headers: {
-          'Content-Type': blob.type,
-        },
-      });
-
-      img.src = signedUrl.split('?')[0];
-    } catch (err) {
-      toast.error('Erro ao fazer upload de imagem');
-      console.error(err);
-      return;
-    }
-  }
-
-  formData.value.description = doc.body.innerHTML;
-
-  formData.value.categoryId = selectedCategory.value;
-
-  // Extract target user IDs from targetUsers array
-  const targetUserIds = targetUsers.value
-    .filter((tu) => tu.userId !== null)
-    .map((tu) => tu.userId!);
-
-  if (targetUserIds.length === 0) {
-    toast.error('Selecione pelo menos um usuário destino');
-    return;
-  }
+  isLoading.value = true;
 
   try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(formData.value.description, 'text/html');
+    const images = Array.from(doc.querySelectorAll('img'));
+
+    for (const img of images) {
+      const base64 = img.src;
+
+      if (!base64.startsWith('data:image/')) continue;
+
+      try {
+        const blob = await fetch(base64).then((res) => res.blob());
+        const ext = blob.type.split('/')[1];
+
+        const { data } = await awsService.getSignedUrl(ext);
+        const signedUrl = data.url;
+
+        await axios.put(signedUrl, blob, {
+          headers: {
+            'Content-Type': blob.type,
+          },
+        });
+
+        img.src = signedUrl.split('?')[0];
+      } catch (err) {
+        toast.error('Erro ao fazer upload de imagem');
+        console.error(err);
+        isLoading.value = false;
+        return;
+      }
+    }
+
+    formData.value.description = doc.body.innerHTML;
+
+    formData.value.categoryId = selectedCategory.value;
+
+    // Extract target user IDs from targetUsers array
+    const targetUserIds = targetUsers.value
+      .filter((tu) => tu.userId !== null)
+      .map((tu) => tu.userId!);
+
+    if (targetUserIds.length === 0) {
+      toast.error('Selecione pelo menos um usuário destino');
+      isLoading.value = false;
+      return;
+    }
+
     const fileUrls = await uploadFilesToS3();
+
+    // Convert Date object to ISO string
+    const dueAtISO = dueAtDate.value ? dueAtDate.value.toISOString() : undefined;
 
     const ticketData = {
       name: formData.value.name,
       priority: formData.value.priority,
       description: formData.value.description,
       requesterId: formData.value.requesterId!,
-      dueAt: formData.value.dueAt || undefined,
+      dueAt: dueAtISO,
       categoryId: selectedCategory.value ?? null,
       isPrivate: formData.value.isPrivate,
       files: fileUrls,
@@ -517,15 +720,73 @@ const handleSubmit = async () => {
     closeModal();
   } catch {
     toast.error('Erro ao criar ticket');
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>
 
 <style scoped>
-.quill-wrapper {
-  margin-bottom: 50px;
+/* Ensure DatePicker takes full width */
+:deep(.mx-datepicker) {
+  width: 100%;
 }
 
+:deep(.mx-input-wrapper) {
+  width: 100%;
+}
+
+:deep(.ql-container) {
+  min-height: 90px;
+}
+
+/* Ensure Quill dropdowns appear above modal footer */
+:deep(.ql-picker-options) {
+  z-index: 10001 !important;
+}
+
+:deep(.ql-snow .ql-picker) {
+  z-index: 10001;
+}
+</style>
+
+<style>
+#newTicketModal div.overflow-y-auto {
+  scrollbar-width: thick;
+  scrollbar-color: #ccd4df transparent;
+}
+
+#newTicketModal div.overflow-y-auto::-webkit-scrollbar {
+  width: 16px !important;
+}
+
+#newTicketModal div.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+#newTicketModal div.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1 !important;
+  border-radius: 7px !important;
+  border: 3px solid transparent !important;
+  background-clip: content-box !important;
+  min-height: 50px;
+}
+
+#newTicketModal div.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8 !important;
+}
+
+.dark #newTicketModal div.overflow-y-auto {
+  scrollbar-color: #4b5563 transparent;
+}
+
+.dark #newTicketModal div.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: #4b5563 !important;
+}
+
+.dark #newTicketModal div.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280 !important;
+}
 /* Mobile responsive Quill editor */
 @media (max-width: 640px) {
   .quill-wrapper {
