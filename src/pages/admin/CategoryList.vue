@@ -111,6 +111,7 @@ const filtersStore = useFiltersStore();
 const categories = ref<Category[]>([]);
 const isModalOpen = ref(false);
 const isEditModalOpen = ref(false);
+const isLoading = ref(false);
 const searchTerm = ref('');
 const totalPages = ref(1);
 const showDeleteConfirmation = ref(false);
@@ -132,7 +133,7 @@ const headers = computed((): TableHeader[] => [
 const initialConfig = computed(() => ({
   items: categories.value,
   headers: headers.value,
-  isLoading: filtersStore.isLoading,
+  isLoading: isLoading.value,
   pagination: {
     currentPage: filtersStore.currentPage,
     totalPages: totalPages.value,
@@ -144,7 +145,7 @@ const initialConfig = computed(() => ({
 const filterConfig = computed(() => ({
   search: {
     label: 'Search',
-    placeholder: 'Buscar categorias...',
+    placeholder: 'Buscar categorias',
     defaultValue: filtersStore.currentSearch || '',
   },
   sort: {
@@ -185,6 +186,8 @@ const handleSort = (sortKey: string) => {
 };
 
 const loadCategories = async () => {
+  isLoading.value = true;
+
   const filters: any = {
     name: filtersStore.currentSearch,
     page: filtersStore.currentPage,
@@ -201,6 +204,8 @@ const loadCategories = async () => {
     totalPages.value = response.data.totalPages;
   } catch {
     toast.error('Erro ao carregar categorias. Tente novamente.');
+  } finally {
+    isLoading.value = false;
   }
 };
 

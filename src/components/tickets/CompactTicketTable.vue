@@ -62,10 +62,16 @@
               >
                 <span v-if="ticket.dueAt" class="flex items-center gap-2 justify-end">
                   <span
+                    v-if="!isDeadlineOverdue(ticket.dueAt)"
                     :class="getDeadlineDotClass(ticket.dueAt)"
                     class="inline-block w-[9px] h-[9px] rounded-full"
                   ></span>
-                  {{ formatDeadlineRelative(ticket.dueAt) }}
+                  <font-awesome-icon
+                    v-else
+                    icon="exclamation-triangle"
+                    class="text-red-500 text-xs"
+                  />
+                  {{ calculateDeadline(ticket) }}
                 </span>
               </template>
               <template v-else>
@@ -78,9 +84,9 @@
               <span
                 :class="[
                   'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium gap-2 whitespace-nowrap',
-                  getStatusClasses(ticket.status),
+                  getStatusClasses(getTicketStatus(ticket)),
                 ]"
-                >{{ formatSnakeToNaturalCase(ticket.status).toUpperCase() }}</span
+                >{{ formatSnakeToNaturalCase(getTicketStatus(ticket)) }}</span
               >
             </td>
           </tr>
@@ -103,7 +109,11 @@ import { computed } from 'vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { DefaultTicketStatus, type Ticket } from '@/models';
 import { formatDate } from '@/utils/date';
-import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import {
+  calculateDeadline,
+  formatSnakeToNaturalCase,
+  getDeadlineInfo,
+} from '@/utils/generic-helper';
 import { useTicketsStore } from '@/stores/tickets';
 
 const props = defineProps<{
@@ -140,53 +150,7 @@ const isLoading = computed(() => {
   }
 });
 
-const statusColor = (status: DefaultTicketStatus) => {
-  switch (status) {
-    case DefaultTicketStatus.Pending:
-      return 'status-pending';
-    case DefaultTicketStatus.InProgress:
-      return 'status-in-progress';
-    case DefaultTicketStatus.AwaitingVerification:
-    case DefaultTicketStatus.UnderVerification:
-      return 'status-awaiting-verification';
-    case DefaultTicketStatus.Completed:
-      return 'status-completed';
-    case DefaultTicketStatus.Returned:
-      return 'status-returned';
-    case DefaultTicketStatus.Rejected:
-      return 'status-rejected';
-    default:
-      return '';
-  }
-};
-
-function calculateDeadlineCompact(ticket: Ticket) {
-  if (!ticket.dueAt) return '—';
-  if (
-    ticket.status !== DefaultTicketStatus.Pending &&
-    ticket.status !== DefaultTicketStatus.InProgress
-  ) {
-    return '—';
-  }
-  const deadline = new Date(ticket.dueAt);
-  const today = new Date();
-  deadline.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
-  const diffTime = deadline.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  if (diffDays < 0) {
-    return 'Atrasado';
-  }
-  // Se faltar menos de 1 dia, mostrar em horas
-  if (diffDays === 0) {
-    const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-    if (diffHours > 0) return `${diffHours}h`;
-    return 'Hoje';
-  }
-  return `${diffDays}d`;
-}
-
-function getStatusClasses(status: DefaultTicketStatus) {
+function getStatusClasses(status: string) {
   switch (status) {
     case DefaultTicketStatus.Pending:
       return 'bg-orange-50 text-orange-500 border border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800';
@@ -206,94 +170,41 @@ function getStatusClasses(status: DefaultTicketStatus) {
   }
 }
 
-function isDeadlineExceeded(dueAt: string) {
-  return new Date(dueAt) < new Date();
-}
-
-function formatDeadlineDate(dueAt: string) {
-  const date = new Date(dueAt);
-  return date
-    .toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-    .replace(',', '');
+function getDeadlineInfoFromDate(dueAt: string) {
+  const info = getDeadlineInfo(dueAt);
+  return info.isValid ? info : null;
 }
 
 function getDeadlineDotClass(dueAt: string) {
-  const deadline = new Date(dueAt);
-  const now = new Date();
-  const diffTime = deadline.getTime() - now.getTime();
-  const diffDays =
-    diffTime < 0
-      ? Math.floor(diffTime / (1000 * 60 * 60 * 24))
-      : Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  const diffHours =
-    diffTime < 0 ? Math.floor(diffTime / (1000 * 60 * 60)) : Math.ceil(diffTime / (1000 * 60 * 60));
-
-  if (diffDays < 0) {
-    return 'bg-red-500';
-  } else if (diffDays === 0 || (diffDays === 1 && diffHours < 8)) {
-    return 'bg-yellow-500';
-  } else {
+  const info = getDeadlineInfoFromDate(dueAt);
+  if (!info) {
     return 'bg-emerald-400';
   }
+
+  if (info.isOverdue) {
+    return 'bg-red-500';
+  }
+
+  // Red when 6 hours or less remaining
+  if (!info.isOverdue && info.hoursDifference <= 6) {
+    return 'bg-red-500';
+  }
+
+  if (info.businessDaysRemaining <= 2) {
+    return 'bg-orange-500';
+  }
+
+  return 'bg-emerald-400';
 }
 
-function formatDeadlineRelative(dueAt: string) {
-  const deadline = new Date(dueAt);
-  const now = new Date();
-  const diffTime = deadline.getTime() - now.getTime();
+function isDeadlineOverdue(dueAt: string) {
+  const info = getDeadlineInfoFromDate(dueAt);
+  return info ? info.isOverdue : false;
+}
 
-  const diffDays =
-    diffTime < 0
-      ? Math.floor(diffTime / (1000 * 60 * 60 * 24))
-      : Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  const diffHours =
-    diffTime < 0 ? Math.floor(diffTime / (1000 * 60 * 60)) : Math.ceil(diffTime / (1000 * 60 * 60));
-
-  if (diffDays < 0) {
-    const overdueHours = Math.abs(diffHours);
-    const overdueDays = Math.abs(diffDays);
-
-    if (overdueHours < 1) {
-      return 'Vencendo agora';
-    } else if (overdueDays === 0) {
-      // Overdue but less than 1 day
-      return overdueHours === 1 ? 'Atrasado há 1 hora' : `Atrasado há ${overdueHours} horas`;
-    } else {
-      // Overdue more than 1 day
-      return overdueDays === 1 ? 'Atrasado há 1 dia' : `Atrasado há ${overdueDays} dias`;
-    }
-  } else if (diffDays === 0) {
-    // Today
-    if (diffHours === 1) {
-      return '1 hora restante';
-    } else if (diffHours < 0) {
-      const overdueHours = Math.abs(diffHours);
-      return overdueHours === 1 ? 'Atrasado há 1 hora' : `Atrasado há ${overdueHours} horas`;
-    } else {
-      return `${diffHours} horas restantes`;
-    }
-  } else if (diffDays === 1) {
-    // Tomorrow
-    if (diffHours < 8) {
-      // Less than 8 hours until tomorrow
-      if (diffHours === 1) {
-        return '1 hora restante';
-      } else {
-        return `${diffHours} horas restantes`;
-      }
-    } else {
-      // More than 8 hours until tomorrow
-      return '1 dia restante';
-    }
-  } else {
-    // 2+ days
-    return `${diffDays} dias restantes`;
-  }
+// Helper function to get ticket status (supports both new and old format)
+function getTicketStatus(ticket: Ticket): string {
+  return ticket.ticketStatus?.key || ticket.status || '';
 }
 </script>
 

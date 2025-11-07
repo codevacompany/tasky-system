@@ -1,5 +1,6 @@
 import type { Ticket } from '@/models';
 import { DefaultTicketStatus } from '@/models';
+import { getBusinessDayDifference } from '@/utils/date';
 
 export function debounce<T extends (...args: unknown[]) => void>(func: T, wait: number) {
   let timeout: ReturnType<typeof setTimeout>;
@@ -19,12 +20,73 @@ export function formatSnakeToCamelCase(str: string): string {
 
 export function formatSnakeToNaturalCase(str: string | undefined | null): string {
   if (!str) return '';
-  // Replace all underscores with spaces and capitalize each word
+
   return str
     .split('_')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 }
+
+const MS_PER_HOUR = 1000 * 60 * 60;
+
+export interface DeadlineInfo {
+  isValid: boolean;
+  isOverdue: boolean;
+  businessDaysRemaining: number;
+  hoursDifference: number; // positive when remaining, negative when overdue
+  message: string;
+}
+
+export const getDeadlineInfo = (
+  dueAt: string | Date,
+  referenceDate: Date = new Date(),
+): DeadlineInfo => {
+  const deadline = typeof dueAt === 'string' ? new Date(dueAt) : new Date(dueAt);
+  const reference = new Date(referenceDate);
+
+  if (Number.isNaN(deadline.getTime()) || Number.isNaN(reference.getTime())) {
+    return {
+      isValid: false,
+      isOverdue: false,
+      businessDaysRemaining: 0,
+      hoursDifference: 0,
+      message: '---',
+    };
+  }
+
+  const msDiff = deadline.getTime() - reference.getTime();
+  const isOverdue = msDiff < 0;
+  const hoursRemaining = !isOverdue ? Math.ceil(msDiff / MS_PER_HOUR) : 0;
+  const hoursOverdue = isOverdue ? Math.ceil(Math.abs(msDiff) / MS_PER_HOUR) : 0;
+  const businessDays = getBusinessDayDifference(deadline, reference);
+  const isLessThanOneDay = !isOverdue && msDiff < MS_PER_HOUR * 24;
+
+  let message = '';
+
+  if (isOverdue) {
+    if (hoursOverdue < 24) {
+      message = hoursOverdue <= 1 ? 'Atrasado há 1 hora' : `Atrasado há ${hoursOverdue} horas`;
+    } else {
+      const daysOverdue = Math.ceil(hoursOverdue / 24);
+      message = daysOverdue <= 1 ? 'Atrasado há 1 dia' : `Atrasado há ${daysOverdue} dias`;
+    }
+  } else {
+    if (isLessThanOneDay) {
+      const remainingHours = Math.max(1, hoursRemaining);
+      message = remainingHours === 1 ? '1 hora restante' : `${remainingHours} horas restantes`;
+    } else {
+      message = businessDays === 1 ? '1 dia restante' : `${businessDays} dias restantes`;
+    }
+  }
+
+  return {
+    isValid: true,
+    isOverdue,
+    businessDaysRemaining: isOverdue ? 0 : Math.max(0, businessDays),
+    hoursDifference: isOverdue ? -hoursOverdue : hoursRemaining,
+    message,
+  };
+};
 
 export function calculateDeadline(ticket: Ticket) {
   if (!ticket.dueAt) return '---';
@@ -37,20 +99,13 @@ export function calculateDeadline(ticket: Ticket) {
     return '---';
   }
 
-  const deadline = new Date(ticket.dueAt);
-  const today = new Date();
+  const info = getDeadlineInfo(ticket.dueAt);
 
-  deadline.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
-
-  const diffTime = deadline.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 0) {
-    return 'Atrasado';
+  if (!info.isValid) {
+    return '---';
   }
 
-  return `${diffDays} dias restantes`;
+  return info.message;
 }
 
 export function formatTimeInSeconds(seconds?: number) {

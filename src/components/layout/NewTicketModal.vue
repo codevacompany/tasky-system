@@ -80,6 +80,7 @@
                 :placeholder="'Selecione data e hora'"
                 :clearable="true"
                 :editable="false"
+                :disabled-date="disabledWeekendDate"
                 @change="handleDatePickerChange"
                 @input="
                   (val: any) => {
@@ -329,7 +330,7 @@ const editorOptions = {
       ['link', 'image', 'video'],
     ],
   },
-  placeholder: 'Adicione uma descrição aqui...',
+  placeholder: 'Adicione uma descrição',
 };
 
 // Update handlers for Select components
@@ -363,6 +364,12 @@ const parseDateTime = (dateString: string): Date | null => {
   } catch {
     return null;
   }
+};
+
+const disabledWeekendDate = (date: Date): boolean => {
+  const dayOfWeek = date.getDay();
+
+  return dayOfWeek === 0 || dayOfWeek === 6;
 };
 
 const loadDepartments = async () => {

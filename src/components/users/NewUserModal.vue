@@ -25,7 +25,7 @@
           v-model="userData.firstName"
           placeholder="Digite o nome do colaborador"
           required
-          class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         />
       </div>
 
@@ -40,7 +40,7 @@
           id="sobrenomeColaborador"
           v-model="userData.lastName"
           placeholder="Digite o sobrenome"
-          class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         />
       </div>
 
@@ -56,7 +56,7 @@
           v-model="userData.email"
           placeholder="Digite o e-mail"
           required
-          class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         />
       </div>
 
@@ -66,17 +66,12 @@
           class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
           >Setor</label
         >
-        <select
-          id="setorColaborador"
-          v-model="userData.departmentId"
-          required
-          class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-        >
-          <option :value="null" disabled>Selecione um setor</option>
-          <option v-for="department in departments" :key="department.id" :value="department.id">
-            {{ department.name }}
-          </option>
-        </select>
+        <Select
+          :options="departmentOptions"
+          :modelValue="departmentValue"
+          @update:modelValue="updateDepartment"
+          placeholder="Selecione um setor"
+        />
       </div>
 
       <div class="col-span-1">
@@ -91,7 +86,7 @@
           v-model="userData.password"
           placeholder="Digite a senha"
           required
-          class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         />
       </div>
 
@@ -101,24 +96,22 @@
           class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
           >Função</label
         >
-        <select
-          id="roleColaborador"
-          v-model="userData.roleId"
-          required
-          class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-        >
-          <option :value="null" disabled>Selecione uma função</option>
-          <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
-        </select>
+        <Select
+          :options="roleOptions"
+          :modelValue="roleValue"
+          @update:modelValue="updateRole"
+          placeholder="Selecione uma função"
+        />
       </div>
     </form>
   </BaseModal>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { departmentService } from '@/services/departmentService';
 import BaseModal from '../common/BaseModal.vue';
+import Select from '../common/Select.vue';
 import { userService } from '@/services/userService';
 import { toast } from 'vue3-toastify';
 import { roleService } from '@/services/roleService';
@@ -139,7 +132,36 @@ const userData = ref<CreateUserDto>({
 
 const departments = ref<{ id: number; name: string }[]>([]);
 const roles = ref<{ id: number; name: string }[]>([]);
-const selectedDepartment = ref<number | null>(null);
+
+const departmentOptions = computed(() =>
+  departments.value.map((dept) => ({
+    value: dept.id.toString(),
+    label: dept.name,
+  })),
+);
+
+const roleOptions = computed(() =>
+  roles.value.map((role) => ({
+    value: role.id.toString(),
+    label: role.name,
+  })),
+);
+
+const departmentValue = computed(() => {
+  return userData.value.departmentId?.toString() || '';
+});
+
+const roleValue = computed(() => {
+  return userData.value.roleId?.toString() || '';
+});
+
+const updateDepartment = (value: string) => {
+  userData.value.departmentId = value ? parseInt(value) : null;
+};
+
+const updateRole = (value: string) => {
+  userData.value.roleId = value ? parseInt(value) : null;
+};
 
 const fetchDepartments = async () => {
   try {
@@ -168,7 +190,6 @@ const resetForm = () => {
     departmentId: null,
     roleId: null,
   };
-  selectedDepartment.value = null;
 };
 
 const closeModal = () => {

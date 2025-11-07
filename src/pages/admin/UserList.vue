@@ -271,7 +271,7 @@ const initialConfig = computed(() => ({
 const filterConfig = computed(() => ({
   search: {
     label: 'Search',
-    placeholder: 'Buscar usuários...',
+    placeholder: 'Buscar usuários',
     defaultValue: filtersStore.currentSearch || '',
   },
   sort: {
