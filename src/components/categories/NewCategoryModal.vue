@@ -4,8 +4,9 @@
     @close="closeModal"
     @cancel="closeModal"
     @confirm="createCategory"
-    :confirmButtonText="isLoading ? '' : 'Cadastrar'"
+    :confirmButtonText="'Cadastrar'"
     :cancelButtonText="'Cancelar'"
+    :confirmButtonLoading="isLoading"
   >
     <div>
       <form id="cadastroCategoriaForm" @submit.prevent="createCategory">
@@ -24,10 +25,6 @@
             class="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
         </div>
-
-        <div v-if="isLoading" class="flex justify-center my-2">
-          <LoadingSpinner :size="22" />
-        </div>
       </form>
     </div>
   </BaseModal>
@@ -38,7 +35,6 @@ import { ref } from 'vue';
 import BaseModal from '../common/BaseModal.vue';
 import { categoryService } from '@/services/categoryService';
 import { toast } from 'vue3-toastify';
-import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
 const emit = defineEmits(['close', 'categoryCreated']);
 

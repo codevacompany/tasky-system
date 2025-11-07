@@ -3,7 +3,8 @@
     <div
       v-for="(targetUser, index) in localTargetUsers"
       :key="index"
-      class="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-4 items-end"
+      class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end"
+      :class="{ 'md:grid-cols-[1fr_1fr_auto]': localTargetUsers.length > 1 }"
     >
       <div class="col-span-1 flex flex-col gap-1.5">
         <label :for="`targetDepartment-${index}`" class="text-sm text-gray-800 dark:text-gray-200"
@@ -48,7 +49,7 @@
         @click="addTargetUser"
         class="py-2 px-4 border border-dashed border-gray-300 dark:border-gray-600 rounded text-sm text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-800 dark:hover:text-gray-300 transition-colors"
       >
-        <font-awesome-icon icon="plus" class="mr-2" /> Adicionar Usuário
+        <font-awesome-icon icon="plus" class="mr-2" /> Adicionar outro
       </button>
     </div>
   </div>

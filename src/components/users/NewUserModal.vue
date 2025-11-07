@@ -4,8 +4,9 @@
     @close="closeModal"
     @cancel="closeModal"
     @confirm="createUser"
-    :confirmButtonText="isLoading ? '' : 'Cadastrar'"
+    :confirmButtonText="'Cadastrar'"
     :cancelButtonText="'Cancelar'"
+    :confirmButtonLoading="isLoading"
   >
     <form
       id="cadastroColaboradorForm"
@@ -110,10 +111,6 @@
           <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.name }}</option>
         </select>
       </div>
-
-      <div v-if="isLoading" class="col-span-2 flex justify-center my-2">
-        <LoadingSpinner :size="22" />
-      </div>
     </form>
   </BaseModal>
 </template>
@@ -124,7 +121,6 @@ import { departmentService } from '@/services/departmentService';
 import BaseModal from '../common/BaseModal.vue';
 import { userService } from '@/services/userService';
 import { toast } from 'vue3-toastify';
-import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { roleService } from '@/services/roleService';
 import type { CreateUserDto } from '@/models';
 

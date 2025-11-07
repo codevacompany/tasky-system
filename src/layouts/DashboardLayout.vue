@@ -186,7 +186,7 @@
           </button>
 
           <div
-            class="text-gray-800 dark:text-gray-200 relative cursor-pointer ml-6"
+            class="flex text-gray-800 dark:text-gray-200 relative cursor-pointer ml-6"
             @click="toggleNotificationsModal"
           >
             <font-awesome-icon :icon="['far', 'bell']" class="text-xl" />

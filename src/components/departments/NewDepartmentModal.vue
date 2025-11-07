@@ -4,8 +4,9 @@
     @close="closeModal"
     @cancel="closeModal"
     @confirm="createDepartment"
-    :confirmButtonText="isLoading ? '' : 'Cadastrar'"
+    :confirmButtonText="'Cadastrar'"
     :cancelButtonText="'Cancelar'"
+    :confirmButtonLoading="isLoading"
   >
     <form id="cadastroSetorForm" @submit.prevent="createDepartment">
       <div class="mb-5">
@@ -23,10 +24,6 @@
           class="w-full px-[15px] py-[10px] border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         />
       </div>
-
-      <div v-if="isLoading" class="flex justify-center my-2">
-        <LoadingSpinner :size="22" />
-      </div>
     </form>
   </BaseModal>
 </template>
@@ -36,7 +33,6 @@ import { ref } from 'vue';
 import BaseModal from '../common/BaseModal.vue';
 import { departmentService } from '@/services/departmentService';
 import { toast } from 'vue3-toastify';
-import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
 const emit = defineEmits(['close', 'departmentCreated']);
 

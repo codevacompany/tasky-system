@@ -8,7 +8,7 @@
       <LoadingSpinner v-if="isLoading" :size="50" :color="'white'" />
       <div
         v-else
-        class="bg-white dark:bg-gray-800 rounded-md shadow-lg min-w-[95vw] sm:min-w-[500px] max-h-[calc(90vh-100px)] sm:max-h-[90vh] flex flex-col overflow-hidden animate-modalSlideIn mx-4"
+        class="bg-white dark:bg-gray-800 rounded-md shadow-lg min-w-[95vw] sm:min-w-[500px] max-h-[calc(90vh-100px)] sm:max-h-[94vh] flex flex-col overflow-hidden animate-modalSlideIn mx-4"
       >
         <div v-if="hasCustomHeader">
           <slot name="custom-header"></slot>
@@ -40,18 +40,23 @@
             <button
               v-if="showCancelButton"
               type="button"
-              class="w-full sm:w-auto px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+              class="w-full sm:w-auto px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               @click="handleCancel"
+              :disabled="confirmButtonLoading"
             >
               {{ cancelButtonText }}
             </button>
             <button
               v-if="showConfirmButton"
+              ref="confirmButtonRef"
               type="button"
-              class="w-full sm:w-auto px-4 py-2 primary-gradient hover:opacity-95 text-white rounded transition-colors"
+              class="w-full sm:w-auto px-4 py-2 primary-gradient hover:opacity-95 text-white rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               @click="handleConfirm"
+              :disabled="confirmButtonLoading"
+              :style="confirmButtonMinWidth"
             >
-              {{ confirmButtonText }}
+              <LoadingSpinner v-if="confirmButtonLoading" :size="16" />
+              <span ref="confirmTextRef" v-if="!confirmButtonLoading">{{ confirmButtonText }}</span>
             </button>
           </slot>
         </div>
@@ -61,12 +66,13 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
+import { defineProps, defineEmits, ref, computed, onMounted, nextTick, watch } from 'vue';
 import LoadingSpinner from './LoadingSpinner.vue';
 
 const props = defineProps({
   title: { type: String, default: 'Modal Title' },
   isLoading: { type: Boolean, default: false },
+  confirmButtonLoading: { type: Boolean, default: false },
   showFooter: { type: Boolean, default: true },
   showCancelButton: { type: Boolean, default: true },
   showConfirmButton: { type: Boolean, default: true },
@@ -77,6 +83,42 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['close', 'cancel', 'confirm']);
+
+const confirmButtonRef = ref<HTMLButtonElement | null>(null);
+const confirmTextRef = ref<HTMLSpanElement | null>(null);
+const buttonMinWidth = ref<number | null>(null);
+
+const confirmButtonMinWidth = computed(() => {
+  if (props.confirmButtonLoading && buttonMinWidth.value) {
+    return { minWidth: `${buttonMinWidth.value}px` };
+  }
+  return {};
+});
+
+const measureButtonWidth = async () => {
+  await nextTick();
+  if (confirmTextRef.value && confirmButtonRef.value) {
+    const textWidth = confirmTextRef.value.offsetWidth;
+    const buttonPadding = 32; // px-4 (16px * 2)
+    buttonMinWidth.value = textWidth + buttonPadding;
+  }
+};
+
+onMounted(() => {
+  if (props.showConfirmButton && !props.confirmButtonLoading) {
+    measureButtonWidth();
+  }
+});
+
+watch(
+  () => [props.confirmButtonText, props.confirmButtonLoading],
+  async () => {
+    if (!props.confirmButtonLoading) {
+      await nextTick();
+      measureButtonWidth();
+    }
+  },
+);
 
 const close = () => {
   emit('close');

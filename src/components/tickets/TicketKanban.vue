@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex gap-4 p-6 overflow-x-auto h-[calc(100vh-120px)] bg-white dark:bg-gray-900 rounded-lg relative w-full"
+    class="flex gap-4 py-6 px-2 overflow-x-auto h-[calc(100vh-120px)] bg-white dark:bg-gray-900 rounded-lg relative w-full"
   >
     <!-- Skeleton while loading columns -->
     <template v-if="ticketsStore.statusColumns.isLoading || kanbanColumns.length === 0">

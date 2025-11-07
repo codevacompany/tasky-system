@@ -57,15 +57,17 @@
       </div>
 
       <div class="confirmation-actions">
-        <button class="action-btn reject" @click="handleCancel">
+        <button class="action-btn reject" @click="handleCancel" :disabled="loading">
           <font-awesome-icon icon="times" /> Cancelar
         </button>
         <button
           class="action-btn approve"
           @click="handleConfirm"
-          :disabled="hasInput && (!inputReason || !inputDescription)"
+          :disabled="(hasInput && (!inputReason || !inputDescription)) || loading"
         >
-          <font-awesome-icon icon="check" /> Confirmar
+          <LoadingSpinner v-if="loading" :size="16" class="spinner" />
+          <font-awesome-icon v-if="!loading" icon="check" />
+          <span v-if="!loading">Confirmar</span>
         </button>
       </div>
     </div>
@@ -75,6 +77,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import BaseModal from './BaseModal.vue';
+import LoadingSpinner from './LoadingSpinner.vue';
 
 const props = defineProps<{
   title: string;
@@ -83,6 +86,7 @@ const props = defineProps<{
   reasonOptions?: { value: string; label: string }[];
   showUserSelector?: boolean;
   targetUsers?: Array<{ userId: number; userName: string; order: number; departmentName?: string }>;
+  loading?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -116,6 +120,8 @@ const resetForm = () => {
 
 const handleConfirm = () => {
   if (!validateForm()) return;
+
+  if (props.loading) return;
 
   if (props.hasInput) {
     emit('confirm', {
@@ -205,6 +211,17 @@ const handleCancel = () => {
   cursor: pointer;
   transition: all 0.2s ease;
   color: white;
+  position: relative;
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.action-btn .spinner {
+  opacity: 1 !important;
+  border-top-color: white !important;
 }
 
 .action-btn.approve {
