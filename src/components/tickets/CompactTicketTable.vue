@@ -39,12 +39,15 @@
           </tr>
           <tr
             v-else
-            v-for="ticket in tickets"
+            v-for="(ticket, index) in tickets"
             :key="ticket.id"
             class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200"
           >
             <td
-              class="max-w-[200px] pl-8 py-3 border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis w-1/2"
+              :class="[
+                'max-w-[200px] pl-8 py-3 text-sm text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis w-1/2',
+                index < tickets.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : '',
+              ]"
               :title="ticket.name"
             >
               <div class="flex flex-col gap-1">
@@ -55,7 +58,10 @@
               </div>
             </td>
             <td
-              class="px-3 py-3 border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap w-1/4"
+              :class="[
+                'px-3 py-3 text-sm text-gray-900 dark:text-white whitespace-nowrap w-1/4',
+                index < tickets.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : '',
+              ]"
             >
               <template
                 v-if="title === 'Últimos Tickets Criados' || title === 'Últimos Tickets Recebidos'"
@@ -79,7 +85,10 @@
               </template>
             </td>
             <td
-              class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white whitespace-nowrap w-1/4"
+              :class="[
+                'px-3 py-3 text-center text-sm text-gray-900 dark:text-white whitespace-nowrap w-1/4',
+                index < tickets.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : '',
+              ]"
             >
               <span
                 :class="[

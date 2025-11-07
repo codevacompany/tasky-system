@@ -6,7 +6,7 @@
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
       <div
-        class="bg-white dark:bg-gray-800 rounded-lg p-6 sm:p-8 flex flex-col items-center gap-4 shadow-lg mx-4"
+        class="bg-white dark:bg-gray-800 rounded-lg p-6 sm:p-8 flex flex-col items-center gap-4 shadow-md mx-4"
       >
         <font-awesome-icon icon="spinner" spin class="text-3xl text-blue-600 dark:text-blue-400" />
         <p class="text-gray-700 dark:text-gray-300 text-base sm:text-lg font-medium text-center">
@@ -196,7 +196,7 @@
             <!-- Created vs Completed Section -->
             <div
               v-permission="PERMISSIONS.VIEW_BASIC_ANALYTICS"
-              class="bg-white dark:bg-gray-800 rounded-lg shadow-lg"
+              class="bg-white dark:bg-gray-800 rounded-lg shadow-md"
             >
               <div
                 class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-6 border-b border-gray-200 dark:border-gray-700"
@@ -295,7 +295,7 @@
             <!-- Charts Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <!-- Status Chart -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
                 <div
                   class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700"
                 >
@@ -347,7 +347,7 @@
               </div>
 
               <!-- Priority Chart -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
                 <div
                   class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700"
                 >
@@ -403,7 +403,7 @@
               <!-- Top Contributors -->
               <div
                 v-permission="PERMISSIONS.VIEW_USERS_ANALYTICS"
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-lg"
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md"
               >
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
@@ -498,7 +498,7 @@
               <!-- Top Setores -->
               <div
                 v-permission="PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS"
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-lg"
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md"
               >
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
@@ -573,7 +573,7 @@
               class="grid grid-cols-1 lg:grid-cols-2 gap-6"
             >
               <!-- Cycle Time per Department -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
                 <div
                   class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-6 border-b border-gray-200 dark:border-gray-700"
                 >
@@ -691,7 +691,7 @@
               </div>
 
               <!-- Status Duration Chart -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                     Tempo Médio Por Status
@@ -803,7 +803,7 @@
           <!-- Em Andamento Tab -->
           <div v-if="currentTab === 'in-progress'" class="space-y-6">
             <!-- In Progress Overview Card -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3">
               <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                   <div>
@@ -933,7 +933,7 @@
             <!-- In Progress Time Analysis -->
             <div
               v-permission="PERMISSIONS.VIEW_BASIC_ANALYTICS"
-              class="bg-white dark:bg-gray-800 rounded-lg shadow-lg"
+              class="bg-white dark:bg-gray-800 rounded-lg shadow-md"
             >
               <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -1042,7 +1042,7 @@
             <!-- Content visible if user has permission -->
             <template v-if="hasPermission(PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS)">
               <!-- Department Summary Card -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3">
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3">
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                     Estatísticas por Setor
@@ -1206,7 +1206,7 @@
               <!-- Top Performing vs Underperforming Departments -->
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Top Performing -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
                   <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                       Melhor Desempenho
@@ -1242,7 +1242,7 @@
                 </div>
 
                 <!-- Needs Improvement -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
                   <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                       Necessita Melhoria
@@ -1280,7 +1280,7 @@
             </template>
 
             <!-- Upgrade prompt if user doesn't have permission -->
-            <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+            <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
               <div class="p-12 text-center">
                 <div
                   class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -1311,7 +1311,7 @@
           <div v-if="currentTab === 'users'" class="space-y-6">
             <template v-if="hasPermission(PERMISSIONS.VIEW_USERS_ANALYTICS)">
               <!-- Users Summary Card -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3">
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3">
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
@@ -1464,7 +1464,7 @@
 
               <!-- Top vs Underperforming Users -->
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
                   <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                       Melhor Desempenho
@@ -1501,7 +1501,7 @@
                   </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
                   <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                       Pior Desempenho
@@ -1535,7 +1535,7 @@
               </div>
             </template>
 
-            <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+            <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
               <div class="p-12 text-center">
                 <div
                   class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -1597,7 +1597,7 @@
               </div>
 
               <!-- Trends Overview -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                     <div>
@@ -1639,7 +1639,7 @@
               </div>
 
               <!-- Cycle Time Analysis -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                     <div>
@@ -1756,7 +1756,7 @@
               <!-- Trend Insights -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Performance Trends -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
                   <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                       Tendências de Performance
@@ -1818,7 +1818,7 @@
                 </div>
 
                 <!-- Status Distribution Trends -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
                   <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                       Tempo Médio Por Status
@@ -1883,7 +1883,7 @@
               </div>
 
               <!-- In Progress Time Analysis -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                     TEMPO GASTO NO STATUS "EM ANDAMENTO"
@@ -1974,7 +1974,7 @@
             </template>
 
             <!-- Upgrade prompt if user doesn't have permission -->
-            <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+            <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
               <div class="p-12 text-center">
                 <div
                   class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
