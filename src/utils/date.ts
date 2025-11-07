@@ -66,3 +66,36 @@ export const formatDateToPortuguese = (dateString: string): string => {
 
   return `${day} de ${month}`;
 };
+
+const isWeekend = (date: Date) => {
+  const day = date.getDay();
+  return day === 0 || day === 6;
+};
+
+export const getBusinessDayDifference = (
+  targetDate: string | Date,
+  referenceDate: Date = new Date(),
+): number => {
+  const target = typeof targetDate === 'string' ? new Date(targetDate) : new Date(targetDate);
+  const reference = new Date(referenceDate);
+
+  if (Number.isNaN(target.getTime()) || Number.isNaN(reference.getTime())) {
+    return 0;
+  }
+
+  const direction = target >= reference ? 1 : -1;
+  const start = new Date(reference.getFullYear(), reference.getMonth(), reference.getDate());
+  const end = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+
+  const current = new Date(start);
+  let businessDays = 0;
+
+  while ((direction === 1 && current < end) || (direction === -1 && current > end)) {
+    current.setDate(current.getDate() + direction);
+    if (!isWeekend(current)) {
+      businessDays += direction;
+    }
+  }
+
+  return businessDays;
+};

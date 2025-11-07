@@ -185,15 +185,15 @@
             >
               <span
                 :class="[
-                  'inline-flex items-center px-1.5 md:px-2 py-0.5 md:py-1 rounded text-xs font-medium gap-1 md:gap-2',
+                  'inline-flex items-center px-1.5 md:px-2 py-0.5 md:py-1 rounded-full text-xs font-medium gap-1 md:gap-2',
                   getStatusClass(getTicketStatus(ticket)),
                 ]"
               >
                 <span class="hidden md:inline">{{
-                  formatSnakeToNaturalCase(getTicketStatus(ticket)).toUpperCase()
+                  formatSnakeToNaturalCase(getTicketStatus(ticket))
                 }}</span>
                 <span class="md:hidden">{{
-                  formatSnakeToNaturalCase(getTicketStatus(ticket)).substring(0, 3).toUpperCase()
+                  formatSnakeToNaturalCase(getTicketStatus(ticket)).substring(0, 3)
                 }}</span>
               </span>
             </td>
@@ -207,7 +207,7 @@
                 <template v-if="ticket.dueAt">
                   <span class="flex items-center gap-2 justify-center">
                     <span
-                      v-if="!isDeadlineExceeded(ticket.dueAt)"
+                      v-if="!isDeadlineOverdue(ticket.dueAt)"
                       :class="getDeadlineDotClass(ticket.dueAt)"
                       class="inline-block w-[9px] h-[9px] rounded-full"
                     ></span>
@@ -216,7 +216,7 @@
                       icon="exclamation-triangle"
                       class="text-red-500 text-xs"
                     />
-                    {{ formatDeadlineRelative(ticket.dueAt) }}
+                    {{ calculateDeadline(ticket) }}
                   </span>
                 </template>
                 <template v-else>
@@ -585,13 +585,18 @@ import { TicketPriority, DefaultTicketStatus, DisapprovalReason, CorrectionReaso
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { ticketService } from '@/services/ticketService';
-import { formatDate } from '@/utils/date';
+import { formatDate, getBusinessDayDifference } from '@/utils/date';
 import { toast } from 'vue3-toastify';
 import ConfirmationModal from '../common/ConfirmationModal.vue';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import BaseModal from '../common/BaseModal.vue';
-import { calculateDeadline, formatSnakeToNaturalCase, enumToOptions } from '@/utils/generic-helper';
+import {
+  calculateDeadline,
+  formatSnakeToNaturalCase,
+  enumToOptions,
+  getDeadlineInfo,
+} from '@/utils/generic-helper';
 
 const props = defineProps<{
   tableType: 'recebidos' | 'criados' | 'setor' | 'arquivados';
@@ -725,54 +730,43 @@ const refreshTickets = async () => {
   }
 };
 
-const getDeadlineClass = (date?: string) => {
-  if (!date) return 'text-gray-900 dark:text-gray-100';
-  const deadline = new Date(date);
-  const now = new Date();
-
-  const diffTime = deadline.getTime() - now.getTime();
-  const diffDays =
-    diffTime < 0
-      ? Math.floor(diffTime / (1000 * 60 * 60 * 24))
-      : Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 0) return 'text-red-600 dark:text-red-400 font-semibold';
-  if (diffDays <= 3) return 'text-orange-500 dark:text-orange-400 font-semibold';
-  return 'text-green-600 dark:text-green-400';
+const getDeadlineInfoFromDate = (date?: string) => {
+  if (!date) return null;
+  const info = getDeadlineInfo(date);
+  return info.isValid ? info : null;
 };
 
-const priorityColor = (priority: TicketPriority) => {
-  switch (priority) {
-    case TicketPriority.Low:
-      return 'text-green-600 dark:text-green-400';
-    case TicketPriority.Medium:
-      return 'text-orange-500 dark:text-orange-400';
-    case TicketPriority.High:
-      return 'text-red-600 dark:text-red-400';
-    default:
-      return '';
-  }
+const getDeadlineClass = (date?: string) => {
+  const info = getDeadlineInfoFromDate(date);
+  if (!info) return 'text-gray-900 dark:text-gray-100';
+
+  if (info.isOverdue) return 'text-red-600 dark:text-red-400 font-semibold';
+  // Red when 6 hours or less remaining
+  if (!info.isOverdue && info.hoursDifference <= 6)
+    return 'text-red-600 dark:text-red-400 font-semibold';
+  if (info.businessDaysRemaining <= 2) return 'text-orange-500 dark:text-orange-400 font-semibold';
+  return 'text-green-600 dark:text-green-400';
 };
 
 const getStatusClass = (status: string) => {
   switch (status) {
     case DefaultTicketStatus.Pending:
-      return 'bg-orange-100 text-orange-500 border border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800';
+      return 'bg-orange-50 text-orange-500 border border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800';
     case DefaultTicketStatus.InProgress:
-      return 'bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800';
+      return 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800';
     case DefaultTicketStatus.AwaitingVerification:
     case DefaultTicketStatus.UnderVerification:
-      return 'bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800';
+      return 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800';
     case DefaultTicketStatus.Completed:
-      return 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800';
+      return 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800';
     case DefaultTicketStatus.Rejected:
-      return 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800';
+      return 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
     case DefaultTicketStatus.Returned:
-      return 'bg-orange-100 text-orange-800 border border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800';
+      return 'bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800';
     case DefaultTicketStatus.Canceled:
-      return 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800';
+      return 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
     default:
-      return 'bg-gray-100 text-gray-800 border border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800';
+      return 'bg-gray-50 text-gray-700 border border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800';
   }
 };
 
@@ -1072,83 +1066,19 @@ const confirmDueDate = async () => {
 };
 
 const getDeadlineDotClass = (dueAt: string) => {
-  const deadline = new Date(dueAt);
-  const now = new Date();
-  const diffTime = deadline.getTime() - now.getTime();
+  const info = getDeadlineInfoFromDate(dueAt);
+  if (!info) return 'bg-emerald-400';
 
-  const diffDays =
-    diffTime < 0
-      ? Math.floor(diffTime / (1000 * 60 * 60 * 24))
-      : Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 0) {
-    return 'bg-red-500';
-  } else if (diffDays <= 3) {
-    return 'bg-orange-500';
-  } else {
-    return 'bg-emerald-400';
-  }
+  if (info.isOverdue) return 'bg-red-500';
+  // Red when 6 hours or less remaining
+  if (!info.isOverdue && info.hoursDifference <= 6) return 'bg-red-500';
+  if (info.businessDaysRemaining <= 2) return 'bg-orange-500';
+  return 'bg-emerald-400';
 };
 
-const formatDeadlineRelative = (dueAt: string) => {
-  const deadline = new Date(dueAt);
-  const now = new Date();
-  const diffTime = deadline.getTime() - now.getTime();
-
-  const diffDays =
-    diffTime < 0
-      ? Math.floor(diffTime / (1000 * 60 * 60 * 24))
-      : Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  const diffHours =
-    diffTime < 0 ? Math.floor(diffTime / (1000 * 60 * 60)) : Math.ceil(diffTime / (1000 * 60 * 60));
-
-  if (diffDays < 0) {
-    const overdueHours = Math.abs(diffHours);
-    const overdueDays = Math.abs(diffDays);
-
-    if (overdueHours < 1) {
-      return 'Vencendo agora';
-    } else if (overdueDays === 0) {
-      // Overdue but less than 1 day
-      return overdueHours === 1 ? 'Atrasado há 1 hora' : `Atrasado há ${overdueHours} horas`;
-    } else {
-      // Overdue more than 1 day
-      return overdueDays === 1 ? 'Atrasado há 1 dia' : `Atrasado há ${overdueDays} dias`;
-    }
-  } else if (diffDays === 0) {
-    // Today
-    if (diffHours === 1) {
-      return '1 hora restante';
-    } else if (diffHours < 0) {
-      const overdueHours = Math.abs(diffHours);
-      return overdueHours === 1 ? 'Atrasado há 1 hora' : `Atrasado há ${overdueHours} horas`;
-    } else {
-      return `${diffHours} horas restantes`;
-    }
-  } else if (diffDays === 1) {
-    // Tomorrow
-    if (diffHours < 8) {
-      // Less than 8 hours until tomorrow
-      if (diffHours === 1) {
-        return '1 hora restante';
-      } else {
-        return `${diffHours} horas restantes`;
-      }
-    } else {
-      // More than 8 hours until tomorrow
-      return '1 dia restante';
-    }
-  } else {
-    // 2+ days
-    return `${diffDays} dias restantes`;
-  }
-};
-
-const isDeadlineExceeded = (dueAt: string) => {
-  const deadline = new Date(dueAt);
-  const now = new Date();
-  const diffTime = deadline.getTime() - now.getTime();
-  return diffTime < 0;
+const isDeadlineOverdue = (dueAt: string) => {
+  const info = getDeadlineInfoFromDate(dueAt);
+  return info ? info.isOverdue : false;
 };
 
 // Helper function to get ticket status (supports both new and old format)

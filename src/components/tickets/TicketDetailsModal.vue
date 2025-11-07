@@ -183,7 +183,7 @@
                     class="text-xs mr-1.5 flex-shrink-0"
                   />
                   <span class="truncate">{{
-                    ticketStatus ? formatSnakeToNaturalCase(ticketStatus).toUpperCase() : '-'
+                    ticketStatus ? formatSnakeToNaturalCase(ticketStatus) : '-'
                   }}</span>
                 </span>
               </div>
@@ -362,19 +362,19 @@
                 </p>
               </div>
 
-              <div class="flex items-start gap-3" :class="getDeadlineClass(loadedTicket.dueAt)">
+              <div class="flex items-start gap-3">
                 <div class="w-[40%]">
                   <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Prazo</p>
                 </div>
                 <div class="flex items-center gap-2">
-                  <p class="text-sm text-gray-900 dark:text-gray-100">
+                  <font-awesome-icon
+                    v-if="loadedTicket.dueAt && isDeadlineOverdue(loadedTicket.dueAt)"
+                    icon="exclamation-triangle"
+                    class="text-red-500 text-xs"
+                  />
+                  <p :class="['text-sm', getDeadlineTextClass(loadedTicket.dueAt)]">
                     {{ calculateDeadline(loadedTicket) }}
                   </p>
-                  <font-awesome-icon
-                    v-if="isPastDeadline(loadedTicket.dueAt)"
-                    icon="exclamation-triangle"
-                    class="text-orange-500 text-sm"
-                  />
                 </div>
               </div>
 
@@ -845,6 +845,7 @@ import {
   formatSnakeToNaturalCase,
   getUserInitials,
   enumToOptions,
+  getDeadlineInfo,
 } from '@/utils/generic-helper';
 import type { TicketUpdate } from '@/models/ticketUpdate';
 import { TicketUpdateService } from '@/services/ticketUpdateService';
@@ -916,7 +917,7 @@ const editorOptions = {
       ['link', 'image', 'video'],
     ],
   },
-  placeholder: 'Digite seu comentário aqui...',
+  placeholder: 'Adicionar comentário...',
 };
 
 const closeModal = () => {
@@ -942,7 +943,14 @@ const closeModal = () => {
   emit('close');
 };
 
-const formatDate = (date?: string) => (date ? new Date(date).toLocaleDateString() : '—');
+const formatDate = (date?: string) => {
+  if (!date) return '—';
+  const dateObj = new Date(date);
+  const day = dateObj.getDate().toString().padStart(2, '0');
+  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+  const year = dateObj.getFullYear();
+  return `${day}/${month}/${year}`;
+};
 
 const getPriorityClass = (priority: string) => {
   switch (priority) {
@@ -979,34 +987,42 @@ const getStatusClass = (status: string) => {
   }
 };
 
+const getDeadlineInfoFromDate = (date?: string) => {
+  if (!date) return null;
+  const info = getDeadlineInfo(date);
+  return info.isValid ? info : null;
+};
+
 const isPastDeadline = (date?: string) => {
-  if (!date) return false;
-  const deadline = new Date(date);
-  const today = new Date();
-
-  // Reset hours to compare just dates
-  deadline.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
-
-  const diffTime = deadline.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  return diffDays <= 3;
+  const info = getDeadlineInfoFromDate(date);
+  return info ? info.isOverdue || info.businessDaysRemaining <= 2 : false;
 };
 
 const getDeadlineClass = (date?: string) => {
-  if (!date) return '';
-  const deadline = new Date(date);
-  const today = new Date();
+  const info = getDeadlineInfoFromDate(date);
+  if (!info) return '';
 
-  deadline.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
+  if (info.isOverdue || info.businessDaysRemaining <= 2) {
+    return 'deadline-danger';
+  }
 
-  const diffTime = deadline.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays <= 3) return 'deadline-danger';
   return 'deadline-normal';
+};
+
+const getDeadlineTextClass = (date?: string) => {
+  const info = getDeadlineInfoFromDate(date);
+  if (!info) return 'text-gray-900 dark:text-gray-100';
+
+  if (info.isOverdue) return 'text-red-600 dark:text-red-400';
+  // Red when 6 hours or less remaining
+  if (!info.isOverdue && info.hoursDifference <= 6) return 'text-red-600 dark:text-red-400';
+  if (info.businessDaysRemaining <= 2) return 'text-orange-500 dark:text-orange-400';
+  return 'text-green-600 dark:text-green-400';
+};
+
+const isDeadlineOverdue = (date?: string) => {
+  const info = getDeadlineInfoFromDate(date);
+  return info ? info.isOverdue : false;
 };
 
 const openConfirmationModal = (
@@ -1046,7 +1062,7 @@ const handleConfirm = async (data?: {
 }) => {
   if (confirmationModal.value.action) {
     confirmationModal.value.isLoading = true;
-    
+
     try {
       if (data) {
         await confirmationModal.value.action(data);

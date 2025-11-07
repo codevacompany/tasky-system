@@ -115,6 +115,7 @@ const filtersStore = useFiltersStore();
 const departments = ref<Department[]>([]);
 const isModalOpen = ref(false);
 const isEditModalOpen = ref(false);
+const isLoading = ref(false);
 const searchTerm = ref('');
 const totalPages = ref(1);
 const showDeleteConfirmation = ref(false);
@@ -136,7 +137,7 @@ const headers = computed((): TableHeader[] => [
 const initialConfig = computed(() => ({
   items: departments.value,
   headers: headers.value,
-  isLoading: filtersStore.isLoading,
+  isLoading: isLoading.value,
   pagination: {
     currentPage: filtersStore.currentPage,
     totalPages: totalPages.value,
@@ -148,7 +149,7 @@ const initialConfig = computed(() => ({
 const filterConfig = computed(() => ({
   search: {
     label: 'Search',
-    placeholder: 'Buscar setores...',
+    placeholder: 'Buscar setores',
     defaultValue: filtersStore.currentSearch || '',
   },
   sort: {
@@ -189,6 +190,8 @@ const handleSort = (sortKey: string) => {
 };
 
 const loadDepartments = async () => {
+  isLoading.value = true;
+
   const filters: any = {
     name: filtersStore.currentSearch,
     page: filtersStore.currentPage,
@@ -205,6 +208,8 @@ const loadDepartments = async () => {
     totalPages.value = response.data.totalPages;
   } catch {
     toast.error('Erro ao carregar setores. Tente novamente.');
+  } finally {
+    isLoading.value = false;
   }
 };
 
