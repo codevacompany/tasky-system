@@ -174,7 +174,6 @@ import Select from '@/components/common/Select.vue';
 import TargetUsersSelector from '@/components/common/TargetUsersSelector.vue';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
-import 'vue-datepicker-next/locale/pt-br';
 
 const emit = defineEmits<{
   (e: 'close'): void;
