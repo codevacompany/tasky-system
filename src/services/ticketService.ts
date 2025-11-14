@@ -142,7 +142,11 @@ export const ticketService = {
   },
 
   async addFiles(id: string, fileUrls: string[]): Promise<AxiosResponse<Ticket>> {
-    return apiClient.post(`/tickets/${id}/files`, { fileUrls });
+    return apiClient.post(`/tickets/${id}/files`, { files: fileUrls });
+  },
+
+  async deleteFile(fileId: number): Promise<AxiosResponse<{ message: string }>> {
+    return apiClient.delete(`/ticket-files/${fileId}`);
   },
 
   async updateAssignee(

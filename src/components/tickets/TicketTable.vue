@@ -200,27 +200,33 @@
             <td
               :class="[
                 'px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700',
-                !ticket.dueAt ? 'text-gray-900 dark:text-gray-100' : getDeadlineClass(ticket.dueAt),
+                !ticket.dueAt ||
+                !calculateDeadline(ticket) ||
+                calculateDeadline(ticket) === ''
+                  ? 'text-gray-900 dark:text-gray-100'
+                  : getDeadlineClass(ticket.dueAt),
               ]"
             >
               <div class="whitespace-nowrap">
                 <template v-if="ticket.dueAt">
                   <span class="flex items-center gap-2 justify-center">
-                    <span
-                      v-if="!isDeadlineOverdue(ticket.dueAt)"
-                      :class="getDeadlineDotClass(ticket.dueAt)"
-                      class="inline-block w-[9px] h-[9px] rounded-full"
-                    ></span>
-                    <font-awesome-icon
-                      v-else
-                      icon="exclamation-triangle"
-                      class="text-red-500 text-xs"
-                    />
-                    {{ calculateDeadline(ticket) }}
+                    <template v-if="calculateDeadline(ticket) && calculateDeadline(ticket) !== ''">
+                      <span
+                        v-if="!isDeadlineOverdue(ticket.dueAt)"
+                        :class="getDeadlineDotClass(ticket.dueAt)"
+                        class="inline-block w-[9px] h-[9px] rounded-full"
+                      ></span>
+                      <font-awesome-icon
+                        v-else
+                        icon="exclamation-triangle"
+                        class="text-red-500 text-xs"
+                      />
+                    </template>
+                    {{ calculateDeadline(ticket) || '-' }}
                   </span>
                 </template>
                 <template v-else>
-                  {{ calculateDeadline(ticket) }}
+                  {{ calculateDeadline(ticket) || '-' }}
                 </template>
               </div>
             </td>
