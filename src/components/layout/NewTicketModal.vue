@@ -76,7 +76,7 @@
                 type="datetime"
                 format="DD/MM/YYYY HH:mm"
                 value-type="format"
-                lang="pt-br"
+                :lang="pt"
                 :placeholder="'Selecione data e hora'"
                 :clearable="true"
                 :editable="false"
@@ -174,6 +174,7 @@ import Select from '@/components/common/Select.vue';
 import TargetUsersSelector from '@/components/common/TargetUsersSelector.vue';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
+import pt from 'vue-datepicker-next/locale/pt-br.es';
 
 const emit = defineEmits<{
   (e: 'close'): void;
@@ -632,16 +633,22 @@ const uploadFilesToS3 = async () => {
     const ext = file.name.split('.').pop();
 
     if (ext) {
-      const { data } = await awsService.getSignedUrl(ext);
+      try {
+        const { data } = await awsService.getSignedUrl(ext);
+        console.log('data', data);
 
-      await axios.put(data.url, file, {
-        headers: {
-          'Content-Type': file.type,
-        },
-      });
+        await axios.put(data.url, file, {
+          headers: {
+            'Content-Type': file.type,
+          },
+        });
 
-      const fileUrl = data.url.split('?')[0];
-      uploadedUrls.push(fileUrl);
+        const fileUrl = data.url.split('?')[0];
+        uploadedUrls.push(fileUrl);
+      } catch (error) {
+        console.error('Erro ao fazer upload do arquivo:', file.name, error);
+        throw error;
+      }
     }
   }
 
@@ -757,31 +764,6 @@ const handleSubmit = async () => {
 </style>
 
 <style>
-#newTicketModal div.overflow-y-auto {
-  scrollbar-width: thick;
-  scrollbar-color: #ccd4df transparent;
-}
-
-#newTicketModal div.overflow-y-auto::-webkit-scrollbar {
-  width: 16px !important;
-}
-
-#newTicketModal div.overflow-y-auto::-webkit-scrollbar-track {
-  background: transparent !important;
-}
-
-#newTicketModal div.overflow-y-auto::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1 !important;
-  border-radius: 7px !important;
-  border: 3px solid transparent !important;
-  background-clip: content-box !important;
-  min-height: 50px;
-}
-
-#newTicketModal div.overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8 !important;
-}
-
 .dark #newTicketModal div.overflow-y-auto {
   scrollbar-color: #4b5563 transparent;
 }

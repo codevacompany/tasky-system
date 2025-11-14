@@ -103,7 +103,7 @@
 
           <div class="flex flex-col gap-2">
             <div class="flex items-center justify-between gap-3 mb-0">
-              <div class="flex items-center gap-2">
+              <div v-if="props.activeTab !== 'recebidos'" class="flex items-center gap-2">
                 <div class="flex items-center gap-1.5">
                   <div
                     v-if="ticket.targetUsers && ticket.targetUsers.length > 0"
@@ -264,6 +264,7 @@ import BaseModal from '@/components/common/BaseModal.vue';
 
 const props = defineProps<{
   tickets: Ticket[];
+  activeTab?: 'recebidos' | 'criados' | 'setor' | 'arquivados';
 }>();
 
 const kanbanColumns = computed(() => ticketsStore.statusColumns.data);

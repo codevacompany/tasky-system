@@ -89,20 +89,22 @@ export const getDeadlineInfo = (
 };
 
 export function calculateDeadline(ticket: Ticket) {
-  if (!ticket.dueAt) return '---';
+  if (!ticket.dueAt) return '';
 
   const currentStatus = ticket.ticketStatus?.key || ticket.status || '';
+
   if (
-    currentStatus !== DefaultTicketStatus.Pending &&
-    currentStatus !== DefaultTicketStatus.InProgress
+    currentStatus === DefaultTicketStatus.Completed ||
+    currentStatus === DefaultTicketStatus.Canceled ||
+    currentStatus === DefaultTicketStatus.Rejected
   ) {
-    return '---';
+    return '';
   }
 
   const info = getDeadlineInfo(ticket.dueAt);
 
   if (!info.isValid) {
-    return '---';
+    return '';
   }
 
   return info.message;

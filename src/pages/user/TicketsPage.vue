@@ -201,7 +201,7 @@
               @rejectTicket="handleRejectTicket"
               @refresh="fetchTicketsWithFilters"
             />
-            <TicketKanban v-else :tickets="tickets" @viewTicket="handleViewTicket" />
+            <TicketKanban v-else :tickets="tickets" :activeTab="activeTab" @viewTicket="handleViewTicket" />
           </div>
         </div>
       </div>
@@ -366,6 +366,7 @@ const newCompletionDate = ref('');
 const isKanbanView = ref(false);
 
 const showFiltersModal = ref(false);
+const isUpdatingUrl = ref(false);
 
 onMounted(async () => {
   const savedView = localStorageService.getTicketsViewPreference();
@@ -376,6 +377,8 @@ onMounted(async () => {
 
 const debouncedSearch = debounce(() => {
   fetchTicketsWithFilters();
+  // Update URL after search completes
+  updateUrlWithFilters();
 }, 400);
 
 const tickets = computed(() => {
@@ -513,8 +516,8 @@ const fetchTicketsWithFilters = async () => {
     filters.status = statusFilter.value as DefaultTicketStatus;
   }
 
-  if (searchTerm.value) {
-    filters.name = searchTerm.value;
+  if (searchTerm.value && searchTerm.value.trim()) {
+    filters.name = searchTerm.value.trim();
   }
 
   await ticketsStore.setCurrentPage(storeType, currentPage.value, filters);
@@ -648,6 +651,7 @@ const setStatusFilter = (status: DefaultTicketStatus | '') => {
 };
 
 const updateUrlWithFilters = () => {
+  isUpdatingUrl.value = true;
   const query: any = { tab: activeTab.value };
 
   if (statusFilter.value) query.status = statusFilter.value;
@@ -655,7 +659,12 @@ const updateUrlWithFilters = () => {
   if (searchTerm.value) query.search = searchTerm.value;
   if (currentPage.value > 1) query.page = currentPage.value;
 
-  router.push({ query });
+  router.push({ query }).finally(() => {
+    // Reset flag after a short delay to allow route watch to process
+    setTimeout(() => {
+      isUpdatingUrl.value = false;
+    }, 100);
+  });
 };
 
 watch(
@@ -670,30 +679,44 @@ watch(
 
 watch(
   () => route.query,
-  (newQuery) => {
-    // Update filters from URL
-    if (newQuery.status !== undefined) {
-      statusFilter.value = newQuery.status as string;
-    }
-    if (newQuery.priority !== undefined) {
-      priorityFilter.value = newQuery.priority as string;
-    }
-    if (newQuery.search !== undefined) {
-      searchTerm.value = newQuery.search as string;
-    }
-    if (newQuery.page !== undefined) {
-      currentPage.value = parseInt(newQuery.page as string) || 1;
+  (newQuery, oldQuery) => {
+    // Don't fetch if we're updating the URL ourselves
+    if (isUpdatingUrl.value) {
+      return;
     }
 
-    // Fetch tickets with new filters
-    fetchTicketsWithFilters();
+    // Only update filters if they actually changed
+    let filtersChanged = false;
+
+    if (newQuery.status !== oldQuery?.status) {
+      statusFilter.value = (newQuery.status as string) || '';
+      filtersChanged = true;
+    }
+    if (newQuery.priority !== oldQuery?.priority) {
+      priorityFilter.value = (newQuery.priority as string) || '';
+      filtersChanged = true;
+    }
+    if (newQuery.search !== oldQuery?.search) {
+      searchTerm.value = (newQuery.search as string) || '';
+      filtersChanged = true;
+    }
+    if (newQuery.page !== oldQuery?.page) {
+      currentPage.value = parseInt(newQuery.page as string) || 1;
+      filtersChanged = true;
+    }
+
+    // Only fetch if filters actually changed
+    if (filtersChanged) {
+      fetchTicketsWithFilters();
+    }
   },
   { deep: true },
 );
 
 watch(searchTerm, () => {
+  // Reset to first page when searching
+  currentPage.value = 1;
   debouncedSearch();
-  updateUrlWithFilters();
 });
 
 watch(currentPage, () => {

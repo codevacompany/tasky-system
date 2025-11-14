@@ -67,17 +67,19 @@
                 v-if="title === 'Últimos Tickets Criados' || title === 'Últimos Tickets Recebidos'"
               >
                 <span v-if="ticket.dueAt" class="flex items-center gap-2 justify-end">
-                  <span
-                    v-if="!isDeadlineOverdue(ticket.dueAt)"
-                    :class="getDeadlineDotClass(ticket.dueAt)"
-                    class="inline-block w-[9px] h-[9px] rounded-full"
-                  ></span>
-                  <font-awesome-icon
-                    v-else
-                    icon="exclamation-triangle"
-                    class="text-red-500 text-xs"
-                  />
-                  {{ calculateDeadline(ticket) }}
+                  <template v-if="calculateDeadline(ticket) && calculateDeadline(ticket) !== ''">
+                    <span
+                      v-if="!isDeadlineOverdue(ticket.dueAt)"
+                      :class="getDeadlineDotClass(ticket.dueAt)"
+                      class="inline-block w-[9px] h-[9px] rounded-full"
+                    ></span>
+                    <font-awesome-icon
+                      v-else
+                      icon="exclamation-triangle"
+                      class="text-red-500 text-xs"
+                    />
+                  </template>
+                  {{ calculateDeadline(ticket) || '-' }}
                 </span>
               </template>
               <template v-else>
