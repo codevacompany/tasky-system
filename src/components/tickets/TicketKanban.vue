@@ -30,11 +30,9 @@
     <div
       v-for="column in kanbanColumns"
       :key="column.id"
-      class="flex-1 min-w-[310px] w-0 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm relative flex flex-col h-full"
+      class="flex-1 min-w-[310px] w-0 bg-[#F8F9FB] dark:bg-gray-800 rounded-2xl shadow-sm relative flex flex-col h-full"
     >
-      <div
-        class="p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 rounded-t-xl text-center flex-shrink-0"
-      >
+      <div class="p-2 text-center flex-shrink-0">
         <h3
           class="m-0 inline-flex items-center gap-3 text-base font-semibold text-gray-900 dark:text-white py-2"
         >
@@ -143,7 +141,7 @@
               </div>
               <div
                 :class="[
-                  'flex items-center justify-center gap-1 px-2 py-1 rounded text-xs font-semibold uppercase whitespace-nowrap text-white',
+                  'flex items-center justify-center gap-1 px-2 py-1 rounded text-xs font-semibold whitespace-nowrap text-white',
                   ticket.priority === TicketPriority.Low
                     ? 'bg-green-500'
                     : ticket.priority === TicketPriority.Medium
@@ -162,7 +160,7 @@
                   "
                   class="text-xs"
                 />
-                {{ ticket.priority }}
+                {{ formatSnakeToNaturalCase(ticket.priority) }}
               </div>
             </div>
             <div class="flex items-center justify-between gap-3 mb-0">

@@ -15,17 +15,11 @@
           <label for="title" class="text-sm text-gray-800 dark:text-gray-200"
             >Assunto: <span class="text-red-500">*</span></label
           >
-          <input
-            type="text"
-            id="title"
-            v-model="formData.name"
-            required
-            class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-          />
+          <Input id="title" v-model="formData.name" required />
         </div>
 
         <div class="col-span-1 flex flex-col gap-1.5">
-          <label class="text-sm text-gray-800 dark:text-gray-200 mt-1"
+          <label class="text-sm text-gray-800 dark:text-gray-200"
             >Prioridade: <span class="text-red-500">*</span></label
           >
           <Select
@@ -170,6 +164,7 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import axios from 'axios';
 import { awsService } from '@/services/awsService';
 import BaseModal from '@/components/common/BaseModal.vue';
+import Input from '@/components/common/Input.vue';
 import Select from '@/components/common/Select.vue';
 import TargetUsersSelector from '@/components/common/TargetUsersSelector.vue';
 import DatePicker from 'vue-datepicker-next';
@@ -749,8 +744,28 @@ const handleSubmit = async () => {
   width: 100%;
 }
 
+.quill-wrapper {
+  border: 1px solid #d7dee8;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+:deep(.ql-toolbar) {
+  border: none !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-radius: 6px 6px 0 0 !important;
+  padding: 10px 12px;
+}
+
 :deep(.ql-container) {
-  min-height: 90px;
+  border: none !important;
+  border-radius: 0 0 6px 6px !important;
+  min-height: 110px;
+}
+
+:deep(.ql-editor) {
+  min-height: 110px;
+  padding: 14px;
 }
 
 /* Ensure Quill dropdowns appear above modal footer */
@@ -760,6 +775,10 @@ const handleSubmit = async () => {
 
 :deep(.ql-snow .ql-picker) {
   z-index: 10001;
+}
+
+.dark #newTicketModal .quill-wrapper {
+  border-color: #485063;
 }
 </style>
 
@@ -781,21 +800,6 @@ const handleSubmit = async () => {
     margin-bottom: 30px;
   }
 
-  :deep(.ql-toolbar) {
-    border-radius: 4px 4px 0 0;
-    padding: 8px;
-  }
-
-  :deep(.ql-container) {
-    border-radius: 0 0 4px 4px;
-    font-size: 14px;
-  }
-
-  :deep(.ql-editor) {
-    min-height: 120px;
-    padding: 12px;
-  }
-
   :deep(.ql-toolbar .ql-formats) {
     margin-right: 8px;
   }
@@ -808,51 +812,57 @@ const handleSubmit = async () => {
 }
 
 /* Dark mode styles for Quill editor */
-:deep(.dark) .ql-toolbar {
-  border-color: #374151;
+.dark #newTicketModal .ql-toolbar {
+  border-color: #2f3542;
+  border-bottom-color: #485063 !important;
   background: #1f2937;
 }
 
-:deep(.dark) .ql-container {
-  border-color: #374151;
+.dark #newTicketModal .ql-container {
+  border-color: #2f3542;
   background: #1f2937;
 }
 
-:deep(.dark) .ql-editor {
+.dark #newTicketModal .ql-editor {
+  color: #f9fafb;
+  background: #1f2937;
+}
+
+.dark #newTicketModal .ql-editor.ql-blank::before {
+  color: rgba(255, 255, 255, 0.85) !important;
+  opacity: 1 !important;
+}
+
+.dark #newTicketModal .ql-toolbar button:hover {
   color: #e5e7eb;
-  background: #1f2937;
 }
 
-:deep(.dark) .ql-toolbar button:hover {
-  color: #e5e7eb;
-}
-
-:deep(.dark) .ql-toolbar button.ql-active {
+.dark #newTicketModal .ql-toolbar button.ql-active {
   color: #60a5fa;
 }
 
-:deep(.dark) .ql-snow .ql-stroke {
+.dark #newTicketModal .ql-snow .ql-stroke {
   stroke: #9ca3af;
 }
 
-:deep(.dark) .ql-snow .ql-fill {
+.dark #newTicketModal .ql-snow .ql-fill {
   fill: #9ca3af;
 }
 
-:deep(.dark) .ql-snow .ql-picker-label {
+.dark #newTicketModal .ql-snow .ql-picker-label {
   color: #9ca3af;
 }
 
-:deep(.dark) .ql-snow .ql-picker-options {
+.dark #newTicketModal .ql-snow .ql-picker-options {
   background: #1f2937;
   border-color: #374151;
 }
 
-:deep(.dark) .ql-snow .ql-picker-item {
+.dark #newTicketModal .ql-snow .ql-picker-item {
   color: #e5e7eb;
 }
 
-:deep(.dark) .ql-snow .ql-picker-item:hover {
+.dark #newTicketModal .ql-snow .ql-picker-item:hover {
   background: #374151;
 }
 </style>

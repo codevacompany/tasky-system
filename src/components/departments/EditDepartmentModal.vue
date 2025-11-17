@@ -15,10 +15,10 @@
             class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
             >Nome</label
           >
-          <input
-            type="text"
+          <Input
             id="nomeSetor"
             v-model="departmentData.name"
+            type="text"
             placeholder="Digite o nome do setor"
             required
             class="w-full px-[15px] py-[10px] border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
@@ -36,6 +36,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import BaseModal from '../common/BaseModal.vue';
+import Input from '../common/Input.vue';
 import { departmentService } from '@/services/departmentService';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';

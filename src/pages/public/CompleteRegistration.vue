@@ -25,11 +25,11 @@
             <label for="customKey">Prefixo da empresa</label>
             <div class="input-group">
               <font-awesome-icon class="input-icon" icon="building" />
-              <input
-                type="text"
+              <Input
                 id="customKey"
-                placeholder="2-3 letras (Ex: TS)"
                 v-model="customKey"
+                type="text"
+                placeholder="2-3 letras (Ex: TS)"
                 required
                 maxlength="3"
                 minlength="2"
@@ -45,11 +45,11 @@
             <label for="password">Senha</label>
             <div class="input-group">
               <font-awesome-icon class="input-icon" icon="lock" />
-              <input
-                type="password"
+              <Input
                 id="password"
-                placeholder="Sua senha"
                 v-model="password"
+                type="password"
+                placeholder="Sua senha"
                 required
                 @input="validatePassword"
               />
@@ -70,11 +70,11 @@
             <label for="confirmPassword">Confirme a senha</label>
             <div class="input-group">
               <font-awesome-icon class="input-icon" icon="lock" />
-              <input
-                type="password"
+              <Input
                 id="confirmPassword"
-                placeholder="Confirme sua senha"
                 v-model="confirmPassword"
+                type="password"
+                placeholder="Confirme sua senha"
                 required
                 @input="validatePasswordMatch"
               />
@@ -108,6 +108,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { signupService } from '@/services/signupService';
+import Input from '@/components/common/Input.vue';
 
 const router = useRouter();
 const route = useRoute();

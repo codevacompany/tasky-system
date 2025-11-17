@@ -213,11 +213,11 @@
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >Senha Atual</label
           >
-          <input
-            type="password"
+          <Input
             id="currentPassword"
             v-model="passwordForm.currentPassword"
-            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:outline-none focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
+            type="password"
+            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
             :class="{ 'border-red-500': passwordForm.errors.currentPassword }"
             placeholder="Digite sua senha atual"
             required
@@ -232,11 +232,11 @@
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >Nova Senha</label
           >
-          <input
-            type="password"
+          <Input
             id="newPassword"
             v-model="passwordForm.newPassword"
-            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:outline-none focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
+            type="password"
+            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
             :class="{ 'border-red-500': passwordForm.errors.newPassword }"
             placeholder="Digite sua nova senha"
             required
@@ -251,11 +251,11 @@
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >Confirmar Nova Senha</label
           >
-          <input
-            type="password"
+          <Input
             id="confirmPassword"
             v-model="passwordForm.confirmPassword"
-            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:outline-none focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
+            type="password"
+            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
             :class="{ 'border-red-500': passwordForm.errors.confirmPassword }"
             placeholder="Confirme sua nova senha"
             required
@@ -341,6 +341,7 @@ import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import BaseModal from '@/components/common/BaseModal.vue';
 import { useRoles } from '@/composables';
+import Input from '@/components/common/Input.vue';
 
 const router = useRouter();
 

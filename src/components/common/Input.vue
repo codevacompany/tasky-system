@@ -1,0 +1,62 @@
+<template>
+  <input
+    :type="type"
+    :value="modelValue ?? ''"
+    :class="inputClasses"
+    v-bind="$attrs"
+    @input="handleInput"
+    @focus="handleFocus"
+    @blur="handleBlur"
+  />
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue';
+
+const paddingMap = {
+  tight: 'py-2',
+  normal: 'py-2.5',
+  relaxed: 'py-3',
+} as const;
+
+type PaddingKey = keyof typeof paddingMap;
+
+const props = withDefaults(
+  defineProps<{
+    modelValue: string | number | null;
+    type?: string;
+    padding?: PaddingKey;
+    inputClass?: string;
+  }>(),
+  {
+    type: 'text',
+    padding: 'normal',
+    inputClass: '',
+  },
+);
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string | number | null): void;
+  (e: 'input', event: Event): void;
+  (e: 'focus', event: FocusEvent): void;
+  (e: 'blur', event: FocusEvent): void;
+}>();
+
+const baseClasses =
+  'w-full px-3 border border-inputBorder rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white transition-colors disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-75 dark:disabled:bg-gray-900 dark:disabled:text-gray-500';
+
+const paddingClass = computed(() => paddingMap[props.padding] ?? paddingMap.normal);
+
+const inputClasses = computed(() =>
+  [baseClasses, paddingClass.value, props.inputClass].join(' ').trim(),
+);
+
+const handleInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  emit('update:modelValue', target.value);
+  emit('input', event);
+};
+
+const handleFocus = (event: FocusEvent) => emit('focus', event);
+const handleBlur = (event: FocusEvent) => emit('blur', event);
+</script>

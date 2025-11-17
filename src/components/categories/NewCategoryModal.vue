@@ -16,10 +16,10 @@
             class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-200"
             >Nome</label
           >
-          <input
-            type="text"
+          <Input
             id="nomeCategoria"
             v-model="categoryData.name"
+            type="text"
             placeholder="Digite o nome da categoria"
             required
             class="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -33,6 +33,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import BaseModal from '../common/BaseModal.vue';
+import Input from '../common/Input.vue';
 import { categoryService } from '@/services/categoryService';
 import { toast } from 'vue3-toastify';
 

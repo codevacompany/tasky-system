@@ -1323,11 +1323,12 @@
                       </p>
                     </div>
                     <div class="w-full sm:w-auto">
-                      <input
+                      <Input
                         v-model="userSearch"
                         type="text"
                         placeholder="Buscar colaborador"
-                        class="w-full sm:w-80 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        padding="tight"
+                        class="w-full sm:w-80 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-400 dark:border-gray-600 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   </div>
@@ -2088,6 +2089,7 @@ import {
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import TabSelector from '@/components/common/TabSelector.vue';
 import Select from '@/components/common/Select.vue';
+import Input from '@/components/common/Input.vue';
 import { toast } from 'vue3-toastify';
 import { downloadFile } from '@/utils/file-helper';
 import * as XLSX from 'xlsx';

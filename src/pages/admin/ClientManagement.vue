@@ -10,11 +10,12 @@
               icon="search"
               class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
             />
-            <input
-              type="text"
+            <Input
               v-model="searchTerm"
+              type="text"
               placeholder="Buscar por nome, CNPJ ou plano"
-              class="w-full py-2 pr-4 pl-10 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+              padding="tight"
+              class="w-full pr-4 pl-10 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600"
             />
           </div>
           <button
@@ -109,7 +110,7 @@
       <div class="flex flex-wrap gap-4 items-center mb-4 w-[50%]">
         <select
           v-model="statusFilter"
-          class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+          class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
         >
           <option value="">Todos os Status</option>
           <option value="trial">Trial</option>
@@ -121,7 +122,7 @@
 
         <select
           v-model="planFilter"
-          class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+          class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
         >
           <option value="">Todos os Planos</option>
           <option value="Iniciante">Iniciante</option>
@@ -133,7 +134,7 @@
         <!-- TODO: Adicionar filtro de status de pagamento -->
         <!-- <select
           v-model="paymentFilter"
-          class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+          class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
         >
           <option value="">Status Pagamento</option>
           <option value="EM_DIA">Em dia</option>
@@ -145,14 +146,14 @@
           <input
             type="date"
             v-model="dateFilter.start"
-            class="flex-1 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+            class="flex-1 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             placeholder="Data inicial"
           />
           <span class="text-sm text-gray-500 dark:text-gray-400">até</span>
           <input
             type="date"
             v-model="dateFilter.end"
-            class="flex-1 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+            class="flex-1 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             placeholder="Data final"
           />
         </div> -->
@@ -662,44 +663,44 @@
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >Razão Social</label
               >
-              <input
-                type="text"
+              <Input
                 v-model="newClient.name"
+                type="text"
                 required
-                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >CNPJ</label
               >
-              <input
-                type="text"
+              <Input
                 v-model="newClient.cnpj"
+                type="text"
                 required
-                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >Chave Personalizada</label
               >
-              <input
-                type="text"
+              <Input
                 v-model="newClient.customKey"
+                type="text"
                 required
-                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >E-mail</label
               >
-              <input
-                type="email"
+              <Input
                 v-model="newClient.email"
+                type="email"
                 required
-                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>
           </form>
@@ -751,11 +752,11 @@
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Nova Senha
               </label>
-              <input
+              <Input
                 v-model="newPassword"
                 type="password"
                 placeholder="Digite a nova senha"
-                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 :disabled="isResettingPassword"
               />
             </div>
@@ -764,11 +765,11 @@
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Confirmar Senha
               </label>
-              <input
+              <Input
                 v-model="confirmPassword"
                 type="password"
                 placeholder="Confirme a nova senha"
-                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 :disabled="isResettingPassword"
               />
             </div>
@@ -837,6 +838,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { getUserInitials, formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import Input from '@/components/common/Input.vue';
 import {
   tenantService,
   type TenantWithStats,

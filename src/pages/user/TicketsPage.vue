@@ -95,7 +95,7 @@
                 class="flex items-center justify-center lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2 w-full lg:w-auto"
               >
                 <div
-                  class="flex items-center justify-center p-0.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-x-auto"
+                  class="flex items-center justify-center p-0.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-x-auto"
                   style="height: 36px; min-width: fit-content"
                 >
                   <div class="flex items-center gap-0 flex-shrink-0">
@@ -104,7 +104,7 @@
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'recebidos'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
                       @click="switchTab('recebidos')"
@@ -116,7 +116,7 @@
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'criados'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
                       @click="switchTab('criados')"
@@ -129,7 +129,7 @@
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'setor'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
                       @click="switchTab('setor')"
@@ -142,7 +142,7 @@
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'arquivados'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
                       @click="switchTab('arquivados')"
@@ -162,18 +162,19 @@
                     icon="search"
                     class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-3.5 h-3.5 pointer-events-none"
                   />
-                  <input
+                  <Input
+                    v-model="searchTerm"
                     type="text"
                     placeholder="Buscar tickets"
-                    v-model="searchTerm"
-                    class="pl-9 pr-3 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
+                    padding="tight"
+                    class="pl-9 pr-3 w-full text-sm transition-all duration-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
                   />
                 </div>
                 <button
-                  class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
+                  class="flex items-center gap-2 px-4 py-2 border border-inputBorder dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
                   @click="showFiltersModal = true"
                 >
-                  <font-awesome-icon icon="filter" class="w-3.5 h-3.5" />
+                  <font-awesome-icon icon="sliders" class="w-3.5 h-3.5" />
                   Filtros
                 </button>
               </div>
@@ -201,7 +202,12 @@
               @rejectTicket="handleRejectTicket"
               @refresh="fetchTicketsWithFilters"
             />
-            <TicketKanban v-else :tickets="tickets" :activeTab="activeTab" @viewTicket="handleViewTicket" />
+            <TicketKanban
+              v-else
+              :tickets="tickets"
+              :activeTab="activeTab"
+              @viewTicket="handleViewTicket"
+            />
           </div>
         </div>
       </div>
@@ -284,11 +290,12 @@
               class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
               >Nova Data de Conclusão:</label
             >
-            <input
-              type="date"
+            <Input
               id="newCompletionDate"
               v-model="newCompletionDate"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
+              type="date"
+              padding="tight"
+              class="w-full text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
               :min="new Date().toISOString().split('T')[0]"
               required
             />
@@ -325,6 +332,7 @@ import { DefaultTicketStatus, TicketPriority } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
 import TicketKanban from '@/components/tickets/TicketKanban.vue';
 import Select from '@/components/common/Select.vue';
+import Input from '@/components/common/Input.vue';
 import { toast } from 'vue3-toastify';
 import { debounce, formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { localStorageService } from '@/utils/localStorageService';

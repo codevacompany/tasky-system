@@ -19,13 +19,13 @@
           class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
           >Nome</label
         >
-        <input
-          type="text"
+        <Input
           id="nomeColaborador"
           v-model="userData.firstName"
+          type="text"
           placeholder="Digite o nome do colaborador"
           required
-          class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          class="px-[14px] text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         />
       </div>
 
@@ -35,12 +35,12 @@
           class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
           >Sobrenome</label
         >
-        <input
-          type="text"
+        <Input
           id="sobrenomeColaborador"
           v-model="userData.lastName"
+          type="text"
           placeholder="Digite o sobrenome"
-          class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          class="px-[14px] text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         />
       </div>
 
@@ -50,13 +50,13 @@
           class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
           >E-mail</label
         >
-        <input
-          type="email"
+        <Input
           id="emailColaborador"
           v-model="userData.email"
+          type="email"
           placeholder="Digite o e-mail"
           required
-          class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          class="px-[14px] text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         />
       </div>
 
@@ -80,13 +80,13 @@
           class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
           >Senha</label
         >
-        <input
-          type="password"
+        <Input
           id="senhaColaborador"
           v-model="userData.password"
+          type="password"
           placeholder="Digite a senha"
           required
-          class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          class="px-[14px] text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
         />
       </div>
 
@@ -112,6 +112,7 @@ import { ref, onMounted, computed } from 'vue';
 import { departmentService } from '@/services/departmentService';
 import BaseModal from '../common/BaseModal.vue';
 import Select from '../common/Select.vue';
+import Input from '../common/Input.vue';
 import { userService } from '@/services/userService';
 import { toast } from 'vue3-toastify';
 import { roleService } from '@/services/roleService';

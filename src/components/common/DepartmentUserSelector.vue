@@ -2,7 +2,7 @@
   <div class="relative" ref="dropdownRef">
     <button
       @click="toggleDropdown"
-      class="w-full text-left px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      class="w-full text-left px-3 py-2 border border-inputBorder dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       :class="{ 'ring-2 ring-blue-500': isOpen }"
     >
       <div class="flex items-center justify-between">
@@ -47,11 +47,12 @@
             icon="search"
             class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 text-sm"
           />
-          <input
+          <Input
             v-model="searchTerm"
             type="text"
             placeholder="Buscar usuários"
-            class="w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            padding="tight"
+            class="pl-10 pr-3 text-sm dark:border-gray-600"
           />
         </div>
       </div>
@@ -104,6 +105,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import Input from '@/components/common/Input.vue';
 import type { Department, User } from '@/models';
 import { departmentService } from '@/services/departmentService';
 import { userService } from '@/services/userService';

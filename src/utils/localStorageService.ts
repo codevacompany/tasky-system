@@ -6,6 +6,7 @@ class StorageService {
   private readonly userKey = 'user';
   private readonly ticketsViewKey = 'ticketsViewPreference';
   private readonly themeKey = 'theme';
+  private readonly notificationsShowOnlyUnreadKey = 'notificationsShowOnlyUnread';
 
   getAccessToken() {
     return localStorage.getItem(this.accessTokenKey);
@@ -60,6 +61,15 @@ class StorageService {
 
   setTheme(theme: 'light' | 'dark') {
     localStorage.setItem(this.themeKey, theme);
+  }
+
+  getNotificationsShowOnlyUnread(): boolean {
+    const preference = localStorage.getItem(this.notificationsShowOnlyUnreadKey);
+    return preference === 'true';
+  }
+
+  setNotificationsShowOnlyUnread(value: boolean) {
+    localStorage.setItem(this.notificationsShowOnlyUnreadKey, String(value));
   }
 
   clear(): void {

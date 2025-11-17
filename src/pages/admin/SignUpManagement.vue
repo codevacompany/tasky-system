@@ -11,11 +11,12 @@
               icon="search"
               class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
             />
-            <input
-              type="text"
+            <Input
               v-model="searchTerm"
+              type="text"
               placeholder="Buscar por nome, CNPJ ou e-mail"
-              class="w-full py-2 pr-4 pl-10 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+              padding="tight"
+              class="w-full pr-4 pl-10 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
             />
           </div>
         </div>
@@ -245,6 +246,7 @@ import { toast } from 'vue3-toastify';
 import { signupService } from '@/services/signupService';
 import { SignUpStatus } from '@/models/SignUp';
 import type { CompanySignUp } from '@/models/SignUp';
+import Input from '@/components/common/Input.vue';
 
 const searchTerm = ref('');
 const signups = ref<CompanySignUp[]>([]);
