@@ -162,11 +162,12 @@
                     icon="search"
                     class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-3.5 h-3.5 pointer-events-none"
                   />
-                  <input
+                  <Input
+                    v-model="searchTerm"
                     type="text"
                     placeholder="Buscar tickets"
-                    v-model="searchTerm"
-                    class="pl-9 pr-3 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
+                    padding="tight"
+                    class="pl-9 pr-3 w-full text-sm transition-all duration-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
                   />
                 </div>
                 <button
@@ -284,11 +285,12 @@
               class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
               >Nova Data de Conclusão:</label
             >
-            <input
-              type="date"
+            <Input
               id="newCompletionDate"
               v-model="newCompletionDate"
-              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
+              type="date"
+              padding="tight"
+              class="w-full text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
               :min="new Date().toISOString().split('T')[0]"
               required
             />
@@ -325,6 +327,7 @@ import { DefaultTicketStatus, TicketPriority } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
 import TicketKanban from '@/components/tickets/TicketKanban.vue';
 import Select from '@/components/common/Select.vue';
+import Input from '@/components/common/Input.vue';
 import { toast } from 'vue3-toastify';
 import { debounce, formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { localStorageService } from '@/utils/localStorageService';

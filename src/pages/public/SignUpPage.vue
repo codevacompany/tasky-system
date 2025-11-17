@@ -65,7 +65,7 @@
           <!-- Step 1 Form -->
           <form v-if="step === 1" @submit.prevent="nextStep" class="space-y-4 lg:space-y-5">
             <div>
-              <input
+              <Input
                 v-model="form.companyName"
                 type="text"
                 required
@@ -76,7 +76,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <input
+                <Input
                   v-model="form.cnpj"
                   type="text"
                   required
@@ -94,7 +94,7 @@
                 </span>
               </div>
               <div>
-                <input
+                <Input
                   v-model="form.companyPhone"
                   type="tel"
                   required
@@ -107,7 +107,7 @@
             </div>
 
             <div>
-              <input
+              <Input
                 v-model="form.companyEmail"
                 type="email"
                 required
@@ -139,7 +139,7 @@
             class="space-y-4 lg:space-y-5"
           >
             <div>
-              <input
+              <Input
                 v-model="form.contactName"
                 type="text"
                 required
@@ -149,7 +149,7 @@
             </div>
 
             <div>
-              <input
+              <Input
                 v-model="form.contactCpf"
                 type="text"
                 required
@@ -168,7 +168,7 @@
             </div>
 
             <div>
-              <input
+              <Input
                 v-model="form.contactEmail"
                 type="email"
                 required
@@ -186,7 +186,7 @@
             </div>
 
             <div>
-              <input
+              <Input
                 v-model="form.contactPhone"
                 type="tel"
                 required
@@ -357,6 +357,7 @@ import {
   validateCNPJ,
 } from '@/utils/form-helpers';
 import { AxiosError } from 'axios';
+import Input from '@/components/common/Input.vue';
 
 const router = useRouter();
 const step = ref(1);

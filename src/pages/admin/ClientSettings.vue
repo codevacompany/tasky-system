@@ -33,36 +33,36 @@
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
             >Razão Social</label
           >
-          <input
-            type="text"
+          <Input
             v-model="settings.razaoSocial"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+            type="text"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           />
         </div>
         <div class="mb-4">
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300">CNPJ</label>
-          <input
-            type="text"
+          <Input
             v-model="settings.cnpj"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+            type="text"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           />
         </div>
         <div class="mb-4">
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300">Domínio</label>
-          <input
-            type="text"
+          <Input
             v-model="settings.dominio"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+            type="text"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           />
         </div>
         <div class="mb-0">
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
             >Email Principal</label
           >
-          <input
-            type="email"
+          <Input
             v-model="settings.emailPrincipal"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+            type="email"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           />
         </div>
       </div>
@@ -78,7 +78,7 @@
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300">Plano Atual</label>
           <select
             v-model="settings.plano"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           >
             <option value="BASIC">Básico</option>
             <option value="PRO">Profissional</option>
@@ -90,32 +90,32 @@
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
             >Limite de Usuários</label
           >
-          <input
-            type="number"
+          <Input
             v-model="settings.limiteUsuarios"
+            type="number"
             min="1"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           />
         </div>
         <div class="mb-4">
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
             >Limite de Tickets/mês</label
           >
-          <input
-            type="number"
+          <Input
             v-model="settings.limiteTickets"
+            type="number"
             min="1"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           />
         </div>
         <div class="mb-0">
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
             >Data de Renovação</label
           >
-          <input
-            type="date"
+          <Input
             v-model="settings.dataRenovacao"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+            type="date"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           />
         </div>
       </div>
@@ -167,7 +167,7 @@
           >
           <select
             v-model="settings.notificacoes.frequenciaRelatorio"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           >
             <option value="DIARIO">Diário</option>
             <option value="SEMANAL">Semanal</option>
@@ -186,9 +186,9 @@
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
             >Cor Primária</label
           >
-          <input
-            type="color"
+          <Input
             v-model="settings.personalizacao.corPrimaria"
+            type="color"
             class="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer"
           />
         </div>
@@ -217,7 +217,7 @@
           <textarea
             v-model="settings.personalizacao.mensagemBoasVindas"
             rows="3"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 resize-y min-h-[80px]"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-y min-h-[80px]"
           ></textarea>
         </div>
       </div>
@@ -227,6 +227,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import Input from '@/components/common/Input.vue';
 
 type IntegrationKey = keyof typeof settings.value.integracoes;
 

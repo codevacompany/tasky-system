@@ -27,13 +27,13 @@
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <font-awesome-icon icon="envelope" class="h-4 w-4 text-gray-400" />
                 </div>
-                <input
-                  type="email"
+                <Input
                   id="loginEmail"
-                  placeholder="Seu e-mail"
                   v-model="email"
+                  type="email"
+                  placeholder="Seu e-mail"
                   required
-                  class="block w-full pl-10 pr-3 py-2.5 sm:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm sm:text-base"
+                  class="block w-full pl-10 pr-3 sm:py-3 bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm sm:text-base rounded-[4px]"
                 />
               </div>
             </div>
@@ -47,13 +47,13 @@
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <font-awesome-icon icon="lock" class="h-4 w-4 text-gray-400" />
                 </div>
-                <input
-                  type="password"
+                <Input
                   id="loginPassword"
-                  placeholder="Sua senha"
                   v-model="password"
+                  type="password"
+                  placeholder="Sua senha"
                   required
-                  class="block w-full pl-10 pr-3 py-2.5 sm:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm sm:text-base"
+                  class="block w-full pl-10 pr-3 sm:py-3 bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm sm:text-base rounded-[4px]"
                 />
               </div>
             </div>
@@ -94,7 +94,7 @@
 
         <!-- Footer -->
         <div class="px-6 pb-6 sm:px-8 sm:pb-8 text-center">
-          <p class="text-sm text-gray-600">Quer o Tasky Pro na sua empresa?</p>
+          <p class="text-sm text-gray-600">Deseja ter o Tasky Pro na sua empresa?</p>
           <router-link to="/cadastrar" class="text-sm text-gray-800 hover:underline font-medium">
             Cadastre aqui
           </router-link>
@@ -110,6 +110,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
+import Input from '@/components/common/Input.vue';
 
 const router = useRouter();
 

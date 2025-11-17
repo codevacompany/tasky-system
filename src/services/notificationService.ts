@@ -12,8 +12,13 @@ export const notificationService = {
     return apiClient.get(`/notifications/unread/count`);
   },
 
-  async getBytargetUser(targetUserId: number): Promise<AxiosResponse<PaginatedResponse<Notification>>> {
-    return apiClient.get(`/notifications/target-user/${targetUserId}`);
+  async getBytargetUser(
+    targetUserId: number,
+    params?: { page?: number; limit?: number },
+  ): Promise<AxiosResponse<PaginatedResponse<Notification>>> {
+    return apiClient.get(`/notifications/target-user/${targetUserId}`, {
+      params,
+    });
   },
 
   async getUnreadByTickets(ticketIds: string[]): Promise<AxiosResponse<Notification[]>> {

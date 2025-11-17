@@ -32,11 +32,12 @@
             icon="search"
             class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
           />
-          <input
-            type="text"
+          <Input
             v-model="searchTerm"
+            type="text"
             placeholder="Buscar por nome, email ou perfil"
-            class="w-full sm:w-[300px] pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+            padding="tight"
+            class="w-full sm:w-[300px] pl-10 pr-4 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
           />
         </div>
         <select
@@ -215,16 +216,16 @@
               <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
                 >Nome Completo</label
               >
-              <input
-                type="text"
+              <Input
                 v-model="newUser.firstName"
+                type="text"
                 required
                 class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 mb-2"
                 placeholder="Nome"
               />
-              <input
-                type="text"
+              <Input
                 v-model="newUser.lastName"
+                type="text"
                 required
                 class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
                 placeholder="Sobrenome"
@@ -232,9 +233,9 @@
             </div>
             <div class="mb-4">
               <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300">Email</label>
-              <input
-                type="email"
+              <Input
                 v-model="newUser.email"
+                type="email"
                 required
                 class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
               />
@@ -243,9 +244,9 @@
               <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
                 >Departamento</label
               >
-              <input
-                type="text"
+              <Input
                 v-model="newUser.departamento"
+                type="text"
                 required
                 class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
               />
@@ -286,6 +287,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { getUserInitials } from '@/utils/generic-helper';
+import Input from '@/components/common/Input.vue';
 
 // Estados
 const searchTerm = ref('');

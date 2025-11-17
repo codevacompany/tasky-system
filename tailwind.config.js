@@ -19,6 +19,7 @@ export default {
         info: '#50b5ff', // rgb(80, 181, 255)
         warning: '#f1b44c', // rgb(241, 180, 76)
         danger: '#f4516c', // rgb(244, 81, 108)
+        inputBorder: '#dce1e9', // slightly lighter, between gray-200 and gray-300
       },
       boxShadow: {
         card: '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)',

@@ -36,11 +36,11 @@
               {{ option.label }}
             </option>
           </select>
-          <input
+          <Input
             v-else
-            type="text"
             id="reason"
             v-model="inputReason"
+            type="text"
             placeholder="Informe o motivo"
             required
           />
@@ -78,6 +78,7 @@
 import { ref, watch } from 'vue';
 import BaseModal from './BaseModal.vue';
 import LoadingSpinner from './LoadingSpinner.vue';
+import Input from './Input.vue';
 
 const props = defineProps<{
   title: string;

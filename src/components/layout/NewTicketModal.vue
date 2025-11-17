@@ -15,17 +15,11 @@
           <label for="title" class="text-sm text-gray-800 dark:text-gray-200"
             >Assunto: <span class="text-red-500">*</span></label
           >
-          <input
-            type="text"
-            id="title"
-            v-model="formData.name"
-            required
-            class="w-full px-[14px] py-2.5 border border-gray-200 rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-          />
+          <Input id="title" v-model="formData.name" required />
         </div>
 
         <div class="col-span-1 flex flex-col gap-1.5">
-          <label class="text-sm text-gray-800 dark:text-gray-200 mt-1"
+          <label class="text-sm text-gray-800 dark:text-gray-200"
             >Prioridade: <span class="text-red-500">*</span></label
           >
           <Select
@@ -170,6 +164,7 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import axios from 'axios';
 import { awsService } from '@/services/awsService';
 import BaseModal from '@/components/common/BaseModal.vue';
+import Input from '@/components/common/Input.vue';
 import Select from '@/components/common/Select.vue';
 import TargetUsersSelector from '@/components/common/TargetUsersSelector.vue';
 import DatePicker from 'vue-datepicker-next';

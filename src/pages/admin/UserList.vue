@@ -19,12 +19,13 @@
             icon="search"
             class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 pointer-events-none"
           />
-          <input
-            type="text"
+          <Input
             id="searchTickets"
-            :placeholder="filterConfig.search.placeholder"
             v-model="searchTerm"
-            class="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-0 focus:ring-blue-500/10 dark:focus:ring-blue-400/10"
+            type="text"
+            :placeholder="filterConfig.search.placeholder"
+            padding="tight"
+            class="pl-10 pr-4 w-full text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 dark:border-gray-600 dark:bg-gray-800"
           />
         </div>
       </div>
@@ -194,6 +195,7 @@ import type { TableHeader, PaginationInfo } from '@/components/common/DataTable.
 import { toast } from 'vue3-toastify';
 import { useUserStore } from '@/stores/user';
 import { useFiltersStore } from '@/stores/filters';
+import Input from '@/components/common/Input.vue';
 
 const userStore = useUserStore();
 const filtersStore = useFiltersStore();

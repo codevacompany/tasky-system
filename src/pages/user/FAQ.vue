@@ -11,7 +11,7 @@
       </h1>
       <!-- Search input - full width on mobile, constrained on larger screens -->
       <div class="flex items-center relative w-full sm:min-w-[280px] sm:max-w-[400px] sm:w-auto">
-        <input
+        <Input
           v-model="searchTerm"
           type="text"
           placeholder="Digite sua dúvida"
@@ -72,6 +72,7 @@ import { ref, computed, watch } from 'vue';
 import Accordion from '@/components/common/Accordion.vue';
 import FaqItem from '@/components/faq/FaqItem.vue';
 import ChatSupportButton from '@/components/faq/ChatSupportButton.vue';
+import Input from '@/components/common/Input.vue';
 
 const sections = ref([
   {

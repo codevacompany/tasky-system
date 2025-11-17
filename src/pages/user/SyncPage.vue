@@ -75,11 +75,12 @@
             <div class="p-5 border-b border-gray-200 dark:border-gray-700">
               <h3 class="mb-3 text-lg font-semibold text-gray-900 dark:text-white">Usuários</h3>
               <div class="relative">
-                <input
-                  type="text"
+                <Input
                   v-model="userSearchTerm"
+                  type="text"
                   placeholder="Buscar usuário"
-                  class="w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                  padding="tight"
+                  class="w-full px-3 text-sm border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                 />
               </div>
             </div>
@@ -403,6 +404,7 @@ import { userService } from '@/services/userService';
 import { toast } from 'vue3-toastify';
 import { formatRelativeTime } from '@/utils/date';
 import MentionSelector from '@/components/MentionSelector.vue';
+import Input from '@/components/common/Input.vue';
 
 const userStore = useUserStore();
 const messageStore = useMessageStore();
