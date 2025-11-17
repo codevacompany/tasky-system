@@ -95,7 +95,7 @@
                 class="flex items-center justify-center lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2 w-full lg:w-auto"
               >
                 <div
-                  class="flex items-center justify-center p-0.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-x-auto"
+                  class="flex items-center justify-center p-0.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-x-auto"
                   style="height: 36px; min-width: fit-content"
                 >
                   <div class="flex items-center gap-0 flex-shrink-0">
@@ -104,7 +104,7 @@
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'recebidos'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
                       @click="switchTab('recebidos')"
@@ -116,7 +116,7 @@
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'criados'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
                       @click="switchTab('criados')"
@@ -129,7 +129,7 @@
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'setor'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
                       @click="switchTab('setor')"
@@ -142,7 +142,7 @@
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'arquivados'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
                       @click="switchTab('arquivados')"
@@ -171,10 +171,10 @@
                   />
                 </div>
                 <button
-                  class="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
+                  class="flex items-center gap-2 px-4 py-2 border border-inputBorder dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
                   @click="showFiltersModal = true"
                 >
-                  <font-awesome-icon icon="filter" class="w-3.5 h-3.5" />
+                  <font-awesome-icon icon="sliders" class="w-3.5 h-3.5" />
                   Filtros
                 </button>
               </div>
@@ -202,7 +202,12 @@
               @rejectTicket="handleRejectTicket"
               @refresh="fetchTicketsWithFilters"
             />
-            <TicketKanban v-else :tickets="tickets" :activeTab="activeTab" @viewTicket="handleViewTicket" />
+            <TicketKanban
+              v-else
+              :tickets="tickets"
+              :activeTab="activeTab"
+              @viewTicket="handleViewTicket"
+            />
           </div>
         </div>
       </div>

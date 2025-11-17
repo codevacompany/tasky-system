@@ -176,7 +176,7 @@
                   {{ getPriorityBars(ticket.priority) }}
                 </span>
                 <span class="text-xs text-gray-500 dark:text-gray-400 hidden md:inline">{{
-                  ticket.priority
+                  formatSnakeToNaturalCase(ticket.priority)
                 }}</span>
               </div>
             </td>
