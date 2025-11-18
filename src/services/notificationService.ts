@@ -25,15 +25,15 @@ export const notificationService = {
     return apiClient.post<Notification[]>('/notifications/unread/tickets', { ticketIds });
   },
 
-  async update(id: number, data: UpdateNotificationDto): Promise<AxiosResponse<Notification>> {
-    return apiClient.patch<Notification>(`/notifications/${id}`, data);
-  },
-
   async markAllAsRead(): Promise<AxiosResponse<Notification>> {
     return apiClient.post<Notification>(`/notifications/mark-as-read`);
   },
 
   async markAsRead(id: number): Promise<AxiosResponse<Notification>> {
     return apiClient.post<Notification>(`/notifications/${id}/mark-as-read`);
+  },
+
+  async delete(uuid: string): Promise<AxiosResponse<{ message: string }>> {
+    return apiClient.delete(`/notifications/${uuid}`);
   },
 };

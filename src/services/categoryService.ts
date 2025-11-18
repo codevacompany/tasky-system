@@ -18,15 +18,15 @@ export const categoryService = {
     return apiClient.get<PaginatedResponse<Category>>('/categories', { params });
   },
 
-  async getById(id: number): Promise<AxiosResponse<Category>> {
-    return apiClient.get<Category>(`/categories/${id}`);
+  async getById(uuid: string): Promise<AxiosResponse<Category>> {
+    return apiClient.get<Category>(`/categories/${uuid}`);
   },
 
-  async update(id: number, data: UpdateCategoryDto): Promise<AxiosResponse<Category>> {
-    return apiClient.patch<Category>(`/categories/${id}`, data);
+  async update(uuid: string, data: UpdateCategoryDto): Promise<AxiosResponse<Category>> {
+    return apiClient.patch<Category>(`/categories/${uuid}`, data);
   },
 
-  async delete(id: number): Promise<AxiosResponse<void>> {
-    return apiClient.delete(`/categories/${id}`);
+  async delete(uuid: string): Promise<AxiosResponse<void>> {
+    return apiClient.delete(`/categories/${uuid}`);
   },
 };

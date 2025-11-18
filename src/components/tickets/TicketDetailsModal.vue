@@ -1,7 +1,7 @@
 <template>
   <BaseModal
     title="Detalhes do Ticket"
-    :isLoading="loadedTicket ? false : true"
+    :isLoading="isLoadingTicket"
     @close="closeModal"
     :showFooter="false"
     :hasCustomHeader="true"
@@ -949,7 +949,7 @@ interface SpecialUpdateEvent {
 }
 
 const props = defineProps<{
-  ticket: Ticket | null;
+  ticketCustomId: string | null;
 }>();
 
 const emit = defineEmits(['close']);
@@ -961,6 +961,7 @@ const editorKey = ref(0);
 const comments = ref<TicketComment[]>([]);
 const ticketUpdates = ref<TicketUpdate[]>([]);
 const loadedTicket = ref<Ticket | null>(null);
+const isLoadingTicket = ref(false);
 const selectedFiles = ref<File[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isUploading = ref(false);
@@ -1247,7 +1248,7 @@ const approveTicket = async (ticketId: string) => {
         await ticketService.approve(ticketId);
         toast.success('Ticket aprovado com sucesso');
 
-        if (props.ticket) {
+        if (loadedTicket.value) {
           refreshSelectedTicket();
         } else {
           await ticketsStore.fetchTicketDetails(ticketId);
@@ -1624,38 +1625,53 @@ const getSpecialUpdateTitle = (subType: string, event?: SpecialUpdateEvent) => {
   return baseTitle;
 };
 
-watch(
-  () => props.ticket,
-  (newTicket) => {
-    if (newTicket) {
-      loadedTicket.value = newTicket;
-      fetchComments();
-      fetchTicketUpdates();
+const fetchTicket = async (customId: string) => {
+  isLoadingTicket.value = true;
+  try {
+    const ticket = await ticketsStore.fetchTicketDetails(customId);
+    loadedTicket.value = ticket;
+    fetchComments();
+    fetchTicketUpdates();
 
-      if (
-        userStore.user?.id === newTicket.reviewer?.id &&
-        (newTicket.ticketStatus?.key === DefaultTicketStatus.AwaitingVerification ||
-          newTicket.status === DefaultTicketStatus.AwaitingVerification) &&
-        !confirmationModal.value.isOpen
-      ) {
-        openConfirmationModal(
-          'Iniciar Verificação',
-          'Você tem certeza que deseja iniciar a verificação deste ticket?',
-          async () => {
-            try {
-              await ticketService.updateStatus(newTicket.customId, {
-                status: DefaultTicketStatus.UnderVerification,
-              });
-              loadedTicket.value = await ticketsStore.fetchTicketDetails(newTicket.customId);
-            } catch {
-              toast.error('Erro ao iniciar verificação');
-            }
-          },
-          false,
-          [],
-          'start-verification', // pass context
-        );
-      }
+    // Check if ticket is awaiting verification and user is reviewer
+    if (
+      userStore.user?.id === ticket.reviewer?.id &&
+      (ticket.ticketStatus?.key === DefaultTicketStatus.AwaitingVerification ||
+        ticket.status === DefaultTicketStatus.AwaitingVerification) &&
+      !confirmationModal.value.isOpen
+    ) {
+      openConfirmationModal(
+        'Iniciar Verificação',
+        'Você tem certeza que deseja iniciar a verificação deste ticket?',
+        async () => {
+          try {
+            await ticketService.updateStatus(ticket.customId, {
+              status: DefaultTicketStatus.UnderVerification,
+            });
+            loadedTicket.value = await ticketsStore.fetchTicketDetails(ticket.customId);
+          } catch {
+            toast.error('Erro ao iniciar verificação');
+          }
+        },
+        false,
+        [],
+        'start-verification', // pass context
+      );
+    }
+  } catch (error) {
+    console.error('Error fetching ticket:', error);
+    toast.error('Erro ao carregar ticket');
+    emit('close');
+  } finally {
+    isLoadingTicket.value = false;
+  }
+};
+
+watch(
+  () => props.ticketCustomId,
+  (newCustomId) => {
+    if (newCustomId) {
+      fetchTicket(newCustomId);
     } else {
       loadedTicket.value = null;
       comments.value = [];
@@ -1746,12 +1762,10 @@ const canEditTicket = computed(() => {
 });
 
 const refreshSelectedTicket = async () => {
-  if (!props.ticket?.customId) return;
-  try {
-    const updatedTicket = await ticketsStore.fetchTicketDetails(props.ticket.customId);
-    loadedTicket.value = updatedTicket;
-  } catch (error) {
-    console.error('Error refreshing ticket:', error);
+  if (loadedTicket.value?.customId) {
+    await fetchTicket(loadedTicket.value.customId);
+  } else if (props.ticketCustomId) {
+    await fetchTicket(props.ticketCustomId);
   }
 };
 
@@ -1824,7 +1838,6 @@ const saveTicketDescription = async () => {
       loadedTicket.value.description = editingDescription.value;
     }
 
-    toast.success('Descrição do ticket atualizada com sucesso');
     refreshSelectedTicket();
   } catch {
     toast.error('Erro ao atualizar descrição do ticket');

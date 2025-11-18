@@ -33,16 +33,16 @@ export const userService = {
     return apiClient.get(`/users/department/${departmentId}`, { params });
   },
 
-  async update(id: number, data: UpdateUserDto): Promise<AxiosResponse<User>> {
-    return apiClient.patch<User>(`/users/${id}`, data);
+  async update(uuid: string, data: UpdateUserDto): Promise<AxiosResponse<User>> {
+    return apiClient.patch<User>(`/users/${uuid}`, data);
   },
 
-  async deactivate(id: number): Promise<AxiosResponse<User>> {
-    return apiClient.patch<User>(`/users/${id}`, { isActive: false });
+  async deactivate(uuid: string): Promise<AxiosResponse<User>> {
+    return apiClient.patch<User>(`/users/${uuid}`, { isActive: false });
   },
 
-  async activate(id: number): Promise<AxiosResponse<User>> {
-    return apiClient.patch<User>(`/users/${id}`, { isActive: true });
+  async activate(uuid: string): Promise<AxiosResponse<User>> {
+    return apiClient.patch<User>(`/users/${uuid}`, { isActive: true });
   },
 
   async getTenantAdmins(): Promise<AxiosResponse<User[]>> {
@@ -50,9 +50,9 @@ export const userService = {
   },
 
   async resetPassword(
-    id: number,
+    uuid: string,
     newPassword: string,
   ): Promise<AxiosResponse<{ message: string }>> {
-    return apiClient.patch(`/auth/admin/reset-password/${id}`, { newPassword });
+    return apiClient.patch(`/auth/admin/reset-password/${uuid}`, { newPassword });
   },
 };

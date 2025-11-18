@@ -375,10 +375,10 @@ const handleConfirmAction = async () => {
 
   try {
     if (type === 'deactivate') {
-      await userService.deactivate(user.id);
+      await userService.deactivate(user.uuid);
       toast.success(`Usuário ${user.firstName} ${user.lastName} foi desativado com sucesso.`);
     } else {
-      await userService.activate(user.id);
+      await userService.activate(user.uuid);
       toast.success(`Usuário ${user.firstName} ${user.lastName} foi ativado com sucesso.`);
     }
     await loadUsers();

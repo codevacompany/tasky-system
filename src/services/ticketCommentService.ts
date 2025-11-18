@@ -11,15 +11,15 @@ export const ticketCommentService = {
     return apiClient.get<TicketComment[]>('/ticket-comments');
   },
 
-  async getById(id: number): Promise<AxiosResponse<TicketComment>> {
-    return apiClient.get<TicketComment>(`/ticket-comments/${id}`);
+  async getById(uuid: string): Promise<AxiosResponse<TicketComment>> {
+    return apiClient.get<TicketComment>(`/ticket-comments/${uuid}`);
   },
 
   async getByTicket(ticketId: string): Promise<AxiosResponse<TicketComment[]>> {
     return apiClient.get<TicketComment[]>(`/ticket-comments/ticket/${ticketId}`);
   },
 
-  async update(id: number, data: UpdateTicketCommentDto): Promise<AxiosResponse<TicketComment>> {
-    return apiClient.patch<TicketComment>(`/ticket-comments/${id}`, data);
+  async update(uuid: string, data: UpdateTicketCommentDto): Promise<AxiosResponse<TicketComment>> {
+    return apiClient.patch<TicketComment>(`/ticket-comments/${uuid}`, data);
   },
 };

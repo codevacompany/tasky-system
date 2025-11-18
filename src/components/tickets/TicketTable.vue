@@ -200,9 +200,7 @@
             <td
               :class="[
                 'px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700',
-                !ticket.dueAt ||
-                !calculateDeadline(ticket) ||
-                calculateDeadline(ticket) === ''
+                !ticket.dueAt || !calculateDeadline(ticket) || calculateDeadline(ticket) === ''
                   ? 'text-gray-900 dark:text-gray-100'
                   : getDeadlineClass(ticket.dueAt),
               ]"
@@ -489,7 +487,6 @@
       </div>
     </div>
 
-    <TicketDetailsModal v-if="isModalOpen" :ticket="selectedTicket!" @close="closeModal" />
     <ConfirmationModal
       v-if="confirmationModal.isOpen"
       :title="confirmationModal.title"
@@ -588,7 +585,6 @@
 import { ref, computed, watch } from 'vue';
 import type { Ticket } from '@/models';
 import { TicketPriority, DefaultTicketStatus, DisapprovalReason, CorrectionReason } from '@/models';
-import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { ticketService } from '@/services/ticketService';
 import { formatDate, getBusinessDayDifference } from '@/utils/date';
@@ -610,13 +606,11 @@ const props = defineProps<{
   currentPage: number;
 }>();
 
-const emit = defineEmits(['changePage']);
+const emit = defineEmits(['changePage', 'viewTicket']);
 
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
 
-const isModalOpen = ref(false);
-const selectedTicket = ref<Ticket | null>(null);
 const showVerificationAlert = ref(false);
 const pendingVerificationTicket = ref<Ticket | null>(null);
 const currentPage = ref(props.currentPage);
@@ -710,13 +704,8 @@ const openTicketDetails = (ticket: Ticket) => {
     return;
   }
 
-  selectedTicket.value = ticket;
-  isModalOpen.value = true;
-};
-
-const closeModal = () => {
-  isModalOpen.value = false;
-  selectedTicket.value = null;
+  // Emit the viewTicket event with the ticket UUID
+  emit('viewTicket', ticket);
 };
 
 const refreshTickets = async () => {
@@ -919,19 +908,19 @@ const handleRequestCorrection = async (ticket: Ticket) => {
     async (data?: { reason: string; description: string }) => {
       try {
         if (data?.reason && data?.description) {
-          await ticketService.requestCorrection(ticket.customId, {
+          await ticketService.requestCorrection(ticket.uuid, {
             reason: data.reason,
             details: data.description,
           });
         } else {
-          await ticketService.updateStatus(ticket.customId, {
+          await ticketService.updateStatus(ticket.uuid, {
             status: DefaultTicketStatus.Returned,
           });
         }
 
         toast.success('Correção solicitada com sucesso');
 
-        await ticketsStore.fetchTicketDetails(ticket.customId);
+        await ticketsStore.fetchTicketDetails(ticket.uuid);
       } catch {
         toast.error('Erro ao solicitar correção');
       }
@@ -949,19 +938,19 @@ const handleRejectTicket = async (ticket: Ticket) => {
     async (data?: { reason: string; description: string }) => {
       try {
         if (data?.reason && data?.description) {
-          await ticketService.reject(ticket.customId, {
+          await ticketService.reject(ticket.uuid, {
             reason: data.reason,
             details: data.description,
           });
         } else {
-          await ticketService.updateStatus(ticket.customId, {
+          await ticketService.updateStatus(ticket.uuid, {
             status: DefaultTicketStatus.Rejected,
           });
         }
 
         toast.success('Ticket reprovado com sucesso');
 
-        await ticketsStore.fetchTicketDetails(ticket.customId);
+        await ticketsStore.fetchTicketDetails(ticket.uuid);
       } catch {
         toast.error('Erro ao reprovar o ticket');
       }
@@ -977,10 +966,8 @@ const handleStartVerification = async (ticket: Ticket) => {
       status: DefaultTicketStatus.UnderVerification,
     });
 
-    selectedTicket.value = ticketResponse.data.ticketData;
-    isModalOpen.value = true;
-
-    await ticketsStore.fetchTicketDetails(ticket.customId);
+    // Emit viewTicket to navigate to URL
+    emit('viewTicket', ticket);
   } catch {
     toast.error('Erro ao iniciar verificação');
   }

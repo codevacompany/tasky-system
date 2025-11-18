@@ -25,8 +25,8 @@ export const ticketService = {
     return apiClient.get('/tickets', { params });
   },
 
-  async getById(id: string): Promise<AxiosResponse<Ticket>> {
-    return apiClient.get(`/tickets/${id}`);
+  async getById(customId: string): Promise<AxiosResponse<Ticket>> {
+    return apiClient.get(`/tickets/${customId}`);
   },
 
   async getByDepartment(
@@ -105,44 +105,44 @@ export const ticketService = {
   },
 
   async update(
-    id: string,
+    customId: string,
     data: UpdateTicketDto,
   ): Promise<AxiosResponse<{ message: string; ticketId: number }>> {
-    return apiClient.patch(`/tickets/${id}`, data);
+    return apiClient.patch(`/tickets/${customId}`, data);
   },
 
   async updateStatus(
-    id: string,
+    customId: string,
     data: UpdateTicketStatusDto,
   ): Promise<AxiosResponse<{ message: string; ticketData: Ticket }>> {
-    return apiClient.patch(`/tickets/${id}/status`, data);
+    return apiClient.patch(`/tickets/${customId}/status`, data);
   },
 
-  async accept(id: string): Promise<AxiosResponse<Ticket>> {
-    return apiClient.post(`/tickets/${id}/accept`);
+  async accept(customId: string): Promise<AxiosResponse<Ticket>> {
+    return apiClient.post(`/tickets/${customId}/accept`);
   },
 
-  async approve(id: string): Promise<AxiosResponse<Ticket>> {
-    return apiClient.post(`/tickets/${id}/approve`);
+  async approve(customId: string): Promise<AxiosResponse<Ticket>> {
+    return apiClient.post(`/tickets/${customId}/approve`);
   },
 
-  async cancel(id: string, data?: { reason: string; details: string }) {
-    return apiClient.post(`/tickets/${id}/cancel`, data);
+  async cancel(customId: string, data?: { reason: string; details: string }) {
+    return apiClient.post(`/tickets/${customId}/cancel`, data);
   },
 
-  async reject(id: string, data?: { reason: string; details: string }) {
-    return apiClient.post(`/tickets/${id}/reject`, data);
+  async reject(customId: string, data?: { reason: string; details: string }) {
+    return apiClient.post(`/tickets/${customId}/reject`, data);
   },
 
   async requestCorrection(
-    id: string,
+    customId: string,
     data?: { reason: string; details: string; targetUserId?: number },
   ) {
-    return apiClient.post(`/tickets/${id}/request-correction`, data);
+    return apiClient.post(`/tickets/${customId}/request-correction`, data);
   },
 
-  async addFiles(id: string, fileUrls: string[]): Promise<AxiosResponse<Ticket>> {
-    return apiClient.post(`/tickets/${id}/files`, { files: fileUrls });
+  async addFiles(customId: string, fileUrls: string[]): Promise<AxiosResponse<Ticket>> {
+    return apiClient.post(`/tickets/${customId}/files`, { files: fileUrls });
   },
 
   async deleteFile(fileId: number): Promise<AxiosResponse<{ message: string }>> {
@@ -150,18 +150,18 @@ export const ticketService = {
   },
 
   async updateAssignee(
-    id: string,
+    customId: string,
     targetUserId: number,
     order: number,
   ): Promise<AxiosResponse<Ticket>> {
-    return apiClient.patch(`/tickets/${id}/assignee`, { targetUserId, order });
+    return apiClient.patch(`/tickets/${customId}/assignee`, { targetUserId, order });
   },
 
-  async updateReviewer(ticketId: string, reviewerId: number) {
-    return apiClient.patch(`/tickets/${ticketId}/reviewer`, { reviewerId });
+  async updateReviewer(ticketCustomId: string, reviewerId: number) {
+    return apiClient.patch(`/tickets/${ticketCustomId}/reviewer`, { reviewerId });
   },
 
-  async sendToNextDepartment(id: string): Promise<AxiosResponse<Ticket>> {
-    return apiClient.post(`/tickets/${id}/send-to-next-department`);
+  async sendToNextDepartment(customId: string): Promise<AxiosResponse<Ticket>> {
+    return apiClient.post(`/tickets/${customId}/send-to-next-department`);
   },
 };

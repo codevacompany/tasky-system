@@ -3,6 +3,7 @@ import type { User } from "./user";
 
 export interface TicketComment {
   id: number;
+  uuid: string;
   ticket: Ticket;
   user: User;
   content: string;

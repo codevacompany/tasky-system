@@ -213,6 +213,13 @@
       </div>
     </div>
 
+    <!-- Ticket Details Modal -->
+    <TicketDetailsModal
+      v-if="selectedTicketCustomId"
+      :ticketCustomId="selectedTicketCustomId"
+      @close="closeTicketModal"
+    />
+
     <!-- Modal de Filtros (Mobile) -->
     <div
       v-if="showFiltersModal"
@@ -331,6 +338,7 @@ import type { Ticket } from '@/models';
 import { DefaultTicketStatus, TicketPriority } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
 import TicketKanban from '@/components/tickets/TicketKanban.vue';
+import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import Select from '@/components/common/Select.vue';
 import Input from '@/components/common/Input.vue';
 import { toast } from 'vue3-toastify';
@@ -375,12 +383,19 @@ const isKanbanView = ref(false);
 
 const showFiltersModal = ref(false);
 const isUpdatingUrl = ref(false);
+const selectedTicketCustomId = ref<string | null>(null);
 
 onMounted(async () => {
   const savedView = localStorageService.getTicketsViewPreference();
   isKanbanView.value = savedView === 'kanban';
 
   await fetchTicketsWithFilters();
+
+  // Check if there's a ticket customId in the URL
+  const ticketCustomId = route.query.ticket as string;
+  if (ticketCustomId) {
+    selectedTicketCustomId.value = ticketCustomId;
+  }
 });
 
 const debouncedSearch = debounce(() => {
@@ -540,7 +555,17 @@ const inProgressTickets = computed(
 );
 
 const handleViewTicket = (ticket: Ticket) => {
-  console.log('Viewing ticket:', ticket);
+  // Update URL with ticket customId
+  const query = { ...route.query, ticket: ticket.customId };
+  router.push({ query });
+};
+
+const closeTicketModal = () => {
+  selectedTicketCustomId.value = null;
+  // Remove ticket from URL query
+  const query = { ...route.query };
+  delete query.ticket;
+  router.push({ query });
 };
 
 const handleEditTicket = (ticket: Ticket) => {
@@ -683,6 +708,18 @@ watch(
       activeTab.value = newTab as 'recebidos' | 'criados' | 'setor' | 'arquivados';
     }
   },
+);
+
+watch(
+  () => route.query.ticket,
+  (newTicketCustomId) => {
+    if (newTicketCustomId && typeof newTicketCustomId === 'string') {
+      selectedTicketCustomId.value = newTicketCustomId;
+    } else if (!newTicketCustomId) {
+      selectedTicketCustomId.value = null;
+    }
+  },
+  { immediate: true },
 );
 
 watch(

@@ -106,18 +106,16 @@
     </div>
   </div>
 
-  <TicketDetailsModal v-if="openTicket" :ticket="selectedTicket" @close="openTicket = false" />
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { notificationService } from '@/services/notificationService';
-import type { Notification, Ticket } from '@/models';
+import type { Notification } from '@/models';
 import { NotificationType } from '@/models';
 import { toast } from 'vue3-toastify';
 import { formatRelativeTime } from '@/utils/date';
-import TicketDetailsModal from '../tickets/TicketDetailsModal.vue';
-import { ticketService } from '@/services/ticketService';
 import { useUserStore } from '@/stores/user';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { localStorageService } from '@/utils/localStorageService';
@@ -127,11 +125,11 @@ const emit = defineEmits<{
   (e: 'notifications-read'): void;
 }>();
 
+const router = useRouter();
+const route = useRoute();
 const notifications = ref<Notification[]>([]);
 const scrollContainer = ref<HTMLElement | null>(null);
 
-const openTicket = ref(false);
-const selectedTicket = ref<Ticket | null>(null);
 const isLoading = ref(false);
 const isLoadingMore = ref(false);
 const currentPage = ref(1);
@@ -213,21 +211,30 @@ const handleScroll = () => {
 const fetchSelectedTicket = async (notification: Notification) => {
   if (notification.resourceCustomId) {
     try {
-      // Clear previous ticket data and show loading state
-      selectedTicket.value = null;
-      openTicket.value = true;
-
-      const response = await ticketService.getById(notification.resourceCustomId);
-      selectedTicket.value = response.data;
-      notificationService.markAsRead(notification.id);
-      // Reset to first page when refreshing
+      // Mark notification as read
+      await notificationService.markAsRead(notification.id);
+      
+      // Close the notifications dropdown
+      closeModal();
+      
+      // Navigate to tickets page with the ticket customId in the URL
+      // Preserve current query params if already on tickets page, otherwise use default tab
+      const isOnTicketsPage = route.path === '/meus-tickets';
+      const query = isOnTicketsPage
+        ? { ...route.query, ticket: notification.resourceCustomId }
+        : { tab: 'recebidos', ticket: notification.resourceCustomId };
+      
+      router.push({
+        path: '/meus-tickets',
+        query,
+      });
+      
+      // Refresh notifications to update the read status
       currentPage.value = 1;
       await fetchNotifications(1, false);
     } catch (err) {
       console.error(err);
       toast.error('Erro ao carregar ticket.');
-      // Close modal on error to prevent showing stale data
-      openTicket.value = false;
     }
   }
 };
