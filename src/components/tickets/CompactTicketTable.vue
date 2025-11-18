@@ -14,7 +14,7 @@
     </div>
     <div class="overflow-x-auto">
       <table class="w-full border-collapse min-w-[600px]">
-        <tbody>
+        <tbody :class="{ 'min-h-[300px]': !isLoading && tickets.length === 0 }">
           <tr v-if="isLoading" v-for="n in 5" :key="`skeleton-${n}`">
             <td class="max-w-[200px] pl-8 py-3 border-b border-gray-200 dark:border-gray-700">
               <div class="flex flex-col gap-1">
@@ -41,12 +41,13 @@
             v-else
             v-for="(ticket, index) in tickets"
             :key="ticket.id"
-            class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200"
+            class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200 cursor-pointer"
+            @click="handleTicketClick(ticket)"
           >
             <td
               :class="[
                 'max-w-[200px] pl-8 py-3 text-sm text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis w-1/2',
-                index < tickets.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : '',
+                index < 4 ? 'border-b border-gray-200 dark:border-gray-700' : '',
               ]"
               :title="ticket.name"
             >
@@ -60,7 +61,7 @@
             <td
               :class="[
                 'px-3 py-3 text-sm text-gray-900 dark:text-white whitespace-nowrap w-1/4',
-                index < tickets.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : '',
+                index < 4 ? 'border-b border-gray-200 dark:border-gray-700' : '',
               ]"
             >
               <template
@@ -89,7 +90,7 @@
             <td
               :class="[
                 'px-3 py-3 text-center text-sm text-gray-900 dark:text-white whitespace-nowrap w-1/4',
-                index < tickets.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : '',
+                index < 4 ? 'border-b border-gray-200 dark:border-gray-700' : '',
               ]"
             >
               <span
@@ -102,11 +103,25 @@
             </td>
           </tr>
           <tr v-if="!isLoading && tickets.length === 0" class="last:border-b-0">
-            <td
-              :colspan="title === 'Últimos Tickets Criados' ? 4 : 5"
-              class="px-3 py-6 text-center text-gray-500 dark:text-gray-400 text-sm flex flex-col items-center gap-2"
-            >
-              <font-awesome-icon icon="inbox" class="text-lg" /> Nenhum ticket encontrado
+            <td colspan="3" class="px-6 py-12 text-center h-[300px]">
+              <div class="flex flex-col items-center justify-center gap-3 h-full">
+                <div
+                  class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center"
+                >
+                  <font-awesome-icon
+                    icon="inbox"
+                    class="text-2xl text-gray-400 dark:text-gray-500"
+                  />
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                  <p class="text-sm font-medium text-gray-600 dark:text-gray-300 m-0">
+                    Nenhum ticket encontrado
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 m-0">
+                    Tickets recentes aparecerão aqui
+                  </p>
+                </div>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -117,6 +132,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { DefaultTicketStatus, type Ticket } from '@/models';
 import { formatDate } from '@/utils/date';
@@ -133,6 +149,8 @@ const props = defineProps<{
   viewAllUrl: string;
 }>();
 
+const router = useRouter();
+const route = useRoute();
 const ticketsStore = useTicketsStore();
 
 const tickets = computed(() => {
@@ -213,10 +231,23 @@ function isDeadlineOverdue(dueAt: string) {
   return info ? info.isOverdue : false;
 }
 
-// Helper function to get ticket status (supports both new and old format)
 function getTicketStatus(ticket: Ticket): string {
   return ticket.ticketStatus?.key || ticket.status || '';
 }
+
+const handleTicketClick = (ticket: Ticket) => {
+  if (!ticket.customId) return;
+
+  const isOnTicketsPage = route.path === '/meus-tickets';
+  const query = isOnTicketsPage
+    ? { ...route.query, ticket: ticket.customId }
+    : { tab: 'recebidos', ticket: ticket.customId };
+
+  router.push({
+    path: '/meus-tickets',
+    query,
+  });
+};
 </script>
 
 <style scoped>

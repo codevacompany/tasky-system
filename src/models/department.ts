@@ -1,5 +1,6 @@
 export interface Department {
   id: number;
+  uuid: string;
   name: string;
   createdAt: string;
 }

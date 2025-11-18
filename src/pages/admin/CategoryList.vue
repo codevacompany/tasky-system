@@ -243,7 +243,7 @@ const deleteCategory = async () => {
   if (!categoryToDelete.value) return;
 
   try {
-    await categoryService.delete(categoryToDelete.value.id);
+    await categoryService.delete(categoryToDelete.value.uuid);
     toast.success('Categoria excluída com sucesso!');
     loadCategories();
   } catch (error) {

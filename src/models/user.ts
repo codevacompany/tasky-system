@@ -3,6 +3,7 @@ import type { Role } from './role';
 
 export interface User {
   id: number;
+  uuid: string;
   tenantId: number;
   firstName: string;
   lastName: string;

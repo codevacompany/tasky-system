@@ -73,7 +73,7 @@ const updateDepartment = async () => {
 
   isLoading.value = true;
   try {
-    await departmentService.update(props.department.id, departmentData.value);
+    await departmentService.update(props.department.uuid, departmentData.value);
     emit('departmentUpdated');
     toast.success('Setor atualizado com sucesso');
     closeModal();

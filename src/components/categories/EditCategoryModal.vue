@@ -74,7 +74,7 @@ const updateCategory = async () => {
 
   isLoading.value = true;
   try {
-    await categoryService.update(props.category.id, categoryData.value);
+    await categoryService.update(props.category.uuid, categoryData.value);
     emit('categoryUpdated');
     toast.success('Categoria atualizada com sucesso');
     closeModal();

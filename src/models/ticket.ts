@@ -34,6 +34,7 @@ export interface TicketTargetUser {
 
 export interface Ticket {
   id: number;
+  uuid: string;
   customId: string;
   name: string;
   priority: TicketPriority;

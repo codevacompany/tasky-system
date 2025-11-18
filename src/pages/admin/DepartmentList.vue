@@ -247,7 +247,7 @@ const deleteDepartment = async () => {
   if (!departmentToDelete.value) return;
 
   try {
-    await departmentService.delete(departmentToDelete.value.id);
+    await departmentService.delete(departmentToDelete.value.uuid);
     toast.success('Setor excluído com sucesso!');
     loadDepartments();
   } catch (error) {

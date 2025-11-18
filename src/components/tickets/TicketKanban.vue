@@ -211,8 +211,6 @@
     </div>
   </div>
 
-  <TicketDetailsModal v-if="isModalOpen" :ticket="selectedTicket" @close="isModalOpen = false" />
-
   <!-- Verification Confirmation Modal -->
   <BaseModal
     v-if="showVerificationAlert"
@@ -253,7 +251,6 @@ import type { StatusColumn, TicketStatus as ColumnTicketStatus } from '@/models/
 import { DefaultTicketStatus, TicketPriority } from '@/models';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { formatDate, formatRelativeTime } from '@/utils/date';
-import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import { ticketService } from '@/services/ticketService';
@@ -265,10 +262,10 @@ const props = defineProps<{
   activeTab?: 'recebidos' | 'criados' | 'setor' | 'arquivados';
 }>();
 
+const emit = defineEmits(['viewTicket']);
+
 const kanbanColumns = computed(() => ticketsStore.statusColumns.data);
 
-const selectedTicket = ref<Ticket | null>(null);
-const isModalOpen = ref(false);
 const showVerificationAlert = ref(false);
 const pendingVerificationTicket = ref<Ticket | null>(null);
 
@@ -406,20 +403,18 @@ const openTicketDetails = (ticket: Ticket) => {
     return;
   }
 
-  selectedTicket.value = ticket;
-  isModalOpen.value = true;
+  // Emit the viewTicket event with the ticket
+  emit('viewTicket', ticket);
 };
 
 const handleStartVerification = async (ticket: Ticket) => {
   try {
-    const ticketResponse = await ticketService.updateStatus(ticket.customId, {
+    await ticketService.updateStatus(ticket.customId, {
       status: DefaultTicketStatus.UnderVerification,
     });
 
-    selectedTicket.value = ticketResponse.data.ticketData;
-    isModalOpen.value = true;
-
-    await ticketsStore.fetchTicketDetails(ticket.customId);
+    // Emit viewTicket to navigate to URL
+    emit('viewTicket', ticket);
   } catch {
     toast.error('Erro ao iniciar verificação');
   }

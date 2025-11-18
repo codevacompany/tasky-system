@@ -1183,7 +1183,7 @@ const confirmPasswordReset = async () => {
 
   try {
     isResettingPassword.value = true;
-    const response = await userService.resetPassword(userToReset.value.id, newPassword.value);
+    const response = await userService.resetPassword(userToReset.value.uuid, newPassword.value);
     resetPasswordResult.value = response.data;
     toast.success('Senha redefinida com sucesso!');
   } catch (error: any) {

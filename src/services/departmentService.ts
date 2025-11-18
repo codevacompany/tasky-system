@@ -18,15 +18,15 @@ export const departmentService = {
     return apiClient.get<PaginatedResponse<Department>>('/departments', { params });
   },
 
-  async getById(id: number): Promise<AxiosResponse<Department>> {
-    return apiClient.get<Department>(`/departments/${id}`);
+  async getById(uuid: string): Promise<AxiosResponse<Department>> {
+    return apiClient.get<Department>(`/departments/${uuid}`);
   },
 
-  async update(id: number, data: UpdateDepartmentDto): Promise<AxiosResponse<Department>> {
-    return apiClient.patch<Department>(`/departments/${id}`, data);
+  async update(uuid: string, data: UpdateDepartmentDto): Promise<AxiosResponse<Department>> {
+    return apiClient.patch<Department>(`/departments/${uuid}`, data);
   },
 
-  async delete(id: number): Promise<AxiosResponse<void>> {
-    return apiClient.delete(`/departments/${id}`);
+  async delete(uuid: string): Promise<AxiosResponse<void>> {
+    return apiClient.delete(`/departments/${uuid}`);
   },
 };

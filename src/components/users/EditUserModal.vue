@@ -24,7 +24,7 @@
           type="text"
           placeholder="Digite o nome do colaborador"
           required
-          class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          padding="normal"
         />
       </div>
 
@@ -39,7 +39,7 @@
           v-model="userData.lastName"
           type="text"
           placeholder="Digite o sobrenome"
-          class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          padding="normal"
         />
       </div>
 
@@ -55,7 +55,7 @@
           type="email"
           placeholder="Digite o e-mail"
           required
-          class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          padding="normal"
         />
       </div>
 
@@ -65,33 +65,26 @@
           class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
           >Setor</label
         >
-        <select
-          id="setorColaborador"
-          v-model="userData.departmentId"
-          required
-          class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-        >
-          <option v-for="department in departments" :key="department.id" :value="department.id">
-            {{ department.name }}
-          </option>
-        </select>
+        <Select
+          :options="departmentOptions"
+          :modelValue="departmentValue"
+          @update:modelValue="updateDepartment"
+          placeholder="Selecione um setor"
+        />
       </div>
 
       <div class="col-span-1">
         <label
-          for="isAdminColaborador"
+          for="roleColaborador"
           class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
-          >Administrador</label
+          >Função</label
         >
-        <select
-          id="isAdminColaborador"
-          v-model="userData.isAdmin"
-          required
-          class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-        >
-          <option :value="false">Não</option>
-          <option :value="true">Sim</option>
-        </select>
+        <Select
+          :options="roleOptions"
+          :modelValue="roleValue"
+          @update:modelValue="updateRole"
+          placeholder="Selecione uma função"
+        />
       </div>
 
       <div class="col-span-1">
@@ -119,13 +112,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { departmentService } from '@/services/departmentService';
 import BaseModal from '../common/BaseModal.vue';
+import Select from '../common/Select.vue';
 import { userService } from '@/services/userService';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import Input from '../common/Input.vue';
+import { roleService } from '@/services/roleService';
 import type { User } from '@/models';
 
 const props = defineProps<{
@@ -141,11 +136,42 @@ const userData = ref({
   lastName: '',
   email: '',
   departmentId: null as number | null,
-  isAdmin: false,
+  roleId: null as number | null,
   isActive: true,
 });
 
 const departments = ref<{ id: number; name: string }[]>([]);
+const roles = ref<{ id: number; name: string }[]>([]);
+
+const departmentOptions = computed(() =>
+  departments.value.map((dept) => ({
+    value: dept.id.toString(),
+    label: dept.name,
+  })),
+);
+
+const roleOptions = computed(() =>
+  roles.value.map((role) => ({
+    value: role.id.toString(),
+    label: role.name,
+  })),
+);
+
+const departmentValue = computed(() => {
+  return userData.value.departmentId?.toString() || '';
+});
+
+const roleValue = computed(() => {
+  return userData.value.roleId?.toString() || '';
+});
+
+const updateDepartment = (value: string) => {
+  userData.value.departmentId = value ? parseInt(value) : null;
+};
+
+const updateRole = (value: string) => {
+  userData.value.roleId = value ? parseInt(value) : null;
+};
 
 const fetchDepartments = async () => {
   try {
@@ -156,6 +182,15 @@ const fetchDepartments = async () => {
   }
 };
 
+const fetchRoles = async () => {
+  try {
+    const response = await roleService.fetchAssignable({ limit: 100 });
+    roles.value = response.data.items;
+  } catch {
+    toast.error('Erro ao carregar funções.');
+  }
+};
+
 const initializeForm = () => {
   if (props.user) {
     userData.value = {
@@ -163,7 +198,7 @@ const initializeForm = () => {
       lastName: props.user.lastName,
       email: props.user.email,
       departmentId: props.user.department?.id || null,
-      isAdmin: props.user.role?.name === 'Administrador',
+      roleId: props.user.role?.id || null,
       isActive: props.user.isActive,
     };
   }
@@ -182,8 +217,12 @@ const updateUser = async () => {
         userData.value.departmentId === null || userData.value.departmentId === undefined
           ? undefined
           : userData.value.departmentId,
+      roleId:
+        userData.value.roleId === null || userData.value.roleId === undefined
+          ? undefined
+          : userData.value.roleId,
     };
-    await userService.update(props.user.id, payload);
+    await userService.update(props.user.uuid, payload);
     emit('userUpdated');
     toast.success('Colaborador atualizado com sucesso!');
     closeModal();
@@ -195,8 +234,8 @@ const updateUser = async () => {
   }
 };
 
-onMounted(() => {
-  fetchDepartments();
+onMounted(async () => {
+  await Promise.all([fetchDepartments(), fetchRoles()]);
   initializeForm();
 });
 
