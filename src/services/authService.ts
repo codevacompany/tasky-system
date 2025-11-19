@@ -53,4 +53,28 @@ export const authService = {
   async changePassword(data: ChangePasswordDto): Promise<AxiosResponse<{ message: string }>> {
     return apiClient.post<{ message: string }>('/auth/change-password', data);
   },
+
+  async requestPasswordReset(email: string): Promise<AxiosResponse<{ message: string }>> {
+    return apiClient.post<{ message: string }>('/auth/reset-password/request', { email });
+  },
+
+  async validateVerificationCode(data: {
+    email: string;
+    code: string;
+  }): Promise<AxiosResponse<{ verificationCode: any; token: string }>> {
+    return apiClient.post<{ verificationCode: any; token: string }>(
+      '/auth/reset-password/validate',
+      data,
+    );
+  },
+
+  async resetPasswordWithToken(
+    token: string,
+    newPassword: string,
+  ): Promise<AxiosResponse<{ message: string }>> {
+    return apiClient.post<{ message: string }>('/auth/reset-password', {
+      token,
+      newPassword,
+    });
+  },
 };

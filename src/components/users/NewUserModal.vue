@@ -76,22 +76,6 @@
 
       <div class="col-span-1">
         <label
-          for="senhaColaborador"
-          class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
-          >Senha</label
-        >
-        <Input
-          id="senhaColaborador"
-          v-model="userData.password"
-          type="password"
-          placeholder="Digite a senha"
-          required
-          class="px-[14px] text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-        />
-      </div>
-
-      <div class="col-span-1">
-        <label
           for="roleColaborador"
           class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
           >Função</label
@@ -126,7 +110,6 @@ const userData = ref<CreateUserDto>({
   firstName: '',
   lastName: '',
   email: '',
-  password: '',
   departmentId: null as number | null,
   roleId: null as number | null,
 });
@@ -187,7 +170,6 @@ const resetForm = () => {
     firstName: '',
     lastName: '',
     email: '',
-    password: '',
     departmentId: null,
     roleId: null,
   };

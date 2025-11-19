@@ -1,26 +1,24 @@
 <template>
-  <section id="ticketsSection" class="p-4 md:p-6">
-    <div class="mb-6">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Tickets</h1>
-        <button
-          class="flex items-center gap-2 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[13px] font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
-          @click="toggleView"
-          :title="
-            isKanbanView ? 'Mudar para visualização em tabela' : 'Mudar para visualização Kanban'
-          "
-        >
-          <font-awesome-icon :icon="isKanbanView ? 'table' : 'columns'" class="w-3 h-3" />
-          <span class="hidden sm:inline">{{
-            isKanbanView ? 'Visualização em Tabela' : 'Visualização Kanban'
-          }}</span>
-          <span class="sm:hidden">{{ isKanbanView ? 'Tabela' : 'Kanban' }}</span>
-        </button>
-      </div>
+  <section id="ticketsSection" class="px-4 pt-4 pb-4 md:px-6 md:pt-4 md:pb-0">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Tickets</h1>
+      <button
+        class="flex items-center gap-2 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[13px] font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
+        @click="toggleView"
+        :title="
+          isKanbanView ? 'Mudar para visualização em tabela' : 'Mudar para visualização Kanban'
+        "
+      >
+        <font-awesome-icon :icon="isKanbanView ? 'table' : 'columns'" class="w-3 h-3" />
+        <span class="hidden sm:inline">{{
+          isKanbanView ? 'Visualização em Tabela' : 'Visualização Kanban'
+        }}</span>
+        <span class="sm:hidden">{{ isKanbanView ? 'Tabela' : 'Kanban' }}</span>
+      </button>
     </div>
 
     <!-- Summary cards - moved to top, only visible in table view -->
-    <div v-if="!isKanbanView" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div v-if="!isKanbanView" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 mb-6">
       <div
         class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
         @click="setStatusFilter('')"
@@ -78,7 +76,7 @@
       </div>
     </div>
 
-    <div class="mt-6">
+    <div class="mt-5">
       <div class="min-h-[300px]">
         <!-- Table Container with integrated tabs and controls -->
         <div
@@ -182,7 +180,7 @@
           </div>
 
           <!-- Content Area -->
-          <div class="overflow-x-auto px-2 pt-1.5 pb-2">
+          <div class="overflow-x-auto px-2 pt-1.5 pb-1.5">
             <TicketTable
               v-if="!isKanbanView"
               :tickets="tickets"
