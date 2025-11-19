@@ -42,6 +42,21 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/pages/public/CompleteRegistration.vue'),
     meta: { requiresAuth: false },
   },
+  {
+    path: '/esqueci-senha',
+    component: () => import('@/pages/public/ResetPasswordRequestPage.vue'),
+    meta: { requiresAuth: false },
+  },
+  {
+    path: '/verificar-codigo',
+    component: () => import('@/pages/public/VerifyCodePage.vue'),
+    meta: { requiresAuth: false },
+  },
+  {
+    path: '/nova-senha',
+    component: () => import('@/pages/public/SetNewPasswordPage.vue'),
+    meta: { requiresAuth: false },
+  },
 
   // User Panel Routes
   {

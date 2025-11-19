@@ -21,7 +21,7 @@ export interface CreateUserDto {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
+  password?: string;
   departmentId: number | null;
   roleId: number | null;
 }

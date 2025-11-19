@@ -879,13 +879,27 @@
         <label for="dueDate" class="text-sm font-medium text-gray-700 dark:text-gray-300">
           Data de Conclusão:
         </label>
-        <input
-          type="datetime-local"
-          id="dueDate"
-          v-model="dueDateValue"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600"
-          required
-        />
+        <div class="w-full">
+          <DatePicker
+            :value="dueDateValue"
+            type="datetime"
+            format="DD/MM/YYYY HH:mm"
+            value-type="format"
+            :lang="pt"
+            :placeholder="'Selecione data e hora'"
+            :clearable="true"
+            :editable="false"
+            :disabled-date="disabledWeekendDate"
+            @change="handleDatePickerChange"
+            :input-class="'w-full px-[14px] py-2.5 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-800 dark:text-white bg-white dark:bg-gray-800'"
+            :placeholder-class="'text-gray-500 dark:text-gray-400'"
+            :time-picker-options="{
+              start: '00:00',
+              step: '00:15',
+              end: '23:45',
+            }"
+          />
+        </div>
       </div>
     </div>
     <template #footer>
@@ -939,6 +953,9 @@ import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import DepartmentUserSelector from '@/components/common/DepartmentUserSelector.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
+import DatePicker from 'vue-datepicker-next';
+import 'vue-datepicker-next/index.css';
+import pt from 'vue-datepicker-next/locale/pt-br.es';
 
 interface SpecialUpdateEvent {
   data?: {
@@ -2006,21 +2023,65 @@ const confirmReviewerSelection = async () => {
 };
 
 const showDueDateModal = ref(false);
-const dueDateValue = ref('');
+const dueDateValue = ref<string | null>(null);
+const dueDateDate = ref<Date | null>(null);
 const isDueDateModalLoading = ref(false);
+
+const disabledWeekendDate = (date: Date): boolean => {
+  const dayOfWeek = date.getDay();
+  return dayOfWeek === 0 || dayOfWeek === 6;
+};
+
+const parseDateTime = (dateString: string): Date | null => {
+  if (!dateString) return null;
+  try {
+    const [datePart, timePart] = dateString.split(' ');
+    const [day, month, year] = datePart.split('/');
+    const [hours, minutes] = timePart.split(':');
+    return new Date(
+      parseInt(year),
+      parseInt(month) - 1,
+      parseInt(day),
+      parseInt(hours),
+      parseInt(minutes),
+    );
+  } catch {
+    return null;
+  }
+};
+
+const handleDatePickerChange = (value: any) => {
+  if (value) {
+    dueDateValue.value = value;
+    dueDateDate.value = parseDateTime(value);
+  } else {
+    dueDateValue.value = null;
+    dueDateDate.value = null;
+  }
+};
 
 const confirmDueDate = async () => {
   if (!dueDateValue.value || !loadedTicket.value) return;
 
   isDueDateModalLoading.value = true;
   try {
-    await ticketService.update(loadedTicket.value.customId, { dueAt: dueDateValue.value });
+    // Convert the formatted date string to ISO string for the API
+    const dueAtISO = dueDateDate.value ? dueDateDate.value.toISOString() : null;
+
+    if (!dueAtISO) {
+      toast.error('Data inválida');
+      isDueDateModalLoading.value = false;
+      return;
+    }
+
+    await ticketService.update(loadedTicket.value.customId, { dueAt: dueAtISO });
 
     await ticketService.accept(loadedTicket.value.customId);
 
     toast.success('Prazo definido e ticket aceito com sucesso');
     showDueDateModal.value = false;
-    dueDateValue.value = '';
+    dueDateValue.value = null;
+    dueDateDate.value = null;
     refreshSelectedTicket();
   } catch {
     toast.error('Erro ao definir prazo e aceitar ticket');
@@ -2031,6 +2092,15 @@ const confirmDueDate = async () => {
 </script>
 
 <style scoped>
+/* Ensure DatePicker takes full width */
+:deep(.mx-datepicker) {
+  width: 100%;
+}
+
+:deep(.mx-input-wrapper) {
+  width: 100%;
+}
+
 /* Quill Editor specific styles */
 :deep(.ql-container) {
   border: none !important;
