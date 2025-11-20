@@ -76,6 +76,12 @@
                 <font-awesome-icon icon="comment" />
                 <span class="text-xs min-w-2">{{ ticket.comments?.length || 0 }}</span>
               </div>
+              <font-awesome-icon
+                v-if="ticket.isPrivate"
+                icon="lock"
+                class="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0"
+                title="Ticket Privado"
+              />
               <div
                 v-if="(ticket.files?.length || 0) > 0"
                 class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 opacity-80"

@@ -283,15 +283,15 @@
     </div>
 
     <div
-      class="hidden lg:flex flex-1 lg:flex-2 bg-blue-50 flex items-center justify-center p-6 lg:p-12 order-first lg:order-last min-h-64 lg:min-h-screen"
+      class="hidden lg:flex flex-1 lg:flex-2 primary-gradient flex items-center justify-center p-6 lg:p-12 order-first lg:order-last min-h-64 lg:min-h-screen"
     >
       <div class="text-center max-w-lg">
-        <h2 class="text-xl lg:text-3xl font-bold text-gray-900 mb-3 lg:mb-4">
+        <h2 class="text-xl lg:text-3xl font-bold text-white mb-3 lg:mb-4">
           Transforme a gestão da sua empresa
         </h2>
-        <p class="text-sm lg:text-lg text-gray-600 mb-6 lg:mb-8">
+        <p class="text-sm lg:text-lg text-white mb-6 lg:mb-8">
           Organize tarefas, otimize processos e aumente a produtividade da sua equipe com o Tasky
-          System.
+          Pro.
         </p>
         <div class="flex justify-center">
           <img

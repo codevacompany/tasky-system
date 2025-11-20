@@ -130,10 +130,8 @@ export const useFiltersStore = defineStore('filters', {
 
       if (currentSortBy === sortKey) {
         if (currentSortDirection === 'asc') {
-          // From asc to desc
           this.applyFilters({ sortBy: sortKey, sortOrder: 'desc' });
         } else if (currentSortDirection === 'desc') {
-          // From desc to none (clear sort)
           this.clearFilter('sortBy');
           this.clearFilter('sortOrder');
         }

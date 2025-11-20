@@ -169,11 +169,17 @@
                   />
                 </div>
                 <button
-                  class="flex items-center gap-2 px-4 py-2 border border-inputBorder dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
+                  class="relative flex items-center gap-2 px-4 py-2 border border-inputBorder dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
                   @click="showFiltersModal = true"
                 >
                   <font-awesome-icon icon="sliders" class="w-3.5 h-3.5" />
                   Filtros
+                  <span
+                    v-if="activeFiltersCount > 0"
+                    class="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-blue-600 text-white text-xs font-semibold rounded-full"
+                  >
+                    {{ activeFiltersCount }}
+                  </span>
                 </button>
               </div>
             </div>
