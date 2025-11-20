@@ -1,492 +1,393 @@
 <template>
   <div>
-    <div class="overflow-x-auto">
-      <table class="w-full border-collapse min-w-[1000px]">
-        <thead>
-          <tr>
-            <th
-              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
-            >
-              ID
-            </th>
-            <th
-              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
-            >
-              Título
-            </th>
-            <th
-              v-if="tableType === 'criados'"
-              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
-            >
-              Destino
-            </th>
-            <th
-              v-else
-              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
-            >
-              Solicitante
-            </th>
-            <th
-              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
-            >
-              Setor
-            </th>
-            <th
-              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
-            >
-              Prioridade
-            </th>
-            <th
-              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
-            >
-              Status
-            </th>
-            <th
-              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
-            >
-              Prazo
-            </th>
-            <th
-              class="px-4 py-3 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
-            >
-              Ações
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="isLoading">
-            <td colspan="8" class="px-3 md:px-4 py-6 md:py-8 text-center">
-              <div class="flex justify-center items-center">
-                <LoadingSpinner :size="28" />
-              </div>
-            </td>
-          </tr>
-          <tr v-else-if="!displayedTickets || displayedTickets.length === 0">
-            <td
-              colspan="8"
-              class="px-3 md:px-4 py-6 md:py-8 text-center text-gray-500 dark:text-gray-400"
-            >
-              <p>Nenhum ticket encontrado</p>
-            </td>
-          </tr>
-          <tr
-            v-for="ticket in displayedTickets"
-            :key="ticket.customId"
-            @click="openTicketDetails(ticket)"
-            class="hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200"
-          >
-            <td
-              class="px-4 py-3 text-sm text-center text-blue-600 dark:text-blue-400 border-b border-gray-200 dark:border-gray-700 whitespace-nowrap"
-            >
-              {{ ticket.customId }}
-            </td>
-            <td
-              class="pl-4 pr-1 py-3 text-sm text-left text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
-            >
-              <div class="truncate max-w-[550px]" :title="ticket.name">
-                {{ ticket.name }}
-              </div>
-              <font-awesome-icon
-                v-if="ticket.isPrivate"
-                icon="lock"
-                class="ml-2 text-gray-500 dark:text-gray-400 text-xs"
-                title="Ticket Privado"
-              />
-            </td>
-            <td
-              v-if="tableType === 'criados'"
-              class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
-            >
-              <div>
-                <div v-if="ticket.targetUsers && ticket.targetUsers.length > 0" class="space-y-1">
-                  <div
-                    v-for="targetUser in ticket.targetUsers"
-                    :key="targetUser.userId"
-                    :class="[
-                      ticket.targetUsers.length > 1 &&
-                      targetUser.userId === ticket.currentTargetUserId
-                        ? 'text-blue-600 dark:text-blue-400'
-                        : 'text-gray-900 dark:text-gray-100',
-                    ]"
-                  >
-                    {{ targetUser.user.firstName }} {{ targetUser.user.lastName }}
-                  </div>
-                  <div
-                    v-if="ticket.targetUsers.some((tu) => tu.user && !tu.user.isActive)"
-                    class="flex items-center justify-center gap-1 mt-1"
-                  >
-                    <font-awesome-icon
-                      icon="exclamation-triangle"
-                      class="text-orange-500 text-xs"
-                      title="Conta desativada"
-                    />
-                    <span class="text-orange-500 text-xs font-medium">Desativado</span>
-                  </div>
-                </div>
-                <div v-else>-</div>
-              </div>
-            </td>
-            <td
-              v-else
-              class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
-            >
-              <div>{{ ticket.requester.firstName }} {{ ticket.requester.lastName }}</div>
-            </td>
-            <td
-              class="px-4 py-3 text-sm text-center text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
-            >
-              <div>
-                <div v-if="ticket.targetUsers && ticket.targetUsers.length > 0" class="space-y-1">
-                  <div
-                    v-for="targetUser in ticket.targetUsers"
-                    :key="targetUser.userId"
-                    :class="[
-                      ticket.targetUsers.length > 1 &&
-                      targetUser.userId === ticket.currentTargetUserId
-                        ? 'text-blue-600 dark:text-blue-400'
-                        : 'text-gray-900 dark:text-gray-100',
-                    ]"
-                  >
-                    {{ targetUser.user.department?.name || '-' }}
-                  </div>
-                </div>
-                <div
-                  v-else
-                  class="truncate"
-                  :title="ticket.targetUsers?.[0]?.user?.department?.name || '-'"
-                >
-                  {{ ticket.targetUsers?.[0]?.user?.department?.name || '-' }}
-                </div>
-              </div>
-            </td>
-            <td
-              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700"
-            >
-              <div class="flex items-center justify-center gap-1 md:gap-2">
-                <span
-                  :class="[
-                    'font-bold tracking-tight text-xs md:text-sm',
-                    ticket.priority === TicketPriority.Low
-                      ? 'text-green-600 dark:text-green-400'
-                      : ticket.priority === TicketPriority.Medium
-                        ? 'text-orange-500 dark:text-orange-400'
-                        : 'text-red-600 dark:text-red-400',
-                  ]"
-                >
-                  {{ getPriorityBars(ticket.priority) }}
-                </span>
-                <span class="text-xs text-gray-500 dark:text-gray-400 hidden md:inline">{{
-                  formatSnakeToNaturalCase(ticket.priority)
-                }}</span>
-              </div>
-            </td>
-            <td
-              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700"
-            >
-              <span
+    <DataTable
+      :data="displayedTickets"
+      :headers="tableHeaders"
+      :isLoading="isLoading"
+      :pagination="paginationInfo"
+      :clickable="true"
+      rowKey="customId"
+      minWidth="1000px"
+      :showActions="true"
+      @rowClick="openTicketDetails"
+      @pageChange="changePage"
+      @sort="handleSort"
+    >
+      <template #column-customId="{ value }">
+        <span
+          class="text-sm text-center text-blue-600 dark:text-blue-400 font-medium whitespace-nowrap"
+        >
+          {{ value }}
+        </span>
+      </template>
+
+      <template #column-name="{ item }">
+        <div class="text-left flex items-center gap-2">
+          <div class="truncate max-w-[550px]" :title="item.name">
+            {{ item.name }}
+          </div>
+          <font-awesome-icon
+            v-if="item.isPrivate"
+            icon="lock"
+            class="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0"
+            title="Ticket Privado"
+          />
+        </div>
+      </template>
+
+      <template #column-person="{ item }">
+        <div class="text-sm text-gray-900 dark:text-gray-100">
+          <template v-if="tableType === 'criados'">
+            <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
+              <div
+                v-for="targetUser in item.targetUsers"
+                :key="targetUser.userId"
                 :class="[
-                  'inline-flex items-center px-1.5 md:px-2 py-0.5 md:py-1 rounded-full text-xs font-medium gap-1 md:gap-2',
-                  getStatusClass(getTicketStatus(ticket)),
+                  item.targetUsers.length > 1 && targetUser.userId === item.currentTargetUserId
+                    ? 'text-blue-600 dark:text-blue-400'
+                    : 'text-gray-900 dark:text-gray-100',
                 ]"
               >
-                <span class="hidden md:inline">{{
-                  formatSnakeToNaturalCase(getTicketStatus(ticket))
-                }}</span>
-                <span class="md:hidden">{{
-                  formatSnakeToNaturalCase(getTicketStatus(ticket)).substring(0, 3)
-                }}</span>
-              </span>
-            </td>
-            <td
+                {{ targetUser.user.firstName }} {{ targetUser.user.lastName }}
+              </div>
+              <div
+                v-if="item.targetUsers.some((tu) => tu.user && !tu.user.isActive)"
+                class="flex items-center justify-center gap-1 mt-1"
+              >
+                <font-awesome-icon
+                  icon="exclamation-triangle"
+                  class="text-orange-500 text-xs"
+                  title="Conta desativada"
+                />
+                <span class="text-orange-500 text-xs font-medium">Desativado</span>
+              </div>
+            </div>
+            <div v-else>-</div>
+          </template>
+          <template v-else> {{ item.requester.firstName }} {{ item.requester.lastName }} </template>
+        </div>
+      </template>
+
+      <template #column-department="{ item }">
+        <div class="text-sm text-gray-900 dark:text-gray-100">
+          <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
+            <div
+              v-for="targetUser in item.targetUsers"
+              :key="targetUser.userId"
               :class="[
-                'px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700',
-                !ticket.dueAt || !calculateDeadline(ticket) || calculateDeadline(ticket) === ''
-                  ? 'text-gray-900 dark:text-gray-100'
-                  : getDeadlineClass(ticket.dueAt),
+                item.targetUsers.length > 1 && targetUser.userId === item.currentTargetUserId
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-gray-900 dark:text-gray-100',
               ]"
             >
-              <div class="whitespace-nowrap">
-                <template v-if="ticket.dueAt">
-                  <span class="flex items-center gap-2 justify-center">
-                    <template v-if="calculateDeadline(ticket) && calculateDeadline(ticket) !== ''">
-                      <span
-                        v-if="!isDeadlineOverdue(ticket.dueAt)"
-                        :class="getDeadlineDotClass(ticket.dueAt)"
-                        class="inline-block w-[9px] h-[9px] rounded-full"
-                      ></span>
-                      <font-awesome-icon
-                        v-else
-                        icon="exclamation-triangle"
-                        class="text-red-500 text-xs"
-                      />
-                    </template>
-                    {{ calculateDeadline(ticket) || '-' }}
-                  </span>
+              {{ targetUser.user.department?.name || '-' }}
+            </div>
+          </div>
+          <div
+            v-else
+            class="truncate"
+            :title="item.targetUsers?.[0]?.user?.department?.name || '-'"
+          >
+            {{ item.targetUsers?.[0]?.user?.department?.name || '-' }}
+          </div>
+        </div>
+      </template>
+
+      <template #column-priority="{ item }">
+        <div class="flex items-center justify-center gap-2">
+          <span
+            :class="[
+              'font-bold tracking-tight text-xs md:text-sm',
+              item.priority === TicketPriority.Low
+                ? 'text-green-600 dark:text-green-400'
+                : item.priority === TicketPriority.Medium
+                  ? 'text-orange-500 dark:text-orange-400'
+                  : 'text-red-600 dark:text-red-400',
+            ]"
+          >
+            {{ getPriorityBars(item.priority) }}
+          </span>
+          <span class="text-xs text-gray-500 dark:text-gray-400 hidden md:inline">{{
+            formatSnakeToNaturalCase(item.priority)
+          }}</span>
+        </div>
+      </template>
+
+      <template #column-status="{ item }">
+        <span
+          :class="[
+            'inline-flex items-center px-1.5 md:px-2 py-0.5 md:py-1 rounded-full text-xs font-medium gap-1 md:gap-2',
+            getStatusClass(getTicketStatus(item)),
+          ]"
+        >
+          <span class="hidden md:inline">{{
+            formatSnakeToNaturalCase(getTicketStatus(item))
+          }}</span>
+          <span class="md:hidden">{{
+            formatSnakeToNaturalCase(getTicketStatus(item)).substring(0, 3)
+          }}</span>
+        </span>
+      </template>
+
+      <template #column-dueDate="{ item }">
+        <div
+          :class="[
+            'text-xs md:text-sm text-center',
+            !item.dueAt || !calculateDeadline(item) || calculateDeadline(item) === ''
+              ? 'text-gray-900 dark:text-gray-100'
+              : getDeadlineClass(item.dueAt),
+          ]"
+        >
+          <div class="whitespace-nowrap">
+            <template v-if="item.dueAt">
+              <span class="flex items-center gap-2 justify-center">
+                <template v-if="calculateDeadline(item) && calculateDeadline(item) !== ''">
+                  <span
+                    v-if="!isDeadlineOverdue(item.dueAt)"
+                    :class="getDeadlineDotClass(item.dueAt)"
+                    class="inline-block w-[9px] h-[9px] rounded-full"
+                  ></span>
+                  <font-awesome-icon icon="exclamation-triangle" class="text-red-500 text-xs" />
                 </template>
-                <template v-else>
-                  {{ calculateDeadline(ticket) || '-' }}
-                </template>
-              </div>
-            </td>
-            <td
-              class="px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-center border-b border-gray-200 dark:border-gray-700"
+                {{ calculateDeadline(item) || '-' }}
+              </span>
+            </template>
+            <template v-else>
+              {{ calculateDeadline(item) || '-' }}
+            </template>
+          </div>
+        </div>
+      </template>
+
+      <template #actions="{ item }">
+        <div class="flex gap-0.5 md:gap-1 justify-center">
+          <template v-if="tableType === 'recebidos'">
+            <button
+              v-if="getTicketStatus(item) === DefaultTicketStatus.Pending"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors duration-200"
+              @click.stop="handleAcceptTicket(item)"
+              title="Aceitar"
             >
-              <div class="flex gap-0.5 md:gap-1 justify-center">
-                <!-- Botões para tabela de tickets recebidos -->
-                <template v-if="tableType === 'recebidos'">
-                  <button
-                    v-if="getTicketStatus(ticket) === DefaultTicketStatus.Pending"
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors duration-200"
-                    @click.stop="handleAcceptTicket(ticket)"
-                    title="Aceitar"
-                  >
-                    <font-awesome-icon icon="check" class="text-xs md:text-sm" />
-                  </button>
-                  <button
-                    v-else-if="
-                      getTicketStatus(ticket) === DefaultTicketStatus.InProgress &&
-                      !isLastTargetUser(ticket)
-                    "
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
-                    @click.stop="handleSendToNextDepartment(ticket)"
-                    title="Enviar para Próximo Setor"
-                  >
-                    <font-awesome-icon icon="arrow-right" class="text-xs md:text-sm" />
-                  </button>
-                  <button
-                    v-else-if="
-                      getTicketStatus(ticket) === DefaultTicketStatus.InProgress &&
-                      isLastTargetUser(ticket)
-                    "
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duration-200"
-                    @click.stop="handleVerifyTicket(ticket)"
-                    title="Enviar para Verificação"
-                  >
-                    <font-awesome-icon icon="arrow-right" class="text-xs md:text-sm" />
-                  </button>
-                  <button
-                    v-else-if="getTicketStatus(ticket) === DefaultTicketStatus.Returned"
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 hover:bg-orange-600 text-white transition-colors duration-200"
-                    @click.stop="handleCorrectTicket(ticket)"
-                    title="Corrigir"
-                  >
-                    <font-awesome-icon icon="wrench" class="text-xs md:text-sm" />
-                  </button>
-                  <button
-                    v-else-if="
-                      getTicketStatus(ticket) === DefaultTicketStatus.AwaitingVerification &&
-                      isReviewer(ticket)
-                    "
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duration-200"
-                    @click.stop="handleStartVerification(ticket)"
-                    title="Iniciar Verificação"
-                  >
-                    <font-awesome-icon icon="search" class="text-xs md:text-sm" />
-                  </button>
-                  <div
-                    v-else-if="getTicketStatus(ticket) === DefaultTicketStatus.AwaitingVerification"
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 text-white"
-                    title="Aguardando Verificação"
-                  >
-                    <font-awesome-icon icon="hourglass-half" spin class="text-xs md:text-sm" />
-                  </div>
-                  <div
-                    v-else-if="getTicketStatus(ticket) === DefaultTicketStatus.Rejected"
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 text-white"
-                    title="Reprovado"
-                  >
-                    <font-awesome-icon icon="xmark-circle" class="text-xs md:text-sm" />
-                  </div>
-                  <div
-                    v-else-if="getTicketStatus(ticket) === DefaultTicketStatus.Completed"
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-700 text-white"
-                    title="Finalizado"
-                  >
-                    <font-awesome-icon icon="check-circle" class="text-xs md:text-sm" />
-                  </div>
-                  <div
-                    v-if="
-                      isReviewer(ticket) &&
-                      getTicketStatus(ticket) === DefaultTicketStatus.UnderVerification
-                    "
-                    class="flex gap-0.5 md:gap-1"
-                  >
-                    <button
-                      class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white transition-colors duration-200"
-                      @click.stop="handleApproveTicket(ticket)"
-                      title="Aprovar"
-                    >
-                      <font-awesome-icon icon="check" class="text-xs md:text-sm" />
-                    </button>
-                    <button
-                      class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duration-200"
-                      @click.stop="handleRequestCorrection(ticket)"
-                      title="Solicitar Correção"
-                    >
-                      <font-awesome-icon icon="exclamation-circle" class="text-xs md:text-sm" />
-                    </button>
-                    <button
-                      class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
-                      @click.stop="handleRejectTicket(ticket)"
-                      title="Reprovar"
-                    >
-                      <font-awesome-icon icon="times" class="text-xs md:text-sm" />
-                    </button>
-                  </div>
-                </template>
+              <font-awesome-icon icon="check" class="text-xs md:text-sm" />
+            </button>
+            <button
+              v-else-if="
+                getTicketStatus(item) === DefaultTicketStatus.InProgress && !isLastTargetUser(item)
+              "
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors duração-200"
+              @click.stop="handleSendToNextDepartment(item)"
+              title="Enviar para Próximo Setor"
+            >
+              <font-awesome-icon icon="arrow-right" class="text-xs md:text-sm" />
+            </button>
+            <button
+              v-else-if="
+                getTicketStatus(item) === DefaultTicketStatus.InProgress && isLastTargetUser(item)
+              "
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duração-200"
+              @click.stop="handleVerifyTicket(item)"
+              title="Enviar para Verificação"
+            >
+              <font-awesome-icon icon="arrow-right" class="text-xs md:text-sm" />
+            </button>
+            <button
+              v-else-if="getTicketStatus(item) === DefaultTicketStatus.Returned"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 hover:bg-orange-600 text-white transition-colors duração-200"
+              @click.stop="handleCorrectTicket(item)"
+              title="Corrigir"
+            >
+              <font-awesome-icon icon="wrench" class="text-xs md:text-sm" />
+            </button>
+            <button
+              v-else-if="
+                getTicketStatus(item) === DefaultTicketStatus.AwaitingVerification &&
+                isReviewer(item)
+              "
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duração-200"
+              @click.stop="handleStartVerification(item)"
+              title="Iniciar Verificação"
+            >
+              <font-awesome-icon icon="search" class="text-xs md:text-sm" />
+            </button>
+            <div
+              v-else-if="getTicketStatus(item) === DefaultTicketStatus.AwaitingVerification"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 text-white"
+              title="Aguardando Verificação"
+            >
+              <font-awesome-icon icon="hourglass-half" spin class="text-xs md:text-sm" />
+            </div>
+            <div
+              v-else-if="getTicketStatus(item) === DefaultTicketStatus.Rejected"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 text-white"
+              title="Reprovado"
+            >
+              <font-awesome-icon icon="xmark-circle" class="text-xs md:text-sm" />
+            </div>
+            <div
+              v-else-if="getTicketStatus(item) === DefaultTicketStatus.Completed"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-700 text-white"
+              title="Finalizado"
+            >
+              <font-awesome-icon icon="check-circle" class="text-xs md:text-sm" />
+            </div>
+            <div
+              v-if="
+                isReviewer(item) && getTicketStatus(item) === DefaultTicketStatus.UnderVerification
+              "
+              class="flex gap-0.5 md:gap-1"
+            >
+              <button
+                class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white transition-colors duração-200"
+                @click.stop="handleApproveTicket(item)"
+                title="Aprovar"
+              >
+                <font-awesome-icon icon="check" class="text-xs md:text-sm" />
+              </button>
+              <button
+                class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duração-200"
+                @click.stop="handleRequestCorrection(item)"
+                title="Solicitar Correção"
+              >
+                <font-awesome-icon icon="exclamation-circle" class="text-xs md:text-sm" />
+              </button>
+              <button
+                class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 hover:bg-red-700 text-white transition-colors duração-200"
+                @click.stop="handleRejectTicket(item)"
+                title="Reprovar"
+              >
+                <font-awesome-icon icon="times" class="text-xs md:text-sm" />
+              </button>
+            </div>
+          </template>
 
-                <!-- Botões para tabela de tickets criados -->
-                <template v-else-if="tableType === 'criados'">
-                  <div
-                    v-if="
-                      getTicketStatus(ticket) === DefaultTicketStatus.Pending &&
-                      isSelfAssigned(ticket)
-                    "
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200"
-                    @click.stop="handleStartTicket(ticket)"
-                    title="Iniciar"
-                  >
-                    <font-awesome-icon icon="play" class="text-xs md:text-sm" />
-                  </div>
-                  <button
-                    v-else-if="getTicketStatus(ticket) === DefaultTicketStatus.Pending"
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 text-white"
-                    title="Não Iniciado"
-                  >
-                    <font-awesome-icon icon="clock" class="text-xs md:text-sm" />
-                  </button>
-                  <div
-                    v-else-if="getTicketStatus(ticket) === DefaultTicketStatus.InProgress"
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 text-white"
-                    title="Fazendo"
-                  >
-                    <font-awesome-icon icon="cog" class="text-xs md:text-sm" />
-                  </div>
-                  <div
-                    v-else-if="getTicketStatus(ticket) === DefaultTicketStatus.Returned"
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 text-white"
-                    title="Devolvido para Correção"
-                  >
-                    <font-awesome-icon icon="wrench" class="text-xs md:text-sm" />
-                  </div>
-                  <div
-                    v-else-if="getTicketStatus(ticket) === DefaultTicketStatus.Rejected"
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 text-white"
-                    title="Reprovado"
-                  >
-                    <font-awesome-icon icon="xmark-circle" class="text-xs md:text-sm" />
-                  </div>
-                  <div
-                    v-else-if="getTicketStatus(ticket) === DefaultTicketStatus.Completed"
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-700 text-white"
-                    title="Finalizado"
-                  >
-                    <font-awesome-icon icon="check-circle" class="text-xs md:text-sm" />
-                  </div>
-                  <button
-                    v-else-if="getTicketStatus(ticket) === DefaultTicketStatus.AwaitingVerification"
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duration-200"
-                    @click.stop="handleStartVerification(ticket)"
-                    title="Verificar"
-                  >
-                    <font-awesome-icon icon="search" class="text-xs md:text-sm" />
-                  </button>
-                  <div
-                    v-if="
-                      isReviewer(ticket) &&
-                      getTicketStatus(ticket) === DefaultTicketStatus.UnderVerification
-                    "
-                    class="flex gap-0.5 md:gap-1"
-                  >
-                    <button
-                      class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white transition-colors duration-200"
-                      @click.stop="handleApproveTicket(ticket)"
-                      title="Aprovar"
-                    >
-                      <font-awesome-icon icon="check" class="text-xs md:text-sm" />
-                    </button>
-                    <button
-                      class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duration-200"
-                      @click.stop="handleRequestCorrection(ticket)"
-                      title="Solicitar Correção"
-                    >
-                      <font-awesome-icon icon="exclamation-circle" class="text-xs md:text-sm" />
-                    </button>
-                    <button
-                      class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
-                      @click.stop="handleRejectTicket(ticket)"
-                      title="Reprovar"
-                    >
-                      <font-awesome-icon icon="times" class="text-xs md:text-sm" />
-                    </button>
-                  </div>
-                </template>
+          <template v-else-if="tableType === 'criados'">
+            <div
+              v-if="getTicketStatus(item) === DefaultTicketStatus.Pending && isSelfAssigned(item)"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors duração-200"
+              @click.stop="handleStartTicket(item)"
+              title="Iniciar"
+            >
+              <font-awesome-icon icon="play" class="text-xs md:text-sm" />
+            </div>
+            <button
+              v-else-if="getTicketStatus(item) === DefaultTicketStatus.Pending"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 text-white"
+              title="Não Iniciado"
+            >
+              <font-awesome-icon icon="clock" class="text-xs md:text-sm" />
+            </button>
+            <div
+              v-else-if="getTicketStatus(item) === DefaultTicketStatus.InProgress"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 text-white"
+              title="Fazendo"
+            >
+              <font-awesome-icon icon="cog" class="text-xs md:text-sm" />
+            </div>
+            <div
+              v-else-if="getTicketStatus(item) === DefaultTicketStatus.Returned"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 text-white"
+              title="Devolvido para Correção"
+            >
+              <font-awesome-icon icon="wrench" class="text-xs md:text-sm" />
+            </div>
+            <div
+              v-else-if="getTicketStatus(item) === DefaultTicketStatus.Rejected"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 text-white"
+              title="Reprovado"
+            >
+              <font-awesome-icon icon="xmark-circle" class="text-xs md:text-sm" />
+            </div>
+            <div
+              v-else-if="getTicketStatus(item) === DefaultTicketStatus.Completed"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-700 text-white"
+              title="Finalizado"
+            >
+              <font-awesome-icon icon="check-circle" class="text-xs md:text-sm" />
+            </div>
+            <button
+              v-else-if="getTicketStatus(item) === DefaultTicketStatus.AwaitingVerification"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duração-200"
+              @click.stop="handleStartVerification(item)"
+              title="Verificar"
+            >
+              <font-awesome-icon icon="search" class="text-xs md:text-sm" />
+            </button>
+            <div
+              v-if="
+                isReviewer(item) && getTicketStatus(item) === DefaultTicketStatus.UnderVerification
+              "
+              class="flex gap-0.5 md:gap-1"
+            >
+              <button
+                class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white transition-colors duração-200"
+                @click.stop="handleApproveTicket(item)"
+                title="Aprovar"
+              >
+                <font-awesome-icon icon="check" class="text-xs md:text-sm" />
+              </button>
+              <button
+                class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duração-200"
+                @click.stop="handleRequestCorrection(item)"
+                title="Solicitar Correção"
+              >
+                <font-awesome-icon icon="exclamation-circle" class="text-xs md:text-sm" />
+              </button>
+              <button
+                class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 hover:bg-red-700 text-white transition-colors duração-200"
+                @click.stop="handleRejectTicket(item)"
+                title="Reprovar"
+              >
+                <font-awesome-icon icon="times" class="text-xs md:text-sm" />
+              </button>
+            </div>
+          </template>
 
-                <!-- Botões para tabela de tickets arquivados -->
-                <template v-else-if="tableType === 'arquivados'">
-                  <div
-                    v-if="getTicketStatus(ticket) === DefaultTicketStatus.Completed"
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-700 text-white"
-                    title="Finalizado"
-                  >
-                    <font-awesome-icon icon="check-circle" class="text-xs md:text-sm" />
-                  </div>
-                  <div
-                    v-else-if="getTicketStatus(ticket) === DefaultTicketStatus.Rejected"
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 text-white"
-                    title="Reprovado"
-                  >
-                    <font-awesome-icon icon="xmark-circle" class="text-xs md:text-sm" />
-                  </div>
-                </template>
+          <template v-else-if="tableType === 'arquivados'">
+            <div
+              v-if="getTicketStatus(item) === DefaultTicketStatus.Completed"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-700 text-white"
+              title="Finalizado"
+            >
+              <font-awesome-icon icon="check-circle" class="text-xs md:text-sm" />
+            </div>
+            <div
+              v-else-if="getTicketStatus(item) === DefaultTicketStatus.Rejected"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 text-white"
+              title="Reprovado"
+            >
+              <font-awesome-icon icon="xmark-circle" class="text-xs md:text-sm" />
+            </div>
+          </template>
 
-                <!-- Botões para tabela de tickets do setor -->
-                <template v-else-if="tableType === 'setor'">
-                  <button
-                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white transition-colors duration-200"
-                    @click.stop="openTicketDetails(ticket)"
-                    title="Visualizar"
-                  >
-                    <font-awesome-icon icon="eye" class="text-xs md:text-sm" />
-                  </button>
-                </template>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div v-if="pagination" class="mt-5 flex items-center justify-between px-6 py-1">
-      <span class="text-sm text-gray-600 dark:text-gray-400"
-        >Página {{ currentPage }} de {{ totalPages }}</span
-      >
+          <template v-else-if="tableType === 'setor'">
+            <button
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white transition-colors duração-200"
+              @click.stop="openTicketDetails(item)"
+              title="Visualizar"
+            >
+              <font-awesome-icon icon="eye" class="text-xs md:text-sm" />
+            </button>
+          </template>
+        </div>
+      </template>
 
-      <div class="flex items-center gap-2">
-        <button
-          class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-gray-800"
-          :disabled="currentPage === 1"
-          @click="changePage(currentPage - 1)"
-        >
-          Anterior
-        </button>
-
-        <button
-          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md hover:bg-blue-700 transition-colors"
-          disabled
-        >
-          {{ currentPage }}
-        </button>
-
-        <button
-          class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-gray-800"
-          :disabled="currentPage === totalPages"
-          @click="changePage(currentPage + 1)"
-        >
-          Próximo
-        </button>
-      </div>
-    </div>
-
+      <template #empty>
+        <div class="p-4 text-center">
+          <div class="flex flex-col items-center justify-center gap-3">
+            <div
+              class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center"
+            >
+              <font-awesome-icon icon="inbox" class="text-2xl text-gray-400 dark:text-gray-500" />
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-300 m-0">
+                Nenhum ticket encontrado
+              </p>
+            </div>
+          </div>
+        </div>
+      </template>
+    </DataTable>
     <ConfirmationModal
       v-if="confirmationModal.isOpen"
       :title="confirmationModal.title"
@@ -591,8 +492,10 @@ import { formatDate, getBusinessDayDifference } from '@/utils/date';
 import { toast } from 'vue3-toastify';
 import ConfirmationModal from '../common/ConfirmationModal.vue';
 import { useUserStore } from '@/stores/user';
-import { useTicketsStore } from '@/stores/tickets';
+import { useTicketsStore, type TicketListFilters } from '@/stores/tickets';
 import BaseModal from '../common/BaseModal.vue';
+import DataTable from '../common/DataTable.vue';
+import type { TableHeader, PaginationInfo } from '../common/DataTable.vue';
 import {
   calculateDeadline,
   formatSnakeToNaturalCase,
@@ -606,10 +509,91 @@ const props = defineProps<{
   currentPage: number;
 }>();
 
-const emit = defineEmits(['changePage', 'viewTicket']);
+const emit = defineEmits<{
+  (e: 'changePage', page: number): void;
+  (e: 'viewTicket', ticket: Ticket): void;
+}>();
 
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
+
+type SortKey = 'customId' | 'name';
+type SortDirection = 'asc' | 'desc';
+type SortState = { key: SortKey; direction: SortDirection };
+
+const activeFilters = computed<TicketListFilters | undefined>(() => {
+  switch (props.tableType) {
+    case 'recebidos':
+      return ticketsStore.receivedTickets.currentFilters;
+    case 'criados':
+      return ticketsStore.myTickets.currentFilters;
+    case 'setor':
+      return ticketsStore.departmentTickets.currentFilters;
+    case 'arquivados':
+      return ticketsStore.archivedTickets.currentFilters;
+    default:
+      return undefined;
+  }
+});
+
+const extractSortState = (filters?: TicketListFilters | null): SortState | null => {
+  const sortBy = filters?.sortBy;
+  const sortOrder = filters?.sortOrder;
+  if (
+    (sortBy === 'customId' || sortBy === 'name') &&
+    (sortOrder === 'asc' || sortOrder === 'desc')
+  ) {
+    return { key: sortBy, direction: sortOrder };
+  }
+  return null;
+};
+
+const sortState = ref<SortState | null>(null);
+
+watch(
+  activeFilters,
+  (filters) => {
+    sortState.value = extractSortState(filters);
+  },
+  { immediate: true },
+);
+
+const tableHeaders = computed<TableHeader<Ticket>[]>(() => {
+  const getSortDirection = (key: SortKey): 'asc' | 'desc' | 'none' => {
+    return sortState.value?.key === key ? sortState.value.direction : 'none';
+  };
+
+  return [
+    {
+      key: 'customId',
+      label: 'ID',
+      align: 'center',
+      width: 0.08,
+      sortable: true,
+      sortKey: 'customId',
+      sortDirection: getSortDirection('customId'),
+    },
+    {
+      key: 'name',
+      label: 'Título',
+      align: 'left',
+      width: 0.25,
+      sortable: true,
+      sortKey: 'name',
+      sortDirection: getSortDirection('name'),
+    },
+    {
+      key: 'person',
+      label: props.tableType === 'criados' ? 'Destino' : 'Solicitante',
+      align: 'center',
+      width: 0.18,
+    },
+    { key: 'department', label: 'Setor', align: 'center', width: 0.18 },
+    { key: 'priority', label: 'Prioridade', align: 'center', width: 0.1 },
+    { key: 'status', label: 'Status', align: 'center', width: 0.11 },
+    { key: 'dueDate', label: 'Prazo', align: 'center', width: 0.1 },
+  ];
+});
 
 const showVerificationAlert = ref(false);
 const pendingVerificationTicket = ref<Ticket | null>(null);
@@ -681,6 +665,30 @@ const totalPages = computed(() => {
   return Math.ceil(totalCount / 10);
 });
 
+const buildFiltersWithSort = (): TicketListFilters => {
+  const {
+    sortBy: _ignoredSortBy,
+    sortOrder: _ignoredSortOrder,
+    ...rest
+  } = activeFilters.value || {};
+  const filters: TicketListFilters = { ...rest };
+
+  if (sortState.value) {
+    filters.sortBy = sortState.value.key;
+    filters.sortOrder = sortState.value.direction;
+  }
+
+  return filters;
+};
+
+const paginationInfo = computed<PaginationInfo | undefined>(() => {
+  if (!props.pagination) return undefined;
+  return {
+    currentPage: currentPage.value,
+    totalPages: Math.max(totalPages.value, 1),
+  };
+});
+
 watch(
   () => props.currentPage,
   (newPage) => {
@@ -688,9 +696,25 @@ watch(
   },
 );
 
-function changePage(page: number) {
+const changePage = (page: number) => {
   emit('changePage', page);
-}
+};
+
+const handleSort = async (sortKey: string) => {
+  if (sortKey !== 'customId' && sortKey !== 'name') return;
+
+  if (sortState.value?.key === sortKey) {
+    if (sortState.value.direction === 'asc') {
+      sortState.value = { key: sortKey, direction: 'desc' };
+    } else if (sortState.value.direction === 'desc') {
+      sortState.value = null;
+    }
+  } else {
+    sortState.value = { key: sortKey, direction: 'asc' };
+  }
+
+  await refreshTickets();
+};
 
 const openTicketDetails = (ticket: Ticket) => {
   // Se for o solicitante e o ticket estiver aguardando verificação
@@ -708,19 +732,22 @@ const openTicketDetails = (ticket: Ticket) => {
   emit('viewTicket', ticket);
 };
 
-const refreshTickets = async () => {
+const refreshTickets = async (pageOverride?: number) => {
+  const pageToUse = pageOverride ?? currentPage.value;
+  const filters = buildFiltersWithSort();
+
   switch (props.tableType) {
     case 'recebidos':
-      await ticketsStore.fetchReceivedTickets(currentPage.value);
+      await ticketsStore.fetchReceivedTickets(pageToUse, 10, filters);
       break;
     case 'criados':
-      await ticketsStore.fetchMyTickets(currentPage.value);
+      await ticketsStore.fetchMyTickets(pageToUse, 10, filters);
       break;
     case 'setor':
-      await ticketsStore.fetchDepartmentTickets(currentPage.value);
+      await ticketsStore.fetchDepartmentTickets(pageToUse, 10, filters);
       break;
     case 'arquivados':
-      await ticketsStore.fetchArchivedTickets(currentPage.value);
+      await ticketsStore.fetchArchivedTickets(pageToUse, 10, filters);
       break;
   }
 };

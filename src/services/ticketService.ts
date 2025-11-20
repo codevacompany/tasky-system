@@ -21,6 +21,8 @@ export const ticketService = {
     priority?: TicketPriority;
     page?: number;
     limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
   }): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
     return apiClient.get('/tickets', { params });
   },
@@ -37,6 +39,8 @@ export const ticketService = {
       priority?: TicketPriority;
       page?: number;
       limit?: number;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
     },
   ): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
     return apiClient.get(`/tickets/department/${departmentId}`, {
@@ -52,6 +56,8 @@ export const ticketService = {
       priority?: TicketPriority;
       page?: number;
       limit?: number;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
     },
   ): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
     return apiClient.get(`/tickets/requester/${requesterId}`, {
@@ -67,6 +73,8 @@ export const ticketService = {
       priority?: TicketPriority;
       page?: number;
       limit?: number;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
     },
   ): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
     return apiClient.get(`/tickets/target-user/${targetUserId}`, {
@@ -82,6 +90,8 @@ export const ticketService = {
       priority?: TicketPriority;
       page?: number;
       limit?: number;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
     },
   ): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
     return apiClient.get(`/tickets/received/${userId}`, {
@@ -94,6 +104,8 @@ export const ticketService = {
     priority?: TicketPriority;
     page?: number;
     limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
   }): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
     return apiClient.get('/tickets/archived', { params });
   },

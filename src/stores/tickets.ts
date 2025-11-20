@@ -6,6 +6,14 @@ import { statusColumnService } from '@/services/statusColumnService';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from './user';
 
+export type TicketListFilters = {
+  status?: DefaultTicketStatus | null;
+  priority?: TicketPriority | null;
+  name?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+};
+
 interface TicketsState {
   myTickets: {
     data: Ticket[];
@@ -14,11 +22,7 @@ interface TicketsState {
     totalCount: number;
     lastFetched: Date | null;
     currentPage: number;
-    currentFilters?: {
-      status?: DefaultTicketStatus | null;
-      priority?: TicketPriority | null;
-      name?: string;
-    };
+    currentFilters?: TicketListFilters;
   };
   receivedTickets: {
     data: Ticket[];
@@ -27,11 +31,7 @@ interface TicketsState {
     totalCount: number;
     lastFetched: Date | null;
     currentPage: number;
-    currentFilters?: {
-      status?: DefaultTicketStatus | null;
-      priority?: TicketPriority | null;
-      name?: string;
-    };
+    currentFilters?: TicketListFilters;
   };
   departmentTickets: {
     data: Ticket[];
@@ -40,11 +40,7 @@ interface TicketsState {
     totalCount: number;
     lastFetched: Date | null;
     currentPage: number;
-    currentFilters?: {
-      status?: DefaultTicketStatus | null;
-      priority?: TicketPriority | null;
-      name?: string;
-    };
+    currentFilters?: TicketListFilters;
   };
   archivedTickets: {
     data: Ticket[];
@@ -53,10 +49,7 @@ interface TicketsState {
     totalCount: number;
     lastFetched: Date | null;
     currentPage: number;
-    currentFilters?: {
-      priority?: TicketPriority | null;
-      name?: string;
-    };
+    currentFilters?: TicketListFilters;
   };
   recentReceivedTickets: Ticket[];
   recentCreatedTickets: Ticket[];
@@ -142,11 +135,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   async function fetchMyTickets(
     page?: number,
     limit = 10,
-    filters?: {
-      status?: DefaultTicketStatus | null;
-      priority?: TicketPriority | null;
-      name?: string;
-    },
+    filters?: TicketListFilters,
   ) {
     const userStore = useUserStore();
     if (!userStore.user) return;
@@ -177,6 +166,12 @@ export const useTicketsStore = defineStore('tickets', () => {
         if (currentFilters.name) {
           params.name = currentFilters.name;
         }
+        if (currentFilters.sortBy) {
+          params.sortBy = currentFilters.sortBy;
+        }
+        if (currentFilters.sortOrder) {
+          params.sortOrder = currentFilters.sortOrder;
+        }
       }
 
       const response = await ticketService.getByRequester(userStore.user.id, params);
@@ -195,15 +190,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
   }
 
-  async function fetchReceivedTickets(
-    page?: number,
-    limit = 10,
-    filters?: {
-      status?: DefaultTicketStatus | null;
-      priority?: TicketPriority | null;
-      name?: string;
-    },
-  ) {
+  async function fetchReceivedTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     const userStore = useUserStore();
     if (!userStore.user) return;
 
@@ -233,6 +220,12 @@ export const useTicketsStore = defineStore('tickets', () => {
         if (currentFilters.name) {
           params.name = currentFilters.name;
         }
+        if (currentFilters.sortBy) {
+          params.sortBy = currentFilters.sortBy;
+        }
+        if (currentFilters.sortOrder) {
+          params.sortOrder = currentFilters.sortOrder;
+        }
       }
 
       const response = await ticketService.getReceivedTickets(userStore.user.id, params);
@@ -251,15 +244,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
   }
 
-  async function fetchDepartmentTickets(
-    page?: number,
-    limit = 10,
-    filters?: {
-      status?: DefaultTicketStatus | null;
-      priority?: TicketPriority | null;
-      name?: string;
-    },
-  ) {
+  async function fetchDepartmentTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     const userStore = useUserStore();
     if (!userStore.user?.departmentId) return;
 
@@ -289,6 +274,12 @@ export const useTicketsStore = defineStore('tickets', () => {
         if (currentFilters.name) {
           params.name = currentFilters.name;
         }
+        if (currentFilters.sortBy) {
+          params.sortBy = currentFilters.sortBy;
+        }
+        if (currentFilters.sortOrder) {
+          params.sortOrder = currentFilters.sortOrder;
+        }
       }
 
       const response = await ticketService.getByDepartment(userStore.user.departmentId, params);
@@ -303,14 +294,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
   }
 
-  async function fetchArchivedTickets(
-    page?: number,
-    limit = 10,
-    filters?: {
-      priority?: TicketPriority | null;
-      name?: string;
-    },
-  ) {
+  async function fetchArchivedTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     // Use current page if no page is provided
     const currentPage = page ?? archivedTickets.value.currentPage;
     // Use current filters if no filters are provided
@@ -333,6 +317,12 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         if (currentFilters.name) {
           params.name = currentFilters.name;
+        }
+        if (currentFilters.sortBy) {
+          params.sortBy = currentFilters.sortBy;
+        }
+        if (currentFilters.sortOrder) {
+          params.sortOrder = currentFilters.sortOrder;
         }
       }
 
