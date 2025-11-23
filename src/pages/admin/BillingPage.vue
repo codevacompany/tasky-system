@@ -122,6 +122,16 @@
                 </div>
               </div>
             </div>
+            <button
+              v-if="!hasTrial"
+              @click="handleManageSubscription"
+              :disabled="isLoadingPortal"
+              class="mt-4 w-full px-3 py-2 text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+            >
+              <font-awesome-icon v-if="!isLoadingPortal" icon="cog" class="text-xs" />
+              <span v-if="isLoadingPortal">Carregando...</span>
+              <span v-else>Gerenciar Assinatura</span>
+            </button>
           </div>
 
           <!-- Trial/Billing Info -->
@@ -170,11 +180,18 @@
           <div class="p-3" :class="getPlanHeaderClass(plan.slug)">
             <h2 class="text-base font-semibold text-white">{{ plan.name }}</h2>
           </div>
-          <div v-if="plan.slug === 'crescer'" class="absolute top-9 right-3 z-10">
+          <div class="absolute top-9 right-3 z-10 flex gap-2">
             <div
+              v-if="plan.slug === 'crescer'"
               class="bg-yellow-500 text-gray-900 text-xs font-bold px-3 py-1 rounded-full shadow-lg border border-yellow-400"
             >
               Maior procura
+            </div>
+            <div
+              v-if="isCurrentPlan(plan.slug) && isInActiveTrial"
+              class="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg border border-orange-400"
+            >
+              Trial
             </div>
           </div>
           <div class="p-4 flex flex-col flex-1">
@@ -218,7 +235,7 @@
             <button
               class="w-full py-2 px-3 text-white text-sm font-medium rounded-md transition-colors mt-auto"
               :class="getPlanButtonClass(plan.slug)"
-              :disabled="isCurrentPlan(plan.slug) || isSubscribing"
+              :disabled="(isCurrentPlan(plan.slug) && !hasTrial) || isSubscribing"
               @click="handleSubscription(plan.slug)"
             >
               {{ getButtonText(plan.slug) }}
@@ -237,18 +254,18 @@
           Histórico de Pagamentos
         </h2> -->
 
-        <!-- Loading State -->
-        <!-- <div v-if="isLoading" class="flex justify-center items-center py-8">
+    <!-- Loading State -->
+    <!-- <div v-if="isLoading" class="flex justify-center items-center py-8">
           <LoadingSpinner />
         </div> -->
 
-        <!-- Empty State -->
-        <!-- <div v-else-if="payments.length === 0" class="text-center py-8">
+    <!-- Empty State -->
+    <!-- <div v-else-if="payments.length === 0" class="text-center py-8">
           <p class="text-gray-500 dark:text-gray-400">Nenhum pagamento encontrado.</p>
         </div> -->
 
-        <!-- Payment History Table -->
-        <!-- <div v-else class="overflow-x-auto">
+    <!-- Payment History Table -->
+    <!-- <div v-else class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-700">
               <tr>
@@ -400,6 +417,9 @@ interface SubscriptionPlan {
   priceYearly: string | number | null;
   description: string;
   isActive: boolean;
+  stripePriceIdMonthly?: string | null;
+  stripePriceIdYearly?: string | null;
+  stripePriceIdPerUser?: string | null;
 }
 
 const userStore = useUserStore();
@@ -411,6 +431,7 @@ const payments = ref<Payment[]>([]);
 const isLoading = ref(true);
 const isLoadingPlans = ref(true);
 const isSubscribing = ref(false);
+const isLoadingPortal = ref(false);
 const availablePlans = ref<SubscriptionPlan[]>([]);
 const currentSubscription = ref<any>(null);
 
@@ -502,6 +523,24 @@ const loadPaymentHistory = async () => {
 // Carregar dados ao montar o componente
 onMounted(async () => {
   await Promise.all([loadPlans(), loadCurrentSubscription(), loadPaymentHistory()]);
+
+  // Handle Stripe Checkout redirects
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('success') === 'true') {
+    toast.success('Assinatura realizada com sucesso!');
+    // Clean up URL
+    window.history.replaceState({}, '', window.location.pathname);
+    await loadCurrentSubscription();
+    try {
+      await authService.whoami();
+    } catch (whoamiError) {
+      console.error('Error refreshing permissions:', whoamiError);
+    }
+  } else if (urlParams.get('canceled') === 'true') {
+    toast.info('Assinatura cancelada. Você pode tentar novamente quando quiser.');
+    // Clean up URL
+    window.history.replaceState({}, '', window.location.pathname);
+  }
 });
 
 const formatDate = (date: Date) => {
@@ -558,6 +597,18 @@ const getPlanHeaderClass = (slug: string) => {
 };
 
 const getPlanButtonClass = (slug: string) => {
+  // If current plan and has trial, show normal button (not disabled)
+  if (isCurrentPlan(slug) && hasTrial.value) {
+    const classMap: { [key: string]: string } = {
+      iniciante: 'bg-blue-600 hover:bg-blue-700',
+      crescer: 'bg-green-600 hover:bg-green-700',
+      profissional: 'bg-gray-900 hover:bg-gray-800',
+      adicional: 'bg-purple-600 hover:bg-purple-700',
+    };
+    return classMap[slug] || 'bg-gray-600 hover:bg-gray-700';
+  }
+
+  // If current plan and no trial, show disabled style
   if (isCurrentPlan(slug)) {
     return 'bg-gray-400 cursor-not-allowed';
   }
@@ -614,8 +665,37 @@ const isCurrentPlan = (slug: string) => {
   );
 };
 
+const isInActiveTrial = computed(() => {
+  if (!currentSubscription.value?.hasSubscription || !currentSubscription.value.subscription) {
+    return false;
+  }
+
+  const trialEndDate = currentSubscription.value.subscription.trialEndDate;
+  if (!trialEndDate) {
+    return false;
+  }
+
+  const now = new Date();
+  const trialEnd = new Date(trialEndDate);
+  return trialEnd > now;
+});
+
+const hasTrial = computed(() => {
+  return (
+    currentSubscription.value?.hasSubscription &&
+    currentSubscription.value.subscription?.trialEndDate !== null &&
+    currentSubscription.value.subscription?.trialEndDate !== undefined
+  );
+});
+
 const getButtonText = (slug: string) => {
-  if (isCurrentPlan(slug)) {
+  // If current plan and has trial (active or expired), show "ASSINAR PLANO"
+  if (isCurrentPlan(slug) && hasTrial.value) {
+    return 'ASSINAR PLANO';
+  }
+
+  // If current plan and no trial, show "PLANO ATUAL"
+  if (isCurrentPlan(slug) && !hasTrial.value) {
     return 'PLANO ATUAL';
   }
 
@@ -640,24 +720,44 @@ const handleSubscription = (slug: string) => {
   }
 };
 
+const handleManageSubscription = async () => {
+  if (!user.value?.tenantId) {
+    toast.error('Erro ao identificar o tenant');
+    return;
+  }
+
+  try {
+    isLoadingPortal.value = true;
+    const returnUrl = `${window.location.origin}/admin/billing`;
+    const { url } = await subscriptionService.createCustomerPortalSession(
+      user.value.tenantId,
+      returnUrl,
+    );
+
+    window.open(url, '_blank');
+  } catch (error: any) {
+    console.error('Error creating portal session:', error);
+    const errorMessage = error.response?.data?.message || 'Erro ao abrir portal de gerenciamento';
+    toast.error(errorMessage);
+  } finally {
+    isLoadingPortal.value = false;
+  }
+};
+
 const confirmSubscription = async () => {
   if (!selectedPlan.value) return;
 
   try {
     isSubscribing.value = true;
-    await subscriptionService.subscribe(selectedPlan.value.slug);
-    toast.success(`Assinatura do ${selectedPlan.value.name} realizada com sucesso!`);
-    showSubscriptionModal.value = false;
+    const response = (await subscriptionService.subscribe(selectedPlan.value.slug)) as {
+      checkoutUrl: string;
+      sessionId: string;
+    };
 
-    await loadCurrentSubscription();
-
-    try {
-      await authService.whoami();
-    } catch (whoamiError) {
-      console.error('Error refreshing permissions:', whoamiError);
-      toast.warning(
-        'Assinatura realizada, mas houve um problema ao atualizar as permissões. Faça logout e login novamente.',
-      );
+    if (response.checkoutUrl) {
+      window.location.href = response.checkoutUrl;
+    } else {
+      throw new Error('No checkout URL received');
     }
   } catch (error: any) {
     console.error('Subscription error:', error);
@@ -667,28 +767,7 @@ const confirmSubscription = async () => {
     } else {
       toast.error('Erro ao realizar assinatura. Tente novamente.');
     }
-  } finally {
     isSubscribing.value = false;
-  }
-};
-
-const downloadInvoice = async (id: number) => {
-  try {
-    // Temporariamente mockado até implementar endpoint de download
-    toast.success('Download do comprovante iniciado!');
-    // Simular download
-    const mockPdf = new Blob(['Comprovante mockado'], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(mockPdf);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `fatura-${id}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-  } catch (error) {
-    toast.error('Erro ao baixar comprovante. Tente novamente.');
-    console.error('Download error:', error);
   }
 };
 </script>

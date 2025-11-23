@@ -28,7 +28,9 @@
               <router-link to="/">
                 <li>
                   <div
-                    :class="{ 'primary-gradient text-white': isActive('/') }"
+                    :class="{
+                      'menu-item-active': isActive('/'),
+                    }"
                     class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
                   >
                     <font-awesome-icon icon="home" /> Início
@@ -38,7 +40,9 @@
               <router-link v-if="!isGlobalAdmin" to="/meus-tickets">
                 <li>
                   <div
-                    :class="{ 'primary-gradient text-white': isActive('/meus-tickets') }"
+                    :class="{
+                      'menu-item-active': isActive('/meus-tickets'),
+                    }"
                     class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
                   >
                     <font-awesome-icon icon="ticket" />Tickets
@@ -48,7 +52,9 @@
               <router-link v-if="isTenantAdmin || isSupervisor" to="/admin/relatorios">
                 <li>
                   <div
-                    :class="{ 'primary-gradient text-white': isActive('/admin/relatorios') }"
+                    :class="{
+                      'menu-item-active': isActive('/admin/relatorios'),
+                    }"
                     class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
                   >
                     <font-awesome-icon icon="chart-line" />
@@ -66,7 +72,7 @@
               >
                 <div
                   :class="{
-                    'primary-gradient text-white':
+                    'menu-item-active':
                       isActive('/admin/usuarios') ||
                       isActive('/admin/setores') ||
                       isActive('/admin/categorias') ||
@@ -257,7 +263,9 @@
             <router-link to="/" @click="closeMobileMenu">
               <li>
                 <div
-                  :class="{ 'primary-gradient text-white': isActive('/') }"
+                  :class="{
+                    'menu-item-active': isActive('/'),
+                  }"
                   class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
                 >
                   <font-awesome-icon icon="tachometer-alt-average" />
@@ -268,7 +276,9 @@
             <router-link v-if="!isGlobalAdmin" to="/meus-tickets" @click="closeMobileMenu">
               <li>
                 <div
-                  :class="{ 'primary-gradient text-white': isActive('/meus-tickets') }"
+                  :class="{
+                    'menu-item-active': isActive('/meus-tickets'),
+                  }"
                   class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
                 >
                   <font-awesome-icon icon="ticket" />
@@ -283,7 +293,9 @@
             >
               <li>
                 <div
-                  :class="{ 'primary-gradient text-white': isActive('/admin/relatorios') }"
+                  :class="{
+                    'menu-item-active': isActive('/admin/relatorios'),
+                  }"
                   class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
                 >
                   <font-awesome-icon icon="chart-line" />
@@ -296,7 +308,7 @@
             <li v-if="isAdmin">
               <div
                 :class="{
-                  'primary-gradient text-white':
+                  'menu-item-active':
                     isActive('/admin/usuarios') ||
                     isActive('/admin/setores') ||
                     isActive('/admin/categorias') ||
@@ -558,6 +570,16 @@ onUnmounted(() => {
 }
 
 .dark-mode .menu-item-hover:hover {
+  background: var(--primary-dark);
+  color: white;
+}
+
+.menu-item-active {
+  background: var(--button-primary-color);
+  color: white;
+}
+
+.dark-mode .menu-item-active {
   background: var(--primary-dark);
   color: white;
 }

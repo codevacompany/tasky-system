@@ -9,6 +9,9 @@ export interface SubscriptionPlan {
   priceYearly: string | number | null;
   description: string;
   isActive: boolean;
+  stripePriceIdMonthly?: string | null;
+  stripePriceIdYearly?: string | null;
+  stripePriceIdPerUser?: string | null;
 }
 
 export interface SubscriptionSummary {
@@ -59,8 +62,8 @@ export interface BillingCalculation {
 export interface BillingSummary {
   currentBilling: BillingCalculation;
   nextBillingDate: string | null;
-  pendingPayments: any[];
-  overduePayments: any[];
+  pendingPayments: unknown[];
+  overduePayments: unknown[];
 }
 
 export interface UserAdditionValidation {
@@ -86,9 +89,16 @@ class SubscriptionService {
     return response.data;
   }
 
-  async subscribe(planSlug: string): Promise<any> {
+  async subscribe(
+    planSlug: string,
+    options?: {
+      billingInterval?: 'monthly' | 'yearly';
+      collectionMethod?: 'charge_automatically' | 'send_invoice';
+    },
+  ): Promise<unknown> {
     const response = await apiClient.post('/tenant-subscriptions/subscribe', {
       planSlug,
+      ...options,
     });
     return response.data;
   }
@@ -119,7 +129,7 @@ class SubscriptionService {
     return response.data;
   }
 
-  async createBillingPayment(tenantId: number, dueDate?: string): Promise<any> {
+  async createBillingPayment(tenantId: number, dueDate?: string): Promise<unknown> {
     const response = await apiClient.post(
       `/tenant-subscriptions/tenant/${tenantId}/billing/create-payment`,
       {
@@ -129,7 +139,11 @@ class SubscriptionService {
     return response.data;
   }
 
-  async generateBillingReport(tenantId: number, fromDate?: string, toDate?: string): Promise<any> {
+  async generateBillingReport(
+    tenantId: number,
+    fromDate?: string,
+    toDate?: string,
+  ): Promise<unknown> {
     const params = new URLSearchParams();
     if (fromDate) params.append('fromDate', fromDate);
     if (toDate) params.append('toDate', toDate);
@@ -141,9 +155,19 @@ class SubscriptionService {
   }
 
   // User validation method (to be used before creating users)
-  async validateUserCreation(usersToAdd: number = 1): Promise<any> {
+  async validateUserCreation(usersToAdd: number = 1): Promise<unknown> {
     const response = await apiClient.post('/users/validate-creation', {
       usersToAdd,
+    });
+    return response.data;
+  }
+
+  async createCustomerPortalSession(
+    tenantId: number,
+    returnUrl?: string,
+  ): Promise<{ url: string }> {
+    const response = await apiClient.post(`/tenant-subscriptions/tenant/${tenantId}/portal`, {
+      returnUrl,
     });
     return response.data;
   }
