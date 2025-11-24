@@ -103,6 +103,7 @@ import {
 import {
   faBell as faBellRegular,
   faClock as faClockRegular,
+  faComment as faCommentRegular,
 } from '@fortawesome/free-regular-svg-icons';
 
 const icons = [
@@ -207,6 +208,7 @@ const icons = [
   faRedo,
   faSliders,
   faPlay,
+  faCommentRegular,
 ];
 
 library.add(...icons);

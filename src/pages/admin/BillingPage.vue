@@ -1,154 +1,200 @@
 <template>
-  <div class="p-6">
-    <header class="mb-8">
-      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
-        Gerenciamento de Assinaturas
-      </h1>
+  <div class="p-6 max-w-[1600px] mx-auto">
+    <header class="mb-8 flex items-center justify-between">
+      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Gerenciar Assinaturas</h1>
+      <button
+        v-if="!hasTrial && currentSubscription?.hasSubscription"
+        @click="handleManageSubscription"
+        :disabled="isLoadingPortal"
+        class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors disabled:opacity-50"
+      >
+        Ver faturas anteriores
+      </button>
     </header>
 
     <!-- Current Subscription Section -->
     <div
       v-if="currentSubscription?.hasSubscription && currentSubscription.subscription"
-      class="mt-6 mb-10 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+      class="mb-8 bg-white dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
     >
-      <div
-        class="px-6 py-4 bg-gray-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-gray-200 dark:border-gray-700"
-      >
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-            <font-awesome-icon icon="star" class="text-white text-lg" />
+      <div class="flex items-center gap-2 mb-4">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+          {{ currentSubscription.subscription.planName }}
+        </h2>
+        <span
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+          :class="
+            currentSubscription.subscription.trialEndDate
+              ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
+              : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+          "
+        >
+          {{ currentSubscription.subscription.trialEndDate ? 'Trial' : 'Plano atual' }}
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Left Column: Price and Trial Info -->
+        <div>
+          <div class="flex items-baseline gap-2 mb-4">
+            <span class="text-3xl font-bold text-gray-900 dark:text-white">
+              R$ {{ currentSubscription.billing?.basePlanCost.toFixed(0) || '0' }}
+            </span>
+            <span class="text-gray-600 dark:text-gray-400">/ mês</span>
           </div>
-          <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Assinatura Atual</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Sua assinatura ativa no momento</p>
+
+          <div v-if="currentSubscription.subscription.trialEndDate">
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              Trial termina em {{ formatDate(currentSubscription.subscription.trialEndDate) }}
+            </p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              Após o trial, o acesso será suspenso até a escolha de um plano.
+            </p>
           </div>
+        </div>
+
+        <!-- Right Column: Features List -->
+        <div>
+          <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
+            O que está incluído:
+          </h3>
+          <ul class="space-y-2">
+            <li class="flex items-center text-sm text-gray-700 dark:text-gray-300">
+              <font-awesome-icon icon="check" class="text-green-500 mr-2 text-xs" />
+              <span
+                >Até {{ currentSubscription.subscription.maxUsers || '∞' }} usuário{{
+                  currentSubscription.subscription.maxUsers ? 's' : ''
+                }}{{ !currentSubscription.subscription.maxUsers ? ' (ilimitado)' : '' }}</span
+              >
+            </li>
+            <li
+              v-for="feature in getPlanFeatures(
+                availablePlans.find((p) => p.slug === currentSubscription.subscription.planSlug) ||
+                  ({} as SubscriptionPlan),
+              ).features"
+              :key="feature"
+              class="flex items-center text-sm text-gray-700 dark:text-gray-300"
+            >
+              <font-awesome-icon icon="check" class="text-green-500 mr-2 text-xs" />
+              {{ feature }}
+            </li>
+          </ul>
         </div>
       </div>
 
-      <div class="p-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="space-y-2">
-            <h4
-              class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide"
-            >
-              Plano
-            </h4>
-            <p class="text-xl font-semibold text-gray-900 dark:text-white">
-              {{ currentSubscription.subscription.planName }}
-            </p>
-            <div class="flex items-center gap-2">
-              <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                :class="getStatusBadgeClass(currentSubscription.subscription.status)"
-              >
-                {{ getStatusLabel(currentSubscription.subscription.status) }}
+      <!-- Usage Bar -->
+      <div
+        v-if="currentSubscription.subscription.maxUsers"
+        class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700"
+      >
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm text-gray-600 dark:text-gray-400">Usuários</span>
+          <span class="text-sm font-medium text-gray-900 dark:text-white">
+            {{ currentSubscription.userStats.totalUsers }}/{{
+              currentSubscription.subscription.maxUsers
+            }}
+          </span>
+        </div>
+        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div
+            class="h-2 rounded-full transition-all duration-300"
+            :class="currentSubscription.billing?.exceedsLimit ? 'bg-orange-500' : 'bg-blue-600'"
+            :style="{ width: getUsagePercentage() + '%' }"
+          ></div>
+        </div>
+        <div v-if="currentSubscription.billing?.exceedsLimit" class="mt-2">
+          <span class="text-xs text-orange-600 dark:text-orange-400">
+            ⚠️ Limite excedido: +{{ currentSubscription.billing.additionalUsers }} usuário{{
+              currentSubscription.billing.additionalUsers > 1 ? 's' : ''
+            }}
+          </span>
+        </div>
+      </div>
+
+      <button
+        v-if="!hasTrial"
+        @click="handleManageSubscription"
+        :disabled="isLoadingPortal"
+        class="mt-6 mx-auto w-[300px] px-3 py-3 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-md font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 border border-gray-200 dark:border-gray-600"
+      >
+        <span v-if="isLoadingPortal">Carregando...</span>
+        <span v-else>Gerenciar Assinatura</span>
+      </button>
+    </div>
+
+    <!-- Upgrade Plans Section -->
+    <div v-if="!isLoadingPlans">
+      <div class="mb-6">
+        <div class="mb-4">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Atualizar plano</h2>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Nossos planos são criados para se adequar ao tamanho do seu projeto. Pague uma taxa fixa
+            por um plano definido, mais um pouco extra se ultrapassar. Atualize para o próximo nível
+            conforme seu projeto cresce.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div
+          v-for="plan in availablePlans"
+          :key="plan.slug"
+          class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 flex flex-col"
+        >
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ plan.name }}</h3>
+
+          <div v-if="plan.slug === 'customizado'" class="mb-4">
+            <div class="flex items-baseline gap-2 mb-2">
+              <span class="text-3xl font-bold text-gray-900 dark:text-white">R$ 399</span>
+              <span class="text-gray-600 dark:text-gray-400">/ mês</span>
+            </div>
+            <div class="text-sm text-gray-700 dark:text-gray-300">
+              <p>+ R$ 15,00 por usuário adicional (a partir do 31º usuário)</p>
+            </div>
+          </div>
+          <div v-else class="mb-4">
+            <div class="flex items-baseline gap-2">
+              <span class="text-3xl font-bold text-gray-900 dark:text-white">
+                R$ {{ Number(plan.priceMonthly).toFixed(0) }}
               </span>
-            </div>
-
-            <div
-              v-if="currentSubscription.billing"
-              class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
-            >
-              <h5 class="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                Cobrança Mensal
-              </h5>
-              <div class="space-y-1 text-sm">
-                <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-400">Plano base:</span>
-                  <span class="font-medium text-gray-900 dark:text-white"
-                    >R$ {{ currentSubscription.billing.basePlanCost.toFixed(2) }}</span
-                  >
-                </div>
-                <div
-                  v-if="currentSubscription.billing.additionalUsers > 0"
-                  class="flex justify-between"
-                >
-                  <span class="text-gray-600 dark:text-gray-400"
-                    >{{ currentSubscription.billing.additionalUsers }} usuário{{
-                      currentSubscription.billing.additionalUsers > 1 ? 's' : ''
-                    }}
-                    adicional{{
-                      currentSubscription.billing.additionalUsers > 1 ? 'is' : ''
-                    }}:</span
-                  >
-                  <span class="font-medium text-gray-900 dark:text-white"
-                    >R$ {{ currentSubscription.billing.additionalUsersCost.toFixed(2) }}</span
-                  >
-                </div>
-                <div
-                  class="flex justify-between border-t border-blue-200 dark:border-blue-700 pt-1"
-                >
-                  <span class="font-medium text-gray-900 dark:text-white">Total:</span>
-                  <span class="font-bold text-blue-600 dark:text-blue-400"
-                    >R$ {{ currentSubscription.billing.totalCost.toFixed(2) }}</span
-                  >
-                </div>
-              </div>
+              <span class="text-gray-600 dark:text-gray-400">/ mês</span>
             </div>
           </div>
 
-          <!-- Usage Stats -->
-          <div class="space-y-2">
-            <h4
-              class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide"
-            >
-              Uso
-            </h4>
-            <div class="space-y-3">
-              <div>
-                <div class="flex items-center justify-between mb-1">
-                  <span class="text-sm text-gray-600 dark:text-gray-400">Usuários</span>
-                  <span class="text-sm font-medium text-gray-900 dark:text-white">
-                    {{ currentSubscription.userStats.totalUsers }}/{{
-                      currentSubscription.subscription.maxUsers || '∞'
-                    }}
-                  </span>
-                </div>
-                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div
-                    class="h-2 rounded-full transition-all duration-300"
-                    :class="
-                      currentSubscription.billing?.exceedsLimit ? 'bg-orange-500' : 'bg-blue-600'
-                    "
-                    :style="{ width: getUsagePercentage() + '%' }"
-                  ></div>
-                </div>
-                <div v-if="currentSubscription.billing?.exceedsLimit" class="mt-1">
-                  <span class="text-xs text-orange-600 dark:text-orange-400">
-                    ⚠️ Limite excedido: +{{ currentSubscription.billing.additionalUsers }} usuário{{
-                      currentSubscription.billing.additionalUsers > 1 ? 's' : ''
-                    }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <button
+            class="w-full py-2 px-4 text-sm font-medium rounded-md transition-colors mb-6 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="(isCurrentPlan(plan.slug) && !hasTrial) || isSubscribing"
+            @click="handleSubscription(plan.slug)"
+          >
+            {{ getButtonText(plan.slug) }}
+          </button>
 
-          <!-- Trial/Billing Info -->
-          <div class="space-y-2">
+          <div class="mb-4">
             <h4
-              class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide"
+              class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3"
             >
-              {{ currentSubscription.subscription.trialEndDate ? 'Trial' : 'Próximo ciclo' }}
+              Incluído
             </h4>
-            <div v-if="currentSubscription.subscription.trialEndDate" class="space-y-1">
-              <p class="text-sm text-orange-600 dark:text-orange-400 font-medium">
-                Termina em {{ formatDate(currentSubscription.subscription.trialEndDate) }}
-              </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">
-                Após o trial, será cobrado mensalmente
-              </p>
-            </div>
-            <div v-else class="space-y-1">
-              <p class="text-sm text-gray-900 dark:text-white font-medium">
-                {{
-                  currentSubscription.subscription.endDate
-                    ? formatDate(currentSubscription.subscription.endDate)
-                    : 'Ativo'
-                }}
-              </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">Renovação automática</p>
-            </div>
+            <ul class="space-y-2">
+              <li class="flex items-start text-sm text-gray-700 dark:text-gray-300">
+                <font-awesome-icon
+                  icon="check"
+                  class="text-green-500 mr-2 text-xs mt-0.5 flex-shrink-0"
+                />
+                <span>{{ getPlanFeatures(plan).users }}</span>
+              </li>
+              <li
+                v-for="feature in getPlanFeatures(plan).features"
+                :key="feature"
+                class="flex items-start text-sm text-gray-700 dark:text-gray-300"
+              >
+                <font-awesome-icon
+                  icon="check"
+                  class="text-green-500 mr-2 text-xs mt-0.5 flex-shrink-0"
+                />
+                <span>{{ feature }}</span>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -157,75 +203,6 @@
     <!-- Loading State for Plans -->
     <div v-if="isLoadingPlans" class="flex justify-center items-center py-8">
       <LoadingSpinner />
-    </div>
-
-    <div v-else class="flex justify-center mb-8">
-      <div class="flex justify-center gap-7 max-w-6xl w-full">
-        <div
-          v-for="plan in availablePlans"
-          :key="plan.slug"
-          class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col w-[280px]"
-          :class="getPlanCardClass(plan.slug)"
-        >
-          <div class="p-3" :class="getPlanHeaderClass(plan.slug)">
-            <h2 class="text-base font-semibold text-white">{{ plan.name }}</h2>
-          </div>
-          <div v-if="plan.slug === 'crescer'" class="absolute top-9 right-3 z-10">
-            <div
-              class="bg-yellow-500 text-gray-900 text-xs font-bold px-3 py-1 rounded-full shadow-lg border border-yellow-400"
-            >
-              Maior procura
-            </div>
-          </div>
-          <div class="p-4 flex flex-col flex-1">
-            <div class="mb-4">
-              <div v-if="plan.slug === 'adicional'" class="space-y-1">
-                <div class="flex items-baseline gap-1">
-                  <span class="text-2xl font-bold text-gray-900 dark:text-white">R$ 399</span>
-                  <span class="text-sm text-gray-500 dark:text-gray-400">/mês</span>
-                </div>
-                <div>
-                  <span class="text-lg font-bold text-gray-700 dark:text-gray-300">+ R$ 15</span>
-                  <span class="text-sm text-gray-500 dark:text-gray-400">/usuário adicional</span>
-                </div>
-              </div>
-              <div v-else>
-                <span class="text-2xl font-bold text-gray-900 dark:text-white"
-                  >R$ {{ Number(plan.priceMonthly).toFixed(0) }}</span
-                >
-                <span class="text-sm text-gray-500 dark:text-gray-400">/mês</span>
-              </div>
-            </div>
-            <ul class="space-y-2 mb-4 flex-1">
-              <li class="flex items-center text-sm text-gray-700 dark:text-gray-300">
-                <font-awesome-icon icon="check" class="text-green-500 mr-2 text-xs" />
-                {{ getPlanFeatures(plan).users }}
-              </li>
-              <li
-                v-for="feature in getPlanFeatures(plan).features"
-                :key="feature"
-                class="flex items-center text-sm text-gray-700 dark:text-gray-300"
-              >
-                <font-awesome-icon icon="check" class="text-green-500 mr-2 text-xs" />
-                {{ feature }}
-              </li>
-            </ul>
-            <div class="mb-3">
-              <p class="text-xs text-gray-500 dark:text-gray-400 italic">
-                {{ plan.description }}
-              </p>
-            </div>
-            <button
-              class="w-full py-2 px-3 text-white text-sm font-medium rounded-md transition-colors mt-auto"
-              :class="getPlanButtonClass(plan.slug)"
-              :disabled="isCurrentPlan(plan.slug) || isSubscribing"
-              @click="handleSubscription(plan.slug)"
-            >
-              {{ getButtonText(plan.slug) }}
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- TODO: Implementar histórico de pagamentos -->
@@ -237,18 +214,18 @@
           Histórico de Pagamentos
         </h2> -->
 
-        <!-- Loading State -->
-        <!-- <div v-if="isLoading" class="flex justify-center items-center py-8">
+    <!-- Loading State -->
+    <!-- <div v-if="isLoading" class="flex justify-center items-center py-8">
           <LoadingSpinner />
         </div> -->
 
-        <!-- Empty State -->
-        <!-- <div v-else-if="payments.length === 0" class="text-center py-8">
+    <!-- Empty State -->
+    <!-- <div v-else-if="payments.length === 0" class="text-center py-8">
           <p class="text-gray-500 dark:text-gray-400">Nenhum pagamento encontrado.</p>
         </div> -->
 
-        <!-- Payment History Table -->
-        <!-- <div v-else class="overflow-x-auto">
+    <!-- Payment History Table -->
+    <!-- <div v-else class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-700">
               <tr>
@@ -325,59 +302,12 @@
         </div>
       </div>
     </div> -->
-
-    <!-- Modal de Confirmação de Assinatura -->
-    <BaseModal
-      v-if="showSubscriptionModal"
-      @close="showSubscriptionModal = false"
-      title="Confirmar Assinatura"
-      :show-footer="false"
-    >
-      <div class="space-y-4">
-        <div v-if="selectedPlan" class="space-y-4">
-          <p class="text-gray-700 dark:text-gray-300">
-            Você está prestes a assinar o {{ selectedPlan.name }}.
-          </p>
-          <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-            <p class="text-gray-700 dark:text-gray-300">
-              Valor mensal:
-              <span class="font-semibold"
-                >R$ {{ Number(selectedPlan.priceMonthly).toFixed(2) }}</span
-              >
-            </p>
-            <p v-if="selectedPlan.maxUsers" class="text-gray-600 dark:text-gray-400 text-sm mt-2">
-              Limite de usuários: {{ selectedPlan.maxUsers }}
-            </p>
-            <p v-else class="text-gray-600 dark:text-gray-400 text-sm mt-2">Usuários ilimitados</p>
-          </div>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            Ao confirmar, você concorda com os termos de serviço e política de privacidade.
-          </p>
-        </div>
-        <div class="mt-6 flex justify-end space-x-3">
-          <button
-            class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors"
-            @click="showSubscriptionModal = false"
-          >
-            Cancelar
-          </button>
-          <button
-            class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
-            :disabled="isSubscribing"
-            @click="confirmSubscription"
-          >
-            {{ isSubscribing ? 'Processando...' : 'Confirmar Assinatura' }}
-          </button>
-        </div>
-      </div>
-    </BaseModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { toast } from 'vue3-toastify';
-import BaseModal from '@/components/common/BaseModal.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { subscriptionService } from '@/services/subscriptionService';
 import { useUserStore } from '@/stores/user';
@@ -400,17 +330,19 @@ interface SubscriptionPlan {
   priceYearly: string | number | null;
   description: string;
   isActive: boolean;
+  stripePriceIdMonthly?: string | null;
+  stripePriceIdYearly?: string | null;
+  stripePriceIdPerUser?: string | null;
 }
 
 const userStore = useUserStore();
 const user = computed(() => userStore.user);
 
-const showSubscriptionModal = ref(false);
-const selectedPlan = ref<SubscriptionPlan | null>(null);
 const payments = ref<Payment[]>([]);
 const isLoading = ref(true);
 const isLoadingPlans = ref(true);
 const isSubscribing = ref(false);
+const isLoadingPortal = ref(false);
 const availablePlans = ref<SubscriptionPlan[]>([]);
 const currentSubscription = ref<any>(null);
 
@@ -438,12 +370,12 @@ const loadPlans = async () => {
     isLoadingPlans.value = true;
     const plans = await subscriptionService.getPlans();
 
-    // Filter active plans and sort them with 'adicional' plan last
+    // Filter active plans and sort them with 'customizado' plan last
     const activePlans = plans.filter((plan) => plan.isActive);
     const sortedPlans = activePlans.sort((a, b) => {
-      // 'adicional' plan should always come last
-      if (a.slug === 'adicional') return 1;
-      if (b.slug === 'adicional') return -1;
+      // 'customizado' plan should always come last
+      if (a.slug === 'customizado') return 1;
+      if (b.slug === 'customizado') return -1;
 
       // For other plans, maintain their original order
       const order = ['iniciante', 'crescer', 'profissional'];
@@ -502,6 +434,24 @@ const loadPaymentHistory = async () => {
 // Carregar dados ao montar o componente
 onMounted(async () => {
   await Promise.all([loadPlans(), loadCurrentSubscription(), loadPaymentHistory()]);
+
+  // Handle Stripe Checkout redirects
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('success') === 'true') {
+    toast.success('Assinatura realizada com sucesso!');
+    // Clean up URL
+    window.history.replaceState({}, '', window.location.pathname);
+    await loadCurrentSubscription();
+    try {
+      await authService.whoami();
+    } catch (whoamiError) {
+      console.error('Error refreshing permissions:', whoamiError);
+    }
+  } else if (urlParams.get('canceled') === 'true') {
+    toast.info('Assinatura cancelada. Você pode tentar novamente quando quiser.');
+    // Clean up URL
+    window.history.replaceState({}, '', window.location.pathname);
+  }
 });
 
 const formatDate = (date: Date) => {
@@ -548,27 +498,23 @@ const getPlanCardClass = (slug: string) => {
 };
 
 const getPlanHeaderClass = (slug: string) => {
-  const classMap: { [key: string]: string } = {
-    iniciante: 'bg-blue-600',
-    crescer: 'bg-green-600',
-    profissional: 'bg-gray-900',
-    adicional: 'bg-purple-600',
-  };
-  return classMap[slug] || 'bg-gray-600';
+  // No longer used - headers are now neutral gray
+  return '';
 };
 
 const getPlanButtonClass = (slug: string) => {
-  if (isCurrentPlan(slug)) {
-    return 'bg-gray-400 cursor-not-allowed';
+  // If current plan and has trial, show normal button (not disabled)
+  if (isCurrentPlan(slug) && hasTrial.value) {
+    return 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600';
   }
 
-  const classMap: { [key: string]: string } = {
-    iniciante: 'bg-blue-600 hover:bg-blue-700',
-    crescer: 'bg-green-600 hover:bg-green-700',
-    profissional: 'bg-gray-900 hover:bg-gray-800',
-    adicional: 'bg-purple-600 hover:bg-purple-700',
-  };
-  return classMap[slug] || 'bg-gray-600 hover:bg-gray-700';
+  // If current plan and no trial, show disabled style
+  if (isCurrentPlan(slug)) {
+    return 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-600 cursor-not-allowed';
+  }
+
+  // Default neutral button style
+  return 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600';
 };
 
 const getPlanFeatures = (plan: SubscriptionPlan) => {
@@ -594,13 +540,9 @@ const getPlanFeatures = (plan: SubscriptionPlan) => {
         'Supervisores por departamento',
       ],
     },
-    adicional: {
-      users: 'Aplicável a partir do 31º usuário',
-      features: [
-        'Sem limite máximo de usuários',
-        'Acesso a todas as funcionalidades',
-        'Escalabilidade ilimitada',
-      ],
+    customizado: {
+      users: 'Sem limite máximo de usuários',
+      features: ['Acesso a todas as funcionalidades'],
     },
   };
 
@@ -614,50 +556,64 @@ const isCurrentPlan = (slug: string) => {
   );
 };
 
+const isInActiveTrial = computed(() => {
+  if (!currentSubscription.value?.hasSubscription || !currentSubscription.value.subscription) {
+    return false;
+  }
+
+  const trialEndDate = currentSubscription.value.subscription.trialEndDate;
+  if (!trialEndDate) {
+    return false;
+  }
+
+  const now = new Date();
+  const trialEnd = new Date(trialEndDate);
+  return trialEnd > now;
+});
+
+const hasTrial = computed(() => {
+  return (
+    currentSubscription.value?.hasSubscription &&
+    currentSubscription.value.subscription?.trialEndDate !== null &&
+    currentSubscription.value.subscription?.trialEndDate !== undefined
+  );
+});
+
 const getButtonText = (slug: string) => {
-  if (isCurrentPlan(slug)) {
-    return 'PLANO ATUAL';
+  // If current plan and has trial, show "Selecionar plano" (not disabled)
+  if (isCurrentPlan(slug) && hasTrial.value) {
+    return 'Selecionar plano';
   }
 
-  if (slug === 'adicional') {
-    return 'SAIBA MAIS';
+  // If current plan and no trial, show disabled "Plano atual"
+  if (isCurrentPlan(slug) && !hasTrial.value) {
+    return 'Plano atual';
   }
 
-  return 'ASSINAR PLANO';
+  return 'Selecionar plano';
 };
 
-const handleSubscription = (slug: string) => {
+const handleSubscription = async (slug: string) => {
   const plan = availablePlans.value.find((p) => p.slug === slug);
   if (!plan) return;
 
-  selectedPlan.value = plan;
-
-  if (slug === 'adicional') {
+  if (slug === 'customizado') {
     // Redirecionar para formulário de contato ou abrir modal específico
     window.location.href = 'mailto:comercial@tasky.com.br?subject=Interesse em Usuários Adicionais';
-  } else {
-    showSubscriptionModal.value = true;
+    return;
   }
-};
-
-const confirmSubscription = async () => {
-  if (!selectedPlan.value) return;
 
   try {
     isSubscribing.value = true;
-    await subscriptionService.subscribe(selectedPlan.value.slug);
-    toast.success(`Assinatura do ${selectedPlan.value.name} realizada com sucesso!`);
-    showSubscriptionModal.value = false;
+    const response = (await subscriptionService.subscribe(plan.slug)) as {
+      checkoutUrl: string;
+      sessionId: string;
+    };
 
-    await loadCurrentSubscription();
-
-    try {
-      await authService.whoami();
-    } catch (whoamiError) {
-      console.error('Error refreshing permissions:', whoamiError);
-      toast.warning(
-        'Assinatura realizada, mas houve um problema ao atualizar as permissões. Faça logout e login novamente.',
-      );
+    if (response.checkoutUrl) {
+      window.location.href = response.checkoutUrl;
+    } else {
+      throw new Error('No checkout URL received');
     }
   } catch (error: any) {
     console.error('Subscription error:', error);
@@ -667,28 +623,31 @@ const confirmSubscription = async () => {
     } else {
       toast.error('Erro ao realizar assinatura. Tente novamente.');
     }
-  } finally {
     isSubscribing.value = false;
   }
 };
 
-const downloadInvoice = async (id: number) => {
+const handleManageSubscription = async () => {
+  if (!user.value?.tenantId) {
+    toast.error('Erro ao identificar o tenant');
+    return;
+  }
+
   try {
-    // Temporariamente mockado até implementar endpoint de download
-    toast.success('Download do comprovante iniciado!');
-    // Simular download
-    const mockPdf = new Blob(['Comprovante mockado'], { type: 'application/pdf' });
-    const url = window.URL.createObjectURL(mockPdf);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `fatura-${id}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-  } catch (error) {
-    toast.error('Erro ao baixar comprovante. Tente novamente.');
-    console.error('Download error:', error);
+    isLoadingPortal.value = true;
+    const returnUrl = `${window.location.origin}/admin/billing`;
+    const { url } = await subscriptionService.createCustomerPortalSession(
+      user.value.tenantId,
+      returnUrl,
+    );
+
+    window.open(url, '_blank');
+  } catch (error: any) {
+    console.error('Error creating portal session:', error);
+    const errorMessage = error.response?.data?.message || 'Erro ao abrir portal de gerenciamento';
+    toast.error(errorMessage);
+  } finally {
+    isLoadingPortal.value = false;
   }
 };
 </script>

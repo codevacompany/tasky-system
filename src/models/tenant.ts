@@ -4,6 +4,7 @@ export interface Tenant {
   isInternal: boolean;
   customKey: string;
   createdAt: string;
+  stripeCustomerId?: string | null;
 }
 
 export interface CreateTenantDto {

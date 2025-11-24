@@ -1,7 +1,7 @@
 <template>
   <BaseModal
     title="Detalhes do Ticket"
-    :isLoading="isLoadingTicket"
+    :isLoading="isLoadingTicket && !hasLoadedTicketOnce"
     @close="closeModal"
     :showFooter="false"
     :hasCustomHeader="true"
@@ -141,8 +141,14 @@
 
     <div
       v-if="loadedTicket"
-      class="w-[85vw] max-w-[1280px] mx-auto p-3 sm:p-0 h-[calc(100vh-200px)] max-h-[650px] flex flex-col"
+      class="relative w-[85vw] max-w-[1280px] mx-auto p-3 sm:p-0 h-[calc(100vh-200px)] max-h-[650px] flex flex-col"
     >
+      <div
+        v-if="isLoadingTicket && hasLoadedTicketOnce"
+        class="absolute inset-0 z-20 bg-white/70 dark:bg-gray-900/70 flex items-center justify-center rounded-lg"
+      >
+        <LoadingSpinner :size="40" />
+      </div>
       <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
         <!-- Left Sidebar -->
         <div class="lg:col-span-1 overflow-y-auto pr-4 space-y-4">
@@ -217,9 +223,26 @@
                   </p>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
-                    {{ loadedTicket.requester.firstName }} {{ loadedTicket.requester.lastName }}
-                  </p>
+                  <div class="flex items-center gap-2">
+                    <div
+                      class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
+                      :style="
+                        getAvatarStyle(
+                          `${loadedTicket.requester.firstName} ${loadedTicket.requester.lastName}`,
+                        )
+                      "
+                    >
+                      {{
+                        getUserInitials({
+                          firstName: loadedTicket.requester.firstName,
+                          lastName: loadedTicket.requester.lastName,
+                        })
+                      }}
+                    </div>
+                    <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                      {{ loadedTicket.requester.firstName }} {{ loadedTicket.requester.lastName }}
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -230,26 +253,41 @@
                     Responsável
                   </p>
                 </div>
-                <div class="flex-1 min-w-0 -mt-1.5">
+                <div class="flex-1 min-w-0">
                   <div v-if="!isEditingAssignee">
                     <div v-if="sortedTargetUsers && sortedTargetUsers.length > 0">
                       <div
                         v-for="targetUser in sortedTargetUsers"
                         :key="targetUser.userId"
-                        class="flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors"
+                        class="flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 py-1 rounded-lg transition-colors"
                         @click="() => startEditingAssignee(targetUser.userId)"
                         :class="{ 'cursor-default': !canEditTicket }"
                         :title="canEditTicket ? 'Clique para alterar responsável' : ''"
                       >
                         <div class="flex-1 min-w-0">
                           <div
-                            class="flex items-center gap-2 -ml-2"
+                            class="flex items-center gap-2"
                             :class="{
                               'font-semibold text-blue-600 dark:text-blue-400':
                                 sortedTargetUsers.length > 1 &&
                                 targetUser.userId === loadedTicket.currentTargetUserId,
                             }"
                           >
+                            <div
+                              class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
+                              :style="
+                                getAvatarStyle(
+                                  `${targetUser.user.firstName} ${targetUser.user.lastName}`,
+                                )
+                              "
+                            >
+                              {{
+                                getUserInitials({
+                                  firstName: targetUser.user.firstName,
+                                  lastName: targetUser.user.lastName,
+                                })
+                              }}
+                            </div>
                             <span class="text-sm"
                               >{{ targetUser.user.firstName }} {{ targetUser.user.lastName }}</span
                             >
@@ -267,7 +305,7 @@
                           </div>
                           <p
                             v-if="targetUser.user.department?.name"
-                            class="text-xs text-gray-500 dark:text-gray-400 -ml-2 mt-0.5"
+                            class="text-xs text-gray-500 dark:text-gray-400 ml-8 mt-0.5"
                           >
                             {{ targetUser.user.department.name }}
                           </p>
@@ -330,10 +368,27 @@
                   <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Revisor</p>
                 </div>
                 <div v-if="loadedTicket.reviewer" class="flex-1 min-w-0">
-                  <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
-                    {{ loadedTicket.reviewer.firstName }} {{ loadedTicket.reviewer.lastName }}
-                  </p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                  <div class="flex items-center gap-2">
+                    <div
+                      class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
+                      :style="
+                        getAvatarStyle(
+                          `${loadedTicket.reviewer.firstName} ${loadedTicket.reviewer.lastName}`,
+                        )
+                      "
+                    >
+                      {{
+                        getUserInitials({
+                          firstName: loadedTicket.reviewer.firstName,
+                          lastName: loadedTicket.reviewer.lastName,
+                        })
+                      }}
+                    </div>
+                    <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                      {{ loadedTicket.reviewer.firstName }} {{ loadedTicket.reviewer.lastName }}
+                    </p>
+                  </div>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 ml-8">
                     {{ loadedTicket.reviewer.department?.name }}
                   </p>
                 </div>
@@ -474,7 +529,7 @@
               <h3
                 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-1"
               >
-                <font-awesome-icon icon="file-text" class="text-primary dark:text-blue-400" />
+                <font-awesome-icon icon="align-left" class="text-gray-600 dark:text-gray-300" />
                 Descrição
               </h3>
 
@@ -595,7 +650,10 @@
               <h3
                 class="font-semibold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2"
               >
-                <font-awesome-icon icon="comments" class="text-primary dark:text-blue-400" />
+                <font-awesome-icon
+                  :icon="['far', 'comment']"
+                  class="text-gray-600 dark:text-gray-300"
+                />
                 Atividade
               </h3>
 
@@ -662,14 +720,19 @@
                       >
                         <div class="flex items-center gap-3 mb-1">
                           <div
-                            :class="[
-                              'w-8 h-8 rounded-full flex items-center justify-center border-2 flex-shrink-0',
-                              isMyComment(event.data.user.id)
-                                ? 'bg-blue-100 dark:bg-blue-800/30 border-blue-200 dark:border-blue-700/30 text-blue-600 dark:text-blue-400'
-                                : 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400',
-                            ]"
+                            class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-sm"
+                            :style="
+                              getAvatarStyle(
+                                `${event.data.user.firstName} ${event.data.user.lastName}`,
+                              )
+                            "
                           >
-                            <font-awesome-icon icon="user-circle" />
+                            {{
+                              getUserInitials({
+                                firstName: event.data.user.firstName,
+                                lastName: event.data.user.lastName,
+                              })
+                            }}
                           </div>
                           <div class="flex items-center justify-between flex-1">
                             <span
@@ -940,6 +1003,8 @@ import {
   calculateDeadline,
   formatSnakeToNaturalCase,
   getUserInitials,
+  getAvatarColor,
+  getAvatarStyle,
   enumToOptions,
   getDeadlineInfo,
 } from '@/utils/generic-helper';
@@ -979,6 +1044,7 @@ const comments = ref<TicketComment[]>([]);
 const ticketUpdates = ref<TicketUpdate[]>([]);
 const loadedTicket = ref<Ticket | null>(null);
 const isLoadingTicket = ref(false);
+const hasLoadedTicketOnce = ref(false);
 const selectedFiles = ref<File[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isUploading = ref(false);
@@ -1647,6 +1713,7 @@ const fetchTicket = async (customId: string) => {
   try {
     const ticket = await ticketsStore.fetchTicketDetails(customId);
     loadedTicket.value = ticket;
+    hasLoadedTicketOnce.value = true;
     fetchComments();
     fetchTicketUpdates();
 
@@ -1688,11 +1755,13 @@ watch(
   () => props.ticketCustomId,
   (newCustomId) => {
     if (newCustomId) {
+      hasLoadedTicketOnce.value = false;
       fetchTicket(newCustomId);
     } else {
       loadedTicket.value = null;
       comments.value = [];
       ticketUpdates.value = [];
+      hasLoadedTicketOnce.value = false;
     }
   },
   { immediate: true },
