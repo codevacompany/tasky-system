@@ -16,7 +16,6 @@
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   --radius: 8px;
   --transition: all 0.2s ease;
-  --header-height: 70px;
 }
 
 html, body {
@@ -61,7 +60,6 @@ ul {
   align-items: center;
   justify-content: space-between;
   padding: 0 2rem;
-  height: var(--header-height);
   background-color: var(--card-bg);
   border-bottom: 1px solid var(--border-color);
   box-shadow: var(--shadow);
@@ -207,7 +205,6 @@ body.dark-mode .dark-mode-toggle i {
 .main-content {
   padding: 2rem;
   margin-bottom: 2rem;
-  min-height: calc(100vh - var(--header-height));
 }
 
 .section-content.active {

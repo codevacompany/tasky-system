@@ -1,7 +1,7 @@
 <template>
   <div class="fixed inset-0 bg-transparent z-[999] pointer-events-auto" @click="closeModal">
     <div
-      class="fixed top-[calc(var(--header-height)+4px)] right-5 w-[90vw] sm:w-[420px] bg-white dark:bg-gray-800 rounded shadow-[0_2px_8px_rgba(0,0,0,0.15)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] z-[1000] overflow-hidden border border-gray-200 dark:border-gray-700"
+      class="fixed top-[var(--header-height)] right-5 w-[90vw] sm:w-[420px] bg-white dark:bg-gray-800 rounded shadow-[0_2px_8px_rgba(0,0,0,0.15)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] z-[1000] overflow-hidden border border-gray-200 dark:border-gray-700"
       @click.stop
     >
       <div
@@ -54,32 +54,43 @@
           <div
             v-for="notification in sortedNotifications"
             :key="notification.id"
-            class="px-4 py-3 border-b border-gray-200 dark:border-gray-600 cursor-pointer transition-all duration-200 relative flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 hover:translate-x-0.5"
+            class="px-4 py-3 border-b border-gray-200 dark:border-gray-600 cursor-pointer transition-all duration-200 relative flex gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 hover:translate-x-0.5"
             :class="{
               'bg-blue-50/50 dark:bg-blue-900/10 border-l-[3px] border-l-blue-500':
                 !notification.read,
+              'items-center': notification.type !== NotificationType.Comment,
+              'items-start': notification.type === NotificationType.Comment,
             }"
             @click="fetchSelectedTicket(notification)"
           >
-            <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center text-base">
-              <font-awesome-icon
-                :icon="getNotificationIcon(notification.type)"
-                :class="{
-                  'text-blue-500 dark:text-blue-400': notification.type === NotificationType.Open,
-                  'text-cyan-500 dark:text-cyan-400':
-                    notification.type === NotificationType.Comment,
-                }"
-              />
+            <div
+              class="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-sm"
+              :style="getNotificationAvatarStyle(notification)"
+            >
+              {{ getNotificationUserInitials(notification) }}
             </div>
-            <div class="w-full flex justify-between gap-1">
+            <div class="w-full flex flex-col gap-1.5">
+              <div class="flex justify-between gap-1">
+                <div
+                  v-html="formatNotificationMessage(notification)"
+                  class="text-sm text-gray-900 dark:text-white m-0 leading-relaxed text-left"
+                ></div>
+                <span
+                  class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap flex-shrink-0"
+                >
+                  <font-awesome-icon :icon="['far', 'clock']" />
+                  {{ formatRelativeTime(notification.createdAt) }}
+                </span>
+              </div>
               <div
-                v-html="formatNotificationMessage(notification)"
-                class="text-sm text-gray-900 dark:text-white m-0 leading-relaxed text-left"
-              ></div>
-              <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                <font-awesome-icon :icon="['far', 'clock']" />
-                {{ formatRelativeTime(notification.createdAt) }}
-              </span>
+                v-if="notification.metadata?.commentText"
+                class="mt-1 p-2.5 bg-white dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600"
+              >
+                <div
+                  class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed comment-preview text-left"
+                  v-html="notification.metadata.commentText"
+                ></div>
+              </div>
             </div>
           </div>
 
@@ -105,7 +116,6 @@
       </div>
     </div>
   </div>
-
 </template>
 
 <script setup lang="ts">
@@ -119,6 +129,7 @@ import { formatRelativeTime } from '@/utils/date';
 import { useUserStore } from '@/stores/user';
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { localStorageService } from '@/utils/localStorageService';
+import { getUserInitials, getAvatarStyle } from '@/utils/generic-helper';
 
 const emit = defineEmits<{
   (e: 'close'): void;
@@ -213,22 +224,22 @@ const fetchSelectedTicket = async (notification: Notification) => {
     try {
       // Mark notification as read
       await notificationService.markAsRead(notification.id);
-      
+
       // Close the notifications dropdown
       closeModal();
-      
+
       // Navigate to tickets page with the ticket customId in the URL
       // Preserve current query params if already on tickets page, otherwise use default tab
       const isOnTicketsPage = route.path === '/meus-tickets';
       const query = isOnTicketsPage
         ? { ...route.query, ticket: notification.resourceCustomId }
         : { tab: 'recebidos', ticket: notification.resourceCustomId };
-      
+
       router.push({
         path: '/meus-tickets',
         query,
       });
-      
+
       // Refresh notifications to update the read status
       currentPage.value = 1;
       await fetchNotifications(1, false);
@@ -250,17 +261,6 @@ const markAllAsRead = async () => {
   }
 };
 
-const getNotificationIcon = (type: NotificationType) => {
-  switch (type) {
-    case NotificationType.Open:
-      return 'ticket';
-    case NotificationType.Comment:
-      return 'comments';
-    default:
-      return 'bell';
-  }
-};
-
 const formatNotificationMessage = (notification: Notification) => {
   const userName = `<span class="font-medium text-gray-900 dark:text-gray-300">${notification.createdBy.firstName} ${notification.createdBy.lastName}</span>`;
   const ticketId = notification.resourceCustomId
@@ -268,6 +268,23 @@ const formatNotificationMessage = (notification: Notification) => {
     : `<span class="font-medium text-gray-900 dark:text-gray-300">${notification.resourceId.toString()}</span>`;
 
   return notification.message.replace('user', userName).replace('resource', ticketId);
+};
+
+const getNotificationUserInitials = (notification: Notification) => {
+  return getUserInitials({
+    firstName: notification.createdBy?.firstName,
+    lastName: notification.createdBy?.lastName,
+  });
+};
+
+const getNotificationAvatarStyle = (notification: Notification) => {
+  const fullName =
+    `${notification.createdBy?.firstName || ''} ${notification.createdBy?.lastName || ''}`.trim();
+  const fallbackSeed =
+    notification.createdBy?.email ||
+    (notification.createdBy?.id ? String(notification.createdBy.id) : '') ||
+    String(notification.id);
+  return getAvatarStyle(fullName || fallbackSeed || '');
 };
 
 // Watch for changes to showOnlyUnread and save to localStorage
@@ -283,3 +300,62 @@ onBeforeUnmount(() => {
   // Cleanup if needed
 });
 </script>
+
+<style scoped>
+.comment-preview :deep(p) {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.comment-preview :deep(p + p) {
+  margin-top: 0.5rem;
+}
+
+.comment-preview :deep(strong) {
+  font-weight: 600;
+}
+
+.comment-preview :deep(em) {
+  font-style: italic;
+}
+
+.comment-preview :deep(ul),
+.comment-preview :deep(ol) {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+
+.comment-preview :deep(li) {
+  margin-bottom: 0.25rem;
+}
+
+.comment-preview :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+}
+
+.comment-preview :deep(blockquote) {
+  margin: 0.5rem 0;
+  padding-left: 0.75rem;
+  border-left: 3px solid #d1d5db;
+  font-style: italic;
+}
+
+.dark .comment-preview :deep(blockquote) {
+  border-left-color: #4b5563;
+}
+
+.comment-preview :deep(code) {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.125rem 0.25rem;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 0.875em;
+}
+
+.dark .comment-preview :deep(code) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+</style>

@@ -194,10 +194,48 @@ export function getUserInitials(
   }
 
   if ('firstName' in input && 'lastName' in input) {
-    const firstInitial = input.firstName?.charAt(0) || '';
-    const lastInitial = input.lastName?.charAt(0) || '';
-    return (firstInitial + lastInitial).toUpperCase();
+    const firstName = input.firstName?.trim() || '';
+    const lastName = input.lastName?.trim() || '';
+    const firstInitial = firstName.charAt(0);
+    const secondInitial = lastName.charAt(0) || firstName.charAt(1);
+    const initials = `${firstInitial}${secondInitial}`.trim();
+    return initials ? initials.toUpperCase() : '??';
   }
 
   return '??';
+}
+
+export const DEFAULT_AVATAR_PALETTE = [
+  '#ef4444', // red
+  '#f97316', // orange
+  '#eab308', // yellow
+  '#84cc16', // green
+  '#06b6d4', // cyan
+  '#3b82f6', // blue
+  '#6366f1', // indigo
+  '#8b5cf6', // violet
+  '#d946ef', // fuchsia
+  '#ec4899', // pink
+] as const;
+
+export function getAvatarColor(
+  seed: string,
+  palette: readonly string[] = DEFAULT_AVATAR_PALETTE,
+): string {
+  if (!seed || palette.length === 0) return palette[0] || '#0ea5e9';
+
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return palette[Math.abs(hash) % palette.length];
+}
+
+export function getAvatarStyle(
+  seed: string,
+  palette: readonly string[] = DEFAULT_AVATAR_PALETTE,
+): { backgroundColor: string } {
+  return {
+    backgroundColor: getAvatarColor(seed, palette),
+  };
 }

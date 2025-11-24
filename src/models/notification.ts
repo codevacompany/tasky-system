@@ -1,4 +1,4 @@
-import type { User } from "./user";
+import type { User } from './user';
 
 export enum NotificationType {
   Open = 'abertura',
@@ -19,7 +19,11 @@ export interface Notification {
   createdBy: User;
   targetUser: User;
   resourceId: number;
-  resourceCustomId?: string
+  resourceCustomId?: string;
+  metadata?: {
+    commentText?: string;
+    [key: string]: unknown;
+  } | null;
   createdAt: string;
 }
 

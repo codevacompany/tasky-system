@@ -58,16 +58,16 @@
           ]"
           @click="openTicketDetails(ticket)"
         >
-          <div class="flex justify-between items-start mb-2 w-full p-0">
-            <div class="flex-1 min-w-0 flex items-start">
+          <div class="flex justify-between items-start gap-3 mb-2 w-full p-0">
+            <div class="flex-1 min-w-0 flex items-start" :class="{ 'pb-1': hasRightIcons(ticket) }">
               <div
-                class="font-semibold text-sm leading-5 text-gray-900 dark:text-white overflow-hidden text-left flex-1 break-words m-0 p-0"
-                style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical"
+                class="font-semibold text-sm leading-5 text-gray-900 dark:text-white text-left flex-1 break-words m-0 p-0"
+                :class="hasRightIcons(ticket) ? 'line-clamp-2' : ''"
               >
                 {{ ticket.name }}
               </div>
             </div>
-            <div class="flex items-center gap-2 ml-auto flex-shrink-0">
+            <div v-if="hasRightIcons(ticket)" class="flex items-center gap-2 ml-3 flex-shrink-0">
               <div
                 v-if="(ticket.comments?.length || 0) > 0"
                 class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 opacity-80"
@@ -127,7 +127,12 @@
                     }"
                     :title="targetUser.user.firstName + ' ' + targetUser.user.lastName"
                   >
-                    {{ getUserInitials(targetUser.user.firstName, targetUser.user.lastName) }}
+                    {{
+                      getUserInitials({
+                        firstName: targetUser.user.firstName,
+                        lastName: targetUser.user.lastName,
+                      })
+                    }}
                   </div>
                 </div>
                 <div class="flex flex-col">
@@ -255,7 +260,7 @@ import { ref, onMounted, computed } from 'vue';
 import type { Ticket } from '@/models';
 import type { StatusColumn, TicketStatus as ColumnTicketStatus } from '@/models/statusColumn';
 import { DefaultTicketStatus, TicketPriority } from '@/models';
-import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import { formatSnakeToNaturalCase, getUserInitials, getAvatarColor } from '@/utils/generic-helper';
 import { formatDate, formatRelativeTime } from '@/utils/date';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
@@ -278,34 +283,20 @@ const pendingVerificationTicket = ref<Ticket | null>(null);
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
 
-const getUserInitials = (firstName: string, lastName: string) => {
-  return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
-};
-
-const getAvatarColor = (name: string) => {
-  const colors = [
-    '#ef4444', // red
-    '#f97316', // orange
-    '#eab308', // yellow
-    '#84cc16', // green
-    '#06b6d4', // cyan
-    '#3b82f6', // blue
-    '#6366f1', // indigo
-    '#8b5cf6', // violet
-    '#d946ef', // fuchsia
-    '#ec4899', // pink
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return colors[Math.abs(hash) % colors.length];
-};
-
 const getSortedTargetUsers = (ticket: Ticket) => {
   if (!ticket?.targetUsers || ticket.targetUsers.length === 0)
     return [] as NonNullable<Ticket['targetUsers']>;
   return [...ticket.targetUsers].sort((a, b) => a.order - b.order);
+};
+
+const hasRightIcons = (ticket: Ticket) => {
+  return (
+    (ticket.comments?.length ?? 0) > 0 ||
+    Boolean(ticket.isPrivate) ||
+    (ticket.files?.length ?? 0) > 0 ||
+    ticket.ticketStatus?.key === DefaultTicketStatus.Returned ||
+    ticket.status === DefaultTicketStatus.Returned
+  );
 };
 
 const getTicketsByColumn = (column: StatusColumn) => {

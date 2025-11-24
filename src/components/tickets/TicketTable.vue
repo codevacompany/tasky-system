@@ -147,7 +147,11 @@
                     :class="getDeadlineDotClass(item.dueAt)"
                     class="inline-block w-[9px] h-[9px] rounded-full"
                   ></span>
-                  <font-awesome-icon icon="exclamation-triangle" class="text-red-500 text-xs" />
+                  <font-awesome-icon
+                    v-else
+                    icon="exclamation-triangle"
+                    class="text-red-500 text-xs"
+                  />
                 </template>
                 {{ calculateDeadline(item) || '-' }}
               </span>
