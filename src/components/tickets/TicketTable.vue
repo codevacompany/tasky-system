@@ -43,7 +43,7 @@
                 v-for="targetUser in item.targetUsers"
                 :key="targetUser.userId"
                 :class="[
-                  item.targetUsers.length > 1 && targetUser.userId === item.currentTargetUserId
+                  shouldHighlightTargetUser(item, targetUser.userId)
                     ? 'text-blue-600 dark:text-blue-400'
                     : 'text-gray-900 dark:text-gray-100',
                 ]"
@@ -68,28 +68,68 @@
         </div>
       </template>
 
-      <template #column-department="{ item }">
-        <div class="text-sm text-gray-900 dark:text-gray-100">
+      <template #column-destinatario="{ item }">
+        <div
+          v-if="tableType === 'gerais' || tableType === 'arquivados'"
+          class="text-sm text-gray-900 dark:text-gray-100"
+        >
           <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
             <div
               v-for="targetUser in item.targetUsers"
               :key="targetUser.userId"
               :class="[
-                item.targetUsers.length > 1 && targetUser.userId === item.currentTargetUserId
+                shouldHighlightTargetUser(item, targetUser.userId)
                   ? 'text-blue-600 dark:text-blue-400'
                   : 'text-gray-900 dark:text-gray-100',
               ]"
             >
-              {{ targetUser.user.department?.name || '-' }}
+              {{ targetUser.user.firstName }} {{ targetUser.user.lastName }}
             </div>
           </div>
-          <div
-            v-else
-            class="truncate"
-            :title="item.targetUsers?.[0]?.user?.department?.name || '-'"
-          >
-            {{ item.targetUsers?.[0]?.user?.department?.name || '-' }}
-          </div>
+          <div v-else>-</div>
+        </div>
+      </template>
+
+      <template #column-department="{ item }">
+        <div class="text-sm text-gray-900 dark:text-gray-100">
+          <template v-if="tableType === 'setor'">
+            <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
+              <div
+                v-for="targetUser in item.targetUsers"
+                :key="targetUser.userId"
+                :class="[
+                  shouldHighlightTargetUser(item, targetUser.userId)
+                    ? 'text-blue-600 dark:text-blue-400'
+                    : 'text-gray-900 dark:text-gray-100',
+                ]"
+              >
+                {{ targetUser.user.firstName }} {{ targetUser.user.lastName }}
+              </div>
+            </div>
+            <div v-else>-</div>
+          </template>
+          <template v-else>
+            <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
+              <div
+                v-for="targetUser in item.targetUsers"
+                :key="targetUser.userId"
+                :class="[
+                  shouldHighlightTargetUser(item, targetUser.userId)
+                    ? 'text-blue-600 dark:text-blue-400'
+                    : 'text-gray-900 dark:text-gray-100',
+                ]"
+              >
+                {{ targetUser.user.department?.name || '-' }}
+              </div>
+            </div>
+            <div
+              v-else
+              class="truncate"
+              :title="item.targetUsers?.[0]?.user?.department?.name || '-'"
+            >
+              {{ item.targetUsers?.[0]?.user?.department?.name || '-' }}
+            </div>
+          </template>
         </div>
       </template>
 
@@ -165,7 +205,7 @@
 
       <template #actions="{ item }">
         <div class="flex gap-0.5 md:gap-1 justify-center">
-          <template v-if="tableType === 'recebidos'">
+          <template v-if="tableType === 'recebidos' || tableType === 'gerais'">
             <button
               v-if="getTicketStatus(item) === DefaultTicketStatus.Pending"
               class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors duration-200"
@@ -497,6 +537,7 @@ import { toast } from 'vue3-toastify';
 import ConfirmationModal from '../common/ConfirmationModal.vue';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore, type TicketListFilters } from '@/stores/tickets';
+import { useRoles } from '@/composables/useRoles';
 import BaseModal from '../common/BaseModal.vue';
 import DataTable from '../common/DataTable.vue';
 import type { TableHeader, PaginationInfo } from '../common/DataTable.vue';
@@ -507,8 +548,10 @@ import {
   getDeadlineInfo,
 } from '@/utils/generic-helper';
 
+type TableType = 'recebidos' | 'criados' | 'setor' | 'arquivados' | 'gerais';
+
 const props = defineProps<{
-  tableType: 'recebidos' | 'criados' | 'setor' | 'arquivados';
+  tableType: TableType;
   pagination?: boolean;
   currentPage: number;
 }>();
@@ -520,6 +563,7 @@ const emit = defineEmits<{
 
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
+const { isSupervisor } = useRoles();
 
 type SortKey = 'customId' | 'name';
 type SortDirection = 'asc' | 'desc';
@@ -535,6 +579,8 @@ const activeFilters = computed<TicketListFilters | undefined>(() => {
       return ticketsStore.departmentTickets.currentFilters;
     case 'arquivados':
       return ticketsStore.archivedTickets.currentFilters;
+    case 'gerais':
+      return ticketsStore.tenantTickets.currentFilters;
     default:
       return undefined;
   }
@@ -567,7 +613,7 @@ const tableHeaders = computed<TableHeader<Ticket>[]>(() => {
     return sortState.value?.key === key ? sortState.value.direction : 'none';
   };
 
-  return [
+  const baseHeaders: TableHeader<Ticket>[] = [
     {
       key: 'customId',
       label: 'ID',
@@ -588,15 +634,35 @@ const tableHeaders = computed<TableHeader<Ticket>[]>(() => {
     },
     {
       key: 'person',
-      label: props.tableType === 'criados' ? 'Destino' : 'Solicitante',
+      label: props.tableType === 'criados' ? 'Destinatário' : 'Solicitante',
       align: 'center',
       width: 0.18,
     },
-    { key: 'department', label: 'Setor', align: 'center', width: 0.18 },
+  ];
+
+  if (props.tableType === 'gerais' || props.tableType === 'arquivados') {
+    baseHeaders.push({
+      key: 'destinatario',
+      label: 'Destinatário',
+      align: 'center',
+      width: 0.18,
+    });
+  }
+
+  baseHeaders.push({
+    key: 'department',
+    label: props.tableType === 'setor' ? 'Destinatário' : 'Setor',
+    align: 'center',
+    width: 0.18,
+  });
+
+  baseHeaders.push(
     { key: 'priority', label: 'Prioridade', align: 'center', width: 0.1 },
     { key: 'status', label: 'Status', align: 'center', width: 0.11 },
     { key: 'dueDate', label: 'Prazo', align: 'center', width: 0.1 },
-  ];
+  );
+
+  return baseHeaders;
 });
 
 const showVerificationAlert = ref(false);
@@ -630,6 +696,8 @@ const displayedTickets = computed(() => {
       return ticketsStore.departmentTickets.data;
     case 'arquivados':
       return ticketsStore.archivedTickets.data;
+    case 'gerais':
+      return ticketsStore.tenantTickets.data;
     default:
       return [];
   }
@@ -645,6 +713,8 @@ const isLoading = computed(() => {
       return ticketsStore.departmentTickets.isLoading;
     case 'arquivados':
       return ticketsStore.archivedTickets.isLoading;
+    case 'gerais':
+      return ticketsStore.tenantTickets.isLoading;
     default:
       return false;
   }
@@ -664,6 +734,9 @@ const totalPages = computed(() => {
       break;
     case 'arquivados':
       totalCount = ticketsStore.archivedTickets.totalCount;
+      break;
+    case 'gerais':
+      totalCount = ticketsStore.tenantTickets.totalCount;
       break;
   }
   return Math.ceil(totalCount / 10);
@@ -721,9 +794,16 @@ const handleSort = async (sortKey: string) => {
 };
 
 const openTicketDetails = (ticket: Ticket) => {
+  if (isSupervisor.value && props.tableType === 'setor' && ticket.isPrivate) {
+    toast.warning('Este ticket é privado');
+    return;
+  }
+
   // Se for o solicitante e o ticket estiver aguardando verificação
   if (
-    (props.tableType === 'criados' || props.tableType === 'recebidos') &&
+    (props.tableType === 'criados' ||
+      props.tableType === 'recebidos' ||
+      props.tableType === 'gerais') &&
     getTicketStatus(ticket) === DefaultTicketStatus.AwaitingVerification &&
     userStore.user?.id === ticket.reviewer?.id
   ) {
@@ -752,6 +832,9 @@ const refreshTickets = async (pageOverride?: number) => {
       break;
     case 'arquivados':
       await ticketsStore.fetchArchivedTickets(pageToUse, 10, filters);
+      break;
+    case 'gerais':
+      await ticketsStore.fetchTenantTickets(pageToUse, 10, filters);
       break;
   }
 };
@@ -1108,6 +1191,22 @@ const isDeadlineOverdue = (dueAt: string) => {
 // Helper function to get ticket status (supports both new and old format)
 const getTicketStatus = (ticket: Ticket): string => {
   return ticket.ticketStatus?.key || ticket.status || '';
+};
+
+const terminalStatuses = new Set([
+  DefaultTicketStatus.Completed,
+  DefaultTicketStatus.Canceled,
+  DefaultTicketStatus.Rejected,
+]);
+
+const shouldHighlightTargetUser = (ticket: Ticket, userId: number) => {
+  if (!ticket.targetUsers || ticket.targetUsers.length <= 1) return false;
+
+  if (terminalStatuses.has(getTicketStatus(ticket) as DefaultTicketStatus)) {
+    return false;
+  }
+
+  return ticket.currentTargetUserId === userId;
 };
 </script>
 

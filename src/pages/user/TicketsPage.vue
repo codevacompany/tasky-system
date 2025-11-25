@@ -136,6 +136,19 @@
                       <span class="sm:hidden">Setor</span>
                     </button>
                     <button
+                      v-if="isTenantAdmin"
+                      :class="[
+                        'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
+                        activeTab === 'gerais'
+                          ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
+                      ]"
+                      style="font-size: 13px"
+                      @click="switchTab('gerais')"
+                    >
+                      Tickets Gerais
+                    </button>
+                    <button
                       :class="[
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'arquivados'
@@ -340,6 +353,7 @@ import { useTicketsStore } from '@/stores/tickets';
 import { useUserStore } from '@/stores/user';
 import type { Ticket } from '@/models';
 import { DefaultTicketStatus, TicketPriority } from '@/models';
+import { useRoles } from '@/composables/useRoles';
 import TicketTable from '@/components/tickets/TicketTable.vue';
 import TicketKanban from '@/components/tickets/TicketKanban.vue';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
@@ -352,13 +366,22 @@ import { localStorageService } from '@/utils/localStorageService';
 const route = useRoute();
 const router = useRouter();
 const ticketsStore = useTicketsStore();
+const { isTenantAdmin } = useRoles();
 
-const getInitialTab = (): 'recebidos' | 'criados' | 'setor' | 'arquivados' => {
+type TicketsTab = 'recebidos' | 'criados' | 'setor' | 'arquivados' | 'gerais';
+
+const BASE_TABS: TicketsTab[] = ['recebidos', 'criados', 'setor', 'arquivados'];
+
+const getValidTabs = (includeGeneral: boolean) => {
+  return includeGeneral ? [...BASE_TABS, 'gerais'] : [...BASE_TABS];
+};
+
+const getInitialTab = (): TicketsTab => {
   const tabFromUrl = route.query.tab as string;
-  const validTabs = ['recebidos', 'criados', 'setor', 'arquivados'];
+  const validTabs = getValidTabs(isTenantAdmin.value);
 
-  if (validTabs.includes(tabFromUrl)) {
-    return tabFromUrl as 'recebidos' | 'criados' | 'setor' | 'arquivados';
+  if (validTabs.includes(tabFromUrl as TicketsTab)) {
+    return tabFromUrl as TicketsTab;
   }
 
   return 'recebidos';
@@ -373,11 +396,15 @@ const getInitialFilters = () => {
   };
 };
 
-const activeTab = ref<'recebidos' | 'criados' | 'setor' | 'arquivados'>(getInitialTab());
+const activeTab = ref<TicketsTab>(getInitialTab());
 const searchTerm = ref(getInitialFilters().search);
 const statusFilter = ref<string>(getInitialFilters().status);
 const priorityFilter = ref<string>(getInitialFilters().priority);
 const currentPage = ref(getInitialFilters().page);
+
+const availableTabs = computed<TicketsTab[]>(() =>
+  isTenantAdmin.value ? [...BASE_TABS, 'gerais'] : [...BASE_TABS],
+);
 
 const showCorrectionModal = ref(false);
 const selectedTicket = ref<Ticket | null>(null);
@@ -423,6 +450,9 @@ const tickets = computed(() => {
       break;
     case 'arquivados':
       return ticketsStore.archivedTickets.data;
+    case 'gerais':
+      ticketsData = ticketsStore.tenantTickets.data;
+      break;
     default:
       return [];
   }
@@ -448,6 +478,8 @@ const isLoading = computed(() => {
       return ticketsStore.departmentTickets.isLoading;
     case 'arquivados':
       return ticketsStore.archivedTickets.isLoading;
+    case 'gerais':
+      return ticketsStore.tenantTickets.isLoading;
     default:
       return false;
   }
@@ -464,6 +496,8 @@ const totalPages = computed(() => {
       return Math.ceil(ticketsStore.departmentTickets.totalCount / 10);
     case 'arquivados':
       return Math.ceil(ticketsStore.archivedTickets.totalCount / 10);
+    case 'gerais':
+      return Math.ceil(ticketsStore.tenantTickets.totalCount / 10);
     default:
       return 1;
   }
@@ -508,7 +542,7 @@ const activeFiltersCount = computed(() => {
   return count;
 });
 
-const switchTab = (tab: 'recebidos' | 'criados' | 'setor' | 'arquivados') => {
+const switchTab = (tab: TicketsTab) => {
   statusFilter.value = '';
   priorityFilter.value = '';
   searchTerm.value = '';
@@ -520,14 +554,22 @@ const switchTab = (tab: 'recebidos' | 'criados' | 'setor' | 'arquivados') => {
 };
 
 const fetchTicketsWithFilters = async () => {
-  const typeMap: Record<string, 'received' | 'createdByMe' | 'department' | 'archived'> = {
+  const typeMap: Record<
+    TicketsTab,
+    'received' | 'createdByMe' | 'department' | 'archived' | 'tenant'
+  > = {
     recebidos: 'received',
     criados: 'createdByMe',
     setor: 'department',
-    arquivo: 'archived',
+    arquivados: 'archived',
+    gerais: 'tenant',
   };
 
   const storeType = typeMap[activeTab.value];
+
+  if (!storeType) {
+    return;
+  }
 
   const filters: {
     priority?: TicketPriority | null;
@@ -707,12 +749,23 @@ const updateUrlWithFilters = () => {
 watch(
   () => route.query.tab,
   (newTab) => {
-    const validTabs = ['recebidos', 'criados', 'setor', 'arquivados'];
-    if (newTab && validTabs.includes(newTab as string)) {
-      activeTab.value = newTab as 'recebidos' | 'criados' | 'setor' | 'arquivados';
+    if (newTab && availableTabs.value.includes(newTab as TicketsTab)) {
+      activeTab.value = newTab as TicketsTab;
     }
   },
 );
+
+watch(isTenantAdmin, (isAdmin) => {
+  if (!isAdmin && activeTab.value === 'gerais') {
+    activeTab.value = 'recebidos';
+    updateUrlWithFilters();
+    return;
+  }
+
+  if (isAdmin && route.query.tab === 'gerais') {
+    activeTab.value = 'gerais';
+  }
+});
 
 watch(
   () => route.query.ticket,

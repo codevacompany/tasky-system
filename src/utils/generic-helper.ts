@@ -215,7 +215,7 @@ export const DEFAULT_AVATAR_PALETTE = [
   '#6366f1', // indigo
   '#8b5cf6', // violet
   '#d946ef', // fuchsia
-  '#ec4899', // pink
+  '#1e3a8a', // dark blue
 ] as const;
 
 export function getAvatarColor(
