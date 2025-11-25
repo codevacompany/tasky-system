@@ -180,7 +180,12 @@ const verifyCode = async () => {
       query: { token: response.data.token },
     });
   } catch (error: any) {
-    toast.error(error.response?.data?.message || 'Código inválido ou expirado');
+    const errorCode = error.response?.data?.code;
+    if (errorCode === 'email-not-found') {
+      toast.error('Este e-mail não está cadastrado');
+    } else {
+      toast.error('Código inválido ou expirado');
+    }
   } finally {
     isLoading.value = false;
   }
@@ -197,7 +202,12 @@ const resendCode = async () => {
     await authService.requestPasswordReset(email.value);
     toast.success('Código reenviado para seu e-mail');
   } catch (error: any) {
-    toast.error(error.response?.data?.message || 'Erro ao reenviar código');
+    const errorCode = error.response?.data?.code;
+    if (errorCode === 'email-not-found') {
+      toast.error('Este e-mail não está cadastrado');
+    } else {
+      toast.error(error.response?.data?.message || 'Erro ao reenviar código');
+    }
   } finally {
     isResending.value = false;
   }
@@ -300,4 +310,3 @@ onMounted(async () => {
   color: #4b5563 !important;
 }
 </style>
-
