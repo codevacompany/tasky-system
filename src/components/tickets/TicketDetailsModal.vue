@@ -714,9 +714,17 @@
                         :class="[
                           'rounded-lg p-3 border',
                           isMyComment(event.data.user.id)
-                            ? 'bg-blue-50/50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-800/30'
+                            ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
                             : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600',
                         ]"
+                        :style="
+                          isMyComment(event.data.user.id)
+                            ? {
+                                backgroundColor: '#FAFBFD',
+                                borderColor: '#E5E7EB',
+                              }
+                            : undefined
+                        "
                       >
                         <div class="flex items-center gap-3 mb-1">
                           <div
@@ -739,7 +747,7 @@
                               :class="[
                                 'font-medium',
                                 isMyComment(event.data.user.id)
-                                  ? 'text-blue-900 dark:text-blue-200'
+                                  ? 'text-gray-900 dark:text-gray-100'
                                   : 'text-gray-900 dark:text-gray-100',
                               ]"
                             >
@@ -1084,6 +1092,55 @@ const editorOptions = {
     ],
   },
   placeholder: 'Adicionar comentário...',
+};
+
+const dataUrlToBlob = (dataUrl: string) => {
+  const arr = dataUrl.split(',');
+  const mimeMatch = arr[0].match(/:(.*?);/);
+  const mime = mimeMatch ? mimeMatch[1] : 'image/png';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return { blob: new Blob([u8arr], { type: mime }), mime };
+};
+
+const uploadInlineImage = async (dataUrl: string) => {
+  const { blob, mime } = dataUrlToBlob(dataUrl);
+  const ext = mime.split('/')[1] || 'png';
+  const { data } = await awsService.getSignedUrl(ext);
+  await axios.put(data.url, blob, {
+    headers: {
+      'Content-Type': mime,
+    },
+  });
+  return data.url.split('?')[0];
+};
+
+const processRichTextContent = async (html: string) => {
+  if (typeof window === 'undefined' || !html) return html;
+
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+
+  const images = Array.from(tempDiv.querySelectorAll('img'));
+  for (const img of images) {
+    const src = img.getAttribute('src');
+    if (src && src.startsWith('data:')) {
+      try {
+        const uploadedUrl = await uploadInlineImage(src);
+        img.setAttribute('src', uploadedUrl);
+      } catch (error) {
+        console.error('Erro ao enviar imagem embutida:', error);
+        toast.error('Erro ao enviar imagem do comentário. Tente novamente.');
+        throw error;
+      }
+    }
+  }
+
+  return tempDiv.innerHTML;
 };
 
 const closeModal = () => {
@@ -1501,11 +1558,13 @@ const comment = async () => {
   }
 
   try {
+    const processedContent = await processRichTextContent(newComment.value);
+
     await ticketCommentService.create({
       ticketId: loadedTicket.value!.id,
       ticketCustomId: loadedTicket.value!.customId,
       userId: userStore.user!.id,
-      content: newComment.value,
+      content: processedContent,
     });
 
     fetchComments();
@@ -1914,15 +1973,18 @@ const saveTicketDescription = async () => {
   }
 
   try {
+    const processedDescription = await processRichTextContent(editingDescription.value);
+
     await ticketService.update(loadedTicket.value!.customId, {
-      description: editingDescription.value,
+      description: processedDescription,
     });
 
     isEditingDescription.value = false;
 
     if (loadedTicket.value) {
-      loadedTicket.value.description = editingDescription.value;
+      loadedTicket.value.description = processedDescription;
     }
+    editingDescription.value = processedDescription;
 
     refreshSelectedTicket();
   } catch {

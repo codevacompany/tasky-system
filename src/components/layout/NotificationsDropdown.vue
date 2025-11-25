@@ -87,9 +87,11 @@
                 class="mt-1 p-2.5 bg-white dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600"
               >
                 <div
+                  v-if="getCommentPreviewText(notification.metadata.commentText)"
                   class="text-xs text-gray-700 dark:text-gray-300 leading-relaxed comment-preview text-left"
-                  v-html="notification.metadata.commentText"
-                ></div>
+                >
+                  {{ getCommentPreviewText(notification.metadata.commentText) }}
+                </div>
               </div>
             </div>
           </div>
@@ -285,6 +287,27 @@ const getNotificationAvatarStyle = (notification: Notification) => {
     (notification.createdBy?.id ? String(notification.createdBy.id) : '') ||
     String(notification.id);
   return getAvatarStyle(fullName || fallbackSeed || '');
+};
+
+const MAX_COMMENT_PREVIEW_LENGTH = 94;
+const getCommentPreviewText = (commentText?: string | null) => {
+  if (!commentText) return '';
+
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = commentText;
+
+  const mediaElements = tempDiv.querySelectorAll('img, video, iframe');
+  mediaElements.forEach((el) => {
+    const placeholder = el.tagName.toLowerCase() === 'img' ? '[Imagem]' : '[Mídia incorporada]';
+    el.replaceWith(document.createTextNode(` ${placeholder} `));
+  });
+
+  const normalizedText = tempDiv.textContent?.replace(/\s+/g, ' ').trim() || '';
+  if (!normalizedText) return '';
+
+  return normalizedText.length > MAX_COMMENT_PREVIEW_LENGTH
+    ? `${normalizedText.slice(0, MAX_COMMENT_PREVIEW_LENGTH).trimEnd()}…`
+    : normalizedText;
 };
 
 // Watch for changes to showOnlyUnread and save to localStorage
