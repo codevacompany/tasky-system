@@ -86,14 +86,13 @@
 <script setup lang="ts">
 import { authService } from '@/services/authService';
 import { ref, computed, onMounted, nextTick } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
 const router = useRouter();
-const route = useRoute();
 
-const email = ref((route.query.email as string) || '');
+const email = ref('');
 const codeDigits = ref<string[]>(['', '', '', '', '', '']);
 const inputRefs = ref<(HTMLInputElement | null)[]>([]);
 const isLoading = ref(false);
@@ -174,11 +173,9 @@ const verifyCode = async () => {
       code: code.value,
     });
 
-    toast.success('Código verificado com sucesso');
-    router.push({
-      path: '/nova-senha',
-      query: { token: response.data.token },
-    });
+    sessionStorage.setItem('resetPasswordToken', response.data.token);
+
+    router.push({ path: '/nova-senha' });
   } catch (error: any) {
     const errorCode = error.response?.data?.code;
     if (errorCode === 'email-not-found') {
@@ -213,8 +210,19 @@ const resendCode = async () => {
   }
 };
 
+const loadEmailFromSession = () => {
+  if (typeof window === 'undefined') return;
+  const storedEmail = sessionStorage.getItem('resetPasswordEmail');
+  if (storedEmail) {
+    email.value = storedEmail;
+  }
+};
+
 onMounted(async () => {
+  loadEmailFromSession();
+
   if (!email.value) {
+    toast.error('E-mail não informado. Solicite um novo código.');
     router.push('/esqueci-senha');
     return;
   }

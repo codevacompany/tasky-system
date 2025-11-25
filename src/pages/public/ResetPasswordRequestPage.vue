@@ -87,10 +87,10 @@ const requestReset = async () => {
   try {
     await authService.requestPasswordReset(email.value);
     toast.success('Código de verificação enviado para seu e-mail');
-    router.push({
-      path: '/verificar-codigo',
-      query: { email: email.value },
-    });
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('resetPasswordEmail', email.value);
+    }
+    router.push({ path: '/verificar-codigo' });
   } catch (error: any) {
     toast.error(error.response?.data?.message || 'Erro ao enviar código de verificação');
   } finally {
@@ -184,4 +184,3 @@ const requestReset = async () => {
   color: #4b5563 !important;
 }
 </style>
-

@@ -43,10 +43,7 @@
 
             <!-- Confirm Password Field -->
             <div>
-              <label
-                for="confirmPassword"
-                class="block text-sm font-medium text-gray-700 mb-2"
-              >
+              <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
                 Confirmar Senha
               </label>
               <div class="relative">
@@ -86,15 +83,14 @@
 <script setup lang="ts">
 import { authService } from '@/services/authService';
 import { ref, computed, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import Input from '@/components/common/Input.vue';
 
 const router = useRouter();
-const route = useRoute();
 
-const token = ref((route.query.token as string) || '');
+const token = ref('');
 const newPassword = ref('');
 const confirmPassword = ref('');
 const isLoading = ref(false);
@@ -119,7 +115,11 @@ const setNewPassword = async () => {
   try {
     await authService.resetPasswordWithToken(token.value, newPassword.value);
     toast.success('Senha redefinida com sucesso!');
-    router.push('/login');
+    sessionStorage.removeItem('resetPasswordToken');
+    sessionStorage.removeItem('resetPasswordEmail');
+    setTimeout(() => {
+      router.push('/login');
+    }, 2000);
   } catch (error: any) {
     toast.error(error.response?.data?.message || 'Erro ao redefinir senha');
   } finally {
@@ -127,7 +127,17 @@ const setNewPassword = async () => {
   }
 };
 
+const loadTokenFromSession = () => {
+  if (typeof window === 'undefined') return;
+  const storedToken = sessionStorage.getItem('resetPasswordToken');
+  if (storedToken) {
+    token.value = storedToken;
+  }
+};
+
 onMounted(() => {
+  loadTokenFromSession();
+
   if (!token.value) {
     toast.error('Token inválido. Por favor, solicite um novo código.');
     router.push('/esqueci-senha');
@@ -220,4 +230,3 @@ onMounted(() => {
   color: #4b5563 !important;
 }
 </style>
-
