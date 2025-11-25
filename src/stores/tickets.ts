@@ -5,6 +5,7 @@ import type { StatusColumn } from '@/models/statusColumn';
 import { statusColumnService } from '@/services/statusColumnService';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from './user';
+import { useRoles } from '@/composables/useRoles';
 
 export type TicketListFilters = {
   status?: DefaultTicketStatus | null;
@@ -43,6 +44,15 @@ interface TicketsState {
     currentFilters?: TicketListFilters;
   };
   archivedTickets: {
+    data: Ticket[];
+    isLoading: boolean;
+    error: string | null;
+    totalCount: number;
+    lastFetched: Date | null;
+    currentPage: number;
+    currentFilters?: TicketListFilters;
+  };
+  tenantTickets: {
     data: Ticket[];
     isLoading: boolean;
     error: string | null;
@@ -102,6 +112,17 @@ export const useTicketsStore = defineStore('tickets', () => {
     currentPage: 1,
   });
 
+  const tenantTickets = ref<TicketsState['tenantTickets']>({
+    data: [],
+    isLoading: false,
+    error: null,
+    totalCount: 0,
+    lastFetched: null,
+    currentPage: 1,
+  });
+
+  const { isTenantAdmin } = useRoles();
+
   const recentReceivedTickets = ref<Ticket[]>([]);
   const recentCreatedTickets = ref<Ticket[]>([]);
   const selectedTicket = ref<Ticket | null>(null);
@@ -125,6 +146,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         ...receivedTickets.value.data,
         ...departmentTickets.value.data,
         ...archivedTickets.value.data,
+        ...tenantTickets.value.data,
       ];
 
       return allTickets.find((ticket) => ticket.customId === id);
@@ -132,11 +154,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   });
 
   // Actions
-  async function fetchMyTickets(
-    page?: number,
-    limit = 10,
-    filters?: TicketListFilters,
-  ) {
+  async function fetchMyTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     const userStore = useUserStore();
     if (!userStore.user) return;
 
@@ -338,6 +356,53 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
   }
 
+  async function fetchTenantTickets(page?: number, limit = 10, filters?: TicketListFilters) {
+    if (!isTenantAdmin.value) return;
+
+    const currentPage = page ?? tenantTickets.value.currentPage;
+    const currentFilters = filters ?? tenantTickets.value.currentFilters;
+
+    if (!isPollingActive.value) {
+      tenantTickets.value.isLoading = true;
+    }
+
+    tenantTickets.value.currentPage = currentPage;
+    tenantTickets.value.currentFilters = currentFilters;
+    tenantTickets.value.error = null;
+
+    try {
+      const params: Record<string, unknown> = { page: currentPage, limit };
+
+      if (currentFilters) {
+        if (currentFilters.status !== undefined && currentFilters.status !== null) {
+          params.status = currentFilters.status;
+        }
+        if (currentFilters.priority !== undefined && currentFilters.priority !== null) {
+          params.priority = currentFilters.priority;
+        }
+        if (currentFilters.name) {
+          params.name = currentFilters.name;
+        }
+        if (currentFilters.sortBy) {
+          params.sortBy = currentFilters.sortBy;
+        }
+        if (currentFilters.sortOrder) {
+          params.sortOrder = currentFilters.sortOrder;
+        }
+      }
+
+      const response = await ticketService.fetch(params);
+      tenantTickets.value.data = response.data.items;
+      tenantTickets.value.totalCount = response.data.total;
+      tenantTickets.value.lastFetched = new Date();
+    } catch (error) {
+      tenantTickets.value.error = 'Failed to fetch tenant tickets';
+      console.error('Error fetching tenant tickets:', error);
+    } finally {
+      tenantTickets.value.isLoading = false;
+    }
+  }
+
   async function fetchTicketDetails(ticketId: string) {
     try {
       const response = await ticketService.getById(ticketId);
@@ -364,6 +429,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     updateInCollection(receivedTickets.value.data);
     updateInCollection(departmentTickets.value.data);
     updateInCollection(archivedTickets.value.data);
+    updateInCollection(tenantTickets.value.data);
   }
 
   function removeTicketFromCollections(ticketId: string) {
@@ -375,6 +441,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     removeFromCollection(receivedTickets);
     removeFromCollection(departmentTickets);
     removeFromCollection(archivedTickets);
+    removeFromCollection(tenantTickets);
   }
 
   async function refreshAllTickets() {
@@ -386,6 +453,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       fetchReceivedTickets(),
       fetchDepartmentTickets(),
       fetchArchivedTickets(),
+      fetchTenantTickets(),
     ]);
   }
 
@@ -484,8 +552,20 @@ export const useTicketsStore = defineStore('tickets', () => {
     return fetchArchivedTickets(page, 10, filters);
   }
 
+  function setTenantTicketsPage(
+    page: number,
+    filters?: {
+      status?: DefaultTicketStatus | null;
+      priority?: TicketPriority | null;
+      name?: string;
+    },
+  ) {
+    tenantTickets.value.currentPage = page;
+    return fetchTenantTickets(page, 10, filters);
+  }
+
   function setCurrentPage(
-    type: 'createdByMe' | 'received' | 'department' | 'archived',
+    type: 'createdByMe' | 'received' | 'department' | 'archived' | 'tenant',
     page: number,
     filters?: {
       status?: DefaultTicketStatus | null;
@@ -502,6 +582,8 @@ export const useTicketsStore = defineStore('tickets', () => {
         return setDepartmentTicketsPage(page, filters);
       case 'archived':
         return setArchivedTicketsPage(page, filters);
+      case 'tenant':
+        return setTenantTicketsPage(page, filters);
     }
   }
 
@@ -511,6 +593,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     receivedTickets,
     departmentTickets,
     archivedTickets,
+    tenantTickets,
     selectedTicket,
     globalRefreshInterval,
     isPollingActive,
@@ -528,6 +611,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     fetchReceivedTickets,
     fetchDepartmentTickets,
     fetchArchivedTickets,
+    fetchTenantTickets,
     fetchTicketDetails,
     refreshAllTickets,
     updateTicketInCollections,
@@ -544,5 +628,6 @@ export const useTicketsStore = defineStore('tickets', () => {
     setReceivedTicketsPage,
     setDepartmentTicketsPage,
     setArchivedTicketsPage,
+    setTenantTicketsPage,
   };
 });

@@ -264,13 +264,14 @@ import { formatSnakeToNaturalCase, getUserInitials, getAvatarColor } from '@/uti
 import { formatDate, formatRelativeTime } from '@/utils/date';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
+import { useRoles } from '@/composables/useRoles';
 import { ticketService } from '@/services/ticketService';
 import { toast } from 'vue3-toastify';
 import BaseModal from '@/components/common/BaseModal.vue';
 
 const props = defineProps<{
   tickets: Ticket[];
-  activeTab?: 'recebidos' | 'criados' | 'setor' | 'arquivados';
+  activeTab?: 'recebidos' | 'criados' | 'setor' | 'arquivados' | 'gerais';
 }>();
 
 const emit = defineEmits(['viewTicket']);
@@ -282,6 +283,7 @@ const pendingVerificationTicket = ref<Ticket | null>(null);
 
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
+const { isSupervisor } = useRoles();
 
 const getSortedTargetUsers = (ticket: Ticket) => {
   if (!ticket?.targetUsers || ticket.targetUsers.length === 0)
@@ -389,6 +391,11 @@ const getDeadlineIcon = (ticket: Ticket) => {
 };
 
 const openTicketDetails = (ticket: Ticket) => {
+  if (isSupervisor.value && props.activeTab === 'setor' && ticket.isPrivate) {
+    toast.warning('Este ticket é privado');
+    return;
+  }
+
   // If ticket is awaiting verification and user is the reviewer, show confirmation first
   const currentStatus = ticket.ticketStatus?.key || ticket.status || '';
   if (
