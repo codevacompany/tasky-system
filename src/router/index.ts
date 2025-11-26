@@ -177,6 +177,10 @@ router.beforeEach(async (to, from, next) => {
     return next('/');
   }
 
+  if (requiresAuth && userStore.hasActiveSubscription === false && to.path !== '/assinaturas') {
+    return next('/assinaturas');
+  }
+
   next();
 });
 

@@ -111,8 +111,10 @@ import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import Input from '@/components/common/Input.vue';
+import { useUserStore } from '@/stores/user';
 
 const router = useRouter();
+const userStore = useUserStore();
 
 const email = ref('');
 const password = ref('');
@@ -123,7 +125,11 @@ const login = async () => {
   try {
     await authService.login({ email: email.value, password: password.value });
 
-    router.push('/');
+    if (userStore.hasActiveSubscription === false) {
+      router.push({ path: '/assinaturas', query: { trialExpired: '1' } });
+    } else {
+      router.push('/');
+    }
   } catch {
     toast.error('Email ou senha incorretos');
   } finally {

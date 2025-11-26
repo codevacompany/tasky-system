@@ -101,10 +101,10 @@
                     <div
                       :class="
                         isActive('/admin/usuarios')
-                          ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
+                          ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
                           : 'text-gray-700'
                       "
-                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="users" />
                       Usuários
@@ -118,10 +118,10 @@
                     <div
                       :class="
                         isActive('/admin/setores')
-                          ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
+                          ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
                           : 'text-gray-700'
                       "
-                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="building" />
                       Setores
@@ -135,10 +135,10 @@
                     <div
                       :class="
                         isActive('/admin/categorias')
-                          ? 'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400'
+                          ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
                           : 'text-gray-700'
                       "
-                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="tag" />
                       Categorias
@@ -151,10 +151,10 @@
                   >
                     <div
                       :class="{
-                        'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                        'admin-submenu-active bg-gray-50 dark:bg-gray-700':
                           isActive('/admin/clientes'),
                       }"
-                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="building" />
                       Clientes
@@ -167,10 +167,10 @@
                   >
                     <div
                       :class="{
-                        'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                        'admin-submenu-active bg-gray-50 dark:bg-gray-700':
                           isActive('/admin/cadastros'),
                       }"
-                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="user-plus" />
                       Cadastros
@@ -184,6 +184,7 @@
 
         <div class="flex items-center gap-6">
           <button
+            v-if="userStore.hasActiveSubscription !== false"
             class="btn btn-primary flex items-center gap-2 text-[15px]"
             @click="openTicketModal"
           >
@@ -333,7 +334,7 @@
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/usuarios'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="users" />
                     Usuários
@@ -345,7 +346,7 @@
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/setores'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="building" />
                     Setores
@@ -357,7 +358,7 @@
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/categorias'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="tag" />
                     Categorias
@@ -369,7 +370,7 @@
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/clientes'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="building" />
                     Clientes
@@ -381,7 +382,7 @@
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/cadastros'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 hover:text-primary hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="user-plus" />
                     Cadastros
@@ -436,7 +437,8 @@ import { useRoles } from '@/composables';
 import taskyLogo from '@/assets/images/tasky-pro-black.png';
 import taskyWhiteLogo from '@/assets/images/tasky-pro-white.png';
 
-const user = useUserStore().user;
+const userStore = useUserStore();
+const user = userStore.user;
 const userPreferencesStore = useUserPreferencesStore();
 const ticketsStore = useTicketsStore();
 const route = useRoute();
@@ -565,13 +567,27 @@ onUnmounted(() => {
 }
 
 .menu-item-hover:hover {
-  background: var(--button-primary-color);
-  color: white;
+  color: #001866;
 }
 
 .dark-mode .menu-item-hover:hover {
-  background: var(--primary-dark);
-  color: white;
+  color: var(--primary-color);
+}
+
+.admin-submenu-hover:hover {
+  color: #001866;
+}
+
+.dark-mode .admin-submenu-hover:hover {
+  color: var(--primary-color);
+}
+
+.admin-submenu-active {
+  color: #001866;
+}
+
+.dark-mode .admin-submenu-active {
+  color: var(--primary-color);
 }
 
 .menu-item-active {
@@ -581,6 +597,14 @@ onUnmounted(() => {
 
 .dark-mode .menu-item-active {
   background: var(--primary-dark);
+  color: white;
+}
+
+.dark-mode .menu-item-active:hover {
+  color: white;
+}
+
+.menu-item-active:hover {
   color: white;
 }
 </style>

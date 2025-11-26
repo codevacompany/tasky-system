@@ -10,6 +10,7 @@ export interface LoginResponse {
     refreshToken: string;
   };
   user: User;
+  hasActiveSubscription?: boolean;
 }
 
 interface ChangePasswordDto {
@@ -19,6 +20,7 @@ interface ChangePasswordDto {
 
 interface WhoamiResponse {
   user: User;
+  hasActiveSubscription?: boolean;
 }
 
 export const authService = {
@@ -28,6 +30,7 @@ export const authService = {
 
       const userstore = useUserStore();
       userstore.setUser(response.data.user);
+      userstore.setHasActiveSubscription(response.data.hasActiveSubscription);
       localStorageService.setAccessToken(response.data.token.accessToken);
       localStorageService.setRefreshToken(response.data.token.refreshToken);
 
@@ -43,6 +46,7 @@ export const authService = {
 
       const userstore = useUserStore();
       userstore.setUser(response.data.user);
+      userstore.setHasActiveSubscription(response.data.hasActiveSubscription);
 
       return response;
     } catch (error) {

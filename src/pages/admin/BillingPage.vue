@@ -302,6 +302,11 @@
         </div>
       </div>
     </div> -->
+
+    <SubscriptionExpiredModal
+      :is-open="showTrialExpiredModal"
+      @close="showTrialExpiredModal = false"
+    />
   </div>
 </template>
 
@@ -312,6 +317,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { subscriptionService } from '@/services/subscriptionService';
 import { useUserStore } from '@/stores/user';
 import { authService } from '@/services/authService';
+import SubscriptionExpiredModal from '@/components/common/SubscriptionExpiredModal.vue';
 
 interface Payment {
   id: number;
@@ -345,6 +351,7 @@ const isSubscribing = ref(false);
 const isLoadingPortal = ref(false);
 const availablePlans = ref<SubscriptionPlan[]>([]);
 const currentSubscription = ref<any>(null);
+const showTrialExpiredModal = ref(false);
 
 // Mock data para histórico de pagamentos (será removido quando integrar com backend)
 const mockPayments = [
@@ -451,6 +458,10 @@ onMounted(async () => {
     toast.info('Assinatura cancelada. Você pode tentar novamente quando quiser.');
     // Clean up URL
     window.history.replaceState({}, '', window.location.pathname);
+  }
+
+  if (userStore.hasActiveSubscription === false) {
+    showTrialExpiredModal.value = true;
   }
 });
 
@@ -579,6 +590,10 @@ const hasTrial = computed(() => {
   );
 });
 
+const hasActiveSubscription = computed(() => {
+  return currentSubscription.value?.hasSubscription && !hasTrial.value;
+});
+
 const getButtonText = (slug: string) => {
   // If current plan and has trial, show "Selecionar plano" (not disabled)
   if (isCurrentPlan(slug) && hasTrial.value) {
@@ -588,6 +603,11 @@ const getButtonText = (slug: string) => {
   // If current plan and no trial, show disabled "Plano atual"
   if (isCurrentPlan(slug) && !hasTrial.value) {
     return 'Plano atual';
+  }
+
+  // If there's an active subscription (not trial) and it's not the current plan, show "Atualizar plano"
+  if (hasActiveSubscription.value && !isCurrentPlan(slug)) {
+    return 'Atualizar plano';
   }
 
   return 'Selecionar plano';
@@ -603,6 +623,33 @@ const handleSubscription = async (slug: string) => {
     return;
   }
 
+  // If there's an active subscription (not trial), redirect to customer portal
+  if (hasActiveSubscription.value) {
+    if (!user.value?.tenantId) {
+      toast.error('Erro ao identificar o tenant');
+      return;
+    }
+
+    try {
+      isSubscribing.value = true;
+      const returnUrl = `${window.location.origin}/assinaturas`;
+      const { url } = await subscriptionService.createCustomerPortalSession(
+        user.value.tenantId,
+        returnUrl,
+      );
+
+      window.open(url, '_blank');
+    } catch (error: any) {
+      console.error('Error creating portal session:', error);
+      const errorMessage = error.response?.data?.message || 'Erro ao abrir portal de gerenciamento';
+      toast.error(errorMessage);
+    } finally {
+      isSubscribing.value = false;
+    }
+    return;
+  }
+
+  // Otherwise, proceed with checkout for new subscriptions
   try {
     isSubscribing.value = true;
     const response = (await subscriptionService.subscribe(plan.slug)) as {
