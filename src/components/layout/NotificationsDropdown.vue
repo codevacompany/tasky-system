@@ -149,7 +149,8 @@ const currentPage = ref(1);
 const totalPages = ref(1);
 const showOnlyUnread = ref(localStorageService.getNotificationsShowOnlyUnread());
 const hasMore = computed(() => currentPage.value < totalPages.value);
-const user = useUserStore().user;
+const userStore = useUserStore();
+const user = userStore.user;
 
 const NOTIFICATIONS_PER_PAGE = 10;
 
@@ -222,6 +223,12 @@ const handleScroll = () => {
 };
 
 const fetchSelectedTicket = async (notification: Notification) => {
+  if (userStore.hasActiveSubscription === false) {
+    toast.error('É necessário ter uma assinatura ativa para acessar os tickets.');
+    closeModal();
+    return;
+  }
+
   if (notification.resourceCustomId) {
     try {
       // Mark notification as read

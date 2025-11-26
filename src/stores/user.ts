@@ -8,6 +8,7 @@ export const useUserStore = defineStore('auth', () => {
   const user = ref<User | null>(null);
   const isNewUser = ref(false);
   const isAppLoading = ref(false);
+  const hasActiveSubscription = ref<boolean | undefined>(undefined);
 
   const setUser = (userData: User | null) => {
     user.value = userData;
@@ -21,16 +22,24 @@ export const useUserStore = defineStore('auth', () => {
     isAppLoading.value = loading;
   };
 
+  const setHasActiveSubscription = (value: boolean | undefined) => {
+    hasActiveSubscription.value = value;
+  };
+
   const whoami = async (): Promise<boolean> => {
     try {
       setAppLoading(true);
-      const response = await apiClient.get<{ user: User }>('/auth/whoami');
+      const response = await apiClient.get<{ user: User; hasActiveSubscription?: boolean }>(
+        '/auth/whoami',
+      );
       setUser(response.data.user);
+      setHasActiveSubscription(response.data.hasActiveSubscription);
       return true;
-    } catch (error) {
+    } catch {
       localStorageService.removeAccessToken();
       localStorageService.removeRefreshToken();
       setUser(null);
+      setHasActiveSubscription(undefined);
       return false;
     } finally {
       setAppLoading(false);
@@ -40,6 +49,7 @@ export const useUserStore = defineStore('auth', () => {
   const logout = () => {
     localStorageService.clear();
     setUser(null);
+    setHasActiveSubscription(undefined);
   };
 
   return {
@@ -49,6 +59,8 @@ export const useUserStore = defineStore('auth', () => {
     setIsNewUser,
     isAppLoading,
     setAppLoading,
+    hasActiveSubscription,
+    setHasActiveSubscription,
     whoami,
     logout,
   };

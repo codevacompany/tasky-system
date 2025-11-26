@@ -184,6 +184,7 @@
 
         <div class="flex items-center gap-6">
           <button
+            v-if="userStore.hasActiveSubscription !== false"
             class="btn btn-primary flex items-center gap-2 text-[15px]"
             @click="openTicketModal"
           >
@@ -436,7 +437,8 @@ import { useRoles } from '@/composables';
 import taskyLogo from '@/assets/images/tasky-pro-black.png';
 import taskyWhiteLogo from '@/assets/images/tasky-pro-white.png';
 
-const user = useUserStore().user;
+const userStore = useUserStore();
+const user = userStore.user;
 const userPreferencesStore = useUserPreferencesStore();
 const ticketsStore = useTicketsStore();
 const route = useRoute();
