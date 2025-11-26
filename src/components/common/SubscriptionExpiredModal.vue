@@ -27,8 +27,8 @@
         </h2>
 
         <p class="text-base leading-6 mb-6 max-w-[460px] text-gray-700 dark:text-gray-300">
-          Seu período de teste terminou. Para continuar usando o Tasky Pro com sua equipe, você precisa assinar um dos planos
-          disponíveis.
+          Seu período de teste terminou. Para continuar usando o Tasky Pro com sua equipe, você
+          precisa assinar um dos planos disponíveis.
         </p>
 
         <div class="flex gap-4 mt-2">
@@ -94,5 +94,3 @@ const close = () => {
   animation: slideUp 0.4s ease;
 }
 </style>
-
-
