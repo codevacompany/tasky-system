@@ -557,15 +557,10 @@
                   />
                 </div>
                 <div class="flex gap-3">
-                  <button
-                    @click="saveTicketDescription"
-                    class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
-                  >
-                    Salvar
-                  </button>
+                  <button @click="saveTicketDescription" class="btn btn-primary">Salvar</button>
                   <button
                     @click="cancelEditingDescription"
-                    class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
+                    class="btn px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
                   >
                     Cancelar
                   </button>
@@ -718,7 +713,7 @@
                             : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600',
                         ]"
                         :style="
-                          isMyComment(event.data.user.id)
+                          isMyComment(event.data.user.id) && !userPreferencesStore.isDarkMode
                             ? {
                                 backgroundColor: '#FAFBFD',
                                 borderColor: '#E5E7EB',
@@ -1004,6 +999,7 @@ import { ticketService } from '@/services/ticketService';
 import { userService } from '@/services/userService';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
+import { useUserPreferencesStore } from '@/stores/userPreferences';
 import { toast } from 'vue3-toastify';
 import { formatRelativeTime } from '@/utils/date';
 import ConfirmationModal from '../common/ConfirmationModal.vue';
@@ -1045,6 +1041,7 @@ const props = defineProps<{
 const emit = defineEmits(['close']);
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
+const userPreferencesStore = useUserPreferencesStore();
 const newComment = ref('');
 const quillEditor = ref<any>(null);
 const editorKey = ref(0);

@@ -4,7 +4,8 @@
     @close="closeModal"
     @cancel="closeModal"
     @confirm="updateCategory"
-    :confirmButtonText="isLoading ? '' : 'Salvar'"
+    :confirmButtonText="'Salvar'"
+    :confirmButtonLoading="isLoading"
     :cancelButtonText="'Cancelar'"
   >
     <div>
@@ -24,10 +25,6 @@
             padding="normal"
             class="dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
-        </div>
-
-        <div v-if="isLoading" class="flex justify-center my-2">
-          <LoadingSpinner :size="22" />
         </div>
       </form>
     </div>

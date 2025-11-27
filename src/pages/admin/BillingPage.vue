@@ -33,7 +33,7 @@
         </span>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <!-- Left Column: Price and Trial Info -->
         <div>
           <div class="flex items-baseline gap-2 mb-4">
@@ -53,8 +53,8 @@
           </div>
         </div>
 
-        <!-- Right Column: Features List -->
-        <div>
+        <!-- Middle Column: Features List -->
+        <div class="pl-4">
           <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
             O que está incluído:
           </h3>
@@ -80,34 +80,58 @@
             </li>
           </ul>
         </div>
-      </div>
 
-      <!-- Usage Bar -->
-      <div
-        v-if="currentSubscription.subscription.maxUsers"
-        class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700"
-      >
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-sm text-gray-600 dark:text-gray-400">Usuários</span>
-          <span class="text-sm font-medium text-gray-900 dark:text-white">
-            {{ currentSubscription.userStats.totalUsers }}/{{
-              currentSubscription.subscription.maxUsers
-            }}
-          </span>
-        </div>
-        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-          <div
-            class="h-2 rounded-full transition-all duration-300"
-            :class="currentSubscription.billing?.exceedsLimit ? 'bg-orange-500' : 'bg-blue-600'"
-            :style="{ width: getUsagePercentage() + '%' }"
-          ></div>
-        </div>
-        <div v-if="currentSubscription.billing?.exceedsLimit" class="mt-2">
-          <span class="text-xs text-orange-600 dark:text-orange-400">
-            ⚠️ Limite excedido: +{{ currentSubscription.billing.additionalUsers }} usuário{{
-              currentSubscription.billing.additionalUsers > 1 ? 's' : ''
-            }}
-          </span>
+        <!-- Right Column: Circular Progress -->
+        <div
+          v-if="currentSubscription.subscription.maxUsers"
+          class="flex flex-col items-center justify-center"
+        >
+          <div class="relative w-32 h-32">
+            <svg class="transform -rotate-90 w-32 h-32">
+              <circle
+                cx="64"
+                cy="64"
+                r="56"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="8"
+                class="text-gray-200 dark:text-gray-700"
+              />
+              <circle
+                cx="64"
+                cy="64"
+                r="56"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="8"
+                stroke-linecap="round"
+                :class="
+                  currentSubscription.billing?.exceedsLimit
+                    ? 'text-orange-500'
+                    : 'text-blue-600 dark:text-blue-500'
+                "
+                :stroke-dasharray="getCircleDashArray()"
+                :stroke-dashoffset="getCircleDashOffset()"
+                class="transition-all duration-300"
+              />
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <span class="text-2xl font-bold text-gray-900 dark:text-white">
+                {{ currentSubscription.userStats.totalUsers }}
+              </span>
+              <span class="text-xs text-gray-600 dark:text-gray-400">
+                /{{ currentSubscription.subscription.maxUsers }}
+              </span>
+            </div>
+          </div>
+          <p class="text-sm font-medium text-gray-900 dark:text-white mt-3">Usuários</p>
+          <div v-if="currentSubscription.billing?.exceedsLimit" class="mt-2">
+            <span class="text-xs text-orange-600 dark:text-orange-400">
+              ⚠️ Limite excedido: +{{ currentSubscription.billing.additionalUsers }} usuário{{
+                currentSubscription.billing.additionalUsers > 1 ? 's' : ''
+              }}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -204,105 +228,6 @@
     <div v-if="isLoadingPlans" class="flex justify-center items-center py-8">
       <LoadingSpinner />
     </div>
-
-    <!-- TODO: Implementar histórico de pagamentos -->
-    <!-- <div
-      class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
-    >
-      <div class="p-6">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Histórico de Pagamentos
-        </h2> -->
-
-    <!-- Loading State -->
-    <!-- <div v-if="isLoading" class="flex justify-center items-center py-8">
-          <LoadingSpinner />
-        </div> -->
-
-    <!-- Empty State -->
-    <!-- <div v-else-if="payments.length === 0" class="text-center py-8">
-          <p class="text-gray-500 dark:text-gray-400">Nenhum pagamento encontrado.</p>
-        </div> -->
-
-    <!-- Payment History Table -->
-    <!-- <div v-else class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th
-                  class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                >
-                  Data
-                </th>
-                <th
-                  class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                >
-                  Plano
-                </th>
-                <th
-                  class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                >
-                  Valor
-                </th>
-                <th
-                  class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                >
-                  Status
-                </th>
-                <th
-                  class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                >
-                  Comprovante
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              <tr v-for="payment in payments" :key="payment.id">
-                <td
-                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-center"
-                >
-                  {{ formatDate(payment.date) }}
-                </td>
-                <td
-                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-center"
-                >
-                  {{ payment.plan }}
-                </td>
-                <td
-                  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-center"
-                >
-                  R$ {{ payment.amount.toFixed(2) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-center">
-                  <span
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                    :class="
-                      payment.status === 'Pago'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    "
-                  >
-                    {{ payment.status }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                  <button
-                    v-if="payment.status === 'Pago'"
-                    class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center justify-center mx-auto"
-                    @click="downloadInvoice(payment.id)"
-                  >
-                    <font-awesome-icon icon="download" class="mr-1" />
-                    DOWNLOAD
-                  </button>
-                  <span v-else class="text-gray-400 dark:text-gray-500"> Indisponível </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div> -->
-
     <SubscriptionExpiredModal
       :is-open="showTrialExpiredModal"
       @close="showTrialExpiredModal = false"
@@ -425,22 +350,9 @@ const loadCurrentSubscription = async () => {
   }
 };
 
-// Carregar histórico de pagamentos
-const loadPaymentHistory = async () => {
-  try {
-    // Temporariamente usando dados mockados até implementar endpoints de pagamento
-    payments.value = mockPayments;
-  } catch (error) {
-    console.error('Error loading payment history:', error);
-    toast.error('Erro ao carregar histórico de pagamentos');
-  } finally {
-    isLoading.value = false;
-  }
-};
-
 // Carregar dados ao montar o componente
 onMounted(async () => {
-  await Promise.all([loadPlans(), loadCurrentSubscription(), loadPaymentHistory()]);
+  await Promise.all([loadPlans(), loadCurrentSubscription()]);
 
   // Handle Stripe Checkout redirects
   const urlParams = new URLSearchParams(window.location.search);
@@ -469,26 +381,6 @@ const formatDate = (date: Date) => {
   return new Date(date).toLocaleDateString('pt-BR');
 };
 
-const getStatusLabel = (status: string) => {
-  const statusMap: { [key: string]: string } = {
-    trial: 'Trial',
-    active: 'Ativo',
-    suspended: 'Suspenso',
-    cancelled: 'Cancelado',
-  };
-  return statusMap[status] || status;
-};
-
-const getStatusBadgeClass = (status: string) => {
-  const statusMap: { [key: string]: string } = {
-    trial: 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-200',
-    active: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200',
-    suspended: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-200',
-    cancelled: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-200',
-  };
-  return statusMap[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-200';
-};
-
 const getUsagePercentage = () => {
   if (
     !currentSubscription.value?.userStats?.totalUsers ||
@@ -503,29 +395,17 @@ const getUsagePercentage = () => {
   return Math.min(percentage, 100); // Ensure it doesn't exceed 100%
 };
 
-const getPlanCardClass = (slug: string) => {
-  if (slug === 'crescer') return 'relative';
-  return '';
+const getCircleDashArray = () => {
+  const radius = 56;
+  const circumference = 2 * Math.PI * radius;
+  return circumference;
 };
 
-const getPlanHeaderClass = (slug: string) => {
-  // No longer used - headers are now neutral gray
-  return '';
-};
-
-const getPlanButtonClass = (slug: string) => {
-  // If current plan and has trial, show normal button (not disabled)
-  if (isCurrentPlan(slug) && hasTrial.value) {
-    return 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600';
-  }
-
-  // If current plan and no trial, show disabled style
-  if (isCurrentPlan(slug)) {
-    return 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-gray-200 dark:border-gray-600 cursor-not-allowed';
-  }
-
-  // Default neutral button style
-  return 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600';
+const getCircleDashOffset = () => {
+  const radius = 56;
+  const circumference = 2 * Math.PI * radius;
+  const percentage = getUsagePercentage();
+  return circumference * (1 - percentage / 100);
 };
 
 const getPlanFeatures = (plan: SubscriptionPlan) => {
