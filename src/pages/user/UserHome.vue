@@ -1,5 +1,5 @@
 <template>
-  <section id="dashboardSection" class="p-5 sm:px-6 sm:py-10">
+  <section id="dashboardSection" class="p-5 sm:px-6 sm:pt-4 sm:pb-10">
     <WelcomeModal
       :isOpen="showWelcomeModal"
       @close="closeWelcomeModal"
@@ -7,325 +7,191 @@
     />
 
     <!-- Estatísticas -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-4">
-      <!-- Total de Tickets -->
-      <div
-        v-if="isLoading"
-        class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-5 flex items-center gap-5 shadow-sm"
-      >
-        <div class="p-2.5 bg-gray-300 dark:bg-gray-600 rounded-lg flex-shrink-0"></div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-center">
-            <div class="h-4 w-24 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-            <div class="h-6 w-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-          <div class="flex flex-col sm:flex-row sm:justify-end gap-1 sm:gap-3 mt-1">
-            <div class="h-3 w-16 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-            <div class="h-3 w-16 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-        </div>
-      </div>
-      <div
-        v-else
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-5 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
-      >
-        <div
-          class="p-2.5 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
-        >
-          <font-awesome-icon icon="ticket" />
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-center">
-            <h3 class="text-sm font-medium text-gray-900 dark:text-white">Total de Tickets</h3>
-            <p id="totalTicketsCount" class="text-xl font-bold text-gray-900 dark:text-gray-100">
-              {{ totalTickets.total }}
-            </p>
-          </div>
-          <div
-            class="flex flex-col sm:flex-row sm:justify-end gap-1 sm:gap-3 text-xs text-gray-600 dark:text-gray-400"
-          >
-            <span>Recebidos: {{ totalTickets.recebidos }}</span>
-            <span>Criados: {{ totalTickets.criados }}</span>
-          </div>
-        </div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg px-6 pt-4 pb-6 mb-5 shadow">
+      <div class="mb-4">
+        <h1 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Estatísticas</h1>
+        <p class="text-xs text-gray-600 dark:text-gray-400">
+          Visão geral do seu desempenho e métricas
+        </p>
       </div>
 
-      <!-- Pendentes -->
-      <div
-        v-if="isLoading"
-        class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-5 flex items-center gap-5 shadow-sm"
-      >
-        <div class="p-2.5 bg-gray-300 dark:bg-gray-600 rounded-lg flex-shrink-0"></div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-center">
-            <div class="h-4 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-            <div class="h-6 w-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-          <div class="flex flex-col sm:flex-row sm:justify-end gap-1 sm:gap-3 mt-1">
-            <div class="h-3 w-16 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-            <div class="h-3 w-16 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-        </div>
-      </div>
-      <div
-        v-else
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-5 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
-      >
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+        <!-- Pendentes -->
         <div
-          class="p-2.5 bg-orange-500 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
+          v-if="isLoading"
+          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
-          <font-awesome-icon icon="clock" />
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-center">
-            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">Pendentes</h3>
-            <p
-              id="pendingTicketsCount"
-              class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2"
-            >
-              {{ ticketsPendentes.total }}
-            </p>
-          </div>
           <div
-            class="flex flex-col sm:flex-row sm:justify-end gap-1 sm:gap-3 text-xs text-gray-600 dark:text-gray-400"
-          >
-            <span>Recebidos: {{ ticketsPendentes.recebidos }}</span>
-            <span>Criados: {{ ticketsPendentes.criados }}</span>
-          </div>
+            class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
+          ></div>
+          <div
+            class="h-8 w-16 bg-gray-300 dark:bg-gray-600 rounded mb-2 animate-pulse-custom"
+          ></div>
+          <div class="h-4 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
         </div>
-      </div>
+        <div
+          v-else
+          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+        >
+          <div class="mb-3">
+            <font-awesome-icon icon="clock" class="text-orange-500 dark:text-orange-400 text-2xl" />
+          </div>
+          <p id="pendingTicketsCount" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            {{ ticketsPendentes.total }}
+          </p>
+          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Pendentes</h3>
+        </div>
 
-      <!-- Em Andamento -->
-      <div
-        v-if="isLoading"
-        class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-5 flex items-center gap-5 shadow-sm"
-      >
-        <div class="p-2.5 bg-gray-300 dark:bg-gray-600 rounded-lg flex-shrink-0"></div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-center">
-            <div class="h-4 w-24 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-            <div class="h-6 w-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-          <div class="flex flex-col sm:flex-row sm:justify-end gap-1 sm:gap-3 mt-1">
-            <div class="h-3 w-16 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-            <div class="h-3 w-16 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-        </div>
-      </div>
-      <div
-        v-else
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-5 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
-      >
+        <!-- Em Andamento -->
         <div
-          class="p-2.5 bg-blue-500 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
+          v-if="isLoading"
+          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
-          <font-awesome-icon icon="spinner" />
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-center">
-            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">Em Andamento</h3>
-            <p
-              id="inProgressTicketsCount"
-              class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2"
-            >
-              {{ ticketsEmAndamento.total }}
-            </p>
+          <div class="mb-3">
+            <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
           </div>
           <div
-            class="flex flex-col sm:flex-row sm:justify-end gap-1 sm:gap-3 text-xs text-gray-600 dark:text-gray-400"
-          >
-            <span>Recebidos: {{ ticketsEmAndamento.recebidos }}</span>
-            <span>Criados: {{ ticketsEmAndamento.criados }}</span>
-          </div>
+            class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
+          ></div>
+          <div class="h-3 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
         </div>
-      </div>
+        <div
+          v-else
+          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+        >
+          <div class="mb-3">
+            <font-awesome-icon icon="spinner" class="text-blue-500 dark:text-blue-400 text-2xl" />
+          </div>
+          <p
+            id="inProgressTicketsCount"
+            class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+          >
+            {{ ticketsEmAndamento.total }}
+          </p>
+          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Em Andamento</h3>
+        </div>
 
-      <!-- Finalizados -->
-      <div
-        v-if="isLoading"
-        class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-5 flex items-center gap-5 shadow-sm"
-      >
-        <div class="p-2.5 bg-gray-300 dark:bg-gray-600 rounded-lg flex-shrink-0"></div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-center">
-            <div class="h-4 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-            <div class="h-6 w-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-          <div class="flex flex-col sm:flex-row sm:justify-end gap-1 sm:gap-3 mt-1">
-            <div class="h-3 w-16 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-            <div class="h-3 w-16 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-        </div>
-      </div>
-      <div
-        v-else
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-5 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
-      >
+        <!-- Finalizados -->
         <div
-          class="p-2.5 bg-green-500 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
+          v-if="isLoading"
+          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
-          <font-awesome-icon icon="check-circle" />
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-center">
-            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">Finalizados</h3>
-            <p
-              id="resolvedTicketsCount"
-              class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2"
-            >
-              {{ ticketsFinalizados.total }}
-            </p>
-          </div>
           <div
-            class="flex flex-col sm:flex-row sm:justify-end gap-1 sm:gap-3 text-xs text-gray-600 dark:text-gray-400"
-          >
-            <span>Recebidos: {{ ticketsFinalizados.recebidos }}</span>
-            <span>Criados: {{ ticketsFinalizados.criados }}</span>
-          </div>
+            class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
+          ></div>
+          <div
+            class="h-8 w-16 bg-gray-300 dark:bg-gray-600 rounded mb-2 animate-pulse-custom"
+          ></div>
+          <div class="h-4 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
         </div>
-      </div>
-    </div>
+        <div
+          v-else
+          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+        >
+          <div class="mb-3">
+            <font-awesome-icon
+              icon="check-circle"
+              class="text-green-500 dark:text-green-400 text-2xl"
+            />
+          </div>
+          <p
+            id="resolvedTicketsCount"
+            class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+          >
+            {{ ticketsFinalizados.total }}
+          </p>
+          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Finalizados</h3>
+        </div>
 
-    <!-- Estatísticas Adicionais -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
-      <!-- Taxa de Resolução -->
-      <div
-        v-if="isLoading"
-        class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-5 flex items-center gap-5 shadow-sm"
-      >
-        <div class="p-2.5 bg-gray-300 dark:bg-gray-600 rounded-lg flex-shrink-0"></div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-center">
-            <div class="h-4 w-28 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-            <div class="h-6 w-12 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-          <div class="flex justify-end mt-1">
-            <div class="h-3 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-        </div>
-      </div>
-      <div
-        v-else
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-5 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
-      >
+        <!-- Taxa de Resolução -->
         <div
-          class="p-2.5 bg-purple-600 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
+          v-if="isLoading"
+          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
-          <font-awesome-icon icon="chart-pie" />
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-center">
-            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">
-              Taxa de Resolução
-            </h3>
-            <p
-              id="resolucaoPercentual"
-              class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2"
-            >
-              {{ resolutionRate }}%
-            </p>
-          </div>
           <div
-            class="flex justify-end text-xs text-green-600 dark:text-green-400"
-            v-if="userStats && userStats.averageAcceptanceTimeSeconds"
-          >
-            <font-awesome-icon icon="clock" class="mr-1" />
-            {{ userStats.resolvedTickets }} tickets resolvidos
-          </div>
+            class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
+          ></div>
+          <div
+            class="h-8 w-16 bg-gray-300 dark:bg-gray-600 rounded mb-2 animate-pulse-custom"
+          ></div>
+          <div class="h-4 w-28 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
         </div>
-      </div>
+        <div
+          v-else
+          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+        >
+          <div class="mb-3">
+            <font-awesome-icon
+              icon="chart-pie"
+              class="text-purple-600 dark:text-purple-400 text-2xl"
+            />
+          </div>
+          <p id="resolucaoPercentual" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            {{ resolutionRate }}%
+          </p>
+          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Taxa de Resolução</h3>
+        </div>
 
-      <!-- Tempo Médio de Aceite -->
-      <div
-        v-if="isLoading"
-        class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-5 flex items-center gap-5 shadow-sm"
-      >
-        <div class="p-2.5 bg-gray-300 dark:bg-gray-600 rounded-lg flex-shrink-0"></div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-center">
-            <div class="h-4 w-32 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-            <div class="h-6 w-16 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-          <div class="flex justify-end mt-1">
-            <div class="h-3 w-24 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-        </div>
-      </div>
-      <div
-        v-else
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-5 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
-      >
+        <!-- Tempo Médio de Aceite -->
         <div
-          class="p-2.5 bg-teal-600 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
+          v-if="isLoading"
+          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
-          <font-awesome-icon icon="hourglass-half" />
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-center">
-            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">
-              Tempo Médio de Aceite
-            </h3>
-            <p
-              id="tempoMedioAceite"
-              class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2"
-            >
-              {{ userStats ? formatTimeInSeconds(userStats.averageAcceptanceTimeSeconds) : 'N/A' }}
-            </p>
-          </div>
           <div
-            class="flex justify-end text-xs text-green-600 dark:text-green-400"
-            v-if="userStats && userStats.averageAcceptanceTimeSeconds"
-          >
-            <font-awesome-icon icon="clock" class="mr-1" />
-            {{ userStats.totalTickets }} tickets analisados
-          </div>
+            class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
+          ></div>
+          <div
+            class="h-8 w-20 bg-gray-300 dark:bg-gray-600 rounded mb-2 animate-pulse-custom"
+          ></div>
+          <div class="h-4 w-32 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
         </div>
-      </div>
+        <div
+          v-else
+          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+        >
+          <div class="mb-3">
+            <font-awesome-icon
+              icon="hourglass-half"
+              class="text-teal-600 dark:text-teal-400 text-2xl"
+            />
+          </div>
+          <p id="tempoMedioAceite" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            {{ userStats ? formatTimeInSeconds(userStats.averageAcceptanceTimeSeconds) : 'N/A' }}
+          </p>
+          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
+            Tempo Médio de Aceite
+          </h3>
+        </div>
 
-      <!-- Tempo Médio de Conclusão -->
-      <div
-        v-if="isLoading"
-        class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg p-5 flex items-center gap-5 shadow-sm"
-      >
-        <div class="p-2.5 bg-gray-300 dark:bg-gray-600 rounded-lg flex-shrink-0"></div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-center">
-            <div class="h-4 w-36 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-            <div class="h-6 w-16 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-          <div class="flex justify-end mt-1">
-            <div class="h-3 w-24 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-        </div>
-      </div>
-      <div
-        v-else
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 flex items-center gap-5 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-200"
-      >
+        <!-- Tempo Médio de Conclusão -->
         <div
-          class="p-2.5 bg-indigo-500 rounded-lg flex items-center justify-center text-white text-xl flex-shrink-0"
+          v-if="isLoading"
+          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
-          <font-awesome-icon icon="calendar-check" />
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-center">
-            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-1">
-              Tempo Médio de Conclusão
-            </h3>
-            <p
-              id="tempoMedioConclusao"
-              class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2"
-            >
-              {{ userStats ? formatTimeInSeconds(userStats.averageResolutionTimeSeconds) : 'N/A' }}
-            </p>
-          </div>
           <div
-            class="flex justify-end text-xs text-green-600 dark:text-green-400"
-            v-if="userStats && userStats.closedTickets"
-          >
-            <font-awesome-icon icon="check-circle" class="mr-1" />
-            {{ userStats.closedTickets }} tickets concluídos
+            class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
+          ></div>
+          <div
+            class="h-8 w-20 bg-gray-300 dark:bg-gray-600 rounded mb-2 animate-pulse-custom"
+          ></div>
+          <div class="h-4 w-36 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+        </div>
+        <div
+          v-else
+          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+        >
+          <div class="mb-3">
+            <font-awesome-icon
+              icon="calendar-check"
+              class="text-indigo-500 dark:text-indigo-400 text-2xl"
+            />
           </div>
+          <p id="tempoMedioConclusao" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            {{ userStats ? formatTimeInSeconds(userStats.averageResolutionTimeSeconds) : 'N/A' }}
+          </p>
+          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
+            Tempo Médio de Conclusão
+          </h3>
         </div>
       </div>
     </div>
@@ -349,7 +215,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { reportService, type UserStatistics } from '@/services/reportService';
-import { DefaultTicketStatus } from '@/models';
+import { DefaultTicketStatus, type Ticket } from '@/models';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import { toast } from 'vue3-toastify';
@@ -366,41 +232,45 @@ const userStats = ref<UserStatistics | null>(null);
 const latestReceivedTickets = computed(() => ticketsStore.recentReceivedTickets);
 const latestCreatedTickets = computed(() => ticketsStore.recentCreatedTickets);
 
-const totalTickets = computed(() => ({
-  total: latestReceivedTickets.value.length + latestCreatedTickets.value.length,
-  recebidos: latestReceivedTickets.value.length,
-  criados: latestCreatedTickets.value.length,
-}));
+const getTicketStatus = (ticket: Ticket): string => {
+  return ticket.ticketStatus?.key || ticket.status || '';
+};
 
-const ticketsPendentes = computed(() => ({
-  total:
-    latestReceivedTickets.value.filter((t) => t.status === DefaultTicketStatus.Pending).length +
-    latestCreatedTickets.value.filter((t) => t.status === DefaultTicketStatus.Pending).length,
-  recebidos: latestReceivedTickets.value.filter((t) => t.status === DefaultTicketStatus.Pending)
-    .length,
-  criados: latestCreatedTickets.value.filter((t) => t.status === DefaultTicketStatus.Pending)
-    .length,
-}));
+const ticketsPendentes = computed(() => {
+  const receivedPending = latestReceivedTickets.value.filter(
+    (t) => getTicketStatus(t) === DefaultTicketStatus.Pending,
+  ).length;
+  return {
+    total: receivedPending,
+  };
+});
 
-const ticketsEmAndamento = computed(() => ({
-  total:
-    latestReceivedTickets.value.filter((t) => t.status === DefaultTicketStatus.InProgress).length +
-    latestCreatedTickets.value.filter((t) => t.status === DefaultTicketStatus.InProgress).length,
-  recebidos: latestReceivedTickets.value.filter((t) => t.status === DefaultTicketStatus.InProgress)
-    .length,
-  criados: latestCreatedTickets.value.filter((t) => t.status === DefaultTicketStatus.InProgress)
-    .length,
-}));
+const ticketsEmAndamento = computed(() => {
+  // Em Andamento includes all statuses except Pending, Completed, Canceled, Rejected
+  const excludedStatuses = new Set([
+    DefaultTicketStatus.Pending,
+    DefaultTicketStatus.Completed,
+    DefaultTicketStatus.Canceled,
+    DefaultTicketStatus.Rejected,
+  ]);
 
-const ticketsFinalizados = computed(() => ({
-  total:
-    latestReceivedTickets.value.filter((t) => t.status === DefaultTicketStatus.Completed).length +
-    latestCreatedTickets.value.filter((t) => t.status === DefaultTicketStatus.Completed).length,
-  recebidos: latestReceivedTickets.value.filter((t) => t.status === DefaultTicketStatus.Completed)
-    .length,
-  criados: latestCreatedTickets.value.filter((t) => t.status === DefaultTicketStatus.Completed)
-    .length,
-}));
+  const receivedInProgress = latestReceivedTickets.value.filter(
+    (t) => !excludedStatuses.has(getTicketStatus(t) as DefaultTicketStatus),
+  ).length;
+
+  return {
+    total: receivedInProgress,
+  };
+});
+
+const ticketsFinalizados = computed(() => {
+  const receivedCompleted = latestReceivedTickets.value.filter(
+    (t) => getTicketStatus(t) === DefaultTicketStatus.Completed,
+  ).length;
+  return {
+    total: receivedCompleted,
+  };
+});
 
 const resolutionRate = computed(() => {
   if (userStats.value) {

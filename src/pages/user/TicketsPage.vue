@@ -592,13 +592,30 @@ const fetchTicketsWithFilters = async () => {
   await ticketsStore.setCurrentPage(storeType, currentPage.value, filters);
 };
 
+// Helper function to get ticket status
+const getTicketStatus = (ticket: Ticket): string => {
+  return ticket.ticketStatus?.key || ticket.status || '';
+};
+
 const totalTickets = computed(() => tickets.value.length);
 const pendingTickets = computed(
-  () => tickets.value.filter((ticket) => ticket.status === DefaultTicketStatus.Pending).length,
+  () =>
+    tickets.value.filter((ticket) => getTicketStatus(ticket) === DefaultTicketStatus.Pending)
+      .length,
 );
-const inProgressTickets = computed(
-  () => tickets.value.filter((ticket) => ticket.status === DefaultTicketStatus.InProgress).length,
-);
+const inProgressTickets = computed(() => {
+  // Em Andamento includes all statuses except Pending, Completed, Canceled, Rejected
+  const excludedStatuses = new Set([
+    DefaultTicketStatus.Pending,
+    DefaultTicketStatus.Completed,
+    DefaultTicketStatus.Canceled,
+    DefaultTicketStatus.Rejected,
+  ]);
+
+  return tickets.value.filter(
+    (ticket) => !excludedStatuses.has(getTicketStatus(ticket) as DefaultTicketStatus),
+  ).length;
+});
 
 const handleViewTicket = (ticket: Ticket) => {
   // Update URL with ticket customId

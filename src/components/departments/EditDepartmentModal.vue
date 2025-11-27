@@ -4,7 +4,8 @@
     @close="closeModal"
     @cancel="closeModal"
     @confirm="updateDepartment"
-    :confirmButtonText="isLoading ? '' : 'Salvar'"
+    :confirmButtonText="'Salvar'"
+    :confirmButtonLoading="isLoading"
     :cancelButtonText="'Cancelar'"
   >
     <div>
@@ -23,10 +24,6 @@
             required
             class="w-full px-[15px] py-[10px] border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
           />
-        </div>
-
-        <div v-if="isLoading" class="flex justify-center my-2">
-          <LoadingSpinner :size="22" />
         </div>
       </form>
     </div>

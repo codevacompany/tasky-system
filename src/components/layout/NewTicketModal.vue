@@ -96,7 +96,8 @@
 
         <div class="flex items-end gap-2 relative">
           <label
-            class="primary-gradient text-white flex justify-center items-center gap-[5px] rounded cursor-pointer py-2 px-4 text-sm h-[40px]"
+            class="btn btn-primary flex justify-center items-center gap-[5px] rounded cursor-pointer px-4 text-sm"
+            style="height: auto; padding-top: 0.625rem; padding-bottom: 0.625rem"
             for="fileUpload"
           >
             <font-awesome-icon icon="paperclip" /> Anexar Arquivos
@@ -105,7 +106,8 @@
             v-if="selectedFiles.length > 0"
             type="button"
             @click="clearSelectedFiles"
-            class="flex justify-center items-center gap-[5px] rounded cursor-pointer py-2 px-4 text-sm h-[40px] bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-colors"
+            class="flex justify-center items-center gap-[5px] rounded cursor-pointer px-4 text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-colors"
+            style="height: auto; padding-top: 0.625rem; padding-bottom: 0.625rem"
             title="Limpar arquivos selecionados"
           >
             <font-awesome-icon icon="times" />
@@ -744,6 +746,19 @@ const handleSubmit = async () => {
   width: 100%;
 }
 
+/* Override button height to match input height */
+#newTicketModal label.btn.btn-primary[for='fileUpload'] {
+  height: auto !important;
+  padding-top: 0.625rem !important;
+  padding-bottom: 0.625rem !important;
+}
+
+#newTicketModal button[title='Limpar arquivos selecionados'] {
+  height: auto !important;
+  padding-top: 0.625rem !important;
+  padding-bottom: 0.625rem !important;
+}
+
 .quill-wrapper {
   border: 1px solid #d7dee8;
   border-radius: 6px;
@@ -864,5 +879,35 @@ const handleSubmit = async () => {
 
 .dark #newTicketModal .ql-snow .ql-picker-item:hover {
   background: #374151;
+}
+
+/* Calendar icon in dark mode - in non-scoped style for better targeting */
+body.dark-mode #newTicketModal .mx-datepicker .mx-input-wrapper i,
+body.dark-mode #newTicketModal .mx-datepicker .mx-input-wrapper i *,
+body.dark-mode #newTicketModal .mx-datepicker .mx-input-wrapper svg,
+body.dark-mode #newTicketModal .mx-datepicker .mx-input-wrapper svg *,
+body.dark-mode #newTicketModal .mx-datepicker .mx-input-wrapper path,
+body.dark-mode #newTicketModal .mx-datepicker .mx-input-wrapper .mx-icon-calendar,
+body.dark-mode #newTicketModal .mx-datepicker .mx-input-wrapper .mx-icon-calendar *,
+.dark #newTicketModal .mx-datepicker .mx-input-wrapper i,
+.dark #newTicketModal .mx-datepicker .mx-input-wrapper i *,
+.dark #newTicketModal .mx-datepicker .mx-input-wrapper svg,
+.dark #newTicketModal .mx-datepicker .mx-input-wrapper svg *,
+.dark #newTicketModal .mx-datepicker .mx-input-wrapper path,
+.dark #newTicketModal .mx-datepicker .mx-input-wrapper .mx-icon-calendar,
+.dark #newTicketModal .mx-datepicker .mx-input-wrapper .mx-icon-calendar * {
+  color: #9ca3af !important;
+  fill: #9ca3af !important;
+  stroke: #9ca3af !important;
+}
+
+/* Target icon by position (last child) */
+body.dark-mode #newTicketModal .mx-datepicker .mx-input-wrapper > *:last-child,
+body.dark-mode #newTicketModal .mx-datepicker .mx-input-wrapper > *:last-child *,
+.dark #newTicketModal .mx-datepicker .mx-input-wrapper > *:last-child,
+.dark #newTicketModal .mx-datepicker .mx-input-wrapper > *:last-child * {
+  color: #9ca3af !important;
+  fill: #9ca3af !important;
+  stroke: #9ca3af !important;
 }
 </style>

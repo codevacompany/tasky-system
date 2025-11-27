@@ -8,7 +8,9 @@
       <div
         class="bg-white dark:bg-gray-800 rounded-lg p-6 sm:p-8 flex flex-col items-center gap-4 shadow-md mx-4"
       >
-        <font-awesome-icon icon="spinner" spin class="text-3xl text-blue-600 dark:text-blue-400" />
+        <div
+          class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"
+        ></div>
         <p class="text-gray-700 dark:text-gray-300 text-base sm:text-lg font-medium text-center">
           Carregando dados dos relatórios...
         </p>
@@ -196,7 +198,7 @@
             <!-- Created vs Completed Section -->
             <div
               v-permission="PERMISSIONS.VIEW_BASIC_ANALYTICS"
-              class="bg-white dark:bg-gray-800 rounded-lg shadow-md"
+              class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
             >
               <div
                 class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-6 border-b border-gray-200 dark:border-gray-700"
@@ -295,7 +297,9 @@
             <!-- Charts Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <!-- Status Chart -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+              <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              >
                 <div
                   class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700"
                 >
@@ -347,7 +351,9 @@
               </div>
 
               <!-- Priority Chart -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+              <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              >
                 <div
                   class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700"
                 >
@@ -403,7 +409,7 @@
               <!-- Top Contributors -->
               <div
                 v-permission="PERMISSIONS.VIEW_USERS_ANALYTICS"
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md"
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
               >
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
@@ -498,7 +504,7 @@
               <!-- Top Setores -->
               <div
                 v-permission="PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS"
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md"
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
               >
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
@@ -573,7 +579,9 @@
               class="grid grid-cols-1 lg:grid-cols-2 gap-6"
             >
               <!-- Cycle Time per Department -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+              <div
+                class="bg-white dark:bg-gray-800 dark:shadow-none dark:border dark:border-gray-700"
+              >
                 <div
                   class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-6 border-b border-gray-200 dark:border-gray-700"
                 >
@@ -691,7 +699,9 @@
               </div>
 
               <!-- Status Duration Chart -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+              <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              >
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                     Tempo Médio Por Status
@@ -803,7 +813,9 @@
           <!-- Em Andamento Tab -->
           <div v-if="currentTab === 'in-progress'" class="space-y-6">
             <!-- In Progress Overview Card -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3">
+            <div
+              class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700 p-3"
+            >
               <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                   <div>
@@ -933,7 +945,7 @@
             <!-- In Progress Time Analysis -->
             <div
               v-permission="PERMISSIONS.VIEW_BASIC_ANALYTICS"
-              class="bg-white dark:bg-gray-800 rounded-lg shadow-md"
+              class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
             >
               <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -1042,7 +1054,9 @@
             <!-- Content visible if user has permission -->
             <template v-if="hasPermission(PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS)">
               <!-- Department Summary Card -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3">
+              <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 dark:shadow-none dark:border dark:border-gray-700"
+              >
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                     Estatísticas por Setor
@@ -1206,7 +1220,9 @@
               <!-- Top Performing vs Underperforming Departments -->
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Top Performing -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                <div
+                  class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+                >
                   <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                       Melhor Desempenho
@@ -1242,7 +1258,9 @@
                 </div>
 
                 <!-- Needs Improvement -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                <div
+                  class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+                >
                   <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                       Necessita Melhoria
@@ -1280,7 +1298,10 @@
             </template>
 
             <!-- Upgrade prompt if user doesn't have permission -->
-            <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+            <div
+              v-else
+              class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+            >
               <div class="p-12 text-center">
                 <div
                   class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -1311,7 +1332,9 @@
           <div v-if="currentTab === 'users'" class="space-y-6">
             <template v-if="hasPermission(PERMISSIONS.VIEW_USERS_ANALYTICS)">
               <!-- Users Summary Card -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3">
+              <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 dark:shadow-none dark:border dark:border-gray-700"
+              >
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
@@ -1465,7 +1488,9 @@
 
               <!-- Top vs Underperforming Users -->
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                <div
+                  class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+                >
                   <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                       Melhor Desempenho
@@ -1475,8 +1500,8 @@
                     </p>
                   </div>
                   <div class="p-6">
-                    <div class="space-y-4">
-                      <template v-if="topPerformers.length > 0">
+                    <template v-if="topPerformers.length > 0">
+                      <div class="space-y-4">
                         <div
                           v-for="user in topPerformers"
                           :key="`best-${user.userId}`"
@@ -1494,15 +1519,33 @@
                             {{ formatPercentage(user.resolutionRate) }}
                           </div>
                         </div>
-                      </template>
-                      <div v-else class="text-sm text-gray-500 dark:text-gray-400 text-center py-2">
-                        Não há colaboradores com bom desempenho
                       </div>
+                    </template>
+                    <div
+                      v-else
+                      class="flex flex-col items-center justify-center min-h-[300px] text-center"
+                    >
+                      <div
+                        class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4"
+                      >
+                        <font-awesome-icon
+                          icon="user-check"
+                          class="text-2xl text-gray-400 dark:text-gray-500"
+                        />
+                      </div>
+                      <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                        Não há colaboradores com bom desempenho
+                      </p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Os colaboradores aparecerão aqui quando atingirem uma boa taxa de resolução
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                <div
+                  class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+                >
                   <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                       Pior Desempenho
@@ -1512,31 +1555,55 @@
                     </p>
                   </div>
                   <div class="p-6">
-                    <div class="space-y-4">
-                      <div
-                        v-for="user in worstPerformers"
-                        :key="`worst-${user.userId}`"
-                        class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
-                      >
-                        <div>
-                          <div class="font-medium text-gray-900 dark:text-white">
-                            {{ user.firstName }} {{ user.lastName }}
+                    <template v-if="worstPerformers.length > 0">
+                      <div class="space-y-4">
+                        <div
+                          v-for="user in worstPerformers"
+                          :key="`worst-${user.userId}`"
+                          class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
+                        >
+                          <div>
+                            <div class="font-medium text-gray-900 dark:text-white">
+                              {{ user.firstName }} {{ user.lastName }}
+                            </div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                              {{ user.resolvedTickets }}/{{ user.totalTickets }} tickets
+                            </div>
                           </div>
-                          <div class="text-sm text-gray-600 dark:text-gray-400">
-                            {{ user.resolvedTickets }}/{{ user.totalTickets }} tickets
+                          <div class="text-lg font-bold text-red-600 dark:text-red-400">
+                            {{ formatPercentage(user.resolutionRate) }}
                           </div>
-                        </div>
-                        <div class="text-lg font-bold text-red-600 dark:text-red-400">
-                          {{ formatPercentage(user.resolutionRate) }}
                         </div>
                       </div>
+                    </template>
+                    <div
+                      v-else
+                      class="flex flex-col items-center justify-center min-h-[300px] text-center"
+                    >
+                      <div
+                        class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4"
+                      >
+                        <font-awesome-icon
+                          icon="user-times"
+                          class="text-2xl text-gray-400 dark:text-gray-500"
+                        />
+                      </div>
+                      <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                        Não há colaboradores com baixo desempenho
+                      </p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Todos os colaboradores estão com uma boa taxa de resolução
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
             </template>
 
-            <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+            <div
+              v-else
+              class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+            >
               <div class="p-12 text-center">
                 <div
                   class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -1598,7 +1665,9 @@
               </div>
 
               <!-- Trends Overview -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+              <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              >
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                     <div>
@@ -1640,7 +1709,9 @@
               </div>
 
               <!-- Cycle Time Analysis -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+              <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              >
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                     <div>
@@ -1757,7 +1828,9 @@
               <!-- Trend Insights -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Performance Trends -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                <div
+                  class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+                >
                   <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                       Tendências de Performance
@@ -1819,7 +1892,9 @@
                 </div>
 
                 <!-- Status Distribution Trends -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                <div
+                  class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+                >
                   <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                     <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                       Tempo Médio Por Status
@@ -1884,7 +1959,9 @@
               </div>
 
               <!-- In Progress Time Analysis -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+              <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              >
                 <div class="p-6 border-b border-gray-200 dark:border-gray-700">
                   <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
                     TEMPO GASTO NO STATUS "EM ANDAMENTO"
@@ -1975,7 +2052,10 @@
             </template>
 
             <!-- Upgrade prompt if user doesn't have permission -->
-            <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+            <div
+              v-else
+              class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+            >
               <div class="p-12 text-center">
                 <div
                   class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -2095,6 +2175,7 @@ import { downloadFile } from '@/utils/file-helper';
 import * as XLSX from 'xlsx';
 import BaseModal from '@/components/common/BaseModal.vue';
 import JSZip from 'jszip';
+import { useUserPreferencesStore } from '@/stores/userPreferences';
 ChartJS.register(ChartDataLabels);
 
 enum StatsPeriod {
@@ -2110,6 +2191,7 @@ const showExportModal = ref(false);
 
 const route = useRoute();
 const router = useRouter();
+const userPreferencesStore = useUserPreferencesStore();
 
 const { isSupervisor } = useRoles();
 
@@ -2280,74 +2362,121 @@ const chartOptions = ref<ChartOptions>({
   },
 });
 
-const trendChartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      display: true,
-      position: 'bottom' as const,
-      labels: {
-        usePointStyle: true,
-        padding: 20,
-        font: { size: 12 },
-      },
-    },
-    tooltip: {
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      padding: 12,
-      titleFont: { size: 14 },
-      bodyFont: { size: 13 },
-      callbacks: {
-        label: (context: any) => `${context.dataset.label}: ${context.parsed.y}`,
-      },
-    },
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-      ticks: { precision: 0 },
-    },
-  },
-};
+const trendChartOptions = computed<ChartOptions>(() => {
+  const isDark = userPreferencesStore.isDarkMode;
+  const textColor = isDark ? '#9ca3af' : '#374151'; // gray-400 for dark, gray-700 for light
+  const gridColor = isDark ? '#374151' : '#e5e7eb'; // gray-700 for dark, gray-200 for light
 
-const createdVsCompletedChartOptions = ref<ChartOptions>({
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      display: true,
-      position: 'bottom',
-      labels: {
-        usePointStyle: true,
-        padding: 20,
-        font: {
-          size: 12,
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom' as const,
+        labels: {
+          usePointStyle: true,
+          padding: 20,
+          font: { size: 12 },
+          color: textColor,
+        },
+      },
+      tooltip: {
+        backgroundColor: isDark ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.8)',
+        padding: 12,
+        titleFont: { size: 14 },
+        bodyFont: { size: 13 },
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        callbacks: {
+          label: (context: any) => `${context.dataset.label}: ${context.parsed.y}`,
+        },
+      },
+      datalabels: {
+        display: false,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          precision: 0,
+          color: textColor,
+        },
+        grid: {
+          color: gridColor,
+        },
+      },
+      x: {
+        ticks: {
+          color: textColor,
+        },
+        grid: {
+          color: gridColor,
         },
       },
     },
-    tooltip: {
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      padding: 12,
-      titleFont: {
-        size: 14,
+  };
+});
+
+const createdVsCompletedChartOptions = computed<ChartOptions>(() => {
+  const isDark = userPreferencesStore.isDarkMode;
+  const textColor = isDark ? '#9ca3af' : '#374151'; // gray-400 for dark, gray-700 for light
+  const gridColor = isDark ? '#374151' : '#e5e7eb'; // gray-700 for dark, gray-200 for light
+
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          padding: 20,
+          font: {
+            size: 12,
+          },
+          color: textColor,
+        },
       },
-      bodyFont: {
-        size: 13,
+      tooltip: {
+        backgroundColor: isDark ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.8)',
+        padding: 12,
+        titleFont: {
+          size: 14,
+        },
+        bodyFont: {
+          size: 13,
+        },
+        titleColor: '#fff',
+        bodyColor: '#fff',
+      },
+      datalabels: {
+        display: false,
       },
     },
-    datalabels: {
-      display: false,
-    },
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-      ticks: {
-        precision: 0,
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          precision: 0,
+          color: textColor,
+        },
+        grid: {
+          color: gridColor,
+        },
+      },
+      x: {
+        ticks: {
+          color: textColor,
+        },
+        grid: {
+          color: gridColor,
+        },
       },
     },
-  },
+  };
 });
 
 const statistics = ref<TenantStatistics | null>(null);
@@ -3187,51 +3316,86 @@ const cycleTimeBarData = computed(() => {
   };
 });
 
-const cycleTimeBarOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      display: false,
-    },
-    tooltip: {
-      callbacks: {
-        label: function (tooltipItem: any) {
-          // Converter horas para formato dias/horas
-          const hours = tooltipItem.raw as number;
-          const days = Math.floor(hours / 24);
-          const remainingHours = Math.floor(hours % 24);
+const cycleTimeBarOptions = computed<ChartOptions>(() => {
+  const isDark = userPreferencesStore.isDarkMode;
+  const textColor = isDark ? '#9ca3af' : '#374151'; // gray-400 for dark, gray-700 for light
+  const gridColor = isDark ? '#374151' : '#e5e7eb'; // gray-700 for dark, gray-200 for light
 
-          if (days > 0) {
-            return `${days}d ${remainingHours}h`;
-          } else {
-            return `${remainingHours}h ${Math.floor((hours - remainingHours) * 60)}m`;
-          }
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+        position: 'bottom' as const,
+        labels: {
+          usePointStyle: true,
+          padding: 20,
+          font: { size: 12 },
+        },
+      },
+      tooltip: {
+        backgroundColor: isDark ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.8)',
+        padding: 12,
+        titleFont: { size: 14 },
+        bodyFont: { size: 13 },
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        callbacks: {
+          label: function (tooltipItem: any) {
+            // Converter horas para formato dias/horas
+            const hours = tooltipItem.raw as number;
+            const days = Math.floor(hours / 24);
+            const remainingHours = Math.floor(hours % 24);
+
+            if (days > 0) {
+              return `${days}d ${remainingHours}h`;
+            } else {
+              return `${remainingHours}h ${Math.floor((hours - remainingHours) * 60)}m`;
+            }
+          },
+        },
+      },
+      datalabels: {
+        display: false,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Tempo (horas)',
+          color: textColor,
+        },
+        ticks: {
+          precision: 0,
+          color: textColor,
+          callback: function (value: any) {
+            const numValue = value as number;
+            if (numValue >= 24) {
+              const days = Math.floor(numValue / 24);
+              const hours = numValue % 24;
+              return `${days}d ${hours}h`;
+            }
+            return `${numValue}h`;
+          },
+        },
+        grid: {
+          color: gridColor,
+        },
+      },
+      x: {
+        ticks: {
+          color: textColor,
+        },
+        grid: {
+          color: gridColor,
         },
       },
     },
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-      title: {
-        display: true,
-        text: 'Tempo (horas)',
-      },
-      ticks: {
-        callback: function (value: any) {
-          const numValue = value as number;
-          if (numValue >= 24) {
-            const days = Math.floor(numValue / 24);
-            const hours = numValue % 24;
-            return `${days}d ${hours}h`;
-          }
-          return `${numValue}h`;
-        },
-      },
-    },
-  },
-};
+  };
+});
 
 // Add a reactive state for chart rendering
 const chartRenderKey = ref(0);
@@ -3308,55 +3472,77 @@ const inProgressTimeChartData = computed(() => {
   };
 });
 
-const inProgressTimeChartOptions = computed(() => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      display: true,
-      position: 'bottom' as const,
-      labels: {
-        usePointStyle: true,
-        padding: 20,
-        font: { size: 12 },
-      },
-    },
-    tooltip: {
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      padding: 12,
-      titleFont: { size: 14 },
-      bodyFont: { size: 13 },
-      callbacks: {
-        label: (context: any) => {
-          const value = context.parsed.y;
-          return formatTimeInSeconds(value);
-        },
-      },
-    },
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-      title: {
+const inProgressTimeChartOptions = computed<ChartOptions>(() => {
+  const isDark = userPreferencesStore.isDarkMode;
+  const textColor = isDark ? '#9ca3af' : '#374151'; // gray-400 for dark, gray-700 for light
+  const gridColor = isDark ? '#374151' : '#e5e7eb'; // gray-700 for dark, gray-200 for light
+
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
         display: true,
-        text: 'Tempo',
-        font: {
-          size: 12,
+        position: 'bottom' as const,
+        labels: {
+          usePointStyle: true,
+          padding: 20,
+          font: { size: 12 },
+          color: textColor,
         },
       },
-      ticks: {
-        callback: function (value: any) {
-          return formatTimeInSecondsCompact(value);
+      tooltip: {
+        backgroundColor: isDark ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.8)',
+        padding: 12,
+        titleFont: { size: 14 },
+        bodyFont: { size: 13 },
+        titleColor: '#fff',
+        bodyColor: '#fff',
+        callbacks: {
+          label: (context: any) => {
+            const value = context.parsed.y;
+            return formatTimeInSeconds(value);
+          },
         },
       },
-    },
-    x: {
-      grid: {
+      datalabels: {
         display: false,
       },
     },
-  },
-}));
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Tempo',
+          color: textColor,
+          font: {
+            size: 12,
+          },
+        },
+        ticks: {
+          precision: 0,
+          color: textColor,
+          callback: function (value: any) {
+            return formatTimeInSecondsCompact(value);
+          },
+        },
+        grid: {
+          color: gridColor,
+        },
+      },
+      x: {
+        ticks: {
+          color: textColor,
+        },
+        grid: {
+          display: false,
+          color: gridColor,
+        },
+      },
+    },
+  };
+});
 
 // Format hours with decimal places
 const formatTimeInHours = (hours: number): string => {

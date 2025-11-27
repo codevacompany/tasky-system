@@ -4,8 +4,9 @@
     @close="closeModal"
     @cancel="closeModal"
     @confirm="updateUser"
-    :confirmButtonText="isLoading ? '' : 'Salvar'"
+    :confirmButtonText="'Salvar'"
     :cancelButtonText="'Cancelar'"
+    :confirmButtonLoading="isLoading"
   >
     <form
       id="editarColaboradorForm"
@@ -102,10 +103,6 @@
           <option :value="true">Ativo</option>
           <option :value="false">Inativo</option>
         </select>
-      </div>
-
-      <div v-if="isLoading" class="col-span-2 flex justify-center my-2">
-        <LoadingSpinner :size="22" />
       </div>
     </form>
   </BaseModal>

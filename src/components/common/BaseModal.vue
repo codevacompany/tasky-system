@@ -40,7 +40,7 @@
             <button
               v-if="showCancelButton"
               type="button"
-              class="w-full sm:w-auto px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-full sm:w-auto px-4 py-2 btn bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               @click="handleCancel"
               :disabled="confirmButtonLoading"
             >
@@ -50,7 +50,7 @@
               v-if="showConfirmButton"
               ref="confirmButtonRef"
               type="button"
-              class="w-full sm:w-auto px-4 py-2 primary-gradient hover:opacity-95 text-white rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              class="w-full sm:w-auto px-4 py-2 btn btn-primary hover:opacity-95 text-white rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               @click="handleConfirm"
               :disabled="confirmButtonLoading"
               :style="confirmButtonMinWidth"
