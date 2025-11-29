@@ -10,10 +10,10 @@
   >
     <form
       id="cadastroColaboradorForm"
-      class="w-[100%] sm:min-w-[600px] grid grid-cols-1 sm:grid-cols-2 gap-5"
+      class="w-[100%] sm:min-w-[460px] grid grid-cols-1 gap-5"
       @submit.prevent="createUser"
     >
-      <div class="col-span-1">
+      <div>
         <label
           for="nomeColaborador"
           class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
