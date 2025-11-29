@@ -54,7 +54,7 @@
           <div
             v-for="(ticket, index) in tickets"
             :key="ticket.id"
-            class="flex items-center gap-4 py-4 px-4 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200 cursor-pointer"
+            class="flex items-center gap-4 py-4 px-4 border border-dashed dark:border-solid border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200 cursor-pointer"
             @click="handleTicketClick(ticket)"
           >
             <!-- Avatar and User Info -->

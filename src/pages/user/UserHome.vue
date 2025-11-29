@@ -19,7 +19,7 @@
         <!-- Pendentes -->
         <div
           v-if="isLoading"
-          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+          class="border border-dashed dark:border-solid border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
           <div
             class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
@@ -31,7 +31,7 @@
         </div>
         <div
           v-else
-          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+          class="border border-dashed dark:border-solid border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
           <div class="mb-3">
             <font-awesome-icon icon="clock" class="text-orange-500 dark:text-orange-400 text-2xl" />
@@ -45,7 +45,7 @@
         <!-- Em Andamento -->
         <div
           v-if="isLoading"
-          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+          class="border border-dashed dark:border-solid border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
           <div class="mb-3">
             <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
@@ -57,7 +57,7 @@
         </div>
         <div
           v-else
-          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+          class="border border-dashed dark:border-solid border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
           <div class="mb-3">
             <font-awesome-icon icon="spinner" class="text-blue-500 dark:text-blue-400 text-2xl" />
@@ -74,7 +74,7 @@
         <!-- Finalizados -->
         <div
           v-if="isLoading"
-          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+          class="border border-dashed dark:border-solid border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
           <div
             class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
@@ -86,7 +86,7 @@
         </div>
         <div
           v-else
-          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+          class="border border-dashed dark:border-solid border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
           <div class="mb-3">
             <font-awesome-icon
@@ -106,7 +106,7 @@
         <!-- Taxa de Resolução -->
         <div
           v-if="isLoading"
-          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+          class="border border-dashed dark:border-solid border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
           <div
             class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
@@ -118,7 +118,7 @@
         </div>
         <div
           v-else
-          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+          class="border border-dashed dark:border-solid border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
           <div class="mb-3">
             <font-awesome-icon
@@ -135,7 +135,7 @@
         <!-- Tempo Médio de Aceite -->
         <div
           v-if="isLoading"
-          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+          class="border border-dashed dark:border-solid border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
           <div
             class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
@@ -147,7 +147,7 @@
         </div>
         <div
           v-else
-          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+          class="border border-dashed dark:border-solid border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
           <div class="mb-3">
             <font-awesome-icon
@@ -166,7 +166,7 @@
         <!-- Tempo Médio de Conclusão -->
         <div
           v-if="isLoading"
-          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+          class="border border-dashed dark:border-solid border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
           <div
             class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
@@ -178,7 +178,7 @@
         </div>
         <div
           v-else
-          class="border border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
+          class="border border-dashed dark:border-solid border-gray-300 dark:border-gray-600 rounded-lg p-6 flex flex-col items-center justify-center"
         >
           <div class="mb-3">
             <font-awesome-icon

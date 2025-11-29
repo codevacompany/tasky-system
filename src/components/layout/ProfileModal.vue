@@ -71,7 +71,11 @@
               </router-link>
 
               <div
-                class="flex items-center gap-3 px-6 py-3.5 text-gray-900 dark:text-white cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
+                ref="temaButtonRef"
+                class="flex items-center gap-3 px-6 py-3.5 text-gray-900 dark:text-white cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700 relative"
+                :class="{
+                  'bg-blue-50 dark:bg-blue-900/10': showThemeModal,
+                }"
                 @click="toggleThemeModal"
               >
                 <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
@@ -115,81 +119,95 @@
       @click="closeThemeModal"
     ></div>
     <div
-      v-if="showThemeModal"
-      class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.15)] z-[1001] overflow-hidden border border-gray-200 dark:border-gray-700"
+      v-if="showThemeModal && temaButtonRef"
+      ref="themePopupRef"
+      class="fixed bg-white dark:bg-gray-800 rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.15)] z-[1001] overflow-hidden border border-gray-200 dark:border-gray-700 min-w-[280px]"
+      :style="themePopupStyle"
       @click.stop
     >
-      <div class="w-full">
+      <div class="p-2 flex flex-col gap-1">
         <div
-          class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-between items-center"
+          class="flex items-center gap-3 px-3 py-3 rounded-md cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+          :class="{
+            'bg-blue-50 dark:bg-blue-900/10': !userPreferencesStore.isDarkMode,
+          }"
+          @click="setTheme('light')"
         >
-          <h2
-            class="m-0 text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"
-          >
-            <font-awesome-icon :icon="userPreferencesStore.isDarkMode ? 'moon' : 'sun'" />
-            Tema
-          </h2>
-          <button
-            class="text-gray-900 dark:text-white opacity-70 bg-none border-none cursor-pointer p-1 text-2xl leading-none rounded hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
-            @click="closeThemeModal"
-          >
-            ×
-          </button>
-        </div>
-        <div class="p-0">
-          <div class="p-6 flex flex-col gap-4">
+          <div class="relative flex items-center justify-center">
             <div
-              class="flex items-center gap-4 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer transition-all duration-200 relative hover:border-blue-500 dark:hover:border-blue-400"
-              :class="{
-                'border-blue-500 dark:border-blue-400 bg-blue-50/50 dark:bg-blue-900/10':
-                  !userPreferencesStore.isDarkMode,
-              }"
-              @click="setTheme('light')"
+              class="w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all duration-200"
+              :class="
+                !userPreferencesStore.isDarkMode
+                  ? 'border-blue-500 dark:border-blue-400'
+                  : 'border-gray-300 dark:border-gray-600'
+              "
             >
               <div
-                class="w-[60px] h-10 rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 flex-shrink-0 bg-white"
-              >
-                <div class="h-3 bg-gray-100 border-b border-gray-200"></div>
-                <div class="h-7 bg-white"></div>
-              </div>
-              <div class="flex-1">
-                <h4 class="m-0 mb-1 text-sm font-semibold text-gray-900 dark:text-white">Claro</h4>
-                <p class="m-0 text-xs text-gray-600 dark:text-gray-400">
-                  Tema padrão com fundo branco
-                </p>
-              </div>
-              <font-awesome-icon
                 v-if="!userPreferencesStore.isDarkMode"
-                icon="check"
-                class="absolute top-2 right-2 text-blue-500 dark:text-blue-400 text-sm"
-              />
+                class="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400"
+              ></div>
             </div>
+          </div>
+          <div
+            class="w-[50px] h-8 rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 flex-shrink-0 bg-white"
+          >
+            <div class="h-2.5 bg-gray-100 border-b border-gray-200"></div>
+            <div class="h-[22px] bg-white"></div>
+          </div>
+          <div class="flex-1 flex flex-col">
+            <span
+              class="text-sm font-medium"
+              :class="
+                !userPreferencesStore.isDarkMode
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-gray-900 dark:text-white'
+              "
+              >Claro</span
+            >
+            <p class="m-0 text-xs text-gray-600 dark:text-gray-400">Tema padrão com fundo branco</p>
+          </div>
+        </div>
+        <div
+          class="flex items-center gap-3 px-3 py-3 rounded-md cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+          :class="{
+            'bg-blue-50 dark:bg-blue-900/10': userPreferencesStore.isDarkMode,
+          }"
+          @click="setTheme('dark')"
+        >
+          <div class="relative flex items-center justify-center">
             <div
-              class="flex items-center gap-4 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer transition-all duration-200 relative hover:border-blue-500 dark:hover:border-blue-400"
-              :class="{
-                'border-blue-500 dark:border-blue-400 bg-blue-50/50 dark:bg-blue-900/10':
-                  userPreferencesStore.isDarkMode,
-              }"
-              @click="setTheme('dark')"
+              class="w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all duration-200"
+              :class="
+                userPreferencesStore.isDarkMode
+                  ? 'border-blue-500 dark:border-blue-400'
+                  : 'border-gray-300 dark:border-gray-600'
+              "
             >
               <div
-                class="w-[60px] h-10 rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 flex-shrink-0 bg-gray-800"
-              >
-                <div class="h-3 bg-gray-700 border-b border-gray-600"></div>
-                <div class="h-7 bg-gray-800"></div>
-              </div>
-              <div class="flex-1">
-                <h4 class="m-0 mb-1 text-sm font-semibold text-gray-900 dark:text-white">Escuro</h4>
-                <p class="m-0 text-xs text-gray-600 dark:text-gray-400">
-                  Tema escuro para reduzir o cansaço visual
-                </p>
-              </div>
-              <font-awesome-icon
                 v-if="userPreferencesStore.isDarkMode"
-                icon="check"
-                class="absolute top-2 right-2 text-blue-500 dark:text-blue-400 text-sm"
-              />
+                class="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400"
+              ></div>
             </div>
+          </div>
+          <div
+            class="w-[50px] h-8 rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 flex-shrink-0 bg-gray-800"
+          >
+            <div class="h-2.5 bg-gray-700 border-b border-gray-600"></div>
+            <div class="h-[22px] bg-gray-800"></div>
+          </div>
+          <div class="flex-1 flex flex-col">
+            <span
+              class="text-sm font-medium"
+              :class="
+                userPreferencesStore.isDarkMode
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-gray-900 dark:text-white'
+              "
+              >Escuro</span
+            >
+            <p class="m-0 text-xs text-gray-600 dark:text-gray-400">
+              Tema escuro para reduzir o cansaço visual
+            </p>
           </div>
         </div>
       </div>
@@ -332,7 +350,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, reactive } from 'vue';
+import { computed, ref, reactive, nextTick, onMounted, onUnmounted } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { useUserPreferencesStore } from '@/stores/userPreferences';
 import { authService } from '@/services/authService';
@@ -357,6 +375,9 @@ const userPreferencesStore = useUserPreferencesStore();
 const { isTenantAdmin } = useRoles();
 
 const showThemeModal = ref(false);
+const temaButtonRef = ref<HTMLElement | null>(null);
+const themePopupRef = ref<HTMLElement | null>(null);
+const themePopupStyle = ref<{ top: string; left: string }>({ top: '0px', left: '0px' });
 
 const showChangePasswordModal = ref(false);
 const isChangingPassword = ref(false);
@@ -381,8 +402,60 @@ const handleLogout = () => {
   router.push('/login');
 };
 
+const updateThemePopupPosition = () => {
+  if (!temaButtonRef.value || !showThemeModal.value) return;
+
+  nextTick(() => {
+    if (!temaButtonRef.value) return;
+
+    const buttonRect = temaButtonRef.value.getBoundingClientRect();
+    const profileModal = document.getElementById('profileModal');
+    if (!profileModal) return;
+
+    const modalRect = profileModal.getBoundingClientRect();
+    const popupWidth = 280;
+    const gap = 6;
+
+    const top = buttonRect.top;
+
+    let left = modalRect.left - popupWidth - gap;
+
+    const minLeft = 8;
+    left = Math.max(left, minLeft);
+
+    const popupRightEdge = left + popupWidth;
+    if (popupRightEdge >= modalRect.left) {
+      left = modalRect.left - popupWidth - gap;
+      left = Math.max(left, minLeft);
+    }
+
+    themePopupStyle.value = {
+      top: `${top}px`,
+      left: `${left}px`,
+    };
+
+    nextTick(() => {
+      if (themePopupRef.value) {
+        const popupRect = themePopupRef.value.getBoundingClientRect();
+        const actualPopupRight = popupRect.right;
+
+        if (actualPopupRight >= modalRect.left - gap) {
+          const adjustedLeft = modalRect.left - popupRect.width - gap;
+          themePopupStyle.value = {
+            top: `${top}px`,
+            left: `${Math.max(adjustedLeft, minLeft)}px`,
+          };
+        }
+      }
+    });
+  });
+};
+
 const toggleThemeModal = () => {
-  showThemeModal.value = true;
+  showThemeModal.value = !showThemeModal.value;
+  if (showThemeModal.value) {
+    updateThemePopupPosition();
+  }
 };
 
 const closeThemeModal = () => {
@@ -393,6 +466,22 @@ const setTheme = (theme: 'light' | 'dark') => {
   userPreferencesStore.setTheme(theme);
   closeThemeModal();
 };
+
+const handleResize = () => {
+  if (showThemeModal.value) {
+    updateThemePopupPosition();
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize);
+  window.addEventListener('scroll', handleResize, true);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
+  window.removeEventListener('scroll', handleResize, true);
+});
 
 const openChangePasswordModal = () => {
   showChangePasswordModal.value = true;

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex gap-4 pt-3 pb-6 px-2 overflow-x-auto h-[calc(100vh-236px)] bg-white dark:bg-gray-900 rounded-lg relative w-full"
+    class="kanban-container flex gap-4 p-3 px-2 overflow-x-auto h-[calc(100vh-234px)] bg-white dark:bg-gray-900 rounded-lg relative w-full"
   >
     <!-- Skeleton while loading columns -->
     <template v-if="ticketsStore.statusColumns.isLoading || kanbanColumns.length === 0">
@@ -452,6 +452,22 @@ onMounted(() => {
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
+
+.kanban-container::-webkit-scrollbar {
+  height: 7px;
+}
+
+.kanban-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.kanban-container::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded;
+}
+
+.kanban-container::-webkit-scrollbar-thumb:hover {
   @apply bg-gray-400 dark:bg-gray-500;
 }
 </style>
