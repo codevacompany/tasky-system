@@ -10,10 +10,10 @@
   >
     <form
       id="editarColaboradorForm"
-      class="w-[100%] sm:min-w-[500px] grid grid-cols-1 sm:grid-cols-2 gap-5"
+      class="w-[100%] sm:min-w-[460px] grid grid-cols-1 gap-5"
       @submit.prevent="updateUser"
     >
-      <div class="col-span-1">
+      <div>
         <label
           for="nomeColaborador"
           class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
@@ -74,7 +74,7 @@
         />
       </div>
 
-      <div class="col-span-1">
+      <div>
         <label
           for="roleColaborador"
           class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
@@ -86,23 +86,6 @@
           @update:modelValue="updateRole"
           placeholder="Selecione uma função"
         />
-      </div>
-
-      <div class="col-span-1">
-        <label
-          for="isActiveColaborador"
-          class="block mb-2 text-sm font-medium text-gray-800 dark:text-gray-200"
-          >Status</label
-        >
-        <select
-          id="isActiveColaborador"
-          v-model="userData.isActive"
-          required
-          class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-        >
-          <option :value="true">Ativo</option>
-          <option :value="false">Inativo</option>
-        </select>
       </div>
     </form>
   </BaseModal>

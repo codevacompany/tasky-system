@@ -224,16 +224,16 @@
                   </p>
                   <div class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
                     <p v-if="trendData && trendData.length > 0">
-                      <span class="font-semibold text-blue-600 dark:text-blue-400"
-                        >{{ getTotalResolved() }} tickets</span
-                      >
-                      concluídos no período selecionado
-                    </p>
-                    <p v-if="trendData && trendData.length > 0">
-                      <span class="font-semibold text-green-600 dark:text-green-400"
+                      <span class="font-semibold text-blue-600 dark:text-green-400"
                         >{{ getTotalCreated() }} tickets</span
                       >
                       criados no período selecionado
+                    </p>
+                    <p v-if="trendData && trendData.length > 0">
+                      <span class="font-semibold text-green-600 dark:text-blue-400"
+                        >{{ getTotalResolved() }} tickets</span
+                      >
+                      concluídos no período selecionado
                     </p>
                     <p
                       v-if="
@@ -276,14 +276,14 @@
                 </div>
 
                 <div class="p-6 lg:w-2/3">
-                  <div class="h-80">
-                    <Line
-                      v-if="trendData && trendData.length > 0"
+                  <div class="h-80 relative">
+                    <Bar
+                      v-if="trendData && trendData.length > 0 && !trendChartLoading"
                       :data="createdVsCompletedChartData"
                       :options="createdVsCompletedChartOptions"
                     />
                     <div
-                      v-else
+                      v-if="trendChartLoading || !trendData || trendData.length === 0"
                       class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
                     >
                       <font-awesome-icon icon="spinner" spin class="text-2xl mb-3" />
@@ -1691,14 +1691,14 @@
                 </div>
 
                 <div class="p-6">
-                  <div class="h-80">
-                    <Line
-                      v-if="trendChartData"
+                  <div class="h-80 relative">
+                    <Bar
+                      v-if="trendChartData && !trendChartLoading"
                       :data="trendChartData"
                       :options="trendChartOptions"
                     />
                     <div
-                      v-else
+                      v-if="trendChartLoading || !trendChartData"
                       class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
                     >
                       <font-awesome-icon icon="spinner" spin class="text-2xl mb-3" />
@@ -1740,23 +1740,23 @@
                 <div class="flex flex-col lg:flex-row">
                   <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
                     <div class="space-y-4">
-                      <div>
-                        <p class="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                          Tempo {{ periodTextMap[selectedCycleTimePeriod] }}:
-                        </p>
-                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <span
+                          class="block text-lg font-semibold text-gray-900 dark:text-white mb-1"
+                        >
                           {{ formatTimeInSecondsCompact(getLatestResolutionTime() * 3600) }}
-                        </div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
-                          {{ getPeriodName() }}
-                        </p>
+                        </span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                          Tempo {{ periodTextMap[selectedCycleTimePeriod] }}
+                          <span v-if="getPeriodName()"> ({{ getPeriodName() }})</span>
+                        </span>
                       </div>
 
-                      <div v-if="hasPreviousPeriodData()">
-                        <p class="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                          Comparação:
-                        </p>
-                        <div class="flex items-center gap-2">
+                      <div
+                        v-if="hasPreviousPeriodData()"
+                        class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                      >
+                        <div class="flex items-center justify-center gap-2 mb-1">
                           <font-awesome-icon
                             :icon="getResolutionTimeTrend() > 0 ? 'arrow-up' : 'arrow-down'"
                             :class="
@@ -1771,36 +1771,38 @@
                                 ? 'text-red-600 dark:text-red-400'
                                 : 'text-green-600 dark:text-green-400'
                             "
-                            class="font-medium"
+                            class="font-semibold text-lg"
                           >
                             {{ Math.abs(getResolutionTimeTrend()) }}%
                           </span>
-                          <span class="text-gray-600 dark:text-gray-400 text-sm">
-                            vs {{ getPreviousPeriodLabel() }}
-                          </span>
                         </div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                          vs {{ getPreviousPeriodLabel() }}
+                        </span>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           {{
                             getResolutionTimeTrend() > 0
-                              ? 'Aumento no tempo de resolução (preocupante)'
-                              : 'Diminuição no tempo de resolução (positivo)'
+                              ? 'Aumento (preocupante)'
+                              : 'Diminuição (positivo)'
                           }}
                         </p>
                       </div>
 
-                      <div>
-                        <p class="text-sm font-medium text-gray-900 dark:text-white mb-2">
-                          Média histórica:
-                        </p>
-                        <div class="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                      <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <span
+                          class="block text-lg font-semibold text-gray-900 dark:text-white mb-1"
+                        >
                           {{ formatTimeInSecondsCompact(getAverageResolutionTime() * 3600) }}
-                        </div>
+                        </span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                          Média histórica
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <div class="p-6 lg:w-2/3">
-                    <div :key="chartRenderKey" class="h-64">
+                    <div :key="chartRenderKey" class="h-80">
                       <div
                         v-if="cycleTimeChartLoading"
                         class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
@@ -2007,27 +2009,7 @@
                           }} </span
                         >.
                       </p>
-                    </div>
-                  </div>
-
-                  <div class="p-6 lg:w-2/3">
-                    <div class="space-y-4">
-                      <div class="h-64">
-                        <Line
-                          v-if="inProgressTimeChartData"
-                          :data="inProgressTimeChartData"
-                          :options="inProgressTimeChartOptions"
-                        />
-                        <div
-                          v-else
-                          class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
-                        >
-                          <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
-                          <p class="text-sm">Carregando dados...</p>
-                        </div>
-                      </div>
-
-                      <div v-if="inProgressTimeSeries" class="grid grid-cols-2 gap-4">
+                      <div v-if="inProgressTimeSeries" class="grid grid-cols-1 gap-4 mt-6">
                         <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                           <span class="block text-lg font-semibold text-gray-900 dark:text-white">{{
                             formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
@@ -2044,6 +2026,23 @@
                             >Número de tickets</span
                           >
                         </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="p-6 lg:w-2/3">
+                    <div class="h-80">
+                      <Line
+                        v-if="inProgressTimeChartData"
+                        :data="inProgressTimeChartData"
+                        :options="inProgressTimeChartOptions"
+                      />
+                      <div
+                        v-else
+                        class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                      >
+                        <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
+                        <p class="text-sm">Carregando dados...</p>
                       </div>
                     </div>
                   </div>
@@ -2365,7 +2364,7 @@ const chartOptions = ref<ChartOptions>({
 const trendChartOptions = computed<ChartOptions>(() => {
   const isDark = userPreferencesStore.isDarkMode;
   const textColor = isDark ? '#9ca3af' : '#374151'; // gray-400 for dark, gray-700 for light
-  const gridColor = isDark ? '#374151' : '#e5e7eb'; // gray-700 for dark, gray-200 for light
+  const gridColor = isDark ? '#374151' : '#f3f4f6'; // gray-700 for dark (more visible), gray-100 for light (very light)
 
   return {
     responsive: true,
@@ -2413,7 +2412,15 @@ const trendChartOptions = computed<ChartOptions>(() => {
         },
         grid: {
           color: gridColor,
+          display: false,
         },
+      },
+    },
+    datasets: {
+      bar: {
+        categoryPercentage: 1.0,
+        barPercentage: 1.5,
+        maxBarThickness: barThickness.value,
       },
     },
   };
@@ -2422,7 +2429,7 @@ const trendChartOptions = computed<ChartOptions>(() => {
 const createdVsCompletedChartOptions = computed<ChartOptions>(() => {
   const isDark = userPreferencesStore.isDarkMode;
   const textColor = isDark ? '#9ca3af' : '#374151'; // gray-400 for dark, gray-700 for light
-  const gridColor = isDark ? '#374151' : '#e5e7eb'; // gray-700 for dark, gray-200 for light
+  const gridColor = isDark ? '#374151' : '#f3f4f6'; // gray-700 for dark (more visible), gray-100 for light (very light)
 
   return {
     responsive: true,
@@ -2473,7 +2480,15 @@ const createdVsCompletedChartOptions = computed<ChartOptions>(() => {
         },
         grid: {
           color: gridColor,
+          display: false,
         },
+      },
+    },
+    datasets: {
+      bar: {
+        categoryPercentage: 1.0,
+        barPercentage: 1.5,
+        maxBarThickness: barThickness.value,
       },
     },
   };
@@ -2848,6 +2863,11 @@ const hasPriorityData = computed(() =>
 const selectedTrendPeriod = ref<'daily' | 'weekly' | 'monthly'>('weekly');
 const selectedCycleTimeFilter = ref<'department' | 'priority'>('department');
 const trendData = ref<{ date: string; total: number; resolved: number; created: number }[]>([]);
+const trendChartLoading = ref(false);
+
+const barThickness = computed(() => {
+  return selectedTrendPeriod.value === 'daily' ? 12 : 20;
+});
 
 const trendChartData = computed(() => {
   if (!trendData.value || trendData.value.length === 0) return null;
@@ -2855,22 +2875,34 @@ const trendChartData = computed(() => {
     labels: trendData.value.map((item) => formatDateDDMM(item.date)),
     datasets: [
       {
-        label: 'Concluídos',
-        data: trendData.value.map((item) => item.resolved),
-        borderColor: '#22c55e',
-        backgroundColor: 'rgba(34, 197, 94, 0.1)',
-        fill: true,
-        tension: 0.4,
-        pointRadius: 3,
-      },
-      {
         label: 'Criados',
         data: trendData.value.map((item) => item.created),
+        backgroundColor: '#3b82f6',
         borderColor: '#2563eb',
-        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-        fill: true,
-        tension: 0.4,
-        pointRadius: 3,
+        borderWidth: 1,
+        maxBarThickness: barThickness.value,
+        barThickness: barThickness.value,
+        borderRadius: {
+          topLeft: 6,
+          topRight: 6,
+          bottomLeft: 0,
+          bottomRight: 0,
+        },
+      },
+      {
+        label: 'Concluídos',
+        data: trendData.value.map((item) => item.resolved),
+        backgroundColor: '#4ade80',
+        borderColor: '#22c55e',
+        borderWidth: 1,
+        maxBarThickness: barThickness.value,
+        barThickness: barThickness.value,
+        borderRadius: {
+          topLeft: 6,
+          topRight: 6,
+          bottomLeft: 0,
+          bottomRight: 0,
+        },
       },
     ],
   };
@@ -2887,20 +2919,32 @@ const createdVsCompletedChartData = computed(() => {
       {
         label: 'Criados',
         data: trendData.value.map((item) => item.created),
+        backgroundColor: '#3b82f6',
         borderColor: '#2563eb',
-        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-        fill: true,
-        tension: 0.4,
-        pointRadius: 3,
+        borderWidth: 1,
+        maxBarThickness: barThickness.value,
+        barThickness: barThickness.value,
+        borderRadius: {
+          topLeft: 6,
+          topRight: 6,
+          bottomLeft: 0,
+          bottomRight: 0,
+        },
       },
       {
         label: 'Concluídos',
         data: trendData.value.map((item) => item.resolved),
+        backgroundColor: '#4ade80',
         borderColor: '#22c55e',
-        backgroundColor: 'rgba(34, 197, 94, 0.1)',
-        fill: true,
-        tension: 0.4,
-        pointRadius: 3,
+        borderWidth: 1,
+        maxBarThickness: barThickness.value,
+        barThickness: barThickness.value,
+        borderRadius: {
+          topLeft: 6,
+          topRight: 6,
+          bottomLeft: 0,
+          bottomRight: 0,
+        },
       },
     ],
   };
@@ -2932,19 +2976,16 @@ const disabledDate = (date: Date) => {
 
 const updateTrendPeriod = async (period: string) => {
   selectedTrendPeriod.value = period as 'daily' | 'weekly' | 'monthly';
+  trendChartLoading.value = true;
 
   try {
     const data = await reportService.getTicketTrends(selectedTrendPeriod.value);
     trendData.value = data[selectedTrendPeriod.value];
-
-    // Just update the UI by triggering reactivity
-    loading.value = true;
-    setTimeout(() => {
-      loading.value = false;
-    }, 300);
   } catch (err: unknown) {
     console.error('Erro ao carregar tendências:', err);
     error.value = 'Erro ao carregar dados de tendências. Por favor, tente novamente.';
+  } finally {
+    trendChartLoading.value = false;
   }
 };
 
@@ -3310,7 +3351,7 @@ const cycleTimeBarData = computed(() => {
         borderColor: '#3b82f6',
         borderWidth: 1,
         borderRadius: 4,
-        maxBarThickness: 40,
+        maxBarThickness: 20,
       },
     ],
   };
@@ -3319,7 +3360,7 @@ const cycleTimeBarData = computed(() => {
 const cycleTimeBarOptions = computed<ChartOptions>(() => {
   const isDark = userPreferencesStore.isDarkMode;
   const textColor = isDark ? '#9ca3af' : '#374151'; // gray-400 for dark, gray-700 for light
-  const gridColor = isDark ? '#374151' : '#e5e7eb'; // gray-700 for dark, gray-200 for light
+  const gridColor = isDark ? '#374151' : '#f3f4f6'; // gray-700 for dark (more visible), gray-100 for light (very light)
 
   return {
     responsive: true,
@@ -3475,7 +3516,7 @@ const inProgressTimeChartData = computed(() => {
 const inProgressTimeChartOptions = computed<ChartOptions>(() => {
   const isDark = userPreferencesStore.isDarkMode;
   const textColor = isDark ? '#9ca3af' : '#374151'; // gray-400 for dark, gray-700 for light
-  const gridColor = isDark ? '#374151' : '#e5e7eb'; // gray-700 for dark, gray-200 for light
+  const gridColor = isDark ? '#374151' : '#f3f4f6'; // gray-700 for dark (more visible), gray-100 for light (very light)
 
   return {
     responsive: true,
