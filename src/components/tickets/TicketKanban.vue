@@ -50,7 +50,7 @@
           v-for="ticket in getTicketsByColumn(column)"
           :key="ticket.customId"
           :class="[
-            'min-h-[100px] flex-shrink-0 bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border shadow-sm mb-3.5 flex flex-col hover:-translate-y-0.5 hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
+            'min-h-[100px] flex-shrink-0 bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border shadow-sm mb-3.5 flex flex-col hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
             ticket.ticketStatus?.key === DefaultTicketStatus.Returned ||
             ticket.status === DefaultTicketStatus.Returned
               ? 'border-orange-300 dark:border-orange-600 dark:bg-orange-900/10 hover:border-orange-400 dark:hover:border-orange-500'
@@ -107,8 +107,41 @@
 
           <div class="flex flex-col gap-2">
             <div class="flex items-center justify-between gap-3 mb-0">
-              <div v-if="props.activeTab !== 'recebidos'" class="flex items-center gap-2">
-                <div class="flex items-center gap-1.5">
+              <div class="flex items-center gap-2">
+                <div
+                  v-if="props.activeTab === 'recebidos' && ticket.requester"
+                  class="flex items-center gap-1.5"
+                >
+                  <div class="relative">
+                    <div
+                      :class="[
+                        'w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold',
+                      ]"
+                      :style="{
+                        backgroundColor: getAvatarColor(
+                          ticket.requester.department?.name ||
+                            ticket.requester.firstName + ' ' + ticket.requester.lastName,
+                        ),
+                      }"
+                      :title="`Solicitante: ${ticket.requester.firstName} ${ticket.requester.lastName}${ticket.requester.department?.name ? ' - ' + ticket.requester.department.name : ''}`"
+                    >
+                      {{
+                        getUserInitials({
+                          firstName: ticket.requester.firstName,
+                          lastName: ticket.requester.lastName,
+                        })
+                      }}
+                    </div>
+                    <!-- Requester indicator badge -->
+                    <div
+                      class="absolute -bottom-[6px] -right-1.5 w-4 h-4 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-800"
+                      title="Solicitante"
+                    >
+                      <font-awesome-icon icon="arrow-down" class="text-white text-[8px]" />
+                    </div>
+                  </div>
+                </div>
+                <div v-else-if="props.activeTab !== 'recebidos'" class="flex items-center gap-1.5">
                   <div
                     v-if="ticket.targetUsers && ticket.targetUsers.length > 0"
                     v-for="targetUser in getSortedTargetUsers(ticket)"
@@ -122,30 +155,17 @@
                     ]"
                     :style="{
                       backgroundColor: getAvatarColor(
-                        targetUser.user.firstName + ' ' + targetUser.user.lastName,
+                        targetUser.user.department?.name ||
+                          targetUser.user.firstName + ' ' + targetUser.user.lastName,
                       ),
                     }"
-                    :title="targetUser.user.firstName + ' ' + targetUser.user.lastName"
+                    :title="`${targetUser.user.firstName} ${targetUser.user.lastName}${targetUser.user.department?.name ? ' - ' + targetUser.user.department.name : ''}`"
                   >
                     {{
                       getUserInitials({
                         firstName: targetUser.user.firstName,
                         lastName: targetUser.user.lastName,
                       })
-                    }}
-                  </div>
-                </div>
-                <div class="flex flex-col">
-                  <div class="text-xs text-gray-400 dark:text-gray-400">
-                    {{
-                      ticket.currentTargetUser?.department?.name ||
-                      (ticket.currentTargetUserId && ticket.targetUsers?.length > 0
-                        ? ticket.targetUsers.find((tu) => tu.userId === ticket.currentTargetUserId)
-                            ?.user?.department?.name
-                        : '') ||
-                      (ticket.targetUsers && ticket.targetUsers.length > 0
-                        ? ticket.targetUsers[0]?.user?.department?.name
-                        : '-')
                     }}
                   </div>
                 </div>

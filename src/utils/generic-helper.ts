@@ -165,6 +165,25 @@ export function formatTimeCompact(seconds: number): string {
   }
 }
 
+export function formatTimeShort(seconds?: number): string {
+  if (seconds === undefined || seconds === null || seconds === 0) return '0s';
+
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  if (days > 0) {
+    return hours > 0 ? `${days}d ${hours}h` : `${days}d`;
+  } else if (hours > 0) {
+    return minutes > 0 ? `${hours}h ${minutes}min` : `${hours}h`;
+  } else if (minutes > 0) {
+    return `${minutes}min`;
+  } else {
+    return `${secs}s`;
+  }
+}
+
 export function enumToOptions(enumObj: object): { value: string; label: string }[] {
   const filteredEntries = Object.entries(enumObj).filter(([key]) => isNaN(Number(key)));
 
@@ -208,7 +227,7 @@ export function getUserInitials(
 export const DEFAULT_AVATAR_PALETTE = [
   '#ef4444', // red
   '#f97316', // orange
-  '#eab308', // yellow
+  '#7d14e5', // purple
   '#84cc16', // green
   '#06b6d4', // cyan
   '#3b82f6', // blue

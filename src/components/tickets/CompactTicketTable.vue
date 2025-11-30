@@ -22,7 +22,7 @@
             class="flex items-center gap-4 py-3 border-b border-gray-200 dark:border-gray-700"
           >
             <div
-              class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full animate-pulse-custom flex-shrink-0"
+              class="w-[34px] h-[34px] bg-gray-300 dark:bg-gray-600 rounded-full animate-pulse-custom flex-shrink-0"
             ></div>
             <div class="flex-1">
               <div
@@ -60,7 +60,18 @@
             <!-- Avatar and User Info -->
             <div class="flex items-center gap-3 flex-shrink-0 w-[200px]">
               <div
-                class="w-10 h-10 rounded-full flex items-center justify-center bg-primary text-white text-xs font-semibold flex-shrink-0"
+                class="w-[34px] h-[34px] rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0"
+                :style="
+                  title === 'Últimos Tickets Criados'
+                    ? getAvatarStyle(
+                        ticket.currentTargetUser?.department?.name ||
+                          ticket.targetUsers?.[0]?.user?.department?.name ||
+                          getTargetUserName(ticket),
+                      )
+                    : getAvatarStyle(
+                        ticket.requester?.department?.name || getRequesterName(ticket),
+                      )
+                "
               >
                 <template v-if="title === 'Últimos Tickets Criados'">
                   {{ getTargetUserInitials(ticket) }}
@@ -211,6 +222,7 @@ import {
   formatSnakeToNaturalCase,
   getDeadlineInfo,
   getUserInitials,
+  getAvatarStyle,
 } from '@/utils/generic-helper';
 import { useTicketsStore } from '@/stores/tickets';
 
