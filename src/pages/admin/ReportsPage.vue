@@ -1816,7 +1816,7 @@
                         <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
                         <p class="text-sm">Atualizando gráfico...</p>
                       </div>
-                      <Bar
+                      <Line
                         v-else-if="cycleTimeBarData && cycleTimeBarData.labels.length"
                         :data="cycleTimeBarData"
                         :options="cycleTimeBarOptions"
@@ -1825,7 +1825,7 @@
                         v-else
                         class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
                       >
-                        <font-awesome-icon icon="chart-bar" class="text-2xl mb-2" />
+                        <font-awesome-icon icon="chart-line" class="text-2xl mb-2" />
                         <p class="text-sm">Nenhum dado disponível para o período selecionado</p>
                       </div>
                     </div>
@@ -3364,11 +3364,16 @@ const cycleTimeBarData = computed(() => {
       {
         label: 'Tempo de Resolução',
         data: data.map((item) => item.value),
-        backgroundColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
         borderColor: '#2563eb',
-        borderWidth: 1,
-        borderRadius: 4,
-        maxBarThickness: 20,
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointBackgroundColor: '#2563eb',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
       },
     ],
   };
