@@ -6,6 +6,7 @@ import { statusColumnService } from '@/services/statusColumnService';
 import { ticketService } from '@/services/ticketService';
 import { useUserStore } from './user';
 import { useRoles } from '@/composables/useRoles';
+import { localStorageService } from '@/utils/localStorageService';
 
 export type TicketListFilters = {
   status?: DefaultTicketStatus | null;
@@ -172,7 +173,21 @@ export const useTicketsStore = defineStore('tickets', () => {
     myTickets.value.error = null;
 
     try {
-      const params: Record<string, unknown> = { page: currentPage, limit };
+      const viewPreference = localStorageService.getTicketsViewPreference();
+      const isKanbanView = viewPreference === 'kanban';
+
+      // For kanban view, always use page 1 and disable pagination
+      const pageToUse = isKanbanView ? 1 : currentPage;
+      if (isKanbanView) {
+        myTickets.value.currentPage = 1;
+      }
+
+      const params: Record<string, unknown> = { page: pageToUse, limit };
+
+      // Disable pagination for kanban view
+      if (isKanbanView) {
+        params.paginated = false;
+      }
 
       if (currentFilters) {
         if (currentFilters.status !== undefined && currentFilters.status !== null) {
@@ -197,7 +212,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       myTickets.value.totalCount = response.data.total;
       myTickets.value.lastFetched = new Date();
 
-      if (currentPage === 1) {
+      if (pageToUse === 1) {
         recentCreatedTickets.value = response.data.items.slice(0, 5);
       }
     } catch (error) {
@@ -226,7 +241,21 @@ export const useTicketsStore = defineStore('tickets', () => {
     receivedTickets.value.error = null;
 
     try {
-      const params: Record<string, unknown> = { page: currentPage, limit };
+      const viewPreference = localStorageService.getTicketsViewPreference();
+      const isKanbanView = viewPreference === 'kanban';
+
+      // For kanban view, always use page 1 and disable pagination
+      const pageToUse = isKanbanView ? 1 : currentPage;
+      if (isKanbanView) {
+        receivedTickets.value.currentPage = 1;
+      }
+
+      const params: Record<string, unknown> = { page: pageToUse, limit };
+
+      // Disable pagination for kanban view
+      if (isKanbanView) {
+        params.paginated = false;
+      }
 
       if (currentFilters) {
         if (currentFilters.status !== undefined && currentFilters.status !== null) {
@@ -251,7 +280,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       receivedTickets.value.totalCount = response.data.total;
       receivedTickets.value.lastFetched = new Date();
 
-      if (currentPage === 1) {
+      if (pageToUse === 1) {
         recentReceivedTickets.value = response.data.items.slice(0, 5);
       }
     } catch (error) {
@@ -280,7 +309,21 @@ export const useTicketsStore = defineStore('tickets', () => {
     departmentTickets.value.error = null;
 
     try {
-      const params: Record<string, unknown> = { page: currentPage, limit };
+      const viewPreference = localStorageService.getTicketsViewPreference();
+      const isKanbanView = viewPreference === 'kanban';
+
+      // For kanban view, always use page 1 and disable pagination
+      const pageToUse = isKanbanView ? 1 : currentPage;
+      if (isKanbanView) {
+        departmentTickets.value.currentPage = 1;
+      }
+
+      const params: Record<string, unknown> = { page: pageToUse, limit };
+
+      // Disable pagination for kanban view
+      if (isKanbanView) {
+        params.paginated = false;
+      }
 
       if (currentFilters) {
         if (currentFilters.status !== undefined && currentFilters.status !== null) {
@@ -371,7 +414,21 @@ export const useTicketsStore = defineStore('tickets', () => {
     tenantTickets.value.error = null;
 
     try {
-      const params: Record<string, unknown> = { page: currentPage, limit };
+      const viewPreference = localStorageService.getTicketsViewPreference();
+      const isKanbanView = viewPreference === 'kanban';
+
+      // For kanban view, always use page 1 and disable pagination
+      const pageToUse = isKanbanView ? 1 : currentPage;
+      if (isKanbanView) {
+        tenantTickets.value.currentPage = 1;
+      }
+
+      const params: Record<string, unknown> = { page: pageToUse, limit };
+
+      // Disable pagination for kanban view
+      if (isKanbanView) {
+        params.paginated = false;
+      }
 
       if (currentFilters) {
         if (currentFilters.status !== undefined && currentFilters.status !== null) {

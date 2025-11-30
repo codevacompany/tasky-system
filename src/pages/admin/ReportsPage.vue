@@ -516,11 +516,12 @@
                 <div class="p-6">
                   <!-- Table Headers -->
                   <div
-                    class="grid grid-cols-3 gap-4 pb-3 border-b border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                    class="grid grid-cols-4 gap-4 pb-3 border-b border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                   >
                     <div>Setor</div>
                     <div class="text-center">Taxa de resolução</div>
                     <div class="text-center">Tickets resolvidos</div>
+                    <div class="text-center">Tickets totais</div>
                   </div>
 
                   <!-- Table Content -->
@@ -531,7 +532,7 @@
                     <div
                       v-for="dept in topFiveDepartments"
                       :key="dept.departmentId"
-                      class="grid grid-cols-3 gap-4 items-center py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-2 -mx-2 transition-colors"
+                      class="grid grid-cols-4 gap-4 items-center py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-2 -mx-2 transition-colors"
                     >
                       <div class="min-w-0">
                         <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
@@ -549,6 +550,11 @@
                       <div class="text-center">
                         <span class="text-lg font-semibold text-gray-900 dark:text-white">{{
                           dept.resolvedTickets
+                        }}</span>
+                      </div>
+                      <div class="text-center">
+                        <span class="text-lg font-semibold text-gray-900 dark:text-white">{{
+                          dept.totalTickets
                         }}</span>
                       </div>
                     </div>
@@ -1719,7 +1725,7 @@
                         Tempo de Resolução - Análise Temporal
                       </h3>
                       <p class="text-sm text-gray-600 dark:text-gray-400">
-                        {{ formatTimeInSecondsCompact(getAverageResolutionTime()) }} (média
+                        {{ formatAverageTime(getAverageResolutionTime()) }} (média
                         {{ periodTextMap[selectedCycleTimePeriod] }})
                       </p>
                     </div>
@@ -2314,7 +2320,7 @@ const statusOrder = [
 
 const priorityOrder = [
   { key: 'baixa', label: 'Baixa', color: '#22c55e' },
-  { key: 'media', label: 'Média', color: '#eab308' },
+  { key: 'média', label: 'Média', color: '#eab308' },
   { key: 'alta', label: 'Alta', color: '#ef4444' },
 ];
 
@@ -3064,39 +3070,50 @@ const loadInProgressTasks = async () => {
         let diffInSeconds = 0;
 
         // Determine the start date for time calculation
+        // Always use the date when the ticket was moved to "em andamento" status
         let startDate: Date | null = null;
 
-        // First, try to use acceptedAt (most accurate for when ticket actually started)
-        if (ticket.acceptedAt) {
-          startDate = new Date(ticket.acceptedAt);
+        // Find the most recent status update where the ticket was moved to "em andamento"
+        const statusUpdates =
+          ticket.updates?.filter(
+            (update: TicketUpdate) =>
+              update.action === TicketActionType.StatusUpdate &&
+              update.toStatus === DefaultTicketStatus.InProgress,
+          ) || [];
+
+        const lastStatusUpdate =
+          statusUpdates.length > 0
+            ? statusUpdates.sort(
+                (a: TicketUpdate, b: TicketUpdate) =>
+                  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+              )[0]
+            : null;
+
+        if (lastStatusUpdate) {
+          startDate = new Date(lastStatusUpdate.createdAt);
         } else {
-          // Fall back to finding status updates in the ticket history
-          const statusUpdates =
-            ticket.updates?.filter(
-              (update: TicketUpdate) =>
-                update.action === TicketActionType.StatusUpdate &&
-                update.toStatus === DefaultTicketStatus.InProgress,
-            ) || [];
-
-          const lastStatusUpdate =
-            statusUpdates.length > 0
-              ? statusUpdates.sort(
-                  (a: TicketUpdate, b: TicketUpdate) =>
-                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-                )[0]
-              : null;
-
-          if (lastStatusUpdate) {
-            startDate = new Date(lastStatusUpdate.createdAt);
+          if (ticket.acceptedAt) {
+            startDate = new Date(ticket.acceptedAt);
           } else {
-            // Last resort: use createdAt (though less accurate)
             startDate = ticket.createdAt ? new Date(ticket.createdAt) : null;
           }
         }
 
         if (startDate) {
           const now = new Date();
-          diffInSeconds = Math.floor((now.getTime() - startDate.getTime()) / 1000);
+          const diffInMs = now.getTime() - startDate.getTime();
+          diffInSeconds = Math.floor(diffInMs / 1000);
+
+          if (diffInSeconds < 0) {
+            console.warn('Negative time difference detected. This may indicate a timezone issue.', {
+              startDate: startDate.toISOString(),
+              now: now.toISOString(),
+              startDateLocal: startDate.toString(),
+              nowLocal: now.toString(),
+              diffInSeconds,
+            });
+            diffInSeconds = Math.abs(diffInSeconds);
+          }
 
           timeInProgress = formatTimeCompact(diffInSeconds);
 
@@ -3347,8 +3364,8 @@ const cycleTimeBarData = computed(() => {
       {
         label: 'Tempo de Resolução',
         data: data.map((item) => item.value),
-        backgroundColor: '#60a5fa',
-        borderColor: '#3b82f6',
+        backgroundColor: '#3b82f6',
+        borderColor: '#2563eb',
         borderWidth: 1,
         borderRadius: 4,
         maxBarThickness: 20,
@@ -3589,6 +3606,27 @@ const inProgressTimeChartOptions = computed<ChartOptions>(() => {
 const formatTimeInHours = (hours: number): string => {
   if (!hours) return '0h';
 
+  const wholeHours = Math.floor(hours);
+  const minutes = Math.floor((hours - wholeHours) * 60);
+
+  if (minutes === 0) {
+    return `${wholeHours}h`;
+  }
+
+  return `${wholeHours}h ${minutes}m`;
+};
+
+// Format hours: show in minutes if < 1 hour, or in hours if >= 1 hour
+const formatAverageTime = (hours: number): string => {
+  if (!hours || hours === 0) return '0m';
+
+  // If less than 1 hour, show in minutes
+  if (hours < 1) {
+    const minutes = Math.round(hours * 60);
+    return `${minutes}m`;
+  }
+
+  // If 1 hour or more, show in hours (with minutes if needed)
   const wholeHours = Math.floor(hours);
   const minutes = Math.floor((hours - wholeHours) * 60);
 
