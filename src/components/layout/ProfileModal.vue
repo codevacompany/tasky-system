@@ -26,7 +26,8 @@
           <div class="p-6 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center gap-4">
               <div
-                class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-lg font-semibold flex-shrink-0"
+                class="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-semibold flex-shrink-0"
+                :style="avatarStyle"
               >
                 <span class="initials">{{ userInitials }}</span>
               </div>
@@ -359,6 +360,7 @@ import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import BaseModal from '@/components/common/BaseModal.vue';
 import { useRoles } from '@/composables';
+import { getAvatarStyle } from '@/utils/generic-helper';
 import Input from '@/components/common/Input.vue';
 
 const router = useRouter();
@@ -607,5 +609,11 @@ const userInitials = computed(() => {
     return currentUser.firstName.charAt(0) + currentUser.lastName.charAt(0);
   }
   return '';
+});
+
+const avatarStyle = computed(() => {
+  const currentUser = user.value;
+  const departmentName = currentUser?.department?.name || currentUser?.firstName || 'User';
+  return getAvatarStyle(departmentName);
 });
 </script>

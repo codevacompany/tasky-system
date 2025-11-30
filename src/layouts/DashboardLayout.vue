@@ -217,11 +217,12 @@
             @click="toggleProfileModal"
           >
             <div
-              class="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-primary text-white text-base font-bold"
+              class="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-semibold"
+              :style="avatarStyle"
             >
               <span>{{ userInitials }}</span>
             </div>
-            <div class="ml-3 mr-3 hidden sm:block">
+            <div class="ml-2 mr-3 hidden sm:block">
               <span class="text-gray-800 dark:text-gray-200 font-medium text-[15px]">{{
                 user?.firstName
               }}</span>
@@ -434,6 +435,7 @@ import { useTicketsStore } from '@/stores/tickets';
 import { useRoute } from 'vue-router';
 import { notificationService } from '@/services/notificationService';
 import { useRoles } from '@/composables';
+import { getAvatarStyle } from '@/utils/generic-helper';
 import taskyLogo from '@/assets/images/tasky-pro-black.png';
 import taskyWhiteLogo from '@/assets/images/tasky-pro-white.png';
 
@@ -509,6 +511,11 @@ const userInitials = computed(() => {
     return user.firstName.substring(0, 2).toUpperCase();
   }
   return '';
+});
+
+const avatarStyle = computed(() => {
+  const departmentName = user?.department?.name || user?.firstName || 'User';
+  return getAvatarStyle(departmentName);
 });
 
 function playNotificationSound() {
