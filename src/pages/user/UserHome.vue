@@ -100,7 +100,7 @@
           >
             {{ ticketsFinalizados.total }}
           </p>
-          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Finalizados</h3>
+          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Resolvidos</h3>
         </div>
 
         <!-- Taxa de Resolução -->
@@ -156,14 +156,14 @@
             />
           </div>
           <p id="tempoMedioAceite" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-            {{ userStats ? formatTimeInSeconds(userStats.averageAcceptanceTimeSeconds) : 'N/A' }}
+            {{ userStats ? formatTimeShort(userStats.averageAcceptanceTimeSeconds) : 'N/A' }}
           </p>
           <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
             Tempo Médio de Aceite
           </h3>
         </div>
 
-        <!-- Tempo Médio de Conclusão -->
+        <!-- Tempo Médio de Resolução -->
         <div
           v-if="isLoading"
           class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
@@ -187,10 +187,10 @@
             />
           </div>
           <p id="tempoMedioConclusao" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-            {{ userStats ? formatTimeInSeconds(userStats.averageResolutionTimeSeconds) : 'N/A' }}
+            {{ userStats ? formatTimeShort(userStats.averageResolutionTimeSeconds) : 'N/A' }}
           </p>
           <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
-            Tempo Médio de Conclusão
+            Tempo Médio de Resolução
           </h3>
         </div>
       </div>
@@ -220,7 +220,7 @@ import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import { toast } from 'vue3-toastify';
 import CompactTicketTable from '@/components/tickets/CompactTicketTable.vue';
-import { formatTimeInSeconds } from '@/utils/generic-helper';
+import { formatTimeShort } from '@/utils/generic-helper';
 import WelcomeModal from '@/components/common/WelcomeModal.vue';
 import { useRouter } from 'vue-router';
 

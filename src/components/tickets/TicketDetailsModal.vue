@@ -228,7 +228,8 @@
                       class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
                       :style="
                         getAvatarStyle(
-                          `${loadedTicket.requester.firstName} ${loadedTicket.requester.lastName}`,
+                          loadedTicket.requester.department?.name ||
+                            `${loadedTicket.requester.firstName} ${loadedTicket.requester.lastName}`,
                         )
                       "
                     >
@@ -277,7 +278,8 @@
                               class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
                               :style="
                                 getAvatarStyle(
-                                  `${targetUser.user.firstName} ${targetUser.user.lastName}`,
+                                  targetUser.user.department?.name ||
+                                    `${targetUser.user.firstName} ${targetUser.user.lastName}`,
                                 )
                               "
                             >
@@ -373,7 +375,8 @@
                       class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
                       :style="
                         getAvatarStyle(
-                          `${loadedTicket.reviewer.firstName} ${loadedTicket.reviewer.lastName}`,
+                          loadedTicket.reviewer.department?.name ||
+                            `${loadedTicket.reviewer.firstName} ${loadedTicket.reviewer.lastName}`,
                         )
                       "
                     >
@@ -726,7 +729,8 @@
                             class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-sm"
                             :style="
                               getAvatarStyle(
-                                `${event.data.user.firstName} ${event.data.user.lastName}`,
+                                event.data.user.department?.name ||
+                                  `${event.data.user.firstName} ${event.data.user.lastName}`,
                               )
                             "
                           >

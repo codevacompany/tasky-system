@@ -164,7 +164,7 @@
 
 - Prazos podem ser definidos pelo solicitante ou receptor
 - Uma vez definido, o prazo não pode ser alterado
-- Tickets sem prazo definido devem ter prazo definido na aceitação
+- Tickets sem prazo definido devem ter prazo definido na aceite
 
 ### Permissões
 
