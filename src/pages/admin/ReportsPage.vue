@@ -153,7 +153,7 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Tempo médio de Aceitação
+                Tempo médio de Aceite
               </p>
               <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                 {{ formatTimeInSeconds(statistics?.averageAcceptanceTimeSeconds) }}
@@ -1137,7 +1137,7 @@
                         <th
                           class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
                         >
-                          Tempo de Aceitação
+                          Tempo de Aceite
                         </th>
                         <th
                           class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
@@ -3761,7 +3761,7 @@ const exportToExcel = async () => {
         formatTimeInSeconds(statistics.value?.averageResolutionTimeSeconds),
       ],
       [
-        'Tempo Médio de Aceitação',
+        'Tempo Médio de Aceite',
         formatTimeInSeconds(statistics.value?.averageAcceptanceTimeSeconds),
       ],
       [],
@@ -3856,7 +3856,7 @@ const exportToExcel = async () => {
           'Total Tickets',
           'Resolvidos',
           'Taxa Resolução',
-          'Tempo Aceitação',
+          'Tempo Aceite',
           'Tempo Resolução',
           'Tempo Total',
         ],
@@ -3958,7 +3958,7 @@ const exportToCSV = async () => {
     csvContent += `Total de Tickets,${statistics.value?.totalTickets || 0}\n`;
     csvContent += `Taxa de Resolução,${formatPercentage(statistics.value?.resolutionRate)}\n`;
     csvContent += `Tempo Médio de Resolução,${formatTimeInSeconds(statistics.value?.averageResolutionTimeSeconds)}\n`;
-    csvContent += `Tempo Médio de Aceitação,${formatTimeInSeconds(statistics.value?.averageAcceptanceTimeSeconds)}\n`;
+    csvContent += `Tempo Médio de Aceite,${formatTimeInSeconds(statistics.value?.averageAcceptanceTimeSeconds)}\n`;
     csvContent += '\n';
 
     // Distribution by Status
@@ -3995,7 +3995,7 @@ const exportToCSV = async () => {
     if (departmentStats.value && departmentStats.value.length > 0) {
       csvContent += '=== ESTATÍSTICAS POR DEPARTAMENTO ===\n';
       csvContent +=
-        'Departamento,Total Tickets,Resolvidos,Taxa Resolução,Tempo Aceitação,Tempo Resolução,Tempo Total\n';
+        'Departamento,Total Tickets,Resolvidos,Taxa Resolução,Tempo Aceite,Tempo Resolução,Tempo Total\n';
       departmentStats.value.forEach((dept) => {
         csvContent += `${dept.departmentName},${dept.totalTickets},${dept.resolvedTickets},${formatPercentage(dept.resolutionRate)},${formatTimeInSeconds(dept.averageAcceptanceTimeSeconds)},${formatTimeInSeconds(dept.averageResolutionTimeSeconds)},${formatTimeInSeconds(dept.averageTotalTimeSeconds)}\n`;
       });
