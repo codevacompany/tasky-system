@@ -2501,6 +2501,7 @@ const createdVsCompletedChartOptions = computed<ChartOptions>(() => {
 });
 
 const statistics = ref<TenantStatistics | null>(null);
+const departmentTenantStats = ref<TenantStatistics | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const topUsers = ref<UserRankingResponseDto | null>(null);
@@ -2597,6 +2598,7 @@ const loadData = async () => {
   try {
     const [
       statsData,
+      deptTenantStatsData,
       trends,
       statusResult,
       priorityResult,
@@ -2609,13 +2611,17 @@ const loadData = async () => {
       topFiveUsersResult,
       worstFiveUsersResult,
     ] = await Promise.all([
-      reportService.getTenantStatistics(),
+      reportService.getTenantStatistics(), // global stats (all period, with canceled)
+      reportService.getTenantStatistics({
+        period: StatsPeriod.TRIMESTRAL,
+        excludeCanceled: true,
+      }), // last 3 months, excluding canceled - used for department total without duplicates
       reportService.getTicketTrends(selectedTrendPeriod.value),
       reportService.getTicketsByStatus(),
       reportService.getTicketsByPriority(),
       ticketService.getTenantRecentTickets(10),
       reportService.getStatusDurations(selectedStatsPeriod.value),
-      reportService.getTenantDepartmentsStatistics(),
+      reportService.getTenantDepartmentsStatistics(StatsPeriod.TRIMESTRAL),
       reportService.getResolutionTimeData(),
       reportService.getStatusDurationTimeSeries(DefaultTicketStatus.InProgress),
       reportService.getTopUsers(undefined, true), // fetch all users with stats for Colaboradores tab
@@ -2692,6 +2698,7 @@ const loadData = async () => {
     recentTickets.value = recentTicketsResult.data.items;
 
     statistics.value = statsData;
+    departmentTenantStats.value = deptTenantStatsData;
     if (statistics.value) {
       statistics.value.ticketTrends = trends;
     }
@@ -3213,7 +3220,7 @@ const departmentStatsSummary = computed(() => {
   );
 
   return {
-    totalTickets,
+    totalTickets: departmentTenantStats.value?.totalTickets ?? totalTickets,
     totalResolved,
     averageResolutionTimeSeconds: totalResolved ? totalResolutionTime / totalResolved : 0,
     averageAcceptanceTimeSeconds: totalResolved ? totalAcceptanceTime / totalResolved : 0,

@@ -172,26 +172,21 @@
               </div>
               <div
                 :class="[
-                  'flex items-center justify-center gap-1 px-2 py-1 rounded text-xs font-semibold whitespace-nowrap text-white',
+                  'flex items-center justify-center text-sm',
                   ticket.priority === TicketPriority.Low
-                    ? 'bg-green-500'
+                    ? 'text-green-500'
                     : ticket.priority === TicketPriority.Medium
-                      ? 'bg-yellow-500'
-                      : 'bg-red-500',
+                      ? 'text-yellow-500'
+                      : 'text-red-500',
                 ]"
-                :title="'Prioridade: ' + ticket.priority"
+                :title="'Prioridade ' + ticket.priority"
               >
                 <font-awesome-icon
-                  :icon="
-                    ticket.priority === TicketPriority.Low
-                      ? 'arrow-down'
-                      : ticket.priority === TicketPriority.Medium
-                        ? 'minus'
-                        : 'arrow-up'
-                  "
-                  class="text-xs"
+                  v-if="ticket.priority !== TicketPriority.Medium"
+                  :icon="ticket.priority === TicketPriority.Low ? 'angles-down' : 'angles-up'"
+                  class="text-sm"
                 />
-                {{ formatSnakeToNaturalCase(ticket.priority) }}
+                <font-awesome-icon v-else icon="equals" class="text-sm" />
               </div>
             </div>
             <div class="flex items-center justify-between gap-3 mb-0">

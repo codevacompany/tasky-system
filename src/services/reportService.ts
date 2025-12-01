@@ -133,8 +133,10 @@ export type UserRankingResponseDto = {
 };
 
 export const reportService = {
-  async getTenantStatistics(): Promise<TenantStatistics> {
-    const response = await apiClient.get('/stats/by-tenant');
+  async getTenantStatistics(params?: { period?: string; excludeCanceled?: boolean }): Promise<TenantStatistics> {
+    const response = await apiClient.get('/stats/by-tenant', {
+      params,
+    });
     return response.data;
   },
 
@@ -143,8 +145,10 @@ export const reportService = {
     return response.data;
   },
 
-  async getTenantDepartmentsStatistics(): Promise<DepartmentStats[]> {
-    const response = await apiClient.get('/stats/department-stats');
+  async getTenantDepartmentsStatistics(period?: string): Promise<DepartmentStats[]> {
+    const response = await apiClient.get('/stats/department-stats', {
+      params: period ? { period } : undefined,
+    });
     return response.data;
   },
 

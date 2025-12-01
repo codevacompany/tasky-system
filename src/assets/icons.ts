@@ -98,6 +98,9 @@ import {
   faRedo,
   faSliders,
   faPlay,
+  faAnglesDown,
+  faAnglesUp,
+  faEquals,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -208,6 +211,9 @@ const icons = [
   faRedo,
   faSliders,
   faPlay,
+  faAnglesDown,
+  faAnglesUp,
+  faEquals,
   faCommentRegular,
 ];
 
