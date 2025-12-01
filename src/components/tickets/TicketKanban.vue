@@ -170,23 +170,33 @@
                   </div>
                 </div>
               </div>
-              <div
-                :class="[
-                  'flex items-center justify-center text-sm',
-                  ticket.priority === TicketPriority.Low
-                    ? 'text-green-500'
-                    : ticket.priority === TicketPriority.Medium
-                      ? 'text-yellow-500'
-                      : 'text-red-500',
-                ]"
-                :title="'Prioridade ' + ticket.priority"
-              >
-                <font-awesome-icon
-                  v-if="ticket.priority !== TicketPriority.Medium"
-                  :icon="ticket.priority === TicketPriority.Low ? 'angles-down' : 'angles-up'"
-                  class="text-sm"
-                />
-                <font-awesome-icon v-else icon="equals" class="text-sm" />
+              <div class="flex items-center gap-2">
+                <div
+                  v-if="getChecklistProgress(ticket)"
+                  class="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300"
+                  :title="`Checklist: ${getChecklistProgress(ticket)}`"
+                >
+                  <font-awesome-icon icon="tasks" />
+                  <span class="text-xs">{{ getChecklistProgress(ticket) }}</span>
+                </div>
+                <div
+                  :class="[
+                    'flex items-center justify-center text-sm',
+                    ticket.priority === TicketPriority.Low
+                      ? 'text-green-500'
+                      : ticket.priority === TicketPriority.Medium
+                        ? 'text-yellow-500'
+                        : 'text-red-500',
+                  ]"
+                  :title="'Prioridade ' + ticket.priority"
+                >
+                  <font-awesome-icon
+                    v-if="ticket.priority !== TicketPriority.Medium"
+                    :icon="ticket.priority === TicketPriority.Low ? 'angles-down' : 'angles-up'"
+                    class="text-sm"
+                  />
+                  <font-awesome-icon v-else icon="equals" class="text-sm" />
+                </div>
               </div>
             </div>
             <div class="flex items-center justify-between gap-3 mb-0">
@@ -220,8 +230,8 @@
                       : getDeadlineClass(ticket.dueAt) === 'urgent'
                         ? 'bg-orange-400 dark:bg-orange-500 text-white'
                         : getDeadlineClass(ticket.dueAt) === 'overdue'
-                            ? 'bg-red-500 dark:bg-red-600 text-white'
-                            : 'bg-gray-200 text-gray-600',
+                          ? 'bg-red-500 dark:bg-red-600 text-white'
+                          : 'bg-gray-200 text-gray-600',
                 ]"
                 :title="'Prazo: ' + (ticket.dueAt ? formatDate(ticket.dueAt) : 'Não definido')"
               >
@@ -309,9 +319,32 @@ const hasRightIcons = (ticket: Ticket) => {
     (ticket.comments?.length ?? 0) > 0 ||
     Boolean(ticket.isPrivate) ||
     (ticket.files?.length ?? 0) > 0 ||
+    getChecklistProgress(ticket) !== null ||
     ticket.ticketStatus?.key === DefaultTicketStatus.Returned ||
     ticket.status === DefaultTicketStatus.Returned
   );
+};
+
+const getChecklistProgress = (ticket: Ticket): string | null => {
+  if (!ticket.checklists || ticket.checklists.length === 0) {
+    return null;
+  }
+
+  let totalItems = 0;
+  let completedItems = 0;
+
+  ticket.checklists.forEach((checklist) => {
+    if (checklist.items && checklist.items.length > 0) {
+      totalItems += checklist.items.length;
+      completedItems += checklist.items.filter((item) => item.isCompleted).length;
+    }
+  });
+
+  if (totalItems === 0) {
+    return null;
+  }
+
+  return `${completedItems}/${totalItems}`;
 };
 
 const getTicketsByColumn = (column: StatusColumn) => {

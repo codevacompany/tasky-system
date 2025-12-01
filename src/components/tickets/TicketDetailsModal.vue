@@ -290,7 +290,7 @@
                 >
                   <font-awesome-icon
                     :icon="getPriorityIcon(loadedTicket.priority)"
-                    :class="['text-sm', getPriorityClass(loadedTicket.priority)]"
+                    :class="['text-sm pl-1.5', getPriorityClass(loadedTicket.priority)]"
                   />
                   {{ formatSnakeToNaturalCase(loadedTicket.priority) }}
                 </span>
@@ -577,35 +577,40 @@
               <div v-else class="space-y-4">
                 <input
                   v-model="editingName"
-                  class="w-full text-2xl sm:text-3xl font-bold px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full text-xl sm:text-2xl font-bold px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   @keyup.enter="saveTicketName"
                   @keyup.escape="cancelEditingName"
                   ref="nameInput"
                   placeholder="Nome do ticket"
                 />
                 <div class="flex gap-3">
-                  <button
-                    @click="saveTicketName"
-                    class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
-                  >
-                    Salvar
-                  </button>
+                  <button @click="saveTicketName" class="btn btn-primary">Salvar</button>
                   <button
                     @click="cancelEditingName"
-                    class="px-4 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
+                    class="btn px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
                   >
                     Cancelar
                   </button>
                 </div>
               </div>
-              <button
-                v-if="canEditTicket"
-                class="inline-flex items-center justify-center mt-3 px-2 py-1.5 border border-gray-300 gap-2 hover:bg-gray-100 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
-                @click="openFileInput"
-                title="Anexar arquivo"
-              >
-                <font-awesome-icon icon="paperclip" class="text-sm" /> Anexo
-              </button>
+              <div class="flex items-center gap-2 mt-3">
+                <button
+                  v-if="canEditTicket"
+                  class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 gap-2 hover:bg-gray-100 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
+                  @click="openFileInput"
+                  title="Anexar arquivo"
+                >
+                  <font-awesome-icon icon="paperclip" class="text-sm" /> Anexo
+                </button>
+                <button
+                  v-if="canEditTicket"
+                  class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 gap-2 hover:bg-gray-100 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
+                  @click="openCreateChecklistModal"
+                  title="Checklist"
+                >
+                  <font-awesome-icon icon="tasks" class="text-sm" /> Checklist
+                </button>
+              </div>
             </div>
 
             <!-- Description Section -->
@@ -644,7 +649,7 @@
                   <button @click="saveTicketDescription" class="btn btn-primary">Salvar</button>
                   <button
                     @click="cancelEditingDescription"
-                    class="btn px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
+                    class="btn px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
                   >
                     Cancelar
                   </button>
@@ -723,6 +728,14 @@
                 </div>
               </div>
             </div>
+
+            <TicketChecklist
+              v-if="checklists.length > 0 && loadedTicket"
+              :ticketId="loadedTicket.id"
+              :checklists="checklists"
+              :canEdit="canEditTicket"
+              @update="loadChecklists"
+            />
 
             <!-- Activities Section -->
             <div class="p-4 sm:p-6 border-t border-gray-200">
@@ -995,6 +1008,31 @@
     </div>
   </BaseModal>
 
+  <!-- Create Checklist Modal -->
+  <BaseModal
+    v-if="showCreateChecklistModal"
+    title="Adicionar Checklist"
+    @close="showCreateChecklistModal = false"
+    @confirm="createChecklist"
+    :confirmButtonText="'Adicionar'"
+    :cancelButtonText="'Cancelar'"
+    :confirmButtonLoading="isCreatingChecklist"
+  >
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Título
+        </label>
+        <Input
+          v-model="newChecklistTitle"
+          type="text"
+          placeholder="Checklist"
+          @keyup.enter="createChecklist"
+        />
+      </div>
+    </div>
+  </BaseModal>
+
   <ConfirmationModal
     v-if="confirmationModal.isOpen"
     :title="confirmationModal.title"
@@ -1109,7 +1147,10 @@
 
 <script setup lang="ts">
 import BaseModal from '../common/BaseModal.vue';
+import Input from '../common/Input.vue';
 import { CancellationReason, DefaultTicketStatus, type Ticket, type TicketComment } from '@/models';
+import type { Checklist } from '@/models/checklist';
+import { checklistService } from '@/services/checklistService';
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { ticketCommentService } from '@/services/ticketCommentService';
 import { ticketService } from '@/services/ticketService';
@@ -1139,6 +1180,7 @@ import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import DepartmentUserSelector from '@/components/common/DepartmentUserSelector.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
+import TicketChecklist from './TicketChecklist.vue';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import pt from 'vue-datepicker-next/locale/pt-br.es';
@@ -1170,6 +1212,10 @@ const hasLoadedTicketOnce = ref(false);
 const selectedFiles = ref<File[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isUploading = ref(false);
+const checklists = ref<Checklist[]>([]);
+const showCreateChecklistModal = ref(false);
+const newChecklistTitle = ref('');
+const isCreatingChecklist = ref(false);
 
 // Editing states
 const isEditingName = ref(false);
@@ -1900,6 +1946,53 @@ const getSpecialUpdateTitle = (subType: string, event?: SpecialUpdateEvent) => {
   return baseTitle;
 };
 
+const loadChecklists = async () => {
+  if (!loadedTicket.value) return;
+  try {
+    const { data } = await checklistService.getByTicket(loadedTicket.value.id);
+    checklists.value = data;
+
+    // Update the ticket in the store with the new checklists so Kanban updates immediately
+    if (loadedTicket.value) {
+      loadedTicket.value.checklists = data;
+      ticketsStore.updateTicketInCollections(loadedTicket.value);
+    }
+  } catch (error) {
+    console.error('Error loading checklists:', error);
+  }
+};
+
+const openCreateChecklistModal = () => {
+  newChecklistTitle.value = 'Checklist';
+  showCreateChecklistModal.value = true;
+};
+
+const createChecklist = async () => {
+  const title = newChecklistTitle.value.trim();
+  if (!title) {
+    toast.error('O título é obrigatório');
+    return;
+  }
+
+  if (!loadedTicket.value) return;
+
+  isCreatingChecklist.value = true;
+  try {
+    await checklistService.create({
+      title,
+      ticketId: loadedTicket.value.id,
+    });
+    showCreateChecklistModal.value = false;
+    newChecklistTitle.value = '';
+    await loadChecklists();
+    toast.success('Checklist criado com sucesso');
+  } catch (error) {
+    toast.error('Erro ao criar checklist');
+  } finally {
+    isCreatingChecklist.value = false;
+  }
+};
+
 const fetchTicket = async (customId: string) => {
   isLoadingTicket.value = true;
   try {
@@ -1908,6 +2001,7 @@ const fetchTicket = async (customId: string) => {
     hasLoadedTicketOnce.value = true;
     fetchComments();
     fetchTicketUpdates();
+    loadChecklists();
 
     // Check if ticket is awaiting verification and user is reviewer
     if (
