@@ -753,13 +753,44 @@
                             >
                               {{ event.data.user.firstName }} {{ event.data.user.lastName }}
                             </span>
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
-                              {{ formatRelativeTime(event.createdAt) }}
-                            </span>
+                            <div class="flex items-center gap-2">
+                              <span class="text-sm text-gray-500 dark:text-gray-400">
+                                {{ formatRelativeTime(event.createdAt) }}
+                              </span>
+                              <div
+                                v-if="isMyComment(event.data.user.id)"
+                                class="relative comment-menu-container"
+                              >
+                                <button
+                                  @click.stop="
+                                    openCommentMenuId =
+                                      openCommentMenuId === event.data.uuid ? null : event.data.uuid
+                                  "
+                                  class="flex-shrink-0 w-6 h-6 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                                  title="Opções"
+                                >
+                                  <font-awesome-icon icon="ellipsis-vertical" class="text-xs" />
+                                </button>
+                                <div
+                                  v-if="openCommentMenuId === event.data.uuid"
+                                  class="absolute right-0 top-8 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 min-w-[120px]"
+                                  @click.stop
+                                >
+                                  <button
+                                    @click="handleDeleteCommentClick(event.data.uuid)"
+                                    class="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2"
+                                  >
+                                    <font-awesome-icon icon="trash" class="text-xs" />
+                                    Excluir
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                         <div
                           class="comment-text prose prose-sm max-w-none dark:prose-invert ml-11"
+                          style="font-size: 15px"
                           v-html="event.data.content"
                         ></div>
                       </div>
@@ -998,7 +1029,7 @@
 <script setup lang="ts">
 import BaseModal from '../common/BaseModal.vue';
 import { CancellationReason, DefaultTicketStatus, type Ticket, type TicketComment } from '@/models';
-import { ref, computed, watch, nextTick } from 'vue';
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { ticketCommentService } from '@/services/ticketCommentService';
 import { ticketService } from '@/services/ticketService';
 import { userService } from '@/services/userService';
@@ -1066,6 +1097,9 @@ const editingName = ref('');
 const editingDescription = ref('');
 const descriptionEditorKey = ref(0);
 const nameInput = ref<HTMLInputElement | null>(null);
+
+// Comment menu state
+const openCommentMenuId = ref<string | null>(null);
 
 const confirmationModal = ref({
   isOpen: false,
@@ -1594,6 +1628,23 @@ const fetchComments = async () => {
   }
 };
 
+const handleDeleteCommentClick = (commentUuid: string) => {
+  openCommentMenuId.value = null;
+  openConfirmationModal(
+    'Excluir Comentário',
+    'Tem certeza que deseja excluir este comentário? Esta ação não pode ser desfeita.',
+    async () => {
+      try {
+        await ticketCommentService.delete(commentUuid);
+        toast.success('Comentário excluído com sucesso');
+        fetchComments();
+      } catch {
+        toast.error('Erro ao excluir comentário');
+      }
+    },
+  );
+};
+
 const fetchTicketUpdates = async () => {
   try {
     if (loadedTicket.value) {
@@ -1827,6 +1878,23 @@ watch(
   },
   { immediate: true },
 );
+
+// Close comment menu when clicking outside
+const handleClickOutside = (event: MouseEvent) => {
+  const target = event.target as HTMLElement;
+  if (!target.closest('.comment-menu-container')) {
+    openCommentMenuId.value = null;
+  }
+};
+
+// Add click outside listener
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 
 const openFileInput = () => {
   if (fileInput.value) {

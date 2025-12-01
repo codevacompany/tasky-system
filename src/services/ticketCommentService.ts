@@ -22,4 +22,8 @@ export const ticketCommentService = {
   async update(uuid: string, data: UpdateTicketCommentDto): Promise<AxiosResponse<TicketComment>> {
     return apiClient.patch<TicketComment>(`/ticket-comments/${uuid}`, data);
   },
+
+  async delete(uuid: string): Promise<AxiosResponse<void>> {
+    return apiClient.delete<void>(`/ticket-comments/${uuid}`);
+  },
 };
