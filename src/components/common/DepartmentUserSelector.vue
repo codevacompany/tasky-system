@@ -2,7 +2,7 @@
   <div class="relative" ref="dropdownRef">
     <button
       @click="toggleDropdown"
-      class="w-full text-left px-3 py-2 border border-inputBorder dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      class="w-full text-left px-2.5 py-1.5 text-sm border border-inputBorder dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       :class="{ 'ring-2 ring-blue-500': isOpen }"
     >
       <div class="flex items-center justify-between">

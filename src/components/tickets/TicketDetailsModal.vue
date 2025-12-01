@@ -341,7 +341,7 @@
                       <div
                         v-for="targetUser in sortedTargetUsers"
                         :key="targetUser.userId"
-                        class="flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 py-1 rounded-lg transition-colors"
+                        class="flex items-center justify-between cursor-pointer py-1 rounded-lg transition-colors"
                         @click="() => startEditingAssignee(targetUser.userId)"
                         :class="{ 'cursor-default': !canEditTicket }"
                         :title="canEditTicket ? 'Clique para alterar responsável' : ''"
@@ -596,7 +596,7 @@
               <div class="flex items-center gap-2 mt-3">
                 <button
                   v-if="canEditTicket"
-                  class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 gap-2 hover:bg-gray-100 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
+                  class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 dark:border-gray-600 gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
                   @click="openFileInput"
                   title="Anexar arquivo"
                 >
@@ -604,7 +604,7 @@
                 </button>
                 <button
                   v-if="canEditTicket"
-                  class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 gap-2 hover:bg-gray-100 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
+                  class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 dark:border-gray-600 gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
                   @click="openCreateChecklistModal"
                   title="Checklist"
                 >
