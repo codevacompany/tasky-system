@@ -70,10 +70,10 @@
             <div v-if="hasRightIcons(ticket)" class="flex items-center gap-2 ml-3 flex-shrink-0">
               <div
                 v-if="(ticket.comments?.length || 0) > 0"
-                class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 opacity-80"
+                class="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300 opacity-80"
                 title="Comentários"
               >
-                <font-awesome-icon icon="comment" />
+                <font-awesome-icon :icon="['far', 'comment']" />
                 <span class="text-xs min-w-2">{{ ticket.comments?.length || 0 }}</span>
               </div>
               <font-awesome-icon
@@ -216,13 +216,11 @@
                   getDeadlineClass(ticket.dueAt) === 'normal'
                     ? 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
                     : getDeadlineClass(ticket.dueAt) === 'warning'
-                      ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
+                      ? 'bg-yellow-100 dark:bg-yellow-400/60 text-yellow-800 dark:text-white'
                       : getDeadlineClass(ticket.dueAt) === 'urgent'
-                        ? 'bg-orange-500 text-white'
-                        : getDeadlineClass(ticket.dueAt) === 'critical'
-                          ? 'bg-red-500 text-white'
-                          : getDeadlineClass(ticket.dueAt) === 'overdue'
-                            ? 'bg-red-600 text-white'
+                        ? 'bg-orange-400 dark:bg-orange-500 text-white'
+                        : getDeadlineClass(ticket.dueAt) === 'overdue'
+                            ? 'bg-red-500 dark:bg-red-600 text-white'
                             : 'bg-gray-200 text-gray-600',
                 ]"
                 :title="'Prazo: ' + (ticket.dueAt ? formatDate(ticket.dueAt) : 'Não definido')"
@@ -372,9 +370,7 @@ const getDeadlineClass = (dueDate: string | null) => {
   const diffTime = Math.abs(due.getTime() - now.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  if (diffDays <= 1) {
-    return 'critical';
-  } else if (diffDays <= 2) {
+  if (diffDays <= 2) {
     return 'urgent';
   } else if (diffDays <= 3) {
     return 'warning';

@@ -1,7 +1,7 @@
 <template>
   <BaseModal
     title="Detalhes do Ticket"
-    :isLoading="isLoadingTicket && !hasLoadedTicketOnce"
+    :isLoading="false"
     @close="closeModal"
     :showFooter="false"
     :hasCustomHeader="true"
@@ -18,6 +18,10 @@
             <p class="text-gray-600 font-medium dark:text-gray-400">
               {{ loadedTicket.customId }}
             </p>
+          </div>
+          <div v-else class="flex flex-col gap-2">
+            <div class="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+            <div class="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
           </div>
         </div>
 
@@ -140,16 +144,96 @@
     </template>
 
     <div
-      v-if="loadedTicket"
       class="relative w-[85vw] max-w-[1280px] mx-auto p-3 sm:p-0 h-[calc(100vh-200px)] max-h-[650px] flex flex-col"
     >
+      <!-- Skeleton Loading State -->
       <div
-        v-if="isLoadingTicket && hasLoadedTicketOnce"
-        class="absolute inset-0 z-20 bg-white/70 dark:bg-gray-900/70 flex items-center justify-center rounded-lg"
+        v-if="isLoadingTicket && !hasLoadedTicketOnce"
+        class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0"
       >
-        <LoadingSpinner :size="40" />
+        <!-- Left Sidebar Skeleton -->
+        <div class="lg:col-span-1 overflow-y-auto pr-4 space-y-4">
+          <div
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-5 shadow-sm"
+          >
+            <div class="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-4 skeleton-shimmer"></div>
+            <div class="space-y-4">
+              <div v-for="n in 8" :key="n" class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <div class="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+                </div>
+                <div class="flex-1">
+                  <div class="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Content Skeleton -->
+        <div class="lg:col-span-2 overflow-y-auto pl-2">
+          <div class="bg-white dark:bg-gray-800 pr-4 rounded-lg shadow-sm">
+            <!-- Title Skeleton -->
+            <div class="p-4">
+              <div
+                class="h-8 w-3/4 bg-gray-200 dark:bg-gray-700 rounded mb-4 skeleton-shimmer"
+              ></div>
+              <div class="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+            </div>
+
+            <!-- Description Skeleton -->
+            <div class="my-2 px-4 sm:px-6">
+              <div
+                class="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-3 skeleton-shimmer"
+              ></div>
+              <div class="space-y-2">
+                <div class="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+                <div class="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+                <div class="h-4 w-5/6 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+              </div>
+            </div>
+
+            <!-- Attachments Skeleton -->
+            <div class="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700">
+              <div
+                class="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-4 skeleton-shimmer"
+              ></div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div
+                  v-for="n in 2"
+                  :key="n"
+                  class="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg skeleton-shimmer"
+                ></div>
+              </div>
+            </div>
+
+            <!-- Activities Skeleton -->
+            <div class="p-4 sm:p-6 border-t border-gray-200">
+              <div
+                class="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-6 skeleton-shimmer"
+              ></div>
+              <div class="space-y-4">
+                <div v-for="n in 3" :key="n" class="flex gap-4">
+                  <div
+                    class="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full skeleton-shimmer"
+                  ></div>
+                  <div class="flex-1 space-y-2">
+                    <div
+                      class="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"
+                    ></div>
+                    <div
+                      class="h-4 w-1/2 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
+
+      <!-- Actual Content -->
+      <div v-else-if="loadedTicket" class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
         <!-- Left Sidebar -->
         <div class="lg:col-span-1 overflow-y-auto pr-4 space-y-4">
           <div
@@ -202,14 +286,11 @@
                   </p>
                 </div>
                 <span
-                  :class="[
-                    'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium gap-1.5',
-                    getPriorityClass(loadedTicket.priority),
-                  ]"
+                  class="inline-flex items-center text-sm gap-1.5 text-gray-900 dark:text-gray-100"
                 >
                   <font-awesome-icon
                     :icon="getPriorityIcon(loadedTicket.priority)"
-                    class="text-xs"
+                    :class="['text-sm', getPriorityClass(loadedTicket.priority)]"
                   />
                   {{ formatSnakeToNaturalCase(loadedTicket.priority) }}
                 </span>
@@ -1214,13 +1295,13 @@ const formatDate = (date?: string) => {
 const getPriorityClass = (priority: string) => {
   switch (priority) {
     case 'baixa':
-      return 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
+      return 'text-green-500';
     case 'média':
-      return 'bg-orange-100 text-orange-600 border border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800';
+      return 'text-orange-500';
     case 'alta':
-      return 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800';
+      return 'text-red-500';
     default:
-      return 'bg-gray-100 text-gray-800 border border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
+      return 'text-gray-500';
   }
 };
 
@@ -1653,7 +1734,6 @@ const fetchTicketUpdates = async () => {
     }
   } catch (err) {
     console.error(err);
-    toast.error('Erro ao buscar atualizações');
   }
 };
 
@@ -1755,14 +1835,14 @@ const formatTicketUpdateDescription = (ticketUpdate: TicketUpdate) => {
 
 const getPriorityIcon = (priority: string) => {
   switch (priority) {
-    case 'Baixa':
-      return 'arrow-down';
-    case 'Média':
-      return 'minus';
-    case 'Alta':
-      return 'arrow-up';
+    case 'baixa':
+      return 'angles-down';
+    case 'media':
+      return 'equals';
+    case 'alta':
+      return 'angles-up';
     default:
-      return 'exclamation-circle';
+      return 'equals';
   }
 };
 
@@ -2279,7 +2359,7 @@ const confirmDueDate = async () => {
 
     await ticketService.accept(loadedTicket.value.customId);
 
-    toast.success('Prazo definido e ticket aceito com sucesso');
+    toast.success('Ticket aceito com sucesso');
     showDueDateModal.value = false;
     dueDateValue.value = null;
     dueDateDate.value = null;
@@ -4845,5 +4925,22 @@ body.dark-mode .text-gray-800 .comment-text * {
 .dark .description-text a,
 .dark .comment-text a {
   color: #60a5fa !important;
+}
+
+/* Skeleton shimmer animation */
+@keyframes skeleton-shimmer {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.skeleton-shimmer {
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
 }
 </style>
