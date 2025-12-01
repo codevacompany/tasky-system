@@ -730,7 +730,8 @@
                             :style="
                               getAvatarStyle(
                                 event.data.user.department?.name ||
-                                  `${event.data.user.firstName} ${event.data.user.lastName}`,
+                                  event.data.user.firstName ||
+                                  'User',
                               )
                             "
                           >
