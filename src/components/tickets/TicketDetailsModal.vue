@@ -1,7 +1,7 @@
 <template>
   <BaseModal
     title="Detalhes do Ticket"
-    :isLoading="isLoadingTicket && !hasLoadedTicketOnce"
+    :isLoading="false"
     @close="closeModal"
     :showFooter="false"
     :hasCustomHeader="true"
@@ -18,6 +18,10 @@
             <p class="text-gray-600 font-medium dark:text-gray-400">
               {{ loadedTicket.customId }}
             </p>
+          </div>
+          <div v-else class="flex flex-col gap-2">
+            <div class="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+            <div class="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
           </div>
         </div>
 
@@ -140,16 +144,96 @@
     </template>
 
     <div
-      v-if="loadedTicket"
       class="relative w-[85vw] max-w-[1280px] mx-auto p-3 sm:p-0 h-[calc(100vh-200px)] max-h-[650px] flex flex-col"
     >
+      <!-- Skeleton Loading State -->
       <div
-        v-if="isLoadingTicket && hasLoadedTicketOnce"
-        class="absolute inset-0 z-20 bg-white/70 dark:bg-gray-900/70 flex items-center justify-center rounded-lg"
+        v-if="isLoadingTicket && !hasLoadedTicketOnce"
+        class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0"
       >
-        <LoadingSpinner :size="40" />
+        <!-- Left Sidebar Skeleton -->
+        <div class="lg:col-span-1 overflow-y-auto pr-4 space-y-4">
+          <div
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-5 shadow-sm"
+          >
+            <div class="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-4 skeleton-shimmer"></div>
+            <div class="space-y-4">
+              <div v-for="n in 8" :key="n" class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <div class="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+                </div>
+                <div class="flex-1">
+                  <div class="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Content Skeleton -->
+        <div class="lg:col-span-2 overflow-y-auto pl-2">
+          <div class="bg-white dark:bg-gray-800 pr-4 rounded-lg shadow-sm">
+            <!-- Title Skeleton -->
+            <div class="p-4">
+              <div
+                class="h-8 w-3/4 bg-gray-200 dark:bg-gray-700 rounded mb-4 skeleton-shimmer"
+              ></div>
+              <div class="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+            </div>
+
+            <!-- Description Skeleton -->
+            <div class="my-2 px-4 sm:px-6">
+              <div
+                class="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-3 skeleton-shimmer"
+              ></div>
+              <div class="space-y-2">
+                <div class="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+                <div class="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+                <div class="h-4 w-5/6 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+              </div>
+            </div>
+
+            <!-- Attachments Skeleton -->
+            <div class="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700">
+              <div
+                class="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-4 skeleton-shimmer"
+              ></div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div
+                  v-for="n in 2"
+                  :key="n"
+                  class="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg skeleton-shimmer"
+                ></div>
+              </div>
+            </div>
+
+            <!-- Activities Skeleton -->
+            <div class="p-4 sm:p-6 border-t border-gray-200">
+              <div
+                class="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-6 skeleton-shimmer"
+              ></div>
+              <div class="space-y-4">
+                <div v-for="n in 3" :key="n" class="flex gap-4">
+                  <div
+                    class="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full skeleton-shimmer"
+                  ></div>
+                  <div class="flex-1 space-y-2">
+                    <div
+                      class="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"
+                    ></div>
+                    <div
+                      class="h-4 w-1/2 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
+
+      <!-- Actual Content -->
+      <div v-else-if="loadedTicket" class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
         <!-- Left Sidebar -->
         <div class="lg:col-span-1 overflow-y-auto pr-4 space-y-4">
           <div
@@ -202,14 +286,11 @@
                   </p>
                 </div>
                 <span
-                  :class="[
-                    'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium gap-1.5',
-                    getPriorityClass(loadedTicket.priority),
-                  ]"
+                  class="inline-flex items-center text-sm gap-1.5 text-gray-900 dark:text-gray-100"
                 >
                   <font-awesome-icon
                     :icon="getPriorityIcon(loadedTicket.priority)"
-                    class="text-xs"
+                    :class="['text-sm pl-1.5', getPriorityClass(loadedTicket.priority)]"
                   />
                   {{ formatSnakeToNaturalCase(loadedTicket.priority) }}
                 </span>
@@ -496,35 +577,40 @@
               <div v-else class="space-y-4">
                 <input
                   v-model="editingName"
-                  class="w-full text-2xl sm:text-3xl font-bold px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full text-xl sm:text-2xl font-bold px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   @keyup.enter="saveTicketName"
                   @keyup.escape="cancelEditingName"
                   ref="nameInput"
                   placeholder="Nome do ticket"
                 />
                 <div class="flex gap-3">
-                  <button
-                    @click="saveTicketName"
-                    class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
-                  >
-                    Salvar
-                  </button>
+                  <button @click="saveTicketName" class="btn btn-primary">Salvar</button>
                   <button
                     @click="cancelEditingName"
-                    class="px-4 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
+                    class="btn px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
                   >
                     Cancelar
                   </button>
                 </div>
               </div>
-              <button
-                v-if="canEditTicket"
-                class="inline-flex items-center justify-center mt-3 px-2 py-1.5 border border-gray-300 gap-2 hover:bg-gray-100 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
-                @click="openFileInput"
-                title="Anexar arquivo"
-              >
-                <font-awesome-icon icon="paperclip" class="text-sm" /> Anexo
-              </button>
+              <div class="flex items-center gap-2 mt-3">
+                <button
+                  v-if="canEditTicket"
+                  class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 gap-2 hover:bg-gray-100 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
+                  @click="openFileInput"
+                  title="Anexar arquivo"
+                >
+                  <font-awesome-icon icon="paperclip" class="text-sm" /> Anexo
+                </button>
+                <button
+                  v-if="canEditTicket"
+                  class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 gap-2 hover:bg-gray-100 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
+                  @click="openCreateChecklistModal"
+                  title="Checklist"
+                >
+                  <font-awesome-icon icon="tasks" class="text-sm" /> Checklist
+                </button>
+              </div>
             </div>
 
             <!-- Description Section -->
@@ -563,7 +649,7 @@
                   <button @click="saveTicketDescription" class="btn btn-primary">Salvar</button>
                   <button
                     @click="cancelEditingDescription"
-                    class="btn px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
+                    class="btn px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
                   >
                     Cancelar
                   </button>
@@ -642,6 +728,14 @@
                 </div>
               </div>
             </div>
+
+            <TicketChecklist
+              v-if="checklists.length > 0 && loadedTicket"
+              :ticketId="loadedTicket.id"
+              :checklists="checklists"
+              :canEdit="canEditTicket"
+              @update="loadChecklists"
+            />
 
             <!-- Activities Section -->
             <div class="p-4 sm:p-6 border-t border-gray-200">
@@ -914,6 +1008,31 @@
     </div>
   </BaseModal>
 
+  <!-- Create Checklist Modal -->
+  <BaseModal
+    v-if="showCreateChecklistModal"
+    title="Adicionar Checklist"
+    @close="showCreateChecklistModal = false"
+    @confirm="createChecklist"
+    :confirmButtonText="'Adicionar'"
+    :cancelButtonText="'Cancelar'"
+    :confirmButtonLoading="isCreatingChecklist"
+  >
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Título
+        </label>
+        <Input
+          v-model="newChecklistTitle"
+          type="text"
+          placeholder="Checklist"
+          @keyup.enter="createChecklist"
+        />
+      </div>
+    </div>
+  </BaseModal>
+
   <ConfirmationModal
     v-if="confirmationModal.isOpen"
     :title="confirmationModal.title"
@@ -1028,7 +1147,10 @@
 
 <script setup lang="ts">
 import BaseModal from '../common/BaseModal.vue';
+import Input from '../common/Input.vue';
 import { CancellationReason, DefaultTicketStatus, type Ticket, type TicketComment } from '@/models';
+import type { Checklist } from '@/models/checklist';
+import { checklistService } from '@/services/checklistService';
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { ticketCommentService } from '@/services/ticketCommentService';
 import { ticketService } from '@/services/ticketService';
@@ -1058,6 +1180,7 @@ import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import DepartmentUserSelector from '@/components/common/DepartmentUserSelector.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
+import TicketChecklist from './TicketChecklist.vue';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import pt from 'vue-datepicker-next/locale/pt-br.es';
@@ -1089,6 +1212,10 @@ const hasLoadedTicketOnce = ref(false);
 const selectedFiles = ref<File[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isUploading = ref(false);
+const checklists = ref<Checklist[]>([]);
+const showCreateChecklistModal = ref(false);
+const newChecklistTitle = ref('');
+const isCreatingChecklist = ref(false);
 
 // Editing states
 const isEditingName = ref(false);
@@ -1214,13 +1341,13 @@ const formatDate = (date?: string) => {
 const getPriorityClass = (priority: string) => {
   switch (priority) {
     case 'baixa':
-      return 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
+      return 'text-green-500';
     case 'média':
-      return 'bg-orange-100 text-orange-600 border border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800';
+      return 'text-orange-500';
     case 'alta':
-      return 'bg-red-100 text-red-800 border border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800';
+      return 'text-red-500';
     default:
-      return 'bg-gray-100 text-gray-800 border border-gray-200 dark:bg-gray-900/30 dark:text-gray-300 dark:border-gray-800';
+      return 'text-gray-500';
   }
 };
 
@@ -1653,7 +1780,6 @@ const fetchTicketUpdates = async () => {
     }
   } catch (err) {
     console.error(err);
-    toast.error('Erro ao buscar atualizações');
   }
 };
 
@@ -1755,14 +1881,14 @@ const formatTicketUpdateDescription = (ticketUpdate: TicketUpdate) => {
 
 const getPriorityIcon = (priority: string) => {
   switch (priority) {
-    case 'Baixa':
-      return 'arrow-down';
-    case 'Média':
-      return 'minus';
-    case 'Alta':
-      return 'arrow-up';
+    case 'baixa':
+      return 'angles-down';
+    case 'media':
+      return 'equals';
+    case 'alta':
+      return 'angles-up';
     default:
-      return 'exclamation-circle';
+      return 'equals';
   }
 };
 
@@ -1820,6 +1946,53 @@ const getSpecialUpdateTitle = (subType: string, event?: SpecialUpdateEvent) => {
   return baseTitle;
 };
 
+const loadChecklists = async () => {
+  if (!loadedTicket.value) return;
+  try {
+    const { data } = await checklistService.getByTicket(loadedTicket.value.id);
+    checklists.value = data;
+
+    // Update the ticket in the store with the new checklists so Kanban updates immediately
+    if (loadedTicket.value) {
+      loadedTicket.value.checklists = data;
+      ticketsStore.updateTicketInCollections(loadedTicket.value);
+    }
+  } catch (error) {
+    console.error('Error loading checklists:', error);
+  }
+};
+
+const openCreateChecklistModal = () => {
+  newChecklistTitle.value = 'Checklist';
+  showCreateChecklistModal.value = true;
+};
+
+const createChecklist = async () => {
+  const title = newChecklistTitle.value.trim();
+  if (!title) {
+    toast.error('O título é obrigatório');
+    return;
+  }
+
+  if (!loadedTicket.value) return;
+
+  isCreatingChecklist.value = true;
+  try {
+    await checklistService.create({
+      title,
+      ticketId: loadedTicket.value.id,
+    });
+    showCreateChecklistModal.value = false;
+    newChecklistTitle.value = '';
+    await loadChecklists();
+    toast.success('Checklist criado com sucesso');
+  } catch (error) {
+    toast.error('Erro ao criar checklist');
+  } finally {
+    isCreatingChecklist.value = false;
+  }
+};
+
 const fetchTicket = async (customId: string) => {
   isLoadingTicket.value = true;
   try {
@@ -1828,6 +2001,7 @@ const fetchTicket = async (customId: string) => {
     hasLoadedTicketOnce.value = true;
     fetchComments();
     fetchTicketUpdates();
+    loadChecklists();
 
     // Check if ticket is awaiting verification and user is reviewer
     if (
@@ -2279,7 +2453,7 @@ const confirmDueDate = async () => {
 
     await ticketService.accept(loadedTicket.value.customId);
 
-    toast.success('Prazo definido e ticket aceito com sucesso');
+    toast.success('Ticket aceito com sucesso');
     showDueDateModal.value = false;
     dueDateValue.value = null;
     dueDateDate.value = null;
@@ -4845,5 +5019,22 @@ body.dark-mode .text-gray-800 .comment-text * {
 .dark .description-text a,
 .dark .comment-text a {
   color: #60a5fa !important;
+}
+
+/* Skeleton shimmer animation */
+@keyframes skeleton-shimmer {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.skeleton-shimmer {
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
 }
 </style>

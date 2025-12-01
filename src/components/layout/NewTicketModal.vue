@@ -74,7 +74,7 @@
                 :placeholder="'Selecione data e hora'"
                 :clearable="true"
                 :editable="false"
-                :disabled-date="disabledWeekendDate"
+                :disabled-date="disabledDate"
                 @change="handleDatePickerChange"
                 @input="
                   (val: any) => {
@@ -363,10 +363,25 @@ const parseDateTime = (dateString: string): Date | null => {
   }
 };
 
-const disabledWeekendDate = (date: Date): boolean => {
+const disabledDate = (date: Date): boolean => {
   const dayOfWeek = date.getDay();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  return dayOfWeek === 0 || dayOfWeek === 6;
+  const dateToCheck = new Date(date);
+  dateToCheck.setHours(0, 0, 0, 0);
+
+  // Disable weekends
+  if (dayOfWeek === 0 || dayOfWeek === 6) {
+    return true;
+  }
+
+  // Disable past dates
+  if (dateToCheck < today) {
+    return true;
+  }
+
+  return false;
 };
 
 const loadDepartments = async () => {

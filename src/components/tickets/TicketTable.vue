@@ -40,9 +40,10 @@
           <template v-if="tableType === 'criados'">
             <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
               <div
-                v-for="targetUser in item.targetUsers"
+                v-for="targetUser in getSortedTargetUsers(item)"
                 :key="targetUser.userId"
                 :class="[
+                  'whitespace-nowrap overflow-hidden text-ellipsis',
                   shouldHighlightTargetUser(item, targetUser.userId)
                     ? 'text-blue-600 dark:text-blue-400'
                     : 'text-gray-900 dark:text-gray-100',
@@ -64,7 +65,11 @@
             </div>
             <div v-else>-</div>
           </template>
-          <template v-else> {{ item.requester.firstName }} {{ item.requester.lastName }} </template>
+          <template v-else>
+            <span class="whitespace-nowrap overflow-hidden text-ellipsis block">
+              {{ item.requester.firstName }} {{ item.requester.lastName }}
+            </span>
+          </template>
         </div>
       </template>
 
@@ -75,9 +80,10 @@
         >
           <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
             <div
-              v-for="targetUser in item.targetUsers"
+              v-for="targetUser in getSortedTargetUsers(item)"
               :key="targetUser.userId"
               :class="[
+                'whitespace-nowrap overflow-hidden text-ellipsis',
                 shouldHighlightTargetUser(item, targetUser.userId)
                   ? 'text-blue-600 dark:text-blue-400'
                   : 'text-gray-900 dark:text-gray-100',
@@ -95,9 +101,10 @@
           <template v-if="tableType === 'setor'">
             <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
               <div
-                v-for="targetUser in item.targetUsers"
+                v-for="targetUser in getSortedTargetUsers(item)"
                 :key="targetUser.userId"
                 :class="[
+                  'whitespace-nowrap overflow-hidden text-ellipsis',
                   shouldHighlightTargetUser(item, targetUser.userId)
                     ? 'text-blue-600 dark:text-blue-400'
                     : 'text-gray-900 dark:text-gray-100',
@@ -111,7 +118,7 @@
           <template v-else>
             <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
               <div
-                v-for="targetUser in item.targetUsers"
+                v-for="targetUser in getSortedTargetUsers(item)"
                 :key="targetUser.userId"
                 :class="[
                   shouldHighlightTargetUser(item, targetUser.userId)
@@ -125,9 +132,9 @@
             <div
               v-else
               class="truncate"
-              :title="item.targetUsers?.[0]?.user?.department?.name || '-'"
+              :title="getSortedTargetUsers(item)?.[0]?.user?.department?.name || '-'"
             >
-              {{ item.targetUsers?.[0]?.user?.department?.name || '-' }}
+              {{ getSortedTargetUsers(item)?.[0]?.user?.department?.name || '-' }}
             </div>
           </template>
         </div>
@@ -135,28 +142,35 @@
 
       <template #column-priority="{ item }">
         <div class="flex items-center justify-center gap-2">
-          <span
+          <div
             :class="[
-              'font-bold tracking-tight text-xs md:text-sm',
+              'flex items-center justify-center text-sm',
               item.priority === TicketPriority.Low
-                ? 'text-green-600 dark:text-green-400'
+                ? 'text-green-500'
                 : item.priority === TicketPriority.Medium
-                  ? 'text-orange-500 dark:text-orange-400'
-                  : 'text-red-600 dark:text-red-400',
+                  ? 'text-yellow-500'
+                  : 'text-red-500',
             ]"
+            :title="'Prioridade ' + item.priority"
           >
-            {{ getPriorityBars(item.priority) }}
-          </span>
-          <span class="text-xs text-gray-500 dark:text-gray-400 hidden md:inline">{{
-            formatSnakeToNaturalCase(item.priority)
-          }}</span>
+            <font-awesome-icon
+              v-if="item.priority !== TicketPriority.Medium"
+              :icon="item.priority === TicketPriority.Low ? 'angles-down' : 'angles-up'"
+              class="text-sm"
+            />
+            <font-awesome-icon v-else icon="equals" class="text-sm" />
+          </div>
+          <span
+            class="text-xs text-gray-900 dark:text-gray-100 hidden md:inline whitespace-nowrap"
+            >{{ formatSnakeToNaturalCase(item.priority) }}</span
+          >
         </div>
       </template>
 
       <template #column-status="{ item }">
         <span
           :class="[
-            'inline-flex items-center px-1.5 md:px-2 py-0.5 md:py-1 rounded-full text-xs font-medium gap-1 md:gap-2',
+            'inline-flex items-center px-1.5 md:px-2 py-0.5 md:py-1 rounded-full text-xs font-medium gap-1 md:gap-2 whitespace-nowrap',
             getStatusClass(getTicketStatus(item)),
           ]"
         >
@@ -170,35 +184,49 @@
       </template>
 
       <template #column-dueDate="{ item }">
-        <div
-          :class="[
-            'text-xs md:text-sm text-center',
-            !item.dueAt || !calculateDeadline(item) || calculateDeadline(item) === ''
-              ? 'text-gray-900 dark:text-gray-100'
-              : getDeadlineClass(item.dueAt),
-          ]"
-        >
+        <div class="text-xs md:text-sm text-center text-gray-900 dark:text-gray-100">
           <div class="whitespace-nowrap">
             <template v-if="item.dueAt">
-              <span class="flex items-center gap-2 justify-center">
-                <template v-if="calculateDeadline(item) && calculateDeadline(item) !== ''">
+              <!-- Always show message for overdue tickets -->
+              <template v-if="isDeadlineOverdue(item.dueAt)">
+                <span
+                  class="flex items-center gap-2 justify-center"
+                  :class="getDeadlineClass(item.dueAt)"
+                >
+                  <font-awesome-icon icon="exclamation-triangle" class="text-red-500 text-xs" />
+                  {{
+                    calculateDeadline(item) || getDeadlineInfoFromDate(item.dueAt)?.message || '-'
+                  }}
+                </span>
+              </template>
+              <!-- Show date when more than 3 days remaining and not overdue -->
+              <template
+                v-else-if="
+                  getDeadlineInfoFromDate(item.dueAt) &&
+                  getDeadlineInfoFromDate(item.dueAt)!.businessDaysRemaining > 3
+                "
+              >
+                {{ formatDateOnly(item.dueAt) }}
+              </template>
+              <!-- Show remaining days message when 3 days or less -->
+              <template v-else-if="calculateDeadline(item) && calculateDeadline(item) !== ''">
+                <span
+                  class="flex items-center gap-2 justify-center"
+                  :class="getDeadlineClass(item.dueAt)"
+                >
                   <span
-                    v-if="!isDeadlineOverdue(item.dueAt)"
                     :class="getDeadlineDotClass(item.dueAt)"
                     class="inline-block w-[9px] h-[9px] rounded-full"
                   ></span>
-                  <font-awesome-icon
-                    v-else
-                    icon="exclamation-triangle"
-                    class="text-red-500 text-xs"
-                  />
-                </template>
-                {{ calculateDeadline(item) || '-' }}
-              </span>
+                  {{ calculateDeadline(item) }}
+                </span>
+              </template>
+              <!-- For terminal status tickets, show date without dot -->
+              <template v-else>
+                {{ formatDateOnly(item.dueAt) }}
+              </template>
             </template>
-            <template v-else>
-              {{ calculateDeadline(item) || '-' }}
-            </template>
+            <template v-else> - </template>
           </div>
         </div>
       </template>
@@ -846,6 +874,15 @@ const getDeadlineInfoFromDate = (date?: string) => {
 };
 
 const getDeadlineClass = (date?: string) => {
+  if (!date) return 'text-gray-900 dark:text-gray-100';
+
+  // First check if date is overdue by comparing directly
+  const dueDate = new Date(date);
+  const now = new Date();
+  if (dueDate < now) {
+    return 'text-red-600 dark:text-red-400 font-semibold';
+  }
+
   const info = getDeadlineInfoFromDate(date);
   if (!info) return 'text-gray-900 dark:text-gray-100';
 
@@ -876,19 +913,6 @@ const getStatusClass = (status: string) => {
       return 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
     default:
       return 'bg-gray-50 text-gray-700 border border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800';
-  }
-};
-
-const getPriorityBars = (priority: TicketPriority) => {
-  switch (priority) {
-    case TicketPriority.Low:
-      return '|';
-    case TicketPriority.Medium:
-      return '||';
-    case TicketPriority.High:
-      return '|||';
-    default:
-      return '';
   }
 };
 
@@ -1184,8 +1208,24 @@ const getDeadlineDotClass = (dueAt: string) => {
 };
 
 const isDeadlineOverdue = (dueAt: string) => {
-  const info = getDeadlineInfoFromDate(dueAt);
-  return info ? info.isOverdue : false;
+  if (!dueAt) return false;
+
+  // Check directly if date is in the past
+  const dueDate = new Date(dueAt);
+  const now = new Date();
+  if (Number.isNaN(dueDate.getTime())) return false;
+
+  return dueDate < now;
+};
+
+const formatDateOnly = (date: string | Date): string => {
+  if (!date) return '-';
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  if (Number.isNaN(dateObj.getTime())) return '-';
+  const day = dateObj.getDate().toString().padStart(2, '0');
+  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+  const year = dateObj.getFullYear();
+  return `${day}/${month}/${year}`;
 };
 
 // Helper function to get ticket status (supports both new and old format)
@@ -1199,6 +1239,12 @@ const terminalStatuses = new Set([
   DefaultTicketStatus.Rejected,
 ]);
 
+const getSortedTargetUsers = (ticket: Ticket) => {
+  if (!ticket?.targetUsers || ticket.targetUsers.length === 0)
+    return [] as NonNullable<Ticket['targetUsers']>;
+  return [...ticket.targetUsers].sort((a, b) => a.order - b.order);
+};
+
 const shouldHighlightTargetUser = (ticket: Ticket, userId: number) => {
   if (!ticket.targetUsers || ticket.targetUsers.length <= 1) return false;
 
@@ -1211,5 +1257,11 @@ const shouldHighlightTargetUser = (ticket: Ticket, userId: number) => {
 </script>
 
 <style scoped>
-/* All styles have been converted to Tailwind classes */
+/* Ensure names don't wrap */
+:deep(.text-sm) .whitespace-nowrap {
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
 </style>
