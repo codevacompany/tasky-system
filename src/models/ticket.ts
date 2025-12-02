@@ -1,5 +1,5 @@
 import type { Category } from './category';
-import type { Checklist } from './checklist';
+import type { ChecklistItem } from './checklist';
 import type { CorrectionRequest } from './correctionRequest';
 import type { TicketCancellationReason } from './ticketCancellationReason';
 import type { TicketComment } from './ticketComment';
@@ -64,7 +64,7 @@ export interface Ticket {
   cancellationReason?: TicketCancellationReason;
   isPrivate: boolean;
   files: TicketFile[];
-  checklists?: Checklist[];
+  checklistItems?: ChecklistItem[];
   createdAt: string;
   updatedAt: string;
 }

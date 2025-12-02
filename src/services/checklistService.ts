@@ -1,32 +1,10 @@
-import type {
-  Checklist,
-  ChecklistItem,
-  CreateChecklistDto,
-  CreateChecklistItemDto,
-  UpdateChecklistDto,
-  UpdateChecklistItemDto,
-} from '@/models/checklist';
+import type { ChecklistItem, CreateChecklistItemDto, UpdateChecklistItemDto } from '@/models/checklist';
 import apiClient from '@/utils/axiosInstance';
 import type { AxiosResponse } from 'axios';
 
 export const checklistService = {
-  async create(data: CreateChecklistDto): Promise<AxiosResponse<Checklist>> {
-    return apiClient.post('/ticket-checklists', data);
-  },
-
-  async getByTicket(ticketId: number): Promise<AxiosResponse<Checklist[]>> {
+  async getByTicket(ticketId: number): Promise<AxiosResponse<ChecklistItem[]>> {
     return apiClient.get(`/ticket-checklists/ticket/${ticketId}`);
-  },
-
-  async update(
-    id: number,
-    data: UpdateChecklistDto,
-  ): Promise<AxiosResponse<Checklist>> {
-    return apiClient.patch(`/ticket-checklists/${id}`, data);
-  },
-
-  async delete(id: number): Promise<AxiosResponse<{ message: string }>> {
-    return apiClient.delete(`/ticket-checklists/${id}`);
   },
 
   async createItem(data: CreateChecklistItemDto): Promise<AxiosResponse<ChecklistItem>> {
