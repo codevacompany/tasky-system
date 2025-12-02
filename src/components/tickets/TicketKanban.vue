@@ -326,19 +326,12 @@ const hasRightIcons = (ticket: Ticket) => {
 };
 
 const getChecklistProgress = (ticket: Ticket): string | null => {
-  if (!ticket.checklists || ticket.checklists.length === 0) {
+  if (!ticket.checklistItems || ticket.checklistItems.length === 0) {
     return null;
   }
 
-  let totalItems = 0;
-  let completedItems = 0;
-
-  ticket.checklists.forEach((checklist) => {
-    if (checklist.items && checklist.items.length > 0) {
-      totalItems += checklist.items.length;
-      completedItems += checklist.items.filter((item) => item.isCompleted).length;
-    }
-  });
+  const totalItems = ticket.checklistItems.length;
+  const completedItems = ticket.checklistItems.filter((item) => item.isCompleted).length;
 
   if (totalItems === 0) {
     return null;

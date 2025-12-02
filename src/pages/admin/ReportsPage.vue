@@ -425,8 +425,8 @@
                   >
                     <div>Perfil</div>
                     <div class="text-center">Tickets resolvidos</div>
-                    <div class="text-center">Taxa de resolução</div>
                     <div class="text-center">Tickets totais</div>
+                    <div class="text-center">Taxa de resolução</div>
                   </div>
 
                   <!-- Table Content -->
@@ -468,17 +468,17 @@
                         }}</span>
                       </div>
                       <div class="text-center">
+                        <span class="text-lg font-semibold text-gray-900 dark:text-white">{{
+                          user.totalTickets
+                        }}</span>
+                      </div>
+                      <div class="text-center">
                         <span
                           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                           :class="getResolutionRateBadgeClass(user.resolutionRate)"
                         >
                           {{ formatPercentage(user.resolutionRate) }}
                         </span>
-                      </div>
-                      <div class="text-center">
-                        <span class="text-lg font-semibold text-gray-900 dark:text-white">{{
-                          user.totalTickets
-                        }}</span>
                       </div>
                     </div>
                   </div>
@@ -519,9 +519,9 @@
                     class="grid grid-cols-4 gap-4 pb-3 border-b border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                   >
                     <div>Setor</div>
-                    <div class="text-center">Taxa de resolução</div>
                     <div class="text-center">Tickets resolvidos</div>
                     <div class="text-center">Tickets totais</div>
+                    <div class="text-center">Taxa de resolução</div>
                   </div>
 
                   <!-- Table Content -->
@@ -540,14 +540,6 @@
                         </p>
                       </div>
                       <div class="text-center">
-                        <span
-                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                          :class="getResolutionRateBadgeClass(dept.resolutionRate)"
-                        >
-                          {{ formatPercentage(dept.resolutionRate) }}
-                        </span>
-                      </div>
-                      <div class="text-center">
                         <span class="text-lg font-semibold text-gray-900 dark:text-white">{{
                           dept.resolvedTickets
                         }}</span>
@@ -556,6 +548,14 @@
                         <span class="text-lg font-semibold text-gray-900 dark:text-white">{{
                           dept.totalTickets
                         }}</span>
+                      </div>
+                      <div class="text-center">
+                        <span
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          :class="getResolutionRateBadgeClass(dept.resolutionRate)"
+                        >
+                          {{ formatPercentage(dept.resolutionRate) }}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -586,7 +586,7 @@
             >
               <!-- Cycle Time per Department -->
               <div
-                class="bg-white dark:bg-gray-800 dark:shadow-none dark:border dark:border-gray-700"
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
               >
                 <div
                   class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-6 border-b border-gray-200 dark:border-gray-700"
@@ -600,7 +600,8 @@
                       {{ periodTextMap[selectedCycleTimePeriod] }})
                     </p>
                   </div>
-                  <div class="mt-4 sm:mt-0">
+                  <!-- TODO: Add filter by department or priority -->
+                  <!-- <div class="mt-4 sm:mt-0">
                     <Select
                       :options="[
                         { value: 'department', label: 'Por Setor' },
@@ -608,7 +609,7 @@
                       ]"
                       v-model="selectedCycleTimeFilter"
                     />
-                  </div>
+                  </div> -->
                 </div>
 
                 <div class="flex flex-col lg:flex-row">
@@ -665,7 +666,7 @@
                           class="space-y-1"
                         >
                           <div class="flex justify-between items-center text-xs">
-                            <span class="text-gray-700 dark:text-gray-300 truncate max-w-24">{{
+                            <span class="text-gray-700 dark:text-gray-300 truncate max-w-30">{{
                               dept.departmentName
                             }}</span>
                             <span class="font-medium text-gray-900 dark:text-white">
@@ -736,8 +737,8 @@
                           :key="index"
                           class="space-y-1"
                         >
-                          <div class="flex justify-between items-center text-sm">
-                            <span class="text-gray-700 dark:text-gray-300">{{
+                          <div class="flex justify-between items-center text-xs">
+                            <span class="text-gray-700 dark:text-gray-300 truncate max-w-24">{{
                               formatSnakeToNaturalCase(
                                 (duration.status as any)?.key ??
                                   (duration.status as unknown as string),
@@ -1418,12 +1419,12 @@
                           <th
                             class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
                           >
-                            Taxa de Resolução
+                            Tickets Totais
                           </th>
                           <th
                             class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
                           >
-                            Tickets Totais
+                            Taxa de Resolução
                           </th>
                         </tr>
                       </thead>
@@ -1471,6 +1472,11 @@
                             </div>
                           </td>
                           <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <div class="text-sm text-gray-900 dark:text-white">
+                              {{ user.totalTickets }}
+                            </div>
+                          </td>
+                          <td class="px-6 py-4 whitespace-nowrap text-center">
                             <span
                               :class="[
                                 'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
@@ -1479,11 +1485,6 @@
                             >
                               {{ formatPercentage(user.resolutionRate) }}
                             </span>
-                          </td>
-                          <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <div class="text-sm text-gray-900 dark:text-white">
-                              {{ user.totalTickets }}
-                            </div>
                           </td>
                         </tr>
                       </tbody>

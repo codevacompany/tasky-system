@@ -605,10 +605,10 @@
                 <button
                   v-if="canEditTicket"
                   class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 dark:border-gray-600 gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
-                  @click="openCreateChecklistModal"
-                  title="Checklist"
+                  @click="scrollToTarefas"
+                  title="Tarefas"
                 >
-                  <font-awesome-icon icon="tasks" class="text-sm" /> Checklist
+                  <font-awesome-icon icon="tasks" class="text-sm" /> Tarefas
                 </button>
               </div>
             </div>
@@ -729,13 +729,19 @@
               </div>
             </div>
 
-            <TicketChecklist
-              v-if="checklists.length > 0 && loadedTicket"
-              :ticketId="loadedTicket.id"
-              :checklists="checklists"
-              :canEdit="canEditTicket"
-              @update="loadChecklists"
-            />
+            <div
+              v-if="(showTarefasSection || checklistItems.length > 0) && loadedTicket"
+              ref="tarefasSectionRef"
+              id="tarefas-section"
+            >
+              <TicketChecklist
+                :ticketId="loadedTicket.id"
+                :items="checklistItems"
+                :canEdit="canEditTicket"
+                @update="loadChecklistItems"
+                ref="ticketChecklistRef"
+              />
+            </div>
 
             <!-- Activities Section -->
             <div class="p-4 sm:p-6 border-t border-gray-200">
@@ -1008,31 +1014,6 @@
     </div>
   </BaseModal>
 
-  <!-- Create Checklist Modal -->
-  <BaseModal
-    v-if="showCreateChecklistModal"
-    title="Adicionar Checklist"
-    @close="showCreateChecklistModal = false"
-    @confirm="createChecklist"
-    :confirmButtonText="'Adicionar'"
-    :cancelButtonText="'Cancelar'"
-    :confirmButtonLoading="isCreatingChecklist"
-  >
-    <div class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Título
-        </label>
-        <Input
-          v-model="newChecklistTitle"
-          type="text"
-          placeholder="Checklist"
-          @keyup.enter="createChecklist"
-        />
-      </div>
-    </div>
-  </BaseModal>
-
   <ConfirmationModal
     v-if="confirmationModal.isOpen"
     :title="confirmationModal.title"
@@ -1149,7 +1130,7 @@
 import BaseModal from '../common/BaseModal.vue';
 import Input from '../common/Input.vue';
 import { CancellationReason, DefaultTicketStatus, type Ticket, type TicketComment } from '@/models';
-import type { Checklist } from '@/models/checklist';
+import type { ChecklistItem } from '@/models/checklist';
 import { checklistService } from '@/services/checklistService';
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { ticketCommentService } from '@/services/ticketCommentService';
@@ -1212,10 +1193,10 @@ const hasLoadedTicketOnce = ref(false);
 const selectedFiles = ref<File[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isUploading = ref(false);
-const checklists = ref<Checklist[]>([]);
-const showCreateChecklistModal = ref(false);
-const newChecklistTitle = ref('');
-const isCreatingChecklist = ref(false);
+const checklistItems = ref<ChecklistItem[]>([]);
+const showTarefasSection = ref(false);
+const tarefasSectionRef = ref<HTMLElement | null>(null);
+const ticketChecklistRef = ref<InstanceType<typeof TicketChecklist> | null>(null);
 
 // Editing states
 const isEditingName = ref(false);
@@ -1326,6 +1307,7 @@ const closeModal = () => {
     return;
   }
 
+  showTarefasSection.value = false;
   emit('close');
 };
 
@@ -1946,62 +1928,52 @@ const getSpecialUpdateTitle = (subType: string, event?: SpecialUpdateEvent) => {
   return baseTitle;
 };
 
-const loadChecklists = async () => {
+const loadChecklistItems = async () => {
   if (!loadedTicket.value) return;
   try {
     const { data } = await checklistService.getByTicket(loadedTicket.value.id);
-    checklists.value = data;
+    checklistItems.value = data;
 
-    // Update the ticket in the store with the new checklists so Kanban updates immediately
+    // Show Tarefas section if there are items
+    if (data.length > 0) {
+      showTarefasSection.value = true;
+    }
+
+    // Update the ticket in the store with the new checklistItems so Kanban updates immediately
     if (loadedTicket.value) {
-      loadedTicket.value.checklists = data;
+      loadedTicket.value.checklistItems = data;
       ticketsStore.updateTicketInCollections(loadedTicket.value);
     }
   } catch (error) {
-    console.error('Error loading checklists:', error);
+    console.error('Error loading checklist items:', error);
   }
 };
 
-const openCreateChecklistModal = () => {
-  newChecklistTitle.value = 'Checklist';
-  showCreateChecklistModal.value = true;
-};
+const scrollToTarefas = async () => {
+  showTarefasSection.value = true;
+  await nextTick();
+  await nextTick(); // Double nextTick to ensure DOM is updated
+  if (tarefasSectionRef.value) {
+    tarefasSectionRef.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-const createChecklist = async () => {
-  const title = newChecklistTitle.value.trim();
-  if (!title) {
-    toast.error('O título é obrigatório');
-    return;
-  }
-
-  if (!loadedTicket.value) return;
-
-  isCreatingChecklist.value = true;
-  try {
-    await checklistService.create({
-      title,
-      ticketId: loadedTicket.value.id,
-    });
-    showCreateChecklistModal.value = false;
-    newChecklistTitle.value = '';
-    await loadChecklists();
-    toast.success('Checklist criado com sucesso');
-  } catch (error) {
-    toast.error('Erro ao criar checklist');
-  } finally {
-    isCreatingChecklist.value = false;
+    setTimeout(async () => {
+      if (ticketChecklistRef.value) {
+        await ticketChecklistRef.value.startAddItem();
+      }
+    }, 200);
   }
 };
 
 const fetchTicket = async (customId: string) => {
   isLoadingTicket.value = true;
+  showTarefasSection.value = false;
   try {
     const ticket = await ticketsStore.fetchTicketDetails(customId);
     loadedTicket.value = ticket;
     hasLoadedTicketOnce.value = true;
     fetchComments();
     fetchTicketUpdates();
-    loadChecklists();
+    loadChecklistItems();
 
     // Check if ticket is awaiting verification and user is reviewer
     if (

@@ -1,5 +1,6 @@
 <template>
   <input
+    ref="inputRef"
     :type="type"
     :value="modelValue ?? ''"
     :class="inputClasses"
@@ -11,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const paddingMap = {
   tight: 'py-2',
@@ -51,6 +52,8 @@ const inputClasses = computed(() =>
   [baseClasses, paddingClass.value, props.inputClass].join(' ').trim(),
 );
 
+const inputRef = ref<HTMLInputElement | null>(null);
+
 const handleInput = (event: Event) => {
   const target = event.target as HTMLInputElement;
   emit('update:modelValue', target.value);
@@ -59,4 +62,10 @@ const handleInput = (event: Event) => {
 
 const handleFocus = (event: FocusEvent) => emit('focus', event);
 const handleBlur = (event: FocusEvent) => emit('blur', event);
+
+// Expose the input element for parent components
+defineExpose({
+  inputElement: inputRef,
+  focus: () => inputRef.value?.focus(),
+});
 </script>
