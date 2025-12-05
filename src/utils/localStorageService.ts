@@ -7,6 +7,7 @@ class StorageService {
   private readonly ticketsViewKey = 'ticketsViewPreference';
   private readonly themeKey = 'theme';
   private readonly notificationsShowOnlyUnreadKey = 'notificationsShowOnlyUnread';
+  private readonly statsAnalysisPeriodKey = 'statsAnalysisPeriod';
 
   getAccessToken() {
     return localStorage.getItem(this.accessTokenKey);
@@ -70,6 +71,23 @@ class StorageService {
 
   setNotificationsShowOnlyUnread(value: boolean) {
     localStorage.setItem(this.notificationsShowOnlyUnreadKey, String(value));
+  }
+
+  getStatsAnalysisPeriod(): 'weekly' | 'monthly' | 'trimestral' | 'semestral' | 'annual' | null {
+    const value = localStorage.getItem(this.statsAnalysisPeriodKey);
+    if (!value) return null;
+
+    if (['weekly', 'monthly', 'trimestral', 'semestral', 'annual'].includes(value)) {
+      return value as 'weekly' | 'monthly' | 'trimestral' | 'semestral' | 'annual';
+    }
+
+    return null;
+  }
+
+  setStatsAnalysisPeriod(
+    value: 'weekly' | 'monthly' | 'trimestral' | 'semestral' | 'annual',
+  ): void {
+    localStorage.setItem(this.statsAnalysisPeriodKey, value);
   }
 
   clear(): void {
