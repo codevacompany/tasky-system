@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900 p-3 sm:p-6">
+  <div class="min-h-screen dark:bg-gray-900 p-3 sm:px-6 sm:py-4">
     <!-- Loading State -->
     <div
       v-if="loading"
@@ -45,22 +45,13 @@
     <div v-if="!loading && !error" class="space-y-4 sm:space-y-6">
       <!-- Header -->
       <div class="space-y-3 sm:space-y-4">
-        <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-          <span>Dashboard</span>
-          <font-awesome-icon icon="chevron-right" class="text-xs" />
-          <span class="text-blue-600 dark:text-blue-400 font-medium">Relatórios</span>
-        </div>
-
         <div class="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:justify-between sm:items-center">
           <div>
             <h1
-              class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2"
+              class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-1 sm:mb-0"
             >
               Relatórios do Sistema
             </h1>
-            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-              Acompanhe métricas e indicadores importantes dos tickets
-            </p>
           </div>
           <div class="flex gap-2 sm:gap-3">
             <button
@@ -76,104 +67,9 @@
         </div>
       </div>
 
-      <!-- Metrics Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-        <div
-          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-blue-500 rounded-lg p-4 sm:p-6 shadow-sm"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Total de Tickets
-              </p>
-              <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                {{ statistics?.totalTickets }}
-              </h3>
-            </div>
-            <div
-              class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center"
-            >
-              <font-awesome-icon
-                icon="ticket"
-                class="text-lg sm:text-xl text-blue-600 dark:text-blue-400"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-yellow-500 rounded-lg p-4 sm:p-6 shadow-sm"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Taxa de Resolução
-              </p>
-              <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                {{ formatPercentage(statistics?.resolutionRate) }}
-              </h3>
-            </div>
-            <div
-              class="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center"
-            >
-              <font-awesome-icon
-                icon="chart-line"
-                class="text-lg sm:text-xl text-yellow-600 dark:text-yellow-400"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-green-500 rounded-lg p-4 sm:p-6 shadow-sm"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Tempo Médio de Resolução
-              </p>
-              <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                {{ formatTimeInSeconds(statistics?.averageResolutionTimeSeconds) }}
-              </h3>
-            </div>
-            <div
-              class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center"
-            >
-              <font-awesome-icon
-                icon="clock"
-                class="text-lg sm:text-xl text-green-600 dark:text-green-400"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="bg-gray-50 dark:bg-gray-800 border-l-4 border-purple-500 rounded-lg p-4 sm:p-6 shadow-sm"
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Tempo médio de Aceite
-              </p>
-              <h3 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                {{ formatTimeInSeconds(statistics?.averageAcceptanceTimeSeconds) }}
-              </h3>
-            </div>
-            <div
-              class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center"
-            >
-              <font-awesome-icon
-                icon="thumbs-up"
-                class="text-lg sm:text-xl text-purple-600 dark:text-purple-400"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tabs -->
-      <div class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-sm">
-        <div class="border-b border-gray-200 dark:border-gray-700">
+      <!-- Tabs + Global Stats Period Filter -->
+      <div class="border-b border-[#d4d7db] dark:border-gray-700">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <nav class="flex overflow-x-auto scrollbar-hide">
             <button
               v-for="tab in tabs"
@@ -182,7 +78,7 @@
               :class="[
                 'flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0',
                 currentTab === tab.id
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600',
               ]"
             >
@@ -190,22 +86,118 @@
               {{ tab.name }}
             </button>
           </nav>
-        </div>
 
-        <div class="p-3 sm:p-6">
+          <!-- Global analysis period filter -->
+          <div class="flex items-center gap-2 sm:gap-3 justify-end mb-1">
+            <Select
+              :options="[
+                { value: 'weekly', label: 'Última semana' },
+                { value: 'monthly', label: 'Último mês' },
+                { value: 'trimestral', label: 'Últimos 3 meses' },
+                { value: 'semestral', label: 'Últimos 6 meses' },
+                { value: 'annual', label: 'Últimos 12 meses' },
+              ]"
+              v-model="selectedStatsPeriod"
+              @update:modelValue="handlePeriodChange"
+              class="w-36 sm:w-40"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Metrics Grid - Only visible in Overview tab -->
+      <div
+        v-if="currentTab === 'overview'"
+        class="bg-white dark:bg-gray-800 rounded-lg px-6 pt-4 pb-6 shadow"
+      >
+        <div class="mb-4">
+          <h1 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+            Estatísticas gerais
+          </h1>
+          <p class="text-xs text-gray-600 dark:text-gray-400">
+            Métricas e indicadores importantes do desempenho da sua empresa
+          </p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Total de Tickets -->
+          <div
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <font-awesome-icon icon="ticket" class="text-blue-500 dark:text-blue-400 text-2xl" />
+            </div>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              {{ statistics?.totalTickets || 0 }}
+            </p>
+            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Total de Tickets</h3>
+          </div>
+
+          <!-- Taxa de Resolução -->
+          <div
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <font-awesome-icon
+                icon="chart-pie"
+                class="text-purple-500 dark:text-purple-400 text-2xl"
+              />
+            </div>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              {{ formatPercentage(statistics?.resolutionRate) }}
+            </p>
+            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Taxa de Resolução</h3>
+          </div>
+
+          <!-- Tempo Médio de Resolução -->
+          <div
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <font-awesome-icon
+                icon="calendar-check"
+                class="text-indigo-500 dark:text-indigo-400 text-2xl"
+              />
+            </div>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              {{ formatTimeInSecondsCompact(statistics?.averageResolutionTimeSeconds || 0) }}
+            </p>
+            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
+              Tempo Médio de Resolução
+            </h3>
+          </div>
+
+          <!-- Tempo médio de Aceite -->
+          <div
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <font-awesome-icon
+                icon="hourglass-half"
+                class="text-teal-600 dark:text-teal-400 text-2xl"
+              />
+            </div>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              {{ formatTimeInSecondsCompact(statistics?.averageAcceptanceTimeSeconds || 0) }}
+            </p>
+            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
+              Tempo médio de Aceite
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="">
+        <div>
           <!-- Overview Tab -->
           <div v-if="currentTab === 'overview'" class="space-y-6">
             <!-- Created vs Completed Section -->
-            <div
+            <BaseStatsWidget
               v-permission="PERMISSIONS.VIEW_BASIC_ANALYTICS"
-              class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              info-message="Esta visualização mostra a comparação entre tickets criados e concluídos ao longo do tempo. Use os filtros de período (Diário, Semanal, Mensal) para analisar diferentes intervalos."
             >
-              <div
-                class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-6 border-b border-gray-200 dark:border-gray-700"
-              >
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 sm:mb-0">
-                  CRIADOS VS CONCLUÍDOS
-                </h2>
+              <template #title>Criados vs Concluídos</template>
+              <template #header-actions>
                 <TabSelector
                   v-model="selectedTrendPeriod"
                   :options="[
@@ -215,7 +207,7 @@
                   ]"
                   @update:modelValue="updateTrendPeriod"
                 />
-              </div>
+              </template>
 
               <div class="flex flex-col lg:flex-row">
                 <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
@@ -292,26 +284,17 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </BaseStatsWidget>
 
             <!-- Charts Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <!-- Status Chart -->
-              <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              <BaseStatsWidget
+                info-message="Esta visualização mostra a distribuição percentual de tickets por status no período selecionado. O gráfico de rosca exibe a proporção de cada status em relação ao total de tickets."
               >
-                <div
-                  class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700"
-                >
-                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    Distribuição por Status
-                  </h2>
-                  <div class="text-blue-600 dark:text-blue-400">
-                    <font-awesome-icon icon="chart-pie" class="text-xl" />
-                  </div>
-                </div>
+                <template #title>Distribuição por Status</template>
 
-                <div class="flex flex-col md:flex-row p-6">
+                <div class="flex flex-col md:flex-row">
                   <div class="w-full md:w-2/3 h-64">
                     <Doughnut
                       v-if="ticketsByStatus.labels.length && hasStatusData"
@@ -348,24 +331,15 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </BaseStatsWidget>
 
               <!-- Priority Chart -->
-              <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              <BaseStatsWidget
+                info-message="Esta visualização mostra a distribuição percentual de tickets por prioridade no período selecionado. O gráfico de rosca exibe a proporção de cada nível de prioridade em relação ao total de tickets."
               >
-                <div
-                  class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700"
-                >
-                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    Distribuição por Prioridade
-                  </h2>
-                  <div class="text-blue-600 dark:text-blue-400">
-                    <font-awesome-icon icon="chart-bar" class="text-xl" />
-                  </div>
-                </div>
+                <template #title>Distribuição por Prioridade</template>
 
-                <div class="flex flex-col md:flex-row p-6">
+                <div class="flex flex-col md:flex-row">
                   <div class="w-full md:w-2/3 h-64">
                     <Doughnut
                       v-if="ticketsByPriority.labels.length && hasPriorityData"
@@ -402,23 +376,19 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </BaseStatsWidget>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <!-- Top Contributors -->
-              <div
+              <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_USERS_ANALYTICS"
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+                info-message="Ranking dos colaboradores com melhor desempenho em resolução de tickets no período selecionado. Os dados incluem tickets resolvidos, total de tickets atribuídos e a taxa de resolução de cada colaborador."
               >
-                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                    Top Colaboradores
-                  </h2>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">Últimos 3 meses</p>
-                </div>
+                <template #title>Top Colaboradores</template>
+                <template #subtitle>{{ currentPeriodLabel }}</template>
 
-                <div class="p-6">
+                <div>
                   <!-- Table Headers -->
                   <div
                     class="grid grid-cols-4 gap-4 pb-3 border-b border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
@@ -499,21 +469,17 @@
                     <p class="text-sm">Nenhum colaborador encontrado</p>
                   </div>
                 </div>
-              </div>
+              </BaseStatsWidget>
 
               <!-- Top Setores -->
-              <div
+              <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS"
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+                info-message="Ranking dos setores com melhor desempenho em resolução de tickets no período selecionado. Os dados incluem tickets resolvidos, total de tickets e a taxa de resolução por setor."
               >
-                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                    Top Setores
-                  </h2>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">Últimos 3 meses</p>
-                </div>
+                <template #title>Top Setores</template>
+                <template #subtitle>{{ currentPeriodLabel }}</template>
 
-                <div class="p-6">
+                <div>
                   <!-- Table Headers -->
                   <div
                     class="grid grid-cols-4 gap-4 pb-3 border-b border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
@@ -576,7 +542,7 @@
                     <p class="text-sm">Nenhum setor encontrado</p>
                   </div>
                 </div>
-              </div>
+              </BaseStatsWidget>
             </div>
 
             <!-- Cycle Time Section -->
@@ -585,32 +551,14 @@
               class="grid grid-cols-1 lg:grid-cols-2 gap-6"
             >
               <!-- Cycle Time per Department -->
-              <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              <BaseStatsWidget
+                info-message="Esta análise mostra o tempo médio de resolução de tickets por setor. Os dados são apresentados com setores com maior e menor tempo de resolução, além de uma visualização gráfica com barras proporcionais ao tempo de cada setor."
               >
-                <div
-                  class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-6 border-b border-gray-200 dark:border-gray-700"
+                <template #title>Tempo de Resolução Por Setor</template>
+                <template #subtitle
+                  >{{ formatTimeInSecondsCompact(getAverageResolutionTime() * 3600) }} (média
+                  {{ periodTextMap[selectedCycleTimePeriod] }})</template
                 >
-                  <div>
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                      Tempo de Resolução Por Segmento:
-                    </h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      {{ formatTimeInSecondsCompact(getAverageResolutionTime() * 3600) }} (média
-                      {{ periodTextMap[selectedCycleTimePeriod] }})
-                    </p>
-                  </div>
-                  <!-- TODO: Add filter by department or priority -->
-                  <!-- <div class="mt-4 sm:mt-0">
-                    <Select
-                      :options="[
-                        { value: 'department', label: 'Por Setor' },
-                        { value: 'priority', label: 'Por Prioridade' },
-                      ]"
-                      v-model="selectedCycleTimeFilter"
-                    />
-                  </div> -->
-                </div>
 
                 <div class="flex flex-col lg:flex-row">
                   <div class="p-6 lg:w-1/2 border-r border-gray-200 dark:border-gray-700">
@@ -703,17 +651,13 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </BaseStatsWidget>
 
               <!-- Status Duration Chart -->
-              <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              <BaseStatsWidget
+                info-message="Esta análise mostra quanto tempo em média os tickets permanecem em cada status. Tempos altos em determinados status podem indicar gargalos no processo. Os dados são apresentados com barras proporcionais ao tempo médio de cada status."
               >
-                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    Tempo Médio Por Status
-                  </h2>
-                </div>
+                <template #title>Tempo Médio Por Status</template>
 
                 <div class="flex flex-col lg:flex-row">
                   <div class="p-6 lg:w-1/2 border-r border-gray-200 dark:border-gray-700">
@@ -767,7 +711,7 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </BaseStatsWidget>
             </div>
           </div>
 
@@ -950,17 +894,13 @@
             </div>
 
             <!-- In Progress Time Analysis -->
-            <div
+            <BaseStatsWidget
               v-permission="PERMISSIONS.VIEW_BASIC_ANALYTICS"
-              class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              info-message="Esta análise mostra a distribuição de tickets em andamento por tempo de processamento e estatísticas relacionadas. Os dados incluem distribuição por faixas de tempo (menos de 1 dia, 1-3 dias, 3-7 dias, mais de 1 semana) e estatísticas como tempo médio e tempo máximo em andamento."
             >
-              <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                  Análise de Tempo em Andamento
-                </h2>
-              </div>
+              <template #title>Análise de Tempo em Andamento</template>
 
-              <div class="p-6">
+              <div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div class="space-y-4">
                     <h3 class="text-sm font-medium text-gray-900 dark:text-white">
@@ -1053,7 +993,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </BaseStatsWidget>
           </div>
 
           <!-- Setores Tab -->
@@ -1227,18 +1167,13 @@
               <!-- Top Performing vs Underperforming Departments -->
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Top Performing -->
-                <div
-                  class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+                <BaseStatsWidget
+                  info-message="Esta seção mostra os setores com melhor desempenho em termos de taxa de resolução de tickets. Os setores são ordenados pela maior taxa de resolução e exibem o número de tickets resolvidos em relação ao total de tickets."
                 >
-                  <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                      Melhor Desempenho
-                    </h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      Setores com maior taxa de resolução
-                    </p>
-                  </div>
-                  <div class="p-6">
+                  <template #title>Melhor Desempenho</template>
+                  <template #subtitle>Setores com maior taxa de resolução</template>
+
+                  <div>
                     <div class="space-y-4">
                       <div
                         v-for="dept in departmentStats
@@ -1262,21 +1197,16 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </BaseStatsWidget>
 
                 <!-- Needs Improvement -->
-                <div
-                  class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+                <BaseStatsWidget
+                  info-message="Esta seção mostra os setores que necessitam de melhoria em termos de taxa de resolução de tickets. Os setores são ordenados pela menor taxa de resolução e exibem o número de tickets resolvidos em relação ao total de tickets."
                 >
-                  <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                      Necessita Melhoria
-                    </h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      Setores com menor taxa de resolução
-                    </p>
-                  </div>
-                  <div class="p-6">
+                  <template #title>Necessita Melhoria</template>
+                  <template #subtitle>Setores com menor taxa de resolução</template>
+
+                  <div>
                     <div class="space-y-4">
                       <div
                         v-for="dept in departmentStats
@@ -1300,7 +1230,7 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </BaseStatsWidget>
               </div>
             </template>
 
@@ -1495,18 +1425,13 @@
 
               <!-- Top vs Underperforming Users -->
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div
-                  class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+                <BaseStatsWidget
+                  info-message="Esta seção mostra os colaboradores com melhor desempenho em termos de taxa de resolução de tickets. Os colaboradores são ordenados pela maior taxa de resolução e exibem o número de tickets resolvidos em relação ao total de tickets atribuídos."
                 >
-                  <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                      Melhor Desempenho
-                    </h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      Colaboradores com maior taxa de resolução
-                    </p>
-                  </div>
-                  <div class="p-6">
+                  <template #title>Melhor Desempenho</template>
+                  <template #subtitle>Colaboradores com maior taxa de resolução</template>
+
+                  <div>
                     <template v-if="topPerformers.length > 0">
                       <div class="space-y-4">
                         <div
@@ -1548,20 +1473,15 @@
                       </p>
                     </div>
                   </div>
-                </div>
+                </BaseStatsWidget>
 
-                <div
-                  class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+                <BaseStatsWidget
+                  info-message="Esta seção mostra os colaboradores que necessitam de melhoria em termos de taxa de resolução de tickets. Os colaboradores são ordenados pela menor taxa de resolução e exibem o número de tickets resolvidos em relação ao total de tickets atribuídos."
                 >
-                  <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                      Pior Desempenho
-                    </h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      Colaboradores com menor taxa de resolução
-                    </p>
-                  </div>
-                  <div class="p-6">
+                  <template #title>Pior Desempenho</template>
+                  <template #subtitle>Colaboradores com menor taxa de resolução</template>
+
+                  <div>
                     <template v-if="worstPerformers.length > 0">
                       <div class="space-y-4">
                         <div
@@ -1603,7 +1523,7 @@
                       </p>
                     </div>
                   </div>
-                </div>
+                </BaseStatsWidget>
               </div>
             </template>
 
@@ -1641,7 +1561,7 @@
           <div v-if="currentTab === 'trends'" class="space-y-6">
             <!-- Content visible if user has permission -->
             <template v-if="hasPermission(PERMISSIONS.VIEW_ADVANCED_ANALYTICS)">
-              <!-- Period Analysis Controls -->
+              <!-- Period Analysis Header -->
               <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
                 <div>
                   <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
@@ -1651,53 +1571,27 @@
                     Acompanhe as tendências dos tickets ao longo do tempo
                   </p>
                 </div>
-                <div class="flex items-center gap-3 mt-4 sm:mt-0">
-                  <label
-                    class="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap"
-                  >
-                    Período de análise:
-                  </label>
-                  <Select
-                    :options="[
-                      { value: 'weekly', label: '1 semana' },
-                      { value: 'monthly', label: '1 mês' },
-                      { value: 'trimestral', label: '3 meses' },
-                      { value: 'semestral', label: '6 meses' },
-                      { value: 'annual', label: '1 ano' },
-                    ]"
-                    v-model="selectedStatsPeriod"
-                    @update:modelValue="handlePeriodChange"
-                  />
-                </div>
               </div>
 
               <!-- Trends Overview -->
-              <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              <BaseStatsWidget
+                info-message="Esta visualização mostra a comparação entre tickets criados e concluídos ao longo do tempo. Use os filtros de período (Diário, Semanal, Mensal) para analisar diferentes intervalos."
               >
-                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                    <div>
-                      <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                        Criados vs Concluídos
-                      </h2>
-                      <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Novos tickets criados vs tickets concluídos
-                      </p>
-                    </div>
-                    <TabSelector
-                      v-model="selectedTrendPeriod"
-                      :options="[
-                        { value: 'daily', label: 'Diário' },
-                        { value: 'weekly', label: 'Semanal' },
-                        { value: 'monthly', label: 'Mensal' },
-                      ]"
-                      @update:modelValue="updateTrendPeriod"
-                    />
-                  </div>
-                </div>
+                <template #title>Criados vs Concluídos</template>
+                <template #subtitle>Novos tickets criados vs tickets concluídos</template>
+                <template #header-actions>
+                  <TabSelector
+                    v-model="selectedTrendPeriod"
+                    :options="[
+                      { value: 'daily', label: 'Diário' },
+                      { value: 'weekly', label: 'Semanal' },
+                      { value: 'monthly', label: 'Mensal' },
+                    ]"
+                    @update:modelValue="updateTrendPeriod"
+                  />
+                </template>
 
-                <div class="p-6">
+                <div>
                   <div class="h-80 relative">
                     <Bar
                       v-if="trendChartData && !trendChartLoading"
@@ -1713,36 +1607,28 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </BaseStatsWidget>
 
               <!-- Cycle Time Analysis -->
-              <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              <BaseStatsWidget
+                info-message="Esta análise mostra a evolução do tempo de resolução de tickets ao longo do tempo. O gráfico exibe uma linha temporal com o tempo médio de resolução, permitindo identificar tendências e variações. Use o seletor de período para analisar diferentes intervalos (Semanal, Mensal, Trimestral)."
               >
-                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                    <div>
-                      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                        Tempo de Resolução - Análise Temporal
-                      </h3>
-                      <p class="text-sm text-gray-600 dark:text-gray-400">
-                        {{ formatAverageTime(getAverageResolutionTime()) }} (média
-                        {{ periodTextMap[selectedCycleTimePeriod] }})
-                      </p>
-                    </div>
-                    <div class="mt-4 sm:mt-0">
-                      <Select
-                        :options="[
-                          { value: 'week', label: 'Semanal' },
-                          { value: 'month', label: 'Mensal' },
-                          { value: 'quarter', label: 'Trimestral' },
-                        ]"
-                        v-model="selectedCycleTimePeriod"
-                        @update:modelValue="handleCycleTimePeriodChange"
-                      />
-                    </div>
-                  </div>
-                </div>
+                <template #title>Tempo de Resolução - Análise Temporal</template>
+                <template #subtitle
+                  >{{ formatAverageTime(getAverageResolutionTime()) }} (média
+                  {{ periodTextMap[selectedCycleTimePeriod] }})</template
+                >
+                <template #header-actions>
+                  <Select
+                    :options="[
+                      { value: 'week', label: 'Semanal' },
+                      { value: 'month', label: 'Mensal' },
+                      { value: 'quarter', label: 'Trimestral' },
+                    ]"
+                    v-model="selectedCycleTimePeriod"
+                    @update:modelValue="handleCycleTimePeriodChange"
+                  />
+                </template>
 
                 <div class="flex flex-col lg:flex-row">
                   <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
@@ -1832,20 +1718,17 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </BaseStatsWidget>
 
               <!-- Trend Insights -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Performance Trends -->
-                <div
-                  class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+                <BaseStatsWidget
+                  info-message="Esta seção mostra as tendências de performance do sistema, incluindo o número de tickets criados e resolvidos no período selecionado, com indicadores de variação percentual em relação ao período anterior. Também exibe a taxa de resolução geral."
                 >
-                  <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                      Tendências de Performance
-                    </h3>
-                  </div>
-                  <div class="p-6 space-y-4">
+                  <template #title>Tendências de Performance</template>
+
+                  <div class="space-y-4">
                     <div
                       class="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
                     >
@@ -1898,17 +1781,13 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </BaseStatsWidget>
 
                 <!-- Status Distribution Trends -->
-                <div
-                  class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+                <BaseStatsWidget
+                  info-message="Esta análise mostra quanto tempo em média os tickets permanecem em cada status. Tempos altos em determinados status podem indicar gargalos no processo. Os dados são apresentados com barras proporcionais ao tempo médio de cada status."
                 >
-                  <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                      Tempo Médio Por Status
-                    </h2>
-                  </div>
+                  <template #title>Tempo Médio Por Status</template>
 
                   <div class="flex flex-col lg:flex-row">
                     <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
@@ -1964,18 +1843,14 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </BaseStatsWidget>
               </div>
 
               <!-- In Progress Time Analysis -->
-              <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+              <BaseStatsWidget
+                info-message="Esta análise mostra o tempo gasto pelos tickets no status 'Em Andamento' ao longo do tempo. O gráfico exibe uma linha temporal com o tempo médio, permitindo identificar tendências. Tempos altos podem indicar gargalos no processamento de tickets. Os dados são calculados para os últimos 6 meses."
               >
-                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    TEMPO GASTO NO STATUS "EM ANDAMENTO"
-                  </h2>
-                </div>
+                <template #title>Tempo Gasto no Status "Em Andamento"</template>
 
                 <div class="flex flex-col lg:flex-row">
                   <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
@@ -2054,7 +1929,7 @@
                     </div>
                   </div>
                 </div>
-              </div>
+              </BaseStatsWidget>
             </template>
 
             <!-- Upgrade prompt if user doesn't have permission -->
@@ -2176,12 +2051,13 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import TabSelector from '@/components/common/TabSelector.vue';
 import Select from '@/components/common/Select.vue';
 import Input from '@/components/common/Input.vue';
+import BaseStatsWidget from '@/components/common/BaseStatsWidget.vue';
 import { toast } from 'vue3-toastify';
-import { downloadFile } from '@/utils/file-helper';
 import * as XLSX from 'xlsx';
 import BaseModal from '@/components/common/BaseModal.vue';
 import JSZip from 'jszip';
 import { useUserPreferencesStore } from '@/stores/userPreferences';
+import { useStatsFiltersStore } from '@/stores/statsFiltersStore';
 ChartJS.register(ChartDataLabels);
 
 enum StatsPeriod {
@@ -2192,7 +2068,24 @@ enum StatsPeriod {
   WEEKLY = 'weekly',
 }
 
-const selectedStatsPeriod = ref<string>(StatsPeriod.TRIMESTRAL);
+const statsFiltersStore = useStatsFiltersStore();
+
+const selectedStatsPeriod = computed<string>({
+  get: () => statsFiltersStore.analysisPeriod,
+  set: (value) => statsFiltersStore.setAnalysisPeriod(value as any),
+});
+
+const periodLabelMap: Record<string, string> = {
+  weekly: 'Última semana',
+  monthly: 'Último mês',
+  trimestral: 'Últimos 3 meses',
+  semestral: 'Últimos 6 meses',
+  annual: 'Últimos 12 meses',
+};
+
+const currentPeriodLabel = computed(
+  () => periodLabelMap[selectedStatsPeriod.value] || 'Últimos 3 meses',
+);
 const showExportModal = ref(false);
 
 const route = useRoute();
@@ -2503,6 +2396,7 @@ const createdVsCompletedChartOptions = computed<ChartOptions>(() => {
 
 const statistics = ref<TenantStatistics | null>(null);
 const departmentTenantStats = ref<TenantStatistics | null>(null);
+const performanceTrends = ref<{ totalCreated: number; totalResolved: number } | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const topUsers = ref<UserRankingResponseDto | null>(null);
@@ -2601,6 +2495,7 @@ const loadData = async () => {
       statsData,
       deptTenantStatsData,
       trends,
+      performanceTrendsResult,
       statusResult,
       priorityResult,
       recentTicketsResult,
@@ -2612,26 +2507,33 @@ const loadData = async () => {
       topFiveUsersResult,
       worstFiveUsersResult,
     ] = await Promise.all([
-      reportService.getTenantStatistics(), // global stats (all period, with canceled)
       reportService.getTenantStatistics({
-        period: StatsPeriod.TRIMESTRAL,
+        period: selectedStatsPeriod.value as StatsPeriod,
         excludeCanceled: true,
-      }), // last 3 months, excluding canceled - used for department total without duplicates
+      }),
+      reportService.getTenantStatistics({
+        period: selectedStatsPeriod.value as StatsPeriod,
+        excludeCanceled: true,
+      }), // same period filter, used for department total without duplicates
       reportService.getTicketTrends(selectedTrendPeriod.value),
-      reportService.getTicketsByStatus(),
-      reportService.getTicketsByPriority(),
+      reportService.getPerformanceTrends(selectedStatsPeriod.value as StatsPeriod),
+      reportService.getTicketsByStatus(selectedStatsPeriod.value as StatsPeriod),
+      reportService.getTicketsByPriority(selectedStatsPeriod.value as StatsPeriod),
       ticketService.getTenantRecentTickets(10),
-      reportService.getStatusDurations(selectedStatsPeriod.value),
-      reportService.getTenantDepartmentsStatistics(StatsPeriod.TRIMESTRAL),
+      reportService.getStatusDurations(selectedStatsPeriod.value as StatsPeriod), // Tempo Médio Por Status - uses global period filter
+      reportService.getTenantDepartmentsStatistics(selectedStatsPeriod.value as StatsPeriod), // Tempo de Resolução por Setor - uses global period filter
       reportService.getResolutionTimeData(),
       reportService.getStatusDurationTimeSeries(DefaultTicketStatus.InProgress),
-      reportService.getTopUsers(undefined, true), // fetch all users with stats for Colaboradores tab
-      reportService.getTopUsers(5, false), // fetch top 5 for Visão Geral tab
-      reportService.getTopUsers(5, false, 'bottom'), // fetch worst 5 for Pior Desempenho section
+      reportService.getTopUsers(undefined, true, 'top', selectedStatsPeriod.value as StatsPeriod), // fetch all users with stats for Colaboradores tab - uses global period filter
+      reportService.getTopUsers(5, false, 'top', selectedStatsPeriod.value as StatsPeriod), // Top Colaboradores in Visão Geral - uses global period filter
+      reportService.getTopUsers(5, false, 'bottom', selectedStatsPeriod.value as StatsPeriod), // Pior Desempenho - uses global period filter
     ]);
 
     // Initialize trendData with the current period data
     trendData.value = trends[selectedTrendPeriod.value];
+
+    // Store performance trends
+    performanceTrends.value = performanceTrendsResult;
 
     // Store status durations
     statusDurations.value = statusDurationsResult.statusDurations.map((duration) => ({
@@ -3244,13 +3146,14 @@ const handlePeriodChange = () => {
 };
 
 const getTotalResolved = () => {
-  return trendData.value?.reduce((total, item) => total + (item.resolved || 0), 0) || 0;
+  return performanceTrends.value?.totalResolved || 0;
 };
 
 const getTotalCreated = () => {
-  return trendData.value?.reduce((total, item) => total + (item.created || 0), 0) || 0;
+  return performanceTrends.value?.totalCreated || 0;
 };
 
+// Trend percentages are calculated from the chart data (trendData) for visual comparison
 const createdTrendPercentage = computed(() => {
   if (!trendData.value || trendData.value.length < 2) return 0;
 

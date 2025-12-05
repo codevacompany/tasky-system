@@ -132,6 +132,11 @@ export type UserRankingResponseDto = {
   users: UserRankingItemDto[];
 };
 
+export interface PerformanceTrendsResponseDto {
+  totalCreated: number;
+  totalResolved: number;
+}
+
 export const reportService = {
   async getTenantStatistics(params?: { period?: string; excludeCanceled?: boolean }): Promise<TenantStatistics> {
     const response = await apiClient.get('/stats/by-tenant', {
@@ -152,13 +157,17 @@ export const reportService = {
     return response.data;
   },
 
-  async getTicketsByStatus(): Promise<TicketStatusCountResponseDto> {
-    const response = await apiClient.get('/stats/by-status');
+  async getTicketsByStatus(period?: string): Promise<TicketStatusCountResponseDto> {
+    const response = await apiClient.get('/stats/by-status', {
+      params: period ? { period } : undefined,
+    });
     return response.data;
   },
 
-  async getTicketsByPriority(): Promise<TicketPriorityCountResponseDto> {
-    const response = await apiClient.get('/stats/by-priority');
+  async getTicketsByPriority(period?: string): Promise<TicketPriorityCountResponseDto> {
+    const response = await apiClient.get('/stats/by-priority', {
+      params: period ? { period } : undefined,
+    });
     return response.data;
   },
 
@@ -197,10 +206,26 @@ export const reportService = {
     return response.data;
   },
 
-  async getTopUsers(limit = 5, all = false, sort = 'top'): Promise<UserRankingResponseDto> {
-    const response = await apiClient.get(
-      `/stats/top-users?limit=${limit}${all ? '&all=true' : ''}&sort=${sort}`,
-    );
+  async getTopUsers(
+    limit = 5,
+    all = false,
+    sort = 'top',
+    period?: string,
+  ): Promise<UserRankingResponseDto> {
+    const params = new URLSearchParams({
+      limit: limit.toString(),
+      sort,
+    });
+    if (all) params.append('all', 'true');
+    if (period) params.append('period', period);
+    const response = await apiClient.get(`/stats/top-users?${params.toString()}`);
+    return response.data;
+  },
+
+  async getPerformanceTrends(period?: string): Promise<PerformanceTrendsResponseDto> {
+    const response = await apiClient.get('/stats/performance-trends', {
+      params: period ? { period } : undefined,
+    });
     return response.data;
   },
 };
