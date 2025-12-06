@@ -239,13 +239,13 @@ const fetchSelectedTicket = async (notification: Notification) => {
 
       // Navigate to tickets page with the ticket customId in the URL
       // Preserve current query params if already on tickets page, otherwise use default tab
-      const isOnTicketsPage = route.path === '/meus-tickets';
+      const isOnTicketsPage = route.path === '/minhas-tarefas';
       const query = isOnTicketsPage
         ? { ...route.query, ticket: notification.resourceCustomId }
-        : { tab: 'recebidos', ticket: notification.resourceCustomId };
+        : { tab: 'recebidas', ticket: notification.resourceCustomId };
 
       router.push({
-        path: '/meus-tickets',
+        path: '/minhas-tarefas',
         query,
       });
 

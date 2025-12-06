@@ -1,6 +1,6 @@
 <template>
   <BaseModal
-    title="Detalhes do Ticket"
+    title="Detalhes da Tarefa"
     :isLoading="false"
     @close="closeModal"
     :showFooter="false"
@@ -13,7 +13,7 @@
         <div class="flex items-center gap-3">
           <div v-if="loadedTicket">
             <h2 class="text-lg sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
-              Detalhes do Ticket
+              Detalhes da Tarefa
             </h2>
             <p class="text-gray-600 font-medium dark:text-gray-400">
               {{ loadedTicket.customId }}
@@ -130,7 +130,7 @@
             @click="cancelTicket(loadedTicket.customId)"
           >
             <font-awesome-icon icon="ban" class="text-xs" />
-            Cancelar Ticket
+            Cancelar Tarefa
           </button>
 
           <button
@@ -243,14 +243,14 @@
               class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2"
             >
               <font-awesome-icon icon="info-circle" class="text-primary dark:text-blue-400" />
-              Informações do Ticket
+              Informações da Tarefa
             </h3>
 
             <div class="space-y-4">
               <div class="flex items-start gap-3">
                 <div class="w-[40%]">
                   <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                    ID do Ticket
+                    ID da Tarefa
                   </p>
                 </div>
                 <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
@@ -581,7 +581,7 @@
                   @keyup.enter="saveTicketName"
                   @keyup.escape="cancelEditingName"
                   ref="nameInput"
-                  placeholder="Nome do ticket"
+                  placeholder="Nome da tarefa"
                 />
                 <div class="flex gap-3">
                   <button @click="saveTicketName" class="btn btn-primary">Salvar</button>
@@ -608,7 +608,7 @@
                   @click="scrollToTarefas"
                   title="Tarefas"
                 >
-                  <font-awesome-icon icon="tasks" class="text-sm" /> Tarefas
+                  <font-awesome-icon icon="tasks" class="text-sm" /> Subtarefas
                 </button>
               </div>
             </div>
@@ -794,7 +794,7 @@
               >
                 <font-awesome-icon icon="info-circle" />
                 <p class="text-sm">
-                  Comentários permitidos apenas para tickets em andamento ou em verificação
+                  Comentários permitidos apenas para tarefas em andamento ou em verificação
                 </p>
               </div>
 
@@ -821,7 +821,12 @@
                                 backgroundColor: '#FAFBFD',
                                 borderColor: '#E5E7EB',
                               }
-                            : undefined
+                            : isMyComment(event.data.user.id) && userPreferencesStore.isDarkMode
+                              ? {
+                                  backgroundColor: '#2a3441',
+                                  borderColor: '#374151',
+                                }
+                              : undefined
                         "
                       >
                         <div class="flex items-center gap-3 mb-1">
@@ -1074,7 +1079,7 @@
   >
     <div class="p-4">
       <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        Este ticket não possui um prazo definido. Para aceitar o ticket, defina uma data estimada de
+        Esta tarefa não possui um prazo definido. Para aceitar a tarefa, defina uma data estimada de
         conclusão:
       </p>
       <div class="flex flex-col gap-2">
@@ -1296,7 +1301,7 @@ const closeModal = () => {
   ) {
     openConfirmationModal(
       'Iniciar Correção',
-      'Este ticket foi devolvido para correção. Deseja iniciar as correções agora?',
+      'Esta tarefa foi devolvida para correção. Deseja iniciar as correções agora?',
       async () => {
         await startCorrectionDirectly(loadedTicket.value!.customId);
       },
@@ -1464,16 +1469,16 @@ const acceptTicket = async (ticketId: string) => {
   }
 
   openConfirmationModal(
-    'Aceitar Ticket',
-    'Tem certeza que deseja aceitar este ticket?',
+    'Aceitar Tarefa',
+    'Tem certeza que deseja aceitar esta tarefa?',
     async () => {
       try {
         await ticketService.accept(ticketId);
-        toast.success('Ticket aceito com sucesso');
+        toast.success('Tarefa aceita com sucesso');
 
         refreshSelectedTicket();
       } catch {
-        toast.error('Erro ao aceitar o ticket');
+        toast.error('Erro ao aceitar a tarefa');
       }
     },
   );
@@ -1482,15 +1487,15 @@ const acceptTicket = async (ticketId: string) => {
 const sendToNextDepartment = async (ticketId: string) => {
   openConfirmationModal(
     'Enviar para Próximo Setor',
-    'Tem certeza que deseja enviar este ticket para o próximo setor?',
+    'Tem certeza que deseja enviar esta tarefa para o próximo setor?',
     async () => {
       try {
         await ticketService.sendToNextDepartment(ticketId);
-        toast.success('Ticket enviado para o próximo setor');
+        toast.success('Tarefa enviada para o próximo setor');
 
         refreshSelectedTicket();
       } catch {
-        toast.error('Erro ao enviar o ticket para o próximo setor');
+        toast.error('Erro ao enviar a tarefa para o próximo setor');
       }
     },
   );
@@ -1508,17 +1513,17 @@ const sendForReview = async (ticketId: string) => {
   }
   openConfirmationModal(
     'Enviar Para Revisão',
-    'Tem certeza que deseja enviar este ticket para revisão?',
+    'Tem certeza que deseja enviar esta tarefa para revisão?',
     async () => {
       try {
         await ticketService.updateStatus(ticketId, {
           status: DefaultTicketStatus.AwaitingVerification,
         });
-        toast.success('Ticket enviado para revisão');
+        toast.success('Tarefa enviada para revisão');
 
         refreshSelectedTicket();
       } catch {
-        toast.error('Erro ao enviar o ticket para revisão');
+        toast.error('Erro ao enviar a tarefa para revisão');
       }
     },
   );
@@ -1526,12 +1531,12 @@ const sendForReview = async (ticketId: string) => {
 
 const approveTicket = async (ticketId: string) => {
   openConfirmationModal(
-    'Aprovar Ticket',
-    'Tem certeza que deseja aprovar este ticket?',
+    'Aprovar Tarefa',
+    'Tem certeza que deseja aprovar esta tarefa?',
     async () => {
       try {
         await ticketService.approve(ticketId);
-        toast.success('Ticket aprovado com sucesso');
+        toast.success('Tarefa aprovada com sucesso');
 
         if (loadedTicket.value) {
           refreshSelectedTicket();
@@ -1539,7 +1544,7 @@ const approveTicket = async (ticketId: string) => {
           await ticketsStore.fetchTicketDetails(ticketId);
         }
       } catch {
-        toast.error('Erro ao aprovar o ticket');
+        toast.error('Erro ao aprovar a tarefa');
       }
     },
   );
@@ -1592,12 +1597,12 @@ const requestCorrection = async (ticketId: string) => {
 
 const correctTicket = async (ticketId: string) => {
   openConfirmationModal(
-    'Corrigir Ticket',
-    'Tem certeza que deseja iniciar as correções deste ticket?',
+    'Corrigir Tarefa',
+    'Tem certeza que deseja iniciar as correções desta tarefa?',
     async () => {
       try {
         await ticketService.updateStatus(ticketId, { status: DefaultTicketStatus.InProgress });
-        toast.success('Ticket em correção');
+        toast.success('Tarefa em correção');
         refreshSelectedTicket();
       } catch {
         toast.error('Erro ao iniciar correção');
@@ -1609,7 +1614,7 @@ const correctTicket = async (ticketId: string) => {
 const startCorrectionDirectly = async (ticketId: string) => {
   try {
     await ticketService.updateStatus(ticketId, { status: DefaultTicketStatus.InProgress });
-    toast.success('Ticket em correção');
+    toast.success('Tarefa em correção');
     refreshSelectedTicket();
   } catch {
     toast.error('Erro ao iniciar correção');
@@ -1619,7 +1624,7 @@ const startCorrectionDirectly = async (ticketId: string) => {
 const rejectTicket = async (ticketId: string) => {
   const reasonOptions = enumToOptions(DisapprovalReason);
   openConfirmationModal(
-    'Reprovar Ticket',
+    'Reprovar Tarefa',
     'Por favor, informe o motivo da reprovação:',
     async (data?: { reason: string; description: string }) => {
       try {
@@ -1628,11 +1633,11 @@ const rejectTicket = async (ticketId: string) => {
           details: data?.description ?? '',
         });
 
-        toast.success('Ticket reprovado com sucesso');
+        toast.success('Tarefa reprovada com sucesso');
 
         refreshSelectedTicket();
       } catch {
-        toast.error('Erro ao reprovar o ticket');
+        toast.error('Erro ao reprovar a tarefa');
       }
     },
     true,
@@ -1643,7 +1648,7 @@ const rejectTicket = async (ticketId: string) => {
 const cancelTicket = async (ticketId: string) => {
   const reasonOptions = enumToOptions(CancellationReason);
   openConfirmationModal(
-    'Cancelar Ticket',
+    'Cancelar Tarefa',
     'Por favor, informe o motivo do cancelamento:',
     async (data?: { reason: string; description: string }) => {
       try {
@@ -1652,13 +1657,13 @@ const cancelTicket = async (ticketId: string) => {
           details: data?.description ?? '',
         });
 
-        toast.success('Ticket cancelado com sucesso');
+        toast.success('Tarefa cancelada com sucesso');
 
         refreshSelectedTicket();
 
         emit('close');
       } catch {
-        toast.error('Erro ao cancelar o ticket');
+        toast.error('Erro ao cancelar a tarefa');
       }
     },
     true,
@@ -1911,9 +1916,9 @@ const getSpecialUpdateTitle = (subType: string, event?: SpecialUpdateEvent) => {
   const baseTitle = (() => {
     switch (subType) {
       case 'disapproval':
-        return 'Ticket Reprovado';
+        return 'Tarefa Reprovada';
       case 'cancellation':
-        return 'Ticket Cancelado';
+        return 'Tarefa Cancelada';
       case 'correction':
         return 'Solicitação de Correção';
       default:
@@ -1984,7 +1989,7 @@ const fetchTicket = async (customId: string) => {
     ) {
       openConfirmationModal(
         'Iniciar Verificação',
-        'Você tem certeza que deseja iniciar a verificação deste ticket?',
+        'Você tem certeza que deseja iniciar a verificação desta tarefa?',
         async () => {
           try {
             await ticketService.updateStatus(ticket.customId, {
@@ -2002,7 +2007,7 @@ const fetchTicket = async (customId: string) => {
     }
   } catch (error) {
     console.error('Error fetching ticket:', error);
-    toast.error('Erro ao carregar ticket');
+    toast.error('Erro ao carregar tarefa');
     emit('close');
   } finally {
     isLoadingTicket.value = false;
@@ -2142,7 +2147,7 @@ const startEditingName = () => {
 
 const saveTicketName = async () => {
   if (!editingName.value.trim()) {
-    toast.error('O assunto do ticket não pode estar vazio');
+    toast.error('O assunto da tarefa não pode estar vazio');
     return;
   }
 
@@ -2157,10 +2162,10 @@ const saveTicketName = async () => {
       loadedTicket.value.name = editingName.value.trim();
     }
 
-    toast.success('Assunto do ticket atualizado com sucesso');
+    toast.success('Assunto da tarefa atualizado com sucesso');
     refreshSelectedTicket();
   } catch {
-    toast.error('Erro ao atualizar nome do ticket');
+    toast.error('Erro ao atualizar nome da tarefa');
   }
 };
 
@@ -2184,7 +2189,7 @@ const saveTicketDescription = async () => {
   const textContent = tempDiv.textContent || tempDiv.innerText || '';
 
   if (!textContent.trim()) {
-    toast.error('Descrição do ticket não pode estar vazia');
+    toast.error('Descrição da tarefa não pode estar vazia');
     return;
   }
 
@@ -2204,7 +2209,7 @@ const saveTicketDescription = async () => {
 
     refreshSelectedTicket();
   } catch {
-    toast.error('Erro ao atualizar descrição do ticket');
+    toast.error('Erro ao atualizar descrição da tarefa');
   }
 };
 
@@ -2315,15 +2320,15 @@ const isSelfAssigned = computed(
 
 const startTicket = async (ticketId: string) => {
   openConfirmationModal(
-    'Iniciar Ticket',
-    'Tem certeza que deseja iniciar este ticket?',
+    'Iniciar Tarefa',
+    'Tem certeza que deseja iniciar esta tarefa?',
     async () => {
       try {
         await ticketService.accept(ticketId);
-        toast.success('Ticket iniciado com sucesso');
+        toast.success('Tarefa iniciada com sucesso');
         refreshSelectedTicket();
       } catch {
-        toast.error('Erro ao iniciar o ticket');
+        toast.error('Erro ao iniciar a tarefa');
       }
     },
   );
@@ -2360,7 +2365,7 @@ const confirmReviewerSelection = async () => {
     await ticketService.updateStatus(loadedTicket.value.customId, {
       status: DefaultTicketStatus.AwaitingVerification,
     });
-    toast.success('Ticket enviado para revisão');
+    toast.success('Tarefa enviada para revisão');
     refreshSelectedTicket();
   } catch {
     toast.error('Erro ao definir revisor ou enviar para revisão');
@@ -2425,13 +2430,13 @@ const confirmDueDate = async () => {
 
     await ticketService.accept(loadedTicket.value.customId);
 
-    toast.success('Ticket aceito com sucesso');
+    toast.success('Tarefa aceita com sucesso');
     showDueDateModal.value = false;
     dueDateValue.value = null;
     dueDateDate.value = null;
     refreshSelectedTicket();
   } catch {
-    toast.error('Erro ao definir prazo e aceitar ticket');
+    toast.error('Erro ao definir prazo e aceitar tarefa');
   } finally {
     isDueDateModalLoading.value = false;
   }

@@ -22,7 +22,7 @@
         </button>
 
         <!-- Desktop Navigation -->
-        <div class="hidden md:flex flex-1 ml-4">
+        <div class="hidden md:flex flex-1 items-center ml-4 h-full">
           <nav>
             <ul class="flex items-center space-x-2">
               <router-link to="/">
@@ -31,21 +31,21 @@
                     :class="{
                       'menu-item-active': isActive('/'),
                     }"
-                    class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
+                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-gray-600 dark:text-gray-400 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover relative"
                   >
-                    <font-awesome-icon icon="home" /> Início
+                    Início
                   </div>
                 </li>
               </router-link>
-              <router-link v-if="!isGlobalAdmin" to="/meus-tickets">
+              <router-link v-if="!isGlobalAdmin" to="/minhas-tarefas">
                 <li>
                   <div
                     :class="{
-                      'menu-item-active': isActive('/meus-tickets'),
+                      'menu-item-active': isActive('/minhas-tarefas'),
                     }"
-                    class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover"
+                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-gray-600 dark:text-gray-400 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover relative"
                   >
-                    <font-awesome-icon icon="ticket" />Tickets
+                    Tarefas
                   </div>
                 </li>
               </router-link>
@@ -55,9 +55,8 @@
                     :class="{
                       'menu-item-active': isActive('/admin/relatorios'),
                     }"
-                    class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
+                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-gray-600 dark:text-gray-400 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover cursor-pointer relative"
                   >
-                    <font-awesome-icon icon="chart-line" />
                     Relatórios
                   </div>
                 </li>
@@ -79,9 +78,8 @@
                       isActive('/admin/clientes') ||
                       isActive('/admin/cadastros'),
                   }"
-                  class="flex items-center px-4 py-2 rounded text-[15px] text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer"
+                  class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-gray-600 dark:text-gray-400 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer relative"
                 >
-                  <font-awesome-icon icon="user-cog" />
                   Administração
                   <font-awesome-icon
                     icon="chevron-down"
@@ -189,7 +187,7 @@
             @click="openTicketModal"
           >
             <font-awesome-icon icon="plus" />
-            <span class="hidden sm:inline">Novo Ticket</span>
+            <span class="hidden sm:inline">Nova Tarefa</span>
           </button>
 
           <div
@@ -275,11 +273,11 @@
                 </div>
               </li>
             </router-link>
-            <router-link v-if="!isGlobalAdmin" to="/meus-tickets" @click="closeMobileMenu">
+            <router-link v-if="!isGlobalAdmin" to="/minhas-tarefas" @click="closeMobileMenu">
               <li>
                 <div
                   :class="{
-                    'menu-item-active': isActive('/meus-tickets'),
+                    'menu-item-active': isActive('/minhas-tarefas'),
                   }"
                   class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
                 >
@@ -590,28 +588,33 @@ onUnmounted(() => {
 }
 
 .admin-submenu-active {
-  color: #001866;
+  color: #003566;
 }
 
 .dark-mode .admin-submenu-active {
   color: var(--primary-color);
 }
 
+.nav-menu-item {
+  height: calc(var(--header-height) - 2px);
+  border-bottom: 2px solid transparent;
+}
+
 .menu-item-active {
-  background: var(--button-primary-color);
-  color: white;
+  color: #003566;
+  border-bottom: 2px solid #003566;
 }
 
 .dark-mode .menu-item-active {
-  background: var(--primary-dark);
-  color: white;
+  color: #3b82f6;
+  border-bottom: 2px solid #3b82f6;
 }
 
 .dark-mode .menu-item-active:hover {
-  color: white;
+  color: #3b82f6;
 }
 
 .menu-item-active:hover {
-  color: white;
+  color: #003566;
 }
 </style>

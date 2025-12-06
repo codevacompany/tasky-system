@@ -355,13 +355,13 @@ function getRequesterInitials(ticket: Ticket): string {
 const handleTicketClick = (ticket: Ticket) => {
   if (!ticket.customId) return;
 
-  const isOnTicketsPage = route.path === '/meus-tickets';
+  const isOnTicketsPage = route.path === '/minhas-tarefas';
   const query = isOnTicketsPage
     ? { ...route.query, ticket: ticket.customId }
-    : { tab: 'recebidos', ticket: ticket.customId };
+    : { tab: 'recebidas', ticket: ticket.customId };
 
   router.push({
-    path: '/meus-tickets',
+    path: '/minhas-tarefas',
     query,
   });
 };

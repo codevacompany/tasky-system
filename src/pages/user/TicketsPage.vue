@@ -1,7 +1,7 @@
 <template>
   <section id="ticketsSection" class="px-4 pt-4 pb-4 md:px-6 md:pt-4 md:pb-0">
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Tickets</h1>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Tarefas</h1>
       <button
         class="flex items-center gap-2 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[13px] font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
         @click="toggleView"
@@ -22,7 +22,7 @@
       <div
         class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
         @click="setStatusFilter('')"
-        :title="'Mostrar todos os tickets'"
+        :title="'Mostrar todas as tarefas'"
       >
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
@@ -39,7 +39,7 @@
       <div
         class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
         @click="setStatusFilter(DefaultTicketStatus.Pending)"
-        :title="'Filtrar por tickets pendentes'"
+        :title="'Filtrar por tarefas pendentes'"
       >
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
@@ -58,7 +58,7 @@
       <div
         class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
         @click="setStatusFilter(DefaultTicketStatus.InProgress)"
-        :title="'Filtrar por tickets em andamento'"
+        :title="'Filtrar por tarefas em andamento'"
       >
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
@@ -100,27 +100,27 @@
                     <button
                       :class="[
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
-                        activeTab === 'recebidos'
+                        activeTab === 'recebidas'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
                           : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
-                      @click="switchTab('recebidos')"
+                      @click="switchTab('recebidas')"
                     >
-                      Recebidos
+                      Recebidas
                     </button>
                     <button
                       :class="[
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
-                        activeTab === 'criados'
+                        activeTab === 'criadas'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
                           : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
-                      @click="switchTab('criados')"
+                      @click="switchTab('criadas')"
                     >
-                      <span class="hidden sm:inline">Criados por Mim</span>
-                      <span class="sm:hidden">Criados</span>
+                      <span class="hidden sm:inline">Criadas por Mim</span>
+                      <span class="sm:hidden">Criadas</span>
                     </button>
                     <button
                       :class="[
@@ -132,7 +132,7 @@
                       style="font-size: 13px"
                       @click="switchTab('setor')"
                     >
-                      <span class="hidden sm:inline">Tickets do Setor</span>
+                      <span class="hidden sm:inline">Tarefas do Setor</span>
                       <span class="sm:hidden">Setor</span>
                     </button>
                     <button
@@ -146,19 +146,19 @@
                       style="font-size: 13px"
                       @click="switchTab('gerais')"
                     >
-                      Tickets Gerais
+                      Tarefas Gerais
                     </button>
                     <button
                       :class="[
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
-                        activeTab === 'arquivados'
+                        activeTab === 'arquivadas'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
                           : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
-                      @click="switchTab('arquivados')"
+                      @click="switchTab('arquivadas')"
                     >
-                      Arquivados
+                      Arquivadas
                     </button>
                   </div>
                 </div>
@@ -176,7 +176,7 @@
                   <Input
                     v-model="searchTerm"
                     type="text"
-                    placeholder="Buscar tickets"
+                    placeholder="Buscar tarefas"
                     padding="tight"
                     class="pl-9 pr-3 w-full text-sm transition-all duration-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
                   />
@@ -306,7 +306,7 @@
         </div>
         <div class="px-6 py-4">
           <p class="mb-4 text-gray-700 dark:text-gray-300">
-            Por favor, defina uma nova data de conclusão para o ticket:
+            Por favor, defina uma nova data de conclusão para a tarefa:
           </p>
           <div class="mb-4">
             <label
@@ -368,9 +368,9 @@ const router = useRouter();
 const ticketsStore = useTicketsStore();
 const { isTenantAdmin } = useRoles();
 
-type TicketsTab = 'recebidos' | 'criados' | 'setor' | 'arquivados' | 'gerais';
+type TicketsTab = 'recebidas' | 'criadas' | 'setor' | 'arquivadas' | 'gerais';
 
-const BASE_TABS: TicketsTab[] = ['recebidos', 'criados', 'setor', 'arquivados'];
+const BASE_TABS: TicketsTab[] = ['recebidas', 'criadas', 'setor', 'arquivadas'];
 
 const getValidTabs = (includeGeneral: boolean) => {
   return includeGeneral ? [...BASE_TABS, 'gerais'] : [...BASE_TABS];
@@ -384,7 +384,7 @@ const getInitialTab = (): TicketsTab => {
     return tabFromUrl as TicketsTab;
   }
 
-  return 'recebidos';
+  return 'recebidas';
 };
 
 const getInitialFilters = () => {
@@ -439,16 +439,16 @@ const tickets = computed(() => {
   let ticketsData: Ticket[] = [];
 
   switch (activeTab.value) {
-    case 'recebidos':
+    case 'recebidas':
       ticketsData = ticketsStore.receivedTickets.data;
       break;
-    case 'criados':
+    case 'criadas':
       ticketsData = ticketsStore.myTickets.data;
       break;
     case 'setor':
       ticketsData = ticketsStore.departmentTickets.data;
       break;
-    case 'arquivados':
+    case 'arquivadas':
       return ticketsStore.archivedTickets.data;
     case 'gerais':
       ticketsData = ticketsStore.tenantTickets.data;
@@ -470,13 +470,13 @@ const tickets = computed(() => {
 // Get loading state from the store
 const isLoading = computed(() => {
   switch (activeTab.value) {
-    case 'recebidos':
+    case 'recebidas':
       return ticketsStore.receivedTickets.isLoading;
-    case 'criados':
+    case 'criadas':
       return ticketsStore.myTickets.isLoading;
     case 'setor':
       return ticketsStore.departmentTickets.isLoading;
-    case 'arquivados':
+    case 'arquivadas':
       return ticketsStore.archivedTickets.isLoading;
     case 'gerais':
       return ticketsStore.tenantTickets.isLoading;
@@ -488,13 +488,13 @@ const isLoading = computed(() => {
 // Get total pages from the store
 const totalPages = computed(() => {
   switch (activeTab.value) {
-    case 'recebidos':
+    case 'recebidas':
       return Math.ceil(ticketsStore.receivedTickets.totalCount / 10);
-    case 'criados':
+    case 'criadas':
       return Math.ceil(ticketsStore.myTickets.totalCount / 10);
     case 'setor':
       return Math.ceil(ticketsStore.departmentTickets.totalCount / 10);
-    case 'arquivados':
+    case 'arquivadas':
       return Math.ceil(ticketsStore.archivedTickets.totalCount / 10);
     case 'gerais':
       return Math.ceil(ticketsStore.tenantTickets.totalCount / 10);
@@ -558,10 +558,10 @@ const fetchTicketsWithFilters = async () => {
     TicketsTab,
     'received' | 'createdByMe' | 'department' | 'archived' | 'tenant'
   > = {
-    recebidos: 'received',
-    criados: 'createdByMe',
+    recebidas: 'received',
+    criadas: 'createdByMe',
     setor: 'department',
-    arquivados: 'archived',
+    arquivadas: 'archived',
     gerais: 'tenant',
   };
 
@@ -637,13 +637,13 @@ const handleEditTicket = (ticket: Ticket) => {
 };
 
 const handleCancelTicket = async (ticket: Ticket) => {
-  if (confirm('Tem certeza que deseja excluir este ticket?')) {
+  if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
     try {
       await ticketService.cancel(ticket.customId);
-      toast.success('Ticket excluído com sucesso!');
+      toast.success('Tarefa excluída com sucesso!');
       fetchTicketsWithFilters();
     } catch {
-      toast.error('Erro ao excluir ticket. Tente novamente.');
+      toast.error('Erro ao excluir tarefa. Tente novamente.');
     }
   }
 };
@@ -651,10 +651,10 @@ const handleCancelTicket = async (ticket: Ticket) => {
 const handleAcceptTicket = async (ticket: Ticket) => {
   try {
     await ticketService.accept(ticket.customId);
-    toast.success('Ticket aceito com sucesso!');
+    toast.success('Tarefa aceita com sucesso!');
     fetchTicketsWithFilters();
   } catch {
-    toast.error('Erro ao aceitar ticket. Tente novamente.');
+    toast.error('Erro ao aceitar tarefa. Tente novamente.');
   }
 };
 
@@ -663,20 +663,20 @@ const handleVerifyTicket = async (ticketId: string) => {
     await ticketService.updateStatus(ticketId, {
       status: DefaultTicketStatus.AwaitingVerification,
     });
-    toast.success('Ticket enviado para revisão');
+    toast.success('Tarefa enviada para revisão');
     fetchTicketsWithFilters();
   } catch {
-    toast.error('Erro ao enviar o ticket para revisão');
+    toast.error('Erro ao enviar a tarefa para revisão');
   }
 };
 
 const handleApproveTicket = async (ticket: Ticket) => {
   try {
     await ticketService.updateStatus(ticket.customId, { status: DefaultTicketStatus.Completed });
-    toast.success('Ticket aprovado com sucesso!');
+    toast.success('Tarefa aprovada com sucesso!');
     fetchTicketsWithFilters();
   } catch {
-    toast.error('Erro ao aprovar ticket. Tente novamente.');
+    toast.error('Erro ao aprovar tarefa. Tente novamente.');
   }
 };
 
@@ -713,10 +713,10 @@ const cancelCorrection = () => {
 const handleRejectTicket = async (ticket: Ticket) => {
   try {
     await ticketService.updateStatus(ticket.customId, { status: DefaultTicketStatus.Rejected });
-    toast.success('Ticket reprovado com sucesso!');
+    toast.success('Tarefa reprovada com sucesso!');
     fetchTicketsWithFilters();
   } catch {
-    toast.error('Erro ao reprovar ticket. Tente novamente.');
+    toast.error('Erro ao reprovar tarefa. Tente novamente.');
   }
 };
 
@@ -774,7 +774,7 @@ watch(
 
 watch(isTenantAdmin, (isAdmin) => {
   if (!isAdmin && activeTab.value === 'gerais') {
-    activeTab.value = 'recebidos';
+    activeTab.value = 'recebidas';
     updateUrlWithFilters();
     return;
   }
