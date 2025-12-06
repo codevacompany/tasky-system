@@ -15,7 +15,7 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         <!-- Pendentes -->
         <div
           v-if="isLoading"
@@ -101,35 +101,6 @@
             {{ ticketsFinalizados.total }}
           </p>
           <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Resolvidos</h3>
-        </div>
-
-        <!-- Taxa de Resolução -->
-        <div
-          v-if="isLoading"
-          class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg px-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
-        >
-          <div
-            class="w-12 h-10 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
-          ></div>
-          <div
-            class="h-8 w-16 bg-gray-300 dark:bg-gray-600 rounded mb-2 animate-pulse-custom"
-          ></div>
-          <div class="h-3 w-28 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-        </div>
-        <div
-          v-else
-          class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
-        >
-          <div class="mb-3">
-            <font-awesome-icon
-              icon="chart-pie"
-              class="text-purple-600 dark:text-purple-400 text-2xl"
-            />
-          </div>
-          <p id="resolucaoPercentual" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-            {{ resolutionRate }}%
-          </p>
-          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Taxa de Resolução</h3>
         </div>
 
         <!-- Tempo Médio de Aceite -->
@@ -270,13 +241,6 @@ const ticketsFinalizados = computed(() => {
   return {
     total: receivedCompleted,
   };
-});
-
-const resolutionRate = computed(() => {
-  if (userStats.value) {
-    return Math.round(userStats.value.resolutionRate * 100);
-  }
-  return 0;
 });
 
 const showWelcomeModal = ref(userStore.isNewUser);
