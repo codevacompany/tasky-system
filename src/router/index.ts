@@ -17,6 +17,7 @@ import LandingPage from '@/pages/public/LandingPage.vue';
 import { localStorageService } from '@/utils/localStorageService';
 import SignUpManagement from '@/pages/admin/SignUpManagement.vue';
 import BillingPage from '@/pages/admin/BillingPage.vue';
+import CustomPlanSimulationPage from '@/pages/admin/CustomPlanSimulationPage.vue';
 import { RoleName } from '@/models';
 import { useUserStore } from '@/stores/user';
 
@@ -64,10 +65,11 @@ const routes: RouteRecordRaw[] = [
     component: DashboardLayout,
     children: [
       { path: '', component: UserHome },
-      { path: 'meus-tickets', component: TicketsPage },
+      { path: 'minhas-tarefas', component: TicketsPage },
       { path: 'faq', component: () => import('@/pages/user/FAQ.vue') },
       { path: 'sync', component: SyncPage },
       { path: 'assinaturas', component: BillingPage },
+      { path: 'assinaturas/simular-plano-customizado', component: CustomPlanSimulationPage },
     ],
     meta: { requiresAuth: true },
   },

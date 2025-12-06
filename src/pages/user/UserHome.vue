@@ -106,15 +106,15 @@
         <!-- Taxa de Resolução -->
         <div
           v-if="isLoading"
-          class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg px-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
         >
           <div
-            class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
+            class="w-12 h-10 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
           ></div>
           <div
             class="h-8 w-16 bg-gray-300 dark:bg-gray-600 rounded mb-2 animate-pulse-custom"
           ></div>
-          <div class="h-4 w-28 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          <div class="h-3 w-28 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
         </div>
         <div
           v-else
@@ -199,14 +199,14 @@
     <!-- Últimos Tickets Recebidos e Criados -->
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
       <CompactTicketTable
-        title="Últimos Tickets Recebidos"
+        title="Últimas Tarefas Recebidas"
         type="received"
-        :viewAllUrl="'/meus-tickets?tab=recebidos'"
+        :viewAllUrl="'/minhas-tarefas?tab=recebidas'"
       />
       <CompactTicketTable
-        title="Últimos Tickets Criados"
+        title="Últimas Tarefas Criadas"
         type="created"
-        :viewAllUrl="'/meus-tickets?tab=criados'"
+        :viewAllUrl="'/minhas-tarefas?tab=criadas'"
       />
     </div>
   </section>

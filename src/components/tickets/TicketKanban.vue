@@ -109,7 +109,7 @@
             <div class="flex items-center justify-between gap-3 mb-0">
               <div class="flex items-center gap-2">
                 <div
-                  v-if="props.activeTab === 'recebidos' && ticket.requester"
+                  v-if="props.activeTab === 'recebidas' && ticket.requester"
                   class="flex items-center gap-1.5"
                 >
                   <div class="relative">
@@ -141,7 +141,7 @@
                     </div>
                   </div>
                 </div>
-                <div v-else-if="props.activeTab !== 'recebidos'" class="flex items-center gap-1.5">
+                <div v-else-if="props.activeTab !== 'recebidas'" class="flex items-center gap-1.5">
                   <div
                     v-if="ticket.targetUsers && ticket.targetUsers.length > 0"
                     v-for="targetUser in getSortedTargetUsers(ticket)"
@@ -294,7 +294,7 @@ import BaseModal from '@/components/common/BaseModal.vue';
 
 const props = defineProps<{
   tickets: Ticket[];
-  activeTab?: 'recebidos' | 'criados' | 'setor' | 'arquivados' | 'gerais';
+  activeTab?: 'recebidas' | 'criadas' | 'setor' | 'arquivadas' | 'gerais';
 }>();
 
 const emit = defineEmits(['viewTicket']);

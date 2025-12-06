@@ -33,6 +33,8 @@ export interface DepartmentStats {
   averageAcceptanceTimeSeconds: number;
   averageTotalTimeSeconds: number;
   resolutionRate: number;
+  efficiencyScore: number;
+  userCount: number;
 }
 
 export interface TrendStats {
@@ -125,6 +127,9 @@ export type UserRankingItemDto = {
   totalTickets: number;
   resolvedTickets: number;
   resolutionRate: number;
+  efficiencyScore: number; // Wilson Score for ranking
+  averageAcceptanceTimeSeconds: number;
+  averageResolutionTimeSeconds: number;
   avatarUrl?: string;
 };
 
@@ -199,9 +204,12 @@ export const reportService = {
 
   async getStatusDurationTimeSeries(
     status: DefaultTicketStatus,
+    period?: 'week' | 'month' | 'quarter',
   ): Promise<StatusDurationTimeSeriesResponseDto> {
+    const params = new URLSearchParams({ status });
+    if (period) params.append('period', period);
     const response = await apiClient.get<StatusDurationTimeSeriesResponseDto>(
-      `/stats/status-duration-time-series?status=${status}`,
+      `/stats/status-duration-time-series?${params.toString()}`,
     );
     return response.data;
   },

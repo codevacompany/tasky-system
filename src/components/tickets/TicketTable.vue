@@ -37,7 +37,7 @@
 
       <template #column-person="{ item }">
         <div class="text-sm text-gray-900 dark:text-gray-100">
-          <template v-if="tableType === 'criados'">
+          <template v-if="tableType === 'criadas'">
             <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
               <div
                 v-for="targetUser in getSortedTargetUsers(item)"
@@ -75,7 +75,7 @@
 
       <template #column-destinatario="{ item }">
         <div
-          v-if="tableType === 'gerais' || tableType === 'arquivados'"
+          v-if="tableType === 'gerais' || tableType === 'arquivadas'"
           class="text-sm text-gray-900 dark:text-gray-100"
         >
           <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
@@ -233,7 +233,7 @@
 
       <template #actions="{ item }">
         <div class="flex gap-0.5 md:gap-1 justify-center">
-          <template v-if="tableType === 'recebidos' || tableType === 'gerais'">
+          <template v-if="tableType === 'recebidas' || tableType === 'gerais'">
             <button
               v-if="getTicketStatus(item) === DefaultTicketStatus.Pending"
               class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors duration-200"
@@ -332,7 +332,7 @@
             </div>
           </template>
 
-          <template v-else-if="tableType === 'criados'">
+          <template v-else-if="tableType === 'criadas'">
             <div
               v-if="getTicketStatus(item) === DefaultTicketStatus.Pending && isSelfAssigned(item)"
               class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors duração-200"
@@ -414,7 +414,7 @@
             </div>
           </template>
 
-          <template v-else-if="tableType === 'arquivados'">
+          <template v-else-if="tableType === 'arquivadas'">
             <div
               v-if="getTicketStatus(item) === DefaultTicketStatus.Completed"
               class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-700 text-white"
@@ -576,7 +576,7 @@ import {
   getDeadlineInfo,
 } from '@/utils/generic-helper';
 
-type TableType = 'recebidos' | 'criados' | 'setor' | 'arquivados' | 'gerais';
+type TableType = 'recebidas' | 'criadas' | 'setor' | 'arquivadas' | 'gerais';
 
 const props = defineProps<{
   tableType: TableType;
@@ -599,13 +599,13 @@ type SortState = { key: SortKey; direction: SortDirection };
 
 const activeFilters = computed<TicketListFilters | undefined>(() => {
   switch (props.tableType) {
-    case 'recebidos':
+    case 'recebidas':
       return ticketsStore.receivedTickets.currentFilters;
-    case 'criados':
+    case 'criadas':
       return ticketsStore.myTickets.currentFilters;
     case 'setor':
       return ticketsStore.departmentTickets.currentFilters;
-    case 'arquivados':
+    case 'arquivadas':
       return ticketsStore.archivedTickets.currentFilters;
     case 'gerais':
       return ticketsStore.tenantTickets.currentFilters;
@@ -662,13 +662,13 @@ const tableHeaders = computed<TableHeader<Ticket>[]>(() => {
     },
     {
       key: 'person',
-      label: props.tableType === 'criados' ? 'Destinatário' : 'Solicitante',
+      label: props.tableType === 'criadas' ? 'Destinatário' : 'Solicitante',
       align: 'center',
       width: 0.18,
     },
   ];
 
-  if (props.tableType === 'gerais' || props.tableType === 'arquivados') {
+  if (props.tableType === 'gerais' || props.tableType === 'arquivadas') {
     baseHeaders.push({
       key: 'destinatario',
       label: 'Destinatário',
@@ -716,13 +716,13 @@ const isVerificationAlertLoading = ref(false);
 
 const displayedTickets = computed(() => {
   switch (props.tableType) {
-    case 'recebidos':
+    case 'recebidas':
       return ticketsStore.receivedTickets.data;
-    case 'criados':
+    case 'criadas':
       return ticketsStore.myTickets.data;
     case 'setor':
       return ticketsStore.departmentTickets.data;
-    case 'arquivados':
+    case 'arquivadas':
       return ticketsStore.archivedTickets.data;
     case 'gerais':
       return ticketsStore.tenantTickets.data;
@@ -733,13 +733,13 @@ const displayedTickets = computed(() => {
 
 const isLoading = computed(() => {
   switch (props.tableType) {
-    case 'recebidos':
+    case 'recebidas':
       return ticketsStore.receivedTickets.isLoading;
-    case 'criados':
+    case 'criadas':
       return ticketsStore.myTickets.isLoading;
     case 'setor':
       return ticketsStore.departmentTickets.isLoading;
-    case 'arquivados':
+    case 'arquivadas':
       return ticketsStore.archivedTickets.isLoading;
     case 'gerais':
       return ticketsStore.tenantTickets.isLoading;
@@ -751,16 +751,16 @@ const isLoading = computed(() => {
 const totalPages = computed(() => {
   let totalCount = 0;
   switch (props.tableType) {
-    case 'recebidos':
+    case 'recebidas':
       totalCount = ticketsStore.receivedTickets.totalCount;
       break;
-    case 'criados':
+    case 'criadas':
       totalCount = ticketsStore.myTickets.totalCount;
       break;
     case 'setor':
       totalCount = ticketsStore.departmentTickets.totalCount;
       break;
-    case 'arquivados':
+    case 'arquivadas':
       totalCount = ticketsStore.archivedTickets.totalCount;
       break;
     case 'gerais':
@@ -829,8 +829,8 @@ const openTicketDetails = (ticket: Ticket) => {
 
   // Se for o solicitante e o ticket estiver aguardando verificação
   if (
-    (props.tableType === 'criados' ||
-      props.tableType === 'recebidos' ||
+    (props.tableType === 'criadas' ||
+      props.tableType === 'recebidas' ||
       props.tableType === 'gerais') &&
     getTicketStatus(ticket) === DefaultTicketStatus.AwaitingVerification &&
     userStore.user?.id === ticket.reviewer?.id
@@ -849,16 +849,16 @@ const refreshTickets = async (pageOverride?: number) => {
   const filters = buildFiltersWithSort();
 
   switch (props.tableType) {
-    case 'recebidos':
+    case 'recebidas':
       await ticketsStore.fetchReceivedTickets(pageToUse, 10, filters);
       break;
-    case 'criados':
+    case 'criadas':
       await ticketsStore.fetchMyTickets(pageToUse, 10, filters);
       break;
     case 'setor':
       await ticketsStore.fetchDepartmentTickets(pageToUse, 10, filters);
       break;
-    case 'arquivados':
+    case 'arquivadas':
       await ticketsStore.fetchArchivedTickets(pageToUse, 10, filters);
       break;
     case 'gerais':

@@ -3,11 +3,10 @@
     <!-- Loading State -->
     <div
       v-if="loading"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      class="fixed inset-0 flex items-center justify-center z-40"
+      style="top: var(--header-height)"
     >
-      <div
-        class="bg-white dark:bg-gray-800 rounded-lg p-6 sm:p-8 flex flex-col items-center gap-4 shadow-md mx-4"
-      >
+      <div class="p-6 sm:p-8 flex flex-col items-center gap-4 mx-4">
         <div
           class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"
         ></div>
@@ -129,7 +128,7 @@
             <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
               {{ statistics?.totalTickets || 0 }}
             </p>
-            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Total de Tickets</h3>
+            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Total de Tarefas</h3>
           </div>
 
           <!-- Taxa de Resolução -->
@@ -194,7 +193,7 @@
             <!-- Created vs Completed Section -->
             <BaseStatsWidget
               v-permission="PERMISSIONS.VIEW_BASIC_ANALYTICS"
-              info-message="Esta visualização mostra a comparação entre tickets criados e concluídos ao longo do tempo. Use os filtros de período (Diário, Semanal, Mensal) para analisar diferentes intervalos."
+              info-message="Esta visualização mostra a comparação entre tarefas criadas e concluídas ao longo do tempo. Use os filtros de período (Diário, Semanal, Mensal) para analisar diferentes intervalos."
             >
               <template #title>Criados vs Concluídos</template>
               <template #header-actions>
@@ -212,20 +211,20 @@
               <div class="flex flex-col lg:flex-row">
                 <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
                   <p class="text-base font-medium text-gray-900 dark:text-white mb-4">
-                    Novos tickets criados vs concluídos
+                    Novas tarefas criadas vs concluídas
                   </p>
                   <div class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
                     <p v-if="trendData && trendData.length > 0">
                       <span class="font-semibold text-blue-600 dark:text-green-400"
-                        >{{ getTotalCreated() }} tickets</span
+                        >{{ getTotalCreated() }} tarefas</span
                       >
-                      criados no período selecionado
+                      criadas no período selecionado
                     </p>
                     <p v-if="trendData && trendData.length > 0">
                       <span class="font-semibold text-green-600 dark:text-blue-400"
-                        >{{ getTotalResolved() }} tickets</span
+                        >{{ getTotalResolved() }} tarefas</span
                       >
-                      concluídos no período selecionado
+                      concluídas no período selecionado
                     </p>
                     <p
                       v-if="
@@ -290,7 +289,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <!-- Status Chart -->
               <BaseStatsWidget
-                info-message="Esta visualização mostra a distribuição percentual de tickets por status no período selecionado. O gráfico de rosca exibe a proporção de cada status em relação ao total de tickets."
+                info-message="Esta visualização mostra a distribuição percentual de tarefas por status no período selecionado. O gráfico de rosca exibe a proporção de cada status em relação ao total de tarefas."
               >
                 <template #title>Distribuição por Status</template>
 
@@ -335,7 +334,7 @@
 
               <!-- Priority Chart -->
               <BaseStatsWidget
-                info-message="Esta visualização mostra a distribuição percentual de tickets por prioridade no período selecionado. O gráfico de rosca exibe a proporção de cada nível de prioridade em relação ao total de tickets."
+                info-message="Esta visualização mostra a distribuição percentual de tarefas por prioridade no período selecionado. O gráfico de rosca exibe a proporção de cada nível de prioridade em relação ao total de tarefas."
               >
                 <template #title>Distribuição por Prioridade</template>
 
@@ -383,7 +382,7 @@
               <!-- Top Contributors -->
               <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_USERS_ANALYTICS"
-                info-message="Ranking dos colaboradores com melhor desempenho em resolução de tickets no período selecionado. Os dados incluem tickets resolvidos, total de tickets atribuídos e a taxa de resolução de cada colaborador."
+                info-message="Ranking dos colaboradores com melhor desempenho em resolução de tarefas no período selecionado. O ranking é ordenado pela % de Desempenho que considera a taxa de resolução e o volume de tarefas. Quanto mais tarefas um colaborador resolve com qualidade, maior é a confiança no desempenho dele."
               >
                 <template #title>Top Colaboradores</template>
                 <template #subtitle>{{ currentPeriodLabel }}</template>
@@ -391,12 +390,11 @@
                 <div>
                   <!-- Table Headers -->
                   <div
-                    class="grid grid-cols-4 gap-4 pb-3 border-b border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                    class="grid grid-cols-3 gap-4 pb-3 border-b border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                   >
                     <div>Perfil</div>
-                    <div class="text-center">Tickets resolvidos</div>
-                    <div class="text-center">Tickets totais</div>
-                    <div class="text-center">Taxa de resolução</div>
+                    <div class="text-center">Setor</div>
+                    <div class="text-center">% Desempenho</div>
                   </div>
 
                   <!-- Table Content -->
@@ -404,7 +402,7 @@
                     <div
                       v-for="user in topFiveUsers.users"
                       :key="user.userId"
-                      class="grid grid-cols-4 gap-4 items-center py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-2 -mx-2 transition-colors"
+                      class="grid grid-cols-3 gap-4 items-center py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-2 -mx-2 transition-colors"
                     >
                       <div class="flex items-center gap-3">
                         <div
@@ -427,27 +425,18 @@
                           <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
                             {{ user.firstName }} {{ user.lastName }}
                           </p>
-                          <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                            {{ user.departmentName }}
-                          </p>
                         </div>
                       </div>
                       <div class="text-center">
-                        <span class="text-lg font-semibold text-gray-900 dark:text-white">{{
-                          user.resolvedTickets
-                        }}</span>
-                      </div>
-                      <div class="text-center">
-                        <span class="text-lg font-semibold text-gray-900 dark:text-white">{{
-                          user.totalTickets
+                        <span class="text-sm text-gray-900 dark:text-white">{{
+                          user.departmentName
                         }}</span>
                       </div>
                       <div class="text-center">
                         <span
-                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                          :class="getResolutionRateBadgeClass(user.resolutionRate)"
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
                         >
-                          {{ formatPercentage(user.resolutionRate) }}
+                          {{ formatPercentage(user.efficiencyScore) }}
                         </span>
                       </div>
                     </div>
@@ -474,7 +463,7 @@
               <!-- Top Setores -->
               <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS"
-                info-message="Ranking dos setores com melhor desempenho em resolução de tickets no período selecionado. Os dados incluem tickets resolvidos, total de tickets e a taxa de resolução por setor."
+                info-message="Ranking dos setores com melhor desempenho em resolução de tarefas no período selecionado. O ranking é ordenado pelo % de Desempenho considera a taxa de resolução e o volume de tarefas. Quanto mais tarefas um setor resolve com qualidade, maior é a confiança no desempenho dele."
               >
                 <template #title>Top Setores</template>
                 <template #subtitle>{{ currentPeriodLabel }}</template>
@@ -482,12 +471,11 @@
                 <div>
                   <!-- Table Headers -->
                   <div
-                    class="grid grid-cols-4 gap-4 pb-3 border-b border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                    class="grid grid-cols-3 gap-4 pb-3 border-b border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
                   >
                     <div>Setor</div>
-                    <div class="text-center">Tickets resolvidos</div>
-                    <div class="text-center">Tickets totais</div>
-                    <div class="text-center">Taxa de resolução</div>
+                    <div class="text-center">Tarefas totais</div>
+                    <div class="text-center">% Desempenho</div>
                   </div>
 
                   <!-- Table Content -->
@@ -498,17 +486,22 @@
                     <div
                       v-for="dept in topFiveDepartments"
                       :key="dept.departmentId"
-                      class="grid grid-cols-4 gap-4 items-center py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-2 -mx-2 transition-colors"
+                      class="grid grid-cols-3 gap-4 items-center py-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg px-2 -mx-2 transition-colors"
                     >
-                      <div class="min-w-0">
-                        <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                          {{ dept.departmentName }}
-                        </p>
-                      </div>
-                      <div class="text-center">
-                        <span class="text-lg font-semibold text-gray-900 dark:text-white">{{
-                          dept.resolvedTickets
-                        }}</span>
+                      <div class="flex items-center gap-3">
+                        <div
+                          :class="[
+                            'w-12 h-12 rounded-full flex items-center justify-center text-base font-bold',
+                            getAvatarColorClass(dept.departmentId),
+                          ]"
+                        >
+                          <font-awesome-icon icon="building" class="w-5 h-5" />
+                        </div>
+                        <div class="min-w-0">
+                          <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                            {{ dept.departmentName }}
+                          </p>
+                        </div>
                       </div>
                       <div class="text-center">
                         <span class="text-lg font-semibold text-gray-900 dark:text-white">{{
@@ -517,10 +510,9 @@
                       </div>
                       <div class="text-center">
                         <span
-                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                          :class="getResolutionRateBadgeClass(dept.resolutionRate)"
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
                         >
-                          {{ formatPercentage(dept.resolutionRate) }}
+                          {{ formatPercentage(dept.efficiencyScore) }}
                         </span>
                       </div>
                     </div>
@@ -552,7 +544,7 @@
             >
               <!-- Cycle Time per Department -->
               <BaseStatsWidget
-                info-message="Esta análise mostra o tempo médio de resolução de tickets por setor. Os dados são apresentados com setores com maior e menor tempo de resolução, além de uma visualização gráfica com barras proporcionais ao tempo de cada setor."
+                info-message="Esta análise mostra o tempo médio de resolução de tarefas por setor. Os dados são apresentados com setores com maior e menor tempo de resolução, além de uma visualização gráfica com barras proporcionais ao tempo de cada setor."
               >
                 <template #title>Tempo de Resolução Por Setor</template>
                 <template #subtitle
@@ -623,7 +615,7 @@
                           </div>
                           <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                             <div
-                              class="bg-gradient-to-r from-green-500 to-red-500 h-2 rounded-full relative"
+                              class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full relative"
                               :class="{
                                 'min-w-[2px]': dept.averageResolutionTimeSeconds === 0,
                               }"
@@ -764,231 +756,364 @@
           <!-- Em Andamento Tab -->
           <div v-if="currentTab === 'in-progress'" class="space-y-6">
             <!-- In Progress Overview Card -->
-            <div
-              class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700 p-3"
-            >
-              <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                  <div>
-                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                      Tickets em Andamento
-                    </h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      Acompanhe o progresso dos tickets atualmente sendo processados
-                    </p>
-                  </div>
-                  <div class="mt-4 sm:mt-0 flex items-center gap-4">
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                        {{ inProgressTasks.length }}
-                      </div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">Total</div>
-                    </div>
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-red-600 dark:text-red-400">
-                        {{ inProgressTasks.filter((task) => task.isOverdue).length }}
-                      </div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">Em atraso</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div v-if="loadingInProgressTasks" class="p-6">
-                <div
-                  class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400"
-                >
-                  <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
-                  <p class="text-sm">Carregando tickets em andamento...</p>
-                </div>
-              </div>
-
-              <div v-else-if="inProgressTasks.length === 0" class="p-6">
-                <div
-                  class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400"
-                >
-                  <font-awesome-icon icon="check-circle" class="text-3xl mb-3 text-green-500" />
-                  <p class="text-lg font-medium">Nenhum ticket em andamento</p>
-                  <p class="text-sm">Todos os tickets foram processados!</p>
-                </div>
-              </div>
-
-              <div v-else class="overflow-x-auto">
-                <table class="w-full">
-                  <thead class="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                      <th
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                      >
-                        Responsável
-                      </th>
-                      <th
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                      >
-                        Título do Chamado
-                      </th>
-                      <th
-                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                      >
-                        Status
-                      </th>
-                      <th
-                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                      >
-                        Tempo em Andamento
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody
-                    class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
-                  >
-                    <tr
-                      v-for="task in inProgressTasks"
-                      :key="task.id"
-                      class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center gap-3">
-                          <div
-                            class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-xs font-medium text-blue-600 dark:text-blue-400"
-                          >
-                            {{ task.assignee.initials }}
-                          </div>
-                        </div>
-                      </td>
-                      <td class="px-6 py-4">
-                        <div class="flex items-center gap-2">
-                          <span class="text-sm font-medium text-blue-600 dark:text-blue-400">
-                            {{ task.customId }}
-                          </span>
-                          <span class="text-sm text-gray-900 dark:text-white">
-                            {{ task.name }}
-                          </span>
-                        </div>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-center">
-                        <span
-                          class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
-                        >
-                          {{ task.status }}
-                        </span>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-center">
-                        <div class="flex items-center justify-center gap-1">
-                          <span class="text-sm font-medium text-gray-900 dark:text-white">
-                            {{ task.timeInProgress }}
-                          </span>
-                          <span
-                            v-if="task.isOverdue"
-                            class="text-red-600 dark:text-red-400 ml-1"
-                            :title="task.overdueReason"
-                          >
-                            <font-awesome-icon icon="exclamation-triangle" />
-                          </span>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <InProgressTasksTable :tasks="inProgressTasks" :is-loading="loadingInProgressTasks" />
 
             <!-- In Progress Time Analysis -->
             <BaseStatsWidget
               v-permission="PERMISSIONS.VIEW_BASIC_ANALYTICS"
-              info-message="Esta análise mostra a distribuição de tickets em andamento por tempo de processamento e estatísticas relacionadas. Os dados incluem distribuição por faixas de tempo (menos de 1 dia, 1-3 dias, 3-7 dias, mais de 1 semana) e estatísticas como tempo médio e tempo máximo em andamento."
+              info-message="Esta análise mostra a distribuição de tarefas em andamento por tempo de processamento, apresentada em porcentagem. Os dados incluem distribuição por faixas de tempo (menos de 1 dia, 1-3 dias, 3-7 dias, mais de 1 semana)."
             >
               <template #title>Análise de Tempo em Andamento</template>
 
               <div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div class="space-y-4">
-                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">
-                      Distribuição por Tempo
-                    </h3>
-                    <div class="space-y-3">
-                      <div class="flex justify-between items-center text-sm">
-                        <span class="text-gray-600 dark:text-gray-400">Menos de 1 dia</span>
-                        <span class="font-medium text-gray-900 dark:text-white">
-                          {{
-                            inProgressTasks.filter((t) => t.timeInProgressSeconds < 86400).length
-                          }}
-                        </span>
-                      </div>
-                      <div class="flex justify-between items-center text-sm">
-                        <span class="text-gray-600 dark:text-gray-400">1-3 dias</span>
-                        <span class="font-medium text-gray-900 dark:text-white">
-                          {{
-                            inProgressTasks.filter(
-                              (t) =>
-                                t.timeInProgressSeconds >= 86400 &&
-                                t.timeInProgressSeconds < 259200,
-                            ).length
-                          }}
-                        </span>
-                      </div>
-                      <div class="flex justify-between items-center text-sm">
-                        <span class="text-gray-600 dark:text-gray-400">3-7 dias</span>
-                        <span class="font-medium text-gray-900 dark:text-white">
-                          {{
-                            inProgressTasks.filter(
-                              (t) =>
-                                t.timeInProgressSeconds >= 259200 &&
-                                t.timeInProgressSeconds < 604800,
-                            ).length
-                          }}
-                        </span>
-                      </div>
-                      <div class="flex justify-between items-center text-sm">
-                        <span class="text-gray-600 dark:text-gray-400">Mais de 1 semana</span>
-                        <span class="font-medium text-red-600 dark:text-red-400">
-                          {{
-                            inProgressTasks.filter((t) => t.timeInProgressSeconds >= 604800).length
-                          }}
-                        </span>
-                      </div>
+                <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">
+                  Distribuição por Tempo
+                </h3>
+                <div class="flex flex-wrap gap-5 justify-between">
+                  <!-- Menos de 1 semana (< 7 dias = 604800 segundos) -->
+                  <div
+                    class="rounded-lg p-3 flex flex-col items-center justify-center min-h-[120px] w-[18%] min-w-[100px]"
+                    :style="
+                      getCardBackgroundStyle(
+                        inProgressTasks.length > 0
+                          ? Math.round(
+                              (inProgressTasks.filter((t) => t.timeInProgressSeconds < 604800)
+                                .length /
+                                inProgressTasks.length) *
+                                100,
+                            )
+                          : 0,
+                      )
+                    "
+                  >
+                    <div
+                      class="text-xl font-bold mb-1"
+                      :style="{
+                        color:
+                          (inProgressTasks.length > 0
+                            ? Math.round(
+                                (inProgressTasks.filter((t) => t.timeInProgressSeconds < 604800)
+                                  .length /
+                                  inProgressTasks.length) *
+                                  100,
+                              )
+                            : 0) > 50
+                            ? '#ffffff'
+                            : '#1f2937',
+                      }"
+                    >
+                      {{
+                        inProgressTasks.length > 0
+                          ? Math.round(
+                              (inProgressTasks.filter((t) => t.timeInProgressSeconds < 604800)
+                                .length /
+                                inProgressTasks.length) *
+                                100,
+                            )
+                          : 0
+                      }}%
+                    </div>
+                    <div
+                      class="text-xs text-center leading-tight"
+                      :style="{
+                        color:
+                          (inProgressTasks.length > 0
+                            ? Math.round(
+                                (inProgressTasks.filter((t) => t.timeInProgressSeconds < 604800)
+                                  .length /
+                                  inProgressTasks.length) *
+                                  100,
+                              )
+                            : 0) > 50
+                            ? '#ffffff'
+                            : '#6b7280',
+                      }"
+                    >
+                      Menos de 1 semana
                     </div>
                   </div>
-
-                  <div class="space-y-4">
-                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">Estatísticas</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                      <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <div class="text-lg font-semibold text-gray-900 dark:text-white">
-                          {{
-                            (() => {
-                              const tasksWithTime = inProgressTasks.filter(
-                                (t) => t.timeInProgressSeconds > 0,
-                              );
-                              if (tasksWithTime.length === 0) return 0;
-                              const averageSeconds =
-                                tasksWithTime.reduce(
-                                  (sum, task) => sum + task.timeInProgressSeconds,
-                                  0,
-                                ) / tasksWithTime.length;
-                              return Math.round(averageSeconds / 3600);
-                            })()
-                          }}h
-                        </div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Tempo médio</div>
-                      </div>
-                      <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <div class="text-lg font-semibold text-gray-900 dark:text-white">
-                          {{
-                            (() => {
-                              const tasksWithTime = inProgressTasks.filter(
-                                (t) => t.timeInProgressSeconds > 0,
-                              );
-                              if (tasksWithTime.length === 0) return 0;
-                              const maxSeconds = Math.max(
-                                ...tasksWithTime.map((t) => t.timeInProgressSeconds),
-                              );
-                              return Math.round(maxSeconds / 3600);
-                            })()
-                          }}h
-                        </div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Tempo máximo</div>
-                      </div>
+                  <!-- 1-2 semanas (7-14 dias = 604800 - 1209600 segundos) -->
+                  <div
+                    class="rounded-lg p-3 flex flex-col items-center justify-center min-h-[120px] w-[18%] min-w-[100px]"
+                    :style="
+                      getCardBackgroundStyle(
+                        inProgressTasks.length > 0
+                          ? Math.round(
+                              (inProgressTasks.filter(
+                                (t) =>
+                                  t.timeInProgressSeconds >= 604800 &&
+                                  t.timeInProgressSeconds < 1209600,
+                              ).length /
+                                inProgressTasks.length) *
+                                100,
+                            )
+                          : 0,
+                      )
+                    "
+                  >
+                    <div
+                      class="text-xl font-bold mb-1"
+                      :style="{
+                        color:
+                          (inProgressTasks.length > 0
+                            ? Math.round(
+                                (inProgressTasks.filter(
+                                  (t) =>
+                                    t.timeInProgressSeconds >= 604800 &&
+                                    t.timeInProgressSeconds < 1209600,
+                                ).length /
+                                  inProgressTasks.length) *
+                                  100,
+                              )
+                            : 0) > 50
+                            ? '#ffffff'
+                            : '#1f2937',
+                      }"
+                    >
+                      {{
+                        inProgressTasks.length > 0
+                          ? Math.round(
+                              (inProgressTasks.filter(
+                                (t) =>
+                                  t.timeInProgressSeconds >= 604800 &&
+                                  t.timeInProgressSeconds < 1209600,
+                              ).length /
+                                inProgressTasks.length) *
+                                100,
+                            )
+                          : 0
+                      }}%
+                    </div>
+                    <div
+                      class="text-xs text-center leading-tight"
+                      :style="{
+                        color:
+                          (inProgressTasks.length > 0
+                            ? Math.round(
+                                (inProgressTasks.filter(
+                                  (t) =>
+                                    t.timeInProgressSeconds >= 604800 &&
+                                    t.timeInProgressSeconds < 1209600,
+                                ).length /
+                                  inProgressTasks.length) *
+                                  100,
+                              )
+                            : 0) > 50
+                            ? '#ffffff'
+                            : '#6b7280',
+                      }"
+                    >
+                      1-2 semanas
+                    </div>
+                  </div>
+                  <!-- 2-3 semanas (14-21 dias = 1209600 - 1814400 segundos) -->
+                  <div
+                    class="rounded-lg p-3 flex flex-col items-center justify-center min-h-[120px] w-[18%] min-w-[100px]"
+                    :style="
+                      getCardBackgroundStyle(
+                        inProgressTasks.length > 0
+                          ? Math.round(
+                              (inProgressTasks.filter(
+                                (t) =>
+                                  t.timeInProgressSeconds >= 1209600 &&
+                                  t.timeInProgressSeconds < 1814400,
+                              ).length /
+                                inProgressTasks.length) *
+                                100,
+                            )
+                          : 0,
+                      )
+                    "
+                  >
+                    <div
+                      class="text-xl font-bold mb-1"
+                      :style="{
+                        color:
+                          (inProgressTasks.length > 0
+                            ? Math.round(
+                                (inProgressTasks.filter(
+                                  (t) =>
+                                    t.timeInProgressSeconds >= 1209600 &&
+                                    t.timeInProgressSeconds < 1814400,
+                                ).length /
+                                  inProgressTasks.length) *
+                                  100,
+                              )
+                            : 0) > 50
+                            ? '#ffffff'
+                            : '#1f2937',
+                      }"
+                    >
+                      {{
+                        inProgressTasks.length > 0
+                          ? Math.round(
+                              (inProgressTasks.filter(
+                                (t) =>
+                                  t.timeInProgressSeconds >= 1209600 &&
+                                  t.timeInProgressSeconds < 1814400,
+                              ).length /
+                                inProgressTasks.length) *
+                                100,
+                            )
+                          : 0
+                      }}%
+                    </div>
+                    <div
+                      class="text-xs text-center leading-tight"
+                      :style="{
+                        color:
+                          (inProgressTasks.length > 0
+                            ? Math.round(
+                                (inProgressTasks.filter(
+                                  (t) =>
+                                    t.timeInProgressSeconds >= 1209600 &&
+                                    t.timeInProgressSeconds < 1814400,
+                                ).length /
+                                  inProgressTasks.length) *
+                                  100,
+                              )
+                            : 0) > 50
+                            ? '#ffffff'
+                            : '#6b7280',
+                      }"
+                    >
+                      2-3 semanas
+                    </div>
+                  </div>
+                  <!-- 3-4 semanas (21-28 dias = 1814400 - 2419200 segundos) -->
+                  <div
+                    class="rounded-lg p-3 flex flex-col items-center justify-center min-h-[120px] w-[18%] min-w-[100px]"
+                    :style="
+                      getCardBackgroundStyle(
+                        inProgressTasks.length > 0
+                          ? Math.round(
+                              (inProgressTasks.filter(
+                                (t) =>
+                                  t.timeInProgressSeconds >= 1814400 &&
+                                  t.timeInProgressSeconds < 2419200,
+                              ).length /
+                                inProgressTasks.length) *
+                                100,
+                            )
+                          : 0,
+                      )
+                    "
+                  >
+                    <div
+                      class="text-xl font-bold mb-1"
+                      :style="{
+                        color:
+                          (inProgressTasks.length > 0
+                            ? Math.round(
+                                (inProgressTasks.filter(
+                                  (t) =>
+                                    t.timeInProgressSeconds >= 1814400 &&
+                                    t.timeInProgressSeconds < 2419200,
+                                ).length /
+                                  inProgressTasks.length) *
+                                  100,
+                              )
+                            : 0) > 50
+                            ? '#ffffff'
+                            : '#1f2937',
+                      }"
+                    >
+                      {{
+                        inProgressTasks.length > 0
+                          ? Math.round(
+                              (inProgressTasks.filter(
+                                (t) =>
+                                  t.timeInProgressSeconds >= 1814400 &&
+                                  t.timeInProgressSeconds < 2419200,
+                              ).length /
+                                inProgressTasks.length) *
+                                100,
+                            )
+                          : 0
+                      }}%
+                    </div>
+                    <div
+                      class="text-xs text-center leading-tight"
+                      :style="{
+                        color:
+                          (inProgressTasks.length > 0
+                            ? Math.round(
+                                (inProgressTasks.filter(
+                                  (t) =>
+                                    t.timeInProgressSeconds >= 1814400 &&
+                                    t.timeInProgressSeconds < 2419200,
+                                ).length /
+                                  inProgressTasks.length) *
+                                  100,
+                              )
+                            : 0) > 50
+                            ? '#ffffff'
+                            : '#6b7280',
+                      }"
+                    >
+                      3-4 semanas
+                    </div>
+                  </div>
+                  <!-- Acima de 1 mês (>= 28 dias = 2419200 segundos) -->
+                  <div
+                    class="rounded-lg p-3 flex flex-col items-center justify-center min-h-[120px] w-[18%] min-w-[100px]"
+                    :style="
+                      getCardBackgroundStyle(
+                        inProgressTasks.length > 0
+                          ? Math.round(
+                              (inProgressTasks.filter((t) => t.timeInProgressSeconds >= 2419200)
+                                .length /
+                                inProgressTasks.length) *
+                                100,
+                            )
+                          : 0,
+                      )
+                    "
+                  >
+                    <div
+                      class="text-xl font-bold mb-1"
+                      :style="{
+                        color:
+                          (inProgressTasks.length > 0
+                            ? Math.round(
+                                (inProgressTasks.filter((t) => t.timeInProgressSeconds >= 2419200)
+                                  .length /
+                                  inProgressTasks.length) *
+                                  100,
+                              )
+                            : 0) > 50
+                            ? '#ffffff'
+                            : '#1f2937',
+                      }"
+                    >
+                      {{
+                        inProgressTasks.length > 0
+                          ? Math.round(
+                              (inProgressTasks.filter((t) => t.timeInProgressSeconds >= 2419200)
+                                .length /
+                                inProgressTasks.length) *
+                                100,
+                            )
+                          : 0
+                      }}%
+                    </div>
+                    <div
+                      class="text-xs text-center leading-tight"
+                      :style="{
+                        color:
+                          (inProgressTasks.length > 0
+                            ? Math.round(
+                                (inProgressTasks.filter((t) => t.timeInProgressSeconds >= 2419200)
+                                  .length /
+                                  inProgressTasks.length) *
+                                  100,
+                              )
+                            : 0) > 50
+                            ? '#ffffff'
+                            : '#6b7280',
+                      }"
+                    >
+                      Acima de 1 mês
                     </div>
                   </div>
                 </div>
@@ -1001,184 +1126,27 @@
             <!-- Content visible if user has permission -->
             <template v-if="hasPermission(PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS)">
               <!-- Department Summary Card -->
-              <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 dark:shadow-none dark:border dark:border-gray-700"
-              >
-                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                  <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                    Estatísticas por Setor
-                  </h2>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    Análise detalhada do desempenho de cada departamento
-                  </p>
-                </div>
-
-                <div
-                  v-if="departmentStatsSummary"
-                  class="p-6 border-b border-gray-200 dark:border-gray-700"
-                >
-                  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                        {{ departmentStatsSummary.totalTickets }}
-                      </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">Total de Tickets</div>
-                    </div>
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-green-600 dark:text-green-400">
-                        {{ departmentStatsSummary.totalResolved }}
-                      </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">Tickets Resolvidos</div>
-                    </div>
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                        {{
-                          formatTimeInSecondsCompact(
-                            departmentStatsSummary.averageResolutionTimeSeconds,
-                          )
-                        }}
-                      </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">
-                        Tempo Médio de Resolução
-                      </div>
-                    </div>
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                        {{ departmentStats.length }}
-                      </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">Setores Ativos</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                  <table class="w-full">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
-                      <tr>
-                        <th
-                          class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                        >
-                          Setor
-                        </th>
-                        <th
-                          class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                        >
-                          Total
-                        </th>
-                        <th
-                          class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                        >
-                          Resolvidos
-                        </th>
-                        <th
-                          class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                        >
-                          Taxa de Resolução
-                        </th>
-                        <th
-                          class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                        >
-                          Tempo de Aceite
-                        </th>
-                        <th
-                          class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                        >
-                          Tempo de Resolução
-                        </th>
-                        <th
-                          class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                        >
-                          Performance
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody
-                      class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
-                    >
-                      <tr
-                        v-for="dept in departmentStats"
-                        :key="dept.departmentId"
-                        class="hover:bg-gray-50 dark:hover:bg-gray-700"
-                      >
-                        <td class="px-6 py-4 whitespace-nowrap">
-                          <div class="text-sm font-medium text-gray-900 dark:text-white">
-                            {{ dept.departmentName }}
-                          </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                          <div class="text-sm text-gray-900 dark:text-white">
-                            {{ dept.totalTickets }}
-                          </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                          <div class="text-sm text-gray-900 dark:text-white">
-                            {{ dept.resolvedTickets }}
-                          </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                          <span
-                            :class="[
-                              'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
-                              dept.resolutionRate >= 0.8
-                                ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
-                                : dept.resolutionRate >= 0.5
-                                  ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
-                                  : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300',
-                            ]"
-                          >
-                            {{ formatPercentage(dept.resolutionRate) }}
-                          </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                          <div class="text-sm text-gray-900 dark:text-white">
-                            {{ formatTimeInSecondsCompact(dept.averageAcceptanceTimeSeconds) }}
-                          </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                          <div class="text-sm text-gray-900 dark:text-white">
-                            {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds) }}
-                          </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                          <div class="flex items-center justify-center">
-                            <div
-                              class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 max-w-[60px]"
-                            >
-                              <div
-                                class="h-2 rounded-full"
-                                :class="
-                                  dept.resolutionRate >= 0.8
-                                    ? 'bg-green-500'
-                                    : dept.resolutionRate >= 0.5
-                                      ? 'bg-yellow-500'
-                                      : 'bg-red-500'
-                                "
-                                :style="{ width: `${dept.resolutionRate * 100}%` }"
-                              ></div>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              <DepartmentStatsTable
+                :stats="departmentStats"
+                :summary="departmentStatsSummary"
+                :is-loading="loading"
+              />
 
               <!-- Top Performing vs Underperforming Departments -->
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Top Performing -->
                 <BaseStatsWidget
-                  info-message="Esta seção mostra os setores com melhor desempenho em termos de taxa de resolução de tickets. Os setores são ordenados pela maior taxa de resolução e exibem o número de tickets resolvidos em relação ao total de tickets."
+                  info-message="Esta seção mostra os setores com melhor desempenho em termos de % de Desempenho. Os setores são ordenados pela maior % de Desempenho, calculado usando o método Wilson Score, que considera a taxa de resolução e o volume de tarefas."
                 >
                   <template #title>Melhor Desempenho</template>
-                  <template #subtitle>Setores com maior taxa de resolução</template>
+                  <template #subtitle>Setores com maior % de Desempenho</template>
 
                   <div>
                     <div class="space-y-4">
                       <div
                         v-for="dept in departmentStats
                           .slice()
-                          .sort((a, b) => b.resolutionRate - a.resolutionRate)
+                          .sort((a, b) => b.efficiencyScore - a.efficiencyScore)
                           .slice(0, 3)"
                         :key="dept.departmentId"
                         class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
@@ -1188,11 +1156,11 @@
                             {{ dept.departmentName }}
                           </div>
                           <div class="text-sm text-gray-600 dark:text-gray-400">
-                            {{ dept.resolvedTickets }}/{{ dept.totalTickets }} tickets
+                            {{ dept.resolvedTickets }}/{{ dept.totalTickets }} tarefas
                           </div>
                         </div>
                         <div class="text-lg font-bold text-green-600 dark:text-green-400">
-                          {{ formatPercentage(dept.resolutionRate) }}
+                          {{ formatPercentage(dept.efficiencyScore) }}
                         </div>
                       </div>
                     </div>
@@ -1201,17 +1169,17 @@
 
                 <!-- Needs Improvement -->
                 <BaseStatsWidget
-                  info-message="Esta seção mostra os setores que necessitam de melhoria em termos de taxa de resolução de tickets. Os setores são ordenados pela menor taxa de resolução e exibem o número de tickets resolvidos em relação ao total de tickets."
+                  info-message="Esta seção mostra os setores que necessitam de melhoria em termos de % de Desempenho. Os setores são ordenados pela menor % de Desempenho, calculado usando o método Wilson Score, que considera a taxa de resolução e o volume de tarefas."
                 >
-                  <template #title>Necessita Melhoria</template>
-                  <template #subtitle>Setores com menor taxa de resolução</template>
+                  <template #title>Pior Desempenho</template>
+                  <template #subtitle>Setores com menor % de Desempenho</template>
 
                   <div>
                     <div class="space-y-4">
                       <div
                         v-for="dept in departmentStats
                           .slice()
-                          .sort((a, b) => a.resolutionRate - b.resolutionRate)
+                          .sort((a, b) => a.efficiencyScore - b.efficiencyScore)
                           .slice(0, 3)"
                         :key="dept.departmentId"
                         class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
@@ -1221,11 +1189,11 @@
                             {{ dept.departmentName }}
                           </div>
                           <div class="text-sm text-gray-600 dark:text-gray-400">
-                            {{ dept.resolvedTickets }}/{{ dept.totalTickets }} tickets
+                            {{ dept.resolvedTickets }}/{{ dept.totalTickets }} tarefas
                           </div>
                         </div>
                         <div class="text-lg font-bold text-red-600 dark:text-red-400">
-                          {{ formatPercentage(dept.resolutionRate) }}
+                          {{ formatPercentage(dept.efficiencyScore) }}
                         </div>
                       </div>
                     </div>
@@ -1269,167 +1237,19 @@
           <div v-if="currentTab === 'users'" class="space-y-6">
             <template v-if="hasPermission(PERMISSIONS.VIEW_USERS_ANALYTICS)">
               <!-- Users Summary Card -->
-              <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 dark:shadow-none dark:border dark:border-gray-700"
-              >
-                <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div>
-                      <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                        Estatísticas por Colaborador
-                      </h2>
-                      <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Análise detalhada de desempenho por colaborador
-                      </p>
-                    </div>
-                    <div class="w-full sm:w-auto">
-                      <Input
-                        v-model="userSearch"
-                        type="text"
-                        placeholder="Buscar colaborador"
-                        padding="tight"
-                        class="w-full sm:w-80 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-400 dark:border-gray-600 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  v-if="filteredUsers && filteredUsers.length > 0"
-                  class="p-6 border-b border-gray-200 dark:border-gray-700"
-                >
-                  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                        {{ filteredUsers.reduce((acc, u) => acc + (u.totalTickets || 0), 0) }}
-                      </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">Tickets</div>
-                    </div>
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-green-600 dark:text-green-400">
-                        {{ filteredUsers.reduce((acc, u) => acc + (u.resolvedTickets || 0), 0) }}
-                      </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">Resolvidos</div>
-                    </div>
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                        {{
-                          formatTimeInSecondsCompact(
-                            Math.round(statistics?.averageResolutionTimeSeconds || 0),
-                          )
-                        }}
-                      </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">Tempo Médio</div>
-                    </div>
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                        {{ filteredUsers.length }}
-                      </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">Colaboradores</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Users Table -->
-                <div class="p-6">
-                  <div class="overflow-x-auto max-h-[520px] overflow-y-auto">
-                    <table class="w-full">
-                      <thead class="bg-gray-50 dark:bg-gray-700">
-                        <tr>
-                          <th
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                          >
-                            Colaborador
-                          </th>
-                          <th
-                            class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                          >
-                            Tickets Resolvidos
-                          </th>
-                          <th
-                            class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                          >
-                            Tickets Totais
-                          </th>
-                          <th
-                            class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                          >
-                            Taxa de Resolução
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody
-                        class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
-                      >
-                        <tr
-                          v-for="user in filteredUsers"
-                          :key="user.userId"
-                          class="hover:bg-gray-50 dark:hover:bg-gray-700"
-                        >
-                          <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center gap-3">
-                              <div
-                                :class="[
-                                  'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold',
-                                  getAvatarColorClass(user.userId),
-                                ]"
-                              >
-                                <div v-if="!user.avatarUrl">
-                                  {{ getInitials(user.firstName, user.lastName) }}
-                                </div>
-                                <img
-                                  v-else
-                                  :src="user.avatarUrl"
-                                  :alt="`${user.firstName} ${user.lastName}`"
-                                  class="w-full h-full object-cover rounded-full"
-                                />
-                              </div>
-                              <div class="min-w-0">
-                                <p
-                                  class="text-sm font-medium text-gray-900 dark:text-white truncate"
-                                >
-                                  {{ user.firstName }} {{ user.lastName }}
-                                </p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                  {{ user.departmentName }}
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-                          <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <div class="text-sm text-gray-900 dark:text-white">
-                              {{ user.resolvedTickets }}
-                            </div>
-                          </td>
-                          <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <div class="text-sm text-gray-900 dark:text-white">
-                              {{ user.totalTickets }}
-                            </div>
-                          </td>
-                          <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span
-                              :class="[
-                                'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
-                                getResolutionRateBadgeClass(user.resolutionRate),
-                              ]"
-                            >
-                              {{ formatPercentage(user.resolutionRate) }}
-                            </span>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+              <UserStatsTable
+                :users="topUsers?.users || []"
+                :average-resolution-time-seconds="statistics?.averageResolutionTimeSeconds"
+                :is-loading="loading"
+              />
 
               <!-- Top vs Underperforming Users -->
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <BaseStatsWidget
-                  info-message="Esta seção mostra os colaboradores com melhor desempenho em termos de taxa de resolução de tickets. Os colaboradores são ordenados pela maior taxa de resolução e exibem o número de tickets resolvidos em relação ao total de tickets atribuídos."
+                  info-message="Esta seção mostra os colaboradores com melhor desempenho em termos de % de Desempenho. Os colaboradores são ordenados pela maior % de Desempenho, calculado usando o método Wilson Score, que considera a taxa de resolução e o volume de tarefas."
                 >
                   <template #title>Melhor Desempenho</template>
-                  <template #subtitle>Colaboradores com maior taxa de resolução</template>
+                  <template #subtitle>Colaboradores com maior % de Desempenho</template>
 
                   <div>
                     <template v-if="topPerformers.length > 0">
@@ -1444,11 +1264,11 @@
                               {{ user.firstName }} {{ user.lastName }}
                             </div>
                             <div class="text-sm text-gray-600 dark:text-gray-400">
-                              {{ user.resolvedTickets }}/{{ user.totalTickets }} tickets
+                              {{ user.resolvedTickets }}/{{ user.totalTickets }} tarefas
                             </div>
                           </div>
                           <div class="text-lg font-bold text-green-600 dark:text-green-400">
-                            {{ formatPercentage(user.resolutionRate) }}
+                            {{ formatPercentage(user.efficiencyScore) }}
                           </div>
                         </div>
                       </div>
@@ -1469,17 +1289,17 @@
                         Não há colaboradores com bom desempenho
                       </p>
                       <p class="text-xs text-gray-500 dark:text-gray-400">
-                        Os colaboradores aparecerão aqui quando atingirem uma boa taxa de resolução
+                        Os colaboradores aparecerão aqui quando atingirem um bom % de Desempenho
                       </p>
                     </div>
                   </div>
                 </BaseStatsWidget>
 
                 <BaseStatsWidget
-                  info-message="Esta seção mostra os colaboradores que necessitam de melhoria em termos de taxa de resolução de tickets. Os colaboradores são ordenados pela menor taxa de resolução e exibem o número de tickets resolvidos em relação ao total de tickets atribuídos."
+                  info-message="Esta seção mostra os colaboradores que necessitam de melhoria em termos de % de Desempenho. Os colaboradores são ordenados pela menor % de Desempenho, calculado usando o método Wilson Score, que considera a taxa de resolução e o volume de tarefas."
                 >
                   <template #title>Pior Desempenho</template>
-                  <template #subtitle>Colaboradores com menor taxa de resolução</template>
+                  <template #subtitle>Colaboradores com menor % de Desempenho</template>
 
                   <div>
                     <template v-if="worstPerformers.length > 0">
@@ -1494,11 +1314,11 @@
                               {{ user.firstName }} {{ user.lastName }}
                             </div>
                             <div class="text-sm text-gray-600 dark:text-gray-400">
-                              {{ user.resolvedTickets }}/{{ user.totalTickets }} tickets
+                              {{ user.resolvedTickets }}/{{ user.totalTickets }} tarefas
                             </div>
                           </div>
                           <div class="text-lg font-bold text-red-600 dark:text-red-400">
-                            {{ formatPercentage(user.resolutionRate) }}
+                            {{ formatPercentage(user.efficiencyScore) }}
                           </div>
                         </div>
                       </div>
@@ -1519,7 +1339,7 @@
                         Não há colaboradores com baixo desempenho
                       </p>
                       <p class="text-xs text-gray-500 dark:text-gray-400">
-                        Todos os colaboradores estão com uma boa taxa de resolução
+                        Todos os colaboradores estão com um bom % de Desempenho
                       </p>
                     </div>
                   </div>
@@ -1568,17 +1388,17 @@
                     Análise de Tendências
                   </h1>
                   <p class="text-gray-600 dark:text-gray-400">
-                    Acompanhe as tendências dos tickets ao longo do tempo
+                    Acompanhe as tendências das tarefas ao longo do tempo
                   </p>
                 </div>
               </div>
 
               <!-- Trends Overview -->
               <BaseStatsWidget
-                info-message="Esta visualização mostra a comparação entre tickets criados e concluídos ao longo do tempo. Use os filtros de período (Diário, Semanal, Mensal) para analisar diferentes intervalos."
+                info-message="Esta visualização mostra a comparação entre tarefas criadas e concluídas ao longo do tempo. Use os filtros de período (Diário, Semanal, Mensal) para analisar diferentes intervalos."
               >
                 <template #title>Criados vs Concluídos</template>
-                <template #subtitle>Novos tickets criados vs tickets concluídos</template>
+                <template #subtitle>Novas tarefas criadas vs tarefas concluídas</template>
                 <template #header-actions>
                   <TabSelector
                     v-model="selectedTrendPeriod"
@@ -1611,13 +1431,9 @@
 
               <!-- Cycle Time Analysis -->
               <BaseStatsWidget
-                info-message="Esta análise mostra a evolução do tempo de resolução de tickets ao longo do tempo. O gráfico exibe uma linha temporal com o tempo médio de resolução, permitindo identificar tendências e variações. Use o seletor de período para analisar diferentes intervalos (Semanal, Mensal, Trimestral)."
+                info-message="Esta análise mostra a evolução do tempo de resolução de tarefas ao longo do tempo. O gráfico exibe uma linha temporal com o tempo médio de resolução, permitindo identificar tendências e variações. Use o seletor de período para analisar diferentes intervalos (Semanal, Mensal, Trimestral)."
               >
                 <template #title>Tempo de Resolução - Análise Temporal</template>
-                <template #subtitle
-                  >{{ formatAverageTime(getAverageResolutionTime()) }} (média
-                  {{ periodTextMap[selectedCycleTimePeriod] }})</template
-                >
                 <template #header-actions>
                   <Select
                     :options="[
@@ -1633,21 +1449,21 @@
                 <div class="flex flex-col lg:flex-row">
                   <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
                     <div class="space-y-4">
-                      <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div class="text-center p-6 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <span
                           class="block text-lg font-semibold text-gray-900 dark:text-white mb-1"
                         >
                           {{ formatTimeInSecondsCompact(getLatestResolutionTime() * 3600) }}
                         </span>
                         <span class="text-xs text-gray-500 dark:text-gray-400">
-                          Tempo {{ periodTextMap[selectedCycleTimePeriod] }}
+                          Média {{ periodTextMap[selectedCycleTimePeriod] }}
                           <span v-if="getPeriodName()"> ({{ getPeriodName() }})</span>
                         </span>
                       </div>
 
                       <div
                         v-if="hasPreviousPeriodData()"
-                        class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                        class="text-center p-6 bg-gray-50 dark:bg-gray-700 rounded-lg"
                       >
                         <div class="flex items-center justify-center gap-2 mb-1">
                           <font-awesome-icon
@@ -1671,24 +1487,6 @@
                         </div>
                         <span class="text-xs text-gray-500 dark:text-gray-400">
                           vs {{ getPreviousPeriodLabel() }}
-                        </span>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          {{
-                            getResolutionTimeTrend() > 0
-                              ? 'Aumento (preocupante)'
-                              : 'Diminuição (positivo)'
-                          }}
-                        </p>
-                      </div>
-
-                      <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <span
-                          class="block text-lg font-semibold text-gray-900 dark:text-white mb-1"
-                        >
-                          {{ formatTimeInSecondsCompact(getAverageResolutionTime() * 3600) }}
-                        </span>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">
-                          Média histórica
                         </span>
                       </div>
                     </div>
@@ -1720,70 +1518,108 @@
                 </div>
               </BaseStatsWidget>
 
-              <!-- Trend Insights -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Performance Trends -->
-                <BaseStatsWidget
-                  info-message="Esta seção mostra as tendências de performance do sistema, incluindo o número de tickets criados e resolvidos no período selecionado, com indicadores de variação percentual em relação ao período anterior. Também exibe a taxa de resolução geral."
-                >
-                  <template #title>Tendências de Performance</template>
+              <!-- In Progress Time Analysis -->
+              <BaseStatsWidget
+                info-message="Esta análise mostra o tempo gasto pelas tarefas no status 'Em Andamento' ao longo do tempo. O gráfico exibe uma linha temporal com o tempo médio, permitindo identificar tendências. Tempos altos podem indicar gargalos no processamento de tarefas. Use o seletor de período para analisar diferentes intervalos (Semanal, Mensal, Trimestral)."
+              >
+                <template #title>Tempo Gasto no Status "Em Andamento"</template>
+                <template #header-actions>
+                  <Select
+                    :options="[
+                      { value: 'week', label: 'Semanal' },
+                      { value: 'month', label: 'Mensal' },
+                      { value: 'quarter', label: 'Trimestral' },
+                    ]"
+                    v-model="selectedInProgressPeriod"
+                    @update:modelValue="handleInProgressPeriodChange"
+                  />
+                </template>
 
-                  <div class="space-y-4">
-                    <div
-                      class="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
-                    >
-                      <div>
-                        <div class="font-medium text-gray-900 dark:text-white">Tickets Criados</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">
-                          {{ getTotalCreated() }} no período
+                <div class="flex flex-col lg:flex-row">
+                  <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
+                    <div class="space-y-4 text-sm">
+                      <p
+                        v-if="inProgressTimeSeries?.data?.length"
+                        class="text-gray-700 dark:text-gray-300"
+                      >
+                        O tempo médio foi de
+                        <strong class="text-gray-900 dark:text-white">{{
+                          formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
+                        }}</strong>
+                        para
+                        <span class="font-semibold text-blue-600 dark:text-blue-400"
+                          >{{ getTotalInProgressCount() }} tarefas</span
+                        >
+                        nos últimos
+                        <span class="font-semibold text-blue-600 dark:text-blue-400">{{
+                          inProgressPeriodLabelMap[selectedInProgressPeriod]
+                        }}</span
+                        >.
+                      </p>
+                      <p v-if="getInProgressTrend() !== 0" class="text-sm">
+                        Isso é
+                        <span
+                          :class="
+                            getInProgressTrend() > 0
+                              ? 'text-red-600 dark:text-red-400 font-medium'
+                              : 'text-green-600 dark:text-green-400 font-medium'
+                          "
+                        >
+                          {{ Math.abs(getInProgressTrend()) }}%
+                          {{ getInProgressTrend() > 0 ? 'mais' : 'menos' }}
+                        </span>
+                        que no mês anterior
+                        <span class="text-gray-600 dark:text-gray-400">
+                          {{
+                            getInProgressTrend() > 0
+                              ? '(aumento é considerado ruim)'
+                              : '(diminuição é positiva)'
+                          }} </span
+                        >.
+                      </p>
+                      <div v-if="inProgressTimeSeries" class="grid grid-cols-1 gap-4 mt-6">
+                        <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                          <span class="block text-lg font-semibold text-gray-900 dark:text-white">{{
+                            formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
+                          }}</span>
+                          <span class="text-xs text-gray-500 dark:text-gray-400"
+                            >Média últimos
+                            {{ inProgressPeriodLabelMap[selectedInProgressPeriod] }}</span
+                          >
                         </div>
-                      </div>
-                      <div class="text-lg font-bold text-blue-600 dark:text-blue-400">
-                        <font-awesome-icon
-                          :icon="createdTrendPercentage >= 0 ? 'arrow-up' : 'arrow-down'"
-                          class="mr-1"
-                        />
-                        {{ Math.abs(createdTrendPercentage) }}%
-                      </div>
-                    </div>
-
-                    <div
-                      class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
-                    >
-                      <div>
-                        <div class="font-medium text-gray-900 dark:text-white">
-                          Tickets Resolvidos
+                        <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                          <span class="block text-lg font-semibold text-gray-900 dark:text-white">{{
+                            getTotalInProgressCount()
+                          }}</span>
+                          <span class="text-xs text-gray-500 dark:text-gray-400"
+                            >Número de tarefas</span
+                          >
                         </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">
-                          {{ getTotalResolved() }} no período
-                        </div>
-                      </div>
-                      <div class="text-lg font-bold text-green-600 dark:text-green-400">
-                        <font-awesome-icon
-                          :icon="resolvedTrendPercentage >= 0 ? 'arrow-up' : 'arrow-down'"
-                          class="mr-1"
-                        />
-                        {{ Math.abs(resolvedTrendPercentage) }}%
-                      </div>
-                    </div>
-
-                    <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div class="font-medium text-gray-900 dark:text-white mb-1">
-                        Taxa de Resolução
-                      </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">
-                        {{
-                          getTotalCreated() > 0
-                            ? formatPercentage(getTotalResolved() / getTotalCreated())
-                            : '0%'
-                        }}
-                        dos tickets criados foram resolvidos
                       </div>
                     </div>
                   </div>
-                </BaseStatsWidget>
 
-                <!-- Status Distribution Trends -->
+                  <div class="p-6 lg:w-2/3">
+                    <div class="h-80">
+                      <Line
+                        v-if="inProgressTimeChartData && !inProgressChartLoading"
+                        :data="inProgressTimeChartData"
+                        :options="inProgressTimeChartOptions"
+                      />
+                      <div
+                        v-else
+                        class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                      >
+                        <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
+                        <p class="text-sm">Carregando dados...</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </BaseStatsWidget>
+
+              <!-- Status Distribution Trends -->
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <BaseStatsWidget
                   info-message="Esta análise mostra quanto tempo em média os tickets permanecem em cada status. Tempos altos em determinados status podem indicar gargalos no processo. Os dados são apresentados com barras proporcionais ao tempo médio de cada status."
                 >
@@ -1796,7 +1632,7 @@
                       </p>
                       <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                         <p>
-                          Esta análise mostra quanto tempo em média os tickets permanecem em cada
+                          Esta análise mostra quanto tempo em média as tarefas permanecem em cada
                           status.
                         </p>
                         <p>
@@ -1845,91 +1681,6 @@
                   </div>
                 </BaseStatsWidget>
               </div>
-
-              <!-- In Progress Time Analysis -->
-              <BaseStatsWidget
-                info-message="Esta análise mostra o tempo gasto pelos tickets no status 'Em Andamento' ao longo do tempo. O gráfico exibe uma linha temporal com o tempo médio, permitindo identificar tendências. Tempos altos podem indicar gargalos no processamento de tickets. Os dados são calculados para os últimos 6 meses."
-              >
-                <template #title>Tempo Gasto no Status "Em Andamento"</template>
-
-                <div class="flex flex-col lg:flex-row">
-                  <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
-                    <div class="space-y-4 text-sm">
-                      <p
-                        v-if="inProgressTimeSeries?.data?.length"
-                        class="text-gray-700 dark:text-gray-300"
-                      >
-                        O tempo médio foi de
-                        <strong class="text-gray-900 dark:text-white">{{
-                          formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
-                        }}</strong>
-                        para
-                        <span class="font-semibold text-blue-600 dark:text-blue-400"
-                          >{{ getTotalInProgressCount() }} tickets</span
-                        >
-                        nos últimos
-                        <span class="font-semibold text-blue-600 dark:text-blue-400">6 meses</span>.
-                      </p>
-                      <p v-if="getInProgressTrend() !== 0" class="text-sm">
-                        Isso é
-                        <span
-                          :class="
-                            getInProgressTrend() > 0
-                              ? 'text-red-600 dark:text-red-400 font-medium'
-                              : 'text-green-600 dark:text-green-400 font-medium'
-                          "
-                        >
-                          {{ Math.abs(getInProgressTrend()) }}%
-                          {{ getInProgressTrend() > 0 ? 'mais' : 'menos' }}
-                        </span>
-                        que no mês anterior
-                        <span class="text-gray-600 dark:text-gray-400">
-                          {{
-                            getInProgressTrend() > 0
-                              ? '(aumento é considerado ruim)'
-                              : '(diminuição é positiva)'
-                          }} </span
-                        >.
-                      </p>
-                      <div v-if="inProgressTimeSeries" class="grid grid-cols-1 gap-4 mt-6">
-                        <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                          <span class="block text-lg font-semibold text-gray-900 dark:text-white">{{
-                            formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
-                          }}</span>
-                          <span class="text-xs text-gray-500 dark:text-gray-400"
-                            >Média últimos 6 meses</span
-                          >
-                        </div>
-                        <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                          <span class="block text-lg font-semibold text-gray-900 dark:text-white">{{
-                            getTotalInProgressCount()
-                          }}</span>
-                          <span class="text-xs text-gray-500 dark:text-gray-400"
-                            >Número de tickets</span
-                          >
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="p-6 lg:w-2/3">
-                    <div class="h-80">
-                      <Line
-                        v-if="inProgressTimeChartData"
-                        :data="inProgressTimeChartData"
-                        :options="inProgressTimeChartOptions"
-                      />
-                      <div
-                        v-else
-                        class="h-full flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
-                      >
-                        <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
-                        <p class="text-sm">Carregando dados...</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </BaseStatsWidget>
             </template>
 
             <!-- Upgrade prompt if user doesn't have permission -->
@@ -2041,6 +1792,9 @@ import type {
 import { TicketActionType, DefaultTicketStatus, type TicketUpdate } from '@/models';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
+import DepartmentStatsTable from '@/components/reports/DepartmentStatsTable.vue';
+import UserStatsTable from '@/components/reports/UserStatsTable.vue';
+import InProgressTasksTable from '@/components/reports/InProgressTasksTable.vue';
 import {
   formatSnakeToNaturalCase,
   formatTimeCompact,
@@ -2396,29 +2150,23 @@ const createdVsCompletedChartOptions = computed<ChartOptions>(() => {
 
 const statistics = ref<TenantStatistics | null>(null);
 const departmentTenantStats = ref<TenantStatistics | null>(null);
-const performanceTrends = ref<{ totalCreated: number; totalResolved: number } | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const topUsers = ref<UserRankingResponseDto | null>(null);
 const topFiveUsers = ref<UserRankingResponseDto | null>(null);
 const worstFiveUsers = ref<UserRankingResponseDto | null>(null);
-const userSearch = ref('');
-const filteredUsers = computed(() => {
-  const users = topUsers.value?.users || [];
-  const q = userSearch.value.trim().toLowerCase();
-  if (!q) return users;
-  return users.filter((u) => `${u.firstName} ${u.lastName}`.toLowerCase().includes(q));
-});
 const topPerformers = computed(() => {
-  const users = topUsers.value?.users || [];
-  return users
-    .filter((u) => (u.resolutionRate || 0) > 0.5)
-    .sort((a, b) => b.resolutionRate - a.resolutionRate)
-    .slice(0, 5);
+  if (!topUsers.value?.users) return [];
+  return [...topUsers.value.users]
+    .sort((a, b) => b.efficiencyScore - a.efficiencyScore)
+    .slice(0, 3);
 });
 
 const worstPerformers = computed(() => {
-  return worstFiveUsers.value?.users || [];
+  if (!worstFiveUsers.value?.users) return [];
+  return [...worstFiveUsers.value.users]
+    .sort((a, b) => a.efficiencyScore - b.efficiencyScore)
+    .slice(0, 3);
 });
 
 const ticketsByStatus = ref<ChartData>({
@@ -2495,7 +2243,6 @@ const loadData = async () => {
       statsData,
       deptTenantStatsData,
       trends,
-      performanceTrendsResult,
       statusResult,
       priorityResult,
       recentTicketsResult,
@@ -2516,14 +2263,16 @@ const loadData = async () => {
         excludeCanceled: true,
       }), // same period filter, used for department total without duplicates
       reportService.getTicketTrends(selectedTrendPeriod.value),
-      reportService.getPerformanceTrends(selectedStatsPeriod.value as StatsPeriod),
       reportService.getTicketsByStatus(selectedStatsPeriod.value as StatsPeriod),
       reportService.getTicketsByPriority(selectedStatsPeriod.value as StatsPeriod),
       ticketService.getTenantRecentTickets(10),
       reportService.getStatusDurations(selectedStatsPeriod.value as StatsPeriod), // Tempo Médio Por Status - uses global period filter
       reportService.getTenantDepartmentsStatistics(selectedStatsPeriod.value as StatsPeriod), // Tempo de Resolução por Setor - uses global period filter
       reportService.getResolutionTimeData(),
-      reportService.getStatusDurationTimeSeries(DefaultTicketStatus.InProgress),
+      reportService.getStatusDurationTimeSeries(
+        DefaultTicketStatus.InProgress,
+        selectedInProgressPeriod.value,
+      ),
       reportService.getTopUsers(undefined, true, 'top', selectedStatsPeriod.value as StatsPeriod), // fetch all users with stats for Colaboradores tab - uses global period filter
       reportService.getTopUsers(5, false, 'top', selectedStatsPeriod.value as StatsPeriod), // Top Colaboradores in Visão Geral - uses global period filter
       reportService.getTopUsers(5, false, 'bottom', selectedStatsPeriod.value as StatsPeriod), // Pior Desempenho - uses global period filter
@@ -2531,9 +2280,6 @@ const loadData = async () => {
 
     // Initialize trendData with the current period data
     trendData.value = trends[selectedTrendPeriod.value];
-
-    // Store performance trends
-    performanceTrends.value = performanceTrendsResult;
 
     // Store status durations
     statusDurations.value = statusDurationsResult.statusDurations.map((duration) => ({
@@ -2631,9 +2377,10 @@ onMounted(() => {
     return;
   }
 
-  // If starting on the in-progress tab, load those tickets too
+  // If starting on the in-progress tab, load those tickets too and start polling
   if (currentTab.value === 'in-progress') {
     loadInProgressTasks();
+    startPolling();
   }
 });
 
@@ -2868,8 +2615,29 @@ const createdVsCompletedChartData = computed(() => {
 
 // Funções Auxiliares
 const formatPercentage = (value?: number) => {
-  if (value === undefined) return '0.0%';
-  return `${(value * 100).toFixed(1)}%`;
+  if (value === undefined) return '0%';
+  return `${Math.round(value * 100)}%`;
+};
+
+// Calculate background color based on percentage
+// Lower percentages = lighter blue, higher percentages = darker blue
+const getCardBackgroundStyle = (percentage: number) => {
+  // Clamp percentage between 0 and 100
+  const clampedPercentage = Math.max(0, Math.min(100, percentage));
+
+  // Calculate blue intensity: 0% = very light (239, 246, 255), 100% = dark (30, 64, 175)
+  // Using linear interpolation
+  const r = Math.round(239 - (239 - 30) * (clampedPercentage / 100));
+  const g = Math.round(246 - (246 - 64) * (clampedPercentage / 100));
+  const b = Math.round(255 - (255 - 175) * (clampedPercentage / 100));
+
+  // Determine text color: use white for darker backgrounds (percentage > 50%)
+  const textColor = clampedPercentage > 50 ? '#ffffff' : '#1f2937';
+
+  return {
+    backgroundColor: `rgb(${r}, ${g}, ${b})`,
+    color: textColor,
+  };
 };
 
 const getResolutionRateBadgeClass = (rate?: number) => {
@@ -2905,6 +2673,22 @@ const updateTrendPeriod = async (period: string) => {
   }
 };
 
+const handleInProgressPeriodChange = async (period: string) => {
+  selectedInProgressPeriod.value = period as 'week' | 'month' | 'quarter';
+  inProgressChartLoading.value = true;
+  try {
+    const data = await reportService.getStatusDurationTimeSeries(
+      DefaultTicketStatus.InProgress,
+      selectedInProgressPeriod.value,
+    );
+    inProgressTimeSeries.value = data;
+  } catch (error) {
+    console.error('Error updating in progress period:', error);
+  } finally {
+    inProgressChartLoading.value = false;
+  }
+};
+
 const dateRange = ref({
   start: '',
   end: '',
@@ -2916,7 +2700,9 @@ const departmentStats = computed(() => departmentData.value);
 const topFiveDepartments = computed(() => {
   if (!departmentStats.value) return [];
 
-  return [...departmentStats.value].sort((a, b) => b.resolutionRate - a.resolutionRate).slice(0, 5);
+  return [...departmentStats.value]
+    .sort((a, b) => b.efficiencyScore - a.efficiencyScore)
+    .slice(0, 5);
 });
 
 const sortedDepartmentsByResolutionTime = computed(() => {
@@ -3146,11 +2932,13 @@ const handlePeriodChange = () => {
 };
 
 const getTotalResolved = () => {
-  return performanceTrends.value?.totalResolved || 0;
+  if (!trendData.value || trendData.value.length === 0) return 0;
+  return trendData.value.reduce((sum, item) => sum + item.resolved, 0);
 };
 
 const getTotalCreated = () => {
-  return performanceTrends.value?.totalCreated || 0;
+  if (!trendData.value || trendData.value.length === 0) return 0;
+  return trendData.value.reduce((sum, item) => sum + item.created, 0);
 };
 
 // Trend percentages are calculated from the chart data (trendData) for visual comparison
@@ -3198,11 +2986,21 @@ function formatDateDDMM(dateStr: string) {
 // Add new reactive state for cycle time period selection
 const selectedCycleTimePeriod = ref<'week' | 'month' | 'quarter'>('week');
 
+// Add new reactive state for in progress time period selection
+const selectedInProgressPeriod = ref<'week' | 'month' | 'quarter'>('month');
+
 // Period text mapping for UI
 const periodTextMap: Record<'week' | 'month' | 'quarter', string> = {
   week: 'na semana',
   month: 'no mês',
   quarter: 'no trimestre',
+};
+
+// Period label mapping for in progress time series
+const inProgressPeriodLabelMap: Record<'week' | 'month' | 'quarter', string> = {
+  week: '6 semanas',
+  month: '6 meses',
+  quarter: '4 trimestres',
 };
 
 const cycleTimeData = ref<ResolutionTimeDataDto | null>(null);
@@ -3237,7 +3035,9 @@ const getResolutionTimeTrend = () => {
   const current = data[data.length - 1].value;
   const previous = data[data.length - 2].value;
 
-  if (previous === 0) return 0;
+  if (previous === 0) {
+    return current > 0 ? 100 : 0;
+  }
 
   const change = ((current - previous) / previous) * 100;
   return Math.round(change);
@@ -3374,6 +3174,7 @@ const cycleTimeBarOptions = computed<ChartOptions>(() => {
 // Add a reactive state for chart rendering
 const chartRenderKey = ref(0);
 const cycleTimeChartLoading = ref(false);
+const inProgressChartLoading = ref(false);
 
 // Function to handle period change with forced re-render
 const handleCycleTimePeriodChange = () => {
@@ -3394,7 +3195,7 @@ const hasPreviousPeriodData = () => {
   const period = selectedCycleTimePeriod.value;
   const data = cycleTimeData.value[period];
 
-  return data && data.length >= 2 && getPreviousPeriodValue() > 0;
+  return data && data.length >= 2;
 };
 
 // Add function to get previous period value
@@ -3647,7 +3448,7 @@ const fetchAllTickets = async () => {
     return response.data.items;
   } catch (error) {
     console.error('Error fetching all tickets:', error);
-    toast.error('Erro ao buscar tickets para exportação');
+    toast.error('Erro ao buscar tarefas para exportação');
     return [];
   }
 };
@@ -3670,7 +3471,7 @@ const exportToExcel = async () => {
       [],
       ['=== MÉTRICAS GERAIS ==='],
       ['Métrica', 'Valor'],
-      ['Total de Tickets', statistics.value?.totalTickets || 0],
+      ['Total de Tarefas', statistics.value?.totalTickets || 0],
       ['Taxa de Resolução', formatPercentage(statistics.value?.resolutionRate)],
       [
         'Tempo Médio de Resolução',
@@ -3721,9 +3522,9 @@ const exportToExcel = async () => {
     generalData.push([]);
     generalData.push(['=== RESUMO FINAL ===']);
     generalData.push(['Métrica', 'Valor']);
-    generalData.push(['Total de Tickets Criados', getTotalCreated()]);
-    generalData.push(['Total de Tickets Concluídos', getTotalResolved()]);
-    generalData.push(['Tickets em Andamento', inProgressTasks.value?.length || 0]);
+    generalData.push(['Total de Tarefas Criadas', getTotalCreated()]);
+    generalData.push(['Total de Tarefas Concluídas', getTotalResolved()]);
+    generalData.push(['Tarefas em Andamento', inProgressTasks.value?.length || 0]);
     generalData.push(['Departamentos Ativos', departmentStats.value?.length || 0]);
 
     const generalSheet = XLSX.utils.aoa_to_sheet(generalData);
@@ -3760,7 +3561,7 @@ const exportToExcel = async () => {
         ]),
       ];
       const allTicketsSheet = XLSX.utils.aoa_to_sheet(ticketsData);
-      XLSX.utils.book_append_sheet(workbook, allTicketsSheet, 'Tickets');
+      XLSX.utils.book_append_sheet(workbook, allTicketsSheet, 'Tarefas');
     }
 
     // Department Statistics Sheet
@@ -3769,7 +3570,7 @@ const exportToExcel = async () => {
         ['=== ESTATÍSTICAS POR DEPARTAMENTO ==='],
         [
           'Departamento',
-          'Total Tickets',
+          'Total Tarefas',
           'Resolvidos',
           'Taxa Resolução',
           'Tempo Aceite',
@@ -3794,7 +3595,7 @@ const exportToExcel = async () => {
     if (topUsers.value && topUsers.value.users && topUsers.value.users.length > 0) {
       const usersData = [
         ['=== TOP COLABORADORES ==='],
-        ['Nome', 'Departamento', 'Tickets Resolvidos', 'Taxa Resolução', 'Total Tickets'],
+        ['Nome', 'Departamento', 'Tarefas Resolvidas', 'Taxa Resolução', 'Total Tarefas'],
         ...topUsers.value.users.map((user) => [
           `${user.firstName} ${user.lastName}`,
           user.departmentName,
@@ -3811,7 +3612,7 @@ const exportToExcel = async () => {
     if (trendData.value && trendData.value.length > 0) {
       const trendDataSheet = [
         ['=== TENDÊNCIAS (CRIADOS VS CONCLUÍDOS) ==='],
-        ['Data', 'Tickets Criados', 'Tickets Concluídos', 'Total'],
+        ['Data', 'Tarefas Criadas', 'Tarefas Concluídas', 'Total'],
         ...trendData.value.map((item) => [
           new Date(item.date).toLocaleDateString('pt-BR'),
           item.created,
@@ -3871,7 +3672,7 @@ const exportToCSV = async () => {
     // General Metrics
     csvContent += '=== MÉTRICAS GERAIS ===\n';
     csvContent += 'Métrica,Valor\n';
-    csvContent += `Total de Tickets,${statistics.value?.totalTickets || 0}\n`;
+    csvContent += `Total de Tarefas,${statistics.value?.totalTickets || 0}\n`;
     csvContent += `Taxa de Resolução,${formatPercentage(statistics.value?.resolutionRate)}\n`;
     csvContent += `Tempo Médio de Resolução,${formatTimeInSeconds(statistics.value?.averageResolutionTimeSeconds)}\n`;
     csvContent += `Tempo Médio de Aceite,${formatTimeInSeconds(statistics.value?.averageAcceptanceTimeSeconds)}\n`;
@@ -3911,7 +3712,7 @@ const exportToCSV = async () => {
     if (departmentStats.value && departmentStats.value.length > 0) {
       csvContent += '=== ESTATÍSTICAS POR DEPARTAMENTO ===\n';
       csvContent +=
-        'Departamento,Total Tickets,Resolvidos,Taxa Resolução,Tempo Aceite,Tempo Resolução,Tempo Total\n';
+        'Departamento,Total Tarefas,Resolvidas,Taxa Resolução,Tempo Aceite,Tempo Resolução,Tempo Total\n';
       departmentStats.value.forEach((dept) => {
         csvContent += `${dept.departmentName},${dept.totalTickets},${dept.resolvedTickets},${formatPercentage(dept.resolutionRate)},${formatTimeInSeconds(dept.averageAcceptanceTimeSeconds)},${formatTimeInSeconds(dept.averageResolutionTimeSeconds)},${formatTimeInSeconds(dept.averageTotalTimeSeconds)}\n`;
       });
@@ -3921,7 +3722,7 @@ const exportToCSV = async () => {
     // Top Contributors
     if (topUsers.value && topUsers.value.users && topUsers.value.users.length > 0) {
       csvContent += '=== TOP COLABORADORES ===\n';
-      csvContent += 'Nome,Departamento,Tickets Resolvidos,Taxa Resolução,Total Tickets\n';
+      csvContent += 'Nome,Departamento,Tarefas Resolvidas,Taxa Resolução,Total Tarefas\n';
       topUsers.value.users.forEach((user) => {
         csvContent += `${user.firstName} ${user.lastName},${user.departmentName},${user.resolvedTickets},${formatPercentage(user.resolutionRate)},${user.totalTickets}\n`;
       });
@@ -3930,7 +3731,7 @@ const exportToCSV = async () => {
 
     // Recent Tickets
     if (recentTickets.value && recentTickets.value.length > 0) {
-      csvContent += '=== TICKETS RECENTES ===\n';
+      csvContent += '=== TAREFAS RECENTES ===\n';
       csvContent += 'ID,Assunto,Status,Prioridade,Data Criação\n';
       recentTickets.value.forEach((ticket) => {
         const createdDate = new Date(ticket.createdAt).toLocaleDateString('pt-BR');
@@ -3942,7 +3743,7 @@ const exportToCSV = async () => {
     // Trend Data (Created vs Completed)
     if (trendData.value && trendData.value.length > 0) {
       csvContent += '=== TENDÊNCIAS (CRIADOS VS CONCLUÍDOS) ===\n';
-      csvContent += 'Data,Tickets Criados,Tickets Concluídos,Total\n';
+      csvContent += 'Data,Tarefas Criadas,Tarefas Concluídas,Total\n';
       trendData.value.forEach((item) => {
         const date = new Date(item.date).toLocaleDateString('pt-BR');
         csvContent += `${date},${item.created},${item.resolved},${item.total}\n`;
@@ -3963,9 +3764,9 @@ const exportToCSV = async () => {
 
     // Summary footer
     csvContent += '=== RESUMO FINAL ===\n';
-    csvContent += `Total de Tickets Criados,${getTotalCreated()}\n`;
-    csvContent += `Total de Tickets Concluídos,${getTotalResolved()}\n`;
-    csvContent += `Tickets em Andamento,${inProgressTasks.value?.length || 0}\n`;
+    csvContent += `Total de Tarefas Criadas,${getTotalCreated()}\n`;
+    csvContent += `Total de Tarefas Concluídas,${getTotalResolved()}\n`;
+    csvContent += `Tarefas em Andamento,${inProgressTasks.value?.length || 0}\n`;
     csvContent += `Departamentos Ativos,${departmentStats.value?.length || 0}\n`;
 
     // Create tickets CSV content

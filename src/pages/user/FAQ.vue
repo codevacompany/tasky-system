@@ -82,17 +82,17 @@ const sections = ref([
       {
         question: 'O que é o Tasky System?',
         answer:
-          'O Tasky System é uma plataforma web completa para gestão de tickets, desenvolvida para facilitar a comunicação, o acompanhamento e a resolução de demandas entre equipes e setores de uma organização. Com o Tasky, você centraliza solicitações, padroniza processos e garante mais agilidade e transparência no dia a dia.',
+          'O Tasky System é uma plataforma web completa para gestão de tarefas, desenvolvida para facilitar a comunicação, o acompanhamento e a resolução de demandas entre equipes e setores de uma organização. Com o Tasky, você centraliza solicitações, padroniza processos e garante mais agilidade e transparência no dia a dia.',
       },
       {
         question: 'Quais são as principais funcionalidades do Tasky?',
         answer:
-          '<ul style="margin:0;padding-left:1.2em;"><li><b>Gestão de tickets:</b> criação, acompanhamento, histórico e comentários.</li><li><b>Notificações automáticas:</b> mantenha-se informado sobre atualizações e prazos.</li><li><b>Controle de prioridades e prazos:</b> defina o que é mais urgente e acompanhe o andamento.</li><li><b>Permissões e perfis:</b> acesso personalizado para cada usuário ou setor.</li><li><b>Relatórios e dashboards:</b> visualize métricas, produtividade e gargalos.</li><li><b>Fluxo de aprovação:</b> tickets podem passar por etapas de verificação e aprovação.</li><li><b>Responsividade:</b> acesso fácil em qualquer dispositivo.</li></ul>',
+          '<ul style="margin:0;padding-left:1.2em;"><li><b>Gestão de tarefas:</b> criação, acompanhamento, histórico e comentários.</li><li><b>Notificações automáticas:</b> mantenha-se informado sobre atualizações e prazos.</li><li><b>Controle de prioridades e prazos:</b> defina o que é mais urgente e acompanhe o andamento.</li><li><b>Permissões e perfis:</b> acesso personalizado para cada usuário ou setor.</li><li><b>Relatórios e dashboards:</b> visualize métricas, produtividade e gargalos.</li><li><b>Fluxo de aprovação:</b> tarefas podem passar por etapas de verificação e aprovação.</li><li><b>Responsividade:</b> acesso fácil em qualquer dispositivo.</li></ul>',
       },
       {
         question: 'Como o Tasky System pode melhorar o fluxo de trabalho da minha equipe?',
         answer:
-          'O Tasky System centraliza todas as demandas em um só lugar, reduz retrabalho, evita perda de informações e facilita o acompanhamento de cada etapa do ticket. Isso aumenta a transparência, melhora a comunicação entre setores e acelera a resolução de tarefas, tornando sua equipe mais produtiva e organizada.',
+          'O Tasky System centraliza todas as demandas em um só lugar, reduz retrabalho, evita perda de informações e facilita o acompanhamento de cada etapa da tarefa. Isso aumenta a transparência, melhora a comunicação entre setores e acelera a resolução de tarefas, tornando sua equipe mais produtiva e organizada.',
       },
       {
         question: 'Quais navegadores e dispositivos são suportados?',
@@ -127,88 +127,88 @@ const sections = ref([
     ],
   },
   {
-    title: 'Tickets',
+    title: 'Tarefas',
     icon: 'ticket',
     faqs: [
       {
-        question: 'Como crio um novo ticket?',
+        question: 'Como crio uma nova tarefa?',
         answer:
-          'Clique em "Novo Ticket" no menu, preencha os campos obrigatórios e clique em "Criar".',
+          'Clique em "Nova Tarefa" no menu, preencha os campos obrigatórios e clique em "Criar".',
       },
       {
-        question: 'Qual a diferença entre ticket privado e público?',
+        question: 'Qual a diferença entre tarefa privada e pública?',
         answer:
-          'Um ticket privado só pode ser visualizado pelo criador, pelo responsável e pelos administradores. Tickets públicos podem ser visualizados por todos os membros do setor ou equipe relacionados.',
+          'Uma tarefa privada só pode ser visualizada pelo criador, pelo responsável e pelos administradores. Tarefas públicas podem ser visualizadas por todos os membros do setor ou equipe relacionados.',
       },
       {
-        question: 'Quem pode visualizar meus tickets?',
+        question: 'Quem pode visualizar minhas tarefas?',
         answer:
-          'Tickets criados por você podem ser visualizados por você, pelo responsável atribuído e, se público, pelos membros do setor. Tickets privados são restritos ao criador, responsável e administradores.',
+          'Tarefas criadas por você podem ser visualizadas por você, pelo responsável atribuído e, se pública, pelos membros do setor. Tarefas privadas são restritas ao criador, responsável e administradores.',
       },
       {
-        question: 'O que são tickets recebidos, criados e do setor?',
+        question: 'O que são tarefas recebidas, criadas e do setor?',
         answer:
-          '<b>Recebidos</b>: tickets atribuídos a você. <br><b>Criados</b>: tickets que você abriu. <br><b>Do setor</b>: tickets do seu departamento, visíveis conforme permissões.',
+          '<b>Recebidas</b>: tarefas atribuídas a você. <br><b>Criadas</b>: tarefas que você abriu. <br><b>Do setor</b>: tarefas do seu departamento, visíveis conforme permissões.',
       },
       {
-        question: 'Como funciona o fluxo de um ticket?',
+        question: 'Como funciona o fluxo de uma tarefa?',
         answer:
-          'O ticket passa por etapas: Pendente, Em Andamento, Em Verificação, Finalizado ou Rejeitado. Cada etapa tem ações específicas.',
+          'A tarefa passa por etapas: Pendente, Em Andamento, Em Verificação, Finalizado ou Rejeitado. Cada etapa tem ações específicas.',
       },
       {
-        question: 'Posso anexar arquivos aos tickets?',
+        question: 'Posso anexar arquivos às tarefas?',
         answer:
           'Sim! É possível anexar arquivos de até 10MB nos formatos PDF, DOC, XLS, JPG e PNG.',
       },
       {
-        question: 'Como defino a prioridade de um ticket?',
+        question: 'Como defino a prioridade de uma tarefa?',
         answer:
-          'Ao criar o ticket, selecione a prioridade: Baixa, Média, Alta ou Urgente. Cada uma tem um prazo padrão.',
+          'Ao criar a tarefa, selecione a prioridade: Baixa, Média, Alta ou Urgente. Cada uma tem um prazo padrão.',
       },
       {
-        question: 'Como aprovo, rejeito ou solicito correção de um ticket?',
+        question: 'Como aprovo, rejeito ou solicito correção de uma tarefa?',
         answer:
-          'Na tela de detalhes do ticket, utilize os botões de Aprovar, Rejeitar ou Corrigir conforme necessário.',
+          'Na tela de detalhes da tarefa, utilize os botões de Aprovar, Rejeitar ou Corrigir conforme necessário.',
       },
       {
-        question: 'Como vejo o histórico e comentários de um ticket?',
+        question: 'Como vejo o histórico e comentários de uma tarefa?',
         answer:
-          'Abra o ticket e acesse a aba de histórico para visualizar todas as ações realizadas e comentários registrados.',
+          'Abra a tarefa e acesse a aba de histórico para visualizar todas as ações realizadas e comentários registrados.',
       },
       {
-        question: 'Quem pode comentar em um ticket?',
+        question: 'Quem pode comentar em uma tarefa?',
         answer:
-          'O criador, o responsável e, dependendo das permissões, outros membros do setor podem comentar em tickets públicos.',
+          'O criador, o responsável e, dependendo das permissões, outros membros do setor podem comentar em tarefas públicas.',
       },
       {
-        question: 'Como saber se um ticket é privado ou público?',
+        question: 'Como saber se uma tarefa é privada ou pública?',
         answer:
-          'Na tela de detalhes do ticket, há um indicador de privacidade. Tickets privados exibem um ícone de cadeado.',
+          'Na tela de detalhes da tarefa, há um indicador de privacidade. Tarefas privadas exibem um ícone de cadeado.',
       },
       {
-        question: 'Como funcionam os comentários em tickets?',
+        question: 'Como funcionam os comentários em tarefas?',
         answer:
-          'Você pode comentar em tickets para registrar informações, dúvidas ou atualizações. O criador, o responsável e, em tickets públicos, membros do setor podem comentar. Todos os comentários ficam registrados no histórico do ticket.',
+          'Você pode comentar em tarefas para registrar informações, dúvidas ou atualizações. O criador, o responsável e, em tarefas públicas, membros do setor podem comentar. Todos os comentários ficam registrados no histórico da tarefa.',
       },
       {
-        question: 'Recebo notificações quando alguém comenta em um ticket?',
+        question: 'Recebo notificações quando alguém comenta em uma tarefa?',
         answer:
-          'Sim, todos os envolvidos no ticket recebem notificações quando um novo comentário é adicionado.',
+          'Sim, todos os envolvidos na tarefa recebem notificações quando um novo comentário é adicionado.',
       },
       {
-        question: 'Quais são os status possíveis de um ticket?',
+        question: 'Quais são os status possíveis de uma tarefa?',
         answer:
-          '<b>Pendente</b>: aguardando aceite do responsável.<br><b>Em Andamento</b>: sendo tratado.<br><b>Em Verificação</b>: aguardando aprovação do solicitante.<br><b>Finalizado</b>: ticket concluído.<br><b>Rejeitado</b>: ticket recusado pelo solicitante.<br><b>Arquivado</b>: ticket encerrado e guardado para consulta.',
+          '<b>Pendente</b>: aguardando aceite do responsável.<br><b>Em Andamento</b>: sendo tratada.<br><b>Em Verificação</b>: aguardando aprovação do solicitante.<br><b>Finalizado</b>: tarefa concluída.<br><b>Rejeitado</b>: tarefa recusada pelo solicitante.<br><b>Arquivado</b>: tarefa encerrada e guardada para consulta.',
       },
       {
         question: 'O que é a visualização Kanban?',
         answer:
-          'A visualização Kanban exibe os tickets em colunas de acordo com o status (Pendente, Em Andamento, etc.), facilitando o acompanhamento do fluxo de trabalho. Os tickets mudam de coluna automaticamente conforme o status é alterado nas telas de detalhes ou ações do ticket. Não é possível arrastar manualmente entre as colunas.',
+          'A visualização Kanban exibe as tarefas em colunas de acordo com o status (Pendente, Em Andamento, etc.), facilitando o acompanhamento do fluxo de trabalho. As tarefas mudam de coluna automaticamente conforme o status é alterado nas telas de detalhes ou ações da tarefa. Não é possível arrastar manualmente entre as colunas.',
       },
       {
         question: 'Como acesso o Kanban?',
         answer:
-          'Na página de tickets, clique no botão de alternância para mudar entre a visualização em tabela e Kanban.',
+          'Na página de tarefas, clique no botão de alternância para mudar entre a visualização em tabela e Kanban.',
       },
     ],
   },
@@ -219,7 +219,7 @@ const sections = ref([
       {
         question: 'Quais tipos de notificações existem?',
         answer:
-          'Você recebe notificações para novos tickets, atualizações, aprovações, rejeições e solicitações de correção.',
+          'Você recebe notificações para novas tarefas, atualizações, aprovações, rejeições e solicitações de correção.',
       },
       {
         question: 'Como visualizo minhas notificações?',

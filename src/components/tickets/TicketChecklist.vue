@@ -4,7 +4,7 @@
       <!-- Checklist Header -->
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-3 flex-1">
-          <h4 class="font-medium text-gray-900 dark:text-gray-100">Tarefas</h4>
+          <h4 class="font-medium text-gray-900 dark:text-gray-100">Subtarefas</h4>
           <!-- Progress Circle -->
           <div class="relative w-8 h-8 flex-shrink-0">
             <svg class="transform -rotate-90 w-8 h-8">

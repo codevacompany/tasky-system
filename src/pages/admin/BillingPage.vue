@@ -12,9 +12,57 @@
       </button>
     </header>
 
+    <!-- Current Subscription Section Skeleton -->
+    <div
+      v-if="isLoadingSubscription"
+      class="mb-8 bg-white dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
+    >
+      <div class="flex items-center gap-2 mb-4">
+        <div class="h-6 w-40 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+        <div class="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded-full skeleton-shimmer"></div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <!-- Left Column Skeleton -->
+        <div>
+          <div class="flex items-baseline gap-2 mb-4">
+            <div class="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+            <div class="h-5 w-12 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+          </div>
+          <div class="space-y-2">
+            <div class="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+            <div class="h-3 w-40 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+          </div>
+        </div>
+
+        <!-- Middle Column Skeleton -->
+        <div class="pl-4">
+          <div class="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-3 skeleton-shimmer"></div>
+          <ul class="space-y-2">
+            <li v-for="i in 4" :key="i" class="flex items-center gap-2">
+              <div class="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+              <div class="h-4 flex-1 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Right Column Skeleton -->
+        <div class="flex flex-col items-center justify-center">
+          <div
+            class="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-full skeleton-shimmer mb-3"
+          ></div>
+          <div class="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+        </div>
+      </div>
+
+      <div
+        class="mt-6 mx-auto w-[300px] h-10 bg-gray-200 dark:bg-gray-700 rounded-md skeleton-shimmer"
+      ></div>
+    </div>
+
     <!-- Current Subscription Section -->
     <div
-      v-if="currentSubscription?.hasSubscription && currentSubscription.subscription"
+      v-else-if="currentSubscription?.hasSubscription && currentSubscription.subscription"
       class="mb-8 bg-white dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
     >
       <div class="flex items-center gap-2 mb-4">
@@ -147,19 +195,85 @@
     </div>
 
     <!-- Upgrade Plans Section -->
-    <div v-if="!isLoadingPlans">
+    <div>
       <div class="mb-6">
-        <div class="mb-4">
+        <!-- Header Skeleton -->
+        <div v-if="isLoadingPlans || isLoadingSubscription" class="mb-4">
+          <div class="h-7 w-40 bg-gray-200 dark:bg-gray-700 rounded mb-2 skeleton-shimmer"></div>
+          <div class="space-y-2">
+            <div class="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+            <div class="h-4 w-5/6 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+            <div class="h-4 w-4/6 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+          </div>
+        </div>
+        <!-- Header Content -->
+        <div v-else class="mb-4">
           <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Atualizar plano</h2>
-          <p class="text-sm text-gray-600 dark:text-gray-400">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Nossos planos são criados para se adequar ao tamanho do seu projeto. Pague uma taxa fixa
             por um plano definido, mais um pouco extra se ultrapassar. Atualize para o próximo nível
             conforme seu projeto cresce.
           </p>
+          <div class="flex items-center gap-3">
+            <span
+              :class="
+                !isYearlyBilling
+                  ? 'text-gray-900 dark:text-white font-medium'
+                  : 'text-gray-500 dark:text-gray-400'
+              "
+            >
+              Mensal
+            </span>
+            <Switch v-model="isYearlyBilling" />
+            <span
+              :class="
+                isYearlyBilling
+                  ? 'text-gray-900 dark:text-white font-medium'
+                  : 'text-gray-500 dark:text-gray-400'
+              "
+            >
+              Anual
+            </span>
+          </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Skeleton Loading State -->
+      <div
+        v-if="isLoadingPlans || isLoadingSubscription"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+      >
+        <div
+          v-for="n in 4"
+          :key="n"
+          class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 flex flex-col"
+        >
+          <!-- Title skeleton -->
+          <div class="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-4 skeleton-shimmer"></div>
+
+          <!-- Price skeleton -->
+          <div class="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-4 skeleton-shimmer"></div>
+
+          <!-- Button skeleton -->
+          <div class="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded mb-6 skeleton-shimmer"></div>
+
+          <!-- Features skeleton -->
+          <div class="mb-4">
+            <div class="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded mb-3 skeleton-shimmer"></div>
+            <ul class="space-y-2">
+              <li v-for="i in 4" :key="i" class="flex items-start gap-2">
+                <div
+                  class="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded mt-0.5 skeleton-shimmer"
+                ></div>
+                <div class="h-4 flex-1 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plans Cards (only show when fully loaded) -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div
           v-for="plan in availablePlans"
           :key="plan.slug"
@@ -168,24 +282,42 @@
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ plan.name }}</h3>
 
           <div v-if="plan.slug === 'customizado'" class="mb-4">
-            <div class="flex items-baseline gap-2 mb-2">
-              <span class="text-3xl font-bold text-gray-900 dark:text-white">R$ 399</span>
-              <span class="text-gray-600 dark:text-gray-400">/ mês</span>
-            </div>
             <div class="text-sm text-gray-700 dark:text-gray-300">
-              <p>+ R$ 15,00 por usuário adicional (a partir do 31º usuário)</p>
+              <p class="leading-relaxed">
+                Simule o custo mensal baseado no número de usuários da sua equipe.
+              </p>
             </div>
           </div>
           <div v-else class="mb-4">
             <div class="flex items-baseline gap-2">
               <span class="text-3xl font-bold text-gray-900 dark:text-white">
-                R$ {{ Number(plan.priceMonthly).toFixed(0) }}
+                R$
+                {{
+                  isYearlyBilling && plan.priceYearly
+                    ? (Number(plan.priceYearly) / 12).toFixed(0)
+                    : Number(plan.priceMonthly).toFixed(0)
+                }}
               </span>
-              <span class="text-gray-600 dark:text-gray-400">/ mês</span>
+              <span class="text-gray-600 dark:text-gray-400">
+                / {{ isYearlyBilling ? 'mês' : 'mês' }}
+              </span>
+            </div>
+            <div v-if="isYearlyBilling && plan.priceYearly" class="mt-1">
+              <span class="text-xs text-gray-500 dark:text-gray-400">
+                R$ {{ Number(plan.priceYearly).toFixed(0) }} cobrado anualmente
+              </span>
             </div>
           </div>
 
           <button
+            v-if="plan.slug === 'customizado'"
+            class="btn btn-primary w-full py-2 px-4 text-sm font-medium rounded-md transition-all mb-6 disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="handleSimulateCustomPlan"
+          >
+            Simular
+          </button>
+          <button
+            v-else
             class="w-full py-2 px-4 text-sm font-medium rounded-md transition-colors mb-6 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="(isCurrentPlan(plan.slug) && !hasTrial) || isSubscribing"
             @click="handleSubscription(plan.slug)"
@@ -223,11 +355,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Loading State for Plans -->
-    <div v-if="isLoadingPlans" class="flex justify-center items-center py-8">
-      <LoadingSpinner />
-    </div>
     <SubscriptionExpiredModal
       :is-open="showTrialExpiredModal"
       @close="showTrialExpiredModal = false"
@@ -237,8 +364,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
+import Switch from '@/components/common/Switch.vue';
 import { subscriptionService } from '@/services/subscriptionService';
 import { useUserStore } from '@/stores/user';
 import { authService } from '@/services/authService';
@@ -266,17 +395,20 @@ interface SubscriptionPlan {
   stripePriceIdPerUser?: string | null;
 }
 
+const router = useRouter();
 const userStore = useUserStore();
 const user = computed(() => userStore.user);
 
 const payments = ref<Payment[]>([]);
 const isLoading = ref(true);
 const isLoadingPlans = ref(true);
+const isLoadingSubscription = ref(true);
 const isSubscribing = ref(false);
 const isLoadingPortal = ref(false);
 const availablePlans = ref<SubscriptionPlan[]>([]);
 const currentSubscription = ref<any>(null);
 const showTrialExpiredModal = ref(false);
+const isYearlyBilling = ref(true);
 
 // Mock data para histórico de pagamentos (será removido quando integrar com backend)
 const mockPayments = [
@@ -339,6 +471,7 @@ const loadPlans = async () => {
 // Carregar assinatura atual
 const loadCurrentSubscription = async () => {
   try {
+    isLoadingSubscription.value = true;
     if (user.value?.tenantId) {
       currentSubscription.value = await subscriptionService.getCurrentSubscription(
         user.value.tenantId,
@@ -347,6 +480,8 @@ const loadCurrentSubscription = async () => {
   } catch (error) {
     console.error('Error loading current subscription:', error);
     toast.error('Erro ao carregar assinatura atual');
+  } finally {
+    isLoadingSubscription.value = false;
   }
 };
 
@@ -493,13 +628,17 @@ const getButtonText = (slug: string) => {
   return 'Selecionar plano';
 };
 
+const handleSimulateCustomPlan = () => {
+  router.push('/assinaturas/simular-plano-customizado');
+};
+
 const handleSubscription = async (slug: string) => {
   const plan = availablePlans.value.find((p) => p.slug === slug);
   if (!plan) return;
 
   if (slug === 'customizado') {
-    // Redirecionar para formulário de contato ou abrir modal específico
-    window.location.href = 'mailto:comercial@tasky.com.br?subject=Interesse em Usuários Adicionais';
+    // This should not happen anymore as we have a separate button
+    handleSimulateCustomPlan();
     return;
   }
 
@@ -532,7 +671,10 @@ const handleSubscription = async (slug: string) => {
   // Otherwise, proceed with checkout for new subscriptions
   try {
     isSubscribing.value = true;
-    const response = (await subscriptionService.subscribe(plan.slug)) as {
+    const billingInterval = isYearlyBilling.value ? 'yearly' : 'monthly';
+    const response = (await subscriptionService.subscribe(plan.slug, {
+      billingInterval,
+    })) as {
       checkoutUrl: string;
       sessionId: string;
     };
@@ -578,3 +720,35 @@ const handleManageSubscription = async () => {
   }
 };
 </script>
+
+<style scoped>
+.skeleton-shimmer {
+  animation: shimmer 1.5s infinite;
+  background: linear-gradient(
+    90deg,
+    rgba(229, 231, 235, 0.4) 0%,
+    rgba(229, 231, 235, 0.6) 50%,
+    rgba(229, 231, 235, 0.4) 100%
+  );
+  background-size: 200% 100%;
+}
+
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(55, 65, 81, 0.4) 0%,
+    rgba(55, 65, 81, 0.6) 50%,
+    rgba(55, 65, 81, 0.4) 100%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+</style>
