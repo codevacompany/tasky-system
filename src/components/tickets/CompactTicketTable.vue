@@ -148,7 +148,7 @@
           >
             <td
               :class="[
-                'max-w-[200px] pl-8 py-3 text-sm text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis w-1/2',
+                'max-w-[200px] pl-8 py-3 text-sm text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis w-2/3',
                 index < 4 ? 'border-b border-gray-200 dark:border-gray-700' : '',
               ]"
               :title="ticket.name"
@@ -162,15 +162,7 @@
             </td>
             <td
               :class="[
-                'px-3 py-3 text-sm text-gray-900 dark:text-white whitespace-nowrap w-1/4',
-                index < 4 ? 'border-b border-gray-200 dark:border-gray-700' : '',
-              ]"
-            >
-              {{ formatDate(ticket.createdAt) }}
-            </td>
-            <td
-              :class="[
-                'px-3 py-3 text-center text-sm text-gray-900 dark:text-white whitespace-nowrap w-1/4',
+                'px-3 py-3 text-center text-sm text-gray-900 dark:text-white whitespace-nowrap w-1/2',
                 index < 4 ? 'border-b border-gray-200 dark:border-gray-700' : '',
               ]"
             >
@@ -184,7 +176,7 @@
             </td>
           </tr>
           <tr v-if="!isLoading && tickets.length === 0" class="last:border-b-0">
-            <td colspan="3" class="px-6 py-12 text-center h-[300px]">
+            <td colspan="2" class="px-6 py-12 text-center h-[300px]">
               <div class="flex flex-col items-center justify-center gap-3 h-full">
                 <div
                   class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center"

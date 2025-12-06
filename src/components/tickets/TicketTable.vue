@@ -186,45 +186,49 @@
       <template #column-dueDate="{ item }">
         <div class="text-xs md:text-sm text-center text-gray-900 dark:text-gray-100">
           <div class="whitespace-nowrap">
-            <template v-if="item.dueAt">
-              <!-- Always show message for overdue tickets -->
-              <template v-if="isDeadlineOverdue(item.dueAt)">
-                <span
-                  class="flex items-center gap-2 justify-center"
-                  :class="getDeadlineClass(item.dueAt)"
-                >
-                  <font-awesome-icon icon="exclamation-triangle" class="text-red-500 text-xs" />
-                  {{
-                    calculateDeadline(item) || getDeadlineInfoFromDate(item.dueAt)?.message || '-'
-                  }}
-                </span>
-              </template>
-              <!-- Show date when more than 3 days remaining and not overdue -->
-              <template
-                v-else-if="
-                  getDeadlineInfoFromDate(item.dueAt) &&
-                  getDeadlineInfoFromDate(item.dueAt)!.businessDaysRemaining > 3
-                "
-              >
-                {{ formatDateOnly(item.dueAt) }}
-              </template>
-              <!-- Show remaining days message when 3 days or less -->
-              <template v-else-if="calculateDeadline(item) && calculateDeadline(item) !== ''">
-                <span
-                  class="flex items-center gap-2 justify-center"
-                  :class="getDeadlineClass(item.dueAt)"
-                >
+            <template
+              v-if="
+                getTicketStatus(item) !== DefaultTicketStatus.Completed &&
+                getTicketStatus(item) !== DefaultTicketStatus.Canceled &&
+                getTicketStatus(item) !== DefaultTicketStatus.Rejected
+              "
+            >
+              <template v-if="item.dueAt">
+                <!-- Always show message for overdue tickets -->
+                <template v-if="isDeadlineOverdue(item.dueAt)">
                   <span
-                    :class="getDeadlineDotClass(item.dueAt)"
-                    class="inline-block w-[9px] h-[9px] rounded-full"
-                  ></span>
-                  {{ calculateDeadline(item) }}
-                </span>
+                    class="flex items-center gap-2 justify-center"
+                    :class="getDeadlineClass(item.dueAt)"
+                  >
+                    <font-awesome-icon icon="exclamation-triangle" class="text-red-500 text-xs" />
+                    {{
+                      calculateDeadline(item) || getDeadlineInfoFromDate(item.dueAt)?.message || '-'
+                    }}
+                  </span>
+                </template>
+                <!-- Always show remaining days message -->
+                <template v-else-if="calculateDeadline(item) && calculateDeadline(item) !== ''">
+                  <span
+                    class="flex items-center gap-2 justify-center"
+                    :class="getDeadlineClass(item.dueAt)"
+                  >
+                    <span
+                      v-if="
+                        getDeadlineInfoFromDate(item.dueAt) &&
+                        getDeadlineInfoFromDate(item.dueAt)!.businessDaysRemaining <= 3
+                      "
+                      :class="getDeadlineDotClass(item.dueAt)"
+                      class="inline-block w-[9px] h-[9px] rounded-full"
+                    ></span>
+                    {{ calculateDeadline(item) }}
+                  </span>
+                </template>
+                <!-- Fallback: show date if calculateDeadline returns empty -->
+                <template v-else>
+                  {{ formatDateOnly(item.dueAt) }}
+                </template>
               </template>
-              <!-- For terminal status tickets, show date without dot -->
-              <template v-else>
-                {{ formatDateOnly(item.dueAt) }}
-              </template>
+              <template v-else> - </template>
             </template>
             <template v-else> - </template>
           </div>
@@ -891,6 +895,8 @@ const getDeadlineClass = (date?: string) => {
   if (!info.isOverdue && info.hoursDifference <= 6)
     return 'text-red-600 dark:text-red-400 font-semibold';
   if (info.businessDaysRemaining <= 2) return 'text-orange-500 dark:text-orange-400 font-semibold';
+  // Black when more than 3 days remaining
+  if (info.businessDaysRemaining > 3) return 'text-gray-900 dark:text-gray-100';
   return 'text-green-600 dark:text-green-400';
 };
 

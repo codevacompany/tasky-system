@@ -115,9 +115,9 @@ const props = withDefaults(defineProps<Props>(), {
 const currentPage = ref(1);
 const itemsPerPage = 10;
 
-// Sorting state
-const sortKey = ref<string | null>(null);
-const sortDirection = ref<'asc' | 'desc' | 'none'>('none');
+// Sorting state - default to sorting by resolvedTickets descending
+const sortKey = ref<string | null>('resolvedTickets');
+const sortDirection = ref<'asc' | 'desc' | 'none'>('desc');
 
 // Table headers
 const tableHeaders = computed<TableHeader<DepartmentStats>[]>(() => [
@@ -247,13 +247,16 @@ const handlePageChange = (page: number) => {
   currentPage.value = page;
 };
 
-// Reset pagination and sorting when stats change
+// Reset pagination when stats change (but keep default sorting)
 watch(
   () => props.stats,
   () => {
     currentPage.value = 1;
-    sortKey.value = null;
-    sortDirection.value = 'none';
+    // Keep default sorting by resolvedTickets descending
+    if (!sortKey.value) {
+      sortKey.value = 'resolvedTickets';
+      sortDirection.value = 'desc';
+    }
   },
 );
 </script>

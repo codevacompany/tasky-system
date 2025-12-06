@@ -31,8 +31,9 @@
                     :class="{
                       'menu-item-active': isActive('/'),
                     }"
-                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-gray-600 dark:text-gray-400 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover relative"
+                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-gray-600 dark:text-gray-400 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover relative gap-2"
                   >
+                    <font-awesome-icon icon="home" class="text-sm" />
                     Início
                   </div>
                 </li>
@@ -43,8 +44,9 @@
                     :class="{
                       'menu-item-active': isActive('/minhas-tarefas'),
                     }"
-                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-gray-600 dark:text-gray-400 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover relative"
+                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-gray-600 dark:text-gray-400 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover relative gap-2"
                   >
+                    <font-awesome-icon icon="tasks" class="text-sm" />
                     Tarefas
                   </div>
                 </li>
@@ -55,8 +57,9 @@
                     :class="{
                       'menu-item-active': isActive('/admin/relatorios'),
                     }"
-                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-gray-600 dark:text-gray-400 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover cursor-pointer relative"
+                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-gray-600 dark:text-gray-400 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover cursor-pointer relative gap-2"
                   >
+                    <font-awesome-icon icon="chart-line" class="text-sm" />
                     Relatórios
                   </div>
                 </li>

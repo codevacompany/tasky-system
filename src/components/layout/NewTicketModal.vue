@@ -1,10 +1,10 @@
 <template>
   <BaseModal
-    title="Novo Ticket"
+    title="Nova Tarefa"
     @close="closeModal"
     @cancel="resetForm"
     @confirm="handleSubmit"
-    :confirmButtonText="'Criar Ticket'"
+    :confirmButtonText="'Criar Tarefa'"
     :cancelButtonText="'Cancelar'"
     :closeOnClickOutside="false"
     :confirmButtonLoading="isLoading"
@@ -276,7 +276,7 @@ watch(
     if (isPrivate && selectedUser.value && Number(selectedUser.value) === currentUserId) {
       formData.value.isPrivate = false;
       selectedUser.value = null;
-      toast.warning('Você não pode criar um ticket privado para si mesmo.');
+      toast.warning('Você não pode criar uma tarefa privada para si mesmo.');
     }
   },
 );
@@ -606,7 +606,7 @@ const validateForm = () => {
     selectedUser.value &&
     Number(selectedUser.value) === currentUserId
   ) {
-    toast.error('Você não pode criar um ticket privado para si mesmo.');
+    toast.error('Você não pode criar uma tarefa privada para si mesmo.');
     return false;
   }
   if (!formData.value.name.trim()) {
@@ -740,11 +740,11 @@ const handleSubmit = async () => {
 
     await Promise.all([ticketsStore.fetchMyTickets(), ticketsStore.fetchDepartmentTickets()]);
 
-    toast.success('Ticket criado com sucesso!');
+    toast.success('Tarefa criada com sucesso!');
     emit('ticketCreated');
     closeModal();
   } catch {
-    toast.error('Erro ao criar ticket');
+    toast.error('Erro ao criar tarefa');
   } finally {
     isLoading.value = false;
   }
