@@ -2,19 +2,46 @@
   <section id="ticketsSection" class="px-4 pt-4 pb-4 md:px-6 md:pt-4 md:pb-0">
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Tarefas</h1>
-      <button
-        class="flex items-center gap-2 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-[13px] font-medium cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
-        @click="toggleView"
-        :title="
-          isKanbanView ? 'Mudar para visualização em tabela' : 'Mudar para visualização Kanban'
-        "
-      >
-        <font-awesome-icon :icon="isKanbanView ? 'table' : 'columns'" class="w-3 h-3" />
-        <span class="hidden sm:inline">{{
-          isKanbanView ? 'Visualização em Tabela' : 'Visualização Kanban'
-        }}</span>
-        <span class="sm:hidden">{{ isKanbanView ? 'Tabela' : 'Kanban' }}</span>
-      </button>
+      <div class="flex items-center gap-2">
+        <!-- View Toggle Button -->
+        <button
+          class="flex items-center justify-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
+          @click="toggleView"
+          :title="isKanbanView ? 'Alternar para Tabela' : 'Alternar para Kanban'"
+        >
+          <font-awesome-icon :icon="isKanbanView ? 'table' : 'columns'" class="w-[13px] h-[13px]" />
+          <span class="text-[13px] font-medium">{{ isKanbanView ? 'Tabela' : 'Kanban' }}</span>
+        </button>
+
+        <!-- Options Menu Button -->
+        <div class="relative view-menu-container">
+          <button
+            class="flex items-center justify-center w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
+            @click.stop="showViewMenu = !showViewMenu"
+            title="Opções"
+          >
+            <font-awesome-icon icon="ellipsis" class="w-4 h-4" />
+          </button>
+
+          <!-- View Menu Popup -->
+          <div
+            v-if="showViewMenu"
+            class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
+            @click.stop
+          >
+            <div class="py-1">
+              <!-- Tarefas arquivadas option -->
+              <button
+                @click="navigateToArchived"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+              >
+                <font-awesome-icon icon="archive" class="w-4 h-4" />
+                <span>Tarefas arquivadas</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Summary cards - moved to top, only visible in table view -->
@@ -88,12 +115,11 @@
             <div
               class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-4 px-6 gap-3 lg:gap-0 relative"
             >
-              <!-- Tabs Row - Centered -->
               <div
-                class="flex items-center justify-center lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2 w-full lg:w-auto"
+                class="flex items-center justify-start lg:absolute xl:left-1/2 xl:transform xl:-translate-x-1/2 w-full xl:w-auto"
               >
                 <div
-                  class="flex items-center justify-center p-0.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-x-auto"
+                  class="flex items-center justify-start lg:justify-center p-0.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-x-auto"
                   style="height: 36px; min-width: fit-content"
                 >
                   <div class="flex items-center gap-0 flex-shrink-0">
@@ -148,25 +174,13 @@
                     >
                       Tarefas Gerais
                     </button>
-                    <button
-                      :class="[
-                        'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
-                        activeTab === 'arquivadas'
-                          ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
-                      ]"
-                      style="font-size: 13px"
-                      @click="switchTab('arquivadas')"
-                    >
-                      Arquivadas
-                    </button>
                   </div>
                 </div>
               </div>
 
               <!-- Search and Filters Row -->
               <div
-                class="flex items-center justify-start lg:justify-end gap-2 mt-4 lg:mt-0 lg:ml-auto"
+                class="flex items-center justify-start gap-2 mt-4 lg:mt-0 lg:justify-end lg:ml-auto"
               >
                 <div class="relative w-full max-w-xs lg:w-56">
                   <font-awesome-icon
@@ -346,7 +360,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ticketService } from '@/services/ticketService';
 import { useTicketsStore } from '@/stores/tickets';
@@ -368,9 +382,9 @@ const router = useRouter();
 const ticketsStore = useTicketsStore();
 const { isTenantAdmin } = useRoles();
 
-type TicketsTab = 'recebidas' | 'criadas' | 'setor' | 'arquivadas' | 'gerais';
+type TicketsTab = 'recebidas' | 'criadas' | 'setor' | 'gerais';
 
-const BASE_TABS: TicketsTab[] = ['recebidas', 'criadas', 'setor', 'arquivadas'];
+const BASE_TABS: TicketsTab[] = ['recebidas', 'criadas', 'setor'];
 
 const getValidTabs = (includeGeneral: boolean) => {
   return includeGeneral ? [...BASE_TABS, 'gerais'] : [...BASE_TABS];
@@ -411,6 +425,7 @@ const selectedTicket = ref<Ticket | null>(null);
 const newCompletionDate = ref('');
 
 const isKanbanView = ref(false);
+const showViewMenu = ref(false);
 
 const showFiltersModal = ref(false);
 const isUpdatingUrl = ref(false);
@@ -427,7 +442,21 @@ onMounted(async () => {
   if (ticketCustomId) {
     selectedTicketCustomId.value = ticketCustomId;
   }
+
+  // Close view menu when clicking outside
+  document.addEventListener('click', handleClickOutside);
 });
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
+
+const handleClickOutside = (event: MouseEvent) => {
+  const target = event.target as HTMLElement;
+  if (!target.closest('.view-menu-container')) {
+    showViewMenu.value = false;
+  }
+};
 
 const debouncedSearch = debounce(() => {
   fetchTicketsWithFilters();
@@ -448,8 +477,6 @@ const tickets = computed(() => {
     case 'setor':
       ticketsData = ticketsStore.departmentTickets.data;
       break;
-    case 'arquivadas':
-      return ticketsStore.archivedTickets.data;
     case 'gerais':
       ticketsData = ticketsStore.tenantTickets.data;
       break;
@@ -476,8 +503,6 @@ const isLoading = computed(() => {
       return ticketsStore.myTickets.isLoading;
     case 'setor':
       return ticketsStore.departmentTickets.isLoading;
-    case 'arquivadas':
-      return ticketsStore.archivedTickets.isLoading;
     case 'gerais':
       return ticketsStore.tenantTickets.isLoading;
     default:
@@ -494,8 +519,6 @@ const totalPages = computed(() => {
       return Math.ceil(ticketsStore.myTickets.totalCount / 10);
     case 'setor':
       return Math.ceil(ticketsStore.departmentTickets.totalCount / 10);
-    case 'arquivadas':
-      return Math.ceil(ticketsStore.archivedTickets.totalCount / 10);
     case 'gerais':
       return Math.ceil(ticketsStore.tenantTickets.totalCount / 10);
     default:
@@ -554,14 +577,10 @@ const switchTab = (tab: TicketsTab) => {
 };
 
 const fetchTicketsWithFilters = async () => {
-  const typeMap: Record<
-    TicketsTab,
-    'received' | 'createdByMe' | 'department' | 'archived' | 'tenant'
-  > = {
+  const typeMap: Record<TicketsTab, 'received' | 'createdByMe' | 'department' | 'tenant'> = {
     recebidas: 'received',
     criadas: 'createdByMe',
     setor: 'department',
-    arquivadas: 'archived',
     gerais: 'tenant',
   };
 
@@ -723,6 +742,11 @@ const handleRejectTicket = async (ticket: Ticket) => {
 const toggleView = () => {
   isKanbanView.value = !isKanbanView.value;
   localStorageService.setTicketsViewPreference(isKanbanView.value ? 'kanban' : 'table');
+};
+
+const navigateToArchived = () => {
+  showViewMenu.value = false;
+  router.push('/minhas-tarefas/arquivadas');
 };
 
 const clearFilters = () => {

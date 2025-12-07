@@ -8,7 +8,7 @@
       :clickable="true"
       rowKey="customId"
       minWidth="1000px"
-      :showActions="true"
+      :showActions="false"
       @rowClick="openTicketDetails"
       @pageChange="changePage"
       @sort="handleSort"
@@ -691,7 +691,6 @@ const tableHeaders = computed<TableHeader<Ticket>[]>(() => {
   baseHeaders.push(
     { key: 'priority', label: 'Prioridade', align: 'center', width: 0.1 },
     { key: 'status', label: 'Status', align: 'center', width: 0.11 },
-    { key: 'dueDate', label: 'Prazo', align: 'center', width: 0.1 },
   );
 
   return baseHeaders;

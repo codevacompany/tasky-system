@@ -66,6 +66,10 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: '', component: UserHome },
       { path: 'minhas-tarefas', component: TicketsPage },
+      {
+        path: 'minhas-tarefas/arquivadas',
+        component: () => import('@/pages/user/ArchivedTicketsPage.vue'),
+      },
       { path: 'faq', component: () => import('@/pages/user/FAQ.vue') },
       { path: 'sync', component: SyncPage },
       { path: 'assinaturas', component: BillingPage },

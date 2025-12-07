@@ -81,6 +81,7 @@ import {
   faSortDown,
   faSort,
   faEdit,
+  faEllipsis,
   faEllipsisV,
   faTrash,
   faFilter,
@@ -101,6 +102,7 @@ import {
   faAnglesDown,
   faAnglesUp,
   faEquals,
+  faArchive,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -194,6 +196,7 @@ const icons = [
   faSortDown,
   faSort,
   faEdit,
+  faEllipsis,
   faEllipsisV,
   faTrash,
   faFilter,
@@ -214,6 +217,7 @@ const icons = [
   faAnglesDown,
   faAnglesUp,
   faEquals,
+  faArchive,
   faCommentRegular,
 ];
 
