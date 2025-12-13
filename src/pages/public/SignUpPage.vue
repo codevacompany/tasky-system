@@ -286,6 +286,13 @@
       class="hidden lg:flex flex-1 lg:flex-2 primary-gradient flex items-center justify-center p-6 lg:p-12 order-first lg:order-last min-h-64 lg:min-h-screen"
     >
       <div class="text-center max-w-lg">
+        <div class="mb-6 lg:mb-8">
+          <img
+            src="@/assets/images/tasky-pro-white.png"
+            alt="Tasky Logo"
+            class="h-auto w-32 lg:w-40 mx-auto"
+          />
+        </div>
         <h2 class="text-xl lg:text-3xl font-bold text-white mb-3 lg:mb-4">
           Transforme a gestão da sua empresa
         </h2>
