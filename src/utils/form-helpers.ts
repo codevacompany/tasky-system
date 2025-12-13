@@ -52,7 +52,7 @@ export function maskEmail(value: string): string {
  * @param email The email to validate
  */
 export function validateEmail(email: string): boolean {
-  return /^[\w-.]+@[\w-]+\.[a-zA-Z]{2,}$/.test(email);
+  return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 }
 
 /**
