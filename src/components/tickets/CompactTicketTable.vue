@@ -66,11 +66,9 @@
                     ? getAvatarStyle(
                         ticket.currentTargetUser?.department?.name ||
                           ticket.targetUsers?.[0]?.user?.department?.name ||
-                          getTargetUserName(ticket),
+                          '',
                       )
-                    : getAvatarStyle(
-                        ticket.requester?.department?.name || getRequesterName(ticket),
-                      )
+                    : getAvatarStyle(ticket.requester?.department?.name || '')
                 "
               >
                 <template v-if="title === 'Últimos Tickets Criados'">

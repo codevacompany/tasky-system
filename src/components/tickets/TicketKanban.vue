@@ -118,10 +118,7 @@
                         'w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold',
                       ]"
                       :style="{
-                        backgroundColor: getAvatarColor(
-                          ticket.requester.department?.name ||
-                            ticket.requester.firstName + ' ' + ticket.requester.lastName,
-                        ),
+                        backgroundColor: getAvatarColor(ticket.requester.department?.name || ''),
                       }"
                       :title="`Solicitante: ${ticket.requester.firstName} ${ticket.requester.lastName}${ticket.requester.department?.name ? ' - ' + ticket.requester.department.name : ''}`"
                     >
@@ -154,10 +151,7 @@
                         : '',
                     ]"
                     :style="{
-                      backgroundColor: getAvatarColor(
-                        targetUser.user.department?.name ||
-                          targetUser.user.firstName + ' ' + targetUser.user.lastName,
-                      ),
+                      backgroundColor: getAvatarColor(targetUser.user.department?.name || ''),
                     }"
                     :title="`${targetUser.user.firstName} ${targetUser.user.lastName}${targetUser.user.department?.name ? ' - ' + targetUser.user.department.name : ''}`"
                   >

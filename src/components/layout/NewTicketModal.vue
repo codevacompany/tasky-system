@@ -152,6 +152,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue';
+import { useRouter } from 'vue-router';
 import { ticketService } from '@/services/ticketService';
 import { departmentService } from '@/services/departmentService';
 import { userService } from '@/services/userService';
@@ -178,6 +179,7 @@ const emit = defineEmits<{
   (e: 'ticketCreated'): void;
 }>();
 
+const router = useRouter();
 const ticketsStore = useTicketsStore();
 const departments = ref<Department[]>([]);
 const availableUsers = ref<User[]>([]);
@@ -743,6 +745,7 @@ const handleSubmit = async () => {
     toast.success('Tarefa criada com sucesso!');
     emit('ticketCreated');
     closeModal();
+    router.push('/minhas-tarefas?tab=criadas');
   } catch {
     toast.error('Erro ao criar tarefa');
   } finally {

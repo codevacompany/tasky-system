@@ -218,7 +218,7 @@
 
           <!-- Success Step -->
           <div v-else class="text-center space-y-6">
-            <div class="bg-white rounded-xl p-6 lg:p-8 shadow-sm border border-gray-100">
+            <div class="bg-white rounded-xl p-6 lg:p-8">
               <div
                 class="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center"
               >
@@ -245,12 +245,12 @@
               </p>
 
               <div class="flex flex-col sm:flex-row gap-3">
-                <button
-                  class="w-full sm:w-auto px-6 py-2.5 lg:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors text-sm lg:text-base"
-                  @click="goToLanding"
+                <a
+                  href="https://taskypro.com.br/"
+                  class="w-full sm:w-auto px-6 py-2.5 lg:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors text-sm lg:text-base text-center"
                 >
                   Página Inicial
-                </button>
+                </a>
                 <button
                   class="w-full sm:flex-1 py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm lg:text-base"
                   @click="goToLogin"
@@ -461,10 +461,6 @@ function nextStep() {
 }
 function prevStep() {
   if (step.value > 1) step.value--;
-}
-
-function goToLanding() {
-  router.push('/landing');
 }
 
 function goToLogin() {
