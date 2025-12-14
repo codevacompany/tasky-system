@@ -47,14 +47,24 @@ class SignupService {
     return apiClient.post(`${this.baseUrl}/${id}/reject`);
   }
 
-  async completeRegistration(token: string, data: CompleteRegistrationPayload): Promise<AxiosResponse<LoginResponse>> {
+  async resendEmail(id: number) {
+    return apiClient.post(`${this.baseUrl}/${id}/resend-email`);
+  }
+
+  async completeRegistration(
+    token: string,
+    data: CompleteRegistrationPayload,
+  ): Promise<AxiosResponse<LoginResponse>> {
     try {
       const response = await apiClient.post(`${this.baseUrl}/complete/${token}`, data);
 
       const userStore = useUserStore();
-      if(response.data) {
+      if (response.data && response.data.token && response.data.user) {
         userStore.setUser(response.data.user);
         userStore.setIsNewUser(true);
+        if (response.data.hasActiveSubscription !== undefined) {
+          userStore.setHasActiveSubscription(response.data.hasActiveSubscription);
+        }
         localStorageService.setUser(response.data.user);
         localStorageService.setAccessToken(response.data.token.accessToken);
         localStorageService.setRefreshToken(response.data.token.refreshToken);

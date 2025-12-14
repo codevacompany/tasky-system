@@ -307,12 +307,7 @@
                   <div class="flex items-center gap-2">
                     <div
                       class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
-                      :style="
-                        getAvatarStyle(
-                          loadedTicket.requester.department?.name ||
-                            `${loadedTicket.requester.firstName} ${loadedTicket.requester.lastName}`,
-                        )
-                      "
+                      :style="getAvatarStyle(loadedTicket.requester.department?.name || '')"
                     >
                       {{
                         getUserInitials({
@@ -357,12 +352,7 @@
                           >
                             <div
                               class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
-                              :style="
-                                getAvatarStyle(
-                                  targetUser.user.department?.name ||
-                                    `${targetUser.user.firstName} ${targetUser.user.lastName}`,
-                                )
-                              "
+                              :style="getAvatarStyle(targetUser.user.department?.name || '')"
                             >
                               {{
                                 getUserInitials({
@@ -454,12 +444,7 @@
                   <div class="flex items-center gap-2">
                     <div
                       class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
-                      :style="
-                        getAvatarStyle(
-                          loadedTicket.reviewer.department?.name ||
-                            `${loadedTicket.reviewer.firstName} ${loadedTicket.reviewer.lastName}`,
-                        )
-                      "
+                      :style="getAvatarStyle(loadedTicket.reviewer.department?.name || '')"
                     >
                       {{
                         getUserInitials({
@@ -492,12 +477,29 @@
 
               <div class="flex items-start gap-3">
                 <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Criado em</p>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p
+                    class="text-sm text-gray-900 dark:text-gray-100"
+                    :title="loadedTicket.createdAt ? formatDateUtil(loadedTicket.createdAt) : ''"
+                  >
+                    {{ formatDateOnly(loadedTicket.createdAt) }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <div class="w-[40%]">
                   <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                     Concluir até
                   </p>
                 </div>
-                <p class="text-sm text-gray-900 dark:text-gray-100">
-                  {{ formatDate(loadedTicket.dueAt) }}
+                <p
+                  class="text-sm text-gray-900 dark:text-gray-100"
+                  :title="loadedTicket.dueAt ? formatDateUtil(loadedTicket.dueAt) : ''"
+                >
+                  {{ formatDateOnly(loadedTicket.dueAt) }}
                 </p>
               </div>
 
@@ -832,13 +834,7 @@
                         <div class="flex items-center gap-3 mb-1">
                           <div
                             class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-sm"
-                            :style="
-                              getAvatarStyle(
-                                event.data.user.department?.name ||
-                                  event.data.user.firstName ||
-                                  'User',
-                              )
-                            "
+                            :style="getAvatarStyle(event.data.user.department?.name || '')"
                           >
                             {{
                               getUserInitials({
@@ -1145,7 +1141,7 @@ import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import { useUserPreferencesStore } from '@/stores/userPreferences';
 import { toast } from 'vue3-toastify';
-import { formatRelativeTime } from '@/utils/date';
+import { formatRelativeTime, formatDate as formatDateUtil } from '@/utils/date';
 import ConfirmationModal from '../common/ConfirmationModal.vue';
 import {
   calculateDeadline,
@@ -2410,6 +2406,18 @@ const handleDatePickerChange = (value: any) => {
     dueDateValue.value = null;
     dueDateDate.value = null;
   }
+};
+
+const formatDateOnly = (date: string | Date | null | undefined): string => {
+  if (!date) return '-';
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  if (Number.isNaN(dateObj.getTime())) return '-';
+
+  const day = dateObj.getDate().toString().padStart(2, '0');
+  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+  const year = dateObj.getFullYear().toString().slice(-2);
+
+  return `${day}/${month}/${year}`;
 };
 
 const confirmDueDate = async () => {

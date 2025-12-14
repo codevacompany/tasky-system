@@ -147,12 +147,21 @@
                       </button>
                     </template>
                     <template v-else>
+                      <template v-if="signup.status === SignUpStatus.APPROVED">
+                        <button
+                          class="w-8 h-8 rounded flex items-center justify-center text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                          @click="resendEmail(signup)"
+                          title="Reenviar e-mail"
+                        >
+                          <font-awesome-icon icon="envelope" />
+                        </button>
+                      </template>
                       <span
+                        v-else
                         class="w-8 h-8 flex items-center justify-center opacity-70"
                         :class="{
                           'text-green-600': signup.status === SignUpStatus.COMPLETED,
                           'text-red-600': signup.status === SignUpStatus.REJECTED,
-                          'text-blue-600': signup.status === SignUpStatus.APPROVED,
                         }"
                         :title="`Cadastro ${formatStatus(signup.status).toLowerCase()}`"
                       >
@@ -364,6 +373,16 @@ async function rejectSignup(signup: CompanySignUp) {
   } catch (err) {
     console.error('Error rejecting signup:', err);
     toast.error('Erro ao rejeitar cadastro');
+  }
+}
+
+async function resendEmail(signup: CompanySignUp) {
+  try {
+    await signupService.resendEmail(signup.id);
+    toast.success(`E-mail reenviado para ${signup.contactEmail}`);
+  } catch (err) {
+    console.error('Error resending email:', err);
+    toast.error('Erro ao reenviar e-mail');
   }
 }
 

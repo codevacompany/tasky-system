@@ -13,7 +13,6 @@ import ClientManagement from '@/pages/admin/ClientManagement.vue';
 import ClientUsers from '@/pages/admin/ClientUsers.vue';
 import ClientSettings from '@/pages/admin/ClientSettings.vue';
 import SyncPage from '@/pages/user/SyncPage.vue';
-import LandingPage from '@/pages/public/LandingPage.vue';
 import { localStorageService } from '@/utils/localStorageService';
 import SignUpManagement from '@/pages/admin/SignUpManagement.vue';
 import BillingPage from '@/pages/admin/BillingPage.vue';
@@ -23,11 +22,6 @@ import { useUserStore } from '@/stores/user';
 
 const routes: RouteRecordRaw[] = [
   // Public Routes (No Layout)
-  {
-    path: '/landing',
-    component: LandingPage,
-    meta: { requiresAuth: false },
-  },
   {
     path: '/login',
     component: LoginPage,
