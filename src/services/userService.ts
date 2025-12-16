@@ -55,4 +55,10 @@ export const userService = {
   ): Promise<AxiosResponse<{ message: string }>> {
     return apiClient.patch(`/auth/admin/reset-password/${uuid}`, { newPassword });
   },
+
+  async resetPasswordWithRandomPassword(
+    uuid: string,
+  ): Promise<AxiosResponse<{ message: string }>> {
+    return apiClient.patch(`/auth/admin/reset-password-uuid/${uuid}`);
+  },
 };

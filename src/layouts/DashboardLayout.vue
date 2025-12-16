@@ -272,7 +272,7 @@
                   class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
                 >
                   <font-awesome-icon icon="tachometer-alt-average" />
-                  Dashboard
+                  Início
                 </div>
               </li>
             </router-link>
@@ -285,7 +285,7 @@
                   class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
                 >
                   <font-awesome-icon icon="ticket" />
-                  Tickets
+                  Tarefas
                 </div>
               </li>
             </router-link>

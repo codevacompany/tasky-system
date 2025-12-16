@@ -152,8 +152,7 @@ const sections = ref([
       },
       {
         question: 'Como defino a prioridade de uma tarefa?',
-        answer:
-          'Ao criar a tarefa, selecione a prioridade: Baixa, Média ou Alta.',
+        answer: 'Ao criar a tarefa, selecione a prioridade: Baixa, Média ou Alta.',
       },
       {
         question: 'Como aprovo, reprovo ou solicito correção de uma tarefa?',
@@ -243,7 +242,8 @@ const sections = ref([
       },
       {
         question: 'Como marco notificações como lidas?',
-        answer: 'Abra o painel de notificações e clique em cada uma para marcar como lida ou clique em "Marcar todas como lidas".',
+        answer:
+          'Abra o painel de notificações e clique em cada uma para marcar como lida ou clique em "Marcar todas como lidas".',
       },
     ],
   },
