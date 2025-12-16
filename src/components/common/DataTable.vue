@@ -79,18 +79,18 @@
 
           <!-- Data Rows -->
           <template v-else>
-            <tr
-              v-for="(item, idx) in data"
-              :key="getRowKey(item, idx)"
-              :class="[
-                'transition-colors duration-200',
-                selectedItems.includes(getRowId(item))
-                  ? 'bg-blue-50 dark:bg-blue-900/20'
-                  : 'hover:bg-gray-50 dark:hover:bg-gray-700',
-                clickable ? 'cursor-pointer' : '',
-              ]"
-              @click="clickable && handleRowClick(item)"
-            >
+          <tr
+            v-for="(item, idx) in data"
+            :key="getRowKey(item, idx)"
+            :class="[
+              'transition-colors duration-200',
+              selectedItems.includes(getRowId(item))
+                ? 'bg-blue-50 dark:bg-blue-900/20'
+                : 'hover:bg-gray-50 dark:hover:bg-gray-700',
+              clickable ? 'cursor-pointer' : '',
+            ]"
+            @click="clickable && handleRowClick(item)"
+          >
             <!-- Batch Selection Cell -->
             <td v-if="showBatchActions" class="relative w-12 px-6 sm:w-16 sm:px-8">
               <input

@@ -54,7 +54,7 @@
           </div>
           <div class="flex gap-2 sm:gap-3">
             <button
-              v-permission="PERMISSIONS.EXPORT_REPORTS"
+              v-permission="PERMISSIONS.EXPORT_REPORTS && isAdmin"
               @click="openExportModal"
               class="flex items-center gap-2 px-3 sm:px-4 py-2 btn btn-primary text-xs sm:text-sm text-white rounded-md font-medium transition-colors"
             >
@@ -1804,7 +1804,6 @@ import {
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import TabSelector from '@/components/common/TabSelector.vue';
 import Select from '@/components/common/Select.vue';
-import Input from '@/components/common/Input.vue';
 import BaseStatsWidget from '@/components/common/BaseStatsWidget.vue';
 import { toast } from 'vue3-toastify';
 import * as XLSX from 'xlsx';
@@ -1846,7 +1845,7 @@ const route = useRoute();
 const router = useRouter();
 const userPreferencesStore = useUserPreferencesStore();
 
-const { isSupervisor } = useRoles();
+const { isSupervisor, isAdmin } = useRoles();
 
 const tabUrlSlugMap: Record<string, string> = {
   overview: 'visao-geral',

@@ -27,7 +27,7 @@
     <p
       class="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-6 sm:mb-8 ml-0.5 text-center sm:text-left"
     >
-      Encontre respostas para as dúvidas mais comuns sobre o uso do Tasky System.
+      Encontre respostas para as dúvidas mais comuns sobre o uso do Tasky Pro.
     </p>
 
     <div class="flex flex-col gap-3 sm:gap-5">
@@ -63,7 +63,7 @@
       </div>
     </div>
 
-    <ChatSupportButton />
+    <!-- <ChatSupportButton /> -->
   </section>
 </template>
 
@@ -80,24 +80,19 @@ const sections = ref([
     icon: 'info-circle',
     faqs: [
       {
-        question: 'O que é o Tasky System?',
+        question: 'O que é o Tasky Pro?',
         answer:
-          'O Tasky System é uma plataforma web completa para gestão de tarefas, desenvolvida para facilitar a comunicação, o acompanhamento e a resolução de demandas entre equipes e setores de uma organização. Com o Tasky, você centraliza solicitações, padroniza processos e garante mais agilidade e transparência no dia a dia.',
+          'O Tasky Pro é uma plataforma web completa para gestão de tarefas, desenvolvida para facilitar a comunicação, o acompanhamento e a resolução de demandas entre equipes e setores de uma organização. Com o Tasky, você centraliza solicitações, padroniza processos e garante mais agilidade e transparência no dia a dia.',
       },
       {
         question: 'Quais são as principais funcionalidades do Tasky?',
         answer:
-          '<ul style="margin:0;padding-left:1.2em;"><li><b>Gestão de tarefas:</b> criação, acompanhamento, histórico e comentários.</li><li><b>Notificações automáticas:</b> mantenha-se informado sobre atualizações e prazos.</li><li><b>Controle de prioridades e prazos:</b> defina o que é mais urgente e acompanhe o andamento.</li><li><b>Permissões e perfis:</b> acesso personalizado para cada usuário ou setor.</li><li><b>Relatórios e dashboards:</b> visualize métricas, produtividade e gargalos.</li><li><b>Fluxo de aprovação:</b> tarefas podem passar por etapas de verificação e aprovação.</li><li><b>Responsividade:</b> acesso fácil em qualquer dispositivo.</li></ul>',
+          '<ul style="margin:0;padding-left:1.2em;list-style-type:disc;list-style-position:outside;"><li><b>Gestão de tarefas:</b> criação, acompanhamento, histórico e comentários.</li><li><b>Notificações automáticas:</b> mantenha-se informado sobre atualizações e prazos.</li><li><b>Controle de prioridades e prazos:</b> defina o que é mais urgente e acompanhe o andamento.</li><li><b>Permissões e perfis:</b> acesso personalizado para cada usuário.</li><li><b>Relatórios e dashboards:</b> visualize métricas, produtividade e gargalos.</li><li><b>Fluxo de aprovação:</b> tarefas podem passar por etapas de verificação e aprovação.</li></ul>',
       },
       {
-        question: 'Como o Tasky System pode melhorar o fluxo de trabalho da minha equipe?',
+        question: 'Como o Tasky Pro pode melhorar o fluxo de trabalho da minha equipe?',
         answer:
-          'O Tasky System centraliza todas as demandas em um só lugar, reduz retrabalho, evita perda de informações e facilita o acompanhamento de cada etapa da tarefa. Isso aumenta a transparência, melhora a comunicação entre setores e acelera a resolução de tarefas, tornando sua equipe mais produtiva e organizada.',
-      },
-      {
-        question: 'Quais navegadores e dispositivos são suportados?',
-        answer:
-          'O sistema funciona nos principais navegadores modernos (Chrome, Firefox, Edge, Safari) e é responsivo para uso em computadores, tablets e celulares.',
+          'O Tasky Pro centraliza todas as demandas em um só lugar, reduz retrabalho, evita perda de informações e facilita o acompanhamento de cada etapa da tarefa. Isso aumenta a transparência, melhora a comunicação entre setores e acelera a resolução de tarefas, tornando sua equipe mais produtiva e organizada.',
       },
     ],
   },
@@ -116,12 +111,7 @@ const sections = ref([
           'Clique em "Esqueci minha senha" na tela de login e siga as instruções para redefinir.',
       },
       {
-        question: 'Como altero meus dados pessoais?',
-        answer:
-          'Clique no seu perfil no canto superior direito, acesse "Meu Perfil" e edite suas informações.',
-      },
-      {
-        question: 'Como faço logout?',
+        question: 'Como saio do sistema?',
         answer: 'Clique em "Sair" no menu do seu perfil.',
       },
     ],
@@ -138,7 +128,7 @@ const sections = ref([
       {
         question: 'Qual a diferença entre tarefa privada e pública?',
         answer:
-          'Uma tarefa privada só pode ser visualizada pelo criador, pelo responsável e pelos administradores. Tarefas públicas podem ser visualizadas por todos os membros do setor ou equipe relacionados.',
+          'Uma tarefa privada só pode ser visualizada pelo criador, pelo responsável e pelos administradores. Tarefas públicas podem ser visualizadas por todos os membros do setor relacionado.',
       },
       {
         question: 'Quem pode visualizar minhas tarefas?',
@@ -148,7 +138,7 @@ const sections = ref([
       {
         question: 'O que são tarefas recebidas, criadas e do setor?',
         answer:
-          '<b>Recebidas</b>: tarefas atribuídas a você. <br><b>Criadas</b>: tarefas que você abriu. <br><b>Do setor</b>: tarefas do seu departamento, visíveis conforme permissões.',
+          '<b>Recebidas</b>: tarefas atribuídas a você. <br><b>Criadas</b>: tarefas que você abriu. <br><b>Do setor</b>: tarefas do seu setor, visíveis conforme permissões.',
       },
       {
         question: 'Como funciona o fluxo de uma tarefa?',
@@ -163,32 +153,22 @@ const sections = ref([
       {
         question: 'Como defino a prioridade de uma tarefa?',
         answer:
-          'Ao criar a tarefa, selecione a prioridade: Baixa, Média, Alta ou Urgente. Cada uma tem um prazo padrão.',
+          'Ao criar a tarefa, selecione a prioridade: Baixa, Média ou Alta.',
       },
       {
-        question: 'Como aprovo, rejeito ou solicito correção de uma tarefa?',
+        question: 'Como aprovo, reprovo ou solicito correção de uma tarefa?',
         answer:
-          'Na tela de detalhes da tarefa, utilize os botões de Aprovar, Rejeitar ou Corrigir conforme necessário.',
-      },
-      {
-        question: 'Como vejo o histórico e comentários de uma tarefa?',
-        answer:
-          'Abra a tarefa e acesse a aba de histórico para visualizar todas as ações realizadas e comentários registrados.',
+          'Na tela de detalhes da tarefa, utilize os botões de Aprovar, Reprovar ou Corrigir conforme necessário.',
       },
       {
         question: 'Quem pode comentar em uma tarefa?',
         answer:
-          'O criador, o responsável e, dependendo das permissões, outros membros do setor podem comentar em tarefas públicas.',
+          'O criador, o responsável e outros membros do setor podem comentar em tarefas públicas enquanto estiverem em andamento.',
       },
       {
         question: 'Como saber se uma tarefa é privada ou pública?',
         answer:
           'Na tela de detalhes da tarefa, há um indicador de privacidade. Tarefas privadas exibem um ícone de cadeado.',
-      },
-      {
-        question: 'Como funcionam os comentários em tarefas?',
-        answer:
-          'Você pode comentar em tarefas para registrar informações, dúvidas ou atualizações. O criador, o responsável e, em tarefas públicas, membros do setor podem comentar. Todos os comentários ficam registrados no histórico da tarefa.',
       },
       {
         question: 'Recebo notificações quando alguém comenta em uma tarefa?',
@@ -198,7 +178,22 @@ const sections = ref([
       {
         question: 'Quais são os status possíveis de uma tarefa?',
         answer:
-          '<b>Pendente</b>: aguardando aceite do responsável.<br><b>Em Andamento</b>: sendo tratada.<br><b>Em Verificação</b>: aguardando aprovação do solicitante.<br><b>Finalizado</b>: tarefa concluída.<br><b>Rejeitado</b>: tarefa recusada pelo solicitante.<br><b>Arquivado</b>: tarefa encerrada e guardada para consulta.',
+          '<p>Por padrão, uma tarefa pode ter os seguintes status:</p><b>Pendente</b>: aguardando aceite do responsável.<br><b>Em Andamento</b>: sendo tratada.<br><b>Em Verificação</b>: aguardando aprovação do solicitante.<br><b>Finalizado</b>: tarefa concluída.<br><b>Rejeitado</b>: tarefa recusada pelo solicitante.<br><b>Arquivado</b>: tarefa encerrada e guardada para consulta.',
+      },
+      {
+        question: 'Após quantos dias uma tarefa é arquivada automaticamente?',
+        answer:
+          'Tarefas com status "Finalizado" são arquivadas automaticamente após 7 dias da data de conclusão. Tarefas com status "Rejeitado" ou "Cancelado" são arquivadas imediatamente.',
+      },
+      {
+        question: 'Os prazos são obrigatórios?',
+        answer:
+          'Ao criar uma tarefa, o solicitante pode definir um prazo opcionalmente. Se o solicitante definir um prazo, ele não pode ser alterado posteriormente. Se a tarefa não tiver prazo definido pelo solicitante, o responsável que aceitar a tarefa DEVE definir um prazo obrigatoriamente no momento da aceitação. Isso garante que todas as tarefas em andamento tenham uma data estimada de conclusão para melhor controle e acompanhamento.',
+      },
+      {
+        question: 'Como funciona uma tarefa com múltiplos responsáveis ou setores?',
+        answer:
+          'Ao criar uma tarefa, você pode atribuir múltiplos responsáveis em uma ordem específica. A tarefa será encaminhada sequencialmente: apenas um responsável trabalha por vez. Quando o responsável atual concluir seu trabalho, ele pode usar o botão "Enviar Para Próximo Setor" para passar a tarefa para o próximo responsável na ordem definida. Todos os responsáveis atribuídos podem visualizar a tarefa, mas apenas o responsável atual pode trabalhar nela. Membros dos setores dos responsáveis também podem visualizar tarefas públicas relacionadas aos seus setores.',
       },
       {
         question: 'O que é a visualização Kanban?',
@@ -209,6 +204,27 @@ const sections = ref([
         question: 'Como acesso o Kanban?',
         answer:
           'Na página de tarefas, clique no botão de alternância para mudar entre a visualização em tabela e Kanban.',
+      },
+    ],
+  },
+  {
+    title: 'Funções de Colaboradores',
+    icon: 'users',
+    faqs: [
+      {
+        question: 'Quais são as permissões da função "Usuário"?',
+        answer:
+          '<ul style="margin:0;padding-left:1.2em;list-style-type:disc;list-style-position:outside;"><li>Pode criar e receber tarefas.</li><li>Pode ver tarefas do seu setor.</li><li>Tem acesso a suas estatísticas pessoais na home page.</li></ul>',
+      },
+      {
+        question: 'Quais são as permissões da função "Supervisor"?',
+        answer:
+          '<ul style="margin:0;padding-left:1.2em;list-style-type:disc;list-style-position:outside;"><li>Pode criar e receber tarefas.</li><li>Pode ver todas as tarefas do seu setor.</li><li>Pode ver as tarefas privadas do seu setor na lista de tarefas mas não pode abri-las.</li><li>Tem acesso a relatórios do seu setor.</li><li>É responsável por revisar tarefas que um colaborador do seu setor criou para si próprio.</li></ul>',
+      },
+      {
+        question: 'Quais são as permissões da função "Administrador"?',
+        answer:
+          '<ul style="margin:0;padding-left:1.2em;list-style-type:disc;list-style-position:outside;"><li>Pode criar e receber tarefas.</li><li>Pode ver todas as tarefas da empresa, incluindo as tarefas privadas.</li><li>Pode ser escolhido como revisor de tarefas que um colaborador criar para si próprio caso o setor não possua um Supervisor.</li><li>Tem acesso a relatórios gerais, estatísticaspor setor e por colaborador.</li></ul>',
       },
     ],
   },
@@ -227,7 +243,7 @@ const sections = ref([
       },
       {
         question: 'Como marco notificações como lidas?',
-        answer: 'Abra o painel de notificações e clique em cada uma para marcar como lida.',
+        answer: 'Abra o painel de notificações e clique em cada uma para marcar como lida ou clique em "Marcar todas como lidas".',
       },
     ],
   },
@@ -237,12 +253,18 @@ const sections = ref([
     faqs: [
       {
         question: 'Como acesso relatórios?',
-        answer: 'No menu lateral, clique em "Relatórios" para acessar gráficos e dados analíticos.',
+        answer:
+          'No menu superior, clique em "Relatórios" para acessar gráficos e dados analíticos.',
       },
       {
         question: 'Como exporto relatórios?',
         answer:
-          'Na tela de relatórios, clique em "Exportar" e escolha o formato desejado (PDF, XLS, CSV).',
+          'Na tela de relatórios, clique em "Exportar" e escolha o formato desejado (XLSX, CSV).',
+      },
+      {
+        question: 'O que é o % de Desempenho e como é calculado?',
+        answer:
+          'O % de Desempenho é uma métrica que avalia a performance de colaboradores e setores considerando tanto a taxa de resolução quanto o volume de tarefas. Ele é calculado usando o método estatístico Wilson Score, que ajusta a taxa de resolução (tarefas resolvidas / total de tarefas) considerando a confiabilidade estatística baseada no número de tarefas. Isso significa que um colaborador com 100% de resolução em apenas 1 tarefa terá um desempenho menor que outro com 70% de resolução em 100 tarefas, pois o segundo tem mais dados que comprovam sua performance. O método garante que rankings sejam mais justos e confiáveis, dando maior peso a performances com maior volume de dados.',
       },
     ],
   },
@@ -253,12 +275,7 @@ const sections = ref([
       {
         question: 'Meus dados estão seguros?',
         answer:
-          'Sim, utilizamos criptografia, autenticação segura e backups diários para garantir a segurança das informações.',
-      },
-      {
-        question: 'Quem tem acesso aos meus dados?',
-        answer:
-          'Apenas usuários autorizados da sua organização, conforme as permissões definidas pelo administrador.',
+          'Sim, utilizamos autenticação segura e backups diários para garantir a segurança das informações.',
       },
     ],
   },
@@ -269,11 +286,7 @@ const sections = ref([
       {
         question: 'Como entro em contato com o suporte?',
         answer:
-          'Clique no botão "Ajuda" no seu perfil ou envie um email para o suporte informado no rodapé do sistema.',
-      },
-      {
-        question: 'Existe documentação para usuários?',
-        answer: 'Sim, além desta FAQ, há um manual do usuário disponível na seção de documentação.',
+          'Clique no botão "Ajuda" no seu perfil ou envie um email para contato@taskysystem.com.br.',
       },
     ],
   },

@@ -59,12 +59,6 @@ Apenas usuários autorizados dentro da sua organização têm acesso aos dados, 
 ### O sistema funciona em dispositivos móveis?
 Sim, o sistema é totalmente responsivo e funciona em smartphones e tablets.
 
-### Quais navegadores são suportados?
-- Chrome (últimas 2 versões)
-- Firefox (últimas 2 versões)
-- Safari (últimas 2 versões)
-- Edge (últimas 2 versões)
-
 ## 💰 Planos e Preços
 
 ### Quais são os planos disponíveis?
