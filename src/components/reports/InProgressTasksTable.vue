@@ -6,10 +6,10 @@
       <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
         <div>
           <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-            Tickets em Andamento
+            Tarefas em Andamento
           </h2>
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            Acompanhe o progresso dos tickets atualmente sendo processados
+            Acompanhe o progresso das tarefas atualmente sendo processadas
           </p>
         </div>
         <div class="mt-4 sm:mt-0 flex items-center gap-4">
@@ -161,7 +161,7 @@ const tableHeaders = computed<TableHeader<InProgressTask>[]>(() => [
   },
   {
     key: 'ticket',
-    label: 'Título do Chamado',
+    label: 'Título',
     sortable: false,
     align: 'left',
   },

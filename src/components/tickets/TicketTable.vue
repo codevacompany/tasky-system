@@ -457,7 +457,7 @@
             </div>
             <div class="flex flex-col items-center gap-1">
               <p class="text-sm font-medium text-gray-600 dark:text-gray-300 m-0">
-                Nenhum ticket encontrado
+                Nenhuma tarefa encontrada
               </p>
             </div>
           </div>

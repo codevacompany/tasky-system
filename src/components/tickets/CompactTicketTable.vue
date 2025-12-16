@@ -42,10 +42,10 @@
             </div>
             <div class="flex flex-col items-center gap-1">
               <p class="text-sm font-medium text-gray-600 dark:text-gray-300 m-0">
-                Nenhum ticket encontrado
+                Nenhuma tarefa encontrada
               </p>
               <p class="text-xs text-gray-500 dark:text-gray-400 m-0">
-                Tickets recentes aparecerão aqui
+                Tarefas recentes aparecerão aqui
               </p>
             </div>
           </div>
@@ -186,10 +186,10 @@
                 </div>
                 <div class="flex flex-col items-center gap-1">
                   <p class="text-sm font-medium text-gray-600 dark:text-gray-300 m-0">
-                    Nenhum ticket encontrado
+                    Nenhuma tarefa encontrada
                   </p>
                   <p class="text-xs text-gray-500 dark:text-gray-400 m-0">
-                    Tickets recentes aparecerão aqui
+                    Tarefas recentes aparecerão aqui
                   </p>
                 </div>
               </div>
