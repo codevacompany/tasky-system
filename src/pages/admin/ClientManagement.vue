@@ -742,45 +742,17 @@
 
         <div v-if="!resetPasswordResult" class="mb-6">
           <p class="text-gray-700 dark:text-gray-300 mb-4">
-            Digite a nova senha para o usuário
-            <strong>{{ userToReset?.firstName }} {{ userToReset?.lastName }}</strong
-            >:
+            Uma nova senha será gerada automaticamente e enviada por email para o usuário
+            <strong>{{ userToReset?.firstName }} {{ userToReset?.lastName }}</strong>
+            ({{ userToReset?.email }}).
           </p>
 
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Nova Senha
-              </label>
-              <Input
-                v-model="newPassword"
-                type="password"
-                placeholder="Digite a nova senha"
-                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                :disabled="isResettingPassword"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Confirmar Senha
-              </label>
-              <Input
-                v-model="confirmPassword"
-                type="password"
-                placeholder="Confirme a nova senha"
-                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                :disabled="isResettingPassword"
-              />
-            </div>
-          </div>
-
           <div
-            class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mt-4"
+            class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mt-4"
           >
-            <p class="text-sm text-yellow-800 dark:text-yellow-200">
-              <font-awesome-icon icon="exclamation-triangle" class="mr-2" />
-              A nova senha será enviada por email para o usuário.
+            <p class="text-sm text-blue-800 dark:text-blue-200">
+              <font-awesome-icon icon="info-circle" class="mr-2" />
+              A senha será gerada automaticamente pelo sistema e enviada por email para o usuário.
             </p>
           </div>
         </div>
@@ -920,8 +892,6 @@ const newClient = ref({
 const showPasswordResetModal = ref(false);
 const userToReset = ref<any>(null);
 const isResettingPassword = ref(false);
-const newPassword = ref('');
-const confirmPassword = ref('');
 const resetPasswordResult = ref<{ message: string } | null>(null);
 
 const stats = computed(() => {
@@ -950,6 +920,7 @@ const clients = computed(() => {
     nextInvoice: '2024-04-15',
     users: tenant.users.map((user) => ({
       id: user.id,
+      uuid: user.uuid,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
@@ -1165,25 +1136,9 @@ const resetPassword = (user: any) => {
 const confirmPasswordReset = async () => {
   if (!userToReset.value) return;
 
-  // Validate passwords
-  if (!newPassword.value || !confirmPassword.value) {
-    toast.error('Por favor, preencha ambos os campos de senha');
-    return;
-  }
-
-  if (newPassword.value !== confirmPassword.value) {
-    toast.error('As senhas não coincidem');
-    return;
-  }
-
-  if (newPassword.value.length < 8) {
-    toast.error('A senha deve ter pelo menos 8 caracteres');
-    return;
-  }
-
   try {
     isResettingPassword.value = true;
-    const response = await userService.resetPassword(userToReset.value.uuid, newPassword.value);
+    const response = await userService.resetPasswordWithRandomPassword(userToReset.value.uuid);
     resetPasswordResult.value = response.data;
     toast.success('Senha redefinida com sucesso!');
   } catch (error: any) {
@@ -1197,8 +1152,6 @@ const closePasswordResetModal = () => {
   showPasswordResetModal.value = false;
   userToReset.value = null;
   resetPasswordResult.value = null;
-  newPassword.value = '';
-  confirmPassword.value = '';
 };
 
 const renewTrial = async (client: any) => {
