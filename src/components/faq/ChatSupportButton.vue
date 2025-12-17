@@ -124,7 +124,7 @@ const sendMessage = () => {
     userMessage.toLowerCase().includes('acesso')
   ) {
     addSupportMessage(
-      'Para problemas de acesso à conta, verifique se está usando as credenciais corretas. Se persistir, entre em contato com o administrador do sistema no e-mail: suporte@taskysystem.com',
+      'Para problemas de acesso à conta, verifique se está usando as credenciais corretas. Se persistir, entre em contato conosco no e-mail: contato@taskypro.com.br',
     );
   } else {
     addSupportMessage(

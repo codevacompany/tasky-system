@@ -12,7 +12,7 @@
         >Ver todos</router-link
       >
     </div>
-    <div v-if="title === 'Últimos Tickets Criados' || title === 'Últimos Tickets Recebidos'">
+    <div v-if="title === 'Últimas Tarefas Criadas' || title === 'Últimas Tarefas Recebidas'">
       <!-- New Design for Received/Created Tickets -->
       <div class="px-6 pb-6">
         <div v-if="isLoading" class="space-y-4">
@@ -54,7 +54,7 @@
           <div
             v-for="(ticket, index) in tickets"
             :key="ticket.id"
-            class="flex items-center gap-4 py-4 px-4 border border-dashed dark:border-solid border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200 cursor-pointer"
+            class="flex items-center gap-4 py-4 px-4 border dark:border-solid border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200 cursor-pointer"
             @click="handleTicketClick(ticket)"
           >
             <!-- Avatar and User Info -->
@@ -62,7 +62,7 @@
               <div
                 class="w-[34px] h-[34px] rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0"
                 :style="
-                  title === 'Últimos Tickets Criados'
+                  title === 'Últimas Tarefas Criadas'
                     ? getAvatarStyle(
                         ticket.currentTargetUser?.department?.name ||
                           ticket.targetUsers?.[0]?.user?.department?.name ||
@@ -71,7 +71,7 @@
                     : getAvatarStyle(ticket.requester?.department?.name || '')
                 "
               >
-                <template v-if="title === 'Últimos Tickets Criados'">
+                <template v-if="title === 'Últimas Tarefas Criadas'">
                   {{ getTargetUserInitials(ticket) }}
                 </template>
                 <template v-else>
@@ -80,7 +80,7 @@
               </div>
               <div class="flex flex-col min-w-0">
                 <p class="text-sm font-semibold text-gray-900 dark:text-white m-0 truncate">
-                  <template v-if="title === 'Últimos Tickets Criados'">
+                  <template v-if="title === 'Últimas Tarefas Criadas'">
                     {{ getTargetUserName(ticket) }}
                   </template>
                   <template v-else>
@@ -88,7 +88,7 @@
                   </template>
                 </p>
                 <p class="text-xs text-gray-500 dark:text-gray-400 m-0 truncate">
-                  <template v-if="title === 'Últimos Tickets Criados'">
+                  <template v-if="title === 'Últimas Tarefas Criadas'">
                     {{
                       ticket.currentTargetUser?.department?.name ||
                       ticket.targetUsers?.[0]?.user?.department?.name ||

@@ -177,7 +177,7 @@ const tableHeaders = computed<TableHeader<UserRankingItemDto>[]>(() => [
   },
   {
     key: 'resolvedTickets',
-    label: 'Tickets Resolvidos',
+    label: 'Tarefas Resolvidas',
     sortable: true,
     sortKey: 'resolvedTickets',
     align: 'center',
@@ -185,7 +185,7 @@ const tableHeaders = computed<TableHeader<UserRankingItemDto>[]>(() => [
   },
   {
     key: 'totalTickets',
-    label: 'Tickets Totais',
+    label: 'Tarefas Totais',
     sortable: true,
     sortKey: 'totalTickets',
     align: 'center',

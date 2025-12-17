@@ -256,7 +256,7 @@ const settings = ref({
   personalizacao: {
     corPrimaria: '#007BFF',
     logo: '/logos/empresa-abc.png',
-    mensagemBoasVindas: 'Bem-vindo ao sistema de tickets da Empresa ABC!',
+    mensagemBoasVindas: 'Bem-vindo ao sistema de gerenciamento detarefas da Empresa ABC!',
   },
   integracoes: {
     slack: true,

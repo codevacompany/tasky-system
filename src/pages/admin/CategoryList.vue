@@ -248,7 +248,7 @@ const deleteCategory = async () => {
     loadCategories();
   } catch (error) {
     if (error instanceof AxiosError && error.response?.status === 400) {
-      toast.error('Já existem tickets com essa categoria e por isso não pode ser excluída.');
+      toast.error('Já existem tarefas com essa categoria e por isso não pode ser excluída.');
     } else {
       toast.error('Erro ao excluir categoria. Tente novamente.');
     }

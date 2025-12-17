@@ -647,7 +647,7 @@
 
               <!-- Status Duration Chart -->
               <BaseStatsWidget
-                info-message="Esta análise mostra quanto tempo em média os tickets permanecem em cada status. Tempos altos em determinados status podem indicar gargalos no processo. Os dados são apresentados com barras proporcionais ao tempo médio de cada status."
+                info-message="Esta análise mostra quanto tempo em média as tarefas permanecem em cada status. Tempos altos em determinados status podem indicar gargalos no processo. Os dados são apresentados com barras proporcionais ao tempo médio de cada status."
               >
                 <template #title>Tempo Médio Por Status</template>
 
@@ -658,7 +658,7 @@
                     </p>
                     <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                       <p>
-                        Esta análise mostra quanto tempo em média os tickets permanecem em cada
+                        Esta análise mostra quanto tempo em média as tarefas permanecem em cada
                         status.
                       </p>
                       <p>Tempos altos em determinados status podem indicar gargalos no processo.</p>
@@ -1621,7 +1621,7 @@
               <!-- Status Distribution Trends -->
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <BaseStatsWidget
-                  info-message="Esta análise mostra quanto tempo em média os tickets permanecem em cada status. Tempos altos em determinados status podem indicar gargalos no processo. Os dados são apresentados com barras proporcionais ao tempo médio de cada status."
+                  info-message="Esta análise mostra quanto tempo em média as tarefas permanecem em cada status. Tempos altos em determinados status podem indicar gargalos no processo. Os dados são apresentados com barras proporcionais ao tempo médio de cada status."
                 >
                   <template #title>Tempo Médio Por Status</template>
 
