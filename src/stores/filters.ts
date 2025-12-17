@@ -6,29 +6,52 @@ export interface FilterParams {
   [key: string]: string | number | undefined;
 }
 
+interface FilterContext {
+  filters: FilterParams;
+  _searchTimeout: NodeJS.Timeout | null;
+  _currentSearchValue: string;
+}
+
 interface FiltersState {
   filters: FilterParams;
+  contexts: Record<string, FilterContext>;
+  currentContext: string | null;
   isLoading: boolean;
   routeName: string;
   _navigating: boolean;
-  _searchTimeout: NodeJS.Timeout | null;
-  _currentSearchValue: string;
 }
 
 export const useFiltersStore = defineStore('filters', {
   state: (): FiltersState => ({
     filters: {},
+    contexts: {},
+    currentContext: null,
     isLoading: false,
     routeName: '',
     _navigating: false,
-    _searchTimeout: null,
-    _currentSearchValue: '',
   }),
 
   getters: {
+    currentFilters(): FilterParams {
+      if (this.currentContext && this.contexts[this.currentContext]) {
+        return this.contexts[this.currentContext].filters;
+      }
+      return this.filters;
+    },
+
+    getContextFilters: (state) => {
+      return (contextKey: string): FilterParams => {
+        if (state.contexts[contextKey]) {
+          return state.contexts[contextKey].filters;
+        }
+        return {};
+      };
+    },
+
     activeFilters(): FilterParams {
+      const filters = this.currentFilters;
       return Object.fromEntries(
-        Object.entries(this.filters).filter(([key, value]) => {
+        Object.entries(filters).filter(([key, value]) => {
           return (
             key !== 'page' &&
             key !== 'sortBy' &&
@@ -45,16 +68,16 @@ export const useFiltersStore = defineStore('filters', {
     },
 
     currentSortBy(): string | undefined {
-      return this.filters.sortBy as string | undefined;
+      return this.currentFilters.sortBy as string | undefined;
     },
 
     currentSortOrder(): 'asc' | 'desc' | undefined {
-      return this.filters.sortOrder as 'asc' | 'desc' | undefined;
+      return this.currentFilters.sortOrder as 'asc' | 'desc' | undefined;
     },
 
     currentSortDirection(): 'asc' | 'desc' | 'none' {
-      const sortBy = this.filters.sortBy as string | undefined;
-      const sortOrder = this.filters.sortOrder as 'asc' | 'desc' | undefined;
+      const sortBy = this.currentFilters.sortBy as string | undefined;
+      const sortOrder = this.currentFilters.sortOrder as 'asc' | 'desc' | undefined;
 
       if (sortBy && sortOrder) {
         return sortOrder;
@@ -63,27 +86,99 @@ export const useFiltersStore = defineStore('filters', {
     },
 
     currentPage(): number {
-      return (this.filters.page as number) || 1;
+      return (this.currentFilters.page as number) || 1;
     },
 
     currentSearch(): string | undefined {
-      return this.filters.name as string | undefined;
+      return this.currentFilters.name as string | undefined;
     },
   },
 
   actions: {
-    initialize(routeName: string, initialFilters: FilterParams = {}) {
-      this.routeName = routeName;
+    setContext(contextKey: string) {
+      this.currentContext = contextKey;
+      if (!this.contexts[contextKey]) {
+        this.contexts[contextKey] = {
+          filters: {},
+          _searchTimeout: null,
+          _currentSearchValue: '',
+        };
+      }
+    },
 
-      // Read URL parameters if no initial filters provided
-      if (Object.keys(initialFilters).length === 0) {
+    initializeContext(
+      contextKey: string,
+      initialFilters: FilterParams = {},
+      force = false,
+      skipUrlRead = false,
+    ) {
+      if (!this.contexts[contextKey]) {
+        this.contexts[contextKey] = {
+          filters: {},
+          _searchTimeout: null,
+          _currentSearchValue: '',
+        };
+      }
+
+      const existingFilters = this.contexts[contextKey].filters;
+      const hasExistingFilters =
+        Object.keys(existingFilters).length > 0 &&
+        Object.values(existingFilters).some(
+          (v) => v !== undefined && v !== null && String(v).trim() !== '',
+        );
+
+      if (!force && hasExistingFilters && Object.keys(initialFilters).length === 0) {
+        return;
+      }
+
+      if (Object.keys(initialFilters).length === 0 && !skipUrlRead) {
         const urlParams = new URLSearchParams(window.location.search);
         const urlFilters: FilterParams = {};
 
-        // Read all URL parameters
         urlParams.forEach((value, key) => {
           if (key === 'page') {
             urlFilters[key] = parseInt(value, 10);
+          } else if (key === 'search') {
+            urlFilters.name = value;
+          } else {
+            urlFilters[key] = value;
+          }
+        });
+
+        if (!hasExistingFilters || force) {
+          this.contexts[contextKey].filters = {
+            ...this.contexts[contextKey].filters,
+            ...urlFilters,
+          };
+        }
+      } else {
+        const cleanedFilters = Object.fromEntries(
+          Object.entries(initialFilters).filter(([, value]) => {
+            if (value === undefined || value === null) return false;
+            const stringValue = String(value).trim();
+            return stringValue !== '';
+          }),
+        );
+
+        this.contexts[contextKey].filters = {
+          ...this.contexts[contextKey].filters,
+          ...cleanedFilters,
+        };
+      }
+    },
+
+    initialize(routeName: string, initialFilters: FilterParams = {}, skipUrlRead = false) {
+      this.routeName = routeName;
+
+      if (!skipUrlRead && Object.keys(initialFilters).length === 0) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlFilters: FilterParams = {};
+
+        urlParams.forEach((value, key) => {
+          if (key === 'page') {
+            urlFilters[key] = parseInt(value, 10);
+          } else if (key === 'search') {
+            urlFilters.name = value;
           } else {
             urlFilters[key] = value;
           }
@@ -96,13 +191,15 @@ export const useFiltersStore = defineStore('filters', {
     },
 
     applyFilters(newFilters: Partial<FilterParams> = {}, resetPage = true) {
-      // Prevent multiple calls
       if (this._navigating) return;
 
-      // Merge new filters with existing ones
-      const updatedFilters = { ...this.filters, ...newFilters };
+      const targetFilters =
+        this.currentContext && this.contexts[this.currentContext]
+          ? this.contexts[this.currentContext].filters
+          : this.filters;
 
-      // Clean empty values - remove parameters that are empty strings, undefined, or null
+      const updatedFilters = { ...targetFilters, ...newFilters };
+
       const cleanFilters = Object.fromEntries(
         Object.entries(updatedFilters).filter(([, value]) => {
           if (value === undefined || value === null) return false;
@@ -111,13 +208,15 @@ export const useFiltersStore = defineStore('filters', {
         }),
       );
 
-      // Reset page when filters change (except when page itself changes)
       if (resetPage && !('page' in newFilters) && Object.keys(newFilters).length > 0) {
         delete cleanFilters.page;
       }
 
-      this.filters = cleanFilters;
-      this._navigate();
+      if (this.currentContext && this.contexts[this.currentContext]) {
+        this.contexts[this.currentContext].filters = cleanFilters;
+      } else {
+        this.filters = cleanFilters;
+      }
     },
 
     setFilter(key: string, value: string | number | undefined) {
@@ -136,7 +235,6 @@ export const useFiltersStore = defineStore('filters', {
           this.clearFilter('sortOrder');
         }
       } else {
-        // New sort key, default to asc
         this.applyFilters({ sortBy: sortKey, sortOrder: 'asc' });
       }
     },
@@ -146,41 +244,74 @@ export const useFiltersStore = defineStore('filters', {
     },
 
     clearFilter(key: string) {
-      const newFilters = { ...this.filters };
+      const targetFilters =
+        this.currentContext && this.contexts[this.currentContext]
+          ? this.contexts[this.currentContext].filters
+          : this.filters;
+
+      const newFilters = { ...targetFilters };
       delete newFilters[key];
-      this.filters = newFilters;
-      this._navigate();
+
+      if (this.currentContext && this.contexts[this.currentContext]) {
+        this.contexts[this.currentContext].filters = newFilters;
+      } else {
+        this.filters = newFilters;
+      }
     },
 
     clearAllFilters() {
-      // Preserve only page
-      const { page } = this.filters;
-      this.filters = { page };
-      this._navigate();
+      const targetFilters =
+        this.currentContext && this.contexts[this.currentContext]
+          ? this.contexts[this.currentContext].filters
+          : this.filters;
+
+      const { page } = targetFilters;
+      const clearedFilters = { page };
+
+      if (this.currentContext && this.contexts[this.currentContext]) {
+        this.contexts[this.currentContext].filters = clearedFilters;
+      } else {
+        this.filters = clearedFilters;
+      }
     },
 
-    // Debounced search method
     setSearch(value: string) {
-      // Store the current search value immediately
-      this._currentSearchValue = value;
+      const context =
+        this.currentContext && this.contexts[this.currentContext]
+          ? this.contexts[this.currentContext]
+          : null;
 
-      // Clear any existing timeout
-      if (this._searchTimeout) {
-        clearTimeout(this._searchTimeout);
-        this._searchTimeout = null;
-      }
+      if (context) {
+        context._currentSearchValue = value;
 
-      this._searchTimeout = setTimeout(() => {
-        // Use the stored value to ensure we have the latest
-        const searchValue = this._currentSearchValue;
+        if (context._searchTimeout) {
+          clearTimeout(context._searchTimeout);
+          context._searchTimeout = null;
+        }
+
+        context._searchTimeout = setTimeout(() => {
+          const searchValue = context._currentSearchValue;
+
+          if (searchValue.trim() === '') {
+            this.clearFilter('name');
+          } else {
+            this.applyFilters({ name: searchValue });
+          }
+          context._searchTimeout = null;
+        }, SEARCH_DEBOUNCE_DELAY);
+      } else {
+        const searchValue = value;
 
         if (searchValue.trim() === '') {
           this.clearFilter('name');
         } else {
           this.applyFilters({ name: searchValue });
         }
-        this._searchTimeout = null;
-      }, SEARCH_DEBOUNCE_DELAY);
+      }
+    },
+
+    syncUrl() {
+      this._navigate();
     },
 
     _navigate() {
@@ -189,27 +320,29 @@ export const useFiltersStore = defineStore('filters', {
       this.isLoading = true;
       this._navigating = true;
 
-      // Build URL from scratch to avoid stale parameters
       const baseUrl = window.location.origin + window.location.pathname;
-
-      // Build search params from current filters only
       const searchParams = new URLSearchParams();
-      Object.keys(this.filters).forEach((key) => {
+      const filtersToUse = this.currentFilters;
+
+      if (this.currentContext) {
+        searchParams.set('tab', this.currentContext);
+      }
+
+      Object.keys(filtersToUse).forEach((key) => {
         if (
-          this.filters[key] !== undefined &&
-          this.filters[key] !== null &&
-          String(this.filters[key]).trim() !== ''
+          filtersToUse[key] !== undefined &&
+          filtersToUse[key] !== null &&
+          String(filtersToUse[key]).trim() !== ''
         ) {
-          searchParams.set(key, String(this.filters[key]));
+          const urlKey = key === 'name' ? 'search' : key;
+          searchParams.set(urlKey, String(filtersToUse[key]));
         }
       });
 
-      // Construct final URL
       const finalUrl = searchParams.toString() ? `${baseUrl}?${searchParams.toString()}` : baseUrl;
 
       window.history.replaceState({}, '', finalUrl);
 
-      // Simulate async completion
       setTimeout(() => {
         this.isLoading = false;
         this._navigating = false;

@@ -2,8 +2,8 @@
   <div
     class="kanban-container flex gap-4 p-3 px-2 overflow-x-auto h-[calc(100vh-234px)] bg-white dark:bg-gray-900 rounded-lg relative w-full"
   >
-    <!-- Skeleton while loading columns -->
-    <template v-if="ticketsStore.statusColumns.isLoading || kanbanColumns.length === 0">
+    <!-- Skeleton while loading columns or tickets -->
+    <template v-if="props.isLoading || ticketsStore.statusColumns.isLoading || kanbanColumns.length === 0">
       <div
         v-for="n in 5"
         :key="`col-skeleton-${n}`"
@@ -289,6 +289,7 @@ import BaseModal from '@/components/common/BaseModal.vue';
 const props = defineProps<{
   tickets: Ticket[];
   activeTab?: 'recebidas' | 'criadas' | 'setor' | 'arquivadas' | 'gerais';
+  isLoading?: boolean;
 }>();
 
 const emit = defineEmits(['viewTicket']);
