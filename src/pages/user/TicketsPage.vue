@@ -282,6 +282,12 @@
             >
             <Select v-model="modalPriorityFilter" :options="priorityOptions" />
           </div>
+          <div v-if="activeTab !== 'setor' && activeTab !== 'recebidas'">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >Setor:</label
+            >
+            <Select v-model="modalDepartmentFilter" :options="departmentOptions" />
+          </div>
         </div>
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
           <button
@@ -377,6 +383,8 @@ import Input from '@/components/common/Input.vue';
 import { toast } from 'vue3-toastify';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { localStorageService } from '@/utils/localStorageService';
+import { departmentService } from '@/services/departmentService';
+import type { Department } from '@/models';
 
 const route = useRoute();
 const router = useRouter();
@@ -414,6 +422,7 @@ const searchTerm = computed({
 
 const modalStatusFilter = ref<string>('');
 const modalPriorityFilter = ref<string>('');
+const modalDepartmentFilter = ref<string>('');
 
 const statusFilter = computed({
   get: () => (filtersStore.currentFilters.status as string) || '',
@@ -471,20 +480,25 @@ onMounted(async () => {
 
   const urlFilters: Record<string, string | number> = {};
   if (route.query.status) urlFilters.status = route.query.status as string;
-  if (route.query.priority) urlFilters.priority = route.query.priority as string;
+  if (route.query.prioridade) urlFilters.priority = route.query.prioridade as string;
   if (route.query.search) urlFilters.name = route.query.search as string;
+  if (route.query.setor) {
+    urlFilters.departmentUuid = route.query.setor as string;
+  }
   if (route.query.page) {
     urlFilters.page = parseInt(route.query.page as string, 10);
   } else {
     urlFilters.page = 1;
   }
 
-  filtersStore.initializeContext(
-    tabToUse,
-    urlFilters,
-    true,
-    false,
-  );
+  filtersStore.initializeContext(tabToUse, urlFilters, true, false);
+
+  try {
+    const deptResponse = await departmentService.fetch({ limit: 100 });
+    departments.value = deptResponse.data.items;
+  } catch (error) {
+    console.error('Error fetching departments:', error);
+  }
 
   await fetchTicketsWithFilters();
 
@@ -598,11 +612,24 @@ const priorityOptions = computed(() => [
   { value: TicketPriority.High, label: formatSnakeToNaturalCase(TicketPriority.High) },
 ]);
 
+const departments = ref<Department[]>([]);
+const departmentOptions = computed(() => {
+  const options = [{ value: '', label: 'Todos' }];
+  departments.value.forEach((dept) => {
+    options.push({ value: dept.uuid, label: dept.name });
+  });
+  return options;
+});
+
 const activeFiltersCount = computed(() => {
   let count = 0;
   if (statusFilter.value && statusFilter.value !== '') count++;
   if (priorityFilter.value && priorityFilter.value !== '') count++;
   if (searchTerm.value) count++;
+  if (activeTab.value !== 'setor' && activeTab.value !== 'recebidas') {
+    const departmentFilter = filtersStore.currentFilters.departmentUuid;
+    if (departmentFilter && departmentFilter !== '' && departmentFilter !== null) count++;
+  }
   return count;
 });
 
@@ -617,10 +644,17 @@ const syncUrlWithFilters = () => {
     query.status = String(currentFilters.status);
   }
   if (currentFilters.priority) {
-    query.priority = String(currentFilters.priority);
+    query.prioridade = String(currentFilters.priority);
   }
   if (currentFilters.name) {
     query.search = String(currentFilters.name);
+  }
+  if (
+    activeTab.value !== 'setor' &&
+    activeTab.value !== 'recebidas' &&
+    currentFilters.departmentUuid
+  ) {
+    query.setor = String(currentFilters.departmentUuid);
   }
   const pageNum =
     typeof currentFilters.page === 'number'
@@ -665,6 +699,10 @@ const switchTab = (tab: TicketsTab, skipUrlSync = false) => {
 
   const previousTab = activeTab.value;
   activeTab.value = tab;
+
+  if (tab === 'setor' || tab === 'recebidas') {
+    filtersStore.clearFilter('departmentUuid');
+  }
 
   if (!skipUrlSync && !isUpdatingUrl.value) {
     syncUrlWithFilters();
@@ -719,6 +757,7 @@ const fetchTicketsWithFilters = async () => {
     priority?: TicketPriority | null;
     status?: DefaultTicketStatus | null;
     name?: string;
+    departmentUuid?: string | null;
   } = {};
 
   if (currentFilters.priority && String(currentFilters.priority).trim() !== '') {
@@ -731,6 +770,15 @@ const fetchTicketsWithFilters = async () => {
 
   if (currentFilters.name && String(currentFilters.name).trim()) {
     filters.name = String(currentFilters.name).trim();
+  }
+
+  if (
+    storeType !== 'department' &&
+    storeType !== 'received' &&
+    currentFilters.departmentUuid &&
+    currentFilters.departmentUuid !== null
+  ) {
+    filters.departmentUuid = String(currentFilters.departmentUuid);
   }
 
   await ticketsStore.setCurrentPage(storeType, currentPage.value, filters);
@@ -874,16 +922,22 @@ const navigateToArchived = () => {
 const clearFilters = () => {
   modalStatusFilter.value = '';
   modalPriorityFilter.value = '';
+  modalDepartmentFilter.value = '';
   filtersStore.clearAllFilters();
   fetchTicketsWithFilters();
   showFiltersModal.value = false;
 };
 
 const applyFilters = () => {
-  filtersStore.applyFilters({
+  const filtersToApply: Record<string, any> = {
     status: modalStatusFilter.value || undefined,
     priority: modalPriorityFilter.value || undefined,
-  });
+  };
+  if (activeTab.value !== 'setor' && activeTab.value !== 'recebidas') {
+    filtersToApply.departmentUuid = modalDepartmentFilter.value || undefined;
+  }
+  filtersStore.applyFilters(filtersToApply);
+  syncUrlWithFilters();
   fetchTicketsWithFilters();
   showFiltersModal.value = false;
 };
@@ -892,6 +946,11 @@ watch(showFiltersModal, (isOpen) => {
   if (isOpen) {
     modalStatusFilter.value = (filtersStore.currentFilters.status as string) || '';
     modalPriorityFilter.value = (filtersStore.currentFilters.priority as string) || '';
+    if (activeTab.value !== 'setor' && activeTab.value !== 'recebidas') {
+      modalDepartmentFilter.value = (filtersStore.currentFilters.departmentUuid as string) || '';
+    } else {
+      modalDepartmentFilter.value = '';
+    }
   }
 });
 
@@ -951,11 +1010,13 @@ let previousFilters: {
   status: string | number | undefined;
   priority: string | number | undefined;
   name: string | number | undefined;
+  departmentUuid: string | number | undefined;
   page: number;
 } = {
   status: filtersStore.currentFilters.status,
   priority: filtersStore.currentFilters.priority,
   name: filtersStore.currentFilters.name,
+  departmentUuid: filtersStore.currentFilters.departmentUuid,
   page: filtersStore.currentPage,
 };
 
@@ -969,6 +1030,7 @@ watch(
         status: filtersStore.currentFilters.status,
         priority: filtersStore.currentFilters.priority,
         name: filtersStore.currentFilters.name,
+        departmentUuid: filtersStore.currentFilters.departmentUuid,
         page: filtersStore.currentPage,
       };
     }
@@ -980,15 +1042,17 @@ watch(
     filtersStore.currentFilters.status,
     filtersStore.currentFilters.priority,
     filtersStore.currentFilters.name,
+    filtersStore.currentFilters.departmentUuid,
     filtersStore.currentPage,
   ],
-  ([status, priority, name, page]) => {
+  ([status, priority, name, departmentUuid, page]) => {
     if (filtersStore.currentContext !== previousContext) {
       previousContext = filtersStore.currentContext;
       previousFilters = {
         status,
         priority,
         name,
+        departmentUuid,
         page: typeof page === 'number' ? page : parseInt(String(page ?? 1), 10),
       };
       return;
@@ -998,12 +1062,14 @@ watch(
       status !== previousFilters.status ||
       priority !== previousFilters.priority ||
       name !== previousFilters.name ||
+      departmentUuid !== previousFilters.departmentUuid ||
       (page ?? 1) !== previousFilters.page;
 
     previousFilters = {
       status,
       priority,
       name,
+      departmentUuid,
       page: typeof page === 'number' ? page : parseInt(String(page ?? 1), 10),
     };
 

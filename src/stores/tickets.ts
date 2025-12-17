@@ -12,6 +12,7 @@ export type TicketListFilters = {
   status?: DefaultTicketStatus | null;
   priority?: TicketPriority | null;
   name?: string;
+  departmentUuid?: string | null;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 };
@@ -234,6 +235,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         if (currentFilters.name) {
           params.name = currentFilters.name;
         }
+        if (currentFilters.departmentUuid !== undefined && currentFilters.departmentUuid !== null) {
+          params.departmentUuid = currentFilters.departmentUuid;
+        }
         if (currentFilters.sortBy) {
           params.sortBy = currentFilters.sortBy;
         }
@@ -308,6 +312,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         if (currentFilters.name) {
           params.name = currentFilters.name;
         }
+        if (currentFilters.departmentUuid !== undefined && currentFilters.departmentUuid !== null) {
+          params.departmentUuid = currentFilters.departmentUuid;
+        }
         if (currentFilters.sortBy) {
           params.sortBy = currentFilters.sortBy;
         }
@@ -381,6 +388,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         if (currentFilters.name) {
           params.name = currentFilters.name;
+        }
+        if (currentFilters.departmentUuid !== undefined && currentFilters.departmentUuid !== null) {
+          params.departmentUuid = currentFilters.departmentUuid;
         }
         if (currentFilters.sortBy) {
           params.sortBy = currentFilters.sortBy;
@@ -494,6 +504,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         if (currentFilters.name) {
           params.name = currentFilters.name;
+        }
+        if (currentFilters.departmentUuid !== undefined && currentFilters.departmentUuid !== null) {
+          params.departmentUuid = currentFilters.departmentUuid;
         }
         if (currentFilters.sortBy) {
           params.sortBy = currentFilters.sortBy;

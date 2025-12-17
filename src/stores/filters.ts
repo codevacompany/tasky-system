@@ -140,6 +140,10 @@ export const useFiltersStore = defineStore('filters', {
             urlFilters[key] = parseInt(value, 10);
           } else if (key === 'search') {
             urlFilters.name = value;
+          } else if (key === 'setor') {
+            urlFilters.departmentUuid = value;
+          } else if (key === 'prioridade') {
+            urlFilters.priority = value;
           } else {
             urlFilters[key] = value;
           }
@@ -179,6 +183,10 @@ export const useFiltersStore = defineStore('filters', {
             urlFilters[key] = parseInt(value, 10);
           } else if (key === 'search') {
             urlFilters.name = value;
+          } else if (key === 'setor') {
+            urlFilters.departmentUuid = value;
+          } else if (key === 'prioridade') {
+            urlFilters.priority = value;
           } else {
             urlFilters[key] = value;
           }
@@ -334,7 +342,12 @@ export const useFiltersStore = defineStore('filters', {
           filtersToUse[key] !== null &&
           String(filtersToUse[key]).trim() !== ''
         ) {
-          const urlKey = key === 'name' ? 'search' : key;
+          let urlKey = key === 'name' ? 'search' : key;
+          if (key === 'departmentUuid') {
+            urlKey = 'setor';
+          } else if (key === 'priority') {
+            urlKey = 'prioridade';
+          }
           searchParams.set(urlKey, String(filtersToUse[key]));
         }
       });
