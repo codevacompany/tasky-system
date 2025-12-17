@@ -85,7 +85,7 @@
    - Funcionalidades essenciais
    - Suporte por email
 
-2. **Profissional**
+2. **Avançado**
    - Até 50 usuários
    - Todas as funcionalidades
    - Suporte prioritário

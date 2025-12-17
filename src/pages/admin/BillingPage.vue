@@ -415,14 +415,14 @@ const mockPayments = [
   {
     id: 1,
     date: new Date('2024-02-29'),
-    plan: 'Plano Crescer',
+    plan: 'Plano Essencial',
     amount: 199.0,
     status: 'Pago',
   },
   {
     id: 2,
     date: new Date('2024-01-31'),
-    plan: 'Plano Crescer',
+    plan: 'Plano Essencial',
     amount: 199.0,
     status: 'Suspenso',
   },
@@ -442,7 +442,7 @@ const loadPlans = async () => {
       if (b.slug === 'customizado') return -1;
 
       // For other plans, maintain their original order
-      const order = ['iniciante', 'crescer', 'profissional'];
+      const order = ['basico', 'essencial', 'avancado'];
       const aIndex = order.indexOf(a.slug);
       const bIndex = order.indexOf(b.slug);
 
@@ -545,22 +545,22 @@ const getCircleDashOffset = () => {
 
 const getPlanFeatures = (plan: SubscriptionPlan) => {
   const features: { [key: string]: { users: string; features: string[] } } = {
-    iniciante: {
+    basico: {
       users: 'Até 5 usuários',
       features: ['Funcionalidades básicas de tickets', 'Dashboard simples', 'Notificações in-app'],
     },
-    crescer: {
+    essencial: {
       users: 'Até 15 usuários',
       features: [
-        'Todas as funcionalidades do iniciante',
+        'Todas as funcionalidades do Básico',
         'Analytics básicos',
         'Notificações por email',
       ],
     },
-    profissional: {
+    avancado: {
       users: 'Até 30 usuários',
       features: [
-        'Todas as funcionalidades do Crescer',
+        'Todas as funcionalidades do Essencial',
         'Analytics avançados',
         'Exportação de relatórios',
         'Supervisores por departamento',

@@ -31,6 +31,11 @@ export const authService = {
       const userstore = useUserStore();
       userstore.setUser(response.data.user);
       userstore.setHasActiveSubscription(response.data.hasActiveSubscription);
+
+      if (response.data.user.loginCount === 1) {
+        userstore.setIsNewUser(true);
+      }
+
       localStorageService.setAccessToken(response.data.token.accessToken);
       localStorageService.setRefreshToken(response.data.token.refreshToken);
 

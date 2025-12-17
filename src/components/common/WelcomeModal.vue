@@ -23,12 +23,20 @@
         </div>
 
         <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
-          Bem-vindo ao Tasky System!
+          Bem-vindo ao Tasky Pro!
         </h2>
 
-        <p class="text-base leading-6 mb-6 max-w-[450px] text-gray-700 dark:text-gray-300">
-          Vamos começar! Você e sua equipe podem usar o Tasky System gratuitamente por 14 dias.
-          Explore nosso guia ou comece agora mesmo a organizar suas tarefas.
+        <p
+          v-if="isTenantAdmin"
+          class="text-base leading-6 mb-6 max-w-[450px] text-gray-700 dark:text-gray-300"
+        >
+          Vamos começar! Você e sua equipe podem usar o Tasky Pro gratuitamente por 14 dias. Explore
+          nosso guia ou comece agora mesmo a organizar suas tarefas.
+        </p>
+        <p v-else class="text-base leading-6 mb-6 max-w-[450px] text-gray-700 dark:text-gray-300">
+          Estamos felizes em tê-lo aqui! Você faz parte de uma equipe que está transformando a forma
+          de trabalhar. Explore nosso guia para conhecer todas as funcionalidades ou comece agora
+          mesmo a organizar suas tarefas e colaborar com sua equipe.
         </p>
 
         <div class="flex gap-4 mt-2">
@@ -36,7 +44,7 @@
             class="px-5 py-3.5 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-600 rounded-md font-medium cursor-pointer transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-600"
             @click="close"
           >
-            Ver Dashboard
+            Começar
           </button>
           <button
             class="px-5 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium cursor-pointer transition-all duration-200"
@@ -51,8 +59,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
 import { useUserStore } from '@/stores/user';
+import { useRoles } from '@/composables/useRoles';
 
 defineProps({
   isOpen: {
@@ -64,6 +72,7 @@ defineProps({
 const emit = defineEmits(['close', 'openGuide']);
 
 const userStore = useUserStore();
+const { isTenantAdmin } = useRoles();
 
 const close = () => {
   userStore.setIsNewUser(false);
