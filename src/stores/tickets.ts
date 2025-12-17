@@ -12,6 +12,7 @@ export type TicketListFilters = {
   status?: DefaultTicketStatus | null;
   priority?: TicketPriority | null;
   name?: string;
+  departmentUuid?: string | null;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 };
@@ -154,17 +155,54 @@ export const useTicketsStore = defineStore('tickets', () => {
     };
   });
 
+  function shouldShowLoadingForFetch(
+    newFilters: TicketListFilters | undefined,
+    storedFilters: TicketListFilters | undefined,
+    newPage: number,
+    storedPage: number,
+    filtersProvided: boolean,
+    dataLength: number,
+    lastFetched: Date | null,
+  ): boolean {
+    const normalizeFilters = (f: TicketListFilters | undefined) => {
+      if (!f) return {};
+      return Object.fromEntries(
+        Object.entries(f).filter(
+          ([, v]) => v !== undefined && v !== null && String(v).trim() !== '',
+        ),
+      );
+    };
+
+    const normalizedNewFilters = normalizeFilters(newFilters);
+    const normalizedStoredFilters = normalizeFilters(storedFilters);
+
+    const filtersChanged =
+      filtersProvided &&
+      (JSON.stringify(normalizedNewFilters) !== JSON.stringify(normalizedStoredFilters) ||
+        newPage !== storedPage);
+
+    return filtersChanged || dataLength === 0 || !lastFetched;
+  }
+
   // Actions
   async function fetchMyTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     const userStore = useUserStore();
     if (!userStore.user) return;
 
-    // Use current page if no page is provided
     const currentPage = page ?? myTickets.value.currentPage;
-    // Use current filters if no filters are provided
     const currentFilters = filters ?? myTickets.value.currentFilters;
 
-    if (!isPollingActive.value) {
+    if (
+      shouldShowLoadingForFetch(
+        currentFilters,
+        myTickets.value.currentFilters,
+        currentPage,
+        myTickets.value.currentPage,
+        filters !== undefined,
+        myTickets.value.data.length,
+        myTickets.value.lastFetched,
+      )
+    ) {
       myTickets.value.isLoading = true;
     }
 
@@ -176,7 +214,6 @@ export const useTicketsStore = defineStore('tickets', () => {
       const viewPreference = localStorageService.getTicketsViewPreference();
       const isKanbanView = viewPreference === 'kanban';
 
-      // For kanban view, always use page 1 and disable pagination
       const pageToUse = isKanbanView ? 1 : currentPage;
       if (isKanbanView) {
         myTickets.value.currentPage = 1;
@@ -184,7 +221,6 @@ export const useTicketsStore = defineStore('tickets', () => {
 
       const params: Record<string, unknown> = { page: pageToUse, limit };
 
-      // Disable pagination for kanban view
       if (isKanbanView) {
         params.paginated = false;
       }
@@ -198,6 +234,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         if (currentFilters.name) {
           params.name = currentFilters.name;
+        }
+        if (currentFilters.departmentUuid !== undefined && currentFilters.departmentUuid !== null) {
+          params.departmentUuid = currentFilters.departmentUuid;
         }
         if (currentFilters.sortBy) {
           params.sortBy = currentFilters.sortBy;
@@ -227,12 +266,20 @@ export const useTicketsStore = defineStore('tickets', () => {
     const userStore = useUserStore();
     if (!userStore.user) return;
 
-    // Use current page if no page is provided
     const currentPage = page ?? receivedTickets.value.currentPage;
-    // Use current filters if no filters are provided
     const currentFilters = filters ?? receivedTickets.value.currentFilters;
 
-    if (!isPollingActive.value) {
+    if (
+      shouldShowLoadingForFetch(
+        currentFilters,
+        receivedTickets.value.currentFilters,
+        currentPage,
+        receivedTickets.value.currentPage,
+        filters !== undefined,
+        receivedTickets.value.data.length,
+        receivedTickets.value.lastFetched,
+      )
+    ) {
       receivedTickets.value.isLoading = true;
     }
 
@@ -244,7 +291,6 @@ export const useTicketsStore = defineStore('tickets', () => {
       const viewPreference = localStorageService.getTicketsViewPreference();
       const isKanbanView = viewPreference === 'kanban';
 
-      // For kanban view, always use page 1 and disable pagination
       const pageToUse = isKanbanView ? 1 : currentPage;
       if (isKanbanView) {
         receivedTickets.value.currentPage = 1;
@@ -252,7 +298,6 @@ export const useTicketsStore = defineStore('tickets', () => {
 
       const params: Record<string, unknown> = { page: pageToUse, limit };
 
-      // Disable pagination for kanban view
       if (isKanbanView) {
         params.paginated = false;
       }
@@ -266,6 +311,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         if (currentFilters.name) {
           params.name = currentFilters.name;
+        }
+        if (currentFilters.departmentUuid !== undefined && currentFilters.departmentUuid !== null) {
+          params.departmentUuid = currentFilters.departmentUuid;
         }
         if (currentFilters.sortBy) {
           params.sortBy = currentFilters.sortBy;
@@ -295,12 +343,20 @@ export const useTicketsStore = defineStore('tickets', () => {
     const userStore = useUserStore();
     if (!userStore.user?.departmentId) return;
 
-    // Use current page if no page is provided
     const currentPage = page ?? departmentTickets.value.currentPage;
-    // Use current filters if no filters are provided
     const currentFilters = filters ?? departmentTickets.value.currentFilters;
 
-    if (!isPollingActive.value) {
+    if (
+      shouldShowLoadingForFetch(
+        currentFilters,
+        departmentTickets.value.currentFilters,
+        currentPage,
+        departmentTickets.value.currentPage,
+        filters !== undefined,
+        departmentTickets.value.data.length,
+        departmentTickets.value.lastFetched,
+      )
+    ) {
       departmentTickets.value.isLoading = true;
     }
 
@@ -312,7 +368,6 @@ export const useTicketsStore = defineStore('tickets', () => {
       const viewPreference = localStorageService.getTicketsViewPreference();
       const isKanbanView = viewPreference === 'kanban';
 
-      // For kanban view, always use page 1 and disable pagination
       const pageToUse = isKanbanView ? 1 : currentPage;
       if (isKanbanView) {
         departmentTickets.value.currentPage = 1;
@@ -320,7 +375,6 @@ export const useTicketsStore = defineStore('tickets', () => {
 
       const params: Record<string, unknown> = { page: pageToUse, limit };
 
-      // Disable pagination for kanban view
       if (isKanbanView) {
         params.paginated = false;
       }
@@ -334,6 +388,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         if (currentFilters.name) {
           params.name = currentFilters.name;
+        }
+        if (currentFilters.departmentUuid !== undefined && currentFilters.departmentUuid !== null) {
+          params.departmentUuid = currentFilters.departmentUuid;
         }
         if (currentFilters.sortBy) {
           params.sortBy = currentFilters.sortBy;
@@ -405,7 +462,17 @@ export const useTicketsStore = defineStore('tickets', () => {
     const currentPage = page ?? tenantTickets.value.currentPage;
     const currentFilters = filters ?? tenantTickets.value.currentFilters;
 
-    if (!isPollingActive.value) {
+    if (
+      shouldShowLoadingForFetch(
+        currentFilters,
+        tenantTickets.value.currentFilters,
+        currentPage,
+        tenantTickets.value.currentPage,
+        filters !== undefined,
+        tenantTickets.value.data.length,
+        tenantTickets.value.lastFetched,
+      )
+    ) {
       tenantTickets.value.isLoading = true;
     }
 
@@ -417,7 +484,6 @@ export const useTicketsStore = defineStore('tickets', () => {
       const viewPreference = localStorageService.getTicketsViewPreference();
       const isKanbanView = viewPreference === 'kanban';
 
-      // For kanban view, always use page 1 and disable pagination
       const pageToUse = isKanbanView ? 1 : currentPage;
       if (isKanbanView) {
         tenantTickets.value.currentPage = 1;
@@ -425,7 +491,6 @@ export const useTicketsStore = defineStore('tickets', () => {
 
       const params: Record<string, unknown> = { page: pageToUse, limit };
 
-      // Disable pagination for kanban view
       if (isKanbanView) {
         params.paginated = false;
       }
@@ -439,6 +504,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         if (currentFilters.name) {
           params.name = currentFilters.name;
+        }
+        if (currentFilters.departmentUuid !== undefined && currentFilters.departmentUuid !== null) {
+          params.departmentUuid = currentFilters.departmentUuid;
         }
         if (currentFilters.sortBy) {
           params.sortBy = currentFilters.sortBy;

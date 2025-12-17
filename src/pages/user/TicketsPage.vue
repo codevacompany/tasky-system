@@ -237,6 +237,7 @@
               v-else
               :tickets="tickets"
               :activeTab="activeTab"
+              :isLoading="isLoading"
               @viewTicket="handleViewTicket"
             />
           </div>
@@ -273,13 +274,19 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               >Status:</label
             >
-            <Select v-model="statusFilter" :options="statusOptions" />
+            <Select v-model="modalStatusFilter" :options="statusOptions" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               >Prioridade:</label
             >
-            <Select v-model="priorityFilter" :options="priorityOptions" />
+            <Select v-model="modalPriorityFilter" :options="priorityOptions" />
+          </div>
+          <div v-if="activeTab !== 'setor' && activeTab !== 'recebidas'">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >Setor:</label
+            >
+            <Select v-model="modalDepartmentFilter" :options="departmentOptions" />
           </div>
         </div>
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
@@ -364,7 +371,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ticketService } from '@/services/ticketService';
 import { useTicketsStore } from '@/stores/tickets';
-import { useUserStore } from '@/stores/user';
+import { useFiltersStore } from '@/stores/filters';
 import type { Ticket } from '@/models';
 import { DefaultTicketStatus, TicketPriority } from '@/models';
 import { useRoles } from '@/composables/useRoles';
@@ -374,12 +381,15 @@ import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import Select from '@/components/common/Select.vue';
 import Input from '@/components/common/Input.vue';
 import { toast } from 'vue3-toastify';
-import { debounce, formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { localStorageService } from '@/utils/localStorageService';
+import { departmentService } from '@/services/departmentService';
+import type { Department } from '@/models';
 
 const route = useRoute();
 const router = useRouter();
 const ticketsStore = useTicketsStore();
+const filtersStore = useFiltersStore();
 const { isTenantAdmin } = useRoles();
 
 type TicketsTab = 'recebidas' | 'criadas' | 'setor' | 'gerais';
@@ -401,20 +411,39 @@ const getInitialTab = (): TicketsTab => {
   return 'recebidas';
 };
 
-const getInitialFilters = () => {
-  return {
-    status: (route.query.status as string) || '',
-    priority: (route.query.priority as string) || '',
-    search: (route.query.search as string) || '',
-    page: parseInt(route.query.page as string) || 1,
-  };
-};
-
 const activeTab = ref<TicketsTab>(getInitialTab());
-const searchTerm = ref(getInitialFilters().search);
-const statusFilter = ref<string>(getInitialFilters().status);
-const priorityFilter = ref<string>(getInitialFilters().priority);
-const currentPage = ref(getInitialFilters().page);
+
+const searchTerm = computed({
+  get: () => filtersStore.currentSearch || '',
+  set: (value: string) => {
+    filtersStore.setSearch(value);
+  },
+});
+
+const modalStatusFilter = ref<string>('');
+const modalPriorityFilter = ref<string>('');
+const modalDepartmentFilter = ref<string>('');
+
+const statusFilter = computed({
+  get: () => (filtersStore.currentFilters.status as string) || '',
+  set: (value: string) => {
+    filtersStore.setFilter('status', value || undefined);
+  },
+});
+
+const priorityFilter = computed({
+  get: () => (filtersStore.currentFilters.priority as string) || '',
+  set: (value: string) => {
+    filtersStore.setFilter('priority', value || undefined);
+  },
+});
+
+const currentPage = computed({
+  get: () => filtersStore.currentPage,
+  set: (value: number) => {
+    filtersStore.setPage(value);
+  },
+});
 
 const availableTabs = computed<TicketsTab[]>(() =>
   isTenantAdmin.value ? [...BASE_TABS, 'gerais'] : [...BASE_TABS],
@@ -428,22 +457,56 @@ const isKanbanView = ref(false);
 const showViewMenu = ref(false);
 
 const showFiltersModal = ref(false);
-const isUpdatingUrl = ref(false);
 const selectedTicketCustomId = ref<string | null>(null);
+const isUpdatingUrl = ref(false);
 
 onMounted(async () => {
   const savedView = localStorageService.getTicketsViewPreference();
   isKanbanView.value = savedView === 'kanban';
 
+  filtersStore.initialize('tickets', {}, true);
+
+  const urlTab = route.query.tab as string;
+  const tabToUse =
+    urlTab && availableTabs.value.includes(urlTab as TicketsTab)
+      ? (urlTab as TicketsTab)
+      : activeTab.value;
+
+  if (tabToUse !== activeTab.value) {
+    activeTab.value = tabToUse;
+  }
+
+  filtersStore.setContext(tabToUse);
+
+  const urlFilters: Record<string, string | number> = {};
+  if (route.query.status) urlFilters.status = route.query.status as string;
+  if (route.query.prioridade) urlFilters.priority = route.query.prioridade as string;
+  if (route.query.search) urlFilters.name = route.query.search as string;
+  if (route.query.setor) {
+    urlFilters.departmentUuid = route.query.setor as string;
+  }
+  if (route.query.page) {
+    urlFilters.page = parseInt(route.query.page as string, 10);
+  } else {
+    urlFilters.page = 1;
+  }
+
+  filtersStore.initializeContext(tabToUse, urlFilters, true, false);
+
+  try {
+    const deptResponse = await departmentService.fetch({ limit: 100 });
+    departments.value = deptResponse.data.items;
+  } catch (error) {
+    console.error('Error fetching departments:', error);
+  }
+
   await fetchTicketsWithFilters();
 
-  // Check if there's a ticket customId in the URL
   const ticketCustomId = route.query.ticket as string;
   if (ticketCustomId) {
     selectedTicketCustomId.value = ticketCustomId;
   }
 
-  // Close view menu when clicking outside
   document.addEventListener('click', handleClickOutside);
 });
 
@@ -457,12 +520,6 @@ const handleClickOutside = (event: MouseEvent) => {
     showViewMenu.value = false;
   }
 };
-
-const debouncedSearch = debounce(() => {
-  fetchTicketsWithFilters();
-  // Update URL after search completes
-  updateUrlWithFilters();
-}, 400);
 
 const tickets = computed(() => {
   let ticketsData: Ticket[] = [];
@@ -484,7 +541,6 @@ const tickets = computed(() => {
       return [];
   }
 
-  // Filter out canceled and rejected tickets (we only reach here for non-archived tabs)
   return ticketsData.filter(
     (ticket) =>
       ticket.ticketStatus?.key !== DefaultTicketStatus.Canceled &&
@@ -510,7 +566,6 @@ const isLoading = computed(() => {
   }
 });
 
-// Get total pages from the store
 const totalPages = computed(() => {
   switch (activeTab.value) {
     case 'recebidas':
@@ -557,23 +612,129 @@ const priorityOptions = computed(() => [
   { value: TicketPriority.High, label: formatSnakeToNaturalCase(TicketPriority.High) },
 ]);
 
+const departments = ref<Department[]>([]);
+const departmentOptions = computed(() => {
+  const options = [{ value: '', label: 'Todos' }];
+  departments.value.forEach((dept) => {
+    options.push({ value: dept.uuid, label: dept.name });
+  });
+  return options;
+});
+
 const activeFiltersCount = computed(() => {
   let count = 0;
   if (statusFilter.value && statusFilter.value !== '') count++;
   if (priorityFilter.value && priorityFilter.value !== '') count++;
   if (searchTerm.value) count++;
+  if (activeTab.value !== 'setor' && activeTab.value !== 'recebidas') {
+    const departmentFilter = filtersStore.currentFilters.departmentUuid;
+    if (departmentFilter && departmentFilter !== '' && departmentFilter !== null) count++;
+  }
   return count;
 });
 
-const switchTab = (tab: TicketsTab) => {
-  statusFilter.value = '';
-  priorityFilter.value = '';
-  searchTerm.value = '';
+const syncUrlWithFilters = () => {
+  isUpdatingUrl.value = true;
+  const currentFilters = filtersStore.currentFilters;
+  const query: Record<string, string> = {
+    tab: activeTab.value,
+  };
 
+  if (currentFilters.status) {
+    query.status = String(currentFilters.status);
+  }
+  if (currentFilters.priority) {
+    query.prioridade = String(currentFilters.priority);
+  }
+  if (currentFilters.name) {
+    query.search = String(currentFilters.name);
+  }
+  if (
+    activeTab.value !== 'setor' &&
+    activeTab.value !== 'recebidas' &&
+    currentFilters.departmentUuid
+  ) {
+    query.setor = String(currentFilters.departmentUuid);
+  }
+  const pageNum =
+    typeof currentFilters.page === 'number'
+      ? currentFilters.page
+      : parseInt(String(currentFilters.page || '1'), 10);
+  if (pageNum > 1) {
+    query.page = String(pageNum);
+  }
+
+  if (route.query.ticket) {
+    query.ticket = String(route.query.ticket);
+  }
+
+  router.replace({ query }).finally(() => {
+    setTimeout(() => {
+      isUpdatingUrl.value = false;
+    }, 100);
+  });
+};
+
+const switchTab = (tab: TicketsTab, skipUrlSync = false) => {
+  filtersStore.setContext(tab);
+
+  const existingFilters = filtersStore.getContextFilters(tab);
+  const hasFilters =
+    existingFilters &&
+    Object.keys(existingFilters).length > 0 &&
+    Object.values(existingFilters).some(
+      (v) => v !== undefined && v !== null && String(v).trim() !== '',
+    );
+
+  if (!hasFilters) {
+    filtersStore.initializeContext(
+      tab,
+      {
+        page: 1,
+      },
+      false,
+      true,
+    );
+  }
+
+  const previousTab = activeTab.value;
   activeTab.value = tab;
-  currentPage.value = 1;
 
-  updateUrlWithFilters();
+  if (tab === 'setor' || tab === 'recebidas') {
+    filtersStore.clearFilter('departmentUuid');
+  }
+
+  if (!skipUrlSync && !isUpdatingUrl.value) {
+    syncUrlWithFilters();
+  }
+
+  if (previousTab !== tab) {
+    const hasDataForTab = (() => {
+      switch (tab) {
+        case 'recebidas':
+          return (
+            ticketsStore.receivedTickets.data.length > 0 && ticketsStore.receivedTickets.lastFetched
+          );
+        case 'criadas':
+          return ticketsStore.myTickets.data.length > 0 && ticketsStore.myTickets.lastFetched;
+        case 'setor':
+          return (
+            ticketsStore.departmentTickets.data.length > 0 &&
+            ticketsStore.departmentTickets.lastFetched
+          );
+        case 'gerais':
+          return (
+            ticketsStore.tenantTickets.data.length > 0 && ticketsStore.tenantTickets.lastFetched
+          );
+        default:
+          return false;
+      }
+    })();
+
+    if (!hasDataForTab) {
+      fetchTicketsWithFilters();
+    }
+  }
 };
 
 const fetchTicketsWithFilters = async () => {
@@ -590,28 +751,39 @@ const fetchTicketsWithFilters = async () => {
     return;
   }
 
+  const currentFilters = filtersStore.currentFilters;
+
   const filters: {
     priority?: TicketPriority | null;
     status?: DefaultTicketStatus | null;
     name?: string;
+    departmentUuid?: string | null;
   } = {};
 
-  if (priorityFilter.value && priorityFilter.value !== '') {
-    filters.priority = priorityFilter.value as TicketPriority;
+  if (currentFilters.priority && String(currentFilters.priority).trim() !== '') {
+    filters.priority = currentFilters.priority as TicketPriority;
   }
 
-  if (statusFilter.value && statusFilter.value !== '') {
-    filters.status = statusFilter.value as DefaultTicketStatus;
+  if (currentFilters.status && String(currentFilters.status).trim() !== '') {
+    filters.status = currentFilters.status as DefaultTicketStatus;
   }
 
-  if (searchTerm.value && searchTerm.value.trim()) {
-    filters.name = searchTerm.value.trim();
+  if (currentFilters.name && String(currentFilters.name).trim()) {
+    filters.name = String(currentFilters.name).trim();
+  }
+
+  if (
+    storeType !== 'department' &&
+    storeType !== 'received' &&
+    currentFilters.departmentUuid &&
+    currentFilters.departmentUuid !== null
+  ) {
+    filters.departmentUuid = String(currentFilters.departmentUuid);
   }
 
   await ticketsStore.setCurrentPage(storeType, currentPage.value, filters);
 };
 
-// Helper function to get ticket status
 const getTicketStatus = (ticket: Ticket): string => {
   return ticket.ticketStatus?.key || ticket.status || '';
 };
@@ -623,7 +795,6 @@ const pendingTickets = computed(
       .length,
 );
 const inProgressTickets = computed(() => {
-  // Em Andamento includes all statuses except Pending, Completed, Canceled, Rejected
   const excludedStatuses = new Set([
     DefaultTicketStatus.Pending,
     DefaultTicketStatus.Completed,
@@ -637,7 +808,6 @@ const inProgressTickets = computed(() => {
 });
 
 const handleViewTicket = (ticket: Ticket) => {
-  // Update URL with ticket customId
   const query = { ...route.query, ticket: ticket.customId };
   router.push({ query });
 };
@@ -750,61 +920,75 @@ const navigateToArchived = () => {
 };
 
 const clearFilters = () => {
-  statusFilter.value = '';
-  priorityFilter.value = '';
-  searchTerm.value = '';
+  modalStatusFilter.value = '';
+  modalPriorityFilter.value = '';
+  modalDepartmentFilter.value = '';
+  filtersStore.clearAllFilters();
   fetchTicketsWithFilters();
-  updateUrlWithFilters();
+  showFiltersModal.value = false;
 };
 
 const applyFilters = () => {
+  const filtersToApply: Record<string, any> = {
+    status: modalStatusFilter.value || undefined,
+    priority: modalPriorityFilter.value || undefined,
+  };
+  if (activeTab.value !== 'setor' && activeTab.value !== 'recebidas') {
+    filtersToApply.departmentUuid = modalDepartmentFilter.value || undefined;
+  }
+  filtersStore.applyFilters(filtersToApply);
+  syncUrlWithFilters();
   fetchTicketsWithFilters();
   showFiltersModal.value = false;
-  updateUrlWithFilters();
 };
+
+watch(showFiltersModal, (isOpen) => {
+  if (isOpen) {
+    modalStatusFilter.value = (filtersStore.currentFilters.status as string) || '';
+    modalPriorityFilter.value = (filtersStore.currentFilters.priority as string) || '';
+    if (activeTab.value !== 'setor' && activeTab.value !== 'recebidas') {
+      modalDepartmentFilter.value = (filtersStore.currentFilters.departmentUuid as string) || '';
+    } else {
+      modalDepartmentFilter.value = '';
+    }
+  }
+});
 
 const setStatusFilter = (status: DefaultTicketStatus | '') => {
-  statusFilter.value = status;
-  currentPage.value = 1; // Reset to first page when changing filters
-  fetchTicketsWithFilters();
-  updateUrlWithFilters();
-};
-
-const updateUrlWithFilters = () => {
-  isUpdatingUrl.value = true;
-  const query: any = { tab: activeTab.value };
-
-  if (statusFilter.value) query.status = statusFilter.value;
-  if (priorityFilter.value) query.priority = priorityFilter.value;
-  if (searchTerm.value) query.search = searchTerm.value;
-  if (currentPage.value > 1) query.page = currentPage.value;
-
-  router.push({ query }).finally(() => {
-    // Reset flag after a short delay to allow route watch to process
-    setTimeout(() => {
-      isUpdatingUrl.value = false;
-    }, 100);
-  });
+  filtersStore.applyFilters(
+    {
+      status: status || undefined,
+      page: 1,
+    },
+    false,
+  );
 };
 
 watch(
   () => route.query.tab,
   (newTab) => {
+    if (isUpdatingUrl.value) {
+      return;
+    }
+
     if (newTab && availableTabs.value.includes(newTab as TicketsTab)) {
-      activeTab.value = newTab as TicketsTab;
+      const newTabValue = newTab as TicketsTab;
+      if (activeTab.value !== newTabValue) {
+        switchTab(newTabValue, true);
+      }
     }
   },
 );
 
 watch(isTenantAdmin, (isAdmin) => {
   if (!isAdmin && activeTab.value === 'gerais') {
-    activeTab.value = 'recebidas';
-    updateUrlWithFilters();
+    switchTab('recebidas');
+    router.push({ query: { ...route.query, tab: 'recebidas' } });
     return;
   }
 
   if (isAdmin && route.query.tab === 'gerais') {
-    activeTab.value = 'gerais';
+    switchTab('gerais');
   }
 });
 
@@ -820,68 +1004,105 @@ watch(
   { immediate: true },
 );
 
+let filterWatchTimeout: ReturnType<typeof setTimeout> | null = null;
+let previousContext: string | null = filtersStore.currentContext;
+let previousFilters: {
+  status: string | number | undefined;
+  priority: string | number | undefined;
+  name: string | number | undefined;
+  departmentUuid: string | number | undefined;
+  page: number;
+} = {
+  status: filtersStore.currentFilters.status,
+  priority: filtersStore.currentFilters.priority,
+  name: filtersStore.currentFilters.name,
+  departmentUuid: filtersStore.currentFilters.departmentUuid,
+  page: filtersStore.currentPage,
+};
+
+// Watch context changes to update previousFilters when switching tabs
 watch(
-  () => route.query,
-  (newQuery, oldQuery) => {
-    // Don't fetch if we're updating the URL ourselves
-    if (isUpdatingUrl.value) {
+  () => filtersStore.currentContext,
+  (newContext) => {
+    if (newContext !== previousContext) {
+      previousContext = newContext;
+      previousFilters = {
+        status: filtersStore.currentFilters.status,
+        priority: filtersStore.currentFilters.priority,
+        name: filtersStore.currentFilters.name,
+        departmentUuid: filtersStore.currentFilters.departmentUuid,
+        page: filtersStore.currentPage,
+      };
+    }
+  },
+);
+
+watch(
+  () => [
+    filtersStore.currentFilters.status,
+    filtersStore.currentFilters.priority,
+    filtersStore.currentFilters.name,
+    filtersStore.currentFilters.departmentUuid,
+    filtersStore.currentPage,
+  ],
+  ([status, priority, name, departmentUuid, page]) => {
+    if (filtersStore.currentContext !== previousContext) {
+      previousContext = filtersStore.currentContext;
+      previousFilters = {
+        status,
+        priority,
+        name,
+        departmentUuid,
+        page: typeof page === 'number' ? page : parseInt(String(page ?? 1), 10),
+      };
       return;
     }
 
-    // Only update filters if they actually changed
-    let filtersChanged = false;
+    const filtersChanged =
+      status !== previousFilters.status ||
+      priority !== previousFilters.priority ||
+      name !== previousFilters.name ||
+      departmentUuid !== previousFilters.departmentUuid ||
+      (page ?? 1) !== previousFilters.page;
 
-    if (newQuery.status !== oldQuery?.status) {
-      statusFilter.value = (newQuery.status as string) || '';
-      filtersChanged = true;
-    }
-    if (newQuery.priority !== oldQuery?.priority) {
-      priorityFilter.value = (newQuery.priority as string) || '';
-      filtersChanged = true;
-    }
-    if (newQuery.search !== oldQuery?.search) {
-      searchTerm.value = (newQuery.search as string) || '';
-      filtersChanged = true;
-    }
-    if (newQuery.page !== oldQuery?.page) {
-      currentPage.value = parseInt(newQuery.page as string) || 1;
-      filtersChanged = true;
+    previousFilters = {
+      status,
+      priority,
+      name,
+      departmentUuid,
+      page: typeof page === 'number' ? page : parseInt(String(page ?? 1), 10),
+    };
+
+    if (!filtersChanged) {
+      return;
     }
 
-    // Only fetch if filters actually changed
-    if (filtersChanged) {
+    if (filterWatchTimeout) {
+      clearTimeout(filterWatchTimeout);
+    }
+
+    filterWatchTimeout = setTimeout(() => {
+      if (!isUpdatingUrl.value) {
+        syncUrlWithFilters();
+      }
       fetchTicketsWithFilters();
-    }
+      filterWatchTimeout = null;
+    }, 50);
   },
   { deep: true },
 );
 
 watch(searchTerm, () => {
-  // Reset to first page when searching
-  currentPage.value = 1;
-  debouncedSearch();
-});
-
-watch(currentPage, () => {
-  fetchTicketsWithFilters();
-  updateUrlWithFilters();
-});
-
-watch(activeTab, () => {
-  fetchTicketsWithFilters();
-  updateUrlWithFilters();
+  filtersStore.setPage(1);
 });
 </script>
 
 <style scoped>
-/* All styles have been converted to Tailwind classes */
-
-/* Hide scrollbar for tabs */
 .scrollbar-hide {
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 .scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Safari and Chrome */
+  display: none;
 }
 </style>

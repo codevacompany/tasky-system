@@ -19,6 +19,7 @@ export const ticketService = {
     name?: string;
     status?: DefaultTicketStatus;
     priority?: TicketPriority;
+    departmentUuid?: string;
     page?: number;
     limit?: number;
     sortBy?: string;
@@ -38,6 +39,7 @@ export const ticketService = {
       name?: string;
       status?: DefaultTicketStatus;
       priority?: TicketPriority;
+      departmentUuid?: string;
       page?: number;
       limit?: number;
       sortBy?: string;
@@ -56,6 +58,7 @@ export const ticketService = {
       name?: string;
       status?: DefaultTicketStatus;
       priority?: TicketPriority;
+      departmentUuid?: string;
       page?: number;
       limit?: number;
       sortBy?: string;
@@ -92,6 +95,7 @@ export const ticketService = {
       name?: string;
       status?: DefaultTicketStatus;
       priority?: TicketPriority;
+      departmentUuid?: string;
       page?: number;
       limit?: number;
       sortBy?: string;
