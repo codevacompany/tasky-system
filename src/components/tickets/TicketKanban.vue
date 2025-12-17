@@ -87,7 +87,7 @@
                   v-if="ticket.isPrivate"
                   icon="lock"
                   class="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0"
-                  title="Ticket Privado"
+                  title="Tarefa Privada"
                 />
                 <div
                   v-if="(ticket.files?.length || 0) > 0"
@@ -103,7 +103,7 @@
                     ticket.status === DefaultTicketStatus.Returned
                   "
                   class="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 flex-shrink-0"
-                  title="Ticket devolvido"
+                  title="Tarefa devolvida"
                 >
                   <font-awesome-icon icon="undo" class="text-xs" />
                 </div>
@@ -435,7 +435,7 @@ const getDeadlineIcon = (ticket: Ticket) => {
 
 const openTicketDetails = (ticket: Ticket) => {
   if (isSupervisor.value && props.activeTab === 'setor' && ticket.isPrivate) {
-    toast.warning('Este ticket é privado');
+    toast.warning('Esta tarefa é privada');
     return;
   }
 

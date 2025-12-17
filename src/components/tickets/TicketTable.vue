@@ -30,7 +30,7 @@
             v-if="item.isPrivate"
             icon="lock"
             class="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0"
-            title="Ticket Privado"
+            title="Tarefa Privada"
           />
         </div>
       </template>
@@ -484,7 +484,7 @@
     >
       <div class="p-4">
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          Este ticket não possui um prazo definido. Para aceitar o ticket, defina uma data estimada
+          Esta tarefa não possui um prazo definido. Para aceitar a tarefa, defina uma data estimada
           de conclusão:
         </p>
         <div class="flex flex-col gap-2">
@@ -826,7 +826,7 @@ const handleSort = async (sortKey: string) => {
 
 const openTicketDetails = (ticket: Ticket) => {
   if (isSupervisor.value && props.tableType === 'setor' && ticket.isPrivate) {
-    toast.warning('Este ticket é privado');
+    toast.warning('Esta tarefa é privada');
     return;
   }
 
@@ -969,18 +969,18 @@ const handleAcceptTicket = async (ticket: Ticket) => {
   }
 
   openConfirmationModal(
-    'Aceitar Ticket',
-    'Tem certeza que deseja aceitar este ticket?',
+    'Aceitar Tarefa',
+    'Tem certeza que deseja aceitar esta tarefa?',
     async () => {
       try {
         await ticketService.accept(ticket.customId);
-        toast.success('Ticket aceito com sucesso');
+        toast.success('Tarefa aceita com sucesso');
 
         await refreshTickets();
 
         await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
-        toast.error('Erro ao aceitar o ticket');
+        toast.error('Erro ao aceitar a tarefa');
       }
     },
   );
@@ -989,17 +989,17 @@ const handleAcceptTicket = async (ticket: Ticket) => {
 const handleSendToNextDepartment = async (ticket: Ticket) => {
   openConfirmationModal(
     'Enviar para Próximo Setor',
-    'Tem certeza que deseja enviar este ticket para o próximo setor?',
+    'Tem certeza que deseja enviar esta tarefa para o próximo setor?',
     async () => {
       try {
         await ticketService.sendToNextDepartment(ticket.customId);
-        toast.success('Ticket enviado para o próximo setor');
+        toast.success('Tarefa enviada para o próximo setor');
 
         await refreshTickets();
 
         await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
-        toast.error('Erro ao enviar o ticket para o próximo setor');
+        toast.error('Erro ao enviar a tarefa para o próximo setor');
       }
     },
   );
@@ -1008,19 +1008,19 @@ const handleSendToNextDepartment = async (ticket: Ticket) => {
 const handleVerifyTicket = async (ticket: Ticket) => {
   openConfirmationModal(
     'Enviar para Verificação',
-    'Tem certeza que deseja enviar este ticket para verificação?',
+    'Tem certeza que deseja enviar esta tarefa para verificação?',
     async () => {
       try {
         await ticketService.updateStatus(ticket.customId, {
           status: DefaultTicketStatus.AwaitingVerification,
         });
-        toast.success('Ticket enviado para revisão');
+        toast.success('Tarefa enviada para revisão');
 
         await refreshTickets();
 
         await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
-        toast.error('Erro ao enviar o ticket para revisão');
+        toast.error('Erro ao enviar a tarefa para revisão');
       }
     },
   );
@@ -1028,16 +1028,16 @@ const handleVerifyTicket = async (ticket: Ticket) => {
 
 const handleApproveTicket = async (ticket: Ticket) => {
   openConfirmationModal(
-    'Aprovar Ticket',
-    'Tem certeza que deseja aprovar este ticket?',
+    'Aprovar Tarefa',
+    'Tem certeza que deseja aprovar esta tarefa?',
     async () => {
       try {
         await ticketService.approve(ticket.customId);
-        toast.success('Ticket aprovado com sucesso');
+        toast.success('Tarefa aprovada com sucesso');
 
         await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
-        toast.error('Erro ao aprovar o ticket');
+        toast.error('Erro ao aprovar a tarefa');
       }
     },
   );
@@ -1076,7 +1076,7 @@ const handleRequestCorrection = async (ticket: Ticket) => {
 const handleRejectTicket = async (ticket: Ticket) => {
   const reasonOptions = enumToOptions(DisapprovalReason);
   openConfirmationModal(
-    'Reprovar Ticket',
+    'Reprovar Tarefa',
     'Por favor, informe o motivo da reprovação:',
     async (data?: { reason: string; description: string }) => {
       try {
@@ -1091,11 +1091,11 @@ const handleRejectTicket = async (ticket: Ticket) => {
           });
         }
 
-        toast.success('Ticket reprovado com sucesso');
+        toast.success('Tarefa reprovada com sucesso');
 
         await ticketsStore.fetchTicketDetails(ticket.uuid);
       } catch {
-        toast.error('Erro ao reprovar o ticket');
+        toast.error('Erro ao reprovar a tarefa');
       }
     },
     true,
@@ -1131,14 +1131,14 @@ const handleAlertVerification = async () => {
 
 const handleCorrectTicket = async (ticket: Ticket) => {
   openConfirmationModal(
-    'Corrigir Ticket',
-    'Tem certeza que deseja iniciar as correções deste ticket?',
+    'Corrigir Tarefa',
+    'Tem certeza que deseja iniciar as correções desta tarefa?',
     async () => {
       try {
         await ticketService.updateStatus(ticket.customId, {
           status: DefaultTicketStatus.InProgress,
         });
-        toast.success('Ticket em correção');
+        toast.success('Tarefa em correção');
 
         await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
@@ -1165,16 +1165,16 @@ const isLastTargetUser = (ticket: Ticket) => {
 
 const handleStartTicket = async (ticket: Ticket) => {
   openConfirmationModal(
-    'Iniciar Ticket',
-    'Tem certeza que deseja iniciar este ticket?',
+    'Iniciar Tarefa',
+    'Tem certeza que deseja iniciar esta tarefa?',
     async () => {
       try {
         await ticketService.accept(ticket.customId);
-        toast.success('Ticket iniciado com sucesso');
+        toast.success('Tarefa iniciada com sucesso');
         await refreshTickets();
         await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
-        toast.error('Erro ao iniciar o ticket');
+        toast.error('Erro ao iniciar a tarefa');
       }
     },
   );
@@ -1189,13 +1189,13 @@ const confirmDueDate = async () => {
 
     await ticketService.accept(ticketForDueDate.value.customId);
 
-    toast.success('Prazo definido e ticket aceito com sucesso');
+    toast.success('Prazo definido e tarefa aceita com sucesso');
     showDueDateModal.value = false;
     dueDateValue.value = '';
     ticketForDueDate.value = null;
     await refreshTickets();
   } catch {
-    toast.error('Erro ao definir prazo e aceitar ticket');
+    toast.error('Erro ao definir prazo e aceitar tarefa');
   } finally {
     isDueDateModalLoading.value = false;
   }

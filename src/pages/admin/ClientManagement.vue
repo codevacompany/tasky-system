@@ -76,7 +76,7 @@
             <font-awesome-icon icon="inbox" />
           </div>
           <div class="flex-1">
-            <span class="block text-sm text-gray-600 dark:text-gray-400">Tickets no Mês</span>
+            <span class="block text-sm text-gray-600 dark:text-gray-400">Tarefas no Mês</span>
             <span class="block text-xl font-semibold text-gray-900 dark:text-white my-1">{{
               stats.monthlyTickets
             }}</span>
@@ -402,7 +402,7 @@
                     class="text-sm text-gray-900 dark:text-gray-100 flex flex-col items-center gap-1"
                   >
                     {{ client.monthlyTickets }}
-                    <span class="text-xs text-gray-500 dark:text-gray-400">tickets este mês</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">tarefas neste mês</span>
                   </div>
                 </td>
 

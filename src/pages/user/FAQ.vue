@@ -286,7 +286,7 @@ const sections = ref([
       {
         question: 'Como entro em contato com o suporte?',
         answer:
-          'Clique no botão "Ajuda" no seu perfil ou envie um email para contato@taskysystem.com.br.',
+          'Clique no botão "Ajuda" no seu perfil ou envie um email para contato@taskypro.com.br.',
       },
     ],
   },

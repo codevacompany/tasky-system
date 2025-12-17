@@ -91,8 +91,8 @@
           class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400"
         >
           <font-awesome-icon icon="check-circle" class="text-3xl mb-3 text-green-500" />
-          <p class="text-lg font-medium">Nenhum ticket em andamento</p>
-          <p class="text-sm">Todos os tickets foram processados!</p>
+          <p class="text-lg font-medium">Nenhuma tarefa em andamento</p>
+          <p class="text-sm">Todos as tarefas foram processadas!</p>
         </div>
       </template>
     </DataTable>

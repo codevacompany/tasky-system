@@ -21,13 +21,13 @@
           v-if="isLoading"
           class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
         >
+          <div class="mb-3">
+            <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          </div>
           <div
-            class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
+            class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
           ></div>
-          <div
-            class="h-8 w-16 bg-gray-300 dark:bg-gray-600 rounded mb-2 animate-pulse-custom"
-          ></div>
-          <div class="h-4 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          <div class="h-3 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
         </div>
         <div
           v-else
@@ -76,13 +76,13 @@
           v-if="isLoading"
           class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
         >
+          <div class="mb-3">
+            <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          </div>
           <div
-            class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
+            class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
           ></div>
-          <div
-            class="h-8 w-16 bg-gray-300 dark:bg-gray-600 rounded mb-2 animate-pulse-custom"
-          ></div>
-          <div class="h-4 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          <div class="h-3 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
         </div>
         <div
           v-else
@@ -108,13 +108,13 @@
           v-if="isLoading"
           class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
         >
+          <div class="mb-3">
+            <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          </div>
           <div
-            class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
+            class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
           ></div>
-          <div
-            class="h-8 w-20 bg-gray-300 dark:bg-gray-600 rounded mb-2 animate-pulse-custom"
-          ></div>
-          <div class="h-4 w-32 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          <div class="h-3 w-32 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
         </div>
         <div
           v-else
@@ -139,13 +139,13 @@
           v-if="isLoading"
           class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
         >
+          <div class="mb-3">
+            <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          </div>
           <div
-            class="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg mb-4 animate-pulse-custom"
+            class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
           ></div>
-          <div
-            class="h-8 w-20 bg-gray-300 dark:bg-gray-600 rounded mb-2 animate-pulse-custom"
-          ></div>
-          <div class="h-4 w-36 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          <div class="h-3 w-36 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
         </div>
         <div
           v-else
