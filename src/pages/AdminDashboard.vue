@@ -15,7 +15,10 @@
             <p>{{ metrics.clientesAtivos.total }}</p>
           </div>
           <div class="stat-details">
-            <span><font-awesome-icon icon="arrow-up" /> {{ metrics.clientesAtivos.crescimento }}% este mês</span>
+            <span
+              ><font-awesome-icon icon="arrow-up" /> {{ metrics.clientesAtivos.crescimento }}% este
+              mês</span
+            >
           </div>
         </div>
       </div>
@@ -31,7 +34,10 @@
             <p>{{ metrics.novosClientes.total }}</p>
           </div>
           <div class="stat-details">
-            <span><font-awesome-icon icon="arrow-up" /> {{ metrics.novosClientes.crescimento }}% vs mês anterior</span>
+            <span
+              ><font-awesome-icon icon="arrow-up" /> {{ metrics.novosClientes.crescimento }}% vs mês
+              anterior</span
+            >
           </div>
         </div>
       </div>
@@ -47,7 +53,10 @@
             <p>{{ metrics.clientesInativos.total }}</p>
           </div>
           <div class="stat-details">
-            <span class="text-red-500"><font-awesome-icon icon="arrow-up" /> {{ metrics.clientesInativos.crescimento }}% este mês</span>
+            <span class="text-red-500"
+              ><font-awesome-icon icon="arrow-up" /> {{ metrics.clientesInativos.crescimento }}%
+              este mês</span
+            >
           </div>
         </div>
       </div>
@@ -63,7 +72,10 @@
             <p>{{ metrics.cancelamentos.total }}</p>
           </div>
           <div class="stat-details">
-            <span class="text-red-500"><font-awesome-icon icon="arrow-up" /> {{ metrics.cancelamentos.crescimento }}% este mês</span>
+            <span class="text-red-500"
+              ><font-awesome-icon icon="arrow-up" /> {{ metrics.cancelamentos.crescimento }}% este
+              mês</span
+            >
           </div>
         </div>
       </div>
@@ -79,7 +91,10 @@
             <p>{{ metrics.taxaChurn.valor }}%</p>
           </div>
           <div class="stat-details">
-            <span><font-awesome-icon icon="arrow-down" /> {{ Math.abs(metrics.taxaChurn.crescimento) }}% vs mês anterior</span>
+            <span
+              ><font-awesome-icon icon="arrow-down" />
+              {{ Math.abs(metrics.taxaChurn.crescimento) }}% vs mês anterior</span
+            >
           </div>
         </div>
       </div>
@@ -95,7 +110,10 @@
             <p>R$ {{ formatCurrency(metrics.receitaMensal.valor) }}</p>
           </div>
           <div class="stat-details">
-            <span><font-awesome-icon icon="arrow-up" /> {{ metrics.receitaMensal.crescimento }}% vs mês anterior</span>
+            <span
+              ><font-awesome-icon icon="arrow-up" /> {{ metrics.receitaMensal.crescimento }}% vs mês
+              anterior</span
+            >
           </div>
         </div>
       </div>
@@ -105,7 +123,10 @@
     <div class="bg-white rounded-lg shadow mb-8">
       <div class="p-4 flex justify-between items-center border-b">
         <h2 class="text-lg font-semibold">Gestão de Usuários Admin</h2>
-        <button @click="openNovoAdmin" class="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center hover:bg-blue-600 transition-colors">
+        <button
+          @click="openNovoAdmin"
+          class="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center hover:bg-blue-600 transition-colors"
+        >
           <i class="fas fa-plus mr-2"></i> NOVO ADMIN
         </button>
       </div>
@@ -113,11 +134,31 @@
         <table class="w-full">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nível de Acesso</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Último Acesso</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Nome
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Nível de Acesso
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Status
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Último Acesso
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Ações
+              </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -146,7 +187,10 @@
     <div class="bg-white rounded-lg shadow">
       <div class="p-4 flex justify-between items-center border-b">
         <h2 class="text-lg font-semibold">Controle de Recursos por Plano</h2>
-        <button @click="openConfigurarRecursos" class="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center hover:bg-blue-600 transition-colors">
+        <button
+          @click="openConfigurarRecursos"
+          class="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center hover:bg-blue-600 transition-colors"
+        >
           <i class="fas fa-cog mr-2"></i> CONFIGURAR RECURSOS
         </button>
       </div>
@@ -154,12 +198,36 @@
         <table class="w-full">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recurso</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Básico</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profissional</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empresarial</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Recurso
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Básico
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Avançado
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Empresarial
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Status
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Ações
+              </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -171,7 +239,7 @@
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">{{ recurso.basico }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">{{ recurso.profissional }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ recurso.avancado }}</td>
               <td class="px-6 py-4 whitespace-nowrap">{{ recurso.empresarial }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span :class="getStatusClass(recurso.status)">{{ recurso.status }}</span>
@@ -190,58 +258,54 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useDashboardStore } from '../stores/dashboard'
+import { onMounted } from 'vue';
+import { useDashboardStore } from '../stores/dashboard';
 
-const store = useDashboardStore()
-const { metrics, adminUsers, planoRecursos } = store
+const store = useDashboardStore();
+const { metrics, adminUsers, planoRecursos } = store;
 
 // Funções auxiliares
 const formatCurrency = (value: number) => {
-  return (value / 1000).toFixed(0) + 'K'
-}
+  return (value / 1000).toFixed(0) + 'K';
+};
 
 const getStatusClass = (status: string) => {
-  const classes = 'px-2 py-1 text-xs font-semibold rounded-full '
+  const classes = 'px-2 py-1 text-xs font-semibold rounded-full ';
   switch (status.toLowerCase()) {
     case 'ativo':
-      return classes + 'bg-green-100 text-green-800'
+      return classes + 'bg-green-100 text-green-800';
     case 'inativo':
-      return classes + 'bg-red-100 text-red-800'
+      return classes + 'bg-red-100 text-red-800';
     default:
-      return classes + 'bg-gray-100 text-gray-800'
+      return classes + 'bg-gray-100 text-gray-800';
   }
-}
+};
 
 // Funções de ação
 const openNovoAdmin = () => {
   // Implementar lógica para abrir modal de novo admin
-}
+};
 
 const editarAdmin = (user: any) => {
   // Implementar lógica para editar admin
-}
+};
 
 const excluirAdmin = (user: any) => {
   // Implementar lógica para excluir admin
-}
+};
 
 const openConfigurarRecursos = () => {
   // Implementar lógica para abrir modal de configuração de recursos
-}
+};
 
 const editarRecurso = (recurso: any) => {
   // Implementar lógica para editar recurso
-}
+};
 
 // Carregar dados ao montar o componente
 onMounted(async () => {
-  await Promise.all([
-    store.fetchMetrics(),
-    store.fetchAdminUsers(),
-    store.fetchPlanoRecursos()
-  ])
-})
+  await Promise.all([store.fetchMetrics(), store.fetchAdminUsers(), store.fetchPlanoRecursos()]);
+});
 </script>
 
 <style scoped>
@@ -322,7 +386,7 @@ onMounted(async () => {
 
 .stat-info h3 {
   margin: 0;
-  font-size: 1.000rem;
+  font-size: 1rem;
   font-weight: 500;
   color: #64748b;
 }

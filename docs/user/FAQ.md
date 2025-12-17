@@ -67,7 +67,7 @@ Sim, o sistema é totalmente responsivo e funciona em smartphones e tablets.
    - Funcionalidades essenciais
    - Suporte por email
 
-2. **Profissional**
+2. **Avançado**
    - Até 50 usuários
    - Todas as funcionalidades
    - Suporte prioritário
@@ -94,7 +94,7 @@ Sim, oferecemos 14 dias de teste gratuito para todos os planos.
 
 ### Qual o tempo de resposta do suporte?
 - Básico: 24 horas úteis
-- Profissional: 8 horas úteis
+- Avançado: 8 horas úteis
 - Enterprise: 2 horas úteis
 
 ### Onde encontro a documentação?

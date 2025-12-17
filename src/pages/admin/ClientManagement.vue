@@ -125,9 +125,9 @@
           class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
         >
           <option value="">Todos os Planos</option>
-          <option value="Iniciante">Iniciante</option>
-          <option value="Crescer">Crescer</option>
-          <option value="Profissional">Profissional</option>
+          <option value="Básico">Básico</option>
+          <option value="Essencial">Essencial</option>
+          <option value="Avançado">Avançado</option>
           <option value="Sem Plano">Sem Plano</option>
         </select>
 
@@ -341,11 +341,13 @@
                       'inline-flex items-center justify-center px-2 py-1 rounded text-xs font-medium',
                       {
                         'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200':
-                          client.plan.toLowerCase() === 'iniciante',
+                          client.plan.toLowerCase() === 'básico' ||
+                          client.plan.toLowerCase() === 'basico',
                         'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200':
-                          client.plan.toLowerCase() === 'crescer',
+                          client.plan.toLowerCase() === 'essencial',
                         'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200':
-                          client.plan.toLowerCase() === 'profissional',
+                          client.plan.toLowerCase() === 'avançado' ||
+                          client.plan.toLowerCase() === 'avancado',
                         'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200':
                           client.plan.toLowerCase() === 'sem plano',
                       },
@@ -503,12 +505,16 @@
                           >
                             Status
                           </th>
-                          <!-- TODO: Adicionar função de resetar senha -->
-                          <!-- <th
+                          <th
                             class="px-3 py-2 text-center text-xs font-medium text-gray-900 dark:text-gray-100"
                           >
-                            Último Acesso
-                          </th> -->
+                            Logins
+                          </th>
+                          <th
+                            class="px-3 py-2 text-center text-xs font-medium text-gray-900 dark:text-gray-100"
+                          >
+                            Último Login
+                          </th>
                           <th
                             class="px-3 py-2 text-center text-xs font-medium text-gray-900 dark:text-gray-100"
                           >
@@ -574,12 +580,18 @@
                               {{ user.status }}
                             </span>
                           </td>
-                          <!-- TODO: Adicionar função de último acesso -->
-                          <!-- <td
+                          <td
                             class="px-3 py-2 text-center text-sm text-gray-900 dark:text-gray-100"
                           >
-                            {{ user.lastAccess ? formatDateTime(user.lastAccess) : 'Nunca' }}
-                          </td> -->
+                            {{ user.loginCount || 0 }}
+                          </td>
+                          <td
+                            class="px-3 py-2 text-center text-sm text-gray-900 dark:text-gray-100"
+                          >
+                            {{
+                              user.lastLogin ? formatDateTime(user.lastLogin.toString()) : 'Nunca'
+                            }}
+                          </td>
                           <td class="px-3 py-2">
                             <div class="flex items-center justify-center gap-1">
                               <button
@@ -815,6 +827,7 @@ import {
   tenantService,
   type TenantWithStats,
   type TenantStatsResponse,
+  type UserWithStats,
 } from '@/services/tenantService';
 import { userService } from '@/services/userService';
 import { toast } from 'vue3-toastify';
@@ -918,7 +931,7 @@ const clients = computed(() => {
     userLimit: tenant.subscription?.maxUsers || tenant.totalUsers + 10,
     monthlyTickets: tenant.ticketsThisMonth,
     nextInvoice: '2024-04-15',
-    users: tenant.users.map((user) => ({
+    users: tenant.users.map((user: UserWithStats) => ({
       id: user.id,
       uuid: user.uuid,
       firstName: user.firstName,
@@ -928,6 +941,8 @@ const clients = computed(() => {
       profile: user.role,
       status: user.isActive ? 'ATIVO' : 'SUSPENSO',
       lastAccess: user.lastAccess,
+      loginCount: user.loginCount || 0,
+      lastLogin: user.lastLogin,
     })),
   }));
 });

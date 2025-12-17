@@ -14,6 +14,8 @@ export interface User {
   role: Role;
   status?: 'online' | 'offline' | 'away';
   permissions?: string[];
+  loginCount?: number;
+  lastLogin?: string | Date | null;
 }
 
 export interface CreateUserDto {

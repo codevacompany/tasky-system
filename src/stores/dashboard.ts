@@ -39,7 +39,7 @@ interface PlanoRecurso {
   id: string
   nome: string
   basico: string
-  profissional: string
+  avancado: string
   empresarial: string
   status: string
 }
