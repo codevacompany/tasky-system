@@ -8,13 +8,44 @@
         <font-awesome-icon icon="chevron-left" />
         Voltar
       </button>
-      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Simular Plano Customizado</h1>
+      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
+        Simular Plano Customizado
+      </h1>
       <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
-        Informe o número de usuários para calcular o valor mensal do plano customizado
+        Informe o número de usuários para calcular o valor do plano customizado
       </p>
     </header>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
+    >
+      <div class="mb-6 flex items-center gap-3">
+        <span
+          :class="
+            !isYearlyBilling
+              ? 'text-gray-900 dark:text-white font-medium'
+              : 'text-gray-500 dark:text-gray-400'
+          "
+        >
+          Mensal
+        </span>
+        <Switch v-model="isYearlyBilling" />
+        <span
+          :class="
+            isYearlyBilling
+              ? 'text-gray-900 dark:text-white font-medium'
+              : 'text-gray-500 dark:text-gray-400'
+          "
+        >
+          Anual
+        </span>
+        <span
+          v-if="isYearlyBilling"
+          class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
+        >
+          20% OFF
+        </span>
+      </div>
       <div class="mb-6">
         <label
           for="userCount"
@@ -31,8 +62,8 @@
           class="w-full"
         />
         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          O plano customizado inclui 30 usuários base. Usuários adicionais (a partir do 31º) custam R$
-          15,00 cada.
+          O plano customizado inclui 30 usuários base. Usuários adicionais (a partir do 31º) custam
+          R$ 15,00 cada.
         </p>
       </div>
 
@@ -44,28 +75,38 @@
         <div class="space-y-2 text-sm">
           <div class="flex justify-between text-gray-600 dark:text-gray-400">
             <span>Plano base (até 30 usuários):</span>
-            <span class="font-medium">R$ 399,00</span>
-          </div>
-          <div v-if="additionalUsers > 0" class="flex justify-between text-gray-600 dark:text-gray-400">
-            <span>
-              Usuários adicionais ({{ additionalUsers }} usuário{{ additionalUsers > 1 ? 's' : '' }}):
+            <span class="font-medium">
+              R$ {{ basePlanPrice.toFixed(2) }}{{ isYearlyBilling ? '/mês' : '' }}
             </span>
-            <span class="font-medium">R$ {{ additionalUsersCost.toFixed(2) }}</span>
+          </div>
+          <div
+            v-if="additionalUsers > 0"
+            class="flex justify-between text-gray-600 dark:text-gray-400"
+          >
+            <span>
+              Usuários adicionais ({{ additionalUsers }} usuário{{
+                additionalUsers > 1 ? 's' : ''
+              }}):
+            </span>
+            <span class="font-medium">
+              R$ {{ additionalUsersCost.toFixed(2) }}{{ isYearlyBilling ? '/mês' : '' }}
+            </span>
+          </div>
+          <div
+            v-if="isYearlyBilling && yearlyTotal"
+            class="flex justify-between text-xs text-gray-500 dark:text-gray-400"
+          >
+            <span></span>
+            <span>R$ {{ yearlyTotal.toFixed(2) }} cobrado anualmente</span>
           </div>
           <div
             class="flex justify-between text-lg font-semibold text-gray-900 dark:text-white pt-2 border-t border-gray-200 dark:border-gray-600"
           >
             <span>Total mensal:</span>
-            <span
-              class="font-semibold dark:hidden"
-              style="color: #00143b;"
-            >
+            <span class="font-semibold dark:hidden" style="color: #00143b">
               R$ {{ totalMonthlyPrice.toFixed(2) }}
             </span>
-            <span
-              class="font-semibold hidden dark:inline"
-              style="color: rgb(51, 78, 194);"
-            >
+            <span class="font-semibold hidden dark:inline" style="color: rgb(51, 78, 194)">
               R$ {{ totalMonthlyPrice.toFixed(2) }}
             </span>
           </div>
@@ -97,6 +138,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import Input from '@/components/common/Input.vue';
+import Switch from '@/components/common/Switch.vue';
 import { subscriptionService } from '@/services/subscriptionService';
 import { useUserStore } from '@/stores/user';
 
@@ -106,15 +148,21 @@ const userStore = useUserStore();
 const userCount = ref<number>(30);
 const isSubscribing = ref(false);
 const currentSubscription = ref<any>(null);
+const isYearlyBilling = ref<boolean>(true); // Default to annual
 
 // Price calculation constants
-const BASE_PRICE = 399;
+const BASE_PRICE_MONTHLY = 399;
+const BASE_PRICE_YEARLY_MONTHLY = 317; // R$ 317/month for annual billing
 const BASE_USERS = 30;
-const ADDITIONAL_USER_PRICE = 15;
+const ADDITIONAL_USER_PRICE = 15; // Same price regardless of billing period
 
 const additionalUsers = computed(() => {
   if (!userCount.value || userCount.value <= BASE_USERS) return 0;
   return userCount.value - BASE_USERS;
+});
+
+const basePlanPrice = computed(() => {
+  return isYearlyBilling.value ? BASE_PRICE_YEARLY_MONTHLY : BASE_PRICE_MONTHLY;
 });
 
 const additionalUsersCost = computed(() => {
@@ -122,7 +170,12 @@ const additionalUsersCost = computed(() => {
 });
 
 const totalMonthlyPrice = computed(() => {
-  return BASE_PRICE + additionalUsersCost.value;
+  return basePlanPrice.value + additionalUsersCost.value;
+});
+
+const yearlyTotal = computed(() => {
+  if (!isYearlyBilling.value) return null;
+  return basePlanPrice.value * 12 + additionalUsersCost.value * 12;
 });
 
 const hasActiveSubscription = computed(() => {
@@ -182,8 +235,7 @@ const handleSubscribe = async () => {
       window.open(url, '_blank');
     } catch (error: any) {
       console.error('Error creating portal session:', error);
-      const errorMessage =
-        error.response?.data?.message || 'Erro ao abrir portal de gerenciamento';
+      const errorMessage = error.response?.data?.message || 'Erro ao abrir portal de gerenciamento';
       toast.error(errorMessage);
     } finally {
       isSubscribing.value = false;
@@ -196,18 +248,25 @@ const handleSubscribe = async () => {
   toast.info(
     'Para assinar o plano customizado, entre em contato com nossa equipe comercial. Os valores calculados serão enviados por email.',
   );
-  
+
+  const billingPeriod = isYearlyBilling.value ? 'anual' : 'mensal';
+  const priceDisplay =
+    isYearlyBilling.value && yearlyTotal.value
+      ? `R$ ${totalMonthlyPrice.value.toFixed(2)}/mês (R$ ${yearlyTotal.value.toFixed(2)}/ano)`
+      : `R$ ${totalMonthlyPrice.value.toFixed(2)}/mês`;
+
   const subject = encodeURIComponent(
-    `Interesse em Plano Customizado - ${userCount.value} usuários - R$ ${totalMonthlyPrice.value.toFixed(2)}/mês`,
+    `Interesse em Plano Customizado - ${userCount.value} usuários - ${priceDisplay}`,
   );
   const body = encodeURIComponent(
     `Olá,\n\nTenho interesse em assinar o Plano Customizado com as seguintes informações:\n\n` +
       `- Número de usuários: ${userCount.value}\n` +
-      `- Valor mensal calculado: R$ ${totalMonthlyPrice.value.toFixed(2)}\n` +
+      `- Forma de cobrança: ${billingPeriod}\n` +
+      `- Valor calculado: ${priceDisplay}\n` +
       `- Usuários adicionais: ${additionalUsers.value}\n\n` +
       `Aguardo retorno para prosseguir com a assinatura.\n\nAtenciosamente`,
   );
-  
+
   window.location.href = `mailto:comercial@tasky.com.br?subject=${subject}&body=${body}`;
 };
 
@@ -215,4 +274,3 @@ onMounted(async () => {
   await loadCurrentSubscription();
 });
 </script>
-

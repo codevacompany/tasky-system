@@ -131,6 +131,7 @@ export type UserRankingItemDto = {
   averageAcceptanceTimeSeconds: number;
   averageResolutionTimeSeconds: number;
   avatarUrl?: string;
+  isActive: boolean;
 };
 
 export type UserRankingResponseDto = {
