@@ -493,7 +493,7 @@
                           <th
                             class="px-3 py-2 text-center text-xs font-medium text-gray-900 dark:text-gray-100"
                           >
-                            Departamento
+                          setor
                           </th>
                           <th
                             class="px-3 py-2 text-center text-xs font-medium text-gray-900 dark:text-gray-100"

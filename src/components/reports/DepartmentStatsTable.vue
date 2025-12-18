@@ -7,7 +7,7 @@
         Estatísticas por Setor
       </h2>
       <p class="text-sm text-gray-600 dark:text-gray-400">
-        Análise detalhada do desempenho de cada departamento
+        Análise detalhada do desempenho de cada setor
       </p>
     </div>
 

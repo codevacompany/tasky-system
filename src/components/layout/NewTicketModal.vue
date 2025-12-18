@@ -391,7 +391,7 @@ const loadDepartments = async () => {
     const { data } = await departmentService.fetch({ limit: 100 });
     departments.value = data.items;
   } catch {
-    toast.error('Erro ao carregar departamentos');
+    toast.error('Erro ao carregar setores');
   }
 };
 
@@ -644,25 +644,20 @@ const uploadFilesToS3 = async () => {
   const uploadedUrls: string[] = [];
 
   for (const file of selectedFiles.value) {
-    const ext = file.name.split('.').pop();
+    try {
+      const { data } = await awsService.getSignedUrl(file.name);
 
-    if (ext) {
-      try {
-        const { data } = await awsService.getSignedUrl(ext);
-        console.log('data', data);
+      await axios.put(data.url, file, {
+        headers: {
+          'Content-Type': file.type,
+        },
+      });
 
-        await axios.put(data.url, file, {
-          headers: {
-            'Content-Type': file.type,
-          },
-        });
-
-        const fileUrl = data.url.split('?')[0];
-        uploadedUrls.push(fileUrl);
-      } catch (error) {
-        console.error('Erro ao fazer upload do arquivo:', file.name, error);
-        throw error;
-      }
+      const fileUrl = data.url.split('?')[0];
+      uploadedUrls.push(fileUrl);
+    } catch (error) {
+      console.error('Erro ao fazer upload do arquivo:', file.name, error);
+      throw error;
     }
   }
 
@@ -687,8 +682,10 @@ const handleSubmit = async () => {
       try {
         const blob = await fetch(base64).then((res) => res.blob());
         const ext = blob.type.split('/')[1];
+        // Generate a filename for inline images since we don't have the original name
+        const fileName = `image_${Date.now()}.${ext}`;
 
-        const { data } = await awsService.getSignedUrl(ext);
+        const { data } = await awsService.getSignedUrl(fileName);
         const signedUrl = data.url;
 
         await axios.put(signedUrl, blob, {

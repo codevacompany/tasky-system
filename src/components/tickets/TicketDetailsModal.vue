@@ -687,31 +687,67 @@
                 </button>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div
-                  v-for="file in loadedTicket.files"
-                  :key="file.id"
-                  class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
-                >
+              <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                <div v-for="file in loadedTicket.files" :key="file.id" class="relative group">
+                  <!-- Image Preview Card -->
                   <div
-                    class="text-primary dark:text-blue-400 cursor-pointer flex-shrink-0"
-                    @click="downloadFile(file)"
+                    v-if="isImageFile(file)"
+                    class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 transition-all aspect-[4/3] flex items-center justify-center max-w-[140px]"
+                    @click="openImageViewer(file)"
                   >
-                    <font-awesome-icon icon="file" size="lg" />
-                  </div>
-                  <div class="flex-1 min-w-0 cursor-pointer" @click="downloadFile(file)">
-                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                      {{ file.name }}
+                    <img
+                      :src="file.url"
+                      :alt="file.name"
+                      class="w-full h-full object-cover"
+                      @error="handleImageError"
+                      @load="handleImageLoad"
+                    />
+                    <div
+                      class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none"
+                    ></div>
+                    <div
+                      class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 pointer-events-none overflow-hidden"
+                    >
+                      <div
+                        class="text-xs text-white whitespace-nowrap overflow-hidden text-ellipsis"
+                      >
+                        {{ truncateFileName(file.name) }}
+                      </div>
                     </div>
+                    <button
+                      v-if="canEditTicket"
+                      @click.stop="removeFile(file)"
+                      class="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-white bg-red-500 hover:bg-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                      title="Remover arquivo"
+                    >
+                      <font-awesome-icon icon="times" class="text-xs" />
+                    </button>
                   </div>
-                  <button
-                    v-if="canEditTicket"
-                    @click.stop="removeFile(file)"
-                    class="flex-shrink-0 w-6 h-6 flex items-center justify-center text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-all"
-                    title="Remover arquivo"
+                  <!-- Non-Image File Card -->
+                  <div
+                    v-else
+                    class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                   >
-                    <font-awesome-icon icon="times" class="text-sm" />
-                  </button>
+                    <div
+                      class="text-primary dark:text-blue-400 cursor-pointer flex-shrink-0"
+                      @click="downloadFile(file)"
+                    >
+                      <font-awesome-icon icon="file" size="lg" />
+                    </div>
+                    <div class="flex-1 min-w-0 cursor-pointer" @click="downloadFile(file)">
+                      <div class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                        {{ file.name }}
+                      </div>
+                    </div>
+                    <button
+                      v-if="canEditTicket"
+                      @click.stop="removeFile(file)"
+                      class="flex-shrink-0 w-6 h-6 flex items-center justify-center text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-all"
+                      title="Remover arquivo"
+                    >
+                      <font-awesome-icon icon="times" class="text-sm" />
+                    </button>
+                  </div>
                 </div>
 
                 <div
@@ -1015,6 +1051,50 @@
     </div>
   </BaseModal>
 
+  <!-- Image Viewer Modal -->
+  <div
+    v-if="selectedImage"
+    class="fixed inset-0 z-[10001] bg-black/90 flex items-center justify-center"
+    @click="closeImageViewer"
+  >
+    <div class="relative max-w-[90vw] max-h-[90vh] flex items-center justify-center">
+      <button
+        @click="closeImageViewer"
+        class="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center text-white bg-black/50 hover:bg-black/70 rounded-full transition-colors"
+        title="Fechar (ESC)"
+      >
+        <font-awesome-icon icon="times" class="text-xl" />
+      </button>
+      <button
+        v-if="hasPreviousImage"
+        @click.stop="previousImage"
+        class="absolute left-4 z-10 w-10 h-10 flex items-center justify-center text-white bg-black/50 hover:bg-black/70 rounded-full transition-colors"
+        title="Imagem anterior (←)"
+      >
+        <font-awesome-icon icon="chevron-left" class="text-xl" />
+      </button>
+      <button
+        v-if="hasNextImage"
+        @click.stop="nextImage"
+        class="absolute right-4 z-10 w-10 h-10 flex items-center justify-center text-white bg-black/50 hover:bg-black/70 rounded-full transition-colors"
+        title="Próxima imagem (→)"
+      >
+        <font-awesome-icon icon="chevron-right" class="text-xl" />
+      </button>
+      <img
+        :src="selectedImage.url"
+        :alt="selectedImage.name"
+        class="max-w-full max-h-[90vh] object-contain"
+        @click.stop
+      />
+      <div
+        class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-lg text-sm"
+      >
+        {{ selectedImage.name }} ({{ currentImageIndex + 1 }} / {{ imageFiles.length }})
+      </div>
+    </div>
+  </div>
+
   <ConfirmationModal
     v-if="confirmationModal.isOpen"
     :title="confirmationModal.title"
@@ -1125,6 +1205,66 @@
       </div>
     </template>
   </BaseModal>
+
+  <!-- Image Viewer Modal -->
+  <div
+    v-if="selectedImage"
+    class="fixed inset-0 z-[10001] bg-black/90 flex items-center justify-center"
+    @click="closeImageViewer"
+  >
+    <!-- Action buttons - fixed to top right of screen -->
+    <div class="fixed top-4 right-4 z-10 flex items-center gap-2">
+      <button
+        @click.stop="downloadImage"
+        class="w-10 h-10 flex items-center justify-center text-white bg-black/50 hover:bg-black/70 rounded-full transition-colors"
+        title="Baixar imagem"
+      >
+        <font-awesome-icon icon="download" class="text-xl" />
+      </button>
+      <button
+        @click="closeImageViewer"
+        class="w-10 h-10 flex items-center justify-center text-white bg-black/50 hover:bg-black/70 rounded-full transition-colors"
+        title="Fechar (ESC)"
+      >
+        <font-awesome-icon icon="times" class="text-xl" />
+      </button>
+    </div>
+
+    <!-- Navigation buttons - fixed to left and right of screen -->
+    <button
+      v-if="hasPreviousImage"
+      @click.stop="previousImage"
+      class="fixed left-5 top-1/2 transform -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-white bg-black/50 hover:bg-black/70 rounded-full transition-colors"
+      title="Imagem anterior (←)"
+    >
+      <font-awesome-icon icon="chevron-left" class="text-xl" />
+    </button>
+    <button
+      v-if="hasNextImage"
+      @click.stop="nextImage"
+      class="fixed right-5 top-1/2 transform -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-white bg-black/50 hover:bg-black/70 rounded-full transition-colors"
+      title="Próxima imagem (→)"
+    >
+      <font-awesome-icon icon="chevron-right" class="text-xl" />
+    </button>
+
+    <!-- Image container -->
+    <div class="relative max-w-[90vw] max-h-[90vh] flex items-center justify-center">
+      <img
+        :src="selectedImage.url"
+        :alt="selectedImage.name"
+        class="max-w-full max-h-[90vh] object-contain"
+        @click.stop
+      />
+    </div>
+
+    <!-- Image name - fixed to bottom of screen -->
+    <div
+      class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-lg text-sm z-10"
+    >
+      {{ selectedImage.name }} ({{ currentImageIndex + 1 }} / {{ imageFiles.length }})
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -1199,6 +1339,10 @@ const showTarefasSection = ref(false);
 const tarefasSectionRef = ref<HTMLElement | null>(null);
 const ticketChecklistRef = ref<InstanceType<typeof TicketChecklist> | null>(null);
 
+// Image viewer state
+const selectedImage = ref<TicketFile | null>(null);
+const currentImageIndex = ref(0);
+
 // Editing states
 const isEditingName = ref(false);
 const isEditingDescription = ref(false);
@@ -1255,7 +1399,9 @@ const dataUrlToBlob = (dataUrl: string) => {
 const uploadInlineImage = async (dataUrl: string) => {
   const { blob, mime } = dataUrlToBlob(dataUrl);
   const ext = mime.split('/')[1] || 'png';
-  const { data } = await awsService.getSignedUrl(ext);
+  // Generate a filename for inline images since we don't have the original name
+  const fileName = `image_${Date.now()}.${ext}`;
+  const { data } = await awsService.getSignedUrl(fileName);
   await axios.put(data.url, blob, {
     headers: {
       'Content-Type': mime,
@@ -1667,14 +1813,133 @@ const cancelTicket = async (ticketId: string) => {
   );
 };
 
-const downloadFile = (file: TicketFile) => {
-  const link = document.createElement('a');
-  link.href = file.url;
-  link.download = file.name;
-  link.target = '_blank';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+const isImageFile = (file: TicketFile): boolean => {
+  // Check mimeType first if available and not empty
+  if (file.mimeType && file.mimeType.trim() && file.mimeType.startsWith('image/')) {
+    return true;
+  }
+
+  // Check file extension in name
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.ico'];
+  const fileName = file.name.toLowerCase().trim();
+  const fileUrl = (file.url || '').toLowerCase().trim();
+
+  // Check if filename or URL ends with any image extension
+  const hasImageExtension = imageExtensions.some(
+    (ext) => fileName.endsWith(ext) || fileUrl.includes(ext),
+  );
+
+  return hasImageExtension;
+};
+
+const imageFiles = computed(() => {
+  if (!loadedTicket.value) return [];
+  return loadedTicket.value.files.filter((file) => isImageFile(file));
+});
+
+const hasPreviousImage = computed(() => {
+  return currentImageIndex.value > 0;
+});
+
+const hasNextImage = computed(() => {
+  return currentImageIndex.value < imageFiles.value.length - 1;
+});
+
+const openImageViewer = (file: TicketFile) => {
+  if (!isImageFile(file)) {
+    downloadFile(file);
+    return;
+  }
+
+  const index = imageFiles.value.findIndex((f) => f.id === file.id);
+  if (index !== -1) {
+    currentImageIndex.value = index;
+    selectedImage.value = file;
+    // Prevent body scroll when image viewer is open
+    document.body.style.overflow = 'hidden';
+  }
+};
+
+const closeImageViewer = () => {
+  selectedImage.value = null;
+  currentImageIndex.value = 0;
+  document.body.style.overflow = '';
+};
+
+const previousImage = () => {
+  if (hasPreviousImage.value) {
+    currentImageIndex.value--;
+    selectedImage.value = imageFiles.value[currentImageIndex.value];
+  }
+};
+
+const nextImage = () => {
+  if (hasNextImage.value) {
+    currentImageIndex.value++;
+    selectedImage.value = imageFiles.value[currentImageIndex.value];
+  }
+};
+
+const handleImageLoad = () => {
+  // Image loaded successfully
+};
+
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement;
+  // Hide the broken image
+  img.style.display = 'none';
+};
+
+const truncateFileName = (fileName: string, maxLength: number = 19): string => {
+  if (!fileName) return '';
+
+  const lastDotIndex = fileName.lastIndexOf('.');
+  if (lastDotIndex === -1) {
+    if (fileName.length <= maxLength) {
+      return fileName;
+    }
+    return fileName.substring(0, maxLength - 3) + '...';
+  }
+
+  const extension = fileName.substring(lastDotIndex);
+  const nameWithoutExt = fileName.substring(0, lastDotIndex);
+
+  if (fileName.length <= maxLength) {
+    return fileName;
+  }
+
+  const lastThreeChars =
+    nameWithoutExt.length >= 3
+      ? nameWithoutExt.substring(nameWithoutExt.length - 3)
+      : nameWithoutExt;
+
+  const neededLength = 3 + 3 + extension.length;
+
+  if (maxLength < neededLength) {
+    return '...' + lastThreeChars + extension;
+  }
+
+  const availableLength = maxLength - 3 - 3 - extension.length;
+
+  if (availableLength <= 0) {
+    return '...' + lastThreeChars + extension;
+  }
+
+  return nameWithoutExt.substring(0, availableLength) + '...' + lastThreeChars + extension;
+};
+
+const downloadFile = async (file: TicketFile) => {
+  try {
+    await awsService.downloadFile(file.url, file.name);
+  } catch (error) {
+    console.error('Error downloading file:', error);
+    toast.error('Erro ao baixar arquivo');
+  }
+};
+
+const downloadImage = () => {
+  if (!selectedImage.value) return;
+  downloadFile(selectedImage.value);
 };
 
 const removeFile = async (file: TicketFile) => {
@@ -2037,11 +2302,27 @@ const handleClickOutside = (event: MouseEvent) => {
 // Add click outside listener
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
+  document.addEventListener('keydown', handleImageViewerKeyboard);
 });
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
+  document.removeEventListener('keydown', handleImageViewerKeyboard);
+  // Ensure body scroll is restored
+  document.body.style.overflow = '';
 });
+
+const handleImageViewerKeyboard = (event: KeyboardEvent) => {
+  if (!selectedImage.value) return;
+
+  if (event.key === 'Escape') {
+    closeImageViewer();
+  } else if (event.key === 'ArrowLeft' && hasPreviousImage.value) {
+    previousImage();
+  } else if (event.key === 'ArrowRight' && hasNextImage.value) {
+    nextImage();
+  }
+};
 
 const openFileInput = () => {
   if (fileInput.value) {
@@ -2062,25 +2343,21 @@ const handleFileChange = async (event: Event) => {
     const uploadedUrls: string[] = [];
 
     for (const file of files) {
-      const ext = file.name.split('.').pop();
+      try {
+        const { data } = await awsService.getSignedUrl(file.name);
 
-      if (ext) {
-        try {
-          const { data } = await awsService.getSignedUrl(ext);
+        await axios.put(data.url, file, {
+          headers: {
+            'Content-Type': file.type,
+          },
+        });
 
-          await axios.put(data.url, file, {
-            headers: {
-              'Content-Type': file.type,
-            },
-          });
-
-          const fileUrl = data.url.split('?')[0];
-          uploadedUrls.push(fileUrl);
-        } catch (error) {
-          console.error('Erro ao fazer upload do arquivo:', file.name, error);
-          toast.error(`Erro ao fazer upload do arquivo: ${file.name}`);
-          throw error; // Re-throw to stop the process
-        }
+        const fileUrl = data.url.split('?')[0];
+        uploadedUrls.push(fileUrl);
+      } catch (error) {
+        console.error('Erro ao fazer upload do arquivo:', file.name, error);
+        toast.error(`Erro ao fazer upload do arquivo: ${file.name}`);
+        throw error; // Re-throw to stop the process
       }
     }
 

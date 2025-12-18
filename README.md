@@ -27,7 +27,7 @@ O objetivo do Tasky System é proporcionar uma gestão eficiente de tickets, red
 ### Gestão de Usuários
 - Perfis de acesso personalizáveis
 - Controle de permissões granular
-- Gestão de equipes e departamentos
+- Gestão de equipes e setores
 - Integração com sistemas de autenticação
 
 ### Analytics e Relatórios

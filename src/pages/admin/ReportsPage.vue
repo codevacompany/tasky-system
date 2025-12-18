@@ -1217,10 +1217,10 @@
                   />
                 </div>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  Analytics de Departamento Necessários
+                  Analytics de Setor Necessários
                 </h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-                  Acesse estatísticas detalhadas por departamento, performance de setores e análises
+                  Acesse estatísticas detalhadas por setor, performance de setores e análises
                   comparativas de produtividade.
                 </p>
                 <router-link
@@ -3524,7 +3524,7 @@ const exportToExcel = async () => {
     generalData.push(['Total de Tarefas Criadas', getTotalCreated()]);
     generalData.push(['Total de Tarefas Concluídas', getTotalResolved()]);
     generalData.push(['Tarefas em Andamento', inProgressTasks.value?.length || 0]);
-    generalData.push(['Departamentos Ativos', departmentStats.value?.length || 0]);
+    generalData.push(['Setores Ativos', departmentStats.value?.length || 0]);
 
     const generalSheet = XLSX.utils.aoa_to_sheet(generalData);
     XLSX.utils.book_append_sheet(workbook, generalSheet, 'Métricas Gerais');
@@ -3539,7 +3539,7 @@ const exportToExcel = async () => {
           'Prioridade',
           'Solicitante',
           'Responsável',
-          'Departamento',
+          'Setor',
           'Data Criação',
           'Data Atualização',
         ],
@@ -3566,9 +3566,9 @@ const exportToExcel = async () => {
     // Department Statistics Sheet
     if (departmentStats.value && departmentStats.value.length > 0) {
       const deptData = [
-        ['=== ESTATÍSTICAS POR DEPARTAMENTO ==='],
+        ['=== ESTATÍSTICAS POR SETOR ==='],
         [
-          'Departamento',
+          'Setor',
           'Total Tarefas',
           'Resolvidos',
           'Taxa Resolução',
@@ -3587,14 +3587,14 @@ const exportToExcel = async () => {
         ]),
       ];
       const deptSheet = XLSX.utils.aoa_to_sheet(deptData);
-      XLSX.utils.book_append_sheet(workbook, deptSheet, 'Departamentos');
+      XLSX.utils.book_append_sheet(workbook, deptSheet, 'Setores');
     }
 
     // Top Contributors Sheet
     if (topUsers.value && topUsers.value.users && topUsers.value.users.length > 0) {
       const usersData = [
         ['=== TOP COLABORADORES ==='],
-        ['Nome', 'Departamento', 'Tarefas Resolvidas', 'Taxa Resolução', 'Total Tarefas'],
+        ['Nome', 'Setor', 'Tarefas Resolvidas', 'Taxa Resolução', 'Total Tarefas'],
         ...topUsers.value.users.map((user) => [
           `${user.firstName} ${user.lastName}`,
           user.departmentName,
@@ -3709,9 +3709,9 @@ const exportToCSV = async () => {
 
     // Department Statistics
     if (departmentStats.value && departmentStats.value.length > 0) {
-      csvContent += '=== ESTATÍSTICAS POR DEPARTAMENTO ===\n';
+      csvContent += '=== ESTATÍSTICAS POR SETOR ===\n';
       csvContent +=
-        'Departamento,Total Tarefas,Resolvidas,Taxa Resolução,Tempo Aceite,Tempo Resolução,Tempo Total\n';
+        'Setor,Total Tarefas,Resolvidas,Taxa Resolução,Tempo Aceite,Tempo Resolução,Tempo Total\n';
       departmentStats.value.forEach((dept) => {
         csvContent += `${dept.departmentName},${dept.totalTickets},${dept.resolvedTickets},${formatPercentage(dept.resolutionRate)},${formatTimeInSeconds(dept.averageAcceptanceTimeSeconds)},${formatTimeInSeconds(dept.averageResolutionTimeSeconds)},${formatTimeInSeconds(dept.averageTotalTimeSeconds)}\n`;
       });
@@ -3721,7 +3721,7 @@ const exportToCSV = async () => {
     // Top Contributors
     if (topUsers.value && topUsers.value.users && topUsers.value.users.length > 0) {
       csvContent += '=== TOP COLABORADORES ===\n';
-      csvContent += 'Nome,Departamento,Tarefas Resolvidas,Taxa Resolução,Total Tarefas\n';
+      csvContent += 'Nome,Setor,Tarefas Resolvidas,Taxa Resolução,Total Tarefas\n';
       topUsers.value.users.forEach((user) => {
         csvContent += `${user.firstName} ${user.lastName},${user.departmentName},${user.resolvedTickets},${formatPercentage(user.resolutionRate)},${user.totalTickets}\n`;
       });
@@ -3766,12 +3766,12 @@ const exportToCSV = async () => {
     csvContent += `Total de Tarefas Criadas,${getTotalCreated()}\n`;
     csvContent += `Total de Tarefas Concluídas,${getTotalResolved()}\n`;
     csvContent += `Tarefas em Andamento,${inProgressTasks.value?.length || 0}\n`;
-    csvContent += `Departamentos Ativos,${departmentStats.value?.length || 0}\n`;
+    csvContent += `Setores Ativos,${departmentStats.value?.length || 0}\n`;
 
     // Create tickets CSV content
     let ticketsCsvContent = '';
     ticketsCsvContent +=
-      'ID,Assunto,Status,Prioridade,Solicitante,Responsável,Departamento,Data Criação,Data Atualização\n';
+      'ID,Assunto,Status,Prioridade,Solicitante,Responsável,Setor,Data Criação,Data Atualização\n';
 
     allTickets.forEach((ticket) => {
       const requesterName = `${ticket.requester.firstName} ${ticket.requester.lastName}`;

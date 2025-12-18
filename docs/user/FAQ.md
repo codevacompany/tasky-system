@@ -126,7 +126,7 @@ Sim, todas as atualizações são aplicadas automaticamente, sem necessidade de 
 - Relatório de tempo médio de resolução
 - Relatório de satisfação
 - Relatório de produtividade
-- Relatório de tickets por departamento
+- Relatório de tickets por setor
 
 ### Como exportar relatórios?
 - Clique em "Relatórios"

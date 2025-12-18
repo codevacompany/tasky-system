@@ -563,7 +563,7 @@ const getPlanFeatures = (plan: SubscriptionPlan) => {
         'Todas as funcionalidades do Essencial',
         'Analytics avançados',
         'Exportação de relatórios',
-        'Supervisores por departamento',
+        'Supervisores por setor',
       ],
     },
     customizado: {

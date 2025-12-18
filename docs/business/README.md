@@ -4,7 +4,7 @@
 
 ### Mercado Alvo
 - Empresas de médio e grande porte
-- Organizações com múltiplos departamentos
+- Organizações com múltiplos setores
 - Empresas de TI e prestadoras de serviços
 - Setores que necessitam de controle de processos
 

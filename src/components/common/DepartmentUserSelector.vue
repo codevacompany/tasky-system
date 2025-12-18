@@ -28,7 +28,7 @@
             @change="onDepartmentChange"
             class="w-full bg-transparent border-none focus:outline-none text-sm text-gray-900 dark:text-gray-100"
           >
-            <option value="">Selecione um departamento</option>
+            <option value="">Selecione um setor</option>
             <option
               v-for="department in availableDepartments"
               :key="department.id"
@@ -96,7 +96,7 @@
       <!-- No Department Selected Message -->
       <div v-else class="p-4 text-center">
         <div class="text-sm text-gray-500 dark:text-gray-400">
-          Selecione um departamento para ver os usuários
+          Selecione um setor para ver os usuários
         </div>
       </div>
     </div>
@@ -215,7 +215,7 @@ const loadDepartments = async () => {
     const { data } = await departmentService.fetch({ limit: 100 });
     departments.value = data.items;
   } catch {
-    toast.error('Erro ao carregar departamentos');
+    toast.error('Erro ao carregar setores');
   }
 };
 
