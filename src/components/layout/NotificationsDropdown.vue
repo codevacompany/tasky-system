@@ -287,13 +287,9 @@ const getNotificationUserInitials = (notification: Notification) => {
 };
 
 const getNotificationAvatarStyle = (notification: Notification) => {
-  const fullName =
-    `${notification.createdBy?.firstName || ''} ${notification.createdBy?.lastName || ''}`.trim();
-  const fallbackSeed =
-    notification.createdBy?.email ||
-    (notification.createdBy?.id ? String(notification.createdBy.id) : '') ||
-    String(notification.id);
-  return getAvatarStyle(fullName || fallbackSeed || '');
+  // Use department name as seed to match Kanban card avatar colors
+  const departmentName = notification.createdBy?.department?.name || '';
+  return getAvatarStyle(departmentName);
 };
 
 const MAX_COMMENT_PREVIEW_LENGTH = 94;
