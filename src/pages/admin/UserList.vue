@@ -115,7 +115,7 @@
             <button
               v-if="item.isActive && userStore.user?.id !== item.id"
               @click.stop="deactivateUser(item)"
-              class="inline-flex items-center px-3 py-1.5 border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-xs font-medium rounded-md transition-colors"
+              class="inline-flex items-center justify-center w-[90px] py-1.5 border border-red-300 dark:border-red-600 text-red-700 dark:text-red-400 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-xs font-medium rounded-md transition-colors"
               :disabled="isProcessing"
             >
               <font-awesome-icon icon="user-slash" class="w-3 h-3 mr-1" />
@@ -123,7 +123,7 @@
             </button>
             <span
               v-else-if="item.isActive && userStore.user?.id === item.id"
-              class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 text-xs font-medium rounded-md cursor-not-allowed"
+              class="inline-flex items-center justify-center w-[90px] py-1.5 border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 text-xs font-medium rounded-md cursor-not-allowed"
               title="Você não pode desativar sua própria conta"
             >
               <font-awesome-icon icon="user" class="w-3 h-3 mr-1" />

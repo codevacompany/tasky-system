@@ -145,7 +145,7 @@ export const useFiltersStore = defineStore('filters', {
           } else if (key === 'prioridade') {
             urlFilters.priority = value;
           } else if (key === 'colaborador') {
-            urlFilters.targetUserId = parseInt(value, 10);
+            urlFilters.targetUserUuid = value;
           } else {
             urlFilters[key] = value;
           }
@@ -190,7 +190,7 @@ export const useFiltersStore = defineStore('filters', {
           } else if (key === 'prioridade') {
             urlFilters.priority = value;
           } else if (key === 'colaborador') {
-            urlFilters.targetUserId = parseInt(value, 10);
+            urlFilters.targetUserUuid = value;
           } else {
             urlFilters[key] = value;
           }
@@ -351,7 +351,7 @@ export const useFiltersStore = defineStore('filters', {
             urlKey = 'setor';
           } else if (key === 'priority') {
             urlKey = 'prioridade';
-          } else if (key === 'targetUserId') {
+          } else if (key === 'targetUserUuid') {
             urlKey = 'colaborador';
           }
           searchParams.set(urlKey, String(filtersToUse[key]));

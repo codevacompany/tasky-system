@@ -500,7 +500,7 @@ onMounted(async () => {
     urlFilters.departmentUuid = route.query.setor as string;
   }
   if (route.query.colaborador) {
-    urlFilters.targetUserId = parseInt(route.query.colaborador as string, 10);
+    urlFilters.targetUserUuid = route.query.colaborador as string;
   }
   if (route.query.page) {
     urlFilters.page = parseInt(route.query.page as string, 10);
@@ -669,7 +669,7 @@ const userOptions = computed(() => {
   });
   sortedUsers.forEach((user) => {
     options.push({
-      value: String(user.id),
+      value: user.uuid,
       label: `${user.firstName} ${user.lastName}`,
     });
   });
@@ -686,7 +686,7 @@ const activeFiltersCount = computed(() => {
     if (departmentFilter && departmentFilter !== '' && departmentFilter !== null) count++;
   }
   if (activeTab.value === 'setor' || activeTab.value === 'gerais') {
-    const userFilter = filtersStore.currentFilters.targetUserId;
+    const userFilter = filtersStore.currentFilters.targetUserUuid;
     if (userFilter && userFilter !== '' && userFilter !== null) count++;
   }
   return count;
@@ -717,9 +717,9 @@ const syncUrlWithFilters = () => {
   }
   if (
     (activeTab.value === 'setor' || activeTab.value === 'gerais') &&
-    currentFilters.targetUserId
+    currentFilters.targetUserUuid
   ) {
-    query.colaborador = String(currentFilters.targetUserId);
+    query.colaborador = String(currentFilters.targetUserUuid);
   }
   const pageNum =
     typeof currentFilters.page === 'number'
@@ -769,8 +769,7 @@ const switchTab = async (tab: TicketsTab, skipUrlSync = false) => {
     filtersStore.clearFilter('departmentUuid');
   }
 
-  // Load users when switching to tabs that need them
-  if (tab === 'setor' && userStore.user?.departmentId && users.value.length === 0) {
+  if (tab === 'setor' && userStore.user?.departmentId) {
     try {
       const usersResponse = await userService.getByDepartment(userStore.user.departmentId, {
         limit: 100,
@@ -779,7 +778,7 @@ const switchTab = async (tab: TicketsTab, skipUrlSync = false) => {
     } catch (error) {
       console.error('Error fetching users from department:', error);
     }
-  } else if (tab === 'gerais' && users.value.length === 0) {
+  } else if (tab === 'gerais') {
     try {
       const usersResponse = await userService.fetch({ limit: 100 });
       users.value = usersResponse.data.items;
@@ -842,7 +841,7 @@ const fetchTicketsWithFilters = async () => {
     status?: DefaultTicketStatus | null;
     name?: string;
     departmentUuid?: string | null;
-    targetUserId?: number | null;
+    targetUserUuid?: string | null;
   } = {};
 
   if (currentFilters.priority && String(currentFilters.priority).trim() !== '') {
@@ -866,8 +865,8 @@ const fetchTicketsWithFilters = async () => {
     filters.departmentUuid = String(currentFilters.departmentUuid);
   }
 
-  if ((storeType === 'department' || storeType === 'tenant') && currentFilters.targetUserId) {
-    filters.targetUserId = Number(currentFilters.targetUserId);
+  if ((storeType === 'department' || storeType === 'tenant') && currentFilters.targetUserUuid) {
+    filters.targetUserUuid = String(currentFilters.targetUserUuid);
   }
 
   await ticketsStore.setCurrentPage(storeType, currentPage.value, filters);
@@ -1027,9 +1026,7 @@ const applyFilters = () => {
     filtersToApply.departmentUuid = modalDepartmentFilter.value || undefined;
   }
   if (activeTab.value === 'setor' || activeTab.value === 'gerais') {
-    filtersToApply.targetUserId = modalUserFilter.value
-      ? parseInt(modalUserFilter.value, 10)
-      : undefined;
+    filtersToApply.targetUserUuid = modalUserFilter.value || undefined;
   }
   filtersStore.applyFilters(filtersToApply);
   syncUrlWithFilters();
@@ -1044,26 +1041,22 @@ watch(showFiltersModal, async (isOpen) => {
     if (activeTab.value !== 'setor' && activeTab.value !== 'recebidas') {
       modalDepartmentFilter.value = (filtersStore.currentFilters.departmentUuid as string) || '';
       if (activeTab.value === 'gerais') {
-        modalUserFilter.value = filtersStore.currentFilters.targetUserId
-          ? String(filtersStore.currentFilters.targetUserId)
-          : '';
+        modalUserFilter.value = (filtersStore.currentFilters.targetUserUuid as string) || '';
       } else {
         modalUserFilter.value = '';
       }
     } else {
       modalDepartmentFilter.value = '';
       if (activeTab.value === 'setor') {
-        modalUserFilter.value = filtersStore.currentFilters.targetUserId
-          ? String(filtersStore.currentFilters.targetUserId)
-          : '';
+        modalUserFilter.value = (filtersStore.currentFilters.targetUserUuid as string) || '';
       } else {
         modalUserFilter.value = '';
       }
     }
 
     // Load users when opening modal for tabs that need it
-    if ((activeTab.value === 'setor' || activeTab.value === 'gerais') && users.value.length === 0) {
-      if (activeTab.value === 'setor' && userStore.user?.departmentId) {
+    if (activeTab.value === 'setor' && userStore.user?.departmentId) {
+      if (users.value.length === 0) {
         try {
           const usersResponse = await userService.getByDepartment(userStore.user.departmentId, {
             limit: 100,
@@ -1072,13 +1065,14 @@ watch(showFiltersModal, async (isOpen) => {
         } catch (error) {
           console.error('Error fetching users from department:', error);
         }
-      } else if (activeTab.value === 'gerais') {
-        try {
-          const usersResponse = await userService.fetch({ limit: 100 });
-          users.value = usersResponse.data.items;
-        } catch (error) {
-          console.error('Error fetching all users:', error);
-        }
+      }
+    } else if (activeTab.value === 'gerais') {
+      // Always load all tenant users for 'gerais' tab
+      try {
+        const usersResponse = await userService.fetch({ limit: 100 });
+        users.value = usersResponse.data.items;
+      } catch (error) {
+        console.error('Error fetching all users:', error);
       }
     }
   }
