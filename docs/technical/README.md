@@ -12,7 +12,7 @@ src/
 │   ├── tickets/    # Componentes específicos de tickets
 │   ├── users/      # Componentes específicos de usuários
 │   ├── categories/ # Componentes específicos de categorias
-│   ├── departments/# Componentes específicos de departamentos
+│   ├── departments/# Componentes específicos de setores
 │   └── layout/     # Componentes de layout
 ├── composables/    # Composables Vue
 ├── models/         # Modelos de dados e interfaces
@@ -79,7 +79,7 @@ const ticketService = {
 
 #### NewTicketModal
 - Responsável pela criação de novos tickets
-- Permite definir prioridade, departamento, usuário alvo e data de conclusão
+- Permite definir prioridade, setor, usuário alvo e data de conclusão
 - Validação de campos obrigatórios
 
 #### TicketTable
@@ -130,7 +130,7 @@ O sistema utiliza Pinia para gerenciamento de estado, com stores para:
 - Autenticação
 - Usuários
 - Tickets
-- Departamentos
+- Setores
 - Categorias
 
 ### API

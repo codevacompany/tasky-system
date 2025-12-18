@@ -242,7 +242,7 @@
             </div>
             <div class="mb-4">
               <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
-                >Departamento</label
+                >Setor</label
               >
               <Input
                 v-model="newUser.departamento"
