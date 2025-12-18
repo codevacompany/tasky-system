@@ -20,7 +20,7 @@ export const ticketService = {
     status?: DefaultTicketStatus;
     priority?: TicketPriority;
     departmentUuid?: string;
-    targetUserId?: number;
+    targetUserUuid?: string;
     page?: number;
     limit?: number;
     sortBy?: string;

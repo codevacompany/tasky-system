@@ -288,7 +288,12 @@ import { ref, onMounted, computed } from 'vue';
 import type { Ticket } from '@/models';
 import type { StatusColumn, TicketStatus as ColumnTicketStatus } from '@/models/statusColumn';
 import { DefaultTicketStatus, TicketPriority } from '@/models';
-import { formatSnakeToNaturalCase, getUserInitials, getAvatarColor } from '@/utils/generic-helper';
+import {
+  formatSnakeToNaturalCase,
+  getUserInitials,
+  getAvatarColor,
+  calculateDeadline as calculateDeadlineHelper,
+} from '@/utils/generic-helper';
 import { formatDate, formatRelativeTime } from '@/utils/date';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
@@ -371,22 +376,22 @@ const getTicketsByColumn = (column: StatusColumn) => {
 const calculateDeadline = (ticket: Ticket) => {
   if (!ticket.dueAt) return '—';
 
-  const now = new Date();
-  const dueDate = new Date(ticket.dueAt);
+  const result = calculateDeadlineHelper(ticket);
+  if (!result || result === '—') return '—';
 
-  if (dueDate < now) {
-    return 'Atrasado';
-  }
-
-  const diffTime = Math.abs(dueDate.getTime() - now.getTime());
-  const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-
-  if (diffHours < 24) {
-    return diffHours === 1 ? '1 hora restante' : `${diffHours} horas restantes`;
-  }
-
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays === 1 ? '1 dia restante' : `${diffDays} dias restantes`;
+  // Convert to abbreviated format for Kanban card
+  // Replace "dias" with "d" and "horas" with "h"
+  return result
+    .replace(/\s+dia\s+/gi, 'd ')
+    .replace(/\s+dias\s+/gi, 'd ')
+    .replace(/\s+hora\s+/gi, 'h ')
+    .replace(/\s+horas\s+/gi, 'h ')
+    .replace(/\s+dia$/gi, 'd')
+    .replace(/\s+dias$/gi, 'd')
+    .replace(/\s+hora$/gi, 'h')
+    .replace(/\s+horas$/gi, 'h')
+    .replace(/\s+/g, ' ')
+    .trim();
 };
 
 const getDeadlineClass = (dueDate: string | null) => {

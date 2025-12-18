@@ -745,7 +745,7 @@ const handleSubmit = async () => {
     toast.success('Tarefa criada com sucesso!');
     emit('ticketCreated');
     closeModal();
-    router.push('/minhas-tarefas?tab=criadas');
+    // router.push('/minhas-tarefas?tab=criadas');
   } catch {
     toast.error('Erro ao criar tarefa');
   } finally {
