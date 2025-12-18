@@ -2533,8 +2533,16 @@ const barThickness = computed(() => {
 
 const trendChartData = computed(() => {
   if (!trendData.value || trendData.value.length === 0) return null;
+
+  const formatLabel = (dateStr: string) => {
+    if (selectedTrendPeriod.value === 'weekly') {
+      return formatWeeklyDateRange(dateStr);
+    }
+    return formatDateDDMM(dateStr);
+  };
+
   return {
-    labels: trendData.value.map((item) => formatDateDDMM(item.date)),
+    labels: trendData.value.map((item) => formatLabel(item.date)),
     datasets: [
       {
         label: 'Criados',
@@ -2575,8 +2583,17 @@ const createdVsCompletedChartData = computed(() => {
   if (!trendData.value || trendData.value.length === 0) {
     return { labels: [], datasets: [] };
   }
+
+  // Use weekly range format for weekly period, otherwise use DD/MM format
+  const formatLabel = (dateStr: string) => {
+    if (selectedTrendPeriod.value === 'weekly') {
+      return formatWeeklyDateRange(dateStr);
+    }
+    return formatDateDDMM(dateStr);
+  };
+
   return {
-    labels: trendData.value.map((item) => formatDateDDMM(item.date)),
+    labels: trendData.value.map((item) => formatLabel(item.date)),
     datasets: [
       {
         label: 'Criados',
@@ -2980,6 +2997,34 @@ function formatDateDDMM(dateStr: string) {
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
   return `${day}/${month}`;
+}
+
+// Função para formatar intervalo semanal (primeiro dia - último dia da semana)
+function formatWeeklyDateRange(dateStr: string): string {
+  const date = new Date(dateStr);
+
+  // Get the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+  const dayOfWeek = date.getDay();
+
+  // Calculate start of week (Monday)
+  // If Sunday (0), go back 6 days, otherwise go back (dayOfWeek - 1) days
+  const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  const startOfWeek = new Date(date);
+  startOfWeek.setDate(date.getDate() - daysToMonday);
+
+  // Calculate end of week (Sunday)
+  const daysToSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+  const endOfWeek = new Date(date);
+  endOfWeek.setDate(date.getDate() + daysToSunday);
+
+  // Format both dates as DD/MM
+  const formatDate = (d: Date) => {
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    return `${day}/${month}`;
+  };
+
+  return `${formatDate(startOfWeek)} - ${formatDate(endOfWeek)}`;
 }
 
 // Add new reactive state for cycle time period selection

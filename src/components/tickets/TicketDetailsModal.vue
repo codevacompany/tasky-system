@@ -469,9 +469,13 @@
                   <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Categoria</p>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm text-gray-900 dark:text-gray-100">
-                    {{ loadedTicket.category?.name || '-' }}
-                  </p>
+                  <span
+                    v-if="loadedTicket.category?.name"
+                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600"
+                  >
+                    {{ loadedTicket.category.name }}
+                  </span>
+                  <span v-else class="text-sm text-gray-900 dark:text-gray-100">-</span>
                 </div>
               </div>
 
@@ -538,7 +542,7 @@
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm text-gray-900 dark:text-gray-100">
-                    {{ formatDate(loadedTicket.acceptedAt) }}
+                    {{ formatDateOnly(loadedTicket.acceptedAt) }}
                   </p>
                 </div>
               </div>
@@ -726,42 +730,52 @@
                   <!-- Non-Image File Card -->
                   <div
                     v-else
-                    class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                    class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 transition-all aspect-[4/3] flex items-center justify-center max-w-[140px]"
+                    @click="downloadFile(file)"
                   >
-                    <div
-                      class="text-primary dark:text-blue-400 cursor-pointer flex-shrink-0"
-                      @click="downloadFile(file)"
-                    >
-                      <font-awesome-icon icon="file" size="lg" />
+                    <div class="text-primary dark:text-blue-400">
+                      <font-awesome-icon icon="file" size="3x" />
                     </div>
-                    <div class="flex-1 min-w-0 cursor-pointer" @click="downloadFile(file)">
-                      <div class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                        {{ file.name }}
+                    <div
+                      class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none"
+                    ></div>
+                    <div
+                      class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 pointer-events-none overflow-hidden"
+                    >
+                      <div
+                        class="text-xs text-white whitespace-nowrap overflow-hidden text-ellipsis"
+                      >
+                        {{ truncateFileName(file.name) }}
                       </div>
                     </div>
                     <button
                       v-if="canEditTicket"
                       @click.stop="removeFile(file)"
-                      class="flex-shrink-0 w-6 h-6 flex items-center justify-center text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-all"
+                      class="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-white bg-red-500 hover:bg-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
                       title="Remover arquivo"
                     >
-                      <font-awesome-icon icon="times" class="text-sm" />
+                      <font-awesome-icon icon="times" class="text-xs" />
                     </button>
                   </div>
                 </div>
 
+                <!-- Uploading File Placeholder -->
                 <div
                   v-for="(file, i) in selectedFiles"
                   :key="`new-${i}`"
-                  class="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg"
+                  class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden aspect-[4/3] max-w-[140px]"
                 >
-                  <div class="text-yellow-600 dark:text-yellow-400">
-                    <font-awesome-icon icon="file-upload" size="lg" />
+                  <!-- Skeleton for image/file icon area -->
+                  <div class="w-full h-full flex items-center justify-center p-4">
+                    <div
+                      class="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-lg skeleton-shimmer"
+                    ></div>
                   </div>
-                  <div class="flex-1 min-w-0">
-                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                      {{ file.name }}
-                    </div>
+                  <!-- Skeleton for filename area -->
+                  <div
+                    class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2"
+                  >
+                    <div class="h-3 bg-gray-300 dark:bg-gray-500 rounded skeleton-shimmer"></div>
                   </div>
                 </div>
               </div>
@@ -812,15 +826,19 @@
                       contentType="html"
                       theme="snow"
                       :options="editorOptions"
+                      @text-change="handleQuillTextChange"
                     />
                   </div>
                   <div class="flex justify-end">
                     <button
                       @click="comment()"
-                      class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                      :disabled="isCommentLoading"
+                      class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <font-awesome-icon icon="paper-plane" />
-                      Enviar Comentário
+                      <LoadingSpinner v-if="isCommentLoading" :size="16" />
+                      <font-awesome-icon v-else icon="paper-plane" />
+                      <span v-if="isCommentLoading">Enviando...</span>
+                      <span v-else>Enviar Comentário</span>
                     </button>
                   </div>
                 </div>
@@ -845,10 +863,10 @@
                 <div v-for="event in timeline" :key="event.data.id" class="relative">
                   <!-- Comment -->
                   <div v-if="event.type === 'comment'" class="flex gap-4 relative">
-                    <div class="flex-1 min-w-0 pb-4">
+                    <div class="flex-1 min-w-0 pb-4 overflow-hidden">
                       <div
                         :class="[
-                          'rounded-lg p-3 border',
+                          'rounded-lg p-3 border overflow-hidden',
                           isMyComment(event.data.user.id)
                             ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
                             : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600',
@@ -928,7 +946,7 @@
                         <div
                           class="comment-text prose prose-sm max-w-none dark:prose-invert ml-11"
                           style="font-size: 15px"
-                          v-html="event.data.content"
+                          v-html="convertUrlsToLinks(event.data.content)"
                         ></div>
                       </div>
                     </div>
@@ -1326,6 +1344,7 @@ const userPreferencesStore = useUserPreferencesStore();
 const newComment = ref('');
 const quillEditor = ref<any>(null);
 const editorKey = ref(0);
+const isCommentLoading = ref(false);
 const comments = ref<TicketComment[]>([]);
 const ticketUpdates = ref<TicketUpdate[]>([]);
 const loadedTicket = ref<Ticket | null>(null);
@@ -1410,11 +1429,92 @@ const uploadInlineImage = async (dataUrl: string) => {
   return data.url.split('?')[0];
 };
 
-const processRichTextContent = async (html: string) => {
+const convertUrlsToLinks = (html: string): string => {
   if (typeof window === 'undefined' || !html) return html;
 
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = html;
+
+  const urlRegex =
+    /(https?:\/\/[^\s<>"{}|\\^`[\]]+|www\.[^\s<>"{}|\\^`[\]]+|[a-zA-Z0-9-]+\.[a-zA-Z]{2,}[^\s<>"{}|\\^`[\]]*)/gi;
+
+  const processNode = (node: Node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent || '';
+      const parent = node.parentNode;
+
+      if (
+        parent &&
+        (parent.nodeName === 'A' || (parent instanceof Element && parent.closest('a')))
+      ) {
+        return;
+      }
+
+      const matches = Array.from(text.matchAll(urlRegex));
+      if (matches.length > 0) {
+        const fragment = document.createDocumentFragment();
+        let lastIndex = 0;
+
+        matches.forEach((match) => {
+          const url = match[0];
+          const index = match.index || 0;
+
+          if (index > lastIndex) {
+            fragment.appendChild(document.createTextNode(text.substring(lastIndex, index)));
+          }
+
+          const link = document.createElement('a');
+          let href = url;
+          if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            href = url.startsWith('www.') ? `https://${url}` : `https://${url}`;
+          }
+          link.href = href;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = url;
+          link.className = 'text-blue-600 dark:text-blue-400 hover:underline';
+
+          fragment.appendChild(link);
+          lastIndex = index + url.length;
+        });
+
+        if (lastIndex < text.length) {
+          fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
+        }
+
+        if (parent) {
+          parent.replaceChild(fragment, node);
+        }
+      }
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const element = node as Element;
+      if (
+        element.tagName === 'SCRIPT' ||
+        element.tagName === 'STYLE' ||
+        element.tagName === 'A' ||
+        element.closest('a')
+      ) {
+        return;
+      }
+
+      const childNodes = Array.from(node.childNodes);
+      childNodes.forEach(processNode);
+    }
+  };
+
+  const childNodes = Array.from(tempDiv.childNodes);
+  childNodes.forEach(processNode);
+
+  return tempDiv.innerHTML;
+};
+
+const processRichTextContent = async (html: string) => {
+  if (typeof window === 'undefined' || !html) return html;
+
+  let processedHtml = convertUrlsToLinks(html);
+
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = processedHtml;
 
   const images = Array.from(tempDiv.querySelectorAll('img'));
   for (const img of images) {
@@ -1953,6 +2053,12 @@ const removeFile = async (file: TicketFile) => {
   }
 };
 
+// Handle Quill editor text changes - convert URLs to links when user finishes typing
+const handleQuillTextChange = () => {
+  // We'll process URLs when saving instead of real-time to avoid interfering with typing
+  // This is handled in processRichTextContent
+};
+
 const comment = async () => {
   // Create a temporary div to strip HTML and check if content is actually empty
   const tempDiv = document.createElement('div');
@@ -1968,6 +2074,10 @@ const comment = async () => {
     return;
   }
 
+  if (isCommentLoading.value) return; // Prevent double submission
+
+  isCommentLoading.value = true;
+
   try {
     const processedContent = await processRichTextContent(newComment.value);
 
@@ -1978,17 +2088,23 @@ const comment = async () => {
       content: processedContent,
     });
 
-    fetchComments();
-
-    if (loadedTicket.value?.customId) {
-      await ticketsStore.fetchTicketDetails(loadedTicket.value.customId);
-    }
-
-    // Clear the editor by resetting the content and forcing re-render
+    // Clear the editor immediately after successful submission
     newComment.value = '';
     editorKey.value += 1; // Force component re-render
+
+    // Fetch comments and ticket details in parallel (non-blocking)
+    Promise.all([
+      fetchComments(),
+      loadedTicket.value?.customId
+        ? ticketsStore.fetchTicketDetails(loadedTicket.value.customId)
+        : Promise.resolve(),
+    ]).catch((error) => {
+      console.error('Error refreshing comments/ticket:', error);
+    });
   } catch {
     toast.error('Erro ao adicionar comentário');
+  } finally {
+    isCommentLoading.value = false;
   }
 };
 
@@ -2368,7 +2484,7 @@ const handleFileChange = async (event: Event) => {
         loadedTicket.value = response.data;
       }
 
-      toast.success('Arquivos anexados com sucesso!');
+      toast.success('Sucesso');
       refreshSelectedTicket();
     }
   } catch (error) {
@@ -3625,6 +3741,9 @@ const confirmDueDate = async () => {
 .comment-text {
   color: #495057;
   line-height: 1.5;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
 }
 
 .comment-text :deep(p) {
@@ -3684,6 +3803,8 @@ const confirmDueDate = async () => {
 .comment-text :deep(a) {
   color: #4f46e5;
   text-decoration: none;
+  word-break: break-all;
+  overflow-wrap: anywhere;
 }
 
 .comment-text :deep(a:hover) {
