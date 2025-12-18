@@ -41,9 +41,22 @@
       >
         <div
           v-if="isOpen && !disabled"
-          class="fixed z-[10000] bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 shadow-lg max-h-60 overflow-auto"
+          :class="[
+            'fixed z-[10000] bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 shadow-lg overflow-auto',
+            props.dropdownMaxHeight &&
+            (props.dropdownMaxHeight.startsWith('max-h-') || props.dropdownMaxHeight.includes('['))
+              ? props.dropdownMaxHeight
+              : props.dropdownMaxHeight || 'max-h-60',
+          ]"
           ref="dropdownMenu"
-          :style="dropdownStyle"
+          :style="{
+            ...dropdownStyle,
+            ...(props.dropdownMaxHeight &&
+            !props.dropdownMaxHeight.startsWith('max-h-') &&
+            !props.dropdownMaxHeight.includes('[')
+              ? { maxHeight: props.dropdownMaxHeight }
+              : {}),
+          }"
         >
           <div class="px-1.5 py-1 flex flex-col gap-1">
             <button
@@ -82,6 +95,7 @@ const props = defineProps<{
   modelValue: string;
   disabled?: boolean;
   placeholder?: string;
+  dropdownMaxHeight?: string; // Tailwind class like 'max-h-40' or custom value like '200px'
 }>();
 
 const emit = defineEmits<{

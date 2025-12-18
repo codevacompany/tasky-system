@@ -137,6 +137,7 @@ export function formatTimeInSecondsCompact(seconds?: number) {
   const days = Math.floor(seconds / 86400);
   const hours = Math.floor((seconds % 86400) / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
 
   if (days > 0) {
     return hours > 0 ? `${days}d ${hours}h` : `${days}d`;
@@ -145,7 +146,7 @@ export function formatTimeInSecondsCompact(seconds?: number) {
   } else if (minutes > 0) {
     return `${minutes}m`;
   } else {
-    return `${seconds}s`;
+    return `${secs}s`;
   }
 }
 

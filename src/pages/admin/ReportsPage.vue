@@ -797,7 +797,7 @@
                                   inProgressTasks.length) *
                                   100,
                               )
-                            : 0) > 50
+                            : 0) >= 50
                             ? '#ffffff'
                             : '#1f2937',
                       }"
@@ -824,7 +824,7 @@
                                   inProgressTasks.length) *
                                   100,
                               )
-                            : 0) > 50
+                            : 0) >= 50
                             ? '#ffffff'
                             : '#6b7280',
                       }"
@@ -865,7 +865,7 @@
                                   inProgressTasks.length) *
                                   100,
                               )
-                            : 0) > 50
+                            : 0) >= 50
                             ? '#ffffff'
                             : '#1f2937',
                       }"
@@ -898,7 +898,7 @@
                                   inProgressTasks.length) *
                                   100,
                               )
-                            : 0) > 50
+                            : 0) >= 50
                             ? '#ffffff'
                             : '#6b7280',
                       }"
@@ -939,7 +939,7 @@
                                   inProgressTasks.length) *
                                   100,
                               )
-                            : 0) > 50
+                            : 0) >= 50
                             ? '#ffffff'
                             : '#1f2937',
                       }"
@@ -972,7 +972,7 @@
                                   inProgressTasks.length) *
                                   100,
                               )
-                            : 0) > 50
+                            : 0) >= 50
                             ? '#ffffff'
                             : '#6b7280',
                       }"
@@ -1013,7 +1013,7 @@
                                   inProgressTasks.length) *
                                   100,
                               )
-                            : 0) > 50
+                            : 0) >= 50
                             ? '#ffffff'
                             : '#1f2937',
                       }"
@@ -1046,7 +1046,7 @@
                                   inProgressTasks.length) *
                                   100,
                               )
-                            : 0) > 50
+                            : 0) >= 50
                             ? '#ffffff'
                             : '#6b7280',
                       }"
@@ -1081,7 +1081,7 @@
                                   inProgressTasks.length) *
                                   100,
                               )
-                            : 0) > 50
+                            : 0) >= 50
                             ? '#ffffff'
                             : '#1f2937',
                       }"
@@ -1108,7 +1108,7 @@
                                   inProgressTasks.length) *
                                   100,
                               )
-                            : 0) > 50
+                            : 0) >= 50
                             ? '#ffffff'
                             : '#6b7280',
                       }"

@@ -288,6 +288,16 @@
             >
             <Select v-model="modalDepartmentFilter" :options="departmentOptions" />
           </div>
+          <div v-if="activeTab === 'setor' || activeTab === 'gerais'">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >Colaborador:</label
+            >
+            <Select
+              v-model="modalUserFilter"
+              :options="userOptions"
+              dropdown-max-height="max-h-[25vh]"
+            />
+          </div>
         </div>
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
           <button
@@ -384,12 +394,15 @@ import { toast } from 'vue3-toastify';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { localStorageService } from '@/utils/localStorageService';
 import { departmentService } from '@/services/departmentService';
-import type { Department } from '@/models';
+import { userService } from '@/services/userService';
+import { useUserStore } from '@/stores/user';
+import type { Department, User } from '@/models';
 
 const route = useRoute();
 const router = useRouter();
 const ticketsStore = useTicketsStore();
 const filtersStore = useFiltersStore();
+const userStore = useUserStore();
 const { isTenantAdmin } = useRoles();
 
 type TicketsTab = 'recebidas' | 'criadas' | 'setor' | 'gerais';
@@ -423,6 +436,7 @@ const searchTerm = computed({
 const modalStatusFilter = ref<string>('');
 const modalPriorityFilter = ref<string>('');
 const modalDepartmentFilter = ref<string>('');
+const modalUserFilter = ref<string>('');
 
 const statusFilter = computed({
   get: () => (filtersStore.currentFilters.status as string) || '',
@@ -485,6 +499,9 @@ onMounted(async () => {
   if (route.query.setor) {
     urlFilters.departmentUuid = route.query.setor as string;
   }
+  if (route.query.colaborador) {
+    urlFilters.targetUserId = parseInt(route.query.colaborador as string, 10);
+  }
   if (route.query.page) {
     urlFilters.page = parseInt(route.query.page as string, 10);
   } else {
@@ -498,6 +515,27 @@ onMounted(async () => {
     departments.value = deptResponse.data.items;
   } catch (error) {
     console.error('Error fetching departments:', error);
+  }
+
+  // Fetch users for filters
+  // For "Tarefas do Setor" tab: only users from current user's department
+  // For "Tarefas Gerais" tab: all users
+  if (tabToUse === 'setor' && userStore.user?.departmentId) {
+    try {
+      const usersResponse = await userService.getByDepartment(userStore.user.departmentId, {
+        limit: 100,
+      });
+      users.value = usersResponse.data.items;
+    } catch (error) {
+      console.error('Error fetching users from department:', error);
+    }
+  } else if (tabToUse === 'gerais') {
+    try {
+      const usersResponse = await userService.fetch({ limit: 100 });
+      users.value = usersResponse.data.items;
+    } catch (error) {
+      console.error('Error fetching all users:', error);
+    }
   }
 
   await fetchTicketsWithFilters();
@@ -621,6 +659,23 @@ const departmentOptions = computed(() => {
   return options;
 });
 
+const users = ref<User[]>([]);
+const userOptions = computed(() => {
+  const options = [{ value: '', label: 'Todos' }];
+  const sortedUsers = [...users.value].sort((a, b) => {
+    const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
+    const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+  sortedUsers.forEach((user) => {
+    options.push({
+      value: String(user.id),
+      label: `${user.firstName} ${user.lastName}`,
+    });
+  });
+  return options;
+});
+
 const activeFiltersCount = computed(() => {
   let count = 0;
   if (statusFilter.value && statusFilter.value !== '') count++;
@@ -629,6 +684,10 @@ const activeFiltersCount = computed(() => {
   if (activeTab.value !== 'setor' && activeTab.value !== 'recebidas') {
     const departmentFilter = filtersStore.currentFilters.departmentUuid;
     if (departmentFilter && departmentFilter !== '' && departmentFilter !== null) count++;
+  }
+  if (activeTab.value === 'setor' || activeTab.value === 'gerais') {
+    const userFilter = filtersStore.currentFilters.targetUserId;
+    if (userFilter && userFilter !== '' && userFilter !== null) count++;
   }
   return count;
 });
@@ -656,6 +715,12 @@ const syncUrlWithFilters = () => {
   ) {
     query.setor = String(currentFilters.departmentUuid);
   }
+  if (
+    (activeTab.value === 'setor' || activeTab.value === 'gerais') &&
+    currentFilters.targetUserId
+  ) {
+    query.colaborador = String(currentFilters.targetUserId);
+  }
   const pageNum =
     typeof currentFilters.page === 'number'
       ? currentFilters.page
@@ -675,7 +740,7 @@ const syncUrlWithFilters = () => {
   });
 };
 
-const switchTab = (tab: TicketsTab, skipUrlSync = false) => {
+const switchTab = async (tab: TicketsTab, skipUrlSync = false) => {
   filtersStore.setContext(tab);
 
   const existingFilters = filtersStore.getContextFilters(tab);
@@ -702,6 +767,25 @@ const switchTab = (tab: TicketsTab, skipUrlSync = false) => {
 
   if (tab === 'setor' || tab === 'recebidas') {
     filtersStore.clearFilter('departmentUuid');
+  }
+
+  // Load users when switching to tabs that need them
+  if (tab === 'setor' && userStore.user?.departmentId && users.value.length === 0) {
+    try {
+      const usersResponse = await userService.getByDepartment(userStore.user.departmentId, {
+        limit: 100,
+      });
+      users.value = usersResponse.data.items;
+    } catch (error) {
+      console.error('Error fetching users from department:', error);
+    }
+  } else if (tab === 'gerais' && users.value.length === 0) {
+    try {
+      const usersResponse = await userService.fetch({ limit: 100 });
+      users.value = usersResponse.data.items;
+    } catch (error) {
+      console.error('Error fetching all users:', error);
+    }
   }
 
   if (!skipUrlSync && !isUpdatingUrl.value) {
@@ -758,6 +842,7 @@ const fetchTicketsWithFilters = async () => {
     status?: DefaultTicketStatus | null;
     name?: string;
     departmentUuid?: string | null;
+    targetUserId?: number | null;
   } = {};
 
   if (currentFilters.priority && String(currentFilters.priority).trim() !== '') {
@@ -779,6 +864,10 @@ const fetchTicketsWithFilters = async () => {
     currentFilters.departmentUuid !== null
   ) {
     filters.departmentUuid = String(currentFilters.departmentUuid);
+  }
+
+  if ((storeType === 'department' || storeType === 'tenant') && currentFilters.targetUserId) {
+    filters.targetUserId = Number(currentFilters.targetUserId);
   }
 
   await ticketsStore.setCurrentPage(storeType, currentPage.value, filters);
@@ -923,6 +1012,7 @@ const clearFilters = () => {
   modalStatusFilter.value = '';
   modalPriorityFilter.value = '';
   modalDepartmentFilter.value = '';
+  modalUserFilter.value = '';
   filtersStore.clearAllFilters();
   fetchTicketsWithFilters();
   showFiltersModal.value = false;
@@ -936,20 +1026,60 @@ const applyFilters = () => {
   if (activeTab.value !== 'setor' && activeTab.value !== 'recebidas') {
     filtersToApply.departmentUuid = modalDepartmentFilter.value || undefined;
   }
+  if (activeTab.value === 'setor' || activeTab.value === 'gerais') {
+    filtersToApply.targetUserId = modalUserFilter.value
+      ? parseInt(modalUserFilter.value, 10)
+      : undefined;
+  }
   filtersStore.applyFilters(filtersToApply);
   syncUrlWithFilters();
   fetchTicketsWithFilters();
   showFiltersModal.value = false;
 };
 
-watch(showFiltersModal, (isOpen) => {
+watch(showFiltersModal, async (isOpen) => {
   if (isOpen) {
     modalStatusFilter.value = (filtersStore.currentFilters.status as string) || '';
     modalPriorityFilter.value = (filtersStore.currentFilters.priority as string) || '';
     if (activeTab.value !== 'setor' && activeTab.value !== 'recebidas') {
       modalDepartmentFilter.value = (filtersStore.currentFilters.departmentUuid as string) || '';
+      if (activeTab.value === 'gerais') {
+        modalUserFilter.value = filtersStore.currentFilters.targetUserId
+          ? String(filtersStore.currentFilters.targetUserId)
+          : '';
+      } else {
+        modalUserFilter.value = '';
+      }
     } else {
       modalDepartmentFilter.value = '';
+      if (activeTab.value === 'setor') {
+        modalUserFilter.value = filtersStore.currentFilters.targetUserId
+          ? String(filtersStore.currentFilters.targetUserId)
+          : '';
+      } else {
+        modalUserFilter.value = '';
+      }
+    }
+
+    // Load users when opening modal for tabs that need it
+    if ((activeTab.value === 'setor' || activeTab.value === 'gerais') && users.value.length === 0) {
+      if (activeTab.value === 'setor' && userStore.user?.departmentId) {
+        try {
+          const usersResponse = await userService.getByDepartment(userStore.user.departmentId, {
+            limit: 100,
+          });
+          users.value = usersResponse.data.items;
+        } catch (error) {
+          console.error('Error fetching users from department:', error);
+        }
+      } else if (activeTab.value === 'gerais') {
+        try {
+          const usersResponse = await userService.fetch({ limit: 100 });
+          users.value = usersResponse.data.items;
+        } catch (error) {
+          console.error('Error fetching all users:', error);
+        }
+      }
     }
   }
 });

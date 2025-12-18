@@ -13,6 +13,7 @@ export type TicketListFilters = {
   priority?: TicketPriority | null;
   name?: string;
   departmentUuid?: string | null;
+  targetUserId?: number | null;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 };
@@ -392,6 +393,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         if (currentFilters.departmentUuid !== undefined && currentFilters.departmentUuid !== null) {
           params.departmentUuid = currentFilters.departmentUuid;
         }
+        if (currentFilters.targetUserId !== undefined && currentFilters.targetUserId !== null) {
+          params.targetUserId = currentFilters.targetUserId;
+        }
         if (currentFilters.sortBy) {
           params.sortBy = currentFilters.sortBy;
         }
@@ -507,6 +511,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         if (currentFilters.departmentUuid !== undefined && currentFilters.departmentUuid !== null) {
           params.departmentUuid = currentFilters.departmentUuid;
+        }
+        if (currentFilters.targetUserId !== undefined && currentFilters.targetUserId !== null) {
+          params.targetUserId = currentFilters.targetUserId;
         }
         if (currentFilters.sortBy) {
           params.sortBy = currentFilters.sortBy;
