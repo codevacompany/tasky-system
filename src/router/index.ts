@@ -181,6 +181,20 @@ router.beforeEach(async (to, from, next) => {
     return next('/assinaturas');
   }
 
+  // Check if user has accepted terms (except for accept-terms endpoint and public pages)
+  if (
+    requiresAuth &&
+    userStore.user &&
+    (!userStore.user.termsAccepted || !userStore.user.privacyPolicyAccepted) &&
+    to.path !== '/assinaturas' &&
+    !to.path.includes('/accept-terms')
+  ) {
+    // Don't redirect if already on home page (modal will show)
+    if (to.path !== '/') {
+      return next('/');
+    }
+  }
+
   next();
 });
 

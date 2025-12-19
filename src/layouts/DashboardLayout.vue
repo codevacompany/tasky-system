@@ -534,13 +534,18 @@ const handleClickOutside = (event: MouseEvent) => {
 };
 
 const initializeTicketPolling = () => {
-  ticketsStore.startPolling();
+  // Only start polling if terms have been accepted
+  if (userStore.user?.termsAccepted && userStore.user?.privacyPolicyAccepted) {
+    ticketsStore.startPolling();
+  }
 };
 
 onMounted(() => {
-  fetchUnreadCount();
-
-  initializeTicketPolling();
+  // Only fetch notifications if terms have been accepted
+  if (userStore.user?.termsAccepted && userStore.user?.privacyPolicyAccepted) {
+    fetchUnreadCount();
+    initializeTicketPolling();
+  }
 
   //let's use a polling strategy for now
   notificationsIntervalId = setInterval(() => {

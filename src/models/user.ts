@@ -16,6 +16,12 @@ export interface User {
   permissions?: string[];
   loginCount?: number;
   lastLogin?: string | Date | null;
+  termsAccepted?: boolean;
+  termsAcceptedAt?: string | Date | null;
+  termsVersion?: string | null;
+  privacyPolicyAccepted?: boolean;
+  privacyPolicyAcceptedAt?: string | Date | null;
+  privacyPolicyVersion?: string | null;
 }
 
 export interface CreateUserDto {

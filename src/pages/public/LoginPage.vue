@@ -130,8 +130,13 @@ const login = async () => {
     } else {
       router.push('/');
     }
-  } catch {
-    toast.error('Email ou senha incorretos');
+  } catch (error: any) {
+    const errorCode = error.response?.data?.code;
+    if (errorCode === 'subscription-required') {
+      toast.error('Esta conta foi desativada');
+    } else {
+      toast.error('Email ou senha incorretos');
+    }
   } finally {
     isLoading.value = false;
   }

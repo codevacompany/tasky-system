@@ -189,6 +189,11 @@ export const useTicketsStore = defineStore('tickets', () => {
   async function fetchMyTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     const userStore = useUserStore();
     if (!userStore.user) return;
+    
+    // Don't fetch if terms haven't been accepted
+    if (!userStore.user.termsAccepted || !userStore.user.privacyPolicyAccepted) {
+      return;
+    }
 
     const currentPage = page ?? myTickets.value.currentPage;
     const currentFilters = filters ?? myTickets.value.currentFilters;
@@ -266,6 +271,11 @@ export const useTicketsStore = defineStore('tickets', () => {
   async function fetchReceivedTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     const userStore = useUserStore();
     if (!userStore.user) return;
+    
+    // Don't fetch if terms haven't been accepted
+    if (!userStore.user.termsAccepted || !userStore.user.privacyPolicyAccepted) {
+      return;
+    }
 
     const currentPage = page ?? receivedTickets.value.currentPage;
     const currentFilters = filters ?? receivedTickets.value.currentFilters;
@@ -343,6 +353,11 @@ export const useTicketsStore = defineStore('tickets', () => {
   async function fetchDepartmentTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     const userStore = useUserStore();
     if (!userStore.user?.departmentId) return;
+    
+    // Don't fetch if terms haven't been accepted
+    if (!userStore.user.termsAccepted || !userStore.user.privacyPolicyAccepted) {
+      return;
+    }
 
     const currentPage = page ?? departmentTickets.value.currentPage;
     const currentFilters = filters ?? departmentTickets.value.currentFilters;
@@ -417,6 +432,13 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   async function fetchArchivedTickets(page?: number, limit = 10, filters?: TicketListFilters) {
+    const userStore = useUserStore();
+    
+    // Don't fetch if terms haven't been accepted
+    if (!userStore.user?.termsAccepted || !userStore.user?.privacyPolicyAccepted) {
+      return;
+    }
+    
     // Use current page if no page is provided
     const currentPage = page ?? archivedTickets.value.currentPage;
     // Use current filters if no filters are provided
@@ -462,6 +484,13 @@ export const useTicketsStore = defineStore('tickets', () => {
 
   async function fetchTenantTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     if (!isTenantAdmin.value) return;
+    
+    const userStore = useUserStore();
+    
+    // Don't fetch if terms haven't been accepted
+    if (!userStore.user?.termsAccepted || !userStore.user?.privacyPolicyAccepted) {
+      return;
+    }
 
     const currentPage = page ?? tenantTickets.value.currentPage;
     const currentFilters = filters ?? tenantTickets.value.currentFilters;
@@ -579,6 +608,11 @@ export const useTicketsStore = defineStore('tickets', () => {
   async function refreshAllTickets() {
     const userStore = useUserStore();
     if (!userStore.user) return;
+    
+    // Don't fetch if terms haven't been accepted
+    if (!userStore.user.termsAccepted || !userStore.user.privacyPolicyAccepted) {
+      return;
+    }
 
     await Promise.all([
       fetchMyTickets(),
