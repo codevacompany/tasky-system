@@ -1,10 +1,22 @@
 <template>
-  <section id="dashboardSection" class="p-5 sm:px-6 sm:pt-4 sm:pb-10">
-    <WelcomeModal
-      :isOpen="showWelcomeModal"
-      @close="closeWelcomeModal"
-      @openGuide="openUserGuide"
-    />
+  <div class="relative">
+    <!-- Blur overlay for background content only -->
+    <div
+      v-if="showWelcomeModal"
+      class="fixed inset-0 bg-white/30 dark:bg-black/30 backdrop-blur-sm z-[999] pointer-events-none"
+    ></div>
+    
+    <section 
+      id="dashboardSection" 
+      class="p-5 sm:px-6 sm:pt-4 sm:pb-10 transition-all duration-300"
+      :class="{ 'pointer-events-none': showWelcomeModal }"
+    >
+      <WelcomeModal
+        :isOpen="showWelcomeModal"
+        @close="closeWelcomeModal"
+        @openGuide="openUserGuide"
+      />
+    
 
     <!-- Estatísticas -->
     <div class="bg-white dark:bg-gray-800 rounded-lg px-6 pt-4 pb-6 mb-5 shadow">
@@ -180,7 +192,8 @@
         :viewAllUrl="'/minhas-tarefas?tab=criadas'"
       />
     </div>
-  </section>
+    </section>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -243,19 +256,27 @@ const ticketsFinalizados = computed(() => {
   };
 });
 
-const showWelcomeModal = ref(userStore.isNewUser);
+const showWelcomeModal = computed(() => {
+  const user = userStore.user;
+  return user ? !user.termsAccepted || !user.privacyPolicyAccepted : false;
+});
 
 const closeWelcomeModal = () => {
   showWelcomeModal.value = false;
-  userStore.setIsNewUser(false);
 };
 
 const openUserGuide = () => {
-  userStore.setIsNewUser(false);
   router.push('/faq');
 };
 
 onMounted(async () => {
+  // Don't fetch data if terms haven't been accepted
+  const user = userStore.user;
+  if (user && (!user.termsAccepted || !user.privacyPolicyAccepted)) {
+    isLoading.value = false;
+    return;
+  }
+
   isLoading.value = true;
 
   if (ticketsStore.receivedTickets.currentPage !== 1) {

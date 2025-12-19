@@ -1,12 +1,12 @@
-# Tasky System - Sistema de Gerenciamento de Tickets
+# Tasky Pro - Sistema de Gerenciamento de Tickets
 
 ## 📋 Sobre o Projeto
 
-O Tasky System é uma solução completa para gerenciamento de tickets desenvolvida com tecnologias modernas e escaláveis. O sistema foi projetado para otimizar o fluxo de trabalho entre diferentes setores e usuários de uma organização, oferecendo uma experiência intuitiva e eficiente.
+O Tasky Pro é uma solução completa para gerenciamento de tickets desenvolvida com tecnologias modernas e escaláveis. O sistema foi projetado para otimizar o fluxo de trabalho entre diferentes setores e usuários de uma organização, oferecendo uma experiência intuitiva e eficiente.
 
 ## 🎯 Objetivo
 
-O objetivo do Tasky System é proporcionar uma gestão eficiente de tickets, reduzindo o tempo de resposta, aumentando a produtividade e melhorando a comunicação entre equipes, através de uma plataforma moderna e fácil de usar.
+O objetivo do Tasky Pro é proporcionar uma gestão eficiente de tickets, reduzindo o tempo de resposta, aumentando a produtividade e melhorando a comunicação entre equipes, através de uma plataforma moderna e fácil de usar.
 
 ## 🚀 Funcionalidades Principais
 

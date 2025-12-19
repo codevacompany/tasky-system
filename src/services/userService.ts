@@ -61,4 +61,13 @@ export const userService = {
   ): Promise<AxiosResponse<{ message: string }>> {
     return apiClient.patch(`/auth/admin/reset-password-uuid/${uuid}`);
   },
+
+  async acceptTerms(data: {
+    termsAccepted: boolean;
+    privacyPolicyAccepted: boolean;
+    termsVersion?: string;
+    privacyPolicyVersion?: string;
+  }): Promise<AxiosResponse<User>> {
+    return apiClient.post<User>('/users/accept-terms', data);
+  },
 };

@@ -2,8 +2,8 @@
 
 ## 🤔 Geral
 
-### O que é o Tasky System?
-O Tasky System é uma plataforma de gerenciamento de tickets que ajuda empresas a organizarem e acompanharem suas solicitações internas de forma eficiente.
+### O que é o Tasky Pro?
+O Tasky Pro é uma plataforma de gerenciamento de tickets que ajuda empresas a organizarem e acompanharem suas solicitações internas de forma eficiente.
 
 ### Quem pode usar o sistema?
 O sistema é ideal para empresas de médio e grande porte que necessitam gerenciar fluxos de trabalho entre diferentes setores e equipes.
