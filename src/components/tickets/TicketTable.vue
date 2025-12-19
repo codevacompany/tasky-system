@@ -8,7 +8,7 @@
       :clickable="true"
       rowKey="customId"
       minWidth="1000px"
-      :showActions="false"
+      :showActions="true"
       @rowClick="openTicketDetails"
       @pageChange="changePage"
       @sort="handleSort"
@@ -252,7 +252,11 @@
               "
               class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors duração-200"
               @click.stop="handleSendToNextDepartment(item)"
-              title="Enviar para Próximo Setor"
+              :title="
+                isNextUserSameDepartment(item)
+                  ? 'Enviar para Próximo Colaborador'
+                  : 'Enviar para Próximo Setor'
+              "
             >
               <font-awesome-icon icon="arrow-right" class="text-xs md:text-sm" />
             </button>
@@ -987,22 +991,30 @@ const handleAcceptTicket = async (ticket: Ticket) => {
 };
 
 const handleSendToNextDepartment = async (ticket: Ticket) => {
-  openConfirmationModal(
-    'Enviar para Próximo Setor',
-    'Tem certeza que deseja enviar esta tarefa para o próximo setor?',
-    async () => {
-      try {
-        await ticketService.sendToNextDepartment(ticket.customId);
-        toast.success('Tarefa enviada para o próximo setor');
+  const isSameDepartment = isNextUserSameDepartment(ticket);
+  const title = isSameDepartment ? 'Próximo Colaborador' : 'Próximo Setor';
+  const message = isSameDepartment
+    ? 'Tem certeza que deseja enviar esta tarefa para o próximo colaborador?'
+    : 'Tem certeza que deseja enviar esta tarefa para o próximo setor?';
+  const successMessage = isSameDepartment
+    ? 'Tarefa enviada para o próximo colaborador'
+    : 'Tarefa enviada para o próximo setor';
+  const errorMessage = isSameDepartment
+    ? 'Erro ao enviar a tarefa para o próximo colaborador'
+    : 'Erro ao enviar a tarefa para o próximo setor';
 
-        await refreshTickets();
+  openConfirmationModal(title, message, async () => {
+    try {
+      await ticketService.sendToNextDepartment(ticket.customId);
+      toast.success(successMessage);
 
-        await ticketsStore.fetchTicketDetails(ticket.customId);
-      } catch {
-        toast.error('Erro ao enviar a tarefa para o próximo setor');
-      }
-    },
-  );
+      await refreshTickets();
+
+      await ticketsStore.fetchTicketDetails(ticket.customId);
+    } catch {
+      toast.error(errorMessage);
+    }
+  });
 };
 
 const handleVerifyTicket = async (ticket: Ticket) => {
@@ -1161,6 +1173,29 @@ const isLastTargetUser = (ticket: Ticket) => {
   const lastUser = sortedTargetUsers[sortedTargetUsers.length - 1];
 
   return lastUser.userId === ticket.currentTargetUserId;
+};
+
+const isNextUserSameDepartment = (ticket: Ticket) => {
+  if (!ticket.targetUsers || ticket.targetUsers.length === 0) return false;
+  if (!userStore.user?.id) return false;
+  if (isLastTargetUser(ticket)) return false;
+
+  const sortedTargetUsers = [...ticket.targetUsers].sort((a, b) => a.order - b.order);
+  const currentUserIndex = sortedTargetUsers.findIndex(
+    (tu) => tu.userId === ticket.currentTargetUserId,
+  );
+
+  if (currentUserIndex === -1 || currentUserIndex === sortedTargetUsers.length - 1) {
+    return false;
+  }
+
+  const currentUser = sortedTargetUsers[currentUserIndex];
+  const nextUser = sortedTargetUsers[currentUserIndex + 1];
+
+  return (
+    currentUser.user?.departmentId !== null &&
+    currentUser.user?.departmentId === nextUser.user?.departmentId
+  );
 };
 
 const handleStartTicket = async (ticket: Ticket) => {

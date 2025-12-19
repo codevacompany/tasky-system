@@ -106,20 +106,23 @@
             </div>
           </div>
 
-          <div class="flex gap-4 mt-2">
+          <div class="flex gap-4 mt-2" :class="{ 'justify-center': isReturningUser }">
             <button
               :disabled="!termsAccepted || !privacyPolicyAccepted"
               :class="[
                 'px-6 py-3 rounded-md font-medium cursor-pointer transition-all duration-200',
                 termsAccepted && privacyPolicyAccepted
-                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  ? isReturningUser
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
                   : 'bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-600 border border-gray-300 dark:border-gray-700 cursor-not-allowed',
               ]"
               @click="handleAccept"
             >
-              Começar
+              {{ isReturningUser ? 'Continuar' : 'Começar' }}
             </button>
             <button
+              v-if="!isReturningUser"
               :disabled="!termsAccepted || !privacyPolicyAccepted"
               :class="[
                 'px-6 py-3 rounded-md font-medium cursor-pointer transition-all duration-200',
