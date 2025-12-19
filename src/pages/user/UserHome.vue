@@ -5,9 +5,9 @@
       v-if="showWelcomeModal"
       class="fixed inset-0 bg-white/30 dark:bg-black/30 backdrop-blur-sm z-[999] pointer-events-none"
     ></div>
-    
-    <section 
-      id="dashboardSection" 
+
+    <section
+      id="dashboardSection"
       class="p-5 sm:px-6 sm:pt-4 sm:pb-10 transition-all duration-300"
       :class="{ 'pointer-events-none': showWelcomeModal }"
     >
@@ -16,182 +16,190 @@
         @close="closeWelcomeModal"
         @openGuide="openUserGuide"
       />
-    
 
-    <!-- Estatísticas -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg px-6 pt-4 pb-6 mb-5 shadow">
-      <div class="mb-4">
-        <h1 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Estatísticas</h1>
-        <p class="text-xs text-gray-600 dark:text-gray-400">
-          Visão geral do seu desempenho e métricas
-        </p>
+      <!-- Estatísticas -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg px-6 pt-4 pb-6 mb-5 shadow">
+        <div class="mb-4">
+          <h1 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Estatísticas</h1>
+          <p class="text-xs text-gray-600 dark:text-gray-400">
+            Visão geral do seu desempenho e métricas
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <!-- Pendentes -->
+          <div
+            v-if="isLoading"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+            </div>
+            <div
+              class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
+            ></div>
+            <div class="h-3 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          </div>
+          <div
+            v-else
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <font-awesome-icon
+                icon="clock"
+                class="text-orange-500 dark:text-orange-400 text-2xl"
+              />
+            </div>
+            <p
+              id="pendingTicketsCount"
+              class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+            >
+              {{ ticketsPendentes.total }}
+            </p>
+            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Pendentes</h3>
+          </div>
+
+          <!-- Em Andamento -->
+          <div
+            v-if="isLoading"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+            </div>
+            <div
+              class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
+            ></div>
+            <div class="h-3 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          </div>
+          <div
+            v-else
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <font-awesome-icon icon="spinner" class="text-blue-500 dark:text-blue-400 text-2xl" />
+            </div>
+            <p
+              id="inProgressTicketsCount"
+              class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+            >
+              {{ ticketsEmAndamento.total }}
+            </p>
+            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Em Andamento</h3>
+          </div>
+
+          <!-- Finalizados -->
+          <div
+            v-if="isLoading"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+            </div>
+            <div
+              class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
+            ></div>
+            <div class="h-3 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          </div>
+          <div
+            v-else
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <font-awesome-icon
+                icon="check-circle"
+                class="text-green-500 dark:text-green-400 text-2xl"
+              />
+            </div>
+            <p
+              id="resolvedTicketsCount"
+              class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+            >
+              {{ ticketsFinalizados.total }}
+            </p>
+            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Resolvidos</h3>
+          </div>
+
+          <!-- Tempo Médio de Aceite -->
+          <div
+            v-if="isLoading"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+            </div>
+            <div
+              class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
+            ></div>
+            <div class="h-3 w-32 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          </div>
+          <div
+            v-else
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <font-awesome-icon
+                icon="hourglass-half"
+                class="text-teal-600 dark:text-teal-400 text-2xl"
+              />
+            </div>
+            <p id="tempoMedioAceite" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              {{ userStats ? formatTimeShort(userStats.averageAcceptanceTimeSeconds) : 'N/A' }}
+            </p>
+            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
+              Tempo Médio de Aceite
+            </h3>
+          </div>
+
+          <!-- Tempo Médio de Resolução -->
+          <div
+            v-if="isLoading"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+            </div>
+            <div
+              class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
+            ></div>
+            <div class="h-3 w-36 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          </div>
+          <div
+            v-else
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <font-awesome-icon
+                icon="calendar-check"
+                class="text-indigo-500 dark:text-indigo-400 text-2xl"
+              />
+            </div>
+            <p
+              id="tempoMedioConclusao"
+              class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+            >
+              {{ userStats ? formatTimeShort(userStats.averageResolutionTimeSeconds) : 'N/A' }}
+            </p>
+            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
+              Tempo Médio de Resolução
+            </h3>
+          </div>
+        </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-        <!-- Pendentes -->
-        <div
-          v-if="isLoading"
-          class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
-        >
-          <div class="mb-3">
-            <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-          <div
-            class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
-          ></div>
-          <div class="h-3 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-        </div>
-        <div
-          v-else
-          class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
-        >
-          <div class="mb-3">
-            <font-awesome-icon icon="clock" class="text-orange-500 dark:text-orange-400 text-2xl" />
-          </div>
-          <p id="pendingTicketsCount" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-            {{ ticketsPendentes.total }}
-          </p>
-          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Pendentes</h3>
-        </div>
-
-        <!-- Em Andamento -->
-        <div
-          v-if="isLoading"
-          class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
-        >
-          <div class="mb-3">
-            <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-          <div
-            class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
-          ></div>
-          <div class="h-3 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-        </div>
-        <div
-          v-else
-          class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
-        >
-          <div class="mb-3">
-            <font-awesome-icon icon="spinner" class="text-blue-500 dark:text-blue-400 text-2xl" />
-          </div>
-          <p
-            id="inProgressTicketsCount"
-            class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
-          >
-            {{ ticketsEmAndamento.total }}
-          </p>
-          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Em Andamento</h3>
-        </div>
-
-        <!-- Finalizados -->
-        <div
-          v-if="isLoading"
-          class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
-        >
-          <div class="mb-3">
-            <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-          <div
-            class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
-          ></div>
-          <div class="h-3 w-20 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-        </div>
-        <div
-          v-else
-          class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
-        >
-          <div class="mb-3">
-            <font-awesome-icon
-              icon="check-circle"
-              class="text-green-500 dark:text-green-400 text-2xl"
-            />
-          </div>
-          <p
-            id="resolvedTicketsCount"
-            class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
-          >
-            {{ ticketsFinalizados.total }}
-          </p>
-          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Resolvidos</h3>
-        </div>
-
-        <!-- Tempo Médio de Aceite -->
-        <div
-          v-if="isLoading"
-          class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
-        >
-          <div class="mb-3">
-            <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-          <div
-            class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
-          ></div>
-          <div class="h-3 w-32 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-        </div>
-        <div
-          v-else
-          class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
-        >
-          <div class="mb-3">
-            <font-awesome-icon
-              icon="hourglass-half"
-              class="text-teal-600 dark:text-teal-400 text-2xl"
-            />
-          </div>
-          <p id="tempoMedioAceite" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-            {{ userStats ? formatTimeShort(userStats.averageAcceptanceTimeSeconds) : 'N/A' }}
-          </p>
-          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
-            Tempo Médio de Aceite
-          </h3>
-        </div>
-
-        <!-- Tempo Médio de Resolução -->
-        <div
-          v-if="isLoading"
-          class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
-        >
-          <div class="mb-3">
-            <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-          </div>
-          <div
-            class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
-          ></div>
-          <div class="h-3 w-36 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
-        </div>
-        <div
-          v-else
-          class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
-        >
-          <div class="mb-3">
-            <font-awesome-icon
-              icon="calendar-check"
-              class="text-indigo-500 dark:text-indigo-400 text-2xl"
-            />
-          </div>
-          <p id="tempoMedioConclusao" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-            {{ userStats ? formatTimeShort(userStats.averageResolutionTimeSeconds) : 'N/A' }}
-          </p>
-          <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
-            Tempo Médio de Resolução
-          </h3>
-        </div>
+      <!-- Últimos Tickets Recebidos e Criados -->
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <CompactTicketTable
+          title="Últimas Tarefas Recebidas"
+          type="received"
+          :viewAllUrl="'/minhas-tarefas?tab=recebidas'"
+        />
+        <CompactTicketTable
+          title="Últimas Tarefas Criadas"
+          type="created"
+          :viewAllUrl="'/minhas-tarefas?tab=criadas'"
+        />
       </div>
-    </div>
-
-    <!-- Últimos Tickets Recebidos e Criados -->
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-      <CompactTicketTable
-        title="Últimas Tarefas Recebidas"
-        type="received"
-        :viewAllUrl="'/minhas-tarefas?tab=recebidas'"
-      />
-      <CompactTicketTable
-        title="Últimas Tarefas Criadas"
-        type="created"
-        :viewAllUrl="'/minhas-tarefas?tab=criadas'"
-      />
-    </div>
     </section>
   </div>
 </template>
@@ -262,7 +270,9 @@ const showWelcomeModal = computed(() => {
 });
 
 const closeWelcomeModal = () => {
-  showWelcomeModal.value = false;
+  // Modal closes automatically when terms are accepted
+  // This function is called by WelcomeModal after terms acceptance
+  // No action needed as the computed will update automatically
 };
 
 const openUserGuide = () => {
