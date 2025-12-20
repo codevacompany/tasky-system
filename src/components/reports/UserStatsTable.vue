@@ -152,9 +152,7 @@ const sortDirection = ref<'asc' | 'desc' | 'none'>('none');
 const filteredUsers = computed(() => {
   const q = searchQuery.value.trim().toLowerCase();
   if (!q) return props.users;
-  return props.users.filter((u) =>
-    `${u.firstName} ${u.lastName}`.toLowerCase().includes(q),
-  );
+  return props.users.filter((u) => `${u.firstName} ${u.lastName}`.toLowerCase().includes(q));
 });
 
 // Summary computed from filtered users
@@ -162,10 +160,7 @@ const summary = computed(() => {
   if (!filteredUsers.value || filteredUsers.value.length === 0) return null;
 
   const totalTickets = filteredUsers.value.reduce((acc, u) => acc + (u.totalTickets || 0), 0);
-  const totalResolved = filteredUsers.value.reduce(
-    (acc, u) => acc + (u.resolvedTickets || 0),
-    0,
-  );
+  const totalResolved = filteredUsers.value.reduce((acc, u) => acc + (u.resolvedTickets || 0), 0);
 
   return {
     totalTickets,
@@ -335,4 +330,3 @@ watch(
   @apply bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300;
 }
 </style>
-
