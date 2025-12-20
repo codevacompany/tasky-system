@@ -348,7 +348,13 @@
                     >
                       <div class="flex items-center gap-2">
                         <div
-                          class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
+                          :class="[
+                            'flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm',
+                            sortedTargetUsers.length > 1 &&
+                            targetUser.userId === loadedTicket.currentTargetUserId
+                              ? 'ring-2 ring-blue-500'
+                              : '',
+                          ]"
                           :style="getAvatarStyle(targetUser.user.department?.name || '')"
                         >
                           {{
@@ -1112,18 +1118,14 @@
     v-if="showReviewerModal"
     title="Selecione o Revisor"
     :showFooter="true"
-    @close="showReviewerModal = false"
+    @close="closeReviewerModal"
   >
     <div class="p-4">
-      <select
+      <Select
         v-model="reviewerSelection"
-        class="w-full border rounded px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700"
-      >
-        <option value="" disabled selected>Selecione o revisor</option>
-        <option v-for="admin in tenantAdmins" :key="admin.id" :value="admin.id">
-          {{ admin.firstName }} {{ admin.lastName }}
-        </option>
-      </select>
+        :options="reviewerOptions"
+        placeholder="Selecione o revisor"
+      />
     </div>
     <template #footer>
       <div class="flex justify-end gap-2">
@@ -1409,6 +1411,7 @@
 <script setup lang="ts">
 import BaseModal from '../common/BaseModal.vue';
 import Input from '../common/Input.vue';
+import Select from '../common/Select.vue';
 import { CancellationReason, DefaultTicketStatus, type Ticket, type TicketComment } from '@/models';
 import type { ChecklistItem } from '@/models/checklist';
 import { checklistService } from '@/services/checklistService';
@@ -1873,15 +1876,14 @@ const sendToNextDepartment = async (ticketId: string) => {
 };
 
 const sendForReview = async (ticketId: string) => {
-  if (
-    loadedTicket.value &&
-    loadedTicket.value.requester.id === loadedTicket.value.currentTargetUserId &&
-    !loadedTicket.value.reviewer
-  ) {
+  // Check if reviewer is not set - show reviewer selection modal
+  if (loadedTicket.value && !loadedTicket.value.reviewer) {
     await fetchTenantAdmins();
     showReviewerModal.value = true;
+    pendingTargetUserRemoval.value = null; // Clear any pending removal
     return;
   }
+
   openConfirmationModal(
     'Enviar Para Revisão',
     'Tem certeza que deseja enviar esta tarefa para revisão?',
@@ -2714,8 +2716,10 @@ const canEditTargetUser = (targetUserId: number): boolean => {
 const canRemoveTargetUser = (targetUserId: number): boolean => {
   if (!canRequesterEditAssignee.value || !loadedTicket.value) return false;
 
-  // Cannot remove current target user
-  if (loadedTicket.value.currentTargetUserId === targetUserId) return false;
+  // Check if there are at least 2 target users
+  if (!loadedTicket.value.targetUsers || loadedTicket.value.targetUsers.length < 2) {
+    return false;
+  }
 
   const targetUser = loadedTicket.value.targetUsers?.find((tu) => tu.userId === targetUserId);
   const currentTargetUser = loadedTicket.value.targetUsers?.find(
@@ -2723,6 +2727,13 @@ const canRemoveTargetUser = (targetUserId: number): boolean => {
   );
 
   if (!targetUser || !currentTargetUser) return false;
+
+  const isRemovingCurrentTargetUser = loadedTicket.value.currentTargetUserId === targetUserId;
+
+  if (isRemovingCurrentTargetUser) {
+    // Can remove current target user if there are at least 2 target users and status is pending
+    return true;
+  }
 
   // Cannot remove if user has already worked (order < currentTargetUser.order)
   if (targetUser.order < currentTargetUser.order) return false;
@@ -2985,6 +2996,21 @@ const removeTargetUser = async (targetUserId: number) => {
   if (!targetUser) return;
 
   const userName = `${targetUser.user.firstName} ${targetUser.user.lastName}`;
+  const isRemovingCurrentTargetUser = loadedTicket.value.currentTargetUserId === targetUserId;
+  const isLastTargetUser =
+    loadedTicket.value.targetUsers &&
+    loadedTicket.value.targetUsers.length > 0 &&
+    targetUser.order === Math.max(...loadedTicket.value.targetUsers.map((tu) => tu.order));
+
+  // Check if removing last target user and no reviewer is set
+  if (isRemovingCurrentTargetUser && isLastTargetUser && !loadedTicket.value.reviewer) {
+    // Show reviewer selection modal first
+    await fetchTenantAdmins();
+    pendingTargetUserRemoval.value = targetUserId;
+    showReviewerModal.value = true;
+    reviewerSelection.value = '';
+    return;
+  }
 
   openConfirmationModal(
     'Remover Responsável',
@@ -3056,9 +3082,17 @@ const startTicket = async (ticketId: string) => {
 };
 
 const showReviewerModal = ref(false);
-const reviewerSelection = ref<string | number>('');
+const reviewerSelection = ref<string>('');
 const tenantAdmins = ref<any[]>([]);
 const isReviewerModalLoading = ref(false);
+const pendingTargetUserRemoval = ref<number | null>(null);
+
+const reviewerOptions = computed(() => {
+  return tenantAdmins.value.map((admin) => ({
+    value: admin.id.toString(),
+    label: `${admin.firstName} ${admin.lastName}`,
+  }));
+});
 
 const fetchTenantAdmins = async () => {
   try {
@@ -3071,6 +3105,12 @@ const fetchTenantAdmins = async () => {
   }
 };
 
+const closeReviewerModal = () => {
+  showReviewerModal.value = false;
+  pendingTargetUserRemoval.value = null;
+  reviewerSelection.value = '';
+};
+
 const confirmReviewerSelection = async () => {
   if (!reviewerSelection.value || reviewerSelection.value === '' || !loadedTicket.value) {
     toast.error('Selecione um revisor');
@@ -3080,16 +3120,33 @@ const confirmReviewerSelection = async () => {
   try {
     await ticketService.updateReviewer(
       loadedTicket.value.customId,
-      reviewerSelection.value as number,
+      Number(reviewerSelection.value),
     );
+
+    // If there's a pending target user removal, remove it now
+    if (pendingTargetUserRemoval.value !== null) {
+      await ticketService.removeAssignee(
+        loadedTicket.value.customId,
+        pendingTargetUserRemoval.value,
+      );
+      pendingTargetUserRemoval.value = null;
+      toast.success('Responsável removido e tarefa enviada para revisão');
+    } else {
+      // Regular flow: just update status
+      await ticketService.updateStatus(loadedTicket.value.customId, {
+        status: DefaultTicketStatus.AwaitingVerification,
+      });
+      toast.success('Tarefa enviada para revisão');
+    }
+
     showReviewerModal.value = false;
-    await ticketService.updateStatus(loadedTicket.value.customId, {
-      status: DefaultTicketStatus.AwaitingVerification,
-    });
-    toast.success('Tarefa enviada para revisão');
-    refreshSelectedTicket();
-  } catch {
-    toast.error('Erro ao definir revisor ou enviar para revisão');
+    reviewerSelection.value = '';
+    await refreshSelectedTicket();
+  } catch (error: any) {
+    console.error('Erro ao definir revisor ou remover responsável:', error);
+    const errorMessage =
+      error.response?.data?.message || 'Erro ao definir revisor ou enviar para revisão';
+    toast.error(errorMessage);
   } finally {
     isReviewerModalLoading.value = false;
   }

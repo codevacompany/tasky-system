@@ -305,7 +305,7 @@ import {
   getAvatarColor,
   calculateDeadline as calculateDeadlineHelper,
 } from '@/utils/generic-helper';
-import { formatDate, formatRelativeTime } from '@/utils/date';
+import { formatDate, formatRelativeTime, getBusinessDayDifference } from '@/utils/date';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import { useRoles } from '@/composables/useRoles';
@@ -422,12 +422,13 @@ const getDeadlineClass = (dueDate: string | null) => {
     return 'overdue';
   }
 
-  const diffTime = Math.abs(due.getTime() - now.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  // Use business days difference to match the logic used in calculateDeadline
+  // This ensures consistency between the text display and color coding
+  const businessDays = getBusinessDayDifference(due, now);
 
-  if (diffDays <= 2) {
+  if (businessDays <= 2) {
     return 'urgent';
-  } else if (diffDays <= 3) {
+  } else if (businessDays <= 3) {
     return 'warning';
   }
 
