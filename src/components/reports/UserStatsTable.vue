@@ -28,7 +28,13 @@
       v-if="summary && filteredUsers.length > 0"
       class="p-6 border-b border-gray-200 dark:border-gray-700"
     >
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">
+            {{ filteredUsers.length }}
+          </div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Colaboradores</div>
+        </div>
         <div class="text-center">
           <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
             {{ summary.totalTickets }}
@@ -43,15 +49,15 @@
         </div>
         <div class="text-center">
           <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
-            {{ formatTimeInSecondsCompact(summary.averageResolutionTimeSeconds) }}
+            {{ formatTimeInSecondsCompact(summary.averageAcceptanceTimeSeconds) }}
           </div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">Tempo Médio</div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Tempo Médio de Aceite</div>
         </div>
         <div class="text-center">
-          <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">
-            {{ filteredUsers.length }}
+          <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+            {{ formatTimeInSecondsCompact(summary.averageResolutionTimeSeconds) }}
           </div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">Colaboradores</div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Tempo Médio de Resolução</div>
         </div>
       </div>
     </div>
@@ -123,6 +129,7 @@ import { formatTimeInSecondsCompact } from '@/utils/generic-helper';
 interface Props {
   users: UserRankingItemDto[];
   averageResolutionTimeSeconds?: number;
+  averageAcceptanceTimeSeconds?: number;
   isLoading?: boolean;
 }
 
@@ -145,9 +152,7 @@ const sortDirection = ref<'asc' | 'desc' | 'none'>('none');
 const filteredUsers = computed(() => {
   const q = searchQuery.value.trim().toLowerCase();
   if (!q) return props.users;
-  return props.users.filter((u) =>
-    `${u.firstName} ${u.lastName}`.toLowerCase().includes(q),
-  );
+  return props.users.filter((u) => `${u.firstName} ${u.lastName}`.toLowerCase().includes(q));
 });
 
 // Summary computed from filtered users
@@ -155,15 +160,13 @@ const summary = computed(() => {
   if (!filteredUsers.value || filteredUsers.value.length === 0) return null;
 
   const totalTickets = filteredUsers.value.reduce((acc, u) => acc + (u.totalTickets || 0), 0);
-  const totalResolved = filteredUsers.value.reduce(
-    (acc, u) => acc + (u.resolvedTickets || 0),
-    0,
-  );
+  const totalResolved = filteredUsers.value.reduce((acc, u) => acc + (u.resolvedTickets || 0), 0);
 
   return {
     totalTickets,
     totalResolved,
     averageResolutionTimeSeconds: props.averageResolutionTimeSeconds || 0,
+    averageAcceptanceTimeSeconds: props.averageAcceptanceTimeSeconds || 0,
   };
 });
 
@@ -327,4 +330,3 @@ watch(
   @apply bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300;
 }
 </style>
-

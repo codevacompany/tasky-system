@@ -59,7 +59,7 @@
               @click="sendToNextDepartment(loadedTicket.customId)"
             >
               <font-awesome-icon icon="arrow-right" class="text-xs" />
-              Enviar Para Próximo Setor
+              {{ isNextUserSameDepartment ? 'Próximo Colaborador' : 'Próximo Setor' }}
             </button>
 
             <button
@@ -326,112 +326,100 @@
               <!-- Assignee -->
               <div class="flex items-start gap-3">
                 <div class="w-[40%]">
-                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                    Responsável
-                  </p>
+                  <div class="flex items-center gap-2">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                      Responsável
+                    </p>
+                    <font-awesome-icon
+                      v-if="canViewEditAssigneeIcon"
+                      icon="edit"
+                      class="text-gray-400 text-xs cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                      @click="openEditTargetUsersModal"
+                      title="Gerenciar responsáveis"
+                    />
+                  </div>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <div v-if="!isEditingAssignee">
-                    <div v-if="sortedTargetUsers && sortedTargetUsers.length > 0">
-                      <div
-                        v-for="targetUser in sortedTargetUsers"
-                        :key="targetUser.userId"
-                        class="flex items-center justify-between cursor-pointer py-1 rounded-lg transition-colors"
-                        @click="() => startEditingAssignee(targetUser.userId)"
-                        :class="{ 'cursor-default': !canEditTicket }"
-                        :title="canEditTicket ? 'Clique para alterar responsável' : ''"
-                      >
-                        <div class="flex-1 min-w-0">
-                          <div
-                            class="flex items-center gap-2"
-                            :class="{
-                              'font-semibold text-blue-600 dark:text-blue-400':
-                                sortedTargetUsers.length > 1 &&
-                                targetUser.userId === loadedTicket.currentTargetUserId,
-                            }"
-                          >
-                            <div
-                              class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
-                              :style="getAvatarStyle(targetUser.user.department?.name || '')"
-                            >
-                              {{
-                                getUserInitials({
-                                  firstName: targetUser.user.firstName,
-                                  lastName: targetUser.user.lastName,
-                                })
-                              }}
-                            </div>
-                            <span class="text-sm"
-                              >{{ targetUser.user.firstName }} {{ targetUser.user.lastName }}</span
-                            >
-                            <div
-                              v-if="!targetUser.user.isActive"
-                              class="flex items-center gap-1"
-                              title="Conta desativada"
-                            >
-                              <font-awesome-icon
-                                icon="exclamation-triangle"
-                                class="text-orange-500 text-xs"
-                              />
-                              <span class="text-orange-500 text-xs">Desativado</span>
-                            </div>
-                          </div>
-                          <p
-                            v-if="targetUser.user.department?.name"
-                            class="text-xs text-gray-500 dark:text-gray-400 ml-8 mt-0.5"
-                          >
-                            {{ targetUser.user.department.name }}
-                          </p>
-                        </div>
-                        <font-awesome-icon
-                          v-if="canEditTicket && isRequester"
-                          icon="edit"
-                          class="text-gray-400 text-xs"
-                        />
-                      </div>
-                    </div>
+                  <div v-if="sortedTargetUsers && sortedTargetUsers.length > 0">
                     <div
-                      v-else
-                      class="flex items-center justify-between cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-2 -m-2 rounded-lg transition-colors"
-                      @click="() => startEditingAssignee()"
-                      :class="{ 'cursor-default': !canEditTicket }"
-                      :title="canEditTicket ? 'Clique para alterar responsável' : ''"
+                      v-for="targetUser in sortedTargetUsers"
+                      :key="targetUser.userId"
+                      class="flex-1 min-w-0 mb-2 last:mb-0"
                     >
-                      <div class="flex-1 min-w-0">
-                        <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
-                          {{ loadedTicket.currentTargetUser?.firstName }}
-                          {{ loadedTicket.currentTargetUser?.lastName }}
-                        </p>
-                        <p
-                          v-if="loadedTicket.currentTargetUser?.department?.name"
-                          class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"
+                      <div class="flex items-center gap-2">
+                        <div
+                          :class="[
+                            'flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm',
+                            sortedTargetUsers.length > 1 &&
+                            targetUser.userId === loadedTicket.currentTargetUserId
+                              ? 'ring-2 ring-blue-500'
+                              : '',
+                          ]"
+                          :style="getAvatarStyle(targetUser.user.department?.name || '')"
                         >
-                          {{ loadedTicket.currentTargetUser.department.name }}
+                          {{
+                            getUserInitials({
+                              firstName: targetUser.user.firstName,
+                              lastName: targetUser.user.lastName,
+                            })
+                          }}
+                        </div>
+                        <p
+                          class="text-sm text-gray-900 dark:text-gray-100 font-medium"
+                          :class="{
+                            'font-semibold text-blue-600 dark:text-blue-400':
+                              sortedTargetUsers.length > 1 &&
+                              targetUser.userId === loadedTicket.currentTargetUserId,
+                          }"
+                        >
+                          {{ targetUser.user.firstName }} {{ targetUser.user.lastName }}
                         </p>
+                        <div
+                          v-if="!targetUser.user.isActive"
+                          class="flex items-center gap-1"
+                          title="Conta desativada"
+                        >
+                          <font-awesome-icon
+                            icon="exclamation-triangle"
+                            class="text-orange-500 text-xs"
+                          />
+                          <span class="text-orange-500 text-xs">Desativado</span>
+                        </div>
                       </div>
-                      <font-awesome-icon
-                        v-if="canEditTicket && isRequester"
-                        icon="edit"
-                        class="text-gray-400 text-xs ml-1"
-                      />
+                      <p
+                        v-if="targetUser.user.department?.name"
+                        class="text-xs text-gray-500 dark:text-gray-400 ml-8"
+                      >
+                        {{ targetUser.user.department.name }}
+                      </p>
                     </div>
                   </div>
-
-                  <div v-else class="space-y-3">
-                    <DepartmentUserSelector
-                      v-model="assigneeSelection"
-                      @change="saveAssigneeChange"
-                      placeholder="Selecionar responsável"
-                      :excludedDepartmentIds="excludedDepartmentIds"
-                    />
-                    <div class="flex gap-2">
-                      <button
-                        @click="cancelEditingAssignee"
-                        class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
+                  <div v-else class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2">
+                      <div
+                        class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
+                        :style="
+                          getAvatarStyle(loadedTicket.currentTargetUser?.department?.name || '')
+                        "
                       >
-                        Cancelar
-                      </button>
+                        {{
+                          getUserInitials({
+                            firstName: loadedTicket.currentTargetUser?.firstName || '',
+                            lastName: loadedTicket.currentTargetUser?.lastName || '',
+                          })
+                        }}
+                      </div>
+                      <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                        {{ loadedTicket.currentTargetUser?.firstName }}
+                        {{ loadedTicket.currentTargetUser?.lastName }}
+                      </p>
                     </div>
+                    <p
+                      v-if="loadedTicket.currentTargetUser?.department?.name"
+                      class="text-xs text-gray-500 dark:text-gray-400 ml-8"
+                    >
+                      {{ loadedTicket.currentTargetUser.department.name }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -1130,18 +1118,14 @@
     v-if="showReviewerModal"
     title="Selecione o Revisor"
     :showFooter="true"
-    @close="showReviewerModal = false"
+    @close="closeReviewerModal"
   >
     <div class="p-4">
-      <select
+      <Select
         v-model="reviewerSelection"
-        class="w-full border rounded px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700"
-      >
-        <option value="" disabled selected>Selecione o revisor</option>
-        <option v-for="admin in tenantAdmins" :key="admin.id" :value="admin.id">
-          {{ admin.firstName }} {{ admin.lastName }}
-        </option>
-      </select>
+        :options="reviewerOptions"
+        placeholder="Selecione o revisor"
+      />
     </div>
     <template #footer>
       <div class="flex justify-end gap-2">
@@ -1283,11 +1267,151 @@
       {{ selectedImage.name }} ({{ currentImageIndex + 1 }} / {{ imageFiles.length }})
     </div>
   </div>
+
+  <!-- Edit Target Users Modal -->
+  <BaseModal
+    v-if="showEditTargetUsersModal"
+    title="Gerenciar Responsáveis"
+    :showFooter="false"
+    @close="closeEditTargetUsersModal"
+  >
+    <div class="p-4 sm:p-6" style="overflow: visible">
+      <div v-if="!isEditingAssignee && !isAddingAssignee" class="space-y-3">
+        <div
+          v-for="targetUser in sortedTargetUsers"
+          :key="targetUser.userId"
+          class="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+        >
+          <div class="flex items-center gap-3 flex-1 min-w-0">
+            <div
+              class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-sm"
+              :style="getAvatarStyle(targetUser.user.department?.name || '')"
+            >
+              {{
+                getUserInitials({
+                  firstName: targetUser.user.firstName,
+                  lastName: targetUser.user.lastName,
+                })
+              }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div
+                class="flex items-center gap-2"
+                :class="{
+                  'font-semibold text-blue-600 dark:text-blue-400':
+                    sortedTargetUsers.length > 1 &&
+                    targetUser.userId === loadedTicket?.currentTargetUserId,
+                }"
+              >
+                <span class="text-sm"
+                  >{{ targetUser.user.firstName }} {{ targetUser.user.lastName }}</span
+                >
+                <div
+                  v-if="!targetUser.user.isActive"
+                  class="flex items-center gap-1"
+                  title="Conta desativada"
+                >
+                  <font-awesome-icon icon="exclamation-triangle" class="text-orange-500 text-xs" />
+                  <span class="text-orange-500 text-xs">Desativado</span>
+                </div>
+              </div>
+              <p
+                v-if="targetUser.user.department?.name"
+                class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"
+              >
+                {{ targetUser.user.department.name }}
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 ml-3">
+            <font-awesome-icon
+              v-if="canEditTargetUser(targetUser.userId)"
+              icon="edit"
+              class="text-gray-400 text-sm cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              @click="startEditingAssignee(targetUser.userId)"
+              title="Editar responsável"
+            />
+            <font-awesome-icon
+              v-if="canRemoveTargetUser(targetUser.userId)"
+              icon="trash"
+              class="text-gray-400 text-sm cursor-pointer hover:text-red-600 dark:hover:text-red-400 transition-colors"
+              @click="removeTargetUser(targetUser.userId)"
+              title="Remover responsável"
+            />
+          </div>
+        </div>
+
+        <button
+          v-if="canAddNewAssignee"
+          @click="startAddingAssignee"
+          class="w-full mt-3 px-4 py-2.5 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:border-blue-500 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center justify-center gap-2"
+        >
+          <font-awesome-icon icon="plus" class="text-xs" />
+          Adicionar Responsável
+        </button>
+      </div>
+
+      <div v-else-if="isAddingAssignee" class="space-y-4" style="overflow: visible">
+        <div
+          class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50"
+          style="overflow: visible"
+        >
+          <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Adicionar Responsável
+          </p>
+          <div class="relative" style="overflow: visible; z-index: 1">
+            <DepartmentUserSelector
+              v-model="newAssigneeSelection"
+              @change="saveNewAssignee"
+              placeholder="Selecionar responsável"
+              :excludedUserIds="excludedUserIds"
+            />
+          </div>
+          <div class="flex gap-2 mt-3">
+            <button
+              @click="cancelAddingAssignee"
+              class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div v-else class="space-y-4" style="overflow: visible">
+        <div
+          class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50"
+          style="overflow: visible"
+        >
+          <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Editar Responsável
+          </p>
+          <div class="relative" style="overflow: visible; z-index: 1">
+            <DepartmentUserSelector
+              v-model="assigneeSelection"
+              @change="saveAssigneeChange"
+              placeholder="Selecionar responsável"
+              :excludedUserIds="excludedUserIds"
+            />
+          </div>
+          <div class="flex gap-2 mt-3">
+            <button
+              @click="cancelEditingAssignee"
+              class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
 import BaseModal from '../common/BaseModal.vue';
 import Input from '../common/Input.vue';
+import Select from '../common/Select.vue';
 import { CancellationReason, DefaultTicketStatus, type Ticket, type TicketComment } from '@/models';
 import type { ChecklistItem } from '@/models/checklist';
 import { checklistService } from '@/services/checklistService';
@@ -1727,32 +1851,39 @@ const acceptTicket = async (ticketId: string) => {
 };
 
 const sendToNextDepartment = async (ticketId: string) => {
-  openConfirmationModal(
-    'Enviar para Próximo Setor',
-    'Tem certeza que deseja enviar esta tarefa para o próximo setor?',
-    async () => {
-      try {
-        await ticketService.sendToNextDepartment(ticketId);
-        toast.success('Tarefa enviada para o próximo setor');
+  const isSameDepartment = isNextUserSameDepartment.value;
+  const title = isSameDepartment ? 'Próximo Colaborador' : 'Próximo Setor';
+  const message = isSameDepartment
+    ? 'Tem certeza que deseja enviar esta tarefa para o próximo colaborador?'
+    : 'Tem certeza que deseja enviar esta tarefa para o próximo setor?';
+  const successMessage = isSameDepartment
+    ? 'Tarefa enviada para o próximo colaborador'
+    : 'Tarefa enviada para o próximo setor';
+  const errorMessage = isSameDepartment
+    ? 'Erro ao enviar a tarefa para o próximo colaborador'
+    : 'Erro ao enviar a tarefa para o próximo setor';
 
-        refreshSelectedTicket();
-      } catch {
-        toast.error('Erro ao enviar a tarefa para o próximo setor');
-      }
-    },
-  );
+  openConfirmationModal(title, message, async () => {
+    try {
+      await ticketService.sendToNextDepartment(ticketId);
+      toast.success(successMessage);
+
+      refreshSelectedTicket();
+    } catch {
+      toast.error(errorMessage);
+    }
+  });
 };
 
 const sendForReview = async (ticketId: string) => {
-  if (
-    loadedTicket.value &&
-    loadedTicket.value.requester.id === loadedTicket.value.currentTargetUserId &&
-    !loadedTicket.value.reviewer
-  ) {
+  // Check if reviewer is not set - show reviewer selection modal
+  if (loadedTicket.value && !loadedTicket.value.reviewer) {
     await fetchTenantAdmins();
     showReviewerModal.value = true;
+    pendingTargetUserRemoval.value = null; // Clear any pending removal
     return;
   }
+
   openConfirmationModal(
     'Enviar Para Revisão',
     'Tem certeza que deseja enviar esta tarefa para revisão?',
@@ -2217,6 +2348,10 @@ const ticketStatus = computed(() => {
 });
 
 const isTargetUser = computed(() => userStore.user?.id === loadedTicket.value?.currentTargetUserId);
+const isAnyTargetUser = computed(() => {
+  if (!loadedTicket.value || !userStore.user?.id) return false;
+  return loadedTicket.value.targetUsers?.some((tu) => tu.userId === userStore.user?.id) || false;
+});
 const isRequester = computed(() => userStore.user?.id === loadedTicket.value?.requester.id);
 const isReviewer = computed(() => userStore.user?.id === loadedTicket.value?.reviewer?.id);
 
@@ -2237,6 +2372,29 @@ const isLastTargetUser = computed(() => {
   const lastUser = sortedTargetUsersList[sortedTargetUsersList.length - 1];
 
   return lastUser.userId === loadedTicket.value.currentTargetUserId;
+});
+
+const isNextUserSameDepartment = computed(() => {
+  if (!loadedTicket.value?.targetUsers || !isTargetUser.value || isLastTargetUser.value) {
+    return false;
+  }
+
+  const sortedTargetUsersList = sortedTargetUsers.value;
+  const currentUserIndex = sortedTargetUsersList.findIndex(
+    (tu) => tu.userId === loadedTicket.value?.currentTargetUserId,
+  );
+
+  if (currentUserIndex === -1 || currentUserIndex === sortedTargetUsersList.length - 1) {
+    return false;
+  }
+
+  const currentUser = sortedTargetUsersList[currentUserIndex];
+  const nextUser = sortedTargetUsersList[currentUserIndex + 1];
+
+  return (
+    currentUser.user?.departmentId !== null &&
+    currentUser.user?.departmentId === nextUser.user?.departmentId
+  );
 });
 
 const formatTicketUpdateDescription = (ticketUpdate: TicketUpdate) => {
@@ -2516,6 +2674,73 @@ const canEditTicket = computed(() => {
   return isUserInvolved && isTicketActive;
 });
 
+const canRequesterEditAssignee = computed(() => {
+  if (!loadedTicket.value || !isRequester.value) return false;
+  const currentStatus = loadedTicket.value?.ticketStatus?.key || loadedTicket.value?.status || '';
+  return currentStatus === DefaultTicketStatus.Pending;
+});
+
+const canViewEditAssigneeIcon = computed(() => {
+  if (!loadedTicket.value || !userStore.user?.id) return false;
+
+  // Show icon for requester
+  if (isRequester.value) return true;
+
+  // Show icon for any target user
+  return isAnyTargetUser.value;
+});
+
+const canAddNewAssignee = computed(() => {
+  // Requester can add when ticket is pending
+  if (canRequesterEditAssignee.value) return true;
+
+  // Any target user can add new assignees
+  return isAnyTargetUser.value;
+});
+
+const canEditTargetUser = (targetUserId: number): boolean => {
+  if (!canRequesterEditAssignee.value || !loadedTicket.value) return false;
+
+  const targetUser = loadedTicket.value.targetUsers?.find((tu) => tu.userId === targetUserId);
+  const currentTargetUser = loadedTicket.value.targetUsers?.find(
+    (tu) => tu.userId === loadedTicket.value?.currentTargetUserId,
+  );
+
+  if (!targetUser || !currentTargetUser) return false;
+
+  if (targetUser.userId === currentTargetUser.userId) return true;
+
+  return targetUser.order > currentTargetUser.order;
+};
+
+const canRemoveTargetUser = (targetUserId: number): boolean => {
+  if (!canRequesterEditAssignee.value || !loadedTicket.value) return false;
+
+  // Check if there are at least 2 target users
+  if (!loadedTicket.value.targetUsers || loadedTicket.value.targetUsers.length < 2) {
+    return false;
+  }
+
+  const targetUser = loadedTicket.value.targetUsers?.find((tu) => tu.userId === targetUserId);
+  const currentTargetUser = loadedTicket.value.targetUsers?.find(
+    (tu) => tu.userId === loadedTicket.value?.currentTargetUserId,
+  );
+
+  if (!targetUser || !currentTargetUser) return false;
+
+  const isRemovingCurrentTargetUser = loadedTicket.value.currentTargetUserId === targetUserId;
+
+  if (isRemovingCurrentTargetUser) {
+    // Can remove current target user if there are at least 2 target users and status is pending
+    return true;
+  }
+
+  // Cannot remove if user has already worked (order < currentTargetUser.order)
+  if (targetUser.order < currentTargetUser.order) return false;
+
+  return true;
+};
+
 const refreshSelectedTicket = async () => {
   if (loadedTicket.value?.customId) {
     await fetchTicket(loadedTicket.value.customId);
@@ -2637,27 +2862,48 @@ const closeAddMenu = () => {
 };
 
 const isEditingAssignee = ref(false);
+const isAddingAssignee = ref(false);
 const currentlyEditingUser = ref<number | null>(null);
 const assigneeSelection = ref<{ departmentId: number | null; userId: number | null }>({
   departmentId: null,
   userId: null,
 });
+const newAssigneeSelection = ref<{ departmentId: number | null; userId: number | null }>({
+  departmentId: null,
+  userId: null,
+});
+const showEditTargetUsersModal = ref(false);
 
-// Compute excluded department IDs - departments that already have other users assigned
-const excludedDepartmentIds = computed(() => {
-  if (!loadedTicket.value?.targetUsers || !currentlyEditingUser.value) return [];
+// Compute excluded user IDs - users that are already assigned to the ticket (excluding the one being edited)
+const excludedUserIds = computed(() => {
+  if (!loadedTicket.value?.targetUsers) return [];
 
+  // If editing, exclude all users except the one being edited
+  // If adding, exclude all users
+  if (currentlyEditingUser.value) {
+    return loadedTicket.value.targetUsers
+      .filter((tu) => tu.userId !== currentlyEditingUser.value)
+      .map((tu) => tu.userId)
+      .filter((id): id is number => id !== null && id !== undefined);
+  }
+
+  // When adding, exclude all existing target users
   return loadedTicket.value.targetUsers
-    .filter((tu) => tu.userId !== currentlyEditingUser.value)
-    .map((tu) => tu.user?.departmentId)
+    .map((tu) => tu.userId)
     .filter((id): id is number => id !== null && id !== undefined);
 });
 
 const startEditingAssignee = (targetUserId?: number) => {
-  if (!canEditTicket.value || !isRequester.value) return;
+  if (!canRequesterEditAssignee.value) return;
 
   // Determine which user to edit - either the passed targetUserId or currentTargetUserId
   const userIdToEdit = targetUserId ?? loadedTicket.value?.currentTargetUserId ?? null;
+
+  if (!userIdToEdit) return;
+
+  // Check if the specific user can be edited
+  if (!canEditTargetUser(userIdToEdit)) return;
+
   currentlyEditingUser.value = userIdToEdit;
 
   // Find the target user to populate the selector
@@ -2694,11 +2940,123 @@ const saveAssigneeChange = async (selection: { department: any; user: any }) => 
     await refreshSelectedTicket();
     isEditingAssignee.value = false;
     currentlyEditingUser.value = null;
+    assigneeSelection.value = {
+      departmentId: null,
+      userId: null,
+    };
     toast.success('Responsável alterado com sucesso!');
   } catch (error) {
     console.error('Erro ao alterar responsável:', error);
     toast.error('Erro ao alterar responsável');
   }
+};
+
+const startAddingAssignee = () => {
+  isAddingAssignee.value = true;
+  isEditingAssignee.value = false;
+  currentlyEditingUser.value = null;
+  newAssigneeSelection.value = {
+    departmentId: null,
+    userId: null,
+  };
+};
+
+const cancelAddingAssignee = () => {
+  isAddingAssignee.value = false;
+  newAssigneeSelection.value = {
+    departmentId: null,
+    userId: null,
+  };
+};
+
+const saveNewAssignee = async (selection: { department: any; user: any }) => {
+  if (!selection.user || !loadedTicket.value) return;
+
+  try {
+    await ticketService.addAssignee(loadedTicket.value.customId, selection.user.id);
+
+    await refreshSelectedTicket();
+    isAddingAssignee.value = false;
+    newAssigneeSelection.value = {
+      departmentId: null,
+      userId: null,
+    };
+    toast.success('Responsável adicionado com sucesso!');
+  } catch (error: any) {
+    console.error('Erro ao adicionar responsável:', error);
+    const errorMessage = error.response?.data?.message || 'Erro ao adicionar responsável';
+    toast.error(errorMessage);
+  }
+};
+
+const removeTargetUser = async (targetUserId: number) => {
+  if (!loadedTicket.value) return;
+
+  const targetUser = loadedTicket.value.targetUsers?.find((tu) => tu.userId === targetUserId);
+  if (!targetUser) return;
+
+  const userName = `${targetUser.user.firstName} ${targetUser.user.lastName}`;
+  const isRemovingCurrentTargetUser = loadedTicket.value.currentTargetUserId === targetUserId;
+  const isLastTargetUser =
+    loadedTicket.value.targetUsers &&
+    loadedTicket.value.targetUsers.length > 0 &&
+    targetUser.order === Math.max(...loadedTicket.value.targetUsers.map((tu) => tu.order));
+
+  // Check if removing last target user and no reviewer is set
+  if (isRemovingCurrentTargetUser && isLastTargetUser && !loadedTicket.value.reviewer) {
+    // Show reviewer selection modal first
+    await fetchTenantAdmins();
+    pendingTargetUserRemoval.value = targetUserId;
+    showReviewerModal.value = true;
+    reviewerSelection.value = '';
+    return;
+  }
+
+  openConfirmationModal(
+    'Remover Responsável',
+    `Tem certeza que deseja remover ${userName} como responsável desta tarefa?`,
+    async () => {
+      try {
+        await ticketService.removeAssignee(loadedTicket.value!.customId, targetUserId);
+        toast.success('Responsável removido com sucesso!');
+        await refreshSelectedTicket();
+      } catch (error: any) {
+        console.error('Erro ao remover responsável:', error);
+        const errorMessage = error.response?.data?.message || 'Erro ao remover responsável';
+        toast.error(errorMessage);
+      }
+    },
+  );
+};
+
+const openEditTargetUsersModal = () => {
+  showEditTargetUsersModal.value = true;
+  isEditingAssignee.value = false;
+  isAddingAssignee.value = false;
+  currentlyEditingUser.value = null;
+  assigneeSelection.value = {
+    departmentId: null,
+    userId: null,
+  };
+  newAssigneeSelection.value = {
+    departmentId: null,
+    userId: null,
+  };
+};
+
+const closeEditTargetUsersModal = () => {
+  showEditTargetUsersModal.value = false;
+  isEditingAssignee.value = false;
+  isAddingAssignee.value = false;
+  currentlyEditingUser.value = null;
+  assigneeSelection.value = {
+    departmentId: null,
+    userId: null,
+  };
+  newAssigneeSelection.value = {
+    departmentId: null,
+    userId: null,
+  };
 };
 
 const isSelfAssigned = computed(
@@ -2724,9 +3082,17 @@ const startTicket = async (ticketId: string) => {
 };
 
 const showReviewerModal = ref(false);
-const reviewerSelection = ref<string | number>('');
+const reviewerSelection = ref<string>('');
 const tenantAdmins = ref<any[]>([]);
 const isReviewerModalLoading = ref(false);
+const pendingTargetUserRemoval = ref<number | null>(null);
+
+const reviewerOptions = computed(() => {
+  return tenantAdmins.value.map((admin) => ({
+    value: admin.id.toString(),
+    label: `${admin.firstName} ${admin.lastName}`,
+  }));
+});
 
 const fetchTenantAdmins = async () => {
   try {
@@ -2739,6 +3105,12 @@ const fetchTenantAdmins = async () => {
   }
 };
 
+const closeReviewerModal = () => {
+  showReviewerModal.value = false;
+  pendingTargetUserRemoval.value = null;
+  reviewerSelection.value = '';
+};
+
 const confirmReviewerSelection = async () => {
   if (!reviewerSelection.value || reviewerSelection.value === '' || !loadedTicket.value) {
     toast.error('Selecione um revisor');
@@ -2748,16 +3120,33 @@ const confirmReviewerSelection = async () => {
   try {
     await ticketService.updateReviewer(
       loadedTicket.value.customId,
-      reviewerSelection.value as number,
+      Number(reviewerSelection.value),
     );
+
+    // If there's a pending target user removal, remove it now
+    if (pendingTargetUserRemoval.value !== null) {
+      await ticketService.removeAssignee(
+        loadedTicket.value.customId,
+        pendingTargetUserRemoval.value,
+      );
+      pendingTargetUserRemoval.value = null;
+      toast.success('Responsável removido e tarefa enviada para revisão');
+    } else {
+      // Regular flow: just update status
+      await ticketService.updateStatus(loadedTicket.value.customId, {
+        status: DefaultTicketStatus.AwaitingVerification,
+      });
+      toast.success('Tarefa enviada para revisão');
+    }
+
     showReviewerModal.value = false;
-    await ticketService.updateStatus(loadedTicket.value.customId, {
-      status: DefaultTicketStatus.AwaitingVerification,
-    });
-    toast.success('Tarefa enviada para revisão');
-    refreshSelectedTicket();
-  } catch {
-    toast.error('Erro ao definir revisor ou enviar para revisão');
+    reviewerSelection.value = '';
+    await refreshSelectedTicket();
+  } catch (error: any) {
+    console.error('Erro ao definir revisor ou remover responsável:', error);
+    const errorMessage =
+      error.response?.data?.message || 'Erro ao definir revisor ou enviar para revisão';
+    toast.error(errorMessage);
   } finally {
     isReviewerModalLoading.value = false;
   }

@@ -180,6 +180,21 @@ export const ticketService = {
     return apiClient.patch(`/tickets/${customId}/assignee`, { targetUserId, order });
   },
 
+  async addAssignee(
+    customId: string,
+    targetUserId: number,
+    order?: number,
+  ): Promise<AxiosResponse<Ticket>> {
+    return apiClient.post(`/tickets/${customId}/assignee`, { targetUserId, order });
+  },
+
+  async removeAssignee(
+    customId: string,
+    targetUserId: number,
+  ): Promise<AxiosResponse<Ticket>> {
+    return apiClient.delete(`/tickets/${customId}/assignee/${targetUserId}`);
+  },
+
   async updateReviewer(ticketCustomId: string, reviewerId: number) {
     return apiClient.patch(`/tickets/${ticketCustomId}/reviewer`, { reviewerId });
   },

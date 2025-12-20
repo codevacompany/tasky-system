@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, watch } from 'vue';
 import Select from '@/components/common/Select.vue';
 import { type Department, type User } from '@/models';
 
@@ -87,21 +87,9 @@ const emit = defineEmits<{
 const localTargetUsers = ref<TargetUser[]>([...props.targetUsers]);
 
 const getDepartmentOptions = (index: number) => {
-  // Get all departments that are already selected in other rows
-  const selectedDepartments = localTargetUsers.value
-    .map((tu, idx) => (idx !== index ? tu.departmentId : null))
-    .filter((id) => id !== null);
-
-  // Filter out selected departments and include current department
-  const availableDepartments = props.departments.filter(
-    (dept) =>
-      !selectedDepartments.includes(dept.id) ||
-      localTargetUsers.value[index].departmentId === dept.id,
-  );
-
   return [
     { value: '', label: 'Selecione um setor' },
-    ...availableDepartments.map((dept) => ({
+    ...props.departments.map((dept) => ({
       value: dept.id.toString(),
       label: dept.name,
     })),
@@ -114,8 +102,14 @@ const getUserOptionsForDepartment = (index: number) => {
     return [{ value: '', label: 'Selecione um setor primeiro' }];
   }
 
+  const selectedUserIds = localTargetUsers.value
+    .map((tu, idx) => (idx !== index ? tu.userId : null))
+    .filter((id) => id !== null);
+
   const usersInDepartment = props.allUsers.filter(
-    (user) => user.department?.id === targetUser.departmentId,
+    (user) =>
+      user.department?.id === targetUser.departmentId &&
+      (!selectedUserIds.includes(user.id) || targetUser.userId === user.id),
   );
 
   return [

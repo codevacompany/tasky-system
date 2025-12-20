@@ -59,6 +59,7 @@
               ticket.status === DefaultTicketStatus.Returned
                 ? 'border-orange-300 dark:border-orange-600 dark:bg-orange-900/10 hover:border-orange-400 dark:hover:border-orange-500'
                 : 'border-gray-200 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500',
+              !isCurrentTargetUser(ticket) ? 'opacity-60 grayscale-[0.3]' : '',
             ]"
             @click="openTicketDetails(ticket)"
           >
@@ -183,6 +184,16 @@
                     <font-awesome-icon icon="tasks" />
                     <span class="text-xs">{{ getChecklistProgress(ticket) }}</span>
                   </div>
+                  <font-awesome-icon
+                    v-if="
+                      props.activeTab === 'recebidas' &&
+                      ticket.targetUsers &&
+                      ticket.targetUsers.length > 1
+                    "
+                    icon="users"
+                    class="text-[13px] text-gray-500 dark:text-gray-400"
+                    :title="`${ticket.targetUsers.length} usuários de destino`"
+                  />
                   <div
                     :class="[
                       'flex items-center justify-center text-sm',
@@ -294,7 +305,7 @@ import {
   getAvatarColor,
   calculateDeadline as calculateDeadlineHelper,
 } from '@/utils/generic-helper';
-import { formatDate, formatRelativeTime } from '@/utils/date';
+import { formatDate, formatRelativeTime, getBusinessDayDifference } from '@/utils/date';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import { useRoles } from '@/composables/useRoles';
@@ -323,6 +334,13 @@ const getSortedTargetUsers = (ticket: Ticket) => {
   if (!ticket?.targetUsers || ticket.targetUsers.length === 0)
     return [] as NonNullable<Ticket['targetUsers']>;
   return [...ticket.targetUsers].sort((a, b) => a.order - b.order);
+};
+
+const isCurrentTargetUser = (ticket: Ticket) => {
+  // Only apply grayed out effect in "recebidas" tab
+  if (props.activeTab !== 'recebidas') return true;
+  if (!userStore.user?.id || !ticket.currentTargetUserId) return true;
+  return userStore.user.id === ticket.currentTargetUserId;
 };
 
 const hasRightIcons = (ticket: Ticket) => {
@@ -404,12 +422,13 @@ const getDeadlineClass = (dueDate: string | null) => {
     return 'overdue';
   }
 
-  const diffTime = Math.abs(due.getTime() - now.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  // Use business days difference to match the logic used in calculateDeadline
+  // This ensures consistency between the text display and color coding
+  const businessDays = getBusinessDayDifference(due, now);
 
-  if (diffDays <= 2) {
+  if (businessDays <= 2) {
     return 'urgent';
-  } else if (diffDays <= 3) {
+  } else if (businessDays <= 3) {
     return 'warning';
   }
 
