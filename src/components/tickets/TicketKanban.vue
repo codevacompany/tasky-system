@@ -267,13 +267,14 @@
     :is-open="showVerificationAlert"
     @close="showVerificationAlert = false"
     :show-footer="false"
+    title="Ação Necessária"
   >
     <div class="p-6 text-center">
       <div class="text-3xl text-purple-700 dark:text-purple-400 mb-4">
         <font-awesome-icon icon="info-circle" />
       </div>
       <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed mb-6">
-        Para visualizar os detalhes deste ticket, você precisa iniciar a verificação clicando no
+        Para visualizar os detalhes desta tarefa, você precisa iniciar a verificação clicando no
         botão "Verificar".
       </p>
       <div class="flex justify-center gap-4">

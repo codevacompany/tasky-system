@@ -59,7 +59,7 @@ const createDepartment = async () => {
   try {
     await departmentService.create(departmentData.value);
     emit('departmentCreated');
-    toast.success('Setor criado com sucesso!');
+    toast.success('Criado com sucesso');
     closeModal();
   } catch {
     toast.error('Erro ao criar setor. Tente novamente.');
