@@ -66,11 +66,11 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, computed, onMounted, nextTick, watch } from 'vue';
+import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import LoadingSpinner from './LoadingSpinner.vue';
 
 const props = defineProps({
-  title: { type: String, default: 'Modal Title' },
+  title: { type: String, default: 'Ação Necessária' },
   isLoading: { type: Boolean, default: false },
   confirmButtonLoading: { type: Boolean, default: false },
   showFooter: { type: Boolean, default: true },

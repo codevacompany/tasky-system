@@ -72,7 +72,7 @@ const updateDepartment = async () => {
   try {
     await departmentService.update(props.department.uuid, departmentData.value);
     emit('departmentUpdated');
-    toast.success('Setor atualizado com sucesso');
+    toast.success('Atualizado com sucesso');
     closeModal();
   } catch {
     toast.error('Erro ao atualizar setor');
