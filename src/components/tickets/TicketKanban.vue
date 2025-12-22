@@ -59,7 +59,7 @@
               ticket.status === DefaultTicketStatus.Returned
                 ? 'border-orange-300 dark:border-orange-600 dark:bg-orange-900/10 hover:border-orange-400 dark:hover:border-orange-500'
                 : 'border-gray-200 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500',
-              !isCurrentTargetUser(ticket) ? 'opacity-60 grayscale-[0.3]' : '',
+              shouldBeGrayscale(ticket) ? 'opacity-60 grayscale-[0.3]' : '',
             ]"
             @click="openTicketDetails(ticket)"
           >
@@ -284,10 +284,12 @@
           Cancelar
         </button>
         <button
-          class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 transition-colors duration-200"
+          class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           @click="handleAlertVerification"
+          :disabled="isVerifying"
         >
-          Verificar
+          <font-awesome-icon v-if="isVerifying" icon="spinner" spin class="text-sm" />
+          {{ isVerifying ? '' : 'Verificar' }}
         </button>
       </div>
     </div>
@@ -334,6 +336,15 @@ const getSortedTargetUsers = (ticket: Ticket) => {
   if (!ticket?.targetUsers || ticket.targetUsers.length === 0)
     return [] as NonNullable<Ticket['targetUsers']>;
   return [...ticket.targetUsers].sort((a, b) => a.order - b.order);
+};
+
+const shouldBeGrayscale = (ticket: Ticket) => {
+  return (
+    !isCurrentTargetUser(ticket) &&
+    (ticket.ticketStatus?.key === DefaultTicketStatus.Pending ||
+      ticket.ticketStatus?.key === DefaultTicketStatus.InProgress ||
+      ticket.ticketStatus?.key === DefaultTicketStatus.Returned)
+  );
 };
 
 const isCurrentTargetUser = (ticket: Ticket) => {
@@ -479,23 +490,30 @@ const openTicketDetails = (ticket: Ticket) => {
 };
 
 const handleStartVerification = async (ticket: Ticket) => {
-  try {
-    await ticketService.updateStatus(ticket.customId, {
-      status: DefaultTicketStatus.UnderVerification,
-    });
+  await ticketService.updateStatus(ticket.customId, {
+    status: DefaultTicketStatus.UnderVerification,
+  });
 
-    // Emit viewTicket to navigate to URL
-    emit('viewTicket', ticket);
-  } catch {
-    toast.error('Erro ao iniciar verificação');
-  }
+  // Emit viewTicket to navigate to URL
+  emit('viewTicket', ticket);
 };
 
-const handleAlertVerification = () => {
-  if (pendingVerificationTicket.value) {
-    handleStartVerification(pendingVerificationTicket.value);
+const isVerifying = ref(false);
+
+const handleAlertVerification = async () => {
+  if (!pendingVerificationTicket.value) return;
+
+  isVerifying.value = true;
+  try {
+    await handleStartVerification(pendingVerificationTicket.value);
+    // Only close modal after updateStatus completes successfully
     showVerificationAlert.value = false;
     pendingVerificationTicket.value = null;
+  } catch (error) {
+    // Show error toast and keep modal open so user can try again
+    toast.error('Erro ao iniciar verificação');
+  } finally {
+    isVerifying.value = false;
   }
 };
 

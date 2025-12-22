@@ -362,6 +362,8 @@ import BaseModal from '@/components/common/BaseModal.vue';
 import { useRoles } from '@/composables';
 import { getAvatarStyle } from '@/utils/generic-helper';
 import Input from '@/components/common/Input.vue';
+import { useTicketsStore } from '@/stores/tickets';
+import { useFiltersStore } from '@/stores/filters';
 
 const router = useRouter();
 
@@ -372,6 +374,8 @@ const emit = defineEmits<{
 const userStore = useUserStore();
 const user = computed(() => userStore.user);
 const userPreferencesStore = useUserPreferencesStore();
+const ticketsStore = useTicketsStore();
+const filtersStore = useFiltersStore();
 
 // Use the roles composable
 const { isTenantAdmin } = useRoles();
@@ -401,6 +405,8 @@ const closeModal = () => {
 
 const handleLogout = () => {
   userStore.logout();
+  ticketsStore.clear();
+  filtersStore.clearAllFilters();
   router.push('/login');
 };
 
@@ -617,3 +623,13 @@ const avatarStyle = computed(() => {
   return getAvatarStyle(departmentName);
 });
 </script>
+
+<style scoped>
+.initials {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  line-height: 48px;
+}
+</style>

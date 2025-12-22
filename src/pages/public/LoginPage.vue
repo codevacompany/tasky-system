@@ -64,6 +64,7 @@
             >
               <div class="flex items-center">
                 <input
+                  v-model="rememberMe"
                   type="checkbox"
                   id="rememberMe"
                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
@@ -106,7 +107,7 @@
 
 <script setup lang="ts">
 import { authService } from '@/services/authService';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
@@ -118,12 +119,22 @@ const userStore = useUserStore();
 
 const email = ref('');
 const password = ref('');
+const rememberMe = ref(true); // Changed from false to true
 const isLoading = ref(false);
+
+const REMEMBER_ME_KEY = 'tasky_remember_email';
 
 const login = async () => {
   isLoading.value = true;
   try {
     await authService.login({ email: email.value, password: password.value });
+
+    // Handle "Remember Me"
+    if (rememberMe.value) {
+      localStorage.setItem(REMEMBER_ME_KEY, email.value);
+    } else {
+      localStorage.removeItem(REMEMBER_ME_KEY);
+    }
 
     if (userStore.hasActiveSubscription === false) {
       router.push({ path: '/assinaturas', query: { trialExpired: '1' } });
@@ -141,6 +152,22 @@ const login = async () => {
     isLoading.value = false;
   }
 };
+
+const handleLogout = () => {
+  localStorage.removeItem(REMEMBER_ME_KEY);
+};
+
+onMounted(() => {
+  // Load remembered email if exists
+  const rememberedEmail = localStorage.getItem(REMEMBER_ME_KEY);
+  if (rememberedEmail) {
+    email.value = rememberedEmail;
+    rememberMe.value = true;
+  } else {
+    // Set to true by default even if no remembered email exists
+    rememberMe.value = true;
+  }
+});
 </script>
 
 <style scoped>

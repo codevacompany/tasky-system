@@ -34,6 +34,7 @@ export interface DepartmentStats {
   averageTotalTimeSeconds: number;
   resolutionRate: number;
   efficiencyScore: number;
+  overdueRate: number;
   userCount: number;
 }
 
@@ -130,6 +131,7 @@ export type UserRankingItemDto = {
   efficiencyScore: number; // Wilson Score for ranking
   averageAcceptanceTimeSeconds: number;
   averageResolutionTimeSeconds: number;
+  overdueRate: number; // Percentage of completed tickets that were overdue (completedAt > dueAt)
   avatarUrl?: string;
   isActive: boolean;
 };
@@ -252,6 +254,27 @@ export const reportService = {
   },
 
   /**
+   * Fetches department statistics for the tenant.
+   * Used in ReportsPage.vue:
+   * - DepartmentStatsTable component (Setores tab): Main table displaying all departments with statistics
+   * - Top Setores widget (Overview tab): Shows top 5 departments
+   * - Tempo de Resolução Por Setor widget (Overview tab): Shows resolution time by department
+   * - Excel/CSV Export: Department Statistics sheet/section with all department metrics
+   */
+  async getTenantDepartmentsStatistics(
+    period?: string,
+    sortBy: 'efficiency' | 'resolution_time' | 'overdue_rate' = 'efficiency',
+  ): Promise<DepartmentStats[]> {
+    const response = await apiClient.get('/stats/department-stats', {
+      params: {
+        ...(period ? { period } : {}),
+        sortBy,
+      },
+    });
+    return response.data;
+  },
+
+  /**
    * Fetches resolution time data over time (time series).
    * Used in ReportsPage.vue:
    * - Tempo de Resolução - Análise Temporal widget (Trends tab): Line chart showing resolution time evolution
@@ -301,10 +324,12 @@ export const reportService = {
     all = false,
     sort = 'top',
     period?: string,
+    sortBy: 'efficiency' | 'resolution_time' | 'overdue_rate' = 'efficiency',
   ): Promise<UserRankingResponseDto> {
     const params = new URLSearchParams({
       limit: limit.toString(),
       sort,
+      sortBy,
     });
     if (all) params.append('all', 'true');
     if (period) params.append('period', period);

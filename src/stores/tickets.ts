@@ -141,6 +141,9 @@ export const useTicketsStore = defineStore('tickets', () => {
     lastFetched: null,
   });
 
+  const hasNewReceivedTickets = ref<boolean>(false);
+  const previousReceivedTicketIds = ref<string[]>([]);
+
   // Getters
   const getTicketById = computed(() => {
     return (id: string): Ticket | undefined => {
@@ -189,7 +192,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   async function fetchMyTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     const userStore = useUserStore();
     if (!userStore.user) return;
-    
+
     // Don't fetch if terms haven't been accepted
     if (!userStore.user.termsAccepted || !userStore.user.privacyPolicyAccepted) {
       return;
@@ -271,7 +274,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   async function fetchReceivedTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     const userStore = useUserStore();
     if (!userStore.user) return;
-    
+
     // Don't fetch if terms haven't been accepted
     if (!userStore.user.termsAccepted || !userStore.user.privacyPolicyAccepted) {
       return;
@@ -335,6 +338,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       }
 
       const response = await ticketService.getReceivedTickets(userStore.user.id, params);
+
       receivedTickets.value.data = response.data.items;
       receivedTickets.value.totalCount = response.data.total;
       receivedTickets.value.lastFetched = new Date();
@@ -342,6 +346,16 @@ export const useTicketsStore = defineStore('tickets', () => {
       if (pageToUse === 1) {
         recentReceivedTickets.value = response.data.items.slice(0, 5);
       }
+
+      // Check for new tickets
+      const currentIds = response.data.items.map((ticket) => ticket.customId);
+      if (previousReceivedTicketIds.value.length > 0) {
+        const newIds = currentIds.filter((id) => !previousReceivedTicketIds.value.includes(id));
+        if (newIds.length > 0) {
+          hasNewReceivedTickets.value = true;
+        }
+      }
+      previousReceivedTicketIds.value = currentIds;
     } catch (error) {
       receivedTickets.value.error = 'Failed to fetch received tickets';
       console.error('Error fetching received tickets:', error);
@@ -353,7 +367,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   async function fetchDepartmentTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     const userStore = useUserStore();
     if (!userStore.user?.departmentId) return;
-    
+
     // Don't fetch if terms haven't been accepted
     if (!userStore.user.termsAccepted || !userStore.user.privacyPolicyAccepted) {
       return;
@@ -433,12 +447,12 @@ export const useTicketsStore = defineStore('tickets', () => {
 
   async function fetchArchivedTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     const userStore = useUserStore();
-    
+
     // Don't fetch if terms haven't been accepted
     if (!userStore.user?.termsAccepted || !userStore.user?.privacyPolicyAccepted) {
       return;
     }
-    
+
     // Use current page if no page is provided
     const currentPage = page ?? archivedTickets.value.currentPage;
     // Use current filters if no filters are provided
@@ -484,9 +498,9 @@ export const useTicketsStore = defineStore('tickets', () => {
 
   async function fetchTenantTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     if (!isTenantAdmin.value) return;
-    
+
     const userStore = useUserStore();
-    
+
     // Don't fetch if terms haven't been accepted
     if (!userStore.user?.termsAccepted || !userStore.user?.privacyPolicyAccepted) {
       return;
@@ -608,7 +622,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   async function refreshAllTickets() {
     const userStore = useUserStore();
     if (!userStore.user) return;
-    
+
     // Don't fetch if terms haven't been accepted
     if (!userStore.user.termsAccepted || !userStore.user.privacyPolicyAccepted) {
       return;
@@ -669,6 +683,67 @@ export const useTicketsStore = defineStore('tickets', () => {
 
   function $dispose() {
     stopPolling();
+  }
+
+  function clear() {
+    myTickets.value = {
+      data: [],
+      isLoading: false,
+      error: null,
+      totalCount: 0,
+      lastFetched: null,
+      currentPage: 1,
+    };
+    receivedTickets.value = {
+      data: [],
+      isLoading: false,
+      error: null,
+      totalCount: 0,
+      lastFetched: null,
+      currentPage: 1,
+    };
+    departmentTickets.value = {
+      data: [],
+      isLoading: false,
+      error: null,
+      totalCount: 0,
+      lastFetched: null,
+      currentPage: 1,
+    };
+    archivedTickets.value = {
+      data: [],
+      isLoading: false,
+      error: null,
+      totalCount: 0,
+      lastFetched: null,
+      currentPage: 1,
+    };
+    tenantTickets.value = {
+      data: [],
+      isLoading: false,
+      error: null,
+      totalCount: 0,
+      lastFetched: null,
+      currentPage: 1,
+    };
+    recentReceivedTickets.value = [];
+    recentCreatedTickets.value = [];
+    selectedTicket.value = null;
+    statusColumns.value = {
+      data: [],
+      isLoading: false,
+      error: null,
+      lastFetched: null,
+    };
+    hasNewReceivedTickets.value = false;
+    previousReceivedTicketIds.value = [];
+    if (isPollingActive.value) {
+      stopPolling();
+    }
+  }
+
+  function resetNewReceivedTicketsFlag() {
+    hasNewReceivedTickets.value = false;
   }
 
   function setMyTicketsPage(
@@ -764,6 +839,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     globalRefreshInterval,
     isPollingActive,
     statusColumns,
+    hasNewReceivedTickets,
 
     // Recent tickets
     recentReceivedTickets,
@@ -787,6 +863,8 @@ export const useTicketsStore = defineStore('tickets', () => {
     stopPolling,
     setRefreshInterval,
     $dispose,
+    clear, // Added clear method
+    resetNewReceivedTicketsFlag,
 
     // Pagination control
     setCurrentPage,

@@ -73,6 +73,25 @@
         {{ formatTimeInSecondsCompact(value) }}
       </template>
 
+      <template #column-efficiencyScore="{ value }">
+        <span
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+        >
+          {{ formatPercentage(value) }}
+        </span>
+      </template>
+
+      <template #column-overdueRate="{ value }">
+        <span
+          :class="[
+            'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
+            getOverdueBadgeClass(value),
+          ]"
+        >
+          {{ formatOverdueRate(value) }}
+        </span>
+      </template>
+
       <template #empty>
         <p class="text-sm text-gray-500 dark:text-gray-400">Nenhum setor encontrado</p>
       </template>
@@ -93,6 +112,26 @@ import { formatTimeInSecondsCompact } from '@/utils/generic-helper';
 const formatPercentage = (value?: number) => {
   if (value == null || isNaN(value)) return '0%';
   return `${(value * 100).toFixed(1)}%`;
+};
+
+// Format overdue rate helper (already a percentage)
+const formatOverdueRate = (value?: number) => {
+  if (value == null || isNaN(value)) return '0%';
+  return `${value.toFixed(1)}%`;
+};
+
+// Get overdue rate badge class
+const getOverdueBadgeClass = (rate?: number) => {
+  if (rate === undefined || rate === null) return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+
+  // Lower is better for overdue rate
+  if (rate <= 10) {
+    return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+  } else if (rate <= 25) {
+    return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+  } else {
+    return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
+  }
 };
 
 interface Props {
@@ -168,6 +207,22 @@ const tableHeaders = computed<TableHeader<DepartmentStats>[]>(() => [
     sortKey: 'averageResolutionTimeSeconds',
     align: 'center',
     sortDirection: sortKey.value === 'averageResolutionTimeSeconds' ? sortDirection.value : 'none',
+  },
+  {
+    key: 'efficiencyScore',
+    label: '% de Desempenho',
+    sortable: true,
+    sortKey: 'efficiencyScore',
+    align: 'center',
+    sortDirection: sortKey.value === 'efficiencyScore' ? sortDirection.value : 'none',
+  },
+  {
+    key: 'overdueRate',
+    label: '% de Atraso',
+    sortable: true,
+    sortKey: 'overdueRate',
+    align: 'center',
+    sortDirection: sortKey.value === 'overdueRate' ? sortDirection.value : 'none',
   },
 ]);
 

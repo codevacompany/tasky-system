@@ -85,7 +85,7 @@
                 :input-class="'w-full px-[14px] py-2.5 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-800 dark:text-white bg-white dark:bg-gray-800'"
                 :placeholder-class="'text-gray-500 dark:text-gray-400'"
                 :time-picker-options="{
-                  start: '00:00',
+                  start: '08:00',
                   step: '00:15',
                   end: '23:45',
                 }"
@@ -736,8 +736,7 @@ const handleSubmit = async () => {
     };
 
     await ticketService.create(ticketData);
-
-    await Promise.all([ticketsStore.fetchMyTickets(), ticketsStore.fetchDepartmentTickets()]);
+    await Promise.all([ticketsStore.fetchMyTickets(), ticketsStore.fetchReceivedTickets(), ticketsStore.fetchDepartmentTickets()]);
 
     toast.success('Tarefa criada com sucesso!');
     emit('ticketCreated');

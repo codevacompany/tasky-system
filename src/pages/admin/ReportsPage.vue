@@ -209,64 +209,7 @@
               </template>
 
               <div class="flex flex-col lg:flex-row">
-                <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
-                  <p class="text-base font-medium text-gray-900 dark:text-white mb-4">
-                    Novas tarefas criadas vs concluídas
-                  </p>
-                  <div class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-                    <p v-if="trendData && trendData.length > 0">
-                      <span class="font-semibold text-blue-600 dark:text-green-400"
-                        >{{ getTotalCreated() }} tarefas</span
-                      >
-                      criadas no período selecionado
-                    </p>
-                    <p v-if="trendData && trendData.length > 0">
-                      <span class="font-semibold text-green-600 dark:text-blue-400"
-                        >{{ getTotalResolved() }} tarefas</span
-                      >
-                      concluídas no período selecionado
-                    </p>
-                    <p
-                      v-if="
-                        trendData &&
-                        trendData.length > 1 &&
-                        (createdTrendPercentage !== 0 || resolvedTrendPercentage !== 0)
-                      "
-                      class="text-sm"
-                    >
-                      Isso é
-                      <span
-                        v-if="createdTrendPercentage > 0"
-                        :class="
-                          createdTrendPercentage >= 0
-                            ? 'text-green-600 dark:text-green-400 font-medium'
-                            : 'text-red-600 dark:text-red-400 font-medium'
-                        "
-                      >
-                        {{ createdTrendPercentage }}%
-                        {{ createdTrendPercentage >= 0 ? 'mais' : 'menos' }} criados
-                      </span>
-                      <span v-if="createdTrendPercentage > 0 && resolvedTrendPercentage > 0">
-                        e
-                      </span>
-                      <span
-                        v-if="resolvedTrendPercentage > 0"
-                        :class="
-                          resolvedTrendPercentage >= 0
-                            ? 'text-green-600 dark:text-green-400 font-medium'
-                            : 'text-red-600 dark:text-red-400 font-medium'
-                        "
-                      >
-                        {{ resolvedTrendPercentage }}%
-                        {{ resolvedTrendPercentage >= 0 ? 'mais' : 'menos' }} concluídos
-                      </span>
-                      comparado a
-                      <span class="font-medium text-gray-900 dark:text-white">{{ firstDate }}</span>
-                    </p>
-                  </div>
-                </div>
-
-                <div class="p-6 lg:w-2/3">
+                <div class="px-6 py-3 w-full">
                   <div class="h-80 relative">
                     <Bar
                       v-if="trendData && trendData.length > 0 && !trendChartLoading"
@@ -382,10 +325,22 @@
               <!-- Top Contributors -->
               <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_USERS_ANALYTICS"
-                info-message="Ranking dos colaboradores com melhor desempenho em resolução de tarefas no período selecionado. O ranking é ordenado pela % de Desempenho que considera a taxa de resolução e o volume de tarefas. Quanto mais tarefas um colaborador resolve com qualidade, maior é a confiança no desempenho dele."
+                info-message="Ranking dos colaboradores com melhor desempenho em resolução de tarefas no período selecionado. O ranking pode ser ordenado por % de Desempenho (que considera a taxa de resolução e o volume de tarefas), Tempo de Resolução (quanto menor, melhor) ou Taxa de Atraso (porcentagem de tickets completados após o prazo - quanto menor, melhor)."
               >
                 <template #title>Top Colaboradores</template>
                 <template #subtitle>{{ currentPeriodLabel }}</template>
+                <template #header-actions>
+                  <Select
+                    :options="[
+                      { value: 'efficiency', label: '% de Desempenho' },
+                      { value: 'resolution_time', label: 'Tempo de Resolução' },
+                      { value: 'overdue_rate', label: 'Taxa de Atraso' },
+                    ]"
+                    v-model="topUsersSortBy"
+                    @update:modelValue="handleTopUsersSortByChange"
+                    class="w-48"
+                  />
+                </template>
 
                 <div>
                   <!-- Table Headers -->
@@ -394,7 +349,15 @@
                   >
                     <div>Perfil</div>
                     <div class="text-center">Setor</div>
-                    <div class="text-center">% Desempenho</div>
+                    <div class="text-center">
+                      {{
+                        topUsersSortBy === 'efficiency'
+                          ? '% Desempenho'
+                          : topUsersSortBy === 'resolution_time'
+                            ? 'Tempo de Resolução'
+                            : 'Taxa de Atraso'
+                      }}
+                    </div>
                   </div>
 
                   <!-- Table Content -->
@@ -434,9 +397,22 @@
                       </div>
                       <div class="text-center">
                         <span
+                          v-if="topUsersSortBy === 'efficiency'"
                           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
                         >
                           {{ formatPercentage(user.efficiencyScore) }}
+                        </span>
+                        <span
+                          v-else-if="topUsersSortBy === 'resolution_time'"
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                        >
+                          {{ formatTimeInSecondsCompact(user.averageResolutionTimeSeconds || 0) }}
+                        </span>
+                        <span
+                          v-else
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
+                        >
+                          {{ formatPercentage(user.overdueRate / 100) }}
                         </span>
                       </div>
                     </div>
@@ -463,10 +439,22 @@
               <!-- Top Setores -->
               <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS"
-                info-message="Ranking dos setores com melhor desempenho em resolução de tarefas no período selecionado. O ranking é ordenado pelo % de Desempenho considera a taxa de resolução e o volume de tarefas. Quanto mais tarefas um setor resolve com qualidade, maior é a confiança no desempenho dele."
+                info-message="Ranking dos setores com melhor desempenho em resolução de tarefas no período selecionado. O ranking pode ser ordenado por % de Desempenho (que considera a taxa de resolução e o volume de tarefas), Tempo de Resolução (quanto menor, melhor) ou Taxa de Atraso (porcentagem de tickets completados após o prazo - quanto menor, melhor)."
               >
                 <template #title>Top Setores</template>
                 <template #subtitle>{{ currentPeriodLabel }}</template>
+                <template #header-actions>
+                  <Select
+                    :options="[
+                      { value: 'efficiency', label: '% de Desempenho' },
+                      { value: 'resolution_time', label: 'Tempo de Resolução' },
+                      { value: 'overdue_rate', label: 'Taxa de Atraso' },
+                    ]"
+                    v-model="topDepartmentsSortBy"
+                    @update:modelValue="handleTopDepartmentsSortByChange"
+                    class="w-48"
+                  />
+                </template>
 
                 <div>
                   <!-- Table Headers -->
@@ -475,7 +463,15 @@
                   >
                     <div>Setor</div>
                     <div class="text-center">Tarefas totais</div>
-                    <div class="text-center">% Desempenho</div>
+                    <div class="text-center">
+                      {{
+                        topDepartmentsSortBy === 'efficiency'
+                          ? '% Desempenho'
+                          : topDepartmentsSortBy === 'resolution_time'
+                            ? 'Tempo de Resolução'
+                            : 'Taxa de Atraso'
+                      }}
+                    </div>
                   </div>
 
                   <!-- Table Content -->
@@ -510,9 +506,22 @@
                       </div>
                       <div class="text-center">
                         <span
+                          v-if="topDepartmentsSortBy === 'efficiency'"
                           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
                         >
                           {{ formatPercentage(dept.efficiencyScore) }}
+                        </span>
+                        <span
+                          v-else-if="topDepartmentsSortBy === 'resolution_time'"
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                        >
+                          {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds || 0) }}
+                        </span>
+                        <span
+                          v-else
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
+                        >
+                          {{ formatPercentage(dept.overdueRate / 100) }}
                         </span>
                       </div>
                     </div>
@@ -547,100 +556,51 @@
                 info-message="Esta análise mostra o tempo médio de resolução de tarefas por setor. Os dados são apresentados com setores com maior e menor tempo de resolução, além de uma visualização gráfica com barras proporcionais ao tempo de cada setor."
               >
                 <template #title>Tempo de Resolução Por Setor</template>
-                <template #subtitle
-                  >{{ formatTimeInSecondsCompact(getAverageResolutionTime() * 3600) }} (média
-                  {{ periodTextMap[selectedCycleTimePeriod] }})</template
-                >
 
-                <div class="flex flex-col lg:flex-row">
-                  <div class="p-6 lg:w-1/2 border-r border-gray-200 dark:border-gray-700">
-                    <div class="space-y-4">
-                      <div>
-                        <p class="text-sm font-medium text-gray-900 dark:text-white mb-3">
-                          Setores com maior tempo de resolução:
-                        </p>
-                        <div class="space-y-2">
+                <div class="px-6 py-1">
+                  <div class="space-y-3">
+                    <template v-if="sortedDepartmentsByResolutionTime.length">
+                      <div
+                        v-for="dept in sortedDepartmentsByResolutionTime"
+                        :key="dept.departmentId"
+                        class="space-y-1"
+                      >
+                        <div class="flex justify-between items-center text-[13px]">
+                          <span class="text-gray-700 dark:text-gray-300 truncate max-w-30">{{
+                            dept.departmentName
+                          }}</span>
+                          <span class="font-medium text-gray-900 dark:text-white">
+                            {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds) }}
+                          </span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                           <div
-                            v-for="dept in departmentsWithLongestResolutionTime"
-                            :key="dept.departmentId"
-                            class="flex justify-between items-center text-sm"
-                          >
-                            <span class="text-gray-700 dark:text-gray-300">{{
-                              dept.departmentName
-                            }}</span>
-                            <span class="font-medium text-red-600 dark:text-red-400">{{
-                              formatTimeInSeconds(dept.averageResolutionTimeSeconds)
-                            }}</span>
-                          </div>
+                            class="h-2 rounded-full relative"
+                            :class="{
+                              'min-w-[2px]': dept.averageResolutionTimeSeconds === 0,
+                            }"
+                            :style="{
+                              width:
+                                dept.averageResolutionTimeSeconds === 0
+                                  ? '2px'
+                                  : getBarWidth(dept.averageResolutionTimeSeconds),
+                              backgroundColor: getBarColor(dept.averageResolutionTimeSeconds),
+                            }"
+                          ></div>
                         </div>
                       </div>
-
-                      <div>
-                        <p class="text-sm font-medium text-gray-900 dark:text-white mb-3">
-                          Setores com menor tempo de resolução:
+                    </template>
+                    <template v-else>
+                      <div
+                        class="h-40 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                      >
+                        <font-awesome-icon icon="circle-info" class="text-xl mb-2" />
+                        <p class="text-sm font-medium">Sem dados para exibir</p>
+                        <p class="text-xs mt-1">
+                          Ainda não há durações registradas no período selecionado
                         </p>
-                        <div class="space-y-2">
-                          <div
-                            v-for="dept in departmentsWithShortestResolutionTime"
-                            :key="dept.departmentId"
-                            class="flex justify-between items-center text-sm"
-                          >
-                            <span class="text-gray-700 dark:text-gray-300">{{
-                              dept.departmentName
-                            }}</span>
-                            <span class="font-medium text-green-600 dark:text-green-400">{{
-                              formatTimeInSeconds(dept.averageResolutionTimeSeconds)
-                            }}</span>
-                          </div>
-                        </div>
                       </div>
-                    </div>
-                  </div>
-
-                  <div class="p-6 lg:w-1/2">
-                    <div class="space-y-3">
-                      <template v-if="sortedDepartmentsByResolutionTime.length">
-                        <div
-                          v-for="dept in sortedDepartmentsByResolutionTime"
-                          :key="dept.departmentId"
-                          class="space-y-1"
-                        >
-                          <div class="flex justify-between items-center text-xs">
-                            <span class="text-gray-700 dark:text-gray-300 truncate max-w-30">{{
-                              dept.departmentName
-                            }}</span>
-                            <span class="font-medium text-gray-900 dark:text-white">
-                              {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds) }}
-                            </span>
-                          </div>
-                          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                            <div
-                              class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full relative"
-                              :class="{
-                                'min-w-[2px]': dept.averageResolutionTimeSeconds === 0,
-                              }"
-                              :style="{
-                                width:
-                                  dept.averageResolutionTimeSeconds === 0
-                                    ? '2px'
-                                    : `${(dept.averageResolutionTimeSeconds / sortedDepartmentsByResolutionTime[0].averageResolutionTimeSeconds) * 100}%`,
-                              }"
-                            ></div>
-                          </div>
-                        </div>
-                      </template>
-                      <template v-else>
-                        <div
-                          class="h-40 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
-                        >
-                          <font-awesome-icon icon="circle-info" class="text-xl mb-2" />
-                          <p class="text-sm font-medium">Sem dados para exibir</p>
-                          <p class="text-xs mt-1">
-                            Ainda não há durações registradas no período selecionado
-                          </p>
-                        </div>
-                      </template>
-                    </div>
+                    </template>
                   </div>
                 </div>
               </BaseStatsWidget>
@@ -652,20 +612,7 @@
                 <template #title>Tempo Médio Por Status</template>
 
                 <div class="flex flex-col lg:flex-row">
-                  <div class="p-6 lg:w-1/2 border-r border-gray-200 dark:border-gray-700">
-                    <p class="text-sm font-medium text-gray-900 dark:text-white mb-4">
-                      Análise de tempo por status:
-                    </p>
-                    <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                      <p>
-                        Esta análise mostra quanto tempo em média as tarefas permanecem em cada
-                        status.
-                      </p>
-                      <p>Tempos altos em determinados status podem indicar gargalos no processo.</p>
-                    </div>
-                  </div>
-
-                  <div class="p-6 lg:w-1/2">
+                  <div class="px-6 py-1 w-full">
                     <div class="space-y-3">
                       <template v-if="sortedStatusDurations.length">
                         <div
@@ -673,7 +620,7 @@
                           :key="index"
                           class="space-y-1"
                         >
-                          <div class="flex justify-between items-center text-xs">
+                          <div class="flex justify-between items-center text-[13px]">
                             <span class="text-gray-700 dark:text-gray-300 truncate max-w-24">{{
                               formatSnakeToNaturalCase(
                                 (duration.status as any)?.key ??
@@ -691,10 +638,7 @@
                                 'min-w-[2px]': duration.averageDurationSeconds === 0,
                               }"
                               :style="{
-                                width:
-                                  duration.averageDurationSeconds === 0
-                                    ? '2px'
-                                    : `${(duration.averageDurationSeconds / sortedStatusDurations[0].averageDurationSeconds) * 100}%`,
+                                width: getStatusBarWidth(duration.averageDurationSeconds),
                               }"
                             ></div>
                           </div>
@@ -1179,6 +1123,7 @@
                       <div
                         v-for="dept in departmentStats
                           .slice()
+                          .filter((dept) => dept.efficiencyScore > 0)
                           .sort((a, b) => a.efficiencyScore - b.efficiencyScore)
                           .slice(0, 3)"
                         :key="dept.departmentId"
@@ -2155,6 +2100,8 @@ const error = ref<string | null>(null);
 const topUsers = ref<UserRankingResponseDto | null>(null);
 const topFiveUsers = ref<UserRankingResponseDto | null>(null);
 const worstFiveUsers = ref<UserRankingResponseDto | null>(null);
+const topUsersSortBy = ref<'efficiency' | 'resolution_time' | 'overdue_rate'>('efficiency');
+const topDepartmentsSortBy = ref<'efficiency' | 'resolution_time' | 'overdue_rate'>('efficiency');
 const topPerformers = computed(() => {
   if (!topUsers.value?.users) return [];
   return [...topUsers.value.users]
@@ -2165,6 +2112,7 @@ const topPerformers = computed(() => {
 const worstPerformers = computed(() => {
   if (!worstFiveUsers.value?.users) return [];
   return [...worstFiveUsers.value.users]
+    .filter((user) => user.efficiencyScore > 0)
     .sort((a, b) => a.efficiencyScore - b.efficiencyScore)
     .slice(0, 3);
 });
@@ -2259,14 +2207,29 @@ const loadData = async () => {
       reportService.getTicketsByPriority(selectedStatsPeriod.value as StatsPeriod),
       ticketService.getTenantRecentTickets(10),
       reportService.getStatusDurations(selectedStatsPeriod.value as StatsPeriod), // Tempo Médio Por Status - uses global period filter
-      reportService.getTenantDepartmentsStatistics(selectedStatsPeriod.value as StatsPeriod), // Tempo de Resolução por Setor - uses global period filter
+      reportService.getTenantDepartmentsStatistics(
+        selectedStatsPeriod.value as StatsPeriod,
+        topDepartmentsSortBy.value,
+      ), // Tempo de Resolução por Setor - uses global period filter
       reportService.getResolutionTimeData(),
       reportService.getStatusDurationTimeSeries(
         DefaultTicketStatus.InProgress,
         selectedInProgressPeriod.value,
       ),
-      reportService.getTopUsers(undefined, true, 'top', selectedStatsPeriod.value as StatsPeriod), // fetch all users with stats for Colaboradores tab - uses global period filter
-      reportService.getTopUsers(5, false, 'top', selectedStatsPeriod.value as StatsPeriod), // Top Colaboradores in Visão Geral - uses global period filter
+      reportService.getTopUsers(
+        undefined,
+        true,
+        'top',
+        selectedStatsPeriod.value as StatsPeriod,
+        topUsersSortBy.value,
+      ), // fetch all users with stats for Colaboradores tab - uses global period filter
+      reportService.getTopUsers(
+        5,
+        false,
+        'top',
+        selectedStatsPeriod.value as StatsPeriod,
+        topUsersSortBy.value,
+      ), // Top Colaboradores in Visão Geral - uses global period filter
       reportService.getTopUsers(5, false, 'bottom', selectedStatsPeriod.value as StatsPeriod), // Pior Desempenho - uses global period filter
     ]);
 
@@ -2717,9 +2680,10 @@ const topFiveDepartments = computed(() => {
 const sortedDepartmentsByResolutionTime = computed(() => {
   if (!departmentStats.value) return [];
 
-  return [...departmentStats.value].sort(
-    (a, b) => b.averageResolutionTimeSeconds - a.averageResolutionTimeSeconds,
-  );
+  // Filter out departments with 0 resolution time and sort from lowest to highest
+  return [...departmentStats.value]
+    .filter((dept) => dept.averageResolutionTimeSeconds > 0)
+    .sort((a, b) => a.averageResolutionTimeSeconds - b.averageResolutionTimeSeconds);
 });
 
 const departmentsWithLongestResolutionTime = computed(() =>
@@ -2928,16 +2892,75 @@ const departmentStatsSummary = computed(() => {
 
 const sortedStatusDurations = computed(() => {
   const excluded = new Set(['finalizado', 'cancelado', 'reprovado']);
-  return [...statusDurations.value]
-    .filter((d) => {
-      const key = (d as any)?.status?.key ?? (d.status as unknown as string);
-      return !excluded.has(key);
-    })
-    .sort((a, b) => b.averageDurationSeconds - a.averageDurationSeconds);
+
+  const statusOrder = [
+    DefaultTicketStatus.Pending,
+    DefaultTicketStatus.InProgress,
+    DefaultTicketStatus.AwaitingVerification,
+    DefaultTicketStatus.UnderVerification,
+    DefaultTicketStatus.Returned,
+  ];
+
+  const filtered = [...statusDurations.value].filter((d) => {
+    const key = (d as any)?.status?.key ?? (d.status as unknown as string);
+    return !excluded.has(key);
+  });
+
+  return filtered.sort((a, b) => {
+    const aKey = (a as any)?.status?.key ?? (a.status as unknown as string);
+    const bKey = (b as any)?.status?.key ?? (b.status as unknown as string);
+
+    const aIndex = statusOrder.indexOf(aKey as DefaultTicketStatus);
+    const bIndex = statusOrder.indexOf(bKey as DefaultTicketStatus);
+
+    // If status not in order list, put at the end
+    if (aIndex === -1 && bIndex === -1) return 0;
+    if (aIndex === -1) return 1;
+    if (bIndex === -1) return -1;
+
+    return aIndex - bIndex;
+  });
 });
 
 const handlePeriodChange = () => {
   loadData();
+};
+
+const handleTopUsersSortByChange = async () => {
+  // Reload only the topFiveUsers data when sortBy changes
+  try {
+    const topFiveUsersResult = await reportService.getTopUsers(
+      5,
+      false,
+      'top',
+      selectedStatsPeriod.value as StatsPeriod,
+      topUsersSortBy.value,
+    );
+    topFiveUsers.value = topFiveUsersResult;
+  } catch (err: unknown) {
+    console.error('Erro ao carregar top colaboradores:', err);
+  }
+};
+
+const handleTopDepartmentsSortByChange = async () => {
+  // Reload department stats when sortBy changes
+  try {
+    const departmentStatsResult = await reportService.getTenantDepartmentsStatistics(
+      selectedStatsPeriod.value as StatsPeriod,
+      topDepartmentsSortBy.value,
+    );
+    departmentData.value = departmentStatsResult.map((dept) => ({
+      ...dept,
+      departmentId: dept.departmentId,
+      totalTickets: dept.totalTickets || 0,
+      resolvedTickets: dept.resolvedTickets || 0,
+      resolutionRate: dept.resolutionRate || 0,
+      averageAcceptanceTimeSeconds: dept.averageAcceptanceTimeSeconds || 0,
+      averageTotalTimeSeconds: dept.averageTotalTimeSeconds || 0,
+    }));
+  } catch (err: unknown) {
+    console.error('Erro ao carregar estatísticas de setores:', err);
+  }
 };
 
 const getTotalResolved = () => {
@@ -3078,6 +3101,55 @@ const getResolutionTimeTrend = () => {
 
   const change = ((current - previous) / previous) * 100;
   return Math.round(change);
+};
+
+// Get bar width percentage based on resolution time
+const getBarWidth = (resolutionTimeSeconds: number) => {
+  if (!sortedDepartmentsByResolutionTime.value.length) return '0%';
+
+  const maxTime = Math.max(
+    ...sortedDepartmentsByResolutionTime.value.map((d) => d.averageResolutionTimeSeconds),
+  );
+
+  if (maxTime === 0) return '0%';
+
+  return `${(resolutionTimeSeconds / maxTime) * 100}%`;
+};
+
+// Get bar color based on resolution time (green for low, red for high)
+const getBarColor = (resolutionTimeSeconds: number) => {
+  if (!sortedDepartmentsByResolutionTime.value.length) return '#9ca3af'; // gray
+
+  const maxTime = Math.max(
+    ...sortedDepartmentsByResolutionTime.value.map((d) => d.averageResolutionTimeSeconds),
+  );
+
+  if (maxTime === 0) return '#9ca3af'; // gray
+
+  // Calculate percentage (0 = lowest time, 100 = highest time)
+  const percentage = (resolutionTimeSeconds / maxTime) * 100;
+
+  // Interpolate from green (low) to red (high)
+  // Green: rgb(34, 197, 94) = #22c55e
+  // Red: rgb(239, 68, 68) = #ef4444
+  const r = Math.round(34 + (239 - 34) * (percentage / 100));
+  const g = Math.round(197 - (197 - 68) * (percentage / 100));
+  const b = Math.round(94 - (94 - 68) * (percentage / 100));
+
+  return `rgb(${r}, ${g}, ${b})`;
+};
+
+// Get status bar width percentage based on duration time
+const getStatusBarWidth = (durationSeconds: number) => {
+  if (!sortedStatusDurations.value.length) return '0%';
+
+  // Find the maximum duration time from all statuses
+  const maxTime = Math.max(...sortedStatusDurations.value.map((d) => d.averageDurationSeconds));
+
+  if (maxTime === 0) return '0%';
+  if (durationSeconds === 0) return '2px';
+
+  return `${(durationSeconds / maxTime) * 100}%`;
 };
 
 const getPeriodName = () => {
