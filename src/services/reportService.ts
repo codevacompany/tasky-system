@@ -172,20 +172,6 @@ export const reportService = {
     return response.data;
   },
 
-  /**
-   * Fetches statistics aggregated by department.
-   * Used in ReportsPage.vue:
-   * - DepartmentStatsTable component (Setores tab): Main table displaying all department statistics
-   * - Top Setores widget (Overview tab): Shows top 5 departments by efficiency score
-   * - Tempo de Resolução Por Setor widget (Overview tab): Displays resolution time analysis by department
-   * - Excel/CSV Export: Department Statistics sheet/section with all department metrics
-   */
-  async getTenantDepartmentsStatistics(period?: string): Promise<DepartmentStats[]> {
-    const response = await apiClient.get('/stats/department-stats', {
-      params: period ? { period } : undefined,
-    });
-    return response.data;
-  },
 
   /**
    * Fetches ticket count distribution by status.
