@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="mb-8">
       <div class="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Gestão de Clientes</h1>
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Gestão de Clientes test</h1>
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div class="relative min-w-[300px] max-w-[400px]">
             <font-awesome-icon
