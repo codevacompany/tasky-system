@@ -125,7 +125,7 @@
                   <div class="flex items-center gap-0 flex-shrink-0">
                     <button
                       :class="[
-                        'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
+                        'relative px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'recebidas'
                           ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
                           : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
@@ -134,6 +134,10 @@
                       @click="switchTab('recebidas')"
                     >
                       Recebidas
+                      <span
+                        v-if="ticketsStore.hasNewReceivedTickets && activeTab !== 'recebidas'"
+                        class="absolute top-[13px] left-[6px] w-[5px] h-[5px] bg-blue-500 rounded-full"
+                      ></span>
                     </button>
                     <button
                       :class="[
@@ -680,7 +684,6 @@ const activeFiltersCount = computed(() => {
   let count = 0;
   if (statusFilter.value && statusFilter.value !== '') count++;
   if (priorityFilter.value && priorityFilter.value !== '') count++;
-  if (searchTerm.value) count++;
   if (activeTab.value !== 'setor' && activeTab.value !== 'recebidas') {
     const departmentFilter = filtersStore.currentFilters.departmentUuid;
     if (departmentFilter && departmentFilter !== '' && departmentFilter !== null) count++;
@@ -764,6 +767,11 @@ const switchTab = async (tab: TicketsTab, skipUrlSync = false) => {
 
   const previousTab = activeTab.value;
   activeTab.value = tab;
+
+  // Reset new received tickets flag when switching to 'recebidas' tab
+  if (tab === 'recebidas') {
+    ticketsStore.resetNewReceivedTicketsFlag();
+  }
 
   if (tab === 'setor' || tab === 'recebidas') {
     filtersStore.clearFilter('departmentUuid');

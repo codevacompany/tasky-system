@@ -581,7 +581,7 @@
                   <button @click="saveTicketName" class="btn btn-primary">Salvar</button>
                   <button
                     @click="cancelEditingName"
-                    class="btn px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
+                    class="btn px-4 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
                   >
                     Cancelar
                   </button>
@@ -619,7 +619,7 @@
               <div v-if="!isEditingDescription">
                 <div
                   class="description-text prose prose-sm max-w-none dark:prose-invert"
-                  v-html="loadedTicket.description"
+                  v-html="convertUrlsToLinks(loadedTicket.description)"
                   @click="startEditingDescription"
                   :class="{
                     'cursor-text hover:bg-gray-50 dark:hover:bg-gray-700 p-3 rounded-lg transition-colors':
@@ -643,7 +643,7 @@
                   <button @click="saveTicketDescription" class="btn btn-primary">Salvar</button>
                   <button
                     @click="cancelEditingDescription"
-                    class="btn px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
+                    class="btn px-4 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
                   >
                     Cancelar
                   </button>
@@ -1596,7 +1596,21 @@ const convertUrlsToLinks = (html: string): string => {
           link.target = '_blank';
           link.rel = 'noopener noreferrer';
           link.textContent = url;
-          link.className = 'text-blue-600 dark:text-blue-400 hover:underline';
+          link.className = 'comment-link';
+
+          // Add inline style based on dark mode to ensure it works with v-html
+          const isDarkMode =
+            document.body.classList.contains('dark-mode') ||
+            document.body.classList.contains('dark');
+          // Don't set text-decoration inline - let CSS handle it for hover effects
+          link.style.cursor = 'pointer';
+          // Use setProperty with important flag to override CSS rules
+          link.style.setProperty('color', isDarkMode ? '#60a5fa' : '#2563eb', 'important');
+
+          // Add data attribute for CSS targeting
+          if (isDarkMode) {
+            link.setAttribute('data-dark-mode', 'true');
+          }
 
           fragment.appendChild(link);
           lastIndex = index + url.length;
@@ -1628,6 +1642,22 @@ const convertUrlsToLinks = (html: string): string => {
 
   const childNodes = Array.from(tempDiv.childNodes);
   childNodes.forEach(processNode);
+
+  // After processing, ensure all links have the correct color for dark mode
+  const isDarkMode =
+    document.body.classList.contains('dark-mode') || document.body.classList.contains('dark');
+  const allLinks = tempDiv.querySelectorAll('a');
+  allLinks.forEach((link) => {
+    if (isDarkMode) {
+      // Use setProperty with important flag to override CSS rules
+      link.style.setProperty('color', '#60a5fa', 'important');
+      link.setAttribute('data-dark-mode', 'true');
+    } else {
+      link.style.setProperty('color', '#2563eb', 'important');
+    }
+    // Don't set text-decoration inline - let CSS handle it for hover effects
+    link.style.cursor = 'pointer';
+  });
 
   return tempDiv.innerHTML;
 };
@@ -2239,11 +2269,65 @@ const comment = async () => {
   }
 };
 
+const updateCommentLinksColor = () => {
+  nextTick(() => {
+    const isDarkMode =
+      document.body.classList.contains('dark-mode') || document.body.classList.contains('dark');
+    const commentTextElements = document.querySelectorAll('.comment-text');
+
+    commentTextElements.forEach((commentElement) => {
+      const links = commentElement.querySelectorAll('a');
+      links.forEach((link) => {
+        if (isDarkMode) {
+          // Use setProperty with important flag to override CSS rules
+          link.style.setProperty('color', '#60a5fa', 'important');
+          link.setAttribute('data-dark-mode', 'true');
+        } else {
+          link.style.setProperty('color', '#2563eb', 'important');
+          link.removeAttribute('data-dark-mode');
+        }
+        // Don't set text-decoration inline - let CSS handle it for hover effects
+        link.style.cursor = 'pointer';
+      });
+    });
+  });
+};
+
+const updateDescriptionLinksColor = () => {
+  nextTick(() => {
+    const isDarkMode =
+      document.body.classList.contains('dark-mode') || document.body.classList.contains('dark');
+    const descriptionTextElements = document.querySelectorAll('.description-text');
+
+    descriptionTextElements.forEach((descriptionElement) => {
+      const links = descriptionElement.querySelectorAll('a');
+      links.forEach((link) => {
+        if (isDarkMode) {
+          // Use setProperty with important flag to override CSS rules
+          link.style.setProperty('color', '#60a5fa', 'important');
+          link.setAttribute('data-dark-mode', 'true');
+        } else {
+          link.style.setProperty('color', '#4f46e5', 'important');
+          link.removeAttribute('data-dark-mode');
+        }
+        // Only set text-decoration to none if not already set by CSS hover
+        // CSS hover will override this, so we don't need to set it here
+        if (!link.matches(':hover')) {
+          link.style.textDecoration = 'none';
+        }
+        link.style.cursor = 'pointer';
+      });
+    });
+  });
+};
+
 const fetchComments = async () => {
   try {
     if (loadedTicket.value) {
       const response = await ticketCommentService.getByTicket(loadedTicket.value.customId);
       comments.value = response.data;
+      // Update link colors after comments are loaded
+      updateCommentLinksColor();
     }
   } catch {
     toast.error('Erro ao buscar comentários');
@@ -2514,6 +2598,8 @@ const fetchTicket = async (customId: string) => {
     fetchComments();
     fetchTicketUpdates();
     loadChecklistItems();
+    // Update link colors after ticket is loaded
+    updateDescriptionLinksColor();
 
     // Check if ticket is awaiting verification and user is reviewer
     if (
@@ -2563,6 +2649,33 @@ watch(
     }
   },
   { immediate: true },
+);
+
+// Watch for dark mode changes and update link colors
+watch(
+  () => userPreferencesStore.isDarkMode,
+  () => {
+    updateCommentLinksColor();
+    updateDescriptionLinksColor();
+  },
+);
+
+// Watch for comments changes and update link colors
+watch(
+  () => comments.value,
+  () => {
+    updateCommentLinksColor();
+  },
+  { deep: true },
+);
+
+// Watch for ticket changes and update description link colors
+watch(
+  () => loadedTicket.value,
+  () => {
+    updateDescriptionLinksColor();
+  },
+  { deep: true },
 );
 
 // Close comment menu when clicking outside
@@ -3362,11 +3475,19 @@ const confirmDueDate = async () => {
 :deep(.description-text a),
 :deep(.comment-text a) {
   color: #2563eb;
+  text-decoration: none;
+}
+
+:deep(.description-text a:hover),
+:deep(.comment-text a:hover) {
+  text-decoration: underline;
 }
 
 .dark :deep(.description-text a),
-.dark :deep(.comment-text a) {
-  color: #60a5fa;
+.dark :deep(.comment-text a),
+body.dark-mode :deep(.description-text a),
+body.dark-mode :deep(.comment-text a) {
+  color: #60a5fa !important;
 }
 
 /* Editable field styles */
@@ -3663,9 +3784,67 @@ const confirmDueDate = async () => {
   margin: 0.5rem 0;
 }
 
-.description-text :deep(a) {
+.description-text :deep(a),
+.description-text a {
   color: #4f46e5;
   text-decoration: none;
+}
+
+.description-text :deep(a:hover),
+.description-text a:hover {
+  text-decoration: underline !important;
+}
+
+/* Dark mode hover styles for description - ensure underline */
+:deep(body.dark-mode) .description-text :deep(a:hover),
+:deep(body.dark-mode) .description-text a:hover,
+body.dark-mode .description-text a:hover,
+.dark .description-text :deep(a:hover),
+.dark .description-text a:hover,
+[data-v-a180df51] body.dark-mode .description-text a:hover,
+[data-v-a180df51] .dark .description-text a:hover,
+body.dark-mode [data-v-a180df51] .description-text a:hover,
+.dark [data-v-a180df51] .description-text a:hover {
+  text-decoration: underline !important;
+}
+
+/* Dark mode - ensure all links in description are blue - highest specificity */
+:deep(body.dark-mode) .description-text :deep(a),
+:deep(body.dark-mode) .description-text a,
+:deep(body.dark-mode) .description-text a[href],
+:deep(body.dark-mode) .description-text .comment-link,
+body.dark-mode .description-text a,
+body.dark-mode .description-text a[href],
+body.dark-mode .description-text .comment-link,
+body.dark-mode .description-text a[data-dark-mode],
+body.dark-mode .description-text a[data-dark-mode='true'],
+.dark .description-text :deep(a),
+.dark .description-text a,
+.dark .description-text a[href],
+.dark .description-text .comment-link,
+.dark .description-text a[data-dark-mode],
+.dark .description-text a[data-dark-mode='true'],
+/* Override scoped Vue styles */
+[data-v-a180df51] body.dark-mode .description-text a,
+[data-v-a180df51] body.dark-mode .description-text a[href],
+[data-v-a180df51] .dark .description-text a,
+[data-v-a180df51] .dark .description-text a[href],
+body.dark-mode [data-v-a180df51] .description-text a,
+body.dark-mode [data-v-a180df51] .description-text a[href],
+.dark [data-v-a180df51] .description-text a,
+.dark [data-v-a180df51] .description-text a[href] {
+  color: #60a5fa !important;
+}
+
+:deep(body.dark-mode) .description-text :deep(a:hover),
+:deep(body.dark-mode) .description-text a:hover,
+body.dark-mode .description-text a:hover,
+.dark .description-text :deep(a:hover),
+.dark .description-text a:hover,
+[data-v-a180df51] body.dark-mode .description-text a:hover,
+[data-v-a180df51] .dark .description-text a:hover {
+  color: #93c5fd !important;
+  text-decoration: underline;
 }
 
 .description-text :deep(a:hover) {
@@ -4189,11 +4368,79 @@ const confirmDueDate = async () => {
   margin: 0.5rem 0;
 }
 
-.comment-text :deep(a) {
+.comment-text :deep(a),
+.comment-text a,
+.comment-text :deep(.comment-link),
+.comment-text .comment-link {
   color: #4f46e5;
   text-decoration: none;
   word-break: break-all;
   overflow-wrap: anywhere;
+}
+
+.comment-text :deep(a:hover),
+.comment-text a:hover,
+.comment-text :deep(.comment-link:hover),
+.comment-text .comment-link:hover {
+  text-decoration: underline !important;
+}
+
+/* Dark mode hover styles for comments - ensure underline */
+:deep(body.dark-mode) .comment-text :deep(a:hover),
+:deep(body.dark-mode) .comment-text a:hover,
+:deep(body.dark-mode) .comment-text :deep(.comment-link:hover),
+:deep(body.dark-mode) .comment-text .comment-link:hover,
+body.dark-mode .comment-text a:hover,
+body.dark-mode .comment-text .comment-link:hover,
+.dark .comment-text :deep(a:hover),
+.dark .comment-text a:hover,
+.dark .comment-text :deep(.comment-link:hover),
+.dark .comment-text .comment-link:hover,
+[data-v-a180df51] body.dark-mode .comment-text a:hover,
+[data-v-a180df51] .dark .comment-text a:hover,
+body.dark-mode [data-v-a180df51] .comment-text a:hover,
+.dark [data-v-a180df51] .comment-text a:hover {
+  text-decoration: underline !important;
+}
+
+/* Dark mode - ensure all links in comments are blue */
+:deep(body.dark-mode) .comment-text :deep(a),
+:deep(body.dark-mode) .comment-text a,
+:deep(body.dark-mode) .comment-text :deep(.comment-link),
+:deep(body.dark-mode) .comment-text .comment-link,
+body.dark-mode .comment-text a,
+body.dark-mode .comment-text .comment-link,
+body.dark-mode .comment-text a[data-dark-mode],
+body.dark-mode .comment-text a[data-dark-mode='true'],
+.dark .comment-text :deep(a),
+.dark .comment-text a,
+.dark .comment-text :deep(.comment-link),
+.dark .comment-text .comment-link,
+.dark .comment-text a[data-dark-mode],
+.dark .comment-text a[data-dark-mode='true'],
+.comment-text a.dark\:text-blue-400,
+.comment-text :deep(a.dark\:text-blue-400),
+.comment-text .comment-link,
+.comment-text a[data-dark-mode='true'] {
+  color: #60a5fa !important;
+}
+
+:deep(body.dark-mode) .comment-text :deep(a:hover),
+:deep(body.dark-mode) .comment-text a:hover,
+:deep(body.dark-mode) .comment-text :deep(.comment-link:hover),
+:deep(body.dark-mode) .comment-text .comment-link:hover,
+body.dark-mode .comment-text a:hover,
+body.dark-mode .comment-text .comment-link:hover,
+.dark .comment-text :deep(a:hover),
+.dark .comment-text a:hover,
+.dark .comment-text :deep(.comment-link:hover),
+.dark .comment-text .comment-link:hover,
+[data-v-a180df51] body.dark-mode .comment-text a:hover,
+[data-v-a180df51] .dark .comment-text a:hover,
+body.dark-mode [data-v-a180df51] .comment-text a:hover,
+.dark [data-v-a180df51] .comment-text a:hover {
+  color: #93c5fd !important;
+  text-decoration: underline !important;
 }
 
 .comment-text :deep(a:hover) {
@@ -5553,7 +5800,7 @@ const confirmDueDate = async () => {
 
 /* Add comprehensive dark mode styles for v-html content */
 .dark .description-text,
-.dark .description-text *,
+.dark .description-text *:not(a):not(.comment-link),
 :deep(.dark) .description-text,
 :deep(.dark) .description-text * {
   color: #e5e7eb !important;
@@ -5595,9 +5842,9 @@ const confirmDueDate = async () => {
 
 /* Dark mode comment text styles */
 .dark .comment-text,
-.dark .comment-text *,
+.dark .comment-text *:not(a):not(.comment-link),
 :deep(.dark) .comment-text,
-:deep(.dark) .comment-text * {
+:deep(.dark) .comment-text *:not(a):not(.comment-link) {
   color: #e5e7eb !important;
 }
 
@@ -5637,43 +5884,43 @@ const confirmDueDate = async () => {
 
 /* Force override for v-html content in dark mode */
 :deep(.dark) .text-gray-800 .description-text,
-:deep(.dark) .text-gray-800 .description-text *,
+:deep(.dark) .text-gray-800 .description-text *:not(a):not(.comment-link),
 :deep(.dark) .text-gray-800 .comment-text,
-:deep(.dark) .text-gray-800 .comment-text * {
+:deep(.dark) .text-gray-800 .comment-text *:not(a):not(.comment-link) {
   color: #e5e7eb !important;
 }
 
 /* Also support body.dark-mode pattern */
 :deep(body.dark-mode) .description-text,
-:deep(body.dark-mode) .description-text *,
+:deep(body.dark-mode) .description-text *:not(a):not(.comment-link),
 body.dark-mode .description-text,
 body.dark-mode .description-text * {
   color: #e5e7eb !important;
 }
 
 :deep(body.dark-mode) .comment-text,
-:deep(body.dark-mode) .comment-text *,
+:deep(body.dark-mode) .comment-text *:not(a):not(.comment-link),
 body.dark-mode .comment-text,
-body.dark-mode .comment-text * {
+body.dark-mode .comment-text *:not(a):not(.comment-link) {
   color: #e5e7eb !important;
 }
 
 :deep(body.dark-mode) .text-gray-800 .description-text,
-:deep(body.dark-mode) .text-gray-800 .description-text *,
+:deep(body.dark-mode) .text-gray-800 .description-text *:not(a):not(.comment-link),
 :deep(body.dark-mode) .text-gray-800 .comment-text,
-:deep(body.dark-mode) .text-gray-800 .comment-text *,
+:deep(body.dark-mode) .text-gray-800 .comment-text *:not(a):not(.comment-link),
 body.dark-mode .text-gray-800 .description-text,
-body.dark-mode .text-gray-800 .description-text *,
+body.dark-mode .text-gray-800 .description-text *:not(a):not(.comment-link),
 body.dark-mode .text-gray-800 .comment-text,
-body.dark-mode .text-gray-800 .comment-text * {
+body.dark-mode .text-gray-800 .comment-text *:not(a):not(.comment-link) {
   color: #e5e7eb !important;
 }
 
-/* Force text color for v-html content in dark mode */
+/* Force text color for v-html content in dark mode - exclude links */
 .dark .description-text,
-.dark .description-text *,
+.dark .description-text *:not(a):not(.comment-link),
 .dark .comment-text,
-.dark .comment-text * {
+.dark .comment-text *:not(a):not(.comment-link) {
   color: #e5e7eb !important;
 }
 
@@ -5688,87 +5935,107 @@ body.dark-mode .text-gray-800 .comment-text * {
   color: #e5e7eb !important;
 }
 
-.dark :deep(.description-text *),
-.dark :deep(.comment-text *) {
+.dark :deep(.description-text *:not(a):not(.comment-link)),
+.dark :deep(.comment-text *:not(a):not(.comment-link)) {
   color: #e5e7eb !important;
 }
 
 /* Force override for v-html content in dark mode */
 :deep(.dark) .text-gray-800 .description-text,
-:deep(.dark) .text-gray-800 .description-text *,
+:deep(.dark) .text-gray-800 .description-text *:not(a):not(.comment-link),
 :deep(.dark) .text-gray-800 .comment-text,
-:deep(.dark) .text-gray-800 .comment-text * {
+:deep(.dark) .text-gray-800 .comment-text *:not(a):not(.comment-link) {
   color: #e5e7eb !important;
 }
 
 /* Also support body.dark-mode pattern */
 :deep(body.dark-mode) .description-text,
-:deep(body.dark-mode) .description-text *,
+:deep(body.dark-mode) .description-text *:not(a):not(.comment-link),
 body.dark-mode .description-text,
 body.dark-mode .description-text * {
   color: #e5e7eb !important;
 }
 
 :deep(body.dark-mode) .comment-text,
-:deep(body.dark-mode) .comment-text *,
+:deep(body.dark-mode) .comment-text *:not(a):not(.comment-link),
 body.dark-mode .comment-text,
-body.dark-mode .comment-text * {
+body.dark-mode .comment-text *:not(a):not(.comment-link) {
   color: #e5e7eb !important;
 }
 
 :deep(body.dark-mode) .text-gray-800 .description-text,
-:deep(body.dark-mode) .text-gray-800 .description-text *,
+:deep(body.dark-mode) .text-gray-800 .description-text *:not(a):not(.comment-link),
 :deep(body.dark-mode) .text-gray-800 .comment-text,
-:deep(body.dark-mode) .text-gray-800 .comment-text *,
+:deep(body.dark-mode) .text-gray-800 .comment-text *:not(a):not(.comment-link),
 body.dark-mode .text-gray-800 .description-text,
-body.dark-mode .text-gray-800 .description-text *,
+body.dark-mode .text-gray-800 .description-text *:not(a):not(.comment-link),
 body.dark-mode .text-gray-800 .comment-text,
-body.dark-mode .text-gray-800 .comment-text * {
+body.dark-mode .text-gray-800 .comment-text *:not(a):not(.comment-link) {
   color: #e5e7eb !important;
 }
 
 /* Force text color for v-html content in dark mode - comprehensive solution */
 .dark .description-text,
-.dark .description-text *,
+.dark .description-text *:not(a):not(.comment-link),
 .dark .comment-text,
-.dark .comment-text *,
+.dark .comment-text *:not(a):not(.comment-link),
 :deep(.dark) .description-text,
-:deep(.dark) .description-text *,
+:deep(.dark) .description-text *:not(a):not(.comment-link),
 :deep(.dark) .comment-text,
-:deep(.dark) .comment-text *,
+:deep(.dark) .comment-text *:not(a):not(.comment-link),
 .dark :deep(.description-text),
-.dark :deep(.description-text *),
+.dark :deep(.description-text *:not(a):not(.comment-link)),
 .dark :deep(.comment-text),
-.dark :deep(.comment-text *) {
+.dark :deep(.comment-text *:not(a):not(.comment-link)) {
   color: #e5e7eb !important;
 }
 
 /* Override any parent container text color in dark mode */
 .dark .text-gray-800 .description-text,
-.dark .text-gray-800 .description-text *,
+.dark .text-gray-800 .description-text *:not(a):not(.comment-link),
 .dark .text-gray-800 .comment-text,
-.dark .text-gray-800 .comment-text * {
+.dark .text-gray-800 .comment-text *:not(a):not(.comment-link) {
   color: #e5e7eb !important;
+}
+
+/* Ensure links in dark mode override parent text color */
+.dark .text-gray-800 .description-text a,
+.dark .text-gray-800 .description-text a[href],
+.dark .text-gray-800 .description-text .comment-link,
+.dark .text-gray-800 .comment-text a,
+.dark .text-gray-800 .comment-text .comment-link,
+body.dark-mode .description-text a,
+body.dark-mode .description-text a[href],
+body.dark-mode .description-text .comment-link {
+  color: #60a5fa !important;
 }
 
 /* Dark mode styles for descriptions and comments */
 .dark .description-text,
-.dark .description-text *,
+.dark .description-text *:not(a):not(.comment-link),
 .dark .comment-text,
-.dark .comment-text *,
+.dark .comment-text *:not(a):not(.comment-link),
 :deep(.dark) .description-text,
-:deep(.dark) .description-text *,
+:deep(.dark) .description-text *:not(a):not(.comment-link),
 :deep(.dark) .comment-text,
-:deep(.dark) .comment-text * {
+:deep(.dark) .comment-text *:not(a):not(.comment-link) {
   color: #e5e7eb !important;
 }
 
 /* Override parent container styles in dark mode */
 .dark .text-gray-800 .description-text,
-.dark .text-gray-800 .description-text *,
+.dark .text-gray-800 .description-text *:not(a):not(.comment-link),
 .dark .text-gray-800 .comment-text,
-.dark .text-gray-800 .comment-text * {
+.dark .text-gray-800 .comment-text *:not(a):not(.comment-link) {
   color: #e5e7eb !important;
+}
+
+/* Ensure links in dark mode override parent text color */
+.dark .text-gray-800 .description-text a,
+.dark .text-gray-800 .comment-text a,
+.dark .text-gray-800 .comment-text .comment-link,
+.dark .text-gray-800 .comment-text a[data-dark-mode='true'] {
+  color: #60a5fa !important;
 }
 
 /* Headings should be slightly brighter */
@@ -5787,9 +6054,146 @@ body.dark-mode .text-gray-800 .comment-text * {
   color: #f9fafb !important;
 }
 
-/* Links should be blue in dark mode */
+/* Links should be blue in dark mode - override Vue scoped styles */
 .dark .description-text a,
-.dark .comment-text a {
+.dark .comment-text a,
+.dark .comment-text .comment-link,
+body.dark-mode .description-text a,
+body.dark-mode .comment-text a,
+body.dark-mode .comment-text .comment-link,
+:deep(body.dark-mode) .description-text a,
+:deep(body.dark-mode) .comment-text a,
+:deep(body.dark-mode) .comment-text .comment-link,
+:deep(.dark) .description-text a,
+:deep(.dark) .comment-text a,
+:deep(.dark) .comment-text .comment-link,
+/* Override Vue scoped styles with highest specificity */
+[data-v-a180df51] body.dark-mode .description-text a,
+[data-v-a180df51] body.dark-mode .description-text a[href],
+[data-v-a180df51] body.dark-mode .comment-text a,
+[data-v-a180df51] body.dark-mode .comment-text a[href],
+[data-v-a180df51] .dark .description-text a,
+[data-v-a180df51] .dark .description-text a[href],
+[data-v-a180df51] .dark .comment-text a,
+[data-v-a180df51] .dark .comment-text a[href],
+body.dark-mode [data-v-a180df51] .description-text a,
+body.dark-mode [data-v-a180df51] .description-text a[href],
+body.dark-mode [data-v-a180df51] .comment-text a,
+body.dark-mode [data-v-a180df51] .comment-text a[href],
+.dark [data-v-a180df51] .description-text a,
+.dark [data-v-a180df51] .description-text a[href],
+.dark [data-v-a180df51] .comment-text a,
+.dark [data-v-a180df51] .comment-text a[href] {
+  color: #60a5fa !important;
+}
+
+/* Ensure links are visible in dark mode with hover effect */
+.dark .description-text a:hover,
+.dark .comment-text a:hover,
+.dark .comment-text .comment-link:hover,
+body.dark-mode .description-text a:hover,
+body.dark-mode .comment-text a:hover,
+body.dark-mode .comment-text .comment-link:hover,
+:deep(body.dark-mode) .description-text a:hover,
+:deep(body.dark-mode) .comment-text a:hover,
+:deep(body.dark-mode) .comment-text .comment-link:hover,
+:deep(.dark) .description-text a:hover,
+:deep(.dark) .comment-text a:hover,
+:deep(.dark) .comment-text .comment-link:hover,
+/* Override Vue scoped styles for hover */
+[data-v-a180df51] body.dark-mode .description-text a:hover,
+[data-v-a180df51] body.dark-mode .comment-text a:hover,
+[data-v-a180df51] .dark .description-text a:hover,
+[data-v-a180df51] .dark .comment-text a:hover,
+body.dark-mode [data-v-a180df51] .description-text a:hover,
+body.dark-mode [data-v-a180df51] .comment-text a:hover,
+.dark [data-v-a180df51] .description-text a:hover,
+.dark [data-v-a180df51] .comment-text a:hover {
+  color: #93c5fd !important;
+  text-decoration: underline !important;
+}
+
+/* Force blue color for all links in comments in dark mode - most specific selector */
+body.dark-mode .comment-text a,
+body.dark-mode .comment-text a.comment-link,
+body.dark-mode .comment-text .comment-link,
+body.dark-mode .comment-text a[href],
+body.dark-mode .comment-text .comment-link[href],
+body.dark-mode .comment-text a[data-dark-mode='true'],
+.dark .comment-text a,
+.dark .comment-text a.comment-link,
+.dark .comment-text .comment-link,
+.dark .comment-text a[href],
+.dark .comment-text .comment-link[href],
+.dark .comment-text a[data-dark-mode='true'] {
+  color: #60a5fa !important;
+}
+
+/* Override any text color inheritance for links - highest specificity */
+body.dark-mode .comment-text a,
+body.dark-mode .comment-text .comment-link,
+body.dark-mode .comment-text a[style*='color'],
+.dark .comment-text a,
+.dark .comment-text .comment-link,
+.dark .comment-text a[style*='color'] {
+  color: #60a5fa !important;
+}
+
+/* Force blue color for all links in description in dark mode - most specific selector */
+body.dark-mode .description-text a,
+body.dark-mode .description-text a.comment-link,
+body.dark-mode .description-text .comment-link,
+body.dark-mode .description-text a[href],
+body.dark-mode .description-text .comment-link[href],
+body.dark-mode .description-text a[data-dark-mode='true'],
+.dark .description-text a,
+.dark .description-text a.comment-link,
+.dark .description-text .comment-link,
+.dark .description-text a[href],
+.dark .description-text .comment-link[href],
+.dark .description-text a[data-dark-mode='true'],
+/* Override Vue scoped styles with maximum specificity */
+[data-v-a180df51] body.dark-mode .description-text a,
+[data-v-a180df51] body.dark-mode .description-text a[href],
+[data-v-a180df51] body.dark-mode .description-text a.comment-link,
+[data-v-a180df51] body.dark-mode .description-text .comment-link,
+[data-v-a180df51] .dark .description-text a,
+[data-v-a180df51] .dark .description-text a[href],
+[data-v-a180df51] .dark .description-text a.comment-link,
+[data-v-a180df51] .dark .description-text .comment-link,
+body.dark-mode [data-v-a180df51] .description-text a,
+body.dark-mode [data-v-a180df51] .description-text a[href],
+body.dark-mode [data-v-a180df51] .description-text a.comment-link,
+body.dark-mode [data-v-a180df51] .description-text .comment-link,
+.dark [data-v-a180df51] .description-text a,
+.dark [data-v-a180df51] .description-text a[href],
+.dark [data-v-a180df51] .description-text a.comment-link,
+.dark [data-v-a180df51] .description-text .comment-link {
+  color: #60a5fa !important;
+}
+
+/* Override any text color inheritance for description links - highest specificity */
+body.dark-mode .description-text a,
+body.dark-mode .description-text .comment-link,
+body.dark-mode .description-text a[style*='color'],
+body.dark-mode .description-text a[href],
+.dark .description-text a,
+.dark .description-text .comment-link,
+.dark .description-text a[style*='color'],
+.dark .description-text a[href],
+/* Override Vue scoped styles */
+[data-v-a180df51] body.dark-mode .description-text a,
+[data-v-a180df51] body.dark-mode .description-text a[href],
+[data-v-a180df51] body.dark-mode .description-text a[style*='color'],
+[data-v-a180df51] .dark .description-text a,
+[data-v-a180df51] .dark .description-text a[href],
+[data-v-a180df51] .dark .description-text a[style*='color'],
+body.dark-mode [data-v-a180df51] .description-text a,
+body.dark-mode [data-v-a180df51] .description-text a[href],
+body.dark-mode [data-v-a180df51] .description-text a[style*='color'],
+.dark [data-v-a180df51] .description-text a,
+.dark [data-v-a180df51] .description-text a[href],
+.dark [data-v-a180df51] .description-text a[style*='color'] {
   color: #60a5fa !important;
 }
 
