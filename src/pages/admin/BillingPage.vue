@@ -492,7 +492,7 @@ onMounted(async () => {
   // Handle Stripe Checkout redirects
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('success') === 'true') {
-    toast.success('Assinatura realizada com sucesso!');
+    toast.success('Assinatura realizada com sucesso');
     // Clean up URL
     window.history.replaceState({}, '', window.location.pathname);
     await loadCurrentSubscription();

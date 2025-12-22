@@ -325,7 +325,7 @@
               <!-- Top Contributors -->
               <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_USERS_ANALYTICS"
-                info-message="Ranking dos colaboradores com melhor desempenho em resolução de tarefas no período selecionado. O ranking pode ser ordenado por % de Desempenho (que considera a taxa de resolução e o volume de tarefas), Tempo de Resolução (quanto menor, melhor) ou Taxa de Atraso (porcentagem de tickets completados após o prazo - quanto menor, melhor)."
+                info-message="Ranking dos colaboradores com melhor desempenho em resolução de tarefas no período selecionado. O ranking pode ser ordenado por % de Desempenho (que considera a taxa de resolução e o volume de tarefas), Tempo de Resolução (quanto menor, melhor) ou Taxa de Atraso (porcentagem de tarefas enviadas para verificação após o prazo - quanto menor, melhor)."
               >
                 <template #title>Top Colaboradores</template>
                 <template #subtitle>{{ currentPeriodLabel }}</template>
@@ -439,7 +439,7 @@
               <!-- Top Setores -->
               <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS"
-                info-message="Ranking dos setores com melhor desempenho em resolução de tarefas no período selecionado. O ranking pode ser ordenado por % de Desempenho (que considera a taxa de resolução e o volume de tarefas), Tempo de Resolução (quanto menor, melhor) ou Taxa de Atraso (porcentagem de tickets completados após o prazo - quanto menor, melhor)."
+                info-message="Ranking dos setores com melhor desempenho em resolução de tarefas no período selecionado. O ranking pode ser ordenado por % de Desempenho (que considera a taxa de resolução e o volume de tarefas), Tempo de Resolução (quanto menor, melhor) ou Taxa de Atraso (porcentagem de tarefas enviadas para verificação após o prazo - quanto menor, melhor)."
               >
                 <template #title>Top Setores</template>
                 <template #subtitle>{{ currentPeriodLabel }}</template>
@@ -566,7 +566,7 @@
                         class="space-y-1"
                       >
                         <div class="flex justify-between items-center text-[13px]">
-                          <span class="text-gray-700 dark:text-gray-300 truncate max-w-30">{{
+                          <span class="text-gray-700 dark:text-gray-300">{{
                             dept.departmentName
                           }}</span>
                           <span class="font-medium text-gray-900 dark:text-white">
@@ -621,7 +621,7 @@
                           class="space-y-1"
                         >
                           <div class="flex justify-between items-center text-[13px]">
-                            <span class="text-gray-700 dark:text-gray-300 truncate max-w-24">{{
+                            <span class="text-gray-700 dark:text-gray-300">{{
                               formatSnakeToNaturalCase(
                                 (duration.status as any)?.key ??
                                   (duration.status as unknown as string),

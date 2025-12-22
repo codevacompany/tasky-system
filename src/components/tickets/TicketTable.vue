@@ -528,7 +528,7 @@
     <!-- Modal de Aviso de Verificação -->
     <BaseModal
       v-if="showVerificationAlert"
-      title="Ação Necessária"
+      title="Iniciar Verificação"
       @close="showVerificationAlert = false"
       :show-footer="false"
     >
@@ -537,7 +537,7 @@
           <font-awesome-icon icon="info-circle" />
         </div>
         <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed mb-6">
-          Para visualizar os detalhes deste ticket, você precisa iniciar a verificação clicando no
+          Para visualizar os detalhes desta tarefa, você precisa iniciar a verificação clicando no
           botão "Verificar".
         </p>
         <div class="flex justify-center gap-4">
@@ -1150,7 +1150,6 @@ const handleCorrectTicket = async (ticket: Ticket) => {
         await ticketService.updateStatus(ticket.customId, {
           status: DefaultTicketStatus.InProgress,
         });
-        toast.success('Tarefa em correção');
 
         await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
@@ -1224,7 +1223,6 @@ const confirmDueDate = async () => {
 
     await ticketService.accept(ticketForDueDate.value.customId);
 
-    toast.success('Prazo definido e tarefa aceita com sucesso');
     showDueDateModal.value = false;
     dueDateValue.value = '';
     ticketForDueDate.value = null;

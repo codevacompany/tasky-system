@@ -80,7 +80,7 @@ import BaseModal from './BaseModal.vue';
 import LoadingSpinner from './LoadingSpinner.vue';
 import Input from './Input.vue';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   title: string;
   message: string;
   hasInput?: boolean;
@@ -88,7 +88,15 @@ const props = defineProps<{
   showUserSelector?: boolean;
   targetUsers?: Array<{ userId: number; userName: string; order: number; departmentName?: string }>;
   loading?: boolean;
-}>();
+}>(), {
+  title: 'Ação Necessária',
+  message: '',
+  hasInput: false,
+  reasonOptions: () => [],
+  showUserSelector: false,
+  targetUsers: () => [],
+  loading: false,
+});
 
 const emit = defineEmits<{
   (e: 'confirm', data?: { reason: string; description: string; targetUserId?: number }): void;

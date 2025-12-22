@@ -172,7 +172,6 @@ export const reportService = {
     return response.data;
   },
 
-
   /**
    * Fetches ticket count distribution by status.
    * Used in ReportsPage.vue:

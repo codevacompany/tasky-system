@@ -184,7 +184,7 @@ const completeRegistration = async () => {
       password: password.value,
     });
 
-    toast.success('Cadastro finalizado com sucesso!');
+    toast.success('Cadastro finalizado com sucesso');
     router.push('/');
   } catch (error) {
     console.error('Error completing registration:', error);

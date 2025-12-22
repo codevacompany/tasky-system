@@ -2005,7 +2005,6 @@ const correctTicket = async (ticketId: string) => {
     async () => {
       try {
         await ticketService.updateStatus(ticketId, { status: DefaultTicketStatus.InProgress });
-        toast.success('Tarefa em correção');
         refreshSelectedTicket();
       } catch {
         toast.error('Erro ao iniciar correção');
@@ -2017,7 +2016,6 @@ const correctTicket = async (ticketId: string) => {
 const startCorrectionDirectly = async (ticketId: string) => {
   try {
     await ticketService.updateStatus(ticketId, { status: DefaultTicketStatus.InProgress });
-    toast.success('Tarefa em correção');
     refreshSelectedTicket();
   } catch {
     toast.error('Erro ao iniciar correção');
@@ -2743,7 +2741,7 @@ const handleFileChange = async (event: Event) => {
         uploadedUrls.push(fileUrl);
       } catch (error) {
         console.error('Erro ao fazer upload do arquivo:', file.name, error);
-        toast.error(`Erro ao fazer upload do arquivo: ${file.name}`);
+        toast.error('Erro ao fazer upload do arquivo');
         throw error; // Re-throw to stop the process
       }
     }
@@ -3057,7 +3055,7 @@ const saveAssigneeChange = async (selection: { department: any; user: any }) => 
       departmentId: null,
       userId: null,
     };
-    toast.success('Responsável alterado com sucesso!');
+    toast.success('Sucesso');
   } catch (error) {
     console.error('Erro ao alterar responsável:', error);
     toast.error('Erro ao alterar responsável');
@@ -3131,7 +3129,7 @@ const removeTargetUser = async (targetUserId: number) => {
     async () => {
       try {
         await ticketService.removeAssignee(loadedTicket.value!.customId, targetUserId);
-        toast.success('Responsável removido com sucesso!');
+        toast.success('Responsável removido com sucesso');
         await refreshSelectedTicket();
       } catch (error: any) {
         console.error('Erro ao remover responsável:', error);

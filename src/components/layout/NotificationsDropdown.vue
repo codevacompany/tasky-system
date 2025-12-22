@@ -254,7 +254,7 @@ const fetchSelectedTicket = async (notification: Notification) => {
       await fetchNotifications(1, false);
     } catch (err) {
       console.error(err);
-      toast.error('Erro ao carregar ticket.');
+      toast.error('Erro ao carregar ticket');
     }
   }
 };
