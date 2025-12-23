@@ -3,12 +3,26 @@
     class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-3 dark:shadow-none dark:border dark:border-gray-700"
   >
     <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-      <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-        Estatísticas por Setor
-      </h2>
-      <p class="text-sm text-gray-600 dark:text-gray-400">
-        Análise detalhada do desempenho de cada setor
-      </p>
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+            Estatísticas por Setor
+          </h2>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Análise detalhada do desempenho de cada setor
+          </p>
+        </div>
+        <div class="w-full sm:w-auto">
+          <Input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Buscar setor"
+            padding="tight"
+            class="w-full sm:w-80 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-400 dark:border-gray-600 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            @update:modelValue="handleSearch"
+          />
+        </div>
+      </div>
     </div>
 
     <div v-if="summary" class="p-6 border-b border-gray-200 dark:border-gray-700">
@@ -33,7 +47,7 @@
         </div>
         <div class="text-center">
           <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">
-            {{ stats.length }}
+            {{ totalItems }}
           </div>
           <div class="text-sm text-gray-600 dark:text-gray-400">Setores Ativos</div>
         </div>
@@ -41,7 +55,7 @@
     </div>
 
     <DataTable
-      :data="paginatedStats"
+      :data="stats"
       :headers="tableHeaders"
       :pagination="pagination"
       :is-loading="isLoading"
@@ -100,13 +114,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import DataTable, {
   type TableHeader,
   type PaginationInfo,
 } from '@/components/common/DataTable.vue';
+import Input from '@/components/common/Input.vue';
 import type { DepartmentStats } from '@/services/reportService';
-import { formatTimeInSecondsCompact } from '@/utils/generic-helper';
+import { formatTimeInSecondsCompact, debounce } from '@/utils/generic-helper';
 
 // Format percentage helper
 const formatPercentage = (value?: number) => {
@@ -136,6 +151,9 @@ const getOverdueBadgeClass = (rate?: number) => {
 
 interface Props {
   stats: DepartmentStats[];
+  totalItems: number;
+  currentPage: number;
+  itemsPerPage: number;
   summary: {
     totalTickets: number;
     totalResolved: number;
@@ -148,15 +166,40 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   isLoading: false,
+  stats: () => [],
+  totalItems: 0,
+  currentPage: 1,
+  itemsPerPage: 10,
 });
 
-// Pagination state
-const currentPage = ref(1);
-const itemsPerPage = 10;
+const emit = defineEmits<{
+  (e: 'page-change', page: number): void;
+  (e: 'sort-change', key: string, direction: 'asc' | 'desc'): void;
+  (e: 'search-change', query: string): void;
+}>();
 
-// Sorting state - default to sorting by resolvedTickets descending
-const sortKey = ref<string | null>('resolvedTickets');
-const sortDirection = ref<'asc' | 'desc' | 'none'>('desc');
+// Search state
+const searchQuery = ref('');
+
+// Sorting state
+const sortKey = ref<string>('efficiencyScore');
+const sortDirection = ref<'asc' | 'desc'>('desc');
+
+// Debounced search handler
+const handleSearch = debounce((value: any) => {
+  emit('search-change', value);
+}, 300);
+
+// Pagination info
+const pagination = computed<PaginationInfo>(() => {
+  const totalPages = Math.ceil(props.totalItems / props.itemsPerPage);
+  return {
+    currentPage: props.currentPage,
+    totalPages,
+    totalItems: props.totalItems,
+    itemsPerPage: props.itemsPerPage,
+  };
+});
 
 // Table headers
 const tableHeaders = computed<TableHeader<DepartmentStats>[]>(() => [
@@ -226,92 +269,27 @@ const tableHeaders = computed<TableHeader<DepartmentStats>[]>(() => [
   },
 ]);
 
-// Sorted stats
-const sortedStats = computed(() => {
-  if (!props.stats || props.stats.length === 0) return [];
-  if (!sortKey.value || sortDirection.value === 'none') return props.stats;
-
-  const sorted = [...props.stats].sort((a, b) => {
-    const aValue = (a as any)[sortKey.value!];
-    const bValue = (b as any)[sortKey.value!];
-
-    // Handle null/undefined values
-    if (aValue == null && bValue == null) return 0;
-    if (aValue == null) return 1;
-    if (bValue == null) return -1;
-
-    // Compare values
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return sortDirection.value === 'asc'
-        ? aValue.localeCompare(bValue)
-        : bValue.localeCompare(aValue);
-    }
-
-    // Numeric comparison
-    const comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-    return sortDirection.value === 'asc' ? comparison : -comparison;
-  });
-
-  return sorted;
-});
-
-// Paginated stats
-const paginatedStats = computed(() => {
-  if (!sortedStats.value) return [];
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return sortedStats.value.slice(start, end);
-});
-
-// Pagination info
-const pagination = computed<PaginationInfo | undefined>(() => {
-  if (!sortedStats.value || sortedStats.value.length === 0) return undefined;
-  const totalPages = Math.ceil(sortedStats.value.length / itemsPerPage);
-  return {
-    currentPage: currentPage.value,
-    totalPages,
-    totalItems: sortedStats.value.length,
-    itemsPerPage,
-  };
-});
-
 // Handle sort
 const handleSort = (sortKeyParam: string) => {
-  // If clicking the same column, cycle through: none -> asc -> desc -> none
   if (sortKey.value === sortKeyParam) {
-    if (sortDirection.value === 'none') {
+    if (sortDirection.value === 'desc') {
       sortDirection.value = 'asc';
     } else if (sortDirection.value === 'asc') {
-      sortDirection.value = 'desc';
-    } else {
-      // desc -> none (reset sort)
-      sortKey.value = null;
-      sortDirection.value = 'none';
+      // Reset
+      sortKey.value = '';
+      sortDirection.value = 'desc'; // Reset direction default
+      emit('sort-change', '', 'desc');
+      return;
     }
   } else {
-    // New column, start with ascending
     sortKey.value = sortKeyParam;
-    sortDirection.value = 'asc';
+    sortDirection.value = 'desc';
   }
-  // Reset to first page when sorting changes
-  currentPage.value = 1;
+  emit('sort-change', sortKey.value, sortDirection.value);
 };
 
 // Handle page change
 const handlePageChange = (page: number) => {
-  currentPage.value = page;
+  emit('page-change', page);
 };
-
-// Reset pagination when stats change (but keep default sorting)
-watch(
-  () => props.stats,
-  () => {
-    currentPage.value = 1;
-    // Keep default sorting by resolvedTickets descending
-    if (!sortKey.value) {
-      sortKey.value = 'resolvedTickets';
-      sortDirection.value = 'desc';
-    }
-  },
-);
 </script>
