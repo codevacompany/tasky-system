@@ -127,7 +127,7 @@ const props = withDefaults(defineProps<Props>(), {
   users: () => [],
   totalItems: 0,
   currentPage: 1,
-  itemsPerPage: 5,
+  itemsPerPage: 10,
 });
 
 const emit = defineEmits<{
