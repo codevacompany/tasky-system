@@ -1,5 +1,7 @@
 import apiClient from '@/utils/axiosInstance';
 import type { TicketPriority, DefaultTicketStatus } from '@/models';
+import type { PaginatedResponse } from '@/types/http';
+export type { PaginatedResponse };
 
 export interface TenantStatistics {
   totalTickets: number;
@@ -322,6 +324,26 @@ export const reportService = {
     return response.data;
   },
 
+  async getUserStatsList(
+    page = 1,
+    limit = 10,
+    search = '',
+    period?: string,
+    sortBy: 'efficiency' | 'resolution_time' | 'overdue_rate' = 'efficiency',
+    sortDirection: 'asc' | 'desc' = 'desc',
+  ): Promise<PaginatedResponse<UserRankingItemDto>> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      search,
+      sortBy,
+      sortDirection,
+    });
+    if (period) params.append('period', period);
+    const response = await apiClient.get(`/stats/user-stats-list?${params.toString()}`);
+    return response.data;
+  },
+
   /**
    * Fetches performance trends data (total created vs resolved).
    * Currently not used in ReportsPage.vue (reserved for future performance analysis features).
@@ -332,4 +354,24 @@ export const reportService = {
     });
     return response.data;
   },
+  async getDepartmentStatsList(
+    page = 1,
+    limit = 10,
+    search = '',
+    period?: string,
+    sortBy: string = 'efficiencyScore',
+    sortDirection: 'asc' | 'desc' = 'desc',
+  ): Promise<PaginatedResponse<DepartmentStats>> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      search,
+      sortBy,
+      sortDirection,
+    });
+    if (period) params.append('period', period);
+    const response = await apiClient.get(`/stats/department-stats-list?${params.toString()}`);
+    return response.data;
+  },
 };
+

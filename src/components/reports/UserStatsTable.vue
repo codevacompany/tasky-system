@@ -19,51 +19,16 @@
             placeholder="Buscar colaborador"
             padding="tight"
             class="w-full sm:w-80 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-400 dark:border-gray-600 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            @update:modelValue="handleSearch"
           />
         </div>
       </div>
     </div>
 
-    <div
-      v-if="summary && filteredUsers.length > 0"
-      class="p-6 border-b border-gray-200 dark:border-gray-700"
-    >
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <div class="text-center">
-          <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">
-            {{ filteredUsers.length }}
-          </div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">Colaboradores</div>
-        </div>
-        <div class="text-center">
-          <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-            {{ summary.totalTickets }}
-          </div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">Tickets</div>
-        </div>
-        <div class="text-center">
-          <div class="text-2xl font-bold text-green-600 dark:text-green-400">
-            {{ summary.totalResolved }}
-          </div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">Resolvidos</div>
-        </div>
-        <div class="text-center">
-          <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
-            {{ formatTimeInSecondsCompact(summary.averageAcceptanceTimeSeconds) }}
-          </div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">Tempo Médio de Aceite</div>
-        </div>
-        <div class="text-center">
-          <div class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-            {{ formatTimeInSecondsCompact(summary.averageResolutionTimeSeconds) }}
-          </div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">Tempo Médio de Resolução</div>
-        </div>
-      </div>
-    </div>
+    <!-- Summary section removed as it requires full dataset aggregation which is not available with server-side pagination -->
 
     <DataTable
-      :data="paginatedUsers"
+      :data="users"
       :headers="tableHeaders"
       :pagination="pagination"
       :is-loading="isLoading"
@@ -138,17 +103,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import DataTable, {
   type TableHeader,
   type PaginationInfo,
 } from '@/components/common/DataTable.vue';
 import Input from '@/components/common/Input.vue';
 import type { UserRankingItemDto } from '@/services/reportService';
-import { formatTimeInSecondsCompact } from '@/utils/generic-helper';
+import { formatTimeInSecondsCompact, debounce } from '@/utils/generic-helper';
 
 interface Props {
   users: UserRankingItemDto[];
+  totalItems: number;
+  currentPage: number;
+  itemsPerPage: number;
   averageResolutionTimeSeconds?: number;
   averageAcceptanceTimeSeconds?: number;
   isLoading?: boolean;
@@ -156,38 +124,38 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   isLoading: false,
+  users: () => [],
+  totalItems: 0,
+  currentPage: 1,
+  itemsPerPage: 5,
 });
+
+const emit = defineEmits<{
+  (e: 'page-change', page: number): void;
+  (e: 'sort-change', key: string, direction: 'asc' | 'desc'): void;
+  (e: 'search-change', query: string): void;
+}>();
 
 // Search state
 const searchQuery = ref('');
 
-// Pagination state
-const currentPage = ref(1);
-const itemsPerPage = 10;
-
 // Sorting state
-const sortKey = ref<string | null>(null);
-const sortDirection = ref<'asc' | 'desc' | 'none'>('none');
+const sortKey = ref<string>('efficiencyScore');
+const sortDirection = ref<'asc' | 'desc'>('desc');
 
-// Filtered users based on search
-const filteredUsers = computed(() => {
-  const q = searchQuery.value.trim().toLowerCase();
-  if (!q) return props.users;
-  return props.users.filter((u) => `${u.firstName} ${u.lastName}`.toLowerCase().includes(q));
-});
+// Debounced search handler
+const handleSearch = debounce((value: any) => {
+  emit('search-change', value);
+}, 300);
 
-// Summary computed from filtered users
-const summary = computed(() => {
-  if (!filteredUsers.value || filteredUsers.value.length === 0) return null;
-
-  const totalTickets = filteredUsers.value.reduce((acc, u) => acc + (u.totalTickets || 0), 0);
-  const totalResolved = filteredUsers.value.reduce((acc, u) => acc + (u.resolvedTickets || 0), 0);
-
+// Pagination info
+const pagination = computed<PaginationInfo>(() => {
+  const totalPages = Math.ceil(props.totalItems / props.itemsPerPage);
   return {
-    totalTickets,
-    totalResolved,
-    averageResolutionTimeSeconds: props.averageResolutionTimeSeconds || 0,
-    averageAcceptanceTimeSeconds: props.averageAcceptanceTimeSeconds || 0,
+    currentPage: props.currentPage,
+    totalPages,
+    totalItems: props.totalItems,
+    itemsPerPage: props.itemsPerPage,
   };
 });
 
@@ -249,73 +217,28 @@ const tableHeaders = computed<TableHeader<UserRankingItemDto>[]>(() => [
   },
 ]);
 
-// Sorted users
-const sortedUsers = computed(() => {
-  if (!filteredUsers.value || filteredUsers.value.length === 0) return [];
-  if (!sortKey.value || sortDirection.value === 'none') return filteredUsers.value;
-
-  const sorted = [...filteredUsers.value].sort((a, b) => {
-    const aValue = (a as any)[sortKey.value!];
-    const bValue = (b as any)[sortKey.value!];
-
-    // Handle null/undefined values
-    if (aValue == null && bValue == null) return 0;
-    if (aValue == null) return 1;
-    if (bValue == null) return -1;
-
-    // Numeric comparison
-    const comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-    return sortDirection.value === 'asc' ? comparison : -comparison;
-  });
-
-  return sorted;
-});
-
-// Paginated users
-const paginatedUsers = computed(() => {
-  if (!sortedUsers.value) return [];
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return sortedUsers.value.slice(start, end);
-});
-
-// Pagination info
-const pagination = computed<PaginationInfo | undefined>(() => {
-  if (!sortedUsers.value || sortedUsers.value.length === 0) return undefined;
-  const totalPages = Math.ceil(sortedUsers.value.length / itemsPerPage);
-  return {
-    currentPage: currentPage.value,
-    totalPages,
-    totalItems: sortedUsers.value.length,
-    itemsPerPage,
-  };
-});
-
 // Handle sort
 const handleSort = (sortKeyParam: string) => {
-  // If clicking the same column, cycle through: none -> asc -> desc -> none
   if (sortKey.value === sortKeyParam) {
-    if (sortDirection.value === 'none') {
+    if (sortDirection.value === 'desc') {
       sortDirection.value = 'asc';
     } else if (sortDirection.value === 'asc') {
-      sortDirection.value = 'desc';
-    } else {
-      // desc -> none (reset sort)
-      sortKey.value = null;
-      sortDirection.value = 'none';
+      // Reset
+      sortKey.value = '';
+      sortDirection.value = 'desc'; // Reset direction default
+      emit('sort-change', '', 'desc');
+      return;
     }
   } else {
-    // New column, start with ascending
     sortKey.value = sortKeyParam;
-    sortDirection.value = 'asc';
+    sortDirection.value = 'desc'; // Default to desc for stats usually
   }
-  // Reset to first page when sorting changes
-  currentPage.value = 1;
+  emit('sort-change', sortKey.value, sortDirection.value);
 };
 
 // Handle page change
 const handlePageChange = (page: number) => {
-  currentPage.value = page;
+  emit('page-change', page);
 };
 
 // Format percentage helper
@@ -330,25 +253,10 @@ const formatOverdueRate = (value?: number) => {
   return `${value.toFixed(1)}%`;
 };
 
-// Get resolution rate badge class
-const getResolutionRateBadgeClass = (rate?: number) => {
-  if (rate === undefined) return 'bg-gray-100 text-gray-800';
-
-  const percentage = rate * 100;
-
-  if (percentage >= 70) {
-    return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-  } else if (percentage >= 40) {
-    return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-  } else {
-    return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-  }
-};
-
 // Get overdue rate badge class
 const getOverdueBadgeClass = (rate?: number) => {
   if (rate === undefined || rate === null)
-    return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+  return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
 
   // Lower is better for overdue rate
   if (rate <= 10) {
@@ -371,16 +279,6 @@ const getInitials = (firstName: string, lastName: string): string => {
 const getAvatarColorClass = (userId: number): string => {
   return 'avatar-blue';
 };
-
-// Reset pagination when users or search changes
-watch(
-  () => [props.users, searchQuery.value],
-  () => {
-    currentPage.value = 1;
-    sortKey.value = null;
-    sortDirection.value = 'none';
-  },
-);
 </script>
 
 <style scoped>
