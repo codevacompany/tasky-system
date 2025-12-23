@@ -366,20 +366,26 @@
                     <div
                       v-for="i in 5"
                       :key="`skeleton-${i}`"
-                      class="grid grid-cols-3 gap-4 items-center py-3 animate-pulse"
+                      class="grid grid-cols-3 gap-4 items-center py-3"
                     >
                       <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                        <div
+                          class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse-custom"
+                        ></div>
                         <div class="hidden sm:block space-y-2 flex-1">
-                          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                          <div
+                            class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse-custom"
+                          ></div>
                         </div>
                       </div>
                       <div class="text-center">
-                        <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mx-auto"></div>
+                        <div
+                          class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mx-auto animate-pulse-custom"
+                        ></div>
                       </div>
                       <div class="text-center">
                         <div
-                          class="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16 mx-auto"
+                          class="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16 mx-auto animate-pulse-custom"
                         ></div>
                       </div>
                     </div>
@@ -507,20 +513,26 @@
                     <div
                       v-for="i in 5"
                       :key="`skeleton-dept-${i}`"
-                      class="grid grid-cols-3 gap-4 items-center py-3 animate-pulse"
+                      class="grid grid-cols-3 gap-4 items-center py-3"
                     >
                       <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                        <div
+                          class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse-custom"
+                        ></div>
                         <div class="space-y-2 flex-1">
-                          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                          <div
+                            class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse-custom"
+                          ></div>
                         </div>
                       </div>
                       <div class="text-center">
-                        <div class="h-6 bg-gray-200 dark:bg-gray-700 rounded w-12 mx-auto"></div>
+                        <div
+                          class="h-6 bg-gray-200 dark:bg-gray-700 rounded w-12 mx-auto animate-pulse-custom"
+                        ></div>
                       </div>
                       <div class="text-center">
                         <div
-                          class="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16 mx-auto"
+                          class="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16 mx-auto animate-pulse-custom"
                         ></div>
                       </div>
                     </div>
