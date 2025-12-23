@@ -2341,7 +2341,7 @@ const loadData = async () => {
         false,
         'top',
         selectedStatsPeriod.value as StatsPeriod,
-        'efficiencyScore',
+        'efficiency',
       ), // Melhor Desempenho - always sorted by efficiency
     ]);
 
