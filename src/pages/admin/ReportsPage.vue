@@ -361,7 +361,34 @@
                   </div>
 
                   <!-- Table Content -->
-                  <div v-if="topFiveUsers && topFiveUsers.users.length > 0" class="space-y-4 mt-4">
+                  <!-- Loading Skeleton -->
+                  <div v-if="topUsersLoading" class="space-y-4 mt-4">
+                    <div
+                      v-for="i in 5"
+                      :key="`skeleton-${i}`"
+                      class="grid grid-cols-3 gap-4 items-center py-3 animate-pulse"
+                    >
+                      <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                        <div class="hidden sm:block space-y-2 flex-1">
+                          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                        </div>
+                      </div>
+                      <div class="text-center">
+                        <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mx-auto"></div>
+                      </div>
+                      <div class="text-center">
+                        <div
+                          class="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16 mx-auto"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    v-else-if="topFiveUsers && topFiveUsers.users.length > 0"
+                    class="space-y-4 mt-4"
+                  >
                     <div
                       v-for="user in topFiveUsers.users"
                       :key="user.userId"
@@ -475,8 +502,32 @@
                   </div>
 
                   <!-- Table Content -->
+                  <!-- Loading Skeleton -->
+                  <div v-if="topDepartmentsLoading" class="space-y-4 mt-4">
+                    <div
+                      v-for="i in 5"
+                      :key="`skeleton-dept-${i}`"
+                      class="grid grid-cols-3 gap-4 items-center py-3 animate-pulse"
+                    >
+                      <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                        <div class="space-y-2 flex-1">
+                          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                        </div>
+                      </div>
+                      <div class="text-center">
+                        <div class="h-6 bg-gray-200 dark:bg-gray-700 rounded w-12 mx-auto"></div>
+                      </div>
+                      <div class="text-center">
+                        <div
+                          class="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16 mx-auto"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
                   <div
-                    v-if="topFiveDepartments && topFiveDepartments.length > 0"
+                    v-else-if="topFiveDepartments && topFiveDepartments.length > 0"
                     class="space-y-4 mt-4"
                   >
                     <div
@@ -2214,6 +2265,8 @@ const handleDepartmentStatsSearchChange = (query: string) => {
 
 const topUsersSortBy = ref<'efficiency' | 'resolution_time' | 'overdue_rate'>('efficiency');
 const topDepartmentsSortBy = ref<'efficiency' | 'resolution_time' | 'overdue_rate'>('efficiency');
+const topUsersLoading = ref(false);
+const topDepartmentsLoading = ref(false);
 const topPerformers = computed(() => {
   if (!topUsers.value?.users) return [];
   return [...topUsers.value.users]
@@ -3054,6 +3107,7 @@ const handlePeriodChange = () => {
 
 const handleTopUsersSortByChange = async () => {
   // Reload only the topFiveUsers data when sortBy changes
+  topUsersLoading.value = true;
   try {
     const topFiveUsersResult = await reportService.getTopUsers(
       5,
@@ -3065,11 +3119,14 @@ const handleTopUsersSortByChange = async () => {
     topFiveUsers.value = topFiveUsersResult;
   } catch (err: unknown) {
     console.error('Erro ao carregar top colaboradores:', err);
+  } finally {
+    topUsersLoading.value = false;
   }
 };
 
 const handleTopDepartmentsSortByChange = async () => {
   // Reload department stats when sortBy changes
+  topDepartmentsLoading.value = true;
   try {
     const departmentStatsResult = await reportService.getTenantDepartmentsStatistics(
       selectedStatsPeriod.value as StatsPeriod,
@@ -3086,6 +3143,8 @@ const handleTopDepartmentsSortByChange = async () => {
     }));
   } catch (err: unknown) {
     console.error('Erro ao carregar estatísticas de setores:', err);
+  } finally {
+    topDepartmentsLoading.value = false;
   }
 };
 
