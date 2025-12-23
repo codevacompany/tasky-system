@@ -185,7 +185,7 @@ const createUser = async () => {
   try {
     await userService.create(userData.value);
     emit('userCreated');
-    toast.success('Colaborador criado com sucesso!');
+    toast.success('Criado com sucesso!');
     closeModal();
   } catch (error) {
     console.error(error);

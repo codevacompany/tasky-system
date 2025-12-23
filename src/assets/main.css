@@ -612,6 +612,21 @@ body.dark-mode .section-content h1 {
   }
 }
 
+/* Skeleton loading animation - fades opacity without changing size */
+@keyframes fadeInOut {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-pulse-custom {
+  animation: fadeInOut 2s ease-in-out infinite;
+}
+
 /* Tabela de tickets */
 .tickets-table-container {
   position: relative;

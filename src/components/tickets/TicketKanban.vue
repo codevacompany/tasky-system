@@ -267,7 +267,7 @@
     :is-open="showVerificationAlert"
     @close="showVerificationAlert = false"
     :show-footer="false"
-    title="Ação Necessária"
+    title="Iniciar Verificação"
   >
     <div class="p-6 text-center">
       <div class="text-3xl text-purple-700 dark:text-purple-400 mb-4">

@@ -591,7 +591,7 @@ const changePassword = async () => {
       newPassword: passwordForm.newPassword,
     });
 
-    toast.success('Senha alterada com sucesso!');
+    toast.success('Senha alterada com sucesso');
     closeChangePasswordModal();
   } catch (error: any) {
     console.error('Error changing password:', error);

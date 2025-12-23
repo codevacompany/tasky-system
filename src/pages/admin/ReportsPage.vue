@@ -325,7 +325,7 @@
               <!-- Top Contributors -->
               <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_USERS_ANALYTICS"
-                info-message="Ranking dos colaboradores com melhor desempenho em resolução de tarefas no período selecionado. O ranking pode ser ordenado por % de Desempenho (que considera a taxa de resolução e o volume de tarefas), Tempo de Resolução (quanto menor, melhor) ou Taxa de Atraso (porcentagem de tickets completados após o prazo - quanto menor, melhor)."
+                info-message="Ranking dos colaboradores com melhor desempenho em resolução de tarefas no período selecionado. O ranking pode ser ordenado por % de Desempenho (que considera a taxa de resolução e o volume de tarefas), Tempo de Resolução (quanto menor, melhor) ou Taxa de Atraso (porcentagem de tarefas enviadas para verificação após o prazo - quanto menor, melhor)."
               >
                 <template #title>Top Colaboradores</template>
                 <template #subtitle>{{ currentPeriodLabel }}</template>
@@ -361,7 +361,40 @@
                   </div>
 
                   <!-- Table Content -->
-                  <div v-if="topFiveUsers && topFiveUsers.users.length > 0" class="space-y-4 mt-4">
+                  <!-- Loading Skeleton -->
+                  <div v-if="topUsersLoading" class="space-y-4 mt-4">
+                    <div
+                      v-for="i in 5"
+                      :key="`skeleton-${i}`"
+                      class="grid grid-cols-3 gap-4 items-center py-3"
+                    >
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse-custom"
+                        ></div>
+                        <div class="hidden sm:block space-y-2 flex-1">
+                          <div
+                            class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse-custom"
+                          ></div>
+                        </div>
+                      </div>
+                      <div class="text-center">
+                        <div
+                          class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mx-auto animate-pulse-custom"
+                        ></div>
+                      </div>
+                      <div class="text-center">
+                        <div
+                          class="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16 mx-auto animate-pulse-custom"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    v-else-if="topFiveUsers && topFiveUsers.users.length > 0"
+                    class="space-y-4 mt-4"
+                  >
                     <div
                       v-for="user in topFiveUsers.users"
                       :key="user.userId"
@@ -439,7 +472,7 @@
               <!-- Top Setores -->
               <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS"
-                info-message="Ranking dos setores com melhor desempenho em resolução de tarefas no período selecionado. O ranking pode ser ordenado por % de Desempenho (que considera a taxa de resolução e o volume de tarefas), Tempo de Resolução (quanto menor, melhor) ou Taxa de Atraso (porcentagem de tickets completados após o prazo - quanto menor, melhor)."
+                info-message="Ranking dos setores com melhor desempenho em resolução de tarefas no período selecionado. O ranking pode ser ordenado por % de Desempenho (que considera a taxa de resolução e o volume de tarefas), Tempo de Resolução (quanto menor, melhor) ou Taxa de Atraso (porcentagem de tarefas enviadas para verificação após o prazo - quanto menor, melhor)."
               >
                 <template #title>Top Setores</template>
                 <template #subtitle>{{ currentPeriodLabel }}</template>
@@ -475,8 +508,38 @@
                   </div>
 
                   <!-- Table Content -->
+                  <!-- Loading Skeleton -->
+                  <div v-if="topDepartmentsLoading" class="space-y-4 mt-4">
+                    <div
+                      v-for="i in 5"
+                      :key="`skeleton-dept-${i}`"
+                      class="grid grid-cols-3 gap-4 items-center py-3"
+                    >
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse-custom"
+                        ></div>
+                        <div class="space-y-2 flex-1">
+                          <div
+                            class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse-custom"
+                          ></div>
+                        </div>
+                      </div>
+                      <div class="text-center">
+                        <div
+                          class="h-6 bg-gray-200 dark:bg-gray-700 rounded w-12 mx-auto animate-pulse-custom"
+                        ></div>
+                      </div>
+                      <div class="text-center">
+                        <div
+                          class="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-16 mx-auto animate-pulse-custom"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
                   <div
-                    v-if="topFiveDepartments && topFiveDepartments.length > 0"
+                    v-else-if="topFiveDepartments && topFiveDepartments.length > 0"
                     class="space-y-4 mt-4"
                   >
                     <div
@@ -566,7 +629,7 @@
                         class="space-y-1"
                       >
                         <div class="flex justify-between items-center text-[13px]">
-                          <span class="text-gray-700 dark:text-gray-300 truncate max-w-30">{{
+                          <span class="text-gray-700 dark:text-gray-300">{{
                             dept.departmentName
                           }}</span>
                           <span class="font-medium text-gray-900 dark:text-white">
@@ -621,7 +684,7 @@
                           class="space-y-1"
                         >
                           <div class="flex justify-between items-center text-[13px]">
-                            <span class="text-gray-700 dark:text-gray-300 truncate max-w-24">{{
+                            <span class="text-gray-700 dark:text-gray-300">{{
                               formatSnakeToNaturalCase(
                                 (duration.status as any)?.key ??
                                   (duration.status as unknown as string),
@@ -1071,9 +1134,15 @@
             <template v-if="hasPermission(PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS)">
               <!-- Department Summary Card -->
               <DepartmentStatsTable
-                :stats="departmentStats"
+                :stats="departmentStatsData?.items || []"
+                :total-items="departmentStatsData?.total || 0"
+                :current-page="departmentStatsPage"
+                :items-per-page="departmentStatsLimit"
                 :summary="departmentStatsSummary"
-                :is-loading="loading"
+                :is-loading="departmentStatsLoading"
+                @page-change="handleDepartmentStatsPageChange"
+                @sort-change="handleDepartmentStatsSortChange"
+                @search-change="handleDepartmentStatsSearchChange"
               />
 
               <!-- Top Performing vs Underperforming Departments -->
@@ -1183,10 +1252,16 @@
             <template v-if="hasPermission(PERMISSIONS.VIEW_USERS_ANALYTICS)">
               <!-- Users Summary Card -->
               <UserStatsTable
-                :users="topUsers?.users || []"
+                :users="userStatsData?.items || []"
+                :total-items="userStatsData?.total || 0"
+                :current-page="userStatsPage"
+                :items-per-page="userStatsLimit"
                 :average-resolution-time-seconds="statistics?.averageResolutionTimeSeconds"
                 :average-acceptance-time-seconds="statistics?.averageAcceptanceTimeSeconds"
-                :is-loading="loading"
+                :is-loading="userStatsLoading"
+                @page-change="handleUserStatsPageChange"
+                @sort-change="handleUserStatsSortChange"
+                @search-change="handleUserStatsSearchChange"
               />
 
               <!-- Top vs Underperforming Users -->
@@ -1242,7 +1317,7 @@
                 </BaseStatsWidget>
 
                 <BaseStatsWidget
-                  info-message="Esta seção mostra os colaboradores que necessitam de melhoria em termos de % de Desempenho. Os colaboradores são ordenados pela menor % de Desempenho, calculado usando o método Wilson Score, que considera a taxa de resolução e o volume de tarefas."
+                  info-message="Esta seção mostra os colaboradores que necessitam de melhoria em termos de % de Desempenho. Os colaboradores são ordenados pela menor % de Desempenho, calculado usando o método Wilson Score, que considera a taxa de resolução e o volume de tarefas (Colaboradores sem dados não são exibidos)."
                 >
                   <template #title>Pior Desempenho</template>
                   <template #subtitle>Colaboradores com menor % de Desempenho</template>
@@ -1734,6 +1809,8 @@ import type {
   StatusDurationTimeSeriesResponseDto,
   StatusDurationTimePointDto,
   UserRankingResponseDto,
+  PaginatedResponse,
+  UserRankingItemDto,
 } from '@/services/reportService';
 import { TicketActionType, DefaultTicketStatus, type TicketUpdate } from '@/models';
 import DatePicker from 'vue-datepicker-next';
@@ -2100,8 +2177,108 @@ const error = ref<string | null>(null);
 const topUsers = ref<UserRankingResponseDto | null>(null);
 const topFiveUsers = ref<UserRankingResponseDto | null>(null);
 const worstFiveUsers = ref<UserRankingResponseDto | null>(null);
+
+// User Stats Table State
+const userStatsPage = ref(1);
+const userStatsLimit = ref(10);
+const userStatsSortBy = ref('efficiencyScore');
+const userStatsSortDirection = ref<'asc' | 'desc'>('desc');
+const userStatsSearch = ref('');
+const userStatsData = ref<PaginatedResponse<UserRankingItemDto> | null>(null);
+const userStatsLoading = ref(false);
+
+const fetchUserStatsTable = async () => {
+  userStatsLoading.value = true;
+  try {
+    userStatsData.value = await reportService.getUserStatsList(
+      userStatsPage.value,
+      userStatsLimit.value,
+      userStatsSearch.value,
+      selectedStatsPeriod.value,
+      userStatsSortBy.value as any,
+      userStatsSortDirection.value,
+    );
+  } catch (err) {
+    console.error('Error fetching user stats:', err);
+  } finally {
+    userStatsLoading.value = false;
+  }
+};
+
+const handleUserStatsPageChange = (newPage: number) => {
+  userStatsPage.value = newPage;
+  fetchUserStatsTable();
+};
+
+const handleUserStatsSortChange = (field: string, direction: 'asc' | 'desc') => {
+  userStatsSortBy.value = field;
+  userStatsSortDirection.value = direction;
+  fetchUserStatsTable();
+};
+
+const handleUserStatsSearchChange = (query: string) => {
+  userStatsSearch.value = query;
+  userStatsPage.value = 1; // Reset to first page on search
+  fetchUserStatsTable();
+};
+
+watch(selectedStatsPeriod, () => {
+  // refresh user and department stats if needed
+  if (userStatsData.value) {
+    fetchUserStatsTable();
+  }
+  if (departmentStatsData.value) {
+    fetchDepartmentStatsTable();
+  }
+});
+// Department Stats Table State
+const departmentStatsPage = ref(1);
+const departmentStatsLimit = ref(10);
+const departmentStatsSortBy = ref('efficiencyScore');
+const departmentStatsSortDirection = ref<'asc' | 'desc'>('desc');
+const departmentStatsSearch = ref('');
+const departmentStatsData = ref<PaginatedResponse<DepartmentStats> | null>(null);
+const departmentStatsLoading = ref(false);
+
+const fetchDepartmentStatsTable = async () => {
+  departmentStatsLoading.value = true;
+  try {
+    departmentStatsData.value = await reportService.getDepartmentStatsList(
+      departmentStatsPage.value,
+      departmentStatsLimit.value,
+      departmentStatsSearch.value,
+      selectedStatsPeriod.value,
+      departmentStatsSortBy.value,
+      departmentStatsSortDirection.value,
+    );
+  } catch (err) {
+    console.error('Error fetching department stats:', err);
+  } finally {
+    departmentStatsLoading.value = false;
+  }
+};
+
+const handleDepartmentStatsPageChange = (newPage: number) => {
+  departmentStatsPage.value = newPage;
+  fetchDepartmentStatsTable();
+};
+
+const handleDepartmentStatsSortChange = (field: string, direction: 'asc' | 'desc') => {
+  departmentStatsSortBy.value = field;
+  departmentStatsSortDirection.value = direction;
+  fetchDepartmentStatsTable();
+};
+
+const handleDepartmentStatsSearchChange = (query: string) => {
+  departmentStatsSearch.value = query;
+  departmentStatsPage.value = 1; // Reset to first page on search
+  fetchDepartmentStatsTable();
+};
+
 const topUsersSortBy = ref<'efficiency' | 'resolution_time' | 'overdue_rate'>('efficiency');
 const topDepartmentsSortBy = ref<'efficiency' | 'resolution_time' | 'overdue_rate'>('efficiency');
+const topUsersLoading = ref(false);
+const topDepartmentsLoading = ref(false);
 const topPerformers = computed(() => {
   if (!topUsers.value?.users) return [];
   return [...topUsers.value.users]
@@ -2190,9 +2367,9 @@ const loadData = async () => {
       departmentStatsResult,
       resolutionTimeResult,
       inProgressTimeSeriesResult,
-      allUsersResult,
       topFiveUsersResult,
       worstFiveUsersResult,
+      topEfficiencyUsersResult,
     ] = await Promise.all([
       reportService.getTenantStatistics({
         period: selectedStatsPeriod.value as StatsPeriod,
@@ -2217,13 +2394,6 @@ const loadData = async () => {
         selectedInProgressPeriod.value,
       ),
       reportService.getTopUsers(
-        undefined,
-        true,
-        'top',
-        selectedStatsPeriod.value as StatsPeriod,
-        topUsersSortBy.value,
-      ), // fetch all users with stats for Colaboradores tab - uses global period filter
-      reportService.getTopUsers(
         5,
         false,
         'top',
@@ -2231,7 +2401,17 @@ const loadData = async () => {
         topUsersSortBy.value,
       ), // Top Colaboradores in Visão Geral - uses global period filter
       reportService.getTopUsers(5, false, 'bottom', selectedStatsPeriod.value as StatsPeriod), // Pior Desempenho - uses global period filter
+      reportService.getTopUsers(
+        5,
+        false,
+        'top',
+        selectedStatsPeriod.value as StatsPeriod,
+        'efficiency',
+      ), // Melhor Desempenho - always sorted by efficiency
     ]);
+
+    // Fetch initial department stats table data
+    fetchDepartmentStatsTable();
 
     // Initialize trendData with the current period data
     trendData.value = trends[selectedTrendPeriod.value];
@@ -2312,9 +2492,12 @@ const loadData = async () => {
 
     inProgressTimeSeries.value = inProgressTimeSeriesResult;
 
-    topUsers.value = allUsersResult; // All users for Colaboradores tab
-    topFiveUsers.value = topFiveUsersResult; // Top 5 for Visão Geral tab
+    topFiveUsers.value = topFiveUsersResult; // Top 5 for Visão Geral
+
+    // Fetch initial user stats table data
+    fetchUserStatsTable();
     worstFiveUsers.value = worstFiveUsersResult; // Worst 5 for Pior Desempenho section
+    topUsers.value = topEfficiencyUsersResult; // Top efficiency for Melhor Desempenho section
   } catch (err: unknown) {
     console.error('Erro ao carregar dados dos relatórios:', err);
     error.value = 'Ocorreu um erro ao carregar os dados. Por favor, tente novamente.';
@@ -2672,9 +2855,17 @@ const departmentStats = computed(() => departmentData.value);
 const topFiveDepartments = computed(() => {
   if (!departmentStats.value) return [];
 
-  return [...departmentStats.value]
-    .sort((a, b) => b.efficiencyScore - a.efficiencyScore)
-    .slice(0, 5);
+  const copy = [...departmentStats.value];
+
+  if (topDepartmentsSortBy.value === 'resolution_time') {
+    return copy
+      .sort((a, b) => (a.averageResolutionTimeSeconds || 0) - (b.averageResolutionTimeSeconds || 0))
+      .slice(0, 5);
+  } else if (topDepartmentsSortBy.value === 'overdue_rate') {
+    return copy.sort((a, b) => (a.overdueRate || 0) - (b.overdueRate || 0)).slice(0, 5);
+  } else {
+    return copy.sort((a, b) => b.efficiencyScore - a.efficiencyScore).slice(0, 5);
+  }
 });
 
 const sortedDepartmentsByResolutionTime = computed(() => {
@@ -2928,6 +3119,7 @@ const handlePeriodChange = () => {
 
 const handleTopUsersSortByChange = async () => {
   // Reload only the topFiveUsers data when sortBy changes
+  topUsersLoading.value = true;
   try {
     const topFiveUsersResult = await reportService.getTopUsers(
       5,
@@ -2939,11 +3131,14 @@ const handleTopUsersSortByChange = async () => {
     topFiveUsers.value = topFiveUsersResult;
   } catch (err: unknown) {
     console.error('Erro ao carregar top colaboradores:', err);
+  } finally {
+    topUsersLoading.value = false;
   }
 };
 
 const handleTopDepartmentsSortByChange = async () => {
   // Reload department stats when sortBy changes
+  topDepartmentsLoading.value = true;
   try {
     const departmentStatsResult = await reportService.getTenantDepartmentsStatistics(
       selectedStatsPeriod.value as StatsPeriod,
@@ -2960,6 +3155,8 @@ const handleTopDepartmentsSortByChange = async () => {
     }));
   } catch (err: unknown) {
     console.error('Erro ao carregar estatísticas de setores:', err);
+  } finally {
+    topDepartmentsLoading.value = false;
   }
 };
 
