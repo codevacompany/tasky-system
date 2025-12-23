@@ -2672,9 +2672,15 @@ const departmentStats = computed(() => departmentData.value);
 const topFiveDepartments = computed(() => {
   if (!departmentStats.value) return [];
 
-  return [...departmentStats.value]
-    .sort((a, b) => b.efficiencyScore - a.efficiencyScore)
-    .slice(0, 5);
+  const copy = [...departmentStats.value];
+  
+  if (topDepartmentsSortBy.value === 'resolution_time') {
+    return copy.sort((a, b) => (a.averageResolutionTimeSeconds || 0) - (b.averageResolutionTimeSeconds || 0)).slice(0, 5);
+  } else if (topDepartmentsSortBy.value === 'overdue_rate') {
+    return copy.sort((a, b) => (a.overdueRate || 0) - (b.overdueRate || 0)).slice(0, 5);
+  } else {
+    return copy.sort((a, b) => b.efficiencyScore - a.efficiencyScore).slice(0, 5);
+  }
 });
 
 const sortedDepartmentsByResolutionTime = computed(() => {
