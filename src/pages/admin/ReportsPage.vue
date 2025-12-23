@@ -2117,7 +2117,7 @@ const worstFiveUsers = ref<UserRankingResponseDto | null>(null);
 
 // User Stats Table State
 const userStatsPage = ref(1);
-const userStatsLimit = ref(5);
+const userStatsLimit = ref(10);
 const userStatsSortBy = ref('efficiencyScore');
 const userStatsSortDirection = ref<'asc' | 'desc'>('desc');
 const userStatsSearch = ref('');
