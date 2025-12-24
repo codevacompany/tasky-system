@@ -591,18 +591,18 @@
                 <button
                   v-if="canEditTicket"
                   class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 dark:border-gray-600 gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
-                  @click="openFileInput"
-                  title="Anexar arquivo"
-                >
-                  <font-awesome-icon icon="paperclip" class="text-sm" /> Anexo
-                </button>
-                <button
-                  v-if="canEditTicket"
-                  class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 dark:border-gray-600 gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
                   @click="scrollToTarefas"
                   title="Tarefas"
                 >
                   <font-awesome-icon icon="tasks" class="text-sm" /> Subtarefas
+                </button>
+                <button
+                  v-if="canEditTicket"
+                  class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 dark:border-gray-600 gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
+                  @click="openFileInput"
+                  title="Anexar arquivo"
+                >
+                  <font-awesome-icon icon="paperclip" class="text-sm" /> Anexos
                 </button>
               </div>
             </div>
@@ -2574,7 +2574,6 @@ const loadChecklistItems = async () => {
 const scrollToTarefas = async () => {
   showTarefasSection.value = true;
   await nextTick();
-  await nextTick(); // Double nextTick to ensure DOM is updated
   if (tarefasSectionRef.value) {
     tarefasSectionRef.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
 

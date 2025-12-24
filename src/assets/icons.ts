@@ -103,6 +103,7 @@ import {
   faAnglesUp,
   faEquals,
   faArchive,
+  faArrowLeft,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -219,6 +220,7 @@ const icons = [
   faEquals,
   faArchive,
   faCommentRegular,
+  faArrowLeft,
 ];
 
 library.add(...icons);

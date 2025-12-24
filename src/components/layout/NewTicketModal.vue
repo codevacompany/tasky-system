@@ -1,152 +1,393 @@
 <template>
   <BaseModal
-    title="Nova Tarefa"
+    :hasCustomHeader="true"
     @close="closeModal"
-    @cancel="resetForm"
-    @confirm="handleSubmit"
-    :confirmButtonText="'Criar Tarefa'"
-    :cancelButtonText="'Cancelar'"
     :closeOnClickOutside="false"
     :confirmButtonLoading="isLoading"
   >
-    <form @submit.prevent="handleSubmit" class="w-full -mt-2.5 -mb-1">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5 mb-4">
-        <div class="col-span-1 md:col-span-3 flex flex-col gap-1.5">
-          <label for="title" class="text-sm text-gray-800 dark:text-gray-200"
-            >Assunto: <span class="text-red-500">*</span></label
-          >
-          <Input id="title" v-model="formData.name" required />
-        </div>
-
-        <div class="col-span-1 flex flex-col gap-1.5">
-          <label class="text-sm text-gray-800 dark:text-gray-200"
-            >Prioridade: <span class="text-red-500">*</span></label
-          >
-          <Select
-            :options="priorityOptions"
-            :modelValue="priorityValue"
-            @update:modelValue="updatePriority"
-          />
-        </div>
+    <template #custom-header>
+      <div class="primary-gradient flex items-center justify-between p-3 sm:p-4 text-white">
+        <h2
+          class="text-base sm:text-lg font-semibold max-w-[680px] truncate"
+          :title="currentStep === 1 ? 'Nova Tarefa' : `Nova Tarefa - ${formData.name}`"
+        >
+          {{ currentStep === 1 ? 'Nova Tarefa' : `Nova Tarefa - ${formData.name}` }}
+        </h2>
+        <button
+          class="bg-transparent border-none text-white opacity-80 text-lg sm:text-xl cursor-pointer p-1 sm:p-2 rounded-full flex items-center justify-center transition-opacity hover:opacity-100"
+          @click="closeModal"
+        >
+          <font-awesome-icon icon="times" />
+        </button>
       </div>
+    </template>
+    <!-- Step Indicator -->
+    <div class="flex items-center justify-center gap-2 mb-6 -mt-1 relative">
+      <div class="flex items-center gap-2">
+        <div
+          :class="[
+            'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors',
+            currentStep === 1 ? 'bg-blue-600 text-white' : 'bg-green-600 text-white',
+          ]"
+        >
+          <font-awesome-icon v-if="currentStep === 2" icon="check" class="text-xs" />
+          <span v-else>1</span>
+        </div>
+        <span
+          :class="[
+            'text-sm font-medium',
+            currentStep === 1
+              ? 'text-gray-900 dark:text-white'
+              : 'text-gray-500 dark:text-gray-400',
+          ]"
+          >Informações Básicas</span
+        >
+      </div>
+      <div class="w-12 h-0.5 bg-gray-300 dark:bg-gray-600"></div>
+      <div class="flex items-center gap-2">
+        <div
+          :class="[
+            'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors',
+            currentStep === 2
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400',
+          ]"
+        >
+          2
+        </div>
+        <span
+          :class="[
+            'text-sm font-medium',
+            currentStep === 2
+              ? 'text-gray-900 dark:text-white'
+              : 'text-gray-500 dark:text-gray-400',
+          ]"
+          >Detalhes Adicionais</span
+        >
+      </div>
+    </div>
+    <form @submit.prevent="handleSubmit" class="md:min-w-[748px] min-h-[320px] -mt-2.5">
+      <!-- Step 1: Basic Information -->
+      <div v-if="currentStep === 1" class="space-y-5">
+        <!-- Assunto -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5">
+          <div class="col-span-1 md:col-span-4 flex flex-col gap-1.5">
+            <label for="title" class="text-sm text-gray-800 dark:text-gray-200"
+              >Assunto: <span class="text-red-500">*</span></label
+            >
+            <Input
+              id="title"
+              v-model="formData.name"
+              placeholder="Digite o assunto da tarefa"
+              required
+            />
+          </div>
+        </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5 mb-4">
+        <div class="grid grid-cols-2 gap-4 md:gap-5">
+          <div class="col-span-1 flex flex-col gap-1.5">
+            <label class="text-sm text-gray-800 dark:text-gray-200"
+              >Prioridade: <span class="text-red-500">*</span></label
+            >
+            <Select
+              :options="priorityOptions"
+              :modelValue="priorityValue"
+              @update:modelValue="updatePriority"
+            />
+          </div>
+
+          <div class="col-span-1 flex flex-col gap-1.5">
+            <label class="text-sm text-gray-800 dark:text-gray-200">É privado?</label>
+            <Select
+              :options="privateOptions"
+              :modelValue="isPrivateValue"
+              @update:modelValue="updateIsPrivate"
+            />
+          </div>
+        </div>
+
         <TargetUsersSelector
           :departments="departments"
           :allUsers="allUsers"
           v-model:targetUsers="targetUsers"
-          class="col-span-3"
+          class="col-span-2"
         />
-        <div class="col-span-1 flex flex-col gap-1.5">
-          <label class="text-sm text-gray-800 dark:text-gray-200">É privado?</label>
-          <Select
-            :options="privateOptions"
-            :modelValue="isPrivateValue"
-            @update:modelValue="updateIsPrivate"
-          />
-        </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5 mb-4">
-        <div class="col-span-3 grid grid-cols-2 gap-4">
-          <div class="flex flex-col gap-1.5">
-            <label for="category" class="text-sm text-gray-800 dark:text-gray-200"
-              >Categoria: <span class="text-red-500">*</span></label
-            >
-            <Select
-              :options="categoryOptions"
-              :modelValue="selectedCategory?.toString() || ''"
-              @update:modelValue="updateSelectedCategory"
+      <!-- Step 2: Additional Details -->
+      <div v-if="currentStep === 2" class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-5">
+        <!-- Descrição -->
+        <div class="col-span-1 md:col-span-2 flex flex-col gap-1.5 w-full sm:w-[748px]">
+          <label for="description" class="text-sm text-gray-800 dark:text-gray-200"
+            >Descrição: <span class="text-red-500">*</span></label
+          >
+          <div class="quill-wrapper" ref="quillWrapperRef">
+            <QuillEditor
+              v-model:content="formData.description"
+              contentType="html"
+              theme="snow"
+              :options="editorOptions"
             />
           </div>
+          <textarea
+            class="hidden"
+            id="description"
+            v-model="formData.description"
+            required
+            rows="4"
+          ></textarea>
+        </div>
 
-          <div class="flex flex-col gap-1.5 w-full">
-            <label for="dueAt" class="text-sm text-gray-800 dark:text-gray-200"
-              >Concluir até:</label
-            >
-            <div class="w-full">
-              <DatePicker
-                :value="formData.dueAt"
-                type="datetime"
-                format="DD/MM/YYYY HH:mm"
-                value-type="format"
-                :lang="pt"
-                :placeholder="'Selecione data e hora'"
-                :clearable="true"
-                :editable="false"
-                :disabled-date="disabledDate"
-                @change="handleDatePickerChange"
-                @input="
-                  (val: any) => {
-                    console.log('@input event:', val);
-                    formData.dueAt = val || null;
-                  }
-                "
-                :input-class="'w-full px-[14px] py-2.5 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-800 dark:text-white bg-white dark:bg-gray-800'"
-                :placeholder-class="'text-gray-500 dark:text-gray-400'"
-                :time-picker-options="{
-                  start: '08:00',
-                  step: '00:15',
-                  end: '23:45',
-                }"
-              />
-            </div>
+        <!-- Categoria and Concluir até -->
+        <div class="flex flex-col gap-1.5">
+          <label for="category" class="text-sm text-gray-800 dark:text-gray-200"
+            >Categoria: <span class="text-red-500">*</span></label
+          >
+          <Select
+            :options="categoryOptions"
+            :modelValue="selectedCategory?.toString() || ''"
+            @update:modelValue="updateSelectedCategory"
+          />
+        </div>
+
+        <div class="col-span-1 flex flex-col gap-1.5">
+          <label for="dueAt" class="text-sm text-gray-800 dark:text-gray-200">Concluir até:</label>
+          <div class="w-full">
+            <DatePicker
+              :value="formData.dueAt"
+              type="datetime"
+              format="DD/MM/YYYY HH:mm"
+              value-type="format"
+              :lang="pt"
+              :placeholder="'Selecione data e hora'"
+              :clearable="true"
+              :editable="false"
+              :disabled-date="disabledDate"
+              @change="handleDatePickerChange"
+              @input="
+                (val: any) => {
+                  console.log('@input event:', val);
+                  formData.dueAt = val || null;
+                }
+              "
+              :input-class="'w-full px-[14px] py-2.5 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-800 dark:text-white bg-white dark:bg-gray-800'"
+              :placeholder-class="'text-gray-500 dark:text-gray-400'"
+              :time-picker-options="{
+                start: '08:00',
+                step: '00:15',
+                end: '23:45',
+              }"
+            />
           </div>
         </div>
 
-        <div class="flex items-end gap-2 relative">
+        <div class="col-span-2 flex gap-4 mt-2">
+          <button
+            class="py-[10px] px-3 border border-dashed border-gray-300 dark:border-gray-600 rounded text-sm text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-800 dark:hover:text-gray-300 transition-colors"
+            type="button"
+            @click="handleSubtasksClick"
+          >
+            <font-awesome-icon icon="tasks" /> Adicionar Subtarefas
+          </button>
+
+          <!-- Anexar Arquivos Button -->
+          <input class="hidden" type="file" id="fileUpload" multiple @change="handleFileChange" />
           <label
-            class="btn btn-primary flex justify-center items-center gap-[5px] rounded cursor-pointer px-4 text-sm"
-            style="height: auto; padding-top: 0.625rem; padding-bottom: 0.625rem"
+            class="py-[10px] px-4 border border-dashed border-gray-300 dark:border-gray-600 rounded text-sm text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-800 dark:hover:text-gray-300 transition-colors hover:cursor-pointer"
             for="fileUpload"
           >
             <font-awesome-icon icon="paperclip" /> Anexar Arquivos
           </label>
-          <button
-            v-if="selectedFiles.length > 0"
-            type="button"
-            @click="clearSelectedFiles"
-            class="flex justify-center items-center gap-[5px] rounded cursor-pointer px-4 text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 transition-colors"
-            style="height: auto; padding-top: 0.625rem; padding-bottom: 0.625rem"
-            title="Limpar arquivos selecionados"
-          >
-            <font-awesome-icon icon="times" />
-          </button>
-          <div class="mt-20 sm:mt-0 col-span-1 md:col-span-3 flex flex-col">
-            <input class="hidden" type="file" id="fileUpload" multiple @change="handleFileChange" />
-            <div v-if="selectedFiles.length" class="absolute top-[74px] left-0">
-              <div class="flex items-center gap-2">
-                <font-awesome-icon icon="file" class="text-gray-500 text-xs" />
-                <p class="text-sm text-gray-700 dark:text-gray-300">
-                  {{ getFileDisplayText() }}
-                </p>
+        </div>
+
+        <!-- Anexar Arquivos -->
+        <div v-if="selectedFiles.length > 0" class="mb-4 mt-4 col-span-2">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <font-awesome-icon icon="paperclip" class="text-primary dark:text-blue-400" />
+              Anexos
+              <span
+                class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full text-xs font-medium"
+              >
+                {{ selectedFiles.length }}
+              </span>
+            </h3>
+          </div>
+
+          <div class="flex gap-3">
+            <div v-for="(file, index) in selectedFiles" :key="index" class="relative group">
+              <!-- Image Preview Card -->
+              <div
+                v-if="isImageFile(file)"
+                class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 transition-all aspect-[4/3] flex items-center justify-center max-w-[140px]"
+              >
+                <img
+                  :src="getFilePreviewUrl(file)"
+                  :alt="file.name"
+                  class="w-full h-full object-cover"
+                />
+                <div
+                  class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none"
+                ></div>
+                <div
+                  class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 pointer-events-none overflow-hidden"
+                >
+                  <div class="text-xs text-white whitespace-nowrap overflow-hidden text-ellipsis">
+                    {{ truncateFileName(file.name) }}
+                  </div>
+                </div>
+                <button
+                  @click.stop="removeFileByIndex(index)"
+                  class="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-white bg-red-500 hover:bg-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                  title="Remover arquivo"
+                >
+                  <font-awesome-icon icon="times" class="text-xs" />
+                </button>
+              </div>
+              <!-- Non-Image File Card -->
+              <div
+                v-else
+                class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 transition-all aspect-[4/3] flex items-center justify-center max-w-[140px]"
+              >
+                <div class="text-primary dark:text-blue-400">
+                  <font-awesome-icon icon="file" size="3x" />
+                </div>
+                <div
+                  class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors pointer-events-none"
+                ></div>
+                <div
+                  class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 pointer-events-none overflow-hidden"
+                >
+                  <div class="text-xs text-white whitespace-nowrap overflow-hidden text-ellipsis">
+                    {{ truncateFileName(file.name) }}
+                  </div>
+                </div>
+                <button
+                  @click.stop="removeFileByIndex(index)"
+                  class="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-white bg-red-500 hover:bg-red-600 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                  title="Remover arquivo"
+                >
+                  <font-awesome-icon icon="times" class="text-xs" />
+                </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="col-span-1 md:col-span-3 flex flex-col gap-1.5 w-full sm:w-[930px]">
-        <label for="description" class="text-sm text-gray-800 dark:text-gray-200"
-          >Descrição: <span class="text-red-500">*</span></label
+        <!-- Subtarefas (Checklist) -->
+        <div
+          v-if="showChecklist"
+          ref="checklistSectionRef"
+          class="col-span-2 border-t border-gray-100 dark:border-gray-800 pt-4 mt-2"
         >
-        <div class="quill-wrapper" ref="quillWrapperRef">
-          <QuillEditor
-            v-model:content="formData.description"
-            contentType="html"
-            theme="snow"
-            :options="editorOptions"
-          />
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+              <font-awesome-icon icon="tasks" class="text-primary dark:text-blue-400" />
+              Subtarefas
+              <span
+                v-if="checklistItems.length > 0"
+                class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full text-xs font-medium"
+              >
+                {{ checklistItems.length }}
+              </span>
+            </h3>
+          </div>
+
+          <!-- Checklist Items -->
+          <div v-if="checklistItems.length > 0" class="space-y-2 mb-4">
+            <div
+              v-for="(item, index) in checklistItems"
+              :key="index"
+              class="group flex items-start gap-2 p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-gray-700"
+            >
+              <div
+                class="mt-1 w-4 h-4 rounded border border-gray-300 dark:border-gray-600 flex-shrink-0"
+              ></div>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm text-gray-900 dark:text-gray-100">
+                  {{ item.title }}
+                </div>
+              </div>
+              <button
+                type="button"
+                @click="removeChecklistItem(index)"
+                class="flex-shrink-0 w-6 h-6 flex items-center justify-center text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors opacity-0 group-hover:opacity-100"
+                title="Excluir item"
+              >
+                <font-awesome-icon icon="times" class="text-xs" />
+              </button>
+            </div>
+          </div>
+
+          <!-- Add Item Form -->
+          <div
+            v-if="showAddChecklist"
+            class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 mb-4"
+          >
+            <Input
+              v-model="newItemTitle"
+              type="text"
+              placeholder="O que precisa ser feito?"
+              class="mb-3"
+              @keyup.enter="addChecklistItem"
+              @keyup.escape="cancelAddChecklist"
+              ref="itemInputRef"
+            />
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                @click="addChecklistItem"
+                class="px-4 py-2 btn btn-primary hover:opacity-95 text-white text-sm font-medium rounded transition-colors"
+              >
+                Adicionar
+              </button>
+              <button
+                type="button"
+                @click="cancelAddChecklist"
+                class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+
+          <!-- Empty State Add Button -->
+          <button
+            v-if="!showAddChecklist"
+            @click="startAddChecklist"
+            type="button"
+            class="w-full px-4 py-3 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg transition-all flex items-center justify-center gap-2 group"
+          >
+            <font-awesome-icon
+              icon="plus"
+              class="text-xs group-hover:scale-110 transition-transform"
+            />
+            Adicionar uma subtarefa
+          </button>
         </div>
-        <textarea
-          class="hidden"
-          id="description"
-          v-model="formData.description"
-          required
-          rows="4"
-        ></textarea>
       </div>
     </form>
+
+    <template #footer>
+      <button
+        type="button"
+        class="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        @click="handleCancel"
+        :disabled="isLoading"
+      >
+        {{ currentStep === 1 ? 'Cancelar' : 'Voltar' }}
+      </button>
+      <button
+        ref="confirmButtonRef"
+        type="button"
+        class="w-full sm:w-auto px-4 py-2 btn btn-primary hover:opacity-95 text-white rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        @click="handleConfirm"
+        :disabled="isLoading"
+      >
+        <font-awesome-icon v-if="isLoading" icon="spinner" spin />
+        <span>{{ currentStep === 1 ? 'Próximo' : 'Criar Tarefa' }}</span>
+      </button>
+    </template>
   </BaseModal>
 </template>
 
@@ -191,6 +432,54 @@ const selectedCategory = ref<number | null>(null);
 const selectedFiles = ref<File[]>([]);
 const isLoading = ref(false);
 const quillWrapperRef = ref<HTMLElement | null>(null);
+
+// Checklist state
+const checklistItems = ref<{ title: string }[]>([]);
+const newItemTitle = ref('');
+const showChecklist = ref(false);
+const showAddChecklist = ref(false);
+const itemInputRef = ref<InstanceType<typeof Input> | null>(null);
+const checklistSectionRef = ref<HTMLElement | null>(null);
+
+const handleSubtasksClick = async () => {
+  showChecklist.value = true;
+  startAddChecklist();
+  await nextTick();
+  if (checklistSectionRef.value) {
+    checklistSectionRef.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+};
+
+const addChecklistItem = () => {
+  const title = newItemTitle.value.trim();
+  if (title) {
+    checklistItems.value.push({ title });
+    newItemTitle.value = '';
+    showAddChecklist.value = false;
+  }
+};
+
+const removeChecklistItem = (index: number) => {
+  checklistItems.value.splice(index, 1);
+};
+
+const startAddChecklist = async () => {
+  showAddChecklist.value = true;
+  newItemTitle.value = '';
+  await nextTick();
+  if (itemInputRef.value && typeof (itemInputRef.value as any).focus === 'function') {
+    (itemInputRef.value as any).focus();
+  }
+};
+
+const cancelAddChecklist = () => {
+  showAddChecklist.value = false;
+  newItemTitle.value = '';
+};
+
+// Step management
+const currentStep = ref(1);
+const maxSteps = 2;
 const targetUsers = ref<
   Array<{
     departmentId: number | null;
@@ -437,30 +726,31 @@ const handleFileChange = (event: Event) => {
   }
 };
 
-const getFileDisplayText = () => {
-  if (selectedFiles.value.length === 0) return '';
-
-  const firstName = selectedFiles.value[0].name;
-  const maxLength = 22; // Maximum characters before truncation
-
-  let displayName = firstName;
-  if (displayName.length > maxLength) {
-    displayName = displayName.substring(0, maxLength) + '...';
-  }
-
-  if (selectedFiles.value.length === 1) {
-    return displayName;
-  }
-
-  const additionalCount = selectedFiles.value.length - 1;
-  return `${displayName} e +${additionalCount}`;
+const isImageFile = (file: File): boolean => {
+  return file.type.startsWith('image/');
 };
 
-const clearSelectedFiles = () => {
-  selectedFiles.value = [];
-  const fileInput = document.getElementById('fileUpload') as HTMLInputElement;
-  if (fileInput) {
-    fileInput.value = '';
+const getFilePreviewUrl = (file: File): string => {
+  return URL.createObjectURL(file);
+};
+
+const truncateFileName = (fileName: string, maxLength: number = 15): string => {
+  if (fileName.length <= maxLength) return fileName;
+  const extension = fileName.split('.').pop() || '';
+  const nameWithoutExt = fileName.substring(0, fileName.lastIndexOf('.'));
+  const truncatedName = nameWithoutExt.substring(0, maxLength - extension.length - 4);
+  return `${truncatedName}...${extension}`;
+};
+
+const removeFileByIndex = (index: number) => {
+  selectedFiles.value.splice(index, 1);
+};
+
+const handleCancel = () => {
+  if (currentStep.value === 1) {
+    closeModal();
+  } else {
+    goToPreviousStep();
   }
 };
 
@@ -481,13 +771,56 @@ const resetForm = () => {
   availableUsers.value = [];
   selectedCategory.value = null;
   selectedFiles.value = [];
+  checklistItems.value = [];
   isLoading.value = false;
+  currentStep.value = 1;
   targetUsers.value = [
     {
       departmentId: null,
       userId: null,
     },
   ];
+};
+
+const goToNextStep = () => {
+  if (currentStep.value < maxSteps) {
+    currentStep.value++;
+  }
+};
+
+const goToPreviousStep = () => {
+  if (currentStep.value > 1) {
+    currentStep.value--;
+  }
+};
+
+const validateStep1 = (): boolean => {
+  if (!formData.value.name.trim()) {
+    toast.error('O campo Assunto é obrigatório');
+    return false;
+  }
+
+  if (!targetUsers.value.some((tu) => tu.userId !== null)) {
+    toast.error('Selecione pelo menos um usuário destino');
+    return false;
+  }
+
+  if (!formData.value.priority) {
+    toast.error('O campo Prioridade é obrigatório');
+    return false;
+  }
+
+  return true;
+};
+
+const handleConfirm = () => {
+  if (currentStep.value === 1) {
+    if (validateStep1()) {
+      goToNextStep();
+    }
+  } else {
+    handleSubmit();
+  }
 };
 
 let quillObserver: MutationObserver | null = null;
@@ -733,10 +1066,15 @@ const handleSubmit = async () => {
       isPrivate: formData.value.isPrivate,
       files: fileUrls,
       targetUserIds,
+      checklistItems: checklistItems.value,
     };
 
     await ticketService.create(ticketData);
-    await Promise.all([ticketsStore.fetchMyTickets(), ticketsStore.fetchReceivedTickets(), ticketsStore.fetchDepartmentTickets()]);
+    await Promise.all([
+      ticketsStore.fetchMyTickets(),
+      ticketsStore.fetchReceivedTickets(),
+      ticketsStore.fetchDepartmentTickets(),
+    ]);
 
     toast.success('Tarefa criada com sucesso!');
     emit('ticketCreated');
@@ -789,12 +1127,19 @@ const handleSubmit = async () => {
 :deep(.ql-container) {
   border: none !important;
   border-radius: 0 0 6px 6px !important;
-  min-height: 110px;
+  min-height: 10px;
 }
 
 :deep(.ql-editor) {
-  min-height: 110px;
+  min-height: 125px;
   padding: 14px;
+}
+
+:deep(.ql-editor.ql-blank::before) {
+  font-style: normal !important;
+  color: #9ca3af !important;
+  font-size: 0.875rem !important;
+  left: 14px !important;
 }
 
 /* Ensure Quill dropdowns appear above modal footer */
@@ -858,7 +1203,8 @@ const handleSubmit = async () => {
 }
 
 .dark #newTicketModal .ql-editor.ql-blank::before {
-  color: rgba(255, 255, 255, 0.85) !important;
+  color: #9ca3af !important;
+  font-style: normal !important;
   opacity: 1 !important;
 }
 
