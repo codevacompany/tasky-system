@@ -95,7 +95,7 @@
         </span>
       </template>
 
-      <template #column-overdueRate="{ value }">
+      <template #column-deliveryOverdueRate="{ value }">
         <span
           :class="[
             'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
@@ -159,7 +159,6 @@ interface Props {
     totalResolved: number;
     averageResolutionTimeSeconds: number;
     averageAcceptanceTimeSeconds: number;
-    averageTotalTimeSeconds: number;
   } | null;
   isLoading?: boolean;
 }
@@ -260,12 +259,12 @@ const tableHeaders = computed<TableHeader<DepartmentStats>[]>(() => [
     sortDirection: sortKey.value === 'efficiencyScore' ? sortDirection.value : 'none',
   },
   {
-    key: 'overdueRate',
+    key: 'deliveryOverdueRate',
     label: '% de Atraso',
     sortable: true,
-    sortKey: 'overdueRate',
+    sortKey: 'deliveryOverdueRate',
     align: 'center',
-    sortDirection: sortKey.value === 'overdueRate' ? sortDirection.value : 'none',
+    sortDirection: sortKey.value === 'deliveryOverdueRate' ? sortDirection.value : 'none',
   },
 ]);
 

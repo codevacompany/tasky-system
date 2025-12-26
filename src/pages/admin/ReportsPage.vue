@@ -325,14 +325,14 @@
               <!-- Top Contributors -->
               <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_USERS_ANALYTICS"
-                info-message="Ranking dos colaboradores com melhor desempenho em resolução de tarefas no período selecionado. O ranking pode ser ordenado por % de Desempenho (que considera a taxa de resolução e o volume de tarefas), Tempo de Resolução (quanto menor, melhor) ou Taxa de Atraso (porcentagem de tarefas enviadas para verificação após o prazo - quanto menor, melhor)."
+                info-message="Ranking dos colaboradores com melhor desempenho no período selecionado. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%), utilizando o modelo Wilson para correção estatística."
               >
                 <template #title>Top Colaboradores</template>
                 <template #subtitle>{{ currentPeriodLabel }}</template>
                 <template #header-actions>
                   <Select
                     :options="[
-                      { value: 'efficiency', label: '% de Desempenho' },
+                      { value: 'efficiency', label: 'Score' },
                       { value: 'resolution_time', label: 'Tempo de Resolução' },
                       { value: 'overdue_rate', label: 'Taxa de Atraso' },
                     ]"
@@ -352,7 +352,7 @@
                     <div class="text-center">
                       {{
                         topUsersSortBy === 'efficiency'
-                          ? '% Desempenho'
+                          ? 'Score'
                           : topUsersSortBy === 'resolution_time'
                             ? 'Tempo de Resolução'
                             : 'Taxa de Atraso'
@@ -445,7 +445,7 @@
                           v-else
                           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
                         >
-                          {{ formatPercentage(user.overdueRate / 100) }}
+                          {{ formatPercentage(user.deliveryOverdueRate / 100) }}
                         </span>
                       </div>
                     </div>
@@ -472,14 +472,14 @@
               <!-- Top Setores -->
               <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS"
-                info-message="Ranking dos setores com melhor desempenho em resolução de tarefas no período selecionado. O ranking pode ser ordenado por % de Desempenho (que considera a taxa de resolução e o volume de tarefas), Tempo de Resolução (quanto menor, melhor) ou Taxa de Atraso (porcentagem de tarefas enviadas para verificação após o prazo - quanto menor, melhor)."
+                info-message="Ranking dos setores com melhor desempenho no período selecionado. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%), utilizando o modelo Wilson para correção estatística."
               >
                 <template #title>Top Setores</template>
                 <template #subtitle>{{ currentPeriodLabel }}</template>
                 <template #header-actions>
                   <Select
                     :options="[
-                      { value: 'efficiency', label: '% de Desempenho' },
+                      { value: 'efficiency', label: 'Score' },
                       { value: 'resolution_time', label: 'Tempo de Resolução' },
                       { value: 'overdue_rate', label: 'Taxa de Atraso' },
                     ]"
@@ -499,7 +499,7 @@
                     <div class="text-center">
                       {{
                         topDepartmentsSortBy === 'efficiency'
-                          ? '% Desempenho'
+                          ? 'Score'
                           : topDepartmentsSortBy === 'resolution_time'
                             ? 'Tempo de Resolução'
                             : 'Taxa de Atraso'
@@ -584,7 +584,7 @@
                           v-else
                           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
                         >
-                          {{ formatPercentage(dept.overdueRate / 100) }}
+                          {{ formatPercentage(dept.deliveryOverdueRate / 100) }}
                         </span>
                       </div>
                     </div>
@@ -1149,10 +1149,10 @@
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Top Performing -->
                 <BaseStatsWidget
-                  info-message="Esta seção mostra os setores com melhor desempenho em termos de % de Desempenho. Os setores são ordenados pela maior % de Desempenho, calculado usando o método Wilson Score, que considera a taxa de resolução e o volume de tarefas."
+                  info-message="Esta seção mostra os setores com melhor Score. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%)."
                 >
-                  <template #title>Melhor Desempenho</template>
-                  <template #subtitle>Setores com maior % de Desempenho</template>
+                  <template #title>Maiores Scores</template>
+                  <template #subtitle>Setores com maior Score</template>
 
                   <div>
                     <div class="space-y-4">
@@ -1182,10 +1182,10 @@
 
                 <!-- Needs Improvement -->
                 <BaseStatsWidget
-                  info-message="Esta seção mostra os setores que necessitam de melhoria em termos de % de Desempenho. Os setores são ordenados pela menor % de Desempenho, calculado usando o método Wilson Score, que considera a taxa de resolução e o volume de tarefas."
+                  info-message="Esta seção mostra os setores com menor Score. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%)."
                 >
-                  <template #title>Pior Desempenho</template>
-                  <template #subtitle>Setores com menor % de Desempenho</template>
+                  <template #title>Menores Scores</template>
+                  <template #subtitle>Setores com menor Score</template>
 
                   <div>
                     <div class="space-y-4">
@@ -1267,10 +1267,10 @@
               <!-- Top vs Underperforming Users -->
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <BaseStatsWidget
-                  info-message="Esta seção mostra os colaboradores com melhor desempenho em termos de % de Desempenho. Os colaboradores são ordenados pela maior % de Desempenho, calculado usando o método Wilson Score, que considera a taxa de resolução e o volume de tarefas."
+                  info-message="Esta seção mostra os colaboradores com melhor Score. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%)."
                 >
-                  <template #title>Melhor Desempenho</template>
-                  <template #subtitle>Colaboradores com maior % de Desempenho</template>
+                  <template #title>Maiores Scores</template>
+                  <template #subtitle>Colaboradores com maior Score</template>
 
                   <div>
                     <template v-if="topPerformers.length > 0">
@@ -1317,10 +1317,10 @@
                 </BaseStatsWidget>
 
                 <BaseStatsWidget
-                  info-message="Esta seção mostra os colaboradores que necessitam de melhoria em termos de % de Desempenho. Os colaboradores são ordenados pela menor % de Desempenho, calculado usando o método Wilson Score, que considera a taxa de resolução e o volume de tarefas (Colaboradores sem dados não são exibidos)."
+                  info-message="Esta seção mostra os colaboradores com menor Score. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%)."
                 >
-                  <template #title>Pior Desempenho</template>
-                  <template #subtitle>Colaboradores com menor % de Desempenho</template>
+                  <template #title>Menores Scores</template>
+                  <template #subtitle>Colaboradores com menor Score</template>
 
                   <div>
                     <template v-if="worstPerformers.length > 0">
@@ -2442,7 +2442,6 @@ const loadData = async () => {
       resolvedTickets: dept.resolvedTickets || 0,
       resolutionRate: dept.resolutionRate || 0,
       averageAcceptanceTimeSeconds: dept.averageAcceptanceTimeSeconds || 0,
-      averageTotalTimeSeconds: dept.averageTotalTimeSeconds || 0,
     }));
 
     // Distribuição por Status
@@ -2862,7 +2861,7 @@ const topFiveDepartments = computed(() => {
       .sort((a, b) => (a.averageResolutionTimeSeconds || 0) - (b.averageResolutionTimeSeconds || 0))
       .slice(0, 5);
   } else if (topDepartmentsSortBy.value === 'overdue_rate') {
-    return copy.sort((a, b) => (a.overdueRate || 0) - (b.overdueRate || 0)).slice(0, 5);
+    return copy.sort((a, b) => (a.deliveryOverdueRate || 0) - (b.deliveryOverdueRate || 0)).slice(0, 5);
   } else {
     return copy.sort((a, b) => b.efficiencyScore - a.efficiencyScore).slice(0, 5);
   }
@@ -3066,18 +3065,12 @@ const departmentStatsSummary = computed(() => {
       sum + dept.averageAcceptanceTimeSeconds * dept.resolvedTickets,
     0,
   );
-  const totalTotalTime = departmentStats.value.reduce(
-    (sum: number, dept: DepartmentStats) =>
-      sum + dept.averageTotalTimeSeconds * dept.resolvedTickets,
-    0,
-  );
 
   return {
     totalTickets: departmentTenantStats.value?.totalTickets ?? totalTickets,
     totalResolved,
     averageResolutionTimeSeconds: totalResolved ? totalResolutionTime / totalResolved : 0,
     averageAcceptanceTimeSeconds: totalResolved ? totalAcceptanceTime / totalResolved : 0,
-    averageTotalTimeSeconds: totalResolved ? totalTotalTime / totalResolved : 0,
   };
 });
 
@@ -3151,7 +3144,6 @@ const handleTopDepartmentsSortByChange = async () => {
       resolvedTickets: dept.resolvedTickets || 0,
       resolutionRate: dept.resolutionRate || 0,
       averageAcceptanceTimeSeconds: dept.averageAcceptanceTimeSeconds || 0,
-      averageTotalTimeSeconds: dept.averageTotalTimeSeconds || 0,
     }));
   } catch (err: unknown) {
     console.error('Erro ao carregar estatísticas de setores:', err);
@@ -3881,7 +3873,6 @@ const exportToExcel = async () => {
           'Taxa Resolução',
           'Tempo Aceite',
           'Tempo Resolução',
-          'Tempo Total',
         ],
         ...departmentStats.value.map((dept) => [
           dept.departmentName,
@@ -3890,7 +3881,6 @@ const exportToExcel = async () => {
           formatPercentage(dept.resolutionRate),
           formatTimeInSeconds(dept.averageAcceptanceTimeSeconds),
           formatTimeInSeconds(dept.averageResolutionTimeSeconds),
-          formatTimeInSeconds(dept.averageTotalTimeSeconds),
         ]),
       ];
       const deptSheet = XLSX.utils.aoa_to_sheet(deptData);
@@ -4018,9 +4008,9 @@ const exportToCSV = async () => {
     if (departmentStats.value && departmentStats.value.length > 0) {
       csvContent += '=== ESTATÍSTICAS POR SETOR ===\n';
       csvContent +=
-        'Setor,Total Tarefas,Resolvidas,Taxa Resolução,Tempo Aceite,Tempo Resolução,Tempo Total\n';
+        'Setor,Total Tarefas,Resolvidas,Taxa Resolução,Tempo Aceite,Tempo Resolução\n';
       departmentStats.value.forEach((dept) => {
-        csvContent += `${dept.departmentName},${dept.totalTickets},${dept.resolvedTickets},${formatPercentage(dept.resolutionRate)},${formatTimeInSeconds(dept.averageAcceptanceTimeSeconds)},${formatTimeInSeconds(dept.averageResolutionTimeSeconds)},${formatTimeInSeconds(dept.averageTotalTimeSeconds)}\n`;
+        csvContent += `${dept.departmentName},${dept.totalTickets},${dept.resolvedTickets},${formatPercentage(dept.resolutionRate)},${formatTimeInSeconds(dept.averageAcceptanceTimeSeconds)},${formatTimeInSeconds(dept.averageResolutionTimeSeconds)}\n`;
       });
       csvContent += '\n';
     }

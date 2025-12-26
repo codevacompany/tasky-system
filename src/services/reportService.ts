@@ -10,9 +10,25 @@ export interface TenantStatistics {
   resolvedTickets: number;
   averageResolutionTimeSeconds: number;
   averageAcceptanceTimeSeconds: number;
-  averageTotalTimeSeconds: number;
   resolutionRate: number;
+  efficiencyScore: number;
+  deliveryOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
   ticketTrends: TrendStats;
+}
+
+export interface DetailedMetrics {
+  onTimeCompleted: number; // Number of tickets completed on time (sent to verification before dueAt)
+  totalCompleted: number; // Total number of completed tickets
+  onTimeVerified: number; // Number of verification cycles completed on time (within 24h)
+  totalVerified: number; // Total number of verification cycles
+  rejectedCount: number; // Total number of rejections
+  returnedCount: number; // Total number of tickets that were returned
+  totalClosed: number; // Total number of closed tickets
+  totalEntries: number; // Total number of ticket assignments
+  completionIndex: number; // Wilson Score for completion (0-1)
+  verificationIndex: number; // Wilson Score for verification (0-1)
+  rejectionIndex: number; // Quality index based on rejection rate (0-1)
+  returnIndex: number; // Quality index based on return rate (0-1)
 }
 
 export interface UserStatistics {
@@ -22,8 +38,10 @@ export interface UserStatistics {
   resolvedTickets: number;
   averageResolutionTimeSeconds: number;
   averageAcceptanceTimeSeconds: number;
-  averageTotalTimeSeconds: number;
   resolutionRate: number;
+  efficiencyScore: number;
+  deliveryOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
+  detailedMetrics?: DetailedMetrics; // Optional detailed metrics for user stats explanation
 }
 
 export interface DepartmentStats {
@@ -33,10 +51,9 @@ export interface DepartmentStats {
   resolvedTickets: number;
   averageResolutionTimeSeconds: number;
   averageAcceptanceTimeSeconds: number;
-  averageTotalTimeSeconds: number;
   resolutionRate: number;
   efficiencyScore: number;
-  overdueRate: number;
+  deliveryOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
   userCount: number;
 }
 
@@ -133,7 +150,7 @@ export type UserRankingItemDto = {
   efficiencyScore: number; // Wilson Score for ranking
   averageAcceptanceTimeSeconds: number;
   averageResolutionTimeSeconds: number;
-  overdueRate: number; // Percentage of completed tickets that were overdue (completedAt > dueAt)
+  deliveryOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
   avatarUrl?: string;
   isActive: boolean;
 };
@@ -374,4 +391,3 @@ export const reportService = {
     return response.data;
   },
 };
-
