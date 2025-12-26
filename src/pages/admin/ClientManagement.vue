@@ -912,7 +912,7 @@ const stats = computed(() => {
     activeClients: globalStats.value.totalActiveClients,
     totalUsers: globalStats.value.totalUsers,
     monthlyTickets: globalStats.value.totalMonthlyTickets,
-    monthlyRevenue: 0.0, // This remains mocked as per user requirement
+    monthlyRevenue: 0.0, // This remains mocked
   };
 });
 

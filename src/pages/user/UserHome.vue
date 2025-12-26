@@ -19,14 +19,22 @@
 
       <!-- Estatísticas -->
       <div class="bg-white dark:bg-gray-800 rounded-lg px-6 pt-4 pb-6 mb-5 shadow">
-        <div class="mb-4">
-          <h1 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Estatísticas</h1>
-          <p class="text-xs text-gray-600 dark:text-gray-400">
-            Visão geral do seu desempenho e métricas
-          </p>
+        <div class="mb-4 flex justify-between items-start">
+          <div>
+            <h1 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Estatísticas</h1>
+            <p class="text-xs text-gray-600 dark:text-gray-400">
+              Visão geral do seu desempenho e métricas
+            </p>
+          </div>
+          <button
+            @click="showPerformanceModal = true"
+            class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors"
+          >
+            Ver detalhes
+          </button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
           <!-- Pendentes -->
           <div
             v-if="isLoading"
@@ -184,8 +192,47 @@
               Tempo Médio de Resolução
             </h3>
           </div>
+
+          <!-- Score de Desempenho -->
+          <div
+            v-if="isLoading"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+            </div>
+            <div
+              class="h-7 w-14 bg-gray-300 dark:bg-gray-600 rounded mb-1 animate-pulse-custom"
+            ></div>
+            <div class="h-3 w-32 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+          </div>
+          <div
+            v-else
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+          >
+            <div class="mb-3">
+              <font-awesome-icon
+                icon="star"
+                class="text-yellow-500 dark:text-yellow-400 text-2xl"
+              />
+            </div>
+            <p id="efficiencyScore" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              {{ userStats ? (userStats.efficiencyScore * 100).toFixed(0) : '0' }}%
+            </p>
+            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
+              Score de Desempenho
+            </h3>
+          </div>
         </div>
       </div>
+
+      <!-- Performance Explanation Modal -->
+      <PerformanceExplanationModal
+        v-if="showPerformanceModal"
+        :isOpen="showPerformanceModal"
+        :userStats="userStats"
+        @close="showPerformanceModal = false"
+      />
 
       <!-- Últimos Tickets Recebidos e Criados -->
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -214,6 +261,7 @@ import { toast } from 'vue3-toastify';
 import CompactTicketTable from '@/components/tickets/CompactTicketTable.vue';
 import { formatTimeShort } from '@/utils/generic-helper';
 import WelcomeModal from '@/components/common/WelcomeModal.vue';
+import PerformanceExplanationModal from '@/components/user/PerformanceExplanationModal.vue';
 import { useRouter } from 'vue-router';
 
 const userStore = useUserStore();
@@ -221,6 +269,7 @@ const ticketsStore = useTicketsStore();
 const router = useRouter();
 const isLoading = ref(true);
 const userStats = ref<UserStatistics | null>(null);
+const showPerformanceModal = ref(false);
 const latestReceivedTickets = computed(() => ticketsStore.recentReceivedTickets);
 const latestCreatedTickets = computed(() => ticketsStore.recentCreatedTickets);
 
@@ -256,6 +305,19 @@ const ticketsEmAndamento = computed(() => {
 });
 
 const ticketsFinalizados = computed(() => {
+  // Use backend stats if available - prefer totalCompleted from detailedMetrics as it matches modal
+  if (userStats.value?.detailedMetrics?.totalCompleted !== undefined) {
+    return {
+      total: userStats.value.detailedMetrics.totalCompleted,
+    };
+  }
+  // Fallback to resolvedTickets if detailedMetrics not available
+  if (userStats.value?.resolvedTickets !== undefined) {
+    return {
+      total: userStats.value.resolvedTickets,
+    };
+  }
+  // Last fallback: local calculation from recent tickets
   const receivedCompleted = latestReceivedTickets.value.filter(
     (t) => getTicketStatus(t) === DefaultTicketStatus.Completed,
   ).length;
