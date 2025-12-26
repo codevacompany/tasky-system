@@ -280,7 +280,7 @@
                         v-if="userStats"
                         class="text-lg font-bold text-gray-900 dark:text-white"
                       >
-                        {{ formatTime(userStats.averageAcceptanceTimeSeconds) }}
+                        {{ formatTimeShort(userStats.averageAcceptanceTimeSeconds) }}
                       </span>
                     </div>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -300,7 +300,7 @@
                         v-if="userStats"
                         class="text-lg font-bold text-gray-900 dark:text-white"
                       >
-                        {{ formatTime(userStats.averageResolutionTimeSeconds) }}
+                        {{ formatTimeShort(userStats.averageResolutionTimeSeconds) }}
                       </span>
                     </div>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -352,6 +352,7 @@
 import { Teleport, computed } from 'vue';
 import type { UserStatistics } from '@/services/reportService';
 import { useRouter } from 'vue-router';
+import { formatTimeShort } from '@/utils/generic-helper';
 
 const router = useRouter();
 
@@ -468,21 +469,6 @@ const efficiencyScoreColors = computed(() => {
     };
   }
 });
-
-/**
- * Format seconds to human-readable time string
- */
-const formatTime = (seconds: number): string => {
-  if (!seconds || seconds === 0) return '0 min';
-
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-
-  if (hours > 0) {
-    return minutes > 0 ? `${hours}h ${minutes}min` : `${hours}h`;
-  }
-  return `${minutes}min`;
-};
 </script>
 
 <style scoped>
