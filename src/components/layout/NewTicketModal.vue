@@ -193,7 +193,7 @@
           <!-- Anexar Arquivos Button -->
           <input class="hidden" type="file" id="fileUpload" multiple @change="handleFileChange" />
           <label
-            class="py-[10px] px-4 border border-dashed border-gray-300 dark:border-gray-600 rounded text-sm text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-800 dark:hover:text-gray-300 transition-colors hover:cursor-pointer"
+            class="py-[10px] px-5 border border-dashed border-gray-300 dark:border-gray-600 rounded text-sm text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-800 dark:hover:text-gray-300 transition-colors hover:cursor-pointer"
             for="fileUpload"
           >
             <font-awesome-icon icon="paperclip" /> Anexar Arquivos
