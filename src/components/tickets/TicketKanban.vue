@@ -469,6 +469,7 @@ const getDeadlineIcon = (ticket: Ticket) => {
   return 'calendar-day';
 };
 
+// test
 const openTicketDetails = (ticket: Ticket) => {
   if (isSupervisor.value && props.activeTab === 'setor' && ticket.isPrivate) {
     toast.warning('Esta tarefa é privada');

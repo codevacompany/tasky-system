@@ -815,13 +815,14 @@
                       theme="snow"
                       :options="editorOptions"
                       @text-change="handleQuillTextChange"
+                      @ready="initializeQuillMention"
                     />
                   </div>
                   <div class="flex justify-end">
                     <button
                       @click="comment()"
                       :disabled="isCommentLoading"
-                      class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      class="btn btn-primary inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <LoadingSpinner v-if="isCommentLoading" :size="16" />
                       <font-awesome-icon v-else icon="paper-plane" />
@@ -1448,6 +1449,8 @@ import TicketChecklist from './TicketChecklist.vue';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import pt from 'vue-datepicker-next/locale/pt-br.es';
+import QuillMention, { type MentionData } from '@/utils/quill-mention';
+import type { User } from '@/models';
 
 interface SpecialUpdateEvent {
   data?: {
@@ -1470,6 +1473,8 @@ const quillEditor = ref<any>(null);
 const editorKey = ref(0);
 const isCommentLoading = ref(false);
 const comments = ref<TicketComment[]>([]);
+const mentionableUsers = ref<User[]>([]);
+const quillMentionInstance = ref<QuillMention | null>(null);
 const ticketUpdates = ref<TicketUpdate[]>([]);
 const loadedTicket = ref<Ticket | null>(null);
 const isLoadingTicket = ref(false);
@@ -2218,6 +2223,88 @@ const handleQuillTextChange = () => {
   // This is handled in processRichTextContent
 };
 
+const restoreQuillFocus = () => {
+  // Focus restoration that works even with mentions in the editor
+  nextTick(() => {
+    if (!quillEditor.value) return;
+    const quill = quillEditor.value.getQuill?.();
+    if (!quill || !quill.root || !(quill.root instanceof HTMLElement)) return;
+
+    const currentSelection = quill.getSelection();
+    const cursorPosition = currentSelection ? currentSelection.index : quill.getLength();
+    const editor = quill.root;
+
+    // CRITICAL: When there are mentions, we need to set DOM selection directly
+    try {
+      // Get the leaf node at cursor position
+      const [leaf, offset] = quill.getLeaf(cursorPosition);
+      if (leaf && leaf.domNode) {
+        const domNode = leaf.domNode;
+
+        // If it's a text node, set selection directly in DOM
+        if (domNode.nodeType === Node.TEXT_NODE) {
+          const range = document.createRange();
+          const textLength = domNode.textContent?.length || 0;
+          const safeOffset = Math.min(offset, textLength);
+          range.setStart(domNode, safeOffset);
+          range.setEnd(domNode, safeOffset);
+
+          const selection = window.getSelection();
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+        }
+      }
+
+      // Focus the editor
+      editor.focus();
+      quill.setSelection(cursorPosition, 'user');
+    } catch {
+      // Fallback: click and focus
+      editor.click();
+      editor.focus();
+      quill.setSelection(cursorPosition, 'user');
+    }
+  });
+};
+
+const initializeQuillMention = () => {
+  nextTick(() => {
+    if (quillEditor.value && quillEditor.value.getQuill) {
+      const quill = quillEditor.value.getQuill();
+      if (quill) {
+        // Destroy existing instance if any
+        if (quillMentionInstance.value) {
+          quillMentionInstance.value.destroy();
+        }
+        // Initialize with current mentionable users (can be empty initially)
+        // Pass a callback to restore focus
+        quillMentionInstance.value = new QuillMention(
+          quill,
+          mentionableUsers.value,
+          restoreQuillFocus,
+        );
+      }
+    }
+  });
+};
+
+const fetchMentionableUsers = async () => {
+  if (!loadedTicket.value?.customId) return;
+
+  try {
+    const response = await ticketCommentService.getMentionableUsers(loadedTicket.value.customId);
+    mentionableUsers.value = response.data;
+    // Update QuillMention instance if it exists
+    if (quillMentionInstance.value) {
+      quillMentionInstance.value.updateMentionableUsers(mentionableUsers.value);
+    } else {
+      initializeQuillMention();
+    }
+  } catch (error) {
+    console.error('Error fetching mentionable users:', error);
+  }
+};
+
 const comment = async () => {
   // Create a temporary div to strip HTML and check if content is actually empty
   const tempDiv = document.createElement('div');
@@ -2240,11 +2327,15 @@ const comment = async () => {
   try {
     const processedContent = await processRichTextContent(newComment.value);
 
+    // Extract mentions from the content
+    const mentions: MentionData[] = QuillMention.extractMentions(processedContent);
+
     await ticketCommentService.create({
       ticketId: loadedTicket.value!.id,
       ticketCustomId: loadedTicket.value!.customId,
       userId: userStore.user!.id,
       content: processedContent,
+      mentions: mentions.length > 0 ? mentions : undefined,
     });
 
     // Clear the editor immediately after successful submission
@@ -2595,6 +2686,7 @@ const fetchTicket = async (customId: string) => {
     fetchComments();
     fetchTicketUpdates();
     loadChecklistItems();
+    fetchMentionableUsers();
     // Update link colors after ticket is loaded
     updateDescriptionLinksColor();
 
@@ -2692,6 +2784,11 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
   document.removeEventListener('keydown', handleImageViewerKeyboard);
+  // Destroy QuillMention instance
+  if (quillMentionInstance.value) {
+    quillMentionInstance.value.destroy();
+    quillMentionInstance.value = null;
+  }
   // Ensure body scroll is restored
   document.body.style.overflow = '';
 });
@@ -5293,19 +5390,6 @@ body.dark-mode [data-v-a180df51] .comment-text a:hover,
   align-items: center;
 }
 
-.btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
 .btn-save {
   background: #10b981;
   color: white;
@@ -5540,19 +5624,6 @@ body.dark-mode [data-v-a180df51] .comment-text a:hover,
   display: flex;
   gap: 0.5rem;
   align-items: center;
-}
-
-.btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .btn-save {
@@ -6209,5 +6280,61 @@ body.dark-mode [data-v-a180df51] .description-text a[style*='color'],
 
 .skeleton-shimmer {
   animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+/* Mention styles */
+:deep(.ql-editor .mention) {
+  background-color: #dbeafe;
+  color: #1e40af;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: default;
+  user-select: none; /* Prevent text selection */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.dark :deep(.ql-editor .mention) {
+  background-color: #1e3a8a;
+  color: #93c5fd;
+}
+
+:deep(.comment-text .mention) {
+  background-color: #dbeafe;
+  color: #1e40af;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: default;
+}
+
+.dark :deep(.comment-text .mention) {
+  background-color: #1e3a8a;
+  color: #93c5fd;
+}
+
+/* Quill mention selector styles */
+.quill-mention-selector {
+  font-family: inherit;
+}
+
+.quill-mention-selector .mention-item:hover {
+  background-color: #f3f4f6 !important;
+}
+
+.dark .quill-mention-selector {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.dark .quill-mention-selector .mention-item {
+  color: #e5e7eb;
+}
+
+.dark .quill-mention-selector .mention-item:hover,
+.dark .quill-mention-selector .mention-item.active {
+  background-color: #374151 !important;
 }
 </style>
