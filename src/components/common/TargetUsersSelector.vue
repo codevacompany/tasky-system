@@ -6,9 +6,9 @@
       class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end"
     >
       <div class="col-span-1 flex flex-col gap-1.5">
-        <label :for="`targetDepartment-${index}`" class="text-sm text-gray-800 dark:text-gray-200"
-          >Setor Destino: <span class="text-red-500">*</span></label
-        >
+        <label :for="`targetDepartment-${index}`" class="text-sm text-gray-800 dark:text-gray-200">
+          Setor Destino: <span v-if="index === 0" class="text-red-500">*</span>
+        </label>
         <Select
           :id="`targetDepartment-${index}`"
           :options="getDepartmentOptions(index)"
@@ -18,9 +18,9 @@
       </div>
 
       <div class="col-span-1 flex flex-col gap-1.5 relative">
-        <label :for="`targetUser-${index}`" class="text-sm text-gray-800 dark:text-gray-200"
-          >Usuário Destino:</label
-        >
+        <label :for="`targetUser-${index}`" class="text-sm text-gray-800 dark:text-gray-200">
+          Usuário Destino: <span v-if="index === 0" class="text-red-500">*</span>
+        </label>
         <Select
           :id="`targetUser-${index}`"
           :options="getUserOptionsForDepartment(index)"
@@ -29,14 +29,14 @@
           :disabled="!targetUser.departmentId"
         />
         <button
-        v-if="localTargetUsers.length > 1"
-        type="button"
-        @click="removeTargetUser(index)"
-        class="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-red-600 dark:hover:text-red-500 transition-colors absolute right-1 top-1 bg-red-500 rounded-full"
-        title="Remover usuário"
-      >
-        <font-awesome-icon icon="times" class="text-[10px] text-white" />
-      </button>
+          v-if="localTargetUsers.length > 1"
+          type="button"
+          @click="removeTargetUser(index)"
+          class="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-red-600 dark:hover:text-red-500 transition-colors absolute right-1 top-1 bg-red-500 rounded-full"
+          title="Remover usuário"
+        >
+          <font-awesome-icon icon="times" class="text-[10px] text-white" />
+        </button>
       </div>
     </div>
 

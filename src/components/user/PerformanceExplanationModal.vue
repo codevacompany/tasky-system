@@ -27,16 +27,17 @@
           </div>
 
           <!-- Content -->
-          <div class="overflow-y-auto flex-1 p-6">
+          <div class="overflow-y-auto p-6">
             <div class="space-y-6">
               <!-- Score de Desempenho Section -->
               <section>
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
                   Score de Desempenho
                 </h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Seu Score de Desempenho é calculado com base em 4 métricas principais com pesos
-                  diferentes, que somadas resultam no seu score final.
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">
+                  Seu Score de Desempenho é calculado com base em 4 métricas principais, cada uma
+                  com um peso específico, considerando os últimos 3 meses. A soma ponderada dessas
+                  métricas define o seu resultado final.
                   <span class="relative inline-flex items-center group">
                     <span
                       class="text-blue-600 dark:text-blue-400 font-medium cursor-pointer hover:underline"
@@ -50,10 +51,17 @@
                 <div class="space-y-4">
                   <!-- Completion Index -->
                   <div :class="completionColors.bg + ' p-4 rounded-lg'">
-                    <div class="flex items-center justify-between mb-3">
-                      <h4 class="font-semibold text-gray-900 dark:text-white">
-                        1️⃣ Entrega no prazo (40%)
-                      </h4>
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="flex items-center gap-2">
+                        <h4 class="font-semibold text-gray-900 dark:text-white">
+                          Entrega no prazo
+                        </h4>
+                        <InfoTooltip
+                          message="Avalia o cumprimento do prazo de envio de tarefas.Poucas tarefas podem impactar o resultado. Essa métrica representa 40% do score final."
+                          class="mt-[1px]"
+                        />
+                      </div>
+
                       <span
                         v-if="userStats?.detailedMetrics"
                         :class="'text-sm font-bold ' + completionColors.text"
@@ -61,11 +69,7 @@
                         {{ completionColors.label }} · {{ Math.round(completionIndex * 100) }}%
                       </span>
                     </div>
-                    <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                      <p>
-                        <span class="font-medium">O que mede:</span> se você envia as tarefas para
-                        verificação dentro do prazo.
-                      </p>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
                       <p v-if="userStats?.detailedMetrics">
                         <span class="font-medium">Neste período:</span>
                         {{
@@ -83,19 +87,66 @@
                             : 'nenhuma tarefa entregue.'
                         }}
                       </p>
-                      <p class="text-xs text-gray-500 dark:text-gray-500">
-                        <span class="font-medium">ℹ️</span> Ter poucas tarefas impacta negativamente
-                        no índice de entrega no prazo. Possui 40% de peso no score final.
+                    </div>
+                  </div>
+
+                  <!-- Rejection Index -->
+                  <div :class="rejectionColors.bg + ' p-4 rounded-lg'">
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="flex items-center gap-2">
+                        <h4 class="font-semibold text-gray-900 dark:text-white">
+                          Aprovação do trabalho
+                        </h4>
+                        <InfoTooltip
+                          message="Avalia a proporção de tarefas aprovadas em relação às tarefas recebidas. Essa métrica representa 15% do score final."
+                          class="mt-[1px]"
+                        />
+                      </div>
+                      <span
+                        v-if="userStats?.detailedMetrics"
+                        :class="'text-sm font-bold ' + rejectionColors.text"
+                      >
+                        {{ rejectionColors.label }} · {{ Math.round(rejectionIndex * 100) }}%
+                      </span>
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                      <p v-if="userStats?.detailedMetrics">
+                        <span class="font-medium">Neste período:</span>
+                        {{
+                          userStats.detailedMetrics.totalCompleted > 0
+                            ? `${userStats.detailedMetrics.totalCompleted} tarefa${
+                                userStats.detailedMetrics.totalCompleted !== 1 ? 's' : ''
+                              } enviada${
+                                userStats.detailedMetrics.totalCompleted !== 1 ? 's' : ''
+                              }, ${
+                                userStats.detailedMetrics.rejectedCount === 0
+                                  ? 'todas aprovadas'
+                                  : `${userStats.detailedMetrics.totalCompleted - userStats.detailedMetrics.rejectedCount} aprovadas`
+                              }${
+                                userStats.detailedMetrics.rejectedCount > 0
+                                  ? `, ${userStats.detailedMetrics.rejectedCount} rejeitada${
+                                      userStats.detailedMetrics.rejectedCount !== 1 ? 's' : ''
+                                    }`
+                                  : ''
+                              }.`
+                            : 'nenhuma tarefa enviada.'
+                        }}
                       </p>
                     </div>
                   </div>
 
                   <!-- Return Index -->
                   <div :class="returnColors.bg + ' p-4 rounded-lg'">
-                    <div class="flex items-center justify-between mb-3">
-                      <h4 class="font-semibold text-gray-900 dark:text-white">
-                        2️⃣ Qualidade da entrega (30%)
-                      </h4>
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="flex items-center gap-2">
+                        <h4 class="font-semibold text-gray-900 dark:text-white">
+                          Qualidade da entrega
+                        </h4>
+                        <InfoTooltip
+                          message="Avalia se as tarefas foram entregues corretamente, sem necessidade de ajustes ou retrabalho. Essa métrica representa 30% do score final."
+                          class="mt-[1px]"
+                        />
+                      </div>
                       <span
                         v-if="userStats?.detailedMetrics"
                         :class="'text-sm font-bold ' + returnColors.text"
@@ -103,11 +154,7 @@
                         {{ returnColors.label }} · {{ Math.round(returnIndex * 100) }}%
                       </span>
                     </div>
-                    <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                      <p>
-                        <span class="font-medium">O que mede:</span> se a tarefa foi entregue certa,
-                        sem precisar voltar.
-                      </p>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
                       <p v-if="userStats?.detailedMetrics">
                         <span class="font-medium">Neste período:</span>
                         {{
@@ -132,64 +179,21 @@
                             : 'nenhuma tarefa entregue.'
                         }}
                       </p>
-                      <p class="text-xs text-gray-500 dark:text-gray-500">
-                        <span class="font-medium">ℹ️</span> Possui 30% de peso no score final.
-                      </p>
-                    </div>
-                  </div>
-
-                  <!-- Rejection Index -->
-                  <div :class="rejectionColors.bg + ' p-4 rounded-lg'">
-                    <div class="flex items-center justify-between mb-3">
-                      <h4 class="font-semibold text-gray-900 dark:text-white">
-                        3️⃣ Aprovação do trabalho (Peso: 15%)
-                      </h4>
-                      <span
-                        v-if="userStats?.detailedMetrics"
-                        :class="'text-sm font-bold ' + rejectionColors.text"
-                      >
-                        {{ rejectionColors.label }} · {{ Math.round(rejectionIndex * 100) }}%
-                      </span>
-                    </div>
-                    <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                      <p>
-                        <span class="font-medium">O que mede:</span> quantas tarefas foram
-                        aprovadas.
-                      </p>
-                      <p v-if="userStats?.detailedMetrics">
-                        <span class="font-medium">Neste período:</span>
-                        {{
-                          userStats.detailedMetrics.totalCompleted > 0
-                            ? `${userStats.detailedMetrics.totalCompleted} tarefa${
-                                userStats.detailedMetrics.totalCompleted !== 1 ? 's' : ''
-                              } enviada${
-                                userStats.detailedMetrics.totalCompleted !== 1 ? 's' : ''
-                              }, ${
-                                userStats.detailedMetrics.rejectedCount === 0
-                                  ? 'todas aprovadas'
-                                  : `${userStats.detailedMetrics.totalCompleted - userStats.detailedMetrics.rejectedCount} aprovadas`
-                              }${
-                                userStats.detailedMetrics.rejectedCount > 0
-                                  ? `, ${userStats.detailedMetrics.rejectedCount} rejeitada${
-                                      userStats.detailedMetrics.rejectedCount !== 1 ? 's' : ''
-                                    }`
-                                  : ''
-                              }.`
-                            : 'nenhuma tarefa enviada.'
-                        }}
-                      </p>
-                      <p class="text-xs text-gray-500 dark:text-gray-500">
-                        <span class="font-medium">ℹ️</span> Possui 15% de peso no score final.
-                      </p>
                     </div>
                   </div>
 
                   <!-- Verification Index -->
                   <div :class="verificationColors.bg + ' p-4 rounded-lg'">
-                    <div class="flex items-center justify-between mb-3">
-                      <h4 class="font-semibold text-gray-900 dark:text-white">
-                        4️⃣ Verificação no Prazo (Peso: 15%)
-                      </h4>
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="flex items-center gap-2">
+                        <h4 class="font-semibold text-gray-900 dark:text-white">
+                          Verificação no Prazo
+                        </h4>
+                        <InfoTooltip
+                          message="Avalia se as tarefas são verificadas dentro do prazo de até 24 horas. Essa métrica representa 15% do score final."
+                          class="mt-[1px]"
+                        />
+                      </div>
                       <span
                         v-if="userStats?.detailedMetrics"
                         :class="'text-sm font-bold ' + verificationColors.text"
@@ -197,11 +201,7 @@
                         {{ verificationColors.label }} · {{ Math.round(verificationIndex * 100) }}%
                       </span>
                     </div>
-                    <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                      <p>
-                        <span class="font-medium">O que mede:</span> se você verifica tarefas em até
-                        24h.
-                      </p>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
                       <p v-if="userStats?.detailedMetrics">
                         <span class="font-medium">Neste período:</span>
                         {{
@@ -214,9 +214,6 @@
                             : 'nenhuma tarefa entrou em verificação.'
                         }}
                       </p>
-                      <p class="text-xs text-gray-500 dark:text-gray-500">
-                        <span class="font-medium">ℹ️</span> Possui 15% de peso no score final.
-                      </p>
                     </div>
                   </div>
 
@@ -224,7 +221,7 @@
                   <div
                     v-if="userStats"
                     :class="
-                      'p-4 rounded-lg border-2 mb-4 ' +
+                      'px-4 py-3 rounded-lg border-2 mb-4 ' +
                       (efficiencyScoreColors.bg + ' ' + efficiencyScoreColors.border)
                     "
                   >
@@ -233,9 +230,6 @@
                         <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">
                           Score Final
                         </h4>
-                        <p class="text-xs text-gray-600 dark:text-gray-400">
-                          Calculado com base nas 4 métricas abaixo
-                        </p>
                       </div>
                       <div class="text-right">
                         <div :class="'text-3xl font-bold ' + efficiencyScoreColors.text">
@@ -251,14 +245,14 @@
                     Em resumo, para manter um score alto, você deve:
                   </p>
                   <ul class="list-disc list-inside text-sm text-gray-600 dark:text-gray-400">
-                    <li>Entregar as tarefas para verificação dentro do prazo.</li>
+                    <li>Entregar as tarefas dentro do prazo.</li>
+                    <li>Ter uma boa quantidade de tarefas aprovadas.</li>
                     <li>Entregar as tarefas com qualidade.</li>
-                    <li>Ter tarefas aprovadas.</li>
-                    <li>Verificar as tarefas no prazo de 24h.</li>
+                    <li>Verificar as tarefas dentro do prazo de 24h.</li>
                   </ul>
                   <p class="text-xs text-gray-500 dark:text-gray-500">
                     (Obs: Os tempos médios de aceite e resolução servem apenas para fins de análise
-                    e critérios de desemmpate entre colaboradores ou setores.)
+                    e critérios de desempate entre colaboradores ou setores.)
                   </p>
                 </div>
               </section>
@@ -271,11 +265,16 @@
 
                 <div class="space-y-4">
                   <!-- Tempo Médio de Aceite -->
-                  <div class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg">
-                    <div class="flex items-center justify-between mb-2">
-                      <h4 class="font-semibold text-gray-900 dark:text-white">
-                        Tempo Médio de Aceite
-                      </h4>
+                  <div class="bg-gray-50 dark:bg-gray-700/30 px-4 py-5 rounded-lg">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <h4 class="font-semibold text-gray-900 dark:text-white">
+                          Tempo Médio de Aceite
+                        </h4>
+                        <InfoTooltip
+                          message="Tempo médio entre a criação da tarefa e o momento em que você a aceitou a tarefa. Este tempo é calculado apenas durante horários comerciais, excluindo finais de semana."
+                        />
+                      </div>
                       <span
                         v-if="userStats"
                         class="text-lg font-bold text-gray-900 dark:text-white"
@@ -283,19 +282,20 @@
                         {{ formatTimeShort(userStats.averageAcceptanceTimeSeconds) }}
                       </span>
                     </div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      Tempo médio entre a criação da tarefa e quando você a aceitou (mudou o status
-                      de "Pendente" para "Em Andamento"). Este tempo é calculado apenas durante
-                      horários comerciais, excluindo finais de semana.
-                    </p>
                   </div>
 
                   <!-- Tempo Médio de Resolução -->
-                  <div class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg">
-                    <div class="flex items-center justify-between mb-2">
-                      <h4 class="font-semibold text-gray-900 dark:text-white">
-                        Tempo Médio de Resolução
-                      </h4>
+                  <div class="bg-gray-50 dark:bg-gray-700/30 px-4 py-5 rounded-lg">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-2">
+                        <h4 class="font-semibold text-gray-900 dark:text-white">
+                          Tempo Médio de Resolução
+                        </h4>
+                        <InfoTooltip
+                          message="Tempo médio que você passou trabalhando na tarefa enquanto estava com status 'Em Andamento'. Este tempo é calculado apenas durante horários comerciais, excluindo finais de semana."
+                        />
+                      </div>
+
                       <span
                         v-if="userStats"
                         class="text-lg font-bold text-gray-900 dark:text-white"
@@ -303,30 +303,6 @@
                         {{ formatTimeShort(userStats.averageResolutionTimeSeconds) }}
                       </span>
                     </div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      Tempo médio que você passou trabalhando na tarefa enquanto estava com status
-                      "Em Andamento". Este tempo é calculado apenas durante horários comerciais,
-                      excluindo finais de semana.
-                    </p>
-                  </div>
-
-                  <!-- Taxa de Atraso na Entrega -->
-                  <div class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg">
-                    <div class="flex items-center justify-between mb-2">
-                      <h4 class="font-semibold text-gray-900 dark:text-white">
-                        Taxa de Atraso na Entrega
-                      </h4>
-                      <span
-                        v-if="userStats"
-                        class="text-lg font-bold text-gray-900 dark:text-white"
-                      >
-                        {{ userStats.deliveryOverdueRate.toFixed(1) }}%
-                      </span>
-                    </div>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                      Percentual de tarefas concluídas que foram enviadas para verificação após o
-                      prazo. Quanto menor, melhor.
-                    </p>
                   </div>
                 </div>
               </section>
@@ -334,7 +310,7 @@
           </div>
 
           <!-- Footer -->
-          <div class="flex justify-end p-6 border-t border-gray-200 dark:border-gray-700">
+          <div class="flex justify-end p-5 pr-6 border-t border-gray-200 dark:border-gray-700">
             <button
               @click="$emit('close')"
               class="btn btn-primary px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
@@ -353,6 +329,7 @@ import { Teleport, computed } from 'vue';
 import type { UserStatistics } from '@/services/reportService';
 import { useRouter } from 'vue-router';
 import { formatTimeShort } from '@/utils/generic-helper';
+import InfoTooltip from '@/components/common/InfoTooltip.vue';
 
 const router = useRouter();
 

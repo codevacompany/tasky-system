@@ -556,7 +556,7 @@
             <div class="p-4">
               <div v-if="!isEditingName">
                 <h1
-                  class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100 leading-tight"
+                  class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white leading-tight"
                   @click="startEditingName"
                   :class="{
                     'cursor-text hover:text-gray-600 dark:hover:text-gray-400 transition-colors':
@@ -610,7 +610,7 @@
             <!-- Description Section -->
             <div class="my-2 px-4 sm:px-6 dark:border-gray-700">
               <h3
-                class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-1"
+                class="font-semibold text-[16.5px] text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-1"
               >
                 <font-awesome-icon icon="align-left" class="text-gray-600 dark:text-gray-300" />
                 Descrição
@@ -786,7 +786,7 @@
             <!-- Activities Section -->
             <div class="p-4 sm:p-6 border-t border-gray-200">
               <h3
-                class="font-semibold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2"
+                class="font-semibold text-[16.5px] text-gray-900 dark:text-white mb-6 flex items-center gap-2"
               >
                 <font-awesome-icon
                   :icon="['far', 'comment']"
@@ -3374,7 +3374,7 @@ const confirmDueDate = async () => {
 
 .dark :deep(.ql-container) {
   background-color: #374151 !important;
-  color: #f3f4f6 !important;
+  color: #ffffff !important;
 }
 
 :deep(.ql-editor.ql-blank::before) {
@@ -5829,7 +5829,7 @@ body.dark-mode [data-v-a180df51] .comment-text a:hover,
 
 .dark .description-text strong,
 :deep(.dark) .description-text strong {
-  color: #f3f4f6 !important;
+  color: #ffffff !important;
 }
 
 .dark .description-text a,

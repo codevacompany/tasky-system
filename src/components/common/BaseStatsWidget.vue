@@ -13,29 +13,7 @@
               <slot name="title">{{ title }}</slot>
             </h2>
             <!-- Info icon next to title -->
-            <div v-if="infoMessage" class="relative group flex items-center">
-              <button
-                type="button"
-                class="text-[#9ea9b2] hover:text-gray-600 dark:hover:text-gray-300 transition-colors focus:outline-none"
-                aria-label="Informação"
-              >
-                <font-awesome-icon icon="info-circle" class="w-[14px] h-[14px]" />
-              </button>
-              <!-- Tooltip -->
-              <div
-                class="absolute -left-3 top-full mt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none"
-              >
-                <div
-                  class="bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg py-2 px-3 shadow-lg whitespace-normal w-80"
-                >
-                  {{ infoMessage }}
-                  <!-- Tooltip arrow -->
-                  <div
-                    class="absolute left-4 top-0 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-900 dark:border-b-gray-700"
-                  ></div>
-                </div>
-              </div>
-            </div>
+            <BaseInfoTooltip v-if="infoMessage" :message="infoMessage" />
           </div>
           <p
             v-if="subtitle || $slots.subtitle"
@@ -59,6 +37,8 @@
 </template>
 
 <script setup lang="ts">
+import BaseInfoTooltip from './InfoTooltip.vue';
+
 defineProps<{
   title?: string;
   subtitle?: string;
