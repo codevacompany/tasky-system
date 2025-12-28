@@ -29,4 +29,5 @@ export interface UpdateTicketCommentDto {
   ticketCustomId?: string;
   userId?: number;
   content?: string;
+  mentions?: Mention[];
 }
