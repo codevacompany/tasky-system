@@ -3,20 +3,20 @@
     <header class="mb-8">
       <div class="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Gestão de Cadastros</h1>
+          <h1 class="text-2xl font-semibold text-txt-primary dark:text-white">Gestão de Cadastros</h1>
         </div>
         <div class="flex items-center">
           <div class="relative min-w-[300px] max-w-[400px]">
             <font-awesome-icon
               icon="search"
-              class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
+              class="absolute left-4 top-1/2 transform -translate-y-1/2 text-txt-light/80 dark:text-gray-500"
             />
             <Input
               v-model="searchTerm"
               type="text"
               placeholder="Buscar por nome, CNPJ ou e-mail"
               padding="tight"
-              class="w-full pr-4 pl-10 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+              class="w-full pr-4 pl-10 text-sm bg-white dark:bg-gray-800 text-txt-primary dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
             />
           </div>
         </div>
@@ -24,7 +24,7 @@
     </header>
 
     <div
-      class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-soft-xs border border-gray-200 dark:border-gray-700 overflow-hidden"
     >
       <div
         v-if="isLoading"
@@ -54,37 +54,37 @@
           <thead class="bg-gray-50 dark:bg-gray-700">
             <tr>
               <th
-                class="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap"
+                class="px-4 py-3 text-left text-sm font-semibold text-txt-primary dark:text-gray-100 whitespace-nowrap"
               >
                 Nome da Empresa
               </th>
               <th
-                class="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap"
+                class="px-4 py-3 text-left text-sm font-semibold text-txt-primary dark:text-gray-100 whitespace-nowrap"
               >
                 CNPJ
               </th>
               <th
-                class="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap"
+                class="px-4 py-3 text-left text-sm font-semibold text-txt-primary dark:text-gray-100 whitespace-nowrap"
               >
                 E-mail
               </th>
               <th
-                class="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap"
+                class="px-4 py-3 text-left text-sm font-semibold text-txt-primary dark:text-gray-100 whitespace-nowrap"
               >
                 Telefone
               </th>
               <th
-                class="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap"
+                class="px-4 py-3 text-left text-sm font-semibold text-txt-primary dark:text-gray-100 whitespace-nowrap"
               >
                 Status
               </th>
               <th
-                class="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap"
+                class="px-4 py-3 text-left text-sm font-semibold text-txt-primary dark:text-gray-100 whitespace-nowrap"
               >
                 Data Cadastro
               </th>
               <th
-                class="px-4 py-3 text-center text-sm font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap"
+                class="px-4 py-3 text-center text-sm font-semibold text-txt-primary dark:text-gray-100 whitespace-nowrap"
               >
                 Ações
               </th>
@@ -99,10 +99,10 @@
                   { 'bg-blue-50 dark:bg-blue-900/20': expandedId === signup.id },
                 ]"
               >
-                <td class="px-4 py-4 text-gray-900 dark:text-gray-100">{{ signup.companyName }}</td>
-                <td class="px-4 py-4 text-gray-900 dark:text-gray-100">{{ signup.cnpj || '-' }}</td>
-                <td class="px-4 py-4 text-gray-900 dark:text-gray-100">{{ signup.email }}</td>
-                <td class="px-4 py-4 text-gray-900 dark:text-gray-100">
+                <td class="px-4 py-4 text-txt-primary dark:text-gray-100">{{ signup.companyName }}</td>
+                <td class="px-4 py-4 text-txt-primary dark:text-gray-100">{{ signup.cnpj || '-' }}</td>
+                <td class="px-4 py-4 text-txt-primary dark:text-gray-100">{{ signup.email }}</td>
+                <td class="px-4 py-4 text-txt-primary dark:text-gray-100">
                   {{ signup.phoneNumber || '-' }}
                 </td>
                 <td class="px-4 py-4">
@@ -125,7 +125,7 @@
                     {{ formatStatus(signup.status) }}
                   </span>
                 </td>
-                <td class="px-4 py-4 text-gray-900 dark:text-gray-100">
+                <td class="px-4 py-4 text-txt-primary dark:text-gray-100">
                   {{ formatDate(signup.createdAt) }}
                 </td>
                 <td class="px-4 py-4" @click.stop>
@@ -173,7 +173,7 @@
               </tr>
               <tr v-if="expandedId === signup.id" class="bg-gray-50 dark:bg-gray-800">
                 <td colspan="7" class="px-4 py-0">
-                  <div class="py-4 text-gray-900 dark:text-gray-100">
+                  <div class="py-4 text-txt-primary dark:text-gray-100">
                     <div class="flex flex-wrap gap-10">
                       <div class="min-w-[180px] flex-1">
                         <h4 class="text-base font-bold text-blue-600 dark:text-blue-400 mb-2 mt-0">

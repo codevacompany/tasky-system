@@ -3,7 +3,7 @@
     <header class="mb-8">
       <div class="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white m-0">
+          <h1 class="text-2xl font-semibold text-txt-primary dark:text-white m-0">
             Configurações do Cliente
           </h1>
           <h2 class="text-base text-gray-600 dark:text-gray-400 mt-1 m-0">
@@ -24,9 +24,9 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Informações Básicas -->
       <div
-        class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+        class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-soft-xs border border-gray-200 dark:border-gray-700"
       >
-        <h3 class="m-0 mb-6 text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 class="m-0 mb-6 text-lg font-semibold text-txt-primary dark:text-white">
           Informações Básicas
         </h3>
         <div class="mb-4">
@@ -36,7 +36,7 @@
           <Input
             v-model="settings.razaoSocial"
             type="text"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100"
           />
         </div>
         <div class="mb-4">
@@ -44,7 +44,7 @@
           <Input
             v-model="settings.cnpj"
             type="text"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100"
           />
         </div>
         <div class="mb-4">
@@ -52,7 +52,7 @@
           <Input
             v-model="settings.dominio"
             type="text"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100"
           />
         </div>
         <div class="mb-0">
@@ -62,23 +62,23 @@
           <Input
             v-model="settings.emailPrincipal"
             type="email"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100"
           />
         </div>
       </div>
 
       <!-- Plano e Limites -->
       <div
-        class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+        class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-soft-xs border border-gray-200 dark:border-gray-700"
       >
-        <h3 class="m-0 mb-6 text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 class="m-0 mb-6 text-lg font-semibold text-txt-primary dark:text-white">
           Plano e Limites
         </h3>
         <div class="mb-4">
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300">Plano Atual</label>
           <select
             v-model="settings.plano"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100"
           >
             <option value="BASIC">Básico</option>
             <option value="PRO">Profissional</option>
@@ -94,7 +94,7 @@
             v-model="settings.limiteUsuarios"
             type="number"
             min="1"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100"
           />
         </div>
         <div class="mb-4">
@@ -105,7 +105,7 @@
             v-model="settings.limiteTickets"
             type="number"
             min="1"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100"
           />
         </div>
         <div class="mb-0">
@@ -115,16 +115,16 @@
           <Input
             v-model="settings.dataRenovacao"
             type="date"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100"
           />
         </div>
       </div>
 
       <!-- Configurações de Notificação -->
       <div
-        class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+        class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-soft-xs border border-gray-200 dark:border-gray-700"
       >
-        <h3 class="m-0 mb-6 text-lg font-semibold text-gray-900 dark:text-white">Notificações</h3>
+        <h3 class="m-0 mb-6 text-lg font-semibold text-txt-primary dark:text-white">Notificações</h3>
         <div class="mb-4">
           <label class="flex items-center gap-2 cursor-pointer">
             <input
@@ -167,7 +167,7 @@
           >
           <select
             v-model="settings.notificacoes.frequenciaRelatorio"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100"
           >
             <option value="DIARIO">Diário</option>
             <option value="SEMANAL">Semanal</option>
@@ -179,9 +179,9 @@
 
       <!-- Personalização -->
       <div
-        class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+        class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-soft-xs border border-gray-200 dark:border-gray-700"
       >
-        <h3 class="m-0 mb-6 text-lg font-semibold text-gray-900 dark:text-white">Personalização</h3>
+        <h3 class="m-0 mb-6 text-lg font-semibold text-txt-primary dark:text-white">Personalização</h3>
         <div class="mb-4">
           <label class="block mb-2 font-medium text-gray-700 dark:text-gray-300"
             >Cor Primária</label
@@ -217,7 +217,7 @@
           <textarea
             v-model="settings.personalizacao.mensagemBoasVindas"
             rows="3"
-            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-y min-h-[80px]"
+            class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100 resize-y min-h-[80px]"
           ></textarea>
         </div>
       </div>

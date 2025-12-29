@@ -3,19 +3,19 @@
     <!-- Header -->
     <header class="mb-8">
       <div class="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Gestão de Clientes</h1>
+        <h1 class="text-2xl font-semibold text-txt-primary dark:text-white">Gestão de Clientes</h1>
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div class="relative min-w-[300px] max-w-[400px]">
             <font-awesome-icon
               icon="search"
-              class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500"
+              class="absolute left-4 top-1/2 transform -translate-y-1/2 text-txt-primary dark:text-gray-500"
             />
             <Input
               v-model="searchTerm"
               type="text"
               placeholder="Buscar por nome, CNPJ ou plano"
               padding="tight"
-              class="w-full pr-4 pl-10 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600"
+              class="w-full pr-4 pl-10 text-sm bg-white dark:bg-gray-800 text-txt-primary dark:text-gray-100 border border-gray-300 dark:border-gray-600"
             />
           </div>
           <button
@@ -30,7 +30,7 @@
       <!-- Cards de Estatísticas -->
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         <div
-          class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center gap-4 shadow-sm border border-gray-200 dark:border-gray-700"
+          class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center gap-4 shadow-soft-xs border border-gray-200 dark:border-gray-700"
         >
           <div
             class="w-12 h-12 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xl"
@@ -39,7 +39,7 @@
           </div>
           <div class="flex-1">
             <span class="block text-sm text-gray-600 dark:text-gray-400">Clientes Ativos</span>
-            <span class="block text-xl font-semibold text-gray-900 dark:text-white my-1">{{
+            <span class="block text-xl font-semibold text-txt-primary dark:text-white my-1">{{
               stats.activeClients
             }}</span>
             <!-- <span class="block text-sm text-green-600 dark:text-green-400">
@@ -49,7 +49,7 @@
         </div>
 
         <div
-          class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center gap-4 shadow-sm border border-gray-200 dark:border-gray-700"
+          class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center gap-4 shadow-soft-xs border border-gray-200 dark:border-gray-700"
         >
           <div
             class="w-12 h-12 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xl"
@@ -58,7 +58,7 @@
           </div>
           <div class="flex-1">
             <span class="block text-sm text-gray-600 dark:text-gray-400">Total de Usuários</span>
-            <span class="block text-xl font-semibold text-gray-900 dark:text-white my-1">{{
+            <span class="block text-xl font-semibold text-txt-primary dark:text-white my-1">{{
               stats.totalUsers
             }}</span>
             <!-- <span class="block text-sm text-green-600 dark:text-green-400">
@@ -68,7 +68,7 @@
         </div>
 
         <div
-          class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center gap-4 shadow-sm border border-gray-200 dark:border-gray-700"
+          class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center gap-4 shadow-soft-xs border border-gray-200 dark:border-gray-700"
         >
           <div
             class="w-12 h-12 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xl"
@@ -77,7 +77,7 @@
           </div>
           <div class="flex-1">
             <span class="block text-sm text-gray-600 dark:text-gray-400">Tarefas no Mês</span>
-            <span class="block text-xl font-semibold text-gray-900 dark:text-white my-1">{{
+            <span class="block text-xl font-semibold text-txt-primary dark:text-white my-1">{{
               stats.monthlyTickets
             }}</span>
             <!-- <span class="block text-sm text-red-600 dark:text-red-400">
@@ -87,7 +87,7 @@
         </div>
 
         <div
-          class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center gap-4 shadow-sm border border-gray-200 dark:border-gray-700"
+          class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center gap-4 shadow-soft-xs border border-gray-200 dark:border-gray-700"
         >
           <div
             class="w-12 h-12 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xl"
@@ -96,7 +96,7 @@
           </div>
           <div class="flex-1">
             <span class="block text-sm text-gray-600 dark:text-gray-400">Faturamento Mensal</span>
-            <span class="block text-xl font-semibold text-gray-900 dark:text-white my-1">{{
+            <span class="block text-xl font-semibold text-txt-primary dark:text-white my-1">{{
               formatCurrency(stats.monthlyRevenue)
             }}</span>
             <!-- <span class="block text-sm text-green-600 dark:text-green-400">
@@ -110,7 +110,7 @@
       <div class="flex flex-wrap gap-4 items-center mb-4 w-[50%]">
         <select
           v-model="statusFilter"
-          class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+          class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-txt-primary dark:text-gray-100"
         >
           <option value="">Todos os Status</option>
           <option value="trial">Trial</option>
@@ -122,7 +122,7 @@
 
         <select
           v-model="planFilter"
-          class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+          class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-txt-primary dark:text-gray-100"
         >
           <option value="">Todos os Planos</option>
           <option value="Básico">Básico</option>
@@ -134,7 +134,7 @@
         <!-- TODO: Adicionar filtro de status de pagamento -->
         <!-- <select
           v-model="paymentFilter"
-          class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+          class="flex-1 min-w-[140px] py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-txt-primary dark:text-gray-100"
         >
           <option value="">Status Pagamento</option>
           <option value="EM_DIA">Em dia</option>
@@ -146,14 +146,14 @@
           <input
             type="date"
             v-model="dateFilter.start"
-            class="flex-1 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            class="flex-1 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-txt-primary dark:text-gray-100"
             placeholder="Data inicial"
           />
           <span class="text-sm text-gray-500 dark:text-gray-400">até</span>
           <input
             type="date"
             v-model="dateFilter.end"
-            class="flex-1 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            class="flex-1 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-txt-primary dark:text-gray-100"
             placeholder="Data final"
           />
         </div> -->
@@ -164,7 +164,7 @@
         v-if="selectedClients.length > 0"
         class="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center"
       >
-        <span class="font-medium text-gray-900 dark:text-white"
+        <span class="font-medium text-txt-primary dark:text-white"
           >{{ selectedClients.length }} clientes selecionados</span
         >
         <div class="flex flex-wrap gap-2">
@@ -192,7 +192,7 @@
 
     <!-- Lista de Clientes -->
     <div
-      class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-soft-xs border border-gray-200 dark:border-gray-700 overflow-hidden"
     >
       <div
         v-if="isLoading"
@@ -218,7 +218,7 @@
               </th>
               <th
                 @click="sortBy('name')"
-                class="px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
+                class="px-4 py-3 text-left text-sm font-medium text-txt-primary dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
                 Cliente
                 <font-awesome-icon
@@ -229,7 +229,7 @@
               </th>
               <th
                 @click="sortBy('cnpj')"
-                class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
+                class="px-4 py-3 text-center text-sm font-medium text-txt-primary dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
                 CNPJ
                 <font-awesome-icon
@@ -240,7 +240,7 @@
               </th>
               <th
                 @click="sortBy('plan')"
-                class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
+                class="px-4 py-3 text-center text-sm font-medium text-txt-primary dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
                 Plano
                 <font-awesome-icon
@@ -251,7 +251,7 @@
               </th>
               <th
                 @click="sortBy('status')"
-                class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
+                class="px-4 py-3 text-center text-sm font-medium text-txt-primary dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
                 Status
                 <font-awesome-icon
@@ -261,13 +261,13 @@
                 />
               </th>
               <th
-                class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100"
+                class="px-4 py-3 text-center text-sm font-medium text-txt-primary dark:text-gray-100"
               >
                 Trial até
               </th>
               <th
                 @click="sortBy('activeUsers')"
-                class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
+                class="px-4 py-3 text-center text-sm font-medium text-txt-primary dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
                 Usuários
                 <font-awesome-icon
@@ -278,7 +278,7 @@
               </th>
               <th
                 @click="sortBy('ticketsThisMonth')"
-                class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
+                class="px-4 py-3 text-center text-sm font-medium text-txt-primary dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
                 Tickets/Mês
                 <font-awesome-icon
@@ -291,7 +291,7 @@
               <!-- TODO: Adicionar função de próxima fatura -->
               <!-- <th
                 @click="sortBy('nextInvoice')"
-                class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
+                class="px-4 py-3 text-center text-sm font-medium text-txt-primary dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 select-none"
               >
                 Próx. Fatura
                 <font-awesome-icon
@@ -301,7 +301,7 @@
                 />
               </th> -->
               <th
-                class="px-4 py-3 text-center text-sm font-medium text-gray-900 dark:text-gray-100"
+                class="px-4 py-3 text-center text-sm font-medium text-txt-primary dark:text-gray-100"
               >
                 Ações
               </th>
@@ -327,12 +327,12 @@
                 </td>
                 <td class="px-4 py-4">
                   <div>
-                    <span class="font-medium text-gray-900 dark:text-white">{{
+                    <span class="font-medium text-txt-primary dark:text-white">{{
                       client.companyName
                     }}</span>
                   </div>
                 </td>
-                <td class="px-4 py-4 text-center text-gray-900 dark:text-gray-100">
+                <td class="px-4 py-4 text-center text-txt-primary dark:text-gray-100">
                   {{ formatCNPJ(client.cnpj) }}
                 </td>
                 <td class="px-4 py-4 text-center">
@@ -377,12 +377,12 @@
                     {{ client.statusLabel }}
                   </span>
                 </td>
-                <td class="px-4 py-4 text-center text-gray-900 dark:text-gray-100">
+                <td class="px-4 py-4 text-center text-txt-primary dark:text-gray-100">
                   {{ client.trialEndDate ? formatDate(client.trialEndDate) : '-' }}
                 </td>
                 <td class="px-4 py-4 text-center">
                   <div
-                    class="text-sm text-gray-900 dark:text-gray-100 flex flex-col items-center gap-1"
+                    class="text-sm text-txt-primary dark:text-gray-100 flex flex-col items-center gap-1"
                   >
                     {{ client.activeUsers }}/{{ client.userLimit }}
                     <div class="w-20 h-1 bg-gray-200 dark:bg-gray-700 rounded-full">
@@ -401,7 +401,7 @@
                 </td>
                 <td class="px-4 py-4 text-center">
                   <div
-                    class="text-sm text-gray-900 dark:text-gray-100 flex flex-col items-center gap-1"
+                    class="text-sm text-txt-primary dark:text-gray-100 flex flex-col items-center gap-1"
                   >
                     {{ client.monthlyTickets }}
                     <span class="text-xs text-gray-500 dark:text-gray-400">tarefas neste mês</span>
@@ -411,7 +411,7 @@
                 <!-- TODO: Adicionar função de próxima fatura -->
                 <!-- <td class="px-4 py-4 text-center">
                   <div
-                    class="text-sm text-gray-900 dark:text-gray-100 flex flex-col items-center gap-1"
+                    class="text-sm text-txt-primary dark:text-gray-100 flex flex-col items-center gap-1"
                   >
                     <span>{{ formatDate(client.nextInvoice) }}</span>
                   </div>
@@ -481,42 +481,42 @@
                       <thead class="bg-gray-100 dark:bg-gray-700">
                         <tr>
                           <th
-                            class="px-3 py-2 text-left text-xs font-medium text-gray-900 dark:text-gray-100"
+                            class="px-3 py-2 text-left text-xs font-medium text-txt-primary dark:text-gray-100"
                           >
                             Nome
                           </th>
                           <th
-                            class="px-3 py-2 text-center text-xs font-medium text-gray-900 dark:text-gray-100"
+                            class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
                           >
                             Email
                           </th>
                           <th
-                            class="px-3 py-2 text-center text-xs font-medium text-gray-900 dark:text-gray-100"
+                            class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
                           >
                           setor
                           </th>
                           <th
-                            class="px-3 py-2 text-center text-xs font-medium text-gray-900 dark:text-gray-100"
+                            class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
                           >
                             Perfil
                           </th>
                           <th
-                            class="px-3 py-2 text-center text-xs font-medium text-gray-900 dark:text-gray-100"
+                            class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
                           >
                             Status
                           </th>
                           <th
-                            class="px-3 py-2 text-center text-xs font-medium text-gray-900 dark:text-gray-100"
+                            class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
                           >
                             Logins
                           </th>
                           <th
-                            class="px-3 py-2 text-center text-xs font-medium text-gray-900 dark:text-gray-100"
+                            class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
                           >
                             Último Login
                           </th>
                           <th
-                            class="px-3 py-2 text-center text-xs font-medium text-gray-900 dark:text-gray-100"
+                            class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
                           >
                             Ações
                           </th>
@@ -535,18 +535,18 @@
                               >
                                 {{ getUserInitials(user) }}
                               </div>
-                              <span class="text-sm text-gray-900 dark:text-white"
+                              <span class="text-sm text-txt-primary dark:text-white"
                                 >{{ user.firstName }} {{ user.lastName }}</span
                               >
                             </div>
                           </td>
                           <td
-                            class="px-3 py-2 text-center text-sm text-gray-900 dark:text-gray-100"
+                            class="px-3 py-2 text-center text-sm text-txt-primary dark:text-gray-100"
                           >
                             {{ user.email }}
                           </td>
                           <td
-                            class="px-3 py-2 text-center text-sm text-gray-900 dark:text-gray-100"
+                            class="px-3 py-2 text-center text-sm text-txt-primary dark:text-gray-100"
                           >
                             {{ user.department }}
                           </td>
@@ -581,12 +581,12 @@
                             </span>
                           </td>
                           <td
-                            class="px-3 py-2 text-center text-sm text-gray-900 dark:text-gray-100"
+                            class="px-3 py-2 text-center text-sm text-txt-primary dark:text-gray-100"
                           >
                             {{ user.loginCount || 0 }}
                           </td>
                           <td
-                            class="px-3 py-2 text-center text-sm text-gray-900 dark:text-gray-100"
+                            class="px-3 py-2 text-center text-sm text-txt-primary dark:text-gray-100"
                           >
                             {{
                               user.lastLogin ? formatDateTime(user.lastLogin.toString()) : 'Nunca'
@@ -661,7 +661,7 @@
         <div
           class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
         >
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Novo Cliente</h2>
+          <h2 class="text-lg font-semibold text-txt-primary dark:text-white">Novo Cliente</h2>
           <button
             class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
             @click="showNewClientModal = false"
@@ -679,7 +679,7 @@
                 v-model="newClient.name"
                 type="text"
                 required
-                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100"
               />
             </div>
             <div>
@@ -690,7 +690,7 @@
                 v-model="newClient.cnpj"
                 type="text"
                 required
-                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100"
               />
             </div>
             <div>
@@ -701,7 +701,7 @@
                 v-model="newClient.customKey"
                 type="text"
                 required
-                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100"
               />
             </div>
             <div>
@@ -712,7 +712,7 @@
                 v-model="newClient.email"
                 type="email"
                 required
-                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100"
               />
             </div>
           </form>
@@ -747,7 +747,7 @@
             <font-awesome-icon icon="key" class="text-orange-600 dark:text-orange-400" />
           </div>
           <div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Redefinir Senha</h3>
+            <h3 class="text-lg font-semibold text-txt-primary dark:text-white">Redefinir Senha</h3>
             <p class="text-sm text-gray-600 dark:text-gray-400">Confirmar redefinição de senha</p>
           </div>
         </div>

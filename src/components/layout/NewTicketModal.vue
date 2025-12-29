@@ -37,7 +37,7 @@
           :class="[
             'text-sm font-medium',
             currentStep === 1
-              ? 'text-gray-900 dark:text-white'
+              ? 'text-txt-primary dark:text-white'
               : 'text-gray-500 dark:text-gray-400',
           ]"
           >Informações Básicas</span
@@ -59,7 +59,7 @@
           :class="[
             'text-sm font-medium',
             currentStep === 2
-              ? 'text-gray-900 dark:text-white'
+              ? 'text-txt-primary dark:text-white'
               : 'text-gray-500 dark:text-gray-400',
           ]"
           >Detalhes Adicionais</span
@@ -203,7 +203,7 @@
         <!-- Anexar Arquivos -->
         <div v-if="selectedFiles.length > 0" class="mb-4 mt-4 col-span-2">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <h3 class="font-semibold text-txt-primary dark:text-gray-100 flex items-center gap-2">
               <font-awesome-icon icon="paperclip" class="text-primary dark:text-blue-400" />
               Anexos
               <span
@@ -281,7 +281,7 @@
           class="col-span-2 border-t border-gray-100 dark:border-gray-800 pt-4 mt-2"
         >
           <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <h3 class="font-semibold text-txt-primary dark:text-gray-100 flex items-center gap-2">
               <font-awesome-icon icon="tasks" class="text-primary dark:text-blue-400" />
               Subtarefas
               <span
@@ -304,7 +304,7 @@
                 class="mt-1 w-4 h-4 rounded border border-gray-300 dark:border-gray-600 flex-shrink-0"
               ></div>
               <div class="flex-1 min-w-0">
-                <div class="text-sm text-gray-900 dark:text-gray-100">
+                <div class="text-sm text-txt-primary dark:text-gray-100">
                   {{ item.title }}
                 </div>
               </div>

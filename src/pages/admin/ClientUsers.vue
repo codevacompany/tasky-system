@@ -4,7 +4,7 @@
     <header class="mb-8">
       <div class="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-4">
         <div>
-          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white m-0">
+          <h1 class="text-2xl font-semibold text-txt-primary dark:text-white m-0">
             Usuários do Cliente
           </h1>
           <h2 class="text-base text-gray-600 dark:text-gray-400 mt-1 m-0">
@@ -30,19 +30,19 @@
         <div class="relative flex-1">
           <font-awesome-icon
             icon="search"
-            class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+            class="absolute left-4 top-1/2 transform -translate-y-1/2 text-txt-light/80"
           />
           <Input
             v-model="searchTerm"
             type="text"
             placeholder="Buscar por nome, email ou perfil"
             padding="tight"
-            class="w-full sm:w-[300px] pl-10 pr-4 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+            class="w-full sm:w-[300px] pl-10 pr-4 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
           />
         </div>
         <select
           v-model="statusFilter"
-          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 w-full sm:w-[180px]"
+          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 w-full sm:w-[180px]"
         >
           <option value="">Todos os Status</option>
           <option value="ATIVO">Ativo</option>
@@ -50,7 +50,7 @@
         </select>
         <select
           v-model="roleFilter"
-          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 w-full sm:w-[180px]"
+          class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 w-full sm:w-[180px]"
         >
           <option value="">Todos os Perfis</option>
           <option value="ADMIN">Administrador</option>
@@ -62,7 +62,7 @@
 
     <!-- Lista de Usuários -->
     <div
-      class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-auto"
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-soft-xs border border-gray-200 dark:border-gray-700 overflow-auto"
     >
       <table class="w-full border-collapse">
         <thead>
@@ -113,7 +113,7 @@
                   {{ getUserInitials(user) }}
                 </div>
                 <div class="flex flex-col">
-                  <span class="font-medium text-gray-900 dark:text-white"
+                  <span class="font-medium text-txt-primary dark:text-white"
                     >{{ user.firstName }} {{ user.lastName }}</span
                   >
                   <span class="text-xs text-gray-500 dark:text-gray-400">{{
@@ -123,7 +123,7 @@
               </div>
             </td>
             <td
-              class="px-4 py-3 border-b border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+              class="px-4 py-3 border-b border-gray-200 dark:border-gray-600 text-txt-primary dark:text-gray-100"
             >
               {{ user.email }}
             </td>
@@ -155,7 +155,7 @@
             </td>
             <td class="px-4 py-3 border-b border-gray-200 dark:border-gray-600">
               <div class="flex flex-col text-sm">
-                <span class="text-gray-900 dark:text-gray-100">{{
+                <span class="text-txt-primary dark:text-gray-100">{{
                   formatDate(user.ultimoAcesso)
                 }}</span>
                 <span class="text-xs text-gray-500 dark:text-gray-400">{{
@@ -202,7 +202,7 @@
         <div
           class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-600"
         >
-          <h2 class="m-0 text-xl font-semibold text-gray-900 dark:text-white">Novo Usuário</h2>
+          <h2 class="m-0 text-xl font-semibold text-txt-primary dark:text-white">Novo Usuário</h2>
           <button
             class="w-8 h-8 flex items-center justify-center border-none bg-transparent text-gray-600 dark:text-gray-400 rounded-md cursor-pointer transition-all hover:bg-gray-100 dark:hover:bg-gray-600"
             @click="showNewUserModal = false"
@@ -220,14 +220,14 @@
                 v-model="newUser.firstName"
                 type="text"
                 required
-                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 mb-2"
+                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 mb-2"
                 placeholder="Nome"
               />
               <Input
                 v-model="newUser.lastName"
                 type="text"
                 required
-                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
                 placeholder="Sobrenome"
               />
             </div>
@@ -237,7 +237,7 @@
                 v-model="newUser.email"
                 type="email"
                 required
-                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
               />
             </div>
             <div class="mb-4">
@@ -248,7 +248,7 @@
                 v-model="newUser.departamento"
                 type="text"
                 required
-                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
               />
             </div>
             <div class="mb-0">
@@ -256,7 +256,7 @@
               <select
                 v-model="newUser.perfil"
                 required
-                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                class="w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
               >
                 <option value="ADMIN">Administrador</option>
                 <option value="GESTOR">Gestor</option>

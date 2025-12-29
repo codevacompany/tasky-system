@@ -7,7 +7,7 @@
       :class="[
         'px-5 py-2 text-sm font-medium rounded-md transition-all',
         modelValue === option.value
-          ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
+          ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-soft-xs'
           : 'bg-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-200/70 dark:hover:bg-gray-600/70',
       ]"
     >

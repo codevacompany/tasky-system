@@ -1,17 +1,17 @@
 <template>
   <section id="archivedTicketsSection" class="px-4 pt-4 pb-4 md:px-6 md:pt-4 md:pb-0">
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Tarefas Arquivadas</h1>
+      <h1 class="text-2xl font-bold text-txt-primary dark:text-white">Tarefas Arquivadas</h1>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-soft-xs">
       <!-- Search and Filters Bar -->
       <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-4 px-6 gap-3 border-b border-gray-200 dark:border-gray-700">
         <div class="flex items-center justify-start gap-2 w-full lg:w-auto">
           <div class="relative w-full max-w-xs lg:w-56">
             <font-awesome-icon
               icon="search"
-              class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-3.5 h-3.5 pointer-events-none"
+              class="absolute left-3 top-1/2 transform -translate-y-1/2 text-txt-light/80 dark:text-gray-500 w-3.5 h-3.5 pointer-events-none"
             />
             <Input
               v-model="searchTerm"
@@ -68,7 +68,7 @@
         <div
           class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700"
         >
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Filtros</h3>
+          <h3 class="text-lg font-semibold text-txt-primary dark:text-white">Filtros</h3>
           <button
             class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             @click="showFiltersModal = false"

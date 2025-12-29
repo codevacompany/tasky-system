@@ -1,7 +1,7 @@
 <template>
   <section id="setoresSection" class="p-6">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Setores</h1>
+      <h1 class="text-2xl font-bold text-txt-primary dark:text-white">Setores</h1>
       <button
         id="newSetorBtn"
         class="flex items-center gap-2 px-4 py-2 btn btn-primary text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
@@ -17,7 +17,7 @@
         <div class="relative">
           <font-awesome-icon
             icon="search"
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 pointer-events-none"
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-txt-light/80 dark:text-gray-500 w-4 h-4 pointer-events-none"
           />
           <Input
             id="searchDepartments"
@@ -32,7 +32,7 @@
     </div>
 
     <div
-      class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden"
+      class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-soft-xs overflow-hidden"
     >
       <DataTable
         :data="initialConfig.items"
@@ -49,7 +49,7 @@
         @sort="handleSort"
       >
         <template #column-name="{ item }">
-          <div class="font-medium text-gray-900 dark:text-gray-100">
+          <div class="font-medium text-txt-primary dark:text-gray-100">
             {{ item.name }}
           </div>
         </template>

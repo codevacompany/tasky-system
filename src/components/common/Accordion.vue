@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 px-6 py-2 transition-shadow duration-200 hover:shadow-md"
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-soft-xs border border-gray-100 dark:border-gray-700 px-6 py-2 transition-shadow duration-200 hover:shadow-md"
   >
     <button
       class="flex items-center gap-3 w-full bg-transparent border-none text-xl font-semibold text-blue-600 dark:text-blue-400 py-5 cursor-pointer text-left transition-colors duration-200 hover:text-blue-700 dark:hover:text-blue-300"
@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits } from 'vue';
+import { ref } from 'vue';
 
 const props = defineProps({
   title: {

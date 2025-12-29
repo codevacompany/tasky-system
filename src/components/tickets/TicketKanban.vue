@@ -9,7 +9,7 @@
       <div
         v-for="n in 5"
         :key="`col-skeleton-${n}`"
-        class="flex-1 min-w-[310px] w-0 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm relative flex flex-col h-full"
+        class="flex-1 min-w-[310px] w-0 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-soft-xs relative flex flex-col h-full"
       >
         <div
           class="p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-700 rounded-t-xl"
@@ -20,7 +20,7 @@
           <div
             v-for="m in 3"
             :key="`card-skeleton-${n}-${m}`"
-            class="bg-white dark:bg-gray-700 rounded-lg p-3.5 border border-gray-200 dark:border-gray-600 shadow-sm"
+            class="bg-white dark:bg-gray-700 rounded-lg p-3.5 border border-gray-200 dark:border-gray-600 shadow-soft-xs"
           >
             <div class="h-4 bg-gray-200 dark:bg-gray-600 rounded w-3/4 mb-2"></div>
             <div class="h-4 bg-gray-200 dark:bg-gray-600 rounded w-1/2 mb-3"></div>
@@ -34,11 +34,11 @@
       <div
         v-for="column in kanbanColumns"
         :key="column.id"
-        class="flex-1 min-w-[310px] w-0 bg-[#F8F9FB] dark:bg-gray-800 rounded-2xl shadow-sm relative flex flex-col h-full"
+        class="flex-1 min-w-[310px] w-0 bg-[#F8F9FB] dark:bg-gray-800 rounded-2xl shadow-soft-xs relative flex flex-col h-full"
       >
         <div class="p-2 text-center flex-shrink-0">
           <h3
-            class="m-0 inline-flex items-center gap-3 text-base font-semibold text-gray-900 dark:text-white py-2"
+            class="m-0 inline-flex items-center gap-3 text-base font-semibold text-txt-primary dark:text-white py-2"
           >
             {{ column.name }}
             <span
@@ -54,7 +54,7 @@
             v-for="ticket in getTicketsByColumn(column)"
             :key="ticket.customId"
             :class="[
-              'min-h-[100px] flex-shrink-0 bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border shadow-sm mb-3.5 flex flex-col hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
+              'min-h-[100px] flex-shrink-0 bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border shadow-soft-xs mb-3.5 flex flex-col hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
               ticket.ticketStatus?.key === DefaultTicketStatus.Returned ||
               ticket.status === DefaultTicketStatus.Returned
                 ? 'border-orange-300 dark:border-orange-600 dark:bg-orange-900/10 hover:border-orange-400 dark:hover:border-orange-500'
@@ -69,7 +69,7 @@
                 :class="{ 'pb-1': hasRightIcons(ticket) }"
               >
                 <div
-                  class="font-semibold text-sm leading-5 text-gray-900 dark:text-white text-left flex-1 break-words m-0 p-0"
+                  class="font-semibold text-sm leading-5 text-txt-primary dark:text-white text-left flex-1 break-words m-0 p-0"
                   :class="hasRightIcons(ticket) ? 'line-clamp-2' : ''"
                 >
                   {{ ticket.name }}

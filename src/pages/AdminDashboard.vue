@@ -120,7 +120,7 @@
     </div>
 
     <!-- Gestão de Usuários Admin -->
-    <div class="bg-white rounded-lg shadow mb-8">
+    <div class="bg-white rounded-lg shadow-soft-xs mb-8">
       <div class="p-4 flex justify-between items-center border-b">
         <h2 class="text-lg font-semibold">Gestão de Usuários Admin</h2>
         <button
@@ -184,7 +184,7 @@
     </div>
 
     <!-- Controle de Recursos por Plano -->
-    <div class="bg-white rounded-lg shadow">
+    <div class="bg-white rounded-lg shadow-soft-xs">
       <div class="p-4 flex justify-between items-center border-b">
         <h2 class="text-lg font-semibold">Controle de Recursos por Plano</h2>
         <button

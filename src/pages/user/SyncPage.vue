@@ -2,7 +2,7 @@
   <div class="flex flex-col h-full">
     <div class="flex-1 overflow-hidden">
       <!-- Main Content -->
-      <div class="flex h-full bg-white dark:bg-gray-900 rounded-lg shadow-sm overflow-hidden">
+      <div class="flex h-full bg-white dark:bg-gray-900 rounded-lg shadow-soft-xs overflow-hidden">
         <!-- Sidebar -->
         <div class="w-[280px] border-r border-gray-200 dark:border-gray-700 flex flex-col">
           <div class="p-5 border-b border-gray-200 dark:border-gray-700">
@@ -73,7 +73,7 @@
           <!-- Lista de usuários para chat individual -->
           <div v-if="currentChannel === 'individual'" class="flex-1 flex flex-col overflow-hidden">
             <div class="p-5 border-b border-gray-200 dark:border-gray-700">
-              <h3 class="mb-3 text-lg font-semibold text-gray-900 dark:text-white">Usuários</h3>
+              <h3 class="mb-3 text-lg font-semibold text-txt-primary dark:text-white">Usuários</h3>
               <div class="relative">
                 <Input
                   v-model="userSearchTerm"
@@ -98,7 +98,7 @@
                   <span class="text-sm">{{ getUserInitials(user) }}</span>
                 </div>
                 <div class="flex-1 flex flex-col">
-                  <span class="font-medium text-gray-900 dark:text-white"
+                  <span class="font-medium text-txt-primary dark:text-white"
                     >{{ user.firstName }} {{ user.lastName }}</span
                   >
                   <span class="text-xs text-gray-500 dark:text-gray-400">{{
@@ -125,7 +125,7 @@
             class="flex-1 flex items-center justify-center p-8"
           >
             <div
-              class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-left"
+              class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-soft-xs p-8 text-left"
             >
               <h2 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-5">
                 Bem-vindo ao Sync!
@@ -219,7 +219,7 @@
                 <div class="flex-1">
                   <div class="flex justify-between items-start mb-1">
                     <div class="flex flex-col">
-                      <span class="font-medium text-gray-900 dark:text-white"
+                      <span class="font-medium text-txt-primary dark:text-white"
                         >{{ message.sender.firstName }} {{ message.sender.lastName }}</span
                       >
                       <span class="text-xs text-gray-500 dark:text-gray-400">{{
@@ -248,7 +248,7 @@
                     </div>
                   </div>
                   <div v-else class="mb-2">
-                    <div class="leading-relaxed text-gray-900 dark:text-gray-100">
+                    <div class="leading-relaxed text-txt-primary dark:text-gray-100">
                       {{ message.content }}
                     </div>
                     <div
@@ -307,7 +307,7 @@
                     <div class="flex-1">
                       <div class="flex justify-between items-start mb-1">
                         <div class="flex flex-col">
-                          <span class="font-medium text-gray-900 dark:text-white"
+                          <span class="font-medium text-txt-primary dark:text-white"
                             >{{ reply.sender.firstName }} {{ reply.sender.lastName }}</span
                           >
                           <span class="text-xs text-gray-500 dark:text-gray-400">{{
@@ -318,7 +318,7 @@
                           formatTime(reply.createdAt)
                         }}</span>
                       </div>
-                      <div class="leading-relaxed text-gray-900 dark:text-gray-100">
+                      <div class="leading-relaxed text-txt-primary dark:text-gray-100">
                         {{ reply.content }}
                       </div>
                     </div>
@@ -366,7 +366,7 @@
                 @keydown="handleKeyDown"
                 rows="1"
                 ref="messageInput"
-                class="w-full min-h-[44px] max-h-[120px] border border-gray-200 dark:border-gray-600 rounded-2xl px-4 py-3 resize-none text-gray-900 dark:text-gray-100 text-sm leading-relaxed overflow-y-auto bg-white dark:bg-gray-900 focus:outline-none focus:border-blue-600 focus:shadow-[0_0_0_2px_rgba(25,118,210,0.1)]"
+                class="w-full min-h-[44px] max-h-[120px] border border-gray-200 dark:border-gray-600 rounded-2xl px-4 py-3 resize-none text-txt-primary dark:text-gray-100 text-sm leading-relaxed overflow-y-auto bg-white dark:bg-gray-900 focus:outline-none focus:border-blue-600 focus:shadow-[0_0_0_2px_rgba(25,118,210,0.1)]"
               ></textarea>
               <MentionSelector
                 v-if="showMentionSelector"

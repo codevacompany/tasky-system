@@ -36,7 +36,7 @@
       </template>
 
       <template #column-person="{ item }">
-        <div class="text-sm text-gray-900 dark:text-gray-100">
+        <div class="text-sm text-txt-primary dark:text-gray-100">
           <template v-if="tableType === 'criadas'">
             <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
               <div
@@ -46,7 +46,7 @@
                   'whitespace-nowrap overflow-hidden text-ellipsis',
                   shouldHighlightTargetUser(item, targetUser.userId)
                     ? 'text-blue-600 dark:text-blue-400'
-                    : 'text-gray-900 dark:text-gray-100',
+                    : 'text-txt-primary dark:text-gray-100',
                 ]"
               >
                 {{ targetUser.user.firstName }} {{ targetUser.user.lastName }}
@@ -76,7 +76,7 @@
       <template #column-destinatario="{ item }">
         <div
           v-if="tableType === 'gerais' || tableType === 'arquivadas'"
-          class="text-sm text-gray-900 dark:text-gray-100"
+          class="text-sm text-txt-primary dark:text-gray-100"
         >
           <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
             <div
@@ -86,7 +86,7 @@
                 'whitespace-nowrap overflow-hidden text-ellipsis',
                 shouldHighlightTargetUser(item, targetUser.userId)
                   ? 'text-blue-600 dark:text-blue-400'
-                  : 'text-gray-900 dark:text-gray-100',
+                  : 'text-txt-primary dark:text-gray-100',
               ]"
             >
               {{ targetUser.user.firstName }} {{ targetUser.user.lastName }}
@@ -97,7 +97,7 @@
       </template>
 
       <template #column-department="{ item }">
-        <div class="text-sm text-gray-900 dark:text-gray-100">
+        <div class="text-sm text-txt-primary dark:text-gray-100">
           <template v-if="tableType === 'setor'">
             <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
               <div
@@ -107,7 +107,7 @@
                   'whitespace-nowrap overflow-hidden text-ellipsis',
                   shouldHighlightTargetUser(item, targetUser.userId)
                     ? 'text-blue-600 dark:text-blue-400'
-                    : 'text-gray-900 dark:text-gray-100',
+                    : 'text-txt-primary dark:text-gray-100',
                 ]"
               >
                 {{ targetUser.user.firstName }} {{ targetUser.user.lastName }}
@@ -123,7 +123,7 @@
                 :class="[
                   shouldHighlightTargetUser(item, targetUser.userId)
                     ? 'text-blue-600 dark:text-blue-400'
-                    : 'text-gray-900 dark:text-gray-100',
+                    : 'text-txt-primary dark:text-gray-100',
                 ]"
               >
                 {{ targetUser.user.department?.name || '-' }}
@@ -161,7 +161,7 @@
             <font-awesome-icon v-else icon="equals" class="text-sm" />
           </div>
           <span
-            class="text-xs text-gray-900 dark:text-gray-100 hidden md:inline whitespace-nowrap"
+            class="text-xs text-txt-primary dark:text-gray-100 hidden md:inline whitespace-nowrap"
             >{{ formatSnakeToNaturalCase(item.priority) }}</span
           >
         </div>
@@ -184,7 +184,7 @@
       </template>
 
       <template #column-dueDate="{ item }">
-        <div class="text-xs md:text-sm text-center text-gray-900 dark:text-gray-100">
+        <div class="text-xs md:text-sm text-center text-txt-primary dark:text-gray-100">
           <div class="whitespace-nowrap">
             <template
               v-if="
@@ -881,7 +881,7 @@ const getDeadlineInfoFromDate = (date?: string) => {
 };
 
 const getDeadlineClass = (date?: string) => {
-  if (!date) return 'text-gray-900 dark:text-gray-100';
+  if (!date) return 'text-txt-primary dark:text-gray-100';
 
   // First check if date is overdue by comparing directly
   const dueDate = new Date(date);
@@ -891,7 +891,7 @@ const getDeadlineClass = (date?: string) => {
   }
 
   const info = getDeadlineInfoFromDate(date);
-  if (!info) return 'text-gray-900 dark:text-gray-100';
+  if (!info) return 'text-txt-primary dark:text-gray-100';
 
   if (info.isOverdue) return 'text-red-600 dark:text-red-400 font-semibold';
   // Red when 6 hours or less remaining
@@ -899,7 +899,7 @@ const getDeadlineClass = (date?: string) => {
     return 'text-red-600 dark:text-red-400 font-semibold';
   if (info.businessDaysRemaining <= 2) return 'text-orange-500 dark:text-orange-400 font-semibold';
   // Black when more than 3 days remaining
-  if (info.businessDaysRemaining > 3) return 'text-gray-900 dark:text-gray-100';
+  if (info.businessDaysRemaining > 3) return 'text-txt-primary dark:text-gray-100';
   return 'text-green-600 dark:text-green-400';
 };
 

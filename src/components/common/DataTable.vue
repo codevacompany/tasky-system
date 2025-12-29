@@ -481,7 +481,7 @@ const getCellContentClasses = (header: TableHeader<T>) => {
   if (header.key === 'id' || header.key === 'customId') {
     classes.push('text-blue-600 dark:text-blue-400 font-medium');
   } else {
-    classes.push('text-gray-900 dark:text-gray-100');
+    classes.push('text-txt-primary dark:text-gray-100');
   }
 
   return classes.join(' ');

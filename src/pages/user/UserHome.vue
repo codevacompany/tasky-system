@@ -18,17 +18,17 @@
       />
 
       <!-- Estatísticas -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg px-6 pt-4 pb-6 mb-5 shadow">
+      <div class="bg-white dark:bg-gray-800 rounded-lg px-6 pt-4 pb-6 mb-5 shadow-soft-xs">
         <div class="mb-4 flex justify-between items-start">
           <div>
-            <h1 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Estatísticas</h1>
-            <p class="text-xs text-gray-600 dark:text-gray-400">
+            <h1 class="text-lg font-bold text-txt-primary dark:text-white mb-1">Estatísticas</h1>
+            <p class="text-xs text-txt-muted dark:text-gray-400">
               Visão geral do seu desempenho e métricas
             </p>
           </div>
           <button
             @click="showPerformanceModal = true"
-            class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors"
+            class="text-sm text-primary-600 dark:text-blue-400 hover:text-primary-700 dark:hover:text-blue-300 font-medium transition-colors"
           >
             Ver detalhes
           </button>
@@ -38,7 +38,7 @@
           <!-- Pendentes -->
           <div
             v-if="isLoading"
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
@@ -50,7 +50,7 @@
           </div>
           <div
             v-else
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <font-awesome-icon
@@ -60,17 +60,17 @@
             </div>
             <p
               id="pendingTicketsCount"
-              class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+              class="text-2xl font-bold text-txt-primary dark:text-white mb-1"
             >
               {{ ticketsPendentes.total }}
             </p>
-            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Pendentes</h3>
+            <h3 class="text-xs font-medium text-txt-muted dark:text-gray-400">Pendentes</h3>
           </div>
 
           <!-- Em Andamento -->
           <div
             v-if="isLoading"
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
@@ -82,24 +82,24 @@
           </div>
           <div
             v-else
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <font-awesome-icon icon="spinner" class="text-blue-500 dark:text-blue-400 text-2xl" />
             </div>
             <p
               id="inProgressTicketsCount"
-              class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+              class="text-2xl font-bold text-txt-primary dark:text-white mb-1"
             >
               {{ ticketsEmAndamento.total }}
             </p>
-            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Em Andamento</h3>
+            <h3 class="text-xs font-medium text-txt-muted dark:text-gray-400">Em Andamento</h3>
           </div>
 
           <!-- Finalizados -->
           <div
             v-if="isLoading"
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
@@ -111,7 +111,7 @@
           </div>
           <div
             v-else
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <font-awesome-icon
@@ -121,17 +121,17 @@
             </div>
             <p
               id="resolvedTicketsCount"
-              class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+              class="text-2xl font-bold text-txt-primary dark:text-white mb-1"
             >
               {{ ticketsFinalizados.total }}
             </p>
-            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Resolvidos</h3>
+            <h3 class="text-xs font-medium text-txt-muted dark:text-gray-400">Resolvidos</h3>
           </div>
 
           <!-- Tempo Médio de Aceite -->
           <div
             v-if="isLoading"
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
@@ -143,7 +143,7 @@
           </div>
           <div
             v-else
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <font-awesome-icon
@@ -151,10 +151,10 @@
                 class="text-teal-600 dark:text-teal-400 text-2xl"
               />
             </div>
-            <p id="tempoMedioAceite" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            <p id="tempoMedioAceite" class="text-2xl font-bold text-txt-primary dark:text-white mb-1">
               {{ userStats ? formatTimeShort(userStats.averageAcceptanceTimeSeconds) : 'N/A' }}
             </p>
-            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
+            <h3 class="text-xs font-medium text-txt-muted dark:text-gray-400">
               Tempo Médio de Aceite
             </h3>
           </div>
@@ -162,7 +162,7 @@
           <!-- Tempo Médio de Resolução -->
           <div
             v-if="isLoading"
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
@@ -174,7 +174,7 @@
           </div>
           <div
             v-else
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <font-awesome-icon
@@ -184,11 +184,11 @@
             </div>
             <p
               id="tempoMedioConclusao"
-              class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+              class="text-2xl font-bold text-txt-primary dark:text-white mb-1"
             >
               {{ userStats ? formatTimeShort(userStats.averageResolutionTimeSeconds) : 'N/A' }}
             </p>
-            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
+            <h3 class="text-xs font-medium text-txt-muted dark:text-gray-400">
               Tempo Médio de Resolução
             </h3>
           </div>
@@ -196,7 +196,7 @@
           <!-- Score de Desempenho -->
           <div
             v-if="isLoading"
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
@@ -208,7 +208,7 @@
           </div>
           <div
             v-else
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <font-awesome-icon
@@ -217,7 +217,7 @@
               />
             </div>
             <template v-if="userStats?.efficiencyScore !== undefined">
-              <p id="efficiencyScore" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              <p id="efficiencyScore" class="text-2xl font-bold text-txt-primary dark:text-white mb-1">
                 {{ (userStats.efficiencyScore * 100).toFixed(0) }}%
               </p>
               <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
@@ -225,10 +225,10 @@
               </h3>
             </template>
             <template v-else>
-              <p class="text-base font-medium text-gray-600 dark:text-gray-300 mb-1 text-center">
+              <p class="text-base font-medium text-txt-secondary dark:text-gray-300 mb-1 text-center">
                 Score indisponível
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
+              <p class="text-xs text-txt-muted dark:text-gray-400 text-center">
                 Mínimo de 10 tarefas necessário
               </p>
             </template>

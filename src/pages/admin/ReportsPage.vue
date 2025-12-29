@@ -47,7 +47,7 @@
         <div class="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:justify-between sm:items-center">
           <div>
             <h1
-              class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-1 sm:mb-0"
+              class="text-xl sm:text-2xl font-semibold text-txt-primary dark:text-white mb-1 sm:mb-0"
             >
               Relatórios do Sistema
             </h1>
@@ -107,10 +107,10 @@
       <!-- Metrics Grid - Only visible in Overview tab -->
       <div
         v-if="currentTab === 'overview'"
-        class="bg-white dark:bg-gray-800 rounded-lg px-6 pt-4 pb-6 shadow"
+        class="bg-white dark:bg-gray-800 rounded-lg px-6 pt-4 pb-6 shadow-soft-sm"
       >
         <div class="mb-4">
-          <h1 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+          <h1 class="text-lg font-semibold text-txt-primary dark:text-white mb-1">
             Estatísticas gerais
           </h1>
           <p class="text-xs text-gray-600 dark:text-gray-400">
@@ -125,7 +125,7 @@
             <div class="mb-3">
               <font-awesome-icon icon="ticket" class="text-blue-500 dark:text-blue-400 text-2xl" />
             </div>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            <p class="text-2xl font-bold text-txt-primary dark:text-white mb-1">
               {{ statistics?.totalTickets || 0 }}
             </p>
             <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Total de Tarefas</h3>
@@ -141,7 +141,7 @@
                 class="text-purple-500 dark:text-purple-400 text-2xl"
               />
             </div>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            <p class="text-2xl font-bold text-txt-primary dark:text-white mb-1">
               {{ formatPercentage(statistics?.resolutionRate) }}
             </p>
             <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">Taxa de Resolução</h3>
@@ -157,7 +157,7 @@
                 class="text-indigo-500 dark:text-indigo-400 text-2xl"
               />
             </div>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            <p class="text-2xl font-bold text-txt-primary dark:text-white mb-1">
               {{ formatTimeInSecondsCompact(statistics?.averageResolutionTimeSeconds || 0) }}
             </p>
             <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
@@ -175,7 +175,7 @@
                 class="text-teal-600 dark:text-teal-400 text-2xl"
               />
             </div>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            <p class="text-2xl font-bold text-txt-primary dark:text-white mb-1">
               {{ formatTimeInSecondsCompact(statistics?.averageAcceptanceTimeSeconds || 0) }}
             </p>
             <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
@@ -418,13 +418,13 @@
                           />
                         </div>
                         <div class="min-w-0 hidden sm:block">
-                          <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          <p class="text-sm font-medium text-txt-primary dark:text-white truncate">
                             {{ user.firstName }} {{ user.lastName }}
                           </p>
                         </div>
                       </div>
                       <div class="text-center">
-                        <span class="text-sm text-gray-900 dark:text-white">{{
+                        <span class="text-sm text-txt-primary dark:text-white">{{
                           user.departmentName
                         }}</span>
                       </div>
@@ -569,13 +569,13 @@
                           <font-awesome-icon icon="building" class="w-5 h-5" />
                         </div>
                         <div class="min-w-0">
-                          <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          <p class="text-sm font-medium text-txt-primary dark:text-white truncate">
                             {{ dept.departmentName }}
                           </p>
                         </div>
                       </div>
                       <div class="text-center">
-                        <span class="text-lg font-semibold text-gray-900 dark:text-white">{{
+                        <span class="text-lg font-semibold text-txt-primary dark:text-white">{{
                           dept.totalTickets
                         }}</span>
                       </div>
@@ -659,7 +659,7 @@
                           <span class="text-gray-700 dark:text-gray-300">{{
                             dept.departmentName
                           }}</span>
-                          <span class="font-medium text-gray-900 dark:text-white">
+                          <span class="font-medium text-txt-primary dark:text-white">
                             {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds) }}
                           </span>
                         </div>
@@ -717,7 +717,7 @@
                                   (duration.status as unknown as string),
                               )
                             }}</span>
-                            <span class="font-medium text-gray-900 dark:text-white">
+                            <span class="font-medium text-txt-primary dark:text-white">
                               {{ formatTimeInSecondsCompact(duration.averageDurationSeconds) }}
                             </span>
                           </div>
@@ -758,7 +758,7 @@
                   :max-date="new Date()"
                   :min-date="new Date(2023, 0, 1)"
                   :value-type="'format'"
-                  :input-class="'w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'"
+                  :input-class="'w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-txt-primary dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'"
                   :placeholder-class="'text-gray-500 dark:text-gray-400'"
                   :clear-icon="false"
                   :confirm="false"
@@ -778,7 +778,7 @@
                   :max-date="new Date()"
                   :min-date="new Date(2023, 0, 1)"
                   :value-type="'format'"
-                  :input-class="'w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'"
+                  :input-class="'w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-txt-primary dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'"
                   :placeholder-class="'text-gray-500 dark:text-gray-400'"
                   :clear-icon="false"
                   :confirm="false"
@@ -800,7 +800,7 @@
               <template #title>Análise de Tempo em Andamento</template>
 
               <div>
-                <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">
+                <h3 class="text-sm font-medium text-txt-primary dark:text-white mb-4">
                   Distribuição por Tempo
                 </h3>
                 <div class="flex flex-wrap gap-5 justify-between">
@@ -1190,7 +1190,7 @@
                           class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
                         >
                           <div>
-                            <div class="font-medium text-gray-900 dark:text-white">
+                            <div class="font-medium text-txt-primary dark:text-white">
                               {{ dept.departmentName }}
                             </div>
                             <div class="text-sm text-gray-600 dark:text-gray-400">
@@ -1241,7 +1241,7 @@
                           class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
                         >
                           <div>
-                            <div class="font-medium text-gray-900 dark:text-white">
+                            <div class="font-medium text-txt-primary dark:text-white">
                               {{ dept.departmentName }}
                             </div>
                             <div class="text-sm text-gray-600 dark:text-gray-400">
@@ -1292,7 +1292,7 @@
                     class="text-2xl text-blue-600 dark:text-blue-400"
                   />
                 </div>
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 class="text-xl font-semibold text-txt-primary dark:text-white mb-2">
                   Analytics de Setor Necessários
                 </h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
@@ -1343,7 +1343,7 @@
                           class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
                         >
                           <div>
-                            <div class="font-medium text-gray-900 dark:text-white">
+                            <div class="font-medium text-txt-primary dark:text-white">
                               {{ user.firstName }} {{ user.lastName }}
                             </div>
                             <div class="text-sm text-gray-600 dark:text-gray-400">
@@ -1393,7 +1393,7 @@
                           class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
                         >
                           <div>
-                            <div class="font-medium text-gray-900 dark:text-white">
+                            <div class="font-medium text-txt-primary dark:text-white">
                               {{ user.firstName }} {{ user.lastName }}
                             </div>
                             <div class="text-sm text-gray-600 dark:text-gray-400">
@@ -1443,7 +1443,7 @@
                     class="text-2xl text-blue-600 dark:text-blue-400"
                   />
                 </div>
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 class="text-xl font-semibold text-txt-primary dark:text-white mb-2">
                   Analytics de Colaboradores Necessários
                 </h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
@@ -1467,7 +1467,7 @@
               <!-- Period Analysis Header -->
               <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
                 <div>
-                  <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  <h1 class="text-2xl font-bold text-txt-primary dark:text-white mb-2">
                     Análise de Tendências
                   </h1>
                   <p class="text-gray-600 dark:text-gray-400">
@@ -1534,7 +1534,7 @@
                     <div class="space-y-4">
                       <div class="text-center p-6 bg-gray-50 dark:bg-gray-700 rounded-lg">
                         <span
-                          class="block text-lg font-semibold text-gray-900 dark:text-white mb-1"
+                          class="block text-lg font-semibold text-txt-primary dark:text-white mb-1"
                         >
                           {{ formatTimeInSecondsCompact(getLatestResolutionTime() * 3600) }}
                         </span>
@@ -1626,7 +1626,7 @@
                         class="text-gray-700 dark:text-gray-300"
                       >
                         O tempo médio foi de
-                        <strong class="text-gray-900 dark:text-white">{{
+                        <strong class="text-txt-primary dark:text-white">{{
                           formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
                         }}</strong>
                         para
@@ -1662,7 +1662,7 @@
                       </p>
                       <div v-if="inProgressTimeSeries" class="grid grid-cols-1 gap-4 mt-6">
                         <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                          <span class="block text-lg font-semibold text-gray-900 dark:text-white">{{
+                          <span class="block text-lg font-semibold text-txt-primary dark:text-white">{{
                             formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
                           }}</span>
                           <span class="text-xs text-gray-500 dark:text-gray-400"
@@ -1671,7 +1671,7 @@
                           >
                         </div>
                         <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                          <span class="block text-lg font-semibold text-gray-900 dark:text-white">{{
+                          <span class="block text-lg font-semibold text-txt-primary dark:text-white">{{
                             getTotalInProgressCount()
                           }}</span>
                           <span class="text-xs text-gray-500 dark:text-gray-400"
@@ -1716,7 +1716,7 @@
                     class="text-2xl text-indigo-600 dark:text-indigo-400"
                   />
                 </div>
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                <h3 class="text-xl font-semibold text-txt-primary dark:text-white mb-2">
                   Analytics Avançados Necessários
                 </h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">

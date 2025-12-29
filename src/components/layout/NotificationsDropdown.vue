@@ -7,7 +7,7 @@
       <div
         class="flex justify-between items-center px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600"
       >
-        <h2 class="text-base font-medium text-gray-900 dark:text-white m-0">Notificações</h2>
+        <h2 class="text-base font-medium text-txt-primary dark:text-white m-0">Notificações</h2>
         <div class="flex items-center gap-2">
           <span class="text-xs text-gray-600 dark:text-gray-400"
             >Mostrar apenas itens não lidos</span
@@ -26,7 +26,7 @@
           </label>
         </div>
         <button
-          class="bg-none border-none text-gray-500 dark:text-gray-400 cursor-pointer text-xl p-0 leading-none transition-all duration-200 hover:text-gray-900 dark:hover:text-white hover:scale-110 focus:outline-2 focus:outline-blue-500 focus:outline-offset-2"
+          class="bg-none border-none text-gray-500 dark:text-gray-400 cursor-pointer text-xl p-0 leading-none transition-all duration-200 hover:text-txt-primary dark:hover:text-white hover:scale-110 focus:outline-2 focus:outline-blue-500 focus:outline-offset-2"
           @click="closeModal"
         >
           ×
@@ -64,7 +64,7 @@
             @click="fetchSelectedTicket(notification)"
           >
             <div
-              class="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-sm"
+              class="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-soft-xs"
               :style="getNotificationAvatarStyle(notification)"
             >
               {{ getNotificationUserInitials(notification) }}
@@ -73,7 +73,7 @@
               <div class="flex justify-between gap-1">
                 <div
                   v-html="formatNotificationMessage(notification)"
-                  class="text-sm text-gray-900 dark:text-white m-0 leading-relaxed text-left"
+                  class="text-sm text-txt-primary dark:text-white m-0 leading-relaxed text-left"
                 ></div>
                 <span
                   class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap flex-shrink-0"
@@ -271,10 +271,10 @@ const markAllAsRead = async () => {
 };
 
 const formatNotificationMessage = (notification: Notification) => {
-  const userName = `<span class="font-medium text-gray-900 dark:text-gray-300">${notification.createdBy.firstName} ${notification.createdBy.lastName}</span>`;
+  const userName = `<span class="font-medium text-txt-primary dark:text-gray-300">${notification.createdBy.firstName} ${notification.createdBy.lastName}</span>`;
   const ticketId = notification.resourceCustomId
-    ? `<span class="font-medium text-gray-900 dark:text-gray-300">${notification.resourceCustomId.toString()}</span>`
-    : `<span class="font-medium text-gray-900 dark:text-gray-300">${notification.resourceId.toString()}</span>`;
+    ? `<span class="font-medium text-txt-primary dark:text-gray-300">${notification.resourceCustomId.toString()}</span>`
+    : `<span class="font-medium text-txt-primary dark:text-gray-300">${notification.resourceId.toString()}</span>`;
 
   return notification.message.replace('user', userName).replace('resource', ticketId);
 };

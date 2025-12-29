@@ -1,7 +1,7 @@
 <template>
   <section id="ticketsSection" class="px-4 pt-4 pb-4 md:px-6 md:pt-4 md:pb-0">
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Tarefas</h1>
+      <h1 class="text-2xl font-bold text-txt-primary dark:text-white">Tarefas</h1>
       <div class="flex items-center gap-2">
         <!-- View Toggle Button -->
         <button
@@ -47,7 +47,7 @@
     <!-- Summary cards - moved to top, only visible in table view -->
     <div v-if="!isKanbanView" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 mb-6">
       <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-soft-xs cursor-pointer hover:-translate-y-1 transition-transform duration-200"
         @click="setStatusFilter('')"
         :title="'Mostrar todas as tarefas'"
       >
@@ -64,7 +64,7 @@
         </div>
       </div>
       <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-soft-xs cursor-pointer hover:-translate-y-1 transition-transform duration-200"
         @click="setStatusFilter(DefaultTicketStatus.Pending)"
         :title="'Filtrar por tarefas pendentes'"
       >
@@ -83,7 +83,7 @@
         </div>
       </div>
       <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-sm cursor-pointer hover:-translate-y-1 transition-transform duration-200"
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-soft-xs cursor-pointer hover:-translate-y-1 transition-transform duration-200"
         @click="setStatusFilter(DefaultTicketStatus.InProgress)"
         :title="'Filtrar por tarefas em andamento'"
       >
@@ -107,7 +107,7 @@
       <div class="min-h-[300px]">
         <!-- Table Container with integrated tabs and controls -->
         <div
-          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm"
+          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-soft-xs"
         >
           <!-- Integrated Tab Bar -->
           <div class="flex flex-col border-b-1 border-gray-200 dark:border-gray-700">
@@ -119,7 +119,7 @@
                 class="flex items-center justify-start lg:absolute xl:left-1/2 xl:transform xl:-translate-x-1/2 w-full xl:w-auto"
               >
                 <div
-                  class="flex items-center justify-start lg:justify-center p-0.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-x-auto"
+                  class="flex items-center justify-start lg:justify-center p-0.5 bg-[#f4f5f8] dark:bg-gray-700 rounded-full overflow-x-auto"
                   style="height: 36px; min-width: fit-content"
                 >
                   <div class="flex items-center gap-0 flex-shrink-0">
@@ -127,7 +127,7 @@
                       :class="[
                         'relative px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'recebidas'
-                          ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                          ? 'bg-white dark:bg-gray-800 text-txt-primary dark:text-white shadow-soft-xs'
                           : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
@@ -143,7 +143,7 @@
                       :class="[
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'criadas'
-                          ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                          ? 'bg-white dark:bg-gray-800 text-txt-primary dark:text-white shadow-soft-xs'
                           : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
@@ -156,7 +156,7 @@
                       :class="[
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'setor'
-                          ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                          ? 'bg-white dark:bg-gray-800 text-txt-primary dark:text-white shadow-soft-xs'
                           : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
@@ -170,7 +170,7 @@
                       :class="[
                         'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'gerais'
-                          ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                          ? 'bg-white dark:bg-gray-800 text-txt-primary dark:text-white shadow-soft-xs'
                           : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
                       ]"
                       style="font-size: 13px"
@@ -189,7 +189,7 @@
                 <div class="relative w-full max-w-xs lg:w-56">
                   <font-awesome-icon
                     icon="search"
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-3.5 h-3.5 pointer-events-none"
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-txt-light/80 dark:text-gray-500 w-3.5 h-3.5 pointer-events-none"
                   />
                   <Input
                     v-model="searchTerm"
@@ -265,7 +265,7 @@
         <div
           class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700"
         >
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Filtros</h3>
+          <h3 class="text-lg font-semibold text-txt-primary dark:text-white">Filtros</h3>
           <button
             class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             @click="showFiltersModal = false"
@@ -329,7 +329,7 @@
         <div
           class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700"
         >
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white m-0">
+          <h3 class="text-lg font-semibold text-txt-primary dark:text-white m-0">
             Solicitar Correção
           </h3>
           <button

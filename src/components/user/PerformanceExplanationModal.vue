@@ -17,7 +17,7 @@
           <div
             class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700"
           >
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white">Entenda seu Desempenho</h2>
+            <h2 class="text-xl font-bold text-txt-primary dark:text-white">Entenda seu Desempenho</h2>
             <button
               @click="$emit('close')"
               class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
@@ -31,7 +31,7 @@
             <div class="space-y-6">
               <!-- Score de Desempenho Section -->
               <section>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                <h3 class="text-lg font-semibold text-txt-primary dark:text-white mb-3">
                   Score de Desempenho
                 </h3>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">
@@ -53,7 +53,7 @@
                   <div :class="completionColors.bg + ' p-4 rounded-lg'">
                     <div class="flex items-center justify-between mb-2">
                       <div class="flex items-center gap-2">
-                        <h4 class="font-semibold text-gray-900 dark:text-white">
+                        <h4 class="font-semibold text-txt-primary dark:text-white">
                           Entrega no prazo
                         </h4>
                         <InfoTooltip
@@ -97,7 +97,7 @@
                   <div :class="rejectionColors.bg + ' p-4 rounded-lg'">
                     <div class="flex items-center justify-between mb-2">
                       <div class="flex items-center gap-2">
-                        <h4 class="font-semibold text-gray-900 dark:text-white">
+                        <h4 class="font-semibold text-txt-primary dark:text-white">
                           Aprovação do trabalho
                         </h4>
                         <InfoTooltip
@@ -142,7 +142,7 @@
                   <div :class="returnColors.bg + ' p-4 rounded-lg'">
                     <div class="flex items-center justify-between mb-2">
                       <div class="flex items-center gap-2">
-                        <h4 class="font-semibold text-gray-900 dark:text-white">
+                        <h4 class="font-semibold text-txt-primary dark:text-white">
                           Qualidade da entrega
                         </h4>
                         <InfoTooltip
@@ -189,7 +189,7 @@
                   <div :class="verificationColors.bg + ' p-4 rounded-lg'">
                     <div class="flex items-center justify-between mb-2">
                       <div class="flex items-center gap-2">
-                        <h4 class="font-semibold text-gray-900 dark:text-white">
+                        <h4 class="font-semibold text-txt-primary dark:text-white">
                           Verificação no Prazo
                         </h4>
                         <InfoTooltip
@@ -230,7 +230,7 @@
                   >
                     <div class="flex items-center justify-between">
                       <div>
-                        <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">
+                        <h4 class="text-lg font-bold text-txt-primary dark:text-white mb-1">
                           Score Final
                         </h4>
                       </div>
@@ -272,7 +272,7 @@
                       class="text-2xl text-blue-600 dark:text-blue-400"
                     />
                   </div>
-                  <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-2">
+                  <h4 class="text-base font-semibold text-txt-primary dark:text-white mb-2">
                     Dados insuficientes para gerar seu score
                   </h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400 max-w-md">
@@ -285,7 +285,7 @@
 
               <!-- Other Metrics Section -->
               <section>
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                <h3 class="text-lg font-semibold text-txt-primary dark:text-white mb-3">
                   Outras Métricas
                 </h3>
 
@@ -294,7 +294,7 @@
                   <div class="bg-gray-50 dark:bg-gray-700/30 px-4 py-5 rounded-lg">
                     <div class="flex items-center justify-between">
                       <div class="flex items-center gap-2">
-                        <h4 class="font-semibold text-gray-900 dark:text-white">
+                        <h4 class="font-semibold text-txt-primary dark:text-white">
                           Tempo Médio de Aceite
                         </h4>
                         <InfoTooltip
@@ -303,7 +303,7 @@
                       </div>
                       <span
                         v-if="userStats"
-                        class="text-lg font-bold text-gray-900 dark:text-white"
+                        class="text-lg font-bold text-txt-primary dark:text-white"
                       >
                         {{ formatTimeShort(userStats.averageAcceptanceTimeSeconds) }}
                       </span>
@@ -314,7 +314,7 @@
                   <div class="bg-gray-50 dark:bg-gray-700/30 px-4 py-5 rounded-lg">
                     <div class="flex items-center justify-between">
                       <div class="flex items-center gap-2">
-                        <h4 class="font-semibold text-gray-900 dark:text-white">
+                        <h4 class="font-semibold text-txt-primary dark:text-white">
                           Tempo Médio de Resolução
                         </h4>
                         <InfoTooltip
@@ -324,7 +324,7 @@
 
                       <span
                         v-if="userStats"
-                        class="text-lg font-bold text-gray-900 dark:text-white"
+                        class="text-lg font-bold text-txt-primary dark:text-white"
                       >
                         {{ formatTimeShort(userStats.averageResolutionTimeSeconds) }}
                       </span>

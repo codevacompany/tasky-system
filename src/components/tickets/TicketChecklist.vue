@@ -4,7 +4,7 @@
       <!-- Checklist Header -->
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-3 flex-1">
-          <h4 class="font-medium text-gray-900 dark:text-gray-100">Subtarefas</h4>
+          <h4 class="font-medium text-txt-primary dark:text-gray-100">Subtarefas</h4>
           <!-- Progress Circle -->
           <div class="relative w-8 h-8 flex-shrink-0">
             <svg class="transform -rotate-90 w-8 h-8">
@@ -59,7 +59,7 @@
           />
           <div class="flex-1 min-w-0">
             <div
-              class="text-sm text-gray-900 dark:text-gray-100"
+              class="text-sm text-txt-primary dark:text-gray-100"
               :class="{
                 'line-through opacity-60': item.isCompleted,
               }"
@@ -130,7 +130,7 @@
       <button
         v-else-if="canEdit"
         @click="startAddItem"
-        class="mt-3 w-full px-3 py-2 text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors flex items-center justify-center gap-2"
+        class="mt-3 w-full px-3 py-2 text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 hover:text-txt-primary dark:hover:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors flex items-center justify-center gap-2"
       >
         <font-awesome-icon icon="plus" class="text-xs" />
         Adicionar um item

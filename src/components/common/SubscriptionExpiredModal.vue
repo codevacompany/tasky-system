@@ -7,7 +7,7 @@
       class="bg-white dark:bg-gray-800 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] w-[90%] max-w-[550px] relative animate-in slide-in-from-bottom-4 duration-400"
     >
       <div
-        class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full cursor-pointer text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200"
+        class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full cursor-pointer text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-txt-primary dark:hover:text-gray-200 transition-all duration-200"
         @click="close"
       >
         <font-awesome-icon icon="times" />
@@ -22,7 +22,7 @@
           />
         </div>
 
-        <h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
+        <h2 class="text-2xl font-semibold mb-4 text-txt-primary dark:text-white">
           Assine um plano para usar o Tasky Pro
         </h2>
 
