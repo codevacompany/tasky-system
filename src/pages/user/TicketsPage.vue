@@ -196,7 +196,7 @@
                     type="text"
                     placeholder="Buscar tarefas"
                     padding="tight"
-                    class="pl-9 pr-3 w-full text-sm transition-all duration-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                    class="pl-9 pr-3 w-full text-sm transition-all duration-200"
                   />
                 </div>
                 <button

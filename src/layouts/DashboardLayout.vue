@@ -197,7 +197,7 @@
             class="flex text-gray-800 dark:text-gray-200 relative cursor-pointer ml-6"
             @click="toggleNotificationsModal"
           >
-            <font-awesome-icon :icon="['far', 'bell']" class="text-xl text-txt-secondary" />
+            <font-awesome-icon :icon="['far', 'bell']" class="text-xl text-txt-secondary dark:text-gray-200" />
             <span v-if="unreadCount && unreadCount > 0" class="notification-badge">{{
               unreadCount
             }}</span>
@@ -227,7 +227,7 @@
               <span class="text-txt-secondary dark:text-gray-200 font-medium text-[15px]">{{
                 user?.firstName
               }}</span>
-              <font-awesome-icon icon="chevron-down" class="text-sm font-bold ml-2 text-txt-secondary" />
+              <font-awesome-icon icon="chevron-down" class="text-sm font-bold ml-2 text-txt-secondary dark:text-gray-200" />
             </div>
           </div>
         </div>

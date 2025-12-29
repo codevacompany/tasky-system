@@ -42,7 +42,7 @@ export default {
         // Surface colors for backgrounds and borders
         surface: {
           DEFAULT: '#ffffff',
-          extraSoft: '#f8fafc',
+          extraSoft: '#f9fafb',
           soft: '#f3f5f8',
           secondary: '#f5f8fb',
           alt: '#f8fafc', // Slate-50

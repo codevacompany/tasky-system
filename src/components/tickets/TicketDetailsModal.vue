@@ -529,8 +529,30 @@
                   <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Aceite em</p>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm text-txt-primary dark:text-gray-100">
+                  <p
+                    class="text-sm text-txt-primary dark:text-gray-100"
+                    :title="loadedTicket.acceptedAt ? formatDateUtil(loadedTicket.acceptedAt) : ''"
+                  >
                     {{ formatDateOnly(loadedTicket.acceptedAt) }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Completed Date -->
+              <div v-if="loadedTicket.completedAt" class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Concluído em
+                  </p>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p
+                    class="text-sm text-txt-primary dark:text-gray-100"
+                    :title="
+                      loadedTicket.completedAt ? formatDateUtil(loadedTicket.completedAt) : ''
+                    "
+                  >
+                    {{ formatDateOnly(loadedTicket.completedAt) }}
                   </p>
                 </div>
               </div>
@@ -660,7 +682,9 @@
               class="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-600"
             >
               <div class="flex items-center justify-between mb-4">
-                <h3 class="font-semibold text-txt-primary dark:text-gray-100 flex items-center gap-2">
+                <h3
+                  class="font-semibold text-txt-primary dark:text-gray-100 flex items-center gap-2"
+                >
                   <font-awesome-icon icon="paperclip" class="text-primary dark:text-blue-400" />
                   Anexos
                   <span
@@ -876,7 +900,10 @@
                             {{ event.data.user.firstName }} {{ event.data.user.lastName }}
                           </span>
                           <span class="text-gray-400 dark:text-gray-500 text-xs">•</span>
-                          <span class="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                          <span
+                            class="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap"
+                            :title="formatDateUtil(event.createdAt)"
+                          >
                             {{ formatRelativeTime(event.createdAt) }}
                           </span>
                         </div>
@@ -1058,7 +1085,10 @@
                             >
                               {{ getSpecialUpdateTitle(event.subType, event) }}
                             </span>
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                            <span
+                              class="text-sm text-gray-500 dark:text-gray-400"
+                              :title="formatDateUtil(event.createdAt)"
+                            >
                               {{ formatRelativeTime(event.createdAt) }}
                             </span>
                           </div>
@@ -1087,11 +1117,12 @@
                           </div>
                           <div class="flex items-center justify-between flex-1">
                             <div
-                              class="text-sm text-gray-600 dark:text-gray-400 flex-1"
+                              class="text-sm text-txt-muted dark:text-gray-400 flex-1"
                               v-html="formatTicketUpdateDescription(event.data)"
                             ></div>
                             <span
-                              class="text-sm text-gray-500 dark:text-gray-400 ml-4 flex-shrink-0"
+                              class="text-sm text-txt-muted dark:text-gray-400 ml-4 flex-shrink-0"
+                              :title="formatDateUtil(event.createdAt)"
                             >
                               {{ formatRelativeTime(event.createdAt) }}
                             </span>
