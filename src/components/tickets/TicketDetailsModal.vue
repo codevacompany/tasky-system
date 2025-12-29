@@ -6003,18 +6003,18 @@ body.dark-mode [data-v-a180df51] .comment-text a:hover,
 
 /* Add comprehensive dark mode styles for v-html content */
 .dark .description-text,
-.dark .description-text *:not(a):not(.comment-link),
+.dark .description-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 :deep(.dark) .description-text,
-:deep(.dark) .description-text * {
+:deep(.dark) .description-text *:not(a):not(.comment-link):not(.mention):not(.mention *) {
   color: #e5e7eb !important;
 }
 
 .dark .description-text p,
 .dark .description-text div,
-.dark .description-text span,
+.dark .description-text span:not(.mention),
 :deep(.dark) .description-text p,
 :deep(.dark) .description-text div,
-:deep(.dark) .description-text span {
+:deep(.dark) .description-text span:not(.mention) {
   color: #e5e7eb !important;
 }
 
@@ -6045,18 +6045,18 @@ body.dark-mode [data-v-a180df51] .comment-text a:hover,
 
 /* Dark mode comment text styles */
 .dark .comment-text,
-.dark .comment-text *:not(a):not(.comment-link),
+.dark .comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 :deep(.dark) .comment-text,
-:deep(.dark) .comment-text *:not(a):not(.comment-link) {
+:deep(.dark) .comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *) {
   color: #e5e7eb !important;
 }
 
 .dark .comment-text p,
 .dark .comment-text div,
-.dark .comment-text span,
+.dark .comment-text span:not(.mention),
 :deep(.dark) .comment-text p,
 :deep(.dark) .comment-text div,
-:deep(.dark) .comment-text span {
+:deep(.dark) .comment-text span:not(.mention) {
   color: #e5e7eb !important;
 }
 
@@ -6087,43 +6087,55 @@ body.dark-mode [data-v-a180df51] .comment-text a:hover,
 
 /* Force override for v-html content in dark mode */
 :deep(.dark) .text-gray-800 .description-text,
-:deep(.dark) .text-gray-800 .description-text *:not(a):not(.comment-link),
+:deep(.dark) .text-gray-800 .description-text *:not(a):not(.comment-link):not(.mention),
 :deep(.dark) .text-gray-800 .comment-text,
-:deep(.dark) .text-gray-800 .comment-text *:not(a):not(.comment-link) {
+:deep(.dark) .text-gray-800 .comment-text *:not(a):not(.comment-link):not(.mention) {
   color: #e5e7eb !important;
 }
 
 /* Also support body.dark-mode pattern */
 :deep(body.dark-mode) .description-text,
-:deep(body.dark-mode) .description-text *:not(a):not(.comment-link),
+:deep(body.dark-mode) .description-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 body.dark-mode .description-text,
-body.dark-mode .description-text * {
+body.dark-mode .description-text *:not(a):not(.comment-link):not(.mention):not(.mention *) {
   color: #e5e7eb !important;
 }
 
 :deep(body.dark-mode) .comment-text,
-:deep(body.dark-mode) .comment-text *:not(a):not(.comment-link),
+:deep(body.dark-mode) .comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 body.dark-mode .comment-text,
-body.dark-mode .comment-text *:not(a):not(.comment-link) {
+body.dark-mode .comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *) {
   color: #e5e7eb !important;
 }
 
 :deep(body.dark-mode) .text-gray-800 .description-text,
-:deep(body.dark-mode) .text-gray-800 .description-text *:not(a):not(.comment-link),
+:deep(body.dark-mode)
+  .text-gray-800
+  .description-text
+  *:not(a):not(.comment-link):not(.mention):not(.mention *),
 :deep(body.dark-mode) .text-gray-800 .comment-text,
-:deep(body.dark-mode) .text-gray-800 .comment-text *:not(a):not(.comment-link),
+:deep(body.dark-mode)
+  .text-gray-800
+  .comment-text
+  *:not(a):not(.comment-link):not(.mention):not(.mention *),
 body.dark-mode .text-gray-800 .description-text,
-body.dark-mode .text-gray-800 .description-text *:not(a):not(.comment-link),
+body.dark-mode
+  .text-gray-800
+  .description-text
+  *:not(a):not(.comment-link):not(.mention):not(.mention *),
 body.dark-mode .text-gray-800 .comment-text,
-body.dark-mode .text-gray-800 .comment-text *:not(a):not(.comment-link) {
+body.dark-mode
+  .text-gray-800
+  .comment-text
+  *:not(a):not(.comment-link):not(.mention):not(.mention *) {
   color: #e5e7eb !important;
 }
 
 /* Force text color for v-html content in dark mode - exclude links */
 .dark .description-text,
-.dark .description-text *:not(a):not(.comment-link),
+.dark .description-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 .dark .comment-text,
-.dark .comment-text *:not(a):not(.comment-link) {
+.dark .comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *) {
   color: #e5e7eb !important;
 }
 
@@ -6138,16 +6150,22 @@ body.dark-mode .text-gray-800 .comment-text *:not(a):not(.comment-link) {
   color: #e5e7eb !important;
 }
 
-.dark :deep(.description-text *:not(a):not(.comment-link)),
-.dark :deep(.comment-text *:not(a):not(.comment-link)) {
+.dark :deep(.description-text *:not(a):not(.comment-link):not(.mention):not(.mention *)),
+.dark :deep(.comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *)) {
   color: #e5e7eb !important;
 }
 
 /* Force override for v-html content in dark mode */
 :deep(.dark) .text-gray-800 .description-text,
-:deep(.dark) .text-gray-800 .description-text *:not(a):not(.comment-link),
+:deep(.dark)
+  .text-gray-800
+  .description-text
+  *:not(a):not(.comment-link):not(.mention):not(.mention *),
 :deep(.dark) .text-gray-800 .comment-text,
-:deep(.dark) .text-gray-800 .comment-text *:not(a):not(.comment-link) {
+:deep(.dark)
+  .text-gray-800
+  .comment-text
+  *:not(a):not(.comment-link):not(.mention):not(.mention *) {
   color: #e5e7eb !important;
 }
 
@@ -6160,44 +6178,56 @@ body.dark-mode .description-text * {
 }
 
 :deep(body.dark-mode) .comment-text,
-:deep(body.dark-mode) .comment-text *:not(a):not(.comment-link),
+:deep(body.dark-mode) .comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 body.dark-mode .comment-text,
-body.dark-mode .comment-text *:not(a):not(.comment-link) {
+body.dark-mode .comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *) {
   color: #e5e7eb !important;
 }
 
 :deep(body.dark-mode) .text-gray-800 .description-text,
-:deep(body.dark-mode) .text-gray-800 .description-text *:not(a):not(.comment-link),
+:deep(body.dark-mode)
+  .text-gray-800
+  .description-text
+  *:not(a):not(.comment-link):not(.mention):not(.mention *),
 :deep(body.dark-mode) .text-gray-800 .comment-text,
-:deep(body.dark-mode) .text-gray-800 .comment-text *:not(a):not(.comment-link),
+:deep(body.dark-mode)
+  .text-gray-800
+  .comment-text
+  *:not(a):not(.comment-link):not(.mention):not(.mention *),
 body.dark-mode .text-gray-800 .description-text,
-body.dark-mode .text-gray-800 .description-text *:not(a):not(.comment-link),
+body.dark-mode
+  .text-gray-800
+  .description-text
+  *:not(a):not(.comment-link):not(.mention):not(.mention *),
 body.dark-mode .text-gray-800 .comment-text,
-body.dark-mode .text-gray-800 .comment-text *:not(a):not(.comment-link) {
+body.dark-mode
+  .text-gray-800
+  .comment-text
+  *:not(a):not(.comment-link):not(.mention):not(.mention *) {
   color: #e5e7eb !important;
 }
 
 /* Force text color for v-html content in dark mode - comprehensive solution */
 .dark .description-text,
-.dark .description-text *:not(a):not(.comment-link),
+.dark .description-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 .dark .comment-text,
-.dark .comment-text *:not(a):not(.comment-link),
+.dark .comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 :deep(.dark) .description-text,
-:deep(.dark) .description-text *:not(a):not(.comment-link),
+:deep(.dark) .description-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 :deep(.dark) .comment-text,
-:deep(.dark) .comment-text *:not(a):not(.comment-link),
+:deep(.dark) .comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 .dark :deep(.description-text),
-.dark :deep(.description-text *:not(a):not(.comment-link)),
+.dark :deep(.description-text *:not(a):not(.comment-link):not(.mention):not(.mention *)),
 .dark :deep(.comment-text),
-.dark :deep(.comment-text *:not(a):not(.comment-link)) {
+.dark :deep(.comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *)) {
   color: #e5e7eb !important;
 }
 
 /* Override any parent container text color in dark mode */
 .dark .text-gray-800 .description-text,
-.dark .text-gray-800 .description-text *:not(a):not(.comment-link),
+.dark .text-gray-800 .description-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 .dark .text-gray-800 .comment-text,
-.dark .text-gray-800 .comment-text *:not(a):not(.comment-link) {
+.dark .text-gray-800 .comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *) {
   color: #e5e7eb !important;
 }
 
@@ -6215,21 +6245,21 @@ body.dark-mode .description-text .comment-link {
 
 /* Dark mode styles for descriptions and comments */
 .dark .description-text,
-.dark .description-text *:not(a):not(.comment-link),
+.dark .description-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 .dark .comment-text,
-.dark .comment-text *:not(a):not(.comment-link),
+.dark .comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 :deep(.dark) .description-text,
-:deep(.dark) .description-text *:not(a):not(.comment-link),
+:deep(.dark) .description-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 :deep(.dark) .comment-text,
-:deep(.dark) .comment-text *:not(a):not(.comment-link) {
+:deep(.dark) .comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *) {
   color: #e5e7eb !important;
 }
 
 /* Override parent container styles in dark mode */
 .dark .text-gray-800 .description-text,
-.dark .text-gray-800 .description-text *:not(a):not(.comment-link),
+.dark .text-gray-800 .description-text *:not(a):not(.comment-link):not(.mention):not(.mention *),
 .dark .text-gray-800 .comment-text,
-.dark .text-gray-800 .comment-text *:not(a):not(.comment-link) {
+.dark .text-gray-800 .comment-text *:not(a):not(.comment-link):not(.mention):not(.mention *) {
   color: #e5e7eb !important;
 }
 
@@ -6417,37 +6447,55 @@ body.dark-mode [data-v-a180df51] .description-text a[style*='color'],
   animation: skeleton-shimmer 1.5s ease-in-out infinite;
 }
 
-/* Mention styles */
-:deep(.ql-editor .mention) {
-  background-color: #dbeafe;
-  color: #1e40af;
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-weight: 500;
-  cursor: default;
-  user-select: none; /* Prevent text selection */
+/* Mention styles - NUCLEAR SPECIFICITY */
+/* Light mode mentions */
+:deep(span.mention[data-mention]),
+:deep(.comment-text span.mention[data-mention]),
+:deep(.description-text span.mention[data-mention]),
+:deep(.ql-editor span.mention[data-mention]),
+:deep(span[data-mention='true'].mention),
+:deep(.comment-text .mention),
+:deep(.description-text .mention),
+:deep(.ql-editor .mention),
+:deep(.mention),
+:deep(span.mention) {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  padding: 1px 5px !important;
+  border-radius: 4px !important;
+  font-weight: 700 !important;
+  display: inline-block !important;
+  line-height: 1.2 !important;
+  margin: 0 1px !important;
+  cursor: default !important;
+  user-select: none !important;
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
+  border: 1px solid #bfdbfe !important;
 }
 
-.dark :deep(.ql-editor .mention) {
-  background-color: #1e3a8a;
-  color: #93c5fd;
-}
-
-:deep(.comment-text .mention) {
-  background-color: #dbeafe;
-  color: #1e40af;
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-weight: 500;
-  cursor: default;
-}
-
-.dark :deep(.comment-text .mention) {
-  background-color: #1e3a8a;
-  color: #93c5fd;
+/* Dark mode mentions - MAXIMUM SPECIFICITY */
+.dark :deep(span.mention[data-mention]),
+.dark :deep(.comment-text span.mention[data-mention]),
+.dark :deep(.description-text span.mention[data-mention]),
+.dark :deep(.ql-editor span.mention[data-mention]),
+body.dark-mode :deep(span.mention[data-mention]),
+body.dark-mode :deep(.comment-text span.mention[data-mention]),
+body.dark-mode :deep(.description-text span.mention[data-mention]),
+body.dark-mode :deep(.ql-editor span.mention[data-mention]),
+.dark :deep(span[data-mention='true'].mention),
+body.dark-mode :deep(span[data-mention='true'].mention),
+.dark :deep(.comment-text span.mention),
+.dark :deep(.description-text span.mention),
+body.dark-mode :deep(.comment-text span.mention),
+body.dark-mode :deep(.description-text span.mention),
+.dark :deep(.ql-editor .mention),
+.dark :deep(.mention),
+body.dark-mode :deep(.mention),
+.dark :deep(span.mention),
+body.dark-mode :deep(span.mention) {
+  background-color: #1e3a8a !important;
+  color: #eff6ff !important;
+  border: 1px solid #3b82f6 !important;
 }
 
 /* Quill mention selector styles */
@@ -6459,17 +6507,21 @@ body.dark-mode [data-v-a180df51] .description-text a[style*='color'],
   background-color: #f3f4f6 !important;
 }
 
-.dark .quill-mention-selector {
-  background: #1f2937;
-  border-color: #374151;
+.dark .quill-mention-selector,
+body.dark-mode .quill-mention-selector {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
 }
 
-.dark .quill-mention-selector .mention-item {
-  color: #e5e7eb;
+.dark .quill-mention-selector .mention-item,
+body.dark-mode .quill-mention-selector .mention-item {
+  color: #e5e7eb !important;
 }
 
 .dark .quill-mention-selector .mention-item:hover,
-.dark .quill-mention-selector .mention-item.active {
+.dark .quill-mention-selector .mention-item.active,
+body.dark-mode .quill-mention-selector .mention-item:hover,
+body.dark-mode .quill-mention-selector .mention-item.active {
   background-color: #374151 !important;
 }
 

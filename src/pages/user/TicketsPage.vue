@@ -1,5 +1,5 @@
 <template>
-  <section id="ticketsSection" class="px-4 pt-4 pb-4 md:px-6 md:pt-4 md:pb-0">
+  <section id="ticketsSection" class="px-4 pt-3 pb-4 md:px-6 md:pb-0">
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
       <h1 class="text-2xl font-bold text-txt-primary dark:text-white">Tarefas</h1>
       <div class="flex items-center gap-2">
@@ -113,7 +113,7 @@
           <div class="flex flex-col border-b-1 border-gray-200 dark:border-gray-700">
             <!-- Mobile-friendly tabs -->
             <div
-              class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-4 px-6 gap-3 lg:gap-0 relative"
+              class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 px-6 gap-3 lg:gap-0 relative"
             >
               <div
                 class="flex items-center justify-start lg:absolute xl:left-1/2 xl:transform xl:-translate-x-1/2 w-full xl:w-auto"
