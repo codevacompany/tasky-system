@@ -1,6 +1,6 @@
 <template>
   <div
-    class="kanban-container flex gap-4 p-3 px-2 overflow-x-auto h-[calc(100vh-234px)] bg-white dark:bg-gray-900 rounded-lg relative w-full"
+    class="kanban-container flex gap-4 py-2.5 px-2 overflow-x-auto h-[calc(100vh-234px)] bg-white dark:bg-gray-900 rounded-lg relative w-full"
   >
     <!-- Skeleton while loading columns or tickets -->
     <template
@@ -76,28 +76,12 @@
                 </div>
               </div>
               <div v-if="hasRightIcons(ticket)" class="flex items-center gap-2 ml-3 flex-shrink-0">
-                <div
-                  v-if="(ticket.comments?.length || 0) > 0"
-                  class="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300 opacity-80"
-                  title="Comentários"
-                >
-                  <font-awesome-icon :icon="['far', 'comment']" />
-                  <span class="text-xs min-w-2">{{ ticket.comments?.length || 0 }}</span>
-                </div>
                 <font-awesome-icon
                   v-if="ticket.isPrivate"
                   icon="lock"
                   class="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0"
                   title="Tarefa Privada"
                 />
-                <div
-                  v-if="(ticket.files?.length || 0) > 0"
-                  class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 opacity-80"
-                  title="Anexos"
-                >
-                  <font-awesome-icon icon="paperclip" />
-                  <span class="text-xs min-w-4">{{ ticket.files?.length || 0 }}</span>
-                </div>
                 <div
                   v-if="
                     ticket.ticketStatus?.key === DefaultTicketStatus.Returned ||
@@ -175,7 +159,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2.5">
                   <div
                     v-if="getChecklistProgress(ticket)"
                     class="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300"
@@ -183,6 +167,22 @@
                   >
                     <font-awesome-icon icon="tasks" />
                     <span class="text-xs">{{ getChecklistProgress(ticket) }}</span>
+                  </div>
+                  <div
+                    v-if="(ticket.files?.length || 0) > 0"
+                    class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 opacity-80"
+                    title="Anexos"
+                  >
+                    <font-awesome-icon icon="paperclip" />
+                    <span class="text-xs min-w-4">{{ ticket.files?.length || 0 }}</span>
+                  </div>
+                  <div
+                    v-if="(ticket.comments?.length || 0) > 0"
+                    class="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300 opacity-80"
+                    title="Comentários"
+                  >
+                    <font-awesome-icon :icon="['far', 'comment']" />
+                    <span class="text-xs min-w-2">{{ ticket.comments?.length || 0 }}</span>
                   </div>
                   <font-awesome-icon
                     v-if="
