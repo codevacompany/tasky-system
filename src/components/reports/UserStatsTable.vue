@@ -5,7 +5,7 @@
     <div class="p-6 border-b border-gray-200 dark:border-gray-700">
       <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+          <h2 class="text-lg font-semibold text-txt-primary dark:text-white mb-1">
             Estatísticas por Colaborador
           </h2>
           <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -56,7 +56,7 @@
             />
           </div>
           <div class="min-w-0">
-            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+            <p class="text-sm font-medium text-txt-primary dark:text-white truncate">
               {{ item.firstName }} {{ item.lastName }}
             </p>
             <p class="text-xs text-gray-500 dark:text-gray-400 truncate">

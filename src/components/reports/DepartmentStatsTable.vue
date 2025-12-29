@@ -5,7 +5,7 @@
     <div class="p-6 border-b border-gray-200 dark:border-gray-700">
       <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+          <h2 class="text-lg font-semibold text-txt-primary dark:text-white mb-1">
             Estatísticas por Setor
           </h2>
           <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -72,7 +72,7 @@
             <font-awesome-icon icon="building" class="w-5 h-5" />
           </div>
           <div class="min-w-0">
-            <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+            <p class="text-sm font-medium text-txt-primary dark:text-white truncate">
               {{ item.departmentName }}
             </p>
           </div>

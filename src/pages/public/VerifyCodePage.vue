@@ -17,7 +17,7 @@
 
         <!-- Form Container -->
         <div class="px-6 py-6 sm:px-8 sm:py-8">
-          <h2 class="text-xl font-semibold text-gray-900 mb-2">Verificar Código</h2>
+          <h2 class="text-xl font-semibold text-txt-primary mb-2">Verificar Código</h2>
           <p class="text-sm text-gray-600 mb-6">
             Digite o código de 6 dígitos enviado para <strong>{{ email }}</strong>
           </p>
@@ -37,7 +37,7 @@
                   type="text"
                   inputmode="numeric"
                   maxlength="1"
-                  class="w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-semibold bg-gray-50 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors text-gray-900"
+                  class="w-12 h-12 sm:w-14 sm:h-14 text-center text-xl sm:text-2xl font-semibold bg-gray-50 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors text-txt-primary"
                   @input="handleInput(index, $event)"
                   @keydown="handleKeyDown(index, $event)"
                   @paste="handlePaste($event)"
@@ -49,7 +49,7 @@
             <button
               type="submit"
               :disabled="isLoading || code.length !== 6"
-              class="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-[4px] shadow-sm text-sm sm:text-base font-medium text-white btn-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-6"
+              class="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-[4px] shadow-soft-xs text-sm sm:text-base font-medium text-white btn-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-6"
             >
               <LoadingSpinner v-if="isLoading" :size="20" class="mr-2" />
               <span v-if="!isLoading">Verificar</span>
@@ -257,7 +257,7 @@ onMounted(async () => {
   color: #374151 !important;
 }
 
-:deep(.text-gray-900) {
+:deep(.text-txt-primary) {
   color: #111827 !important;
 }
 

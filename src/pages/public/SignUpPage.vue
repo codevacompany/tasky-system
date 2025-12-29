@@ -25,7 +25,7 @@
               </div>
               <span
                 class="text-[11px] sm:text-xs font-medium whitespace-nowrap"
-                :class="[step >= idx + 1 ? 'text-gray-900' : 'text-gray-400']"
+                :class="[step >= idx + 1 ? 'text-txt-primary' : 'text-gray-400']"
               >
                 {{ idx === 0 ? 'Dados da Empresa' : idx === 1 ? 'Responsável' : 'Concluir' }}
               </span>
@@ -54,10 +54,10 @@
               Estamos quase lá
             </h2>
 
-            <h1 v-if="step === 1" class="text-xl lg:text-2xl font-bold text-gray-900">
+            <h1 v-if="step === 1" class="text-xl lg:text-2xl font-bold text-txt-primary">
               Informações da empresa
             </h1>
-            <h1 v-else-if="step === 2" class="text-xl lg:text-2xl font-bold text-gray-900">
+            <h1 v-else-if="step === 2" class="text-xl lg:text-2xl font-bold text-txt-primary">
               Informações do Responsável
             </h1>
           </div>
@@ -70,7 +70,7 @@
                 type="text"
                 required
                 placeholder="Nome da empresa"
-                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
             </div>
 
@@ -84,7 +84,7 @@
                   placeholder="CNPJ (12.345.678/0001-99)"
                   @input="form.cnpj = maskCNPJ(form.cnpj)"
                   @blur="cnpjTouched = true"
-                  class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+                  class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
                 />
                 <span
                   v-if="cnpjTouched && cnpjError"
@@ -101,7 +101,7 @@
                   placeholder="Telefone ((11) 91234-5678)"
                   @input="form.companyPhone = maskPhone(form.companyPhone)"
                   maxlength="15"
-                  class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+                  class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
                 />
               </div>
             </div>
@@ -114,7 +114,7 @@
                 placeholder="E-mail (empresa@email.com)"
                 @input="form.companyEmail = maskEmail(form.companyEmail)"
                 @blur="companyEmailTouched = true"
-                class="w-full px-4 py-3 lg:py-3.5 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+                class="w-full px-4 py-3 lg:py-3.5 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
               <span
                 v-if="companyEmailTouched && companyEmailError"
@@ -144,7 +144,7 @@
                 type="text"
                 required
                 placeholder="Nome do responsável"
-                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
             </div>
 
@@ -157,7 +157,7 @@
                 placeholder="CPF (123.456.789-00)"
                 @input="form.contactCpf = maskCPF(form.contactCpf)"
                 @blur="contactCpfTouched = true"
-                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
               <span
                 v-if="contactCpfTouched && contactCpfError"
@@ -175,7 +175,7 @@
                 placeholder="E-mail (nome@email.com)"
                 @input="form.contactEmail = maskEmail(form.contactEmail)"
                 @blur="contactEmailTouched = true"
-                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
               <span
                 v-if="contactEmailTouched && contactEmailError"
@@ -193,7 +193,7 @@
                 placeholder="Telefone ((11) 91234-5678)"
                 @input="form.contactPhone = maskPhone(form.contactPhone)"
                 maxlength="15"
-                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm lg:text-base"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
             </div>
 
@@ -237,7 +237,7 @@
                 </svg>
               </div>
 
-              <h2 class="text-xl lg:text-2xl font-bold text-gray-900 mb-3">
+              <h2 class="text-xl lg:text-2xl font-bold text-txt-primary mb-3">
                 Cadastro realizado com sucesso!
               </h2>
               <p class="text-gray-600 text-sm lg:text-base mb-6">
@@ -533,7 +533,7 @@ async function submitSignUp() {
   background-color: #dcfce7 !important;
 }
 
-:deep(.text-gray-900) {
+:deep(.text-txt-primary) {
   color: #111827 !important;
 }
 
@@ -659,7 +659,7 @@ async function submitSignUp() {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
 }
 
-:deep(.shadow-sm) {
+:deep(.shadow-soft-xs) {
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
 }
 

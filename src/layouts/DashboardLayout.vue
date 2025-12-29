@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div class="min-h-screen bg-[#f4f5f8] dark:bg-gray-900">
+    <div class="min-h-screen bg-surface-soft dark:bg-gray-900">
       <header
-        class="flex items-center justify-between p-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-[var(--header-height)] sticky top-0 z-50 shadow-sm"
+        class="flex items-center justify-between p-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-[var(--header-height)] sticky top-0 z-50 shadow-soft-xs"
       >
         <div
-          class="hidden md:flex items-center justify-center px-6 min-w-[150px] bg-gray-200 dark:bg-gray-900 h-full relative shadow-sm"
+          class="hidden md:flex items-center justify-center px-6 min-w-[150px] bg-gray-100 dark:bg-gray-900 h-full relative shadow-soft-xs"
         >
           <img
             :src="userPreferencesStore.isDarkMode ? taskyWhiteLogo : taskyLogo"
@@ -31,7 +31,7 @@
                     :class="{
                       'menu-item-active': isActive('/'),
                     }"
-                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-gray-600 dark:text-gray-400 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover relative gap-2"
+                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-txt-secondary dark:text-gray-300 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover relative gap-2"
                   >
                     <font-awesome-icon icon="home" class="text-sm" />
                     Início
@@ -44,7 +44,7 @@
                     :class="{
                       'menu-item-active': isActive('/minhas-tarefas'),
                     }"
-                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-gray-600 dark:text-gray-400 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover relative gap-2"
+                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-txt-secondary dark:text-gray-300 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover relative gap-2"
                   >
                     <font-awesome-icon icon="tasks" class="text-sm" />
                     Tarefas
@@ -57,7 +57,7 @@
                     :class="{
                       'menu-item-active': isActive('/admin/relatorios'),
                     }"
-                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-gray-600 dark:text-gray-400 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover cursor-pointer relative gap-2"
+                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-txt-secondary dark:text-gray-300 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover cursor-pointer relative gap-2"
                   >
                     <font-awesome-icon icon="chart-line" class="text-sm" />
                     Relatórios
@@ -81,7 +81,7 @@
                       isActive('/admin/clientes') ||
                       isActive('/admin/cadastros'),
                   }"
-                  class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-gray-600 dark:text-gray-400 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer relative"
+                  class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-txt-secondary dark:text-gray-300 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer relative"
                 >
                   Administração
                   <font-awesome-icon
@@ -103,7 +103,7 @@
                       :class="
                         isActive('/admin/usuarios')
                           ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
-                          : 'text-gray-700'
+                          : 'text-txt-secondary dark:text-gray-300'
                       "
                       class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
@@ -120,7 +120,7 @@
                       :class="
                         isActive('/admin/setores')
                           ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
-                          : 'text-gray-700'
+                          : 'text-txt-secondary dark:text-gray-300'
                       "
                       class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
@@ -137,7 +137,7 @@
                       :class="
                         isActive('/admin/categorias')
                           ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
-                          : 'text-gray-700'
+                          : 'text-txt-secondary dark:text-gray-300'
                       "
                       class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
@@ -155,7 +155,7 @@
                         'admin-submenu-active bg-gray-50 dark:bg-gray-700':
                           isActive('/admin/clientes'),
                       }"
-                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="flex items-center gap-2 px-4 py-3 text-txt-secondary dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="building" />
                       Clientes
@@ -171,7 +171,7 @@
                         'admin-submenu-active bg-gray-50 dark:bg-gray-700':
                           isActive('/admin/cadastros'),
                       }"
-                      class="flex items-center gap-2 px-4 py-3 text-gray-700 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                      class="flex items-center gap-2 px-4 py-3 text-txt-secondary dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       <font-awesome-icon icon="user-plus" />
                       Cadastros
@@ -197,7 +197,7 @@
             class="flex text-gray-800 dark:text-gray-200 relative cursor-pointer ml-6"
             @click="toggleNotificationsModal"
           >
-            <font-awesome-icon :icon="['far', 'bell']" class="text-xl" />
+            <font-awesome-icon :icon="['far', 'bell']" class="text-xl text-txt-secondary dark:text-gray-200" />
             <span v-if="unreadCount && unreadCount > 0" class="notification-badge">{{
               unreadCount
             }}</span>
@@ -224,10 +224,10 @@
               <span>{{ userInitials }}</span>
             </div>
             <div class="ml-2 mr-3 hidden sm:block">
-              <span class="text-gray-800 dark:text-gray-200 font-medium text-[15px]">{{
+              <span class="text-txt-secondary dark:text-gray-200 font-medium text-[15px]">{{
                 user?.firstName
               }}</span>
-              <font-awesome-icon icon="chevron-down" class="text-sm font-bold ml-2" />
+              <font-awesome-icon icon="chevron-down" class="text-sm font-bold ml-2 text-txt-secondary dark:text-gray-200" />
             </div>
           </div>
         </div>

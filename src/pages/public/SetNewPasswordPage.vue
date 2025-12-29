@@ -17,7 +17,7 @@
 
         <!-- Form Container -->
         <div class="px-6 py-6 sm:px-8 sm:py-8">
-          <h2 class="text-xl font-semibold text-gray-900 mb-2">Nova Senha</h2>
+          <h2 class="text-xl font-semibold text-txt-primary mb-2">Nova Senha</h2>
           <p class="text-sm text-gray-600 mb-6">Digite sua nova senha</p>
 
           <form @submit.prevent="setNewPassword" class="space-y-4 sm:space-y-6">
@@ -36,7 +36,7 @@
                   type="password"
                   placeholder="Digite sua nova senha"
                   required
-                  class="block w-full pl-10 pr-3 sm:py-3 bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm sm:text-base rounded-[4px]"
+                  class="block w-full pl-10 pr-3 sm:py-3 bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm sm:text-base rounded-[4px]"
                 />
               </div>
             </div>
@@ -56,7 +56,7 @@
                   type="password"
                   placeholder="Confirme sua nova senha"
                   required
-                  class="block w-full pl-10 pr-3 sm:py-3 bg-gray-50 text-gray-900 placeholder-gray-500 transition-colors text-sm sm:text-base rounded-[4px]"
+                  class="block w-full pl-10 pr-3 sm:py-3 bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm sm:text-base rounded-[4px]"
                 />
               </div>
               <p v-if="!passwordsMatch && confirmPassword" class="mt-1 text-sm text-red-600">
@@ -68,7 +68,7 @@
             <button
               type="submit"
               :disabled="isLoading || !passwordsMatch || !newPassword"
-              class="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-[4px] shadow-sm text-sm sm:text-base font-medium text-white btn-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-[4px] shadow-soft-xs text-sm sm:text-base font-medium text-white btn-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <LoadingSpinner v-if="isLoading" :size="20" class="mr-2" />
               <span v-if="!isLoading">Redefinir Senha</span>
@@ -169,7 +169,7 @@ onMounted(() => {
   color: #374151 !important;
 }
 
-:deep(.text-gray-900) {
+:deep(.text-txt-primary) {
   color: #111827 !important;
 }
 

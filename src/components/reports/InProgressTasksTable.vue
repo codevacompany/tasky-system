@@ -5,7 +5,7 @@
     <div class="p-6 border-b border-gray-200 dark:border-gray-700">
       <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+          <h2 class="text-lg font-semibold text-txt-primary dark:text-white mb-1">
             Tarefas em Andamento
           </h2>
           <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -46,7 +46,7 @@
           >
             {{ item.assignee.initials }}
           </div>
-          <span class="text-sm text-gray-900 dark:text-white">
+          <span class="text-sm text-txt-primary dark:text-white">
             {{ item.assignee.name }}
           </span>
         </div>
@@ -57,7 +57,7 @@
           <span class="text-sm font-medium text-blue-600 dark:text-blue-400">
             {{ item.customId }}
           </span>
-          <span class="text-sm text-gray-900 dark:text-white">
+          <span class="text-sm text-txt-primary dark:text-white">
             {{ item.name }}
           </span>
         </div>
@@ -73,7 +73,7 @@
 
       <template #column-timeInProgress="{ item }">
         <div class="flex items-center justify-center gap-1">
-          <span class="text-sm font-medium text-gray-900 dark:text-white">
+          <span class="text-sm font-medium text-txt-primary dark:text-white">
             {{ item.timeInProgress }}
           </span>
           <span

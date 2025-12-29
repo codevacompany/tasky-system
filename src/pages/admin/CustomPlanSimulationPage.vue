@@ -3,12 +3,12 @@
     <header class="mb-8">
       <button
         @click="router.back()"
-        class="mb-4 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors flex items-center gap-2"
+        class="mb-4 text-sm text-gray-600 dark:text-gray-400 hover:text-txt-primary dark:hover:text-gray-200 transition-colors flex items-center gap-2"
       >
         <font-awesome-icon icon="chevron-left" />
         Voltar
       </button>
-      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
+      <h1 class="text-2xl font-semibold text-txt-primary dark:text-white">
         Simular Plano Customizado
       </h1>
       <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
@@ -23,7 +23,7 @@
         <span
           :class="
             !isYearlyBilling
-              ? 'text-gray-900 dark:text-white font-medium'
+              ? 'text-txt-primary dark:text-white font-medium'
               : 'text-gray-500 dark:text-gray-400'
           "
         >
@@ -33,7 +33,7 @@
         <span
           :class="
             isYearlyBilling
-              ? 'text-gray-900 dark:text-white font-medium'
+              ? 'text-txt-primary dark:text-white font-medium'
               : 'text-gray-500 dark:text-gray-400'
           "
         >
@@ -100,7 +100,7 @@
             <span>R$ {{ yearlyTotal.toFixed(2) }} cobrado anualmente</span>
           </div>
           <div
-            class="flex justify-between text-lg font-semibold text-gray-900 dark:text-white pt-2 border-t border-gray-200 dark:border-gray-600"
+            class="flex justify-between text-lg font-semibold text-txt-primary dark:text-white pt-2 border-t border-gray-200 dark:border-gray-600"
           >
             <span>Total mensal:</span>
             <span class="font-semibold dark:hidden" style="color: #00143b">
@@ -116,7 +116,7 @@
       <div class="flex gap-4">
         <button
           @click="router.back()"
-          class="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600"
+          class="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-txt-primary dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600"
         >
           Cancelar
         </button>

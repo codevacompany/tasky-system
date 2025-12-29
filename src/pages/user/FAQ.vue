@@ -2,7 +2,7 @@
   <section class="w-full mx-auto py-8 px-4 sm:py-6 sm:px-6">
     <!-- Header -->
     <div class="text-center mb-10">
-      <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-3">FAQ</h1>
+      <h1 class="text-3xl sm:text-4xl font-bold text-txt-primary dark:text-white mb-3">FAQ</h1>
       <p class="text-gray-500 dark:text-gray-400 text-base sm:text-lg">
         Encontre respostas para as dúvidas mais comuns sobre o uso do Tasky Pro.
       </p>
@@ -14,11 +14,11 @@
         v-model="searchTerm"
         type="text"
         placeholder="Buscar pergunta..."
-        class="w-full py-3 pr-12 pl-4 border border-gray-300 dark:border-gray-600 rounded-lg text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 focus:border-transparent"
+        class="w-full py-3 pr-12 pl-4 border border-gray-300 dark:border-gray-600 rounded-lg text-base bg-white dark:bg-gray-800 text-txt-primary dark:text-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 focus:border-transparent"
       />
       <font-awesome-icon
         icon="search"
-        class="absolute right-4 text-gray-400 dark:text-gray-500 text-lg pointer-events-none"
+        class="absolute right-4 text-txt-light/80 dark:text-gray-500 text-lg pointer-events-none"
       />
     </div>
 
@@ -27,7 +27,7 @@
       <!-- Sidebar Column (hidden on mobile/tablet) -->
       <aside class="hidden lg:block relative">
         <div
-          class="sticky top-24 w-56 ml-auto bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm"
+          class="sticky top-24 w-56 ml-auto bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-100 dark:border-gray-700 shadow-soft-xs"
           style="max-height: calc(100vh - 120px); overflow-y: auto"
         >
           <nav>
@@ -43,8 +43,8 @@
                   class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors duration-150"
                   :class="
                     activeSection === section.slug
-                      ? 'bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-medium'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                      ? 'bg-gray-50 dark:bg-gray-700 text-txt-primary dark:text-white font-medium'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-txt-primary dark:hover:text-white'
                   "
                   @click.prevent="scrollToSection(section.slug)"
                 >

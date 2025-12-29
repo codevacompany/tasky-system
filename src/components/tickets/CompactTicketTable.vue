@@ -1,14 +1,14 @@
 <template>
   <div
-    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow flex-1 min-w-0"
+    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-soft-xs flex-1 min-w-0"
   >
     <div
       class="flex justify-between items-center px-6 py-[22px] border-b border-gray-200 dark:border-gray-700"
     >
-      <h2 class="text-sm font-semibold text-gray-900 dark:text-white m-0">{{ title }}</h2>
+      <h2 class="text-sm font-semibold text-txt-primary dark:text-white m-0">{{ title }}</h2>
       <router-link
         :to="viewAllUrl"
-        class="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors duration-200"
+        class="text-sm text-primary-600 dark:text-blue-400 hover:text-primary-700 dark:hover:text-blue-300 font-medium transition-colors duration-200"
         >Ver todos</router-link
       >
     </div>
@@ -41,10 +41,10 @@
               <font-awesome-icon icon="inbox" class="text-2xl text-gray-400 dark:text-gray-500" />
             </div>
             <div class="flex flex-col items-center gap-1">
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-300 m-0">
+              <p class="text-sm font-medium text-txt-primary dark:text-gray-300 m-0">
                 Nenhuma tarefa encontrada
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 m-0">
+              <p class="text-xs text-txt-light dark:text-gray-400 m-0">
                 Tarefas recentes aparecerão aqui
               </p>
             </div>
@@ -79,7 +79,7 @@
                 </template>
               </div>
               <div class="flex flex-col min-w-0">
-                <p class="text-sm font-semibold text-gray-900 dark:text-white m-0 truncate">
+                <p class="text-sm font-semibold text-txt-primary dark:text-white m-0 truncate">
                   <template v-if="title === 'Últimas Tarefas Criadas'">
                     {{ getTargetUserName(ticket) }}
                   </template>
@@ -87,7 +87,7 @@
                     {{ getRequesterName(ticket) }}
                   </template>
                 </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 m-0 truncate">
+                <p class="text-xs text-txt-light font-medium dark:text-gray-400 m-0 truncate">
                   <template v-if="title === 'Últimas Tarefas Criadas'">
                     {{
                       ticket.currentTargetUser?.department?.name ||
@@ -103,7 +103,7 @@
             </div>
             <!-- Ticket Title -->
             <div class="flex-1 min-w-0 text-left">
-              <p class="text-sm font-medium text-gray-900 dark:text-white truncate m-0">
+              <p class="text-sm font-medium text-txt-primary dark:text-white truncate m-0">
                 {{ ticket.name }}
               </p>
             </div>
@@ -146,7 +146,7 @@
           >
             <td
               :class="[
-                'max-w-[200px] pl-8 py-3 text-sm text-gray-900 dark:text-white whitespace-nowrap overflow-hidden text-ellipsis w-2/3',
+                'max-w-[200px] pl-8 py-3 text-sm text-txt-primary dark:text-white whitespace-nowrap overflow-hidden text-ellipsis w-2/3',
                 index < 4 ? 'border-b border-gray-200 dark:border-gray-700' : '',
               ]"
               :title="ticket.name"
@@ -160,7 +160,7 @@
             </td>
             <td
               :class="[
-                'px-3 py-3 text-center text-sm text-gray-900 dark:text-white whitespace-nowrap w-1/2',
+                'px-3 py-3 text-center text-sm text-txt-primary dark:text-white whitespace-nowrap w-1/2',
                 index < 4 ? 'border-b border-gray-200 dark:border-gray-700' : '',
               ]"
             >

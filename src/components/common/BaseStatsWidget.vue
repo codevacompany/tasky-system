@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-gray-700"
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-soft-sm dark:shadow-none dark:border dark:border-gray-700"
   >
     <!-- Header -->
     <div
@@ -9,7 +9,7 @@
       <div class="flex items-center gap-2 mb-4 sm:mb-0">
         <div>
           <div class="flex items-center gap-2">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 class="text-lg font-semibold text-txt-primary dark:text-white">
               <slot name="title">{{ title }}</slot>
             </h2>
             <!-- Info icon next to title -->

@@ -12,7 +12,7 @@
       >
         <div class="flex items-center gap-3">
           <div v-if="loadedTicket">
-            <h2 class="text-lg sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <h2 class="text-lg sm:text-lg font-semibold text-txt-primary dark:text-gray-100">
               Detalhes da Tarefa
             </h2>
             <p class="text-gray-600 font-medium dark:text-gray-400">
@@ -154,7 +154,7 @@
         <!-- Left Sidebar Skeleton -->
         <div class="lg:col-span-1 overflow-y-auto pr-4 space-y-4">
           <div
-            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-5 shadow-sm"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-5 shadow-soft-xs"
           >
             <div class="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-4 skeleton-shimmer"></div>
             <div class="space-y-4">
@@ -172,7 +172,7 @@
 
         <!-- Right Content Skeleton -->
         <div class="lg:col-span-2 overflow-y-auto pl-2">
-          <div class="bg-white dark:bg-gray-800 pr-4 rounded-lg shadow-sm">
+          <div class="bg-white dark:bg-gray-800 pr-4 rounded-lg shadow-soft-xs">
             <!-- Title Skeleton -->
             <div class="p-4">
               <div
@@ -237,10 +237,10 @@
         <!-- Left Sidebar -->
         <div class="lg:col-span-1 overflow-y-auto pr-4 space-y-4">
           <div
-            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-5 shadow-sm"
+            class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-5 shadow-soft-xs"
           >
             <h3
-              class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2"
+              class="text-sm font-semibold text-txt-primary dark:text-gray-100 mb-4 flex items-center gap-2"
             >
               <font-awesome-icon icon="info-circle" class="text-primary dark:text-blue-400" />
               Informações da Tarefa
@@ -253,7 +253,7 @@
                     ID da Tarefa
                   </p>
                 </div>
-                <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                <p class="text-sm text-txt-primary dark:text-gray-100 font-medium">
                   {{ loadedTicket.customId }}
                 </p>
               </div>
@@ -286,7 +286,7 @@
                   </p>
                 </div>
                 <span
-                  class="inline-flex items-center text-sm gap-1.5 text-gray-900 dark:text-gray-100"
+                  class="inline-flex items-center text-sm gap-1.5 text-txt-primary dark:text-gray-100"
                 >
                   <font-awesome-icon
                     :icon="getPriorityIcon(loadedTicket.priority)"
@@ -306,7 +306,7 @@
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
                     <div
-                      class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
+                      class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-soft-xs"
                       :style="getAvatarStyle(loadedTicket.requester.department?.name || '')"
                     >
                       {{
@@ -316,7 +316,7 @@
                         })
                       }}
                     </div>
-                    <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                    <p class="text-sm text-txt-primary dark:text-gray-100 font-medium">
                       {{ loadedTicket.requester.firstName }} {{ loadedTicket.requester.lastName }}
                     </p>
                   </div>
@@ -349,7 +349,7 @@
                       <div class="flex items-center gap-2">
                         <div
                           :class="[
-                            'flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm',
+                            'flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-soft-xs',
                             sortedTargetUsers.length > 1 &&
                             targetUser.userId === loadedTicket.currentTargetUserId
                               ? 'ring-2 ring-blue-500'
@@ -365,7 +365,7 @@
                           }}
                         </div>
                         <p
-                          class="text-sm text-gray-900 dark:text-gray-100 font-medium"
+                          class="text-sm text-txt-primary dark:text-gray-100 font-medium"
                           :class="{
                             'font-semibold text-blue-600 dark:text-blue-400':
                               sortedTargetUsers.length > 1 &&
@@ -397,7 +397,7 @@
                   <div v-else class="flex-1 min-w-0">
                     <div class="flex items-center gap-2">
                       <div
-                        class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
+                        class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-soft-xs"
                         :style="
                           getAvatarStyle(loadedTicket.currentTargetUser?.department?.name || '')
                         "
@@ -409,7 +409,7 @@
                           })
                         }}
                       </div>
-                      <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                      <p class="text-sm text-txt-primary dark:text-gray-100 font-medium">
                         {{ loadedTicket.currentTargetUser?.firstName }}
                         {{ loadedTicket.currentTargetUser?.lastName }}
                       </p>
@@ -431,7 +431,7 @@
                 <div v-if="loadedTicket.reviewer" class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
                     <div
-                      class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-sm"
+                      class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold text-white shadow-soft-xs"
                       :style="getAvatarStyle(loadedTicket.reviewer.department?.name || '')"
                     >
                       {{
@@ -441,7 +441,7 @@
                         })
                       }}
                     </div>
-                    <p class="text-sm text-gray-900 dark:text-gray-100 font-medium">
+                    <p class="text-sm text-txt-primary dark:text-gray-100 font-medium">
                       {{ loadedTicket.reviewer.firstName }} {{ loadedTicket.reviewer.lastName }}
                     </p>
                   </div>
@@ -463,7 +463,7 @@
                   >
                     {{ loadedTicket.category.name }}
                   </span>
-                  <span v-else class="text-sm text-gray-900 dark:text-gray-100">-</span>
+                  <span v-else class="text-sm text-txt-primary dark:text-gray-100">-</span>
                 </div>
               </div>
 
@@ -473,7 +473,7 @@
                 </div>
                 <div class="flex-1 min-w-0">
                   <p
-                    class="text-sm text-gray-900 dark:text-gray-100"
+                    class="text-sm text-txt-primary dark:text-gray-100"
                     :title="loadedTicket.createdAt ? formatDateUtil(loadedTicket.createdAt) : ''"
                   >
                     {{ formatDateOnly(loadedTicket.createdAt) }}
@@ -488,7 +488,7 @@
                   </p>
                 </div>
                 <p
-                  class="text-sm text-gray-900 dark:text-gray-100"
+                  class="text-sm text-txt-primary dark:text-gray-100"
                   :title="loadedTicket.dueAt ? formatDateUtil(loadedTicket.dueAt) : ''"
                 >
                   {{ formatDateOnly(loadedTicket.dueAt) }}
@@ -515,7 +515,7 @@
                       'text-sm',
                       calculateDeadline(loadedTicket) && calculateDeadline(loadedTicket) !== ''
                         ? getDeadlineTextClass(loadedTicket.dueAt)
-                        : 'text-gray-900 dark:text-gray-100',
+                        : 'text-txt-primary dark:text-gray-100',
                     ]"
                   >
                     {{ calculateDeadline(loadedTicket) || '-' }}
@@ -529,8 +529,30 @@
                   <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Aceite em</p>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm text-gray-900 dark:text-gray-100">
+                  <p
+                    class="text-sm text-txt-primary dark:text-gray-100"
+                    :title="loadedTicket.acceptedAt ? formatDateUtil(loadedTicket.acceptedAt) : ''"
+                  >
                     {{ formatDateOnly(loadedTicket.acceptedAt) }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Completed Date -->
+              <div v-if="loadedTicket.completedAt" class="flex items-start gap-3">
+                <div class="w-[40%]">
+                  <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Concluído em
+                  </p>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p
+                    class="text-sm text-txt-primary dark:text-gray-100"
+                    :title="
+                      loadedTicket.completedAt ? formatDateUtil(loadedTicket.completedAt) : ''
+                    "
+                  >
+                    {{ formatDateOnly(loadedTicket.completedAt) }}
                   </p>
                 </div>
               </div>
@@ -541,7 +563,7 @@
                     Privacidade
                   </p>
                 </div>
-                <p class="text-sm text-gray-900 dark:text-gray-100">
+                <p class="text-sm text-txt-primary dark:text-gray-100">
                   {{ loadedTicket.isPrivate ? 'Privado' : 'Público' }}
                 </p>
               </div>
@@ -551,12 +573,12 @@
 
         <!-- Right Content -->
         <div class="lg:col-span-2 overflow-y-auto pl-2">
-          <div class="bg-white dark:bg-gray-800 pr-4 rounded-lg shadow-sm">
+          <div class="bg-white dark:bg-gray-800 pr-4 rounded-lg shadow-soft-xs">
             <!-- Ticket Title Section -->
             <div class="p-4">
               <div v-if="!isEditingName">
                 <h1
-                  class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white leading-tight"
+                  class="text-xl sm:text-2xl font-semibold text-txt-primary dark:text-white leading-tight"
                   @click="startEditingName"
                   :class="{
                     'cursor-text hover:text-gray-600 dark:hover:text-gray-400 transition-colors':
@@ -571,7 +593,7 @@
               <div v-else class="space-y-4">
                 <input
                   v-model="editingName"
-                  class="w-full text-xl sm:text-2xl font-bold px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full text-xl sm:text-2xl font-bold px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   @keyup.enter="saveTicketName"
                   @keyup.escape="cancelEditingName"
                   ref="nameInput"
@@ -610,7 +632,7 @@
             <!-- Description Section -->
             <div class="my-2 px-4 sm:px-6 dark:border-gray-700">
               <h3
-                class="font-semibold text-[16.5px] text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-1"
+                class="font-semibold text-[16.5px] text-txt-primary dark:text-gray-100 flex items-center gap-2 mb-1"
               >
                 <font-awesome-icon icon="align-left" class="text-gray-600 dark:text-gray-300" />
                 Descrição
@@ -660,7 +682,9 @@
               class="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-600"
             >
               <div class="flex items-center justify-between mb-4">
-                <h3 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <h3
+                  class="font-semibold text-txt-primary dark:text-gray-100 flex items-center gap-2"
+                >
                   <font-awesome-icon icon="paperclip" class="text-primary dark:text-blue-400" />
                   Anexos
                   <span
@@ -786,7 +810,7 @@
             <!-- Activities Section -->
             <div class="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-600">
               <h3
-                class="font-semibold text-[16.5px] text-gray-900 dark:text-white mb-6 flex items-center gap-2"
+                class="font-semibold text-[16.5px] text-txt-primary dark:text-white mb-6 flex items-center gap-2"
               >
                 <font-awesome-icon
                   :icon="['far', 'comment']"
@@ -856,7 +880,7 @@
                     <div class="flex items-center gap-3">
                       <!-- Avatar -->
                       <div
-                        class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-sm"
+                        class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-soft-xs"
                         :style="getAvatarStyle(event.data.user.department?.name || '')"
                       >
                         {{
@@ -871,12 +895,15 @@
                         <!-- Name and Relative Time -->
                         <div class="flex items-center gap-2 min-w-0">
                           <span
-                            class="font-bold text-gray-900 dark:text-gray-100 text-[15px] truncate"
+                            class="font-bold text-txt-primary dark:text-gray-100 text-[15px] truncate"
                           >
                             {{ event.data.user.firstName }} {{ event.data.user.lastName }}
                           </span>
                           <span class="text-gray-400 dark:text-gray-500 text-xs">•</span>
-                          <span class="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                          <span
+                            class="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap"
+                            :title="formatDateUtil(event.createdAt)"
+                          >
                             {{ formatRelativeTime(event.createdAt) }}
                           </span>
                         </div>
@@ -957,7 +984,7 @@
                     <div class="ml-11">
                       <div
                         :class="[
-                          'rounded-lg px-4 py-3 border shadow-sm transition-all duration-200',
+                          'rounded-lg px-4 py-3 border shadow-soft-xs transition-all duration-200',
                           isMyComment(event.data.user.id)
                             ? 'bg-blue-50/30 dark:bg-blue-800/10 border-blue-100 dark:border-blue-900/30'
                             : 'bg-white dark:bg-gray-700/30 border-gray-200 dark:border-gray-700/50',
@@ -1058,7 +1085,10 @@
                             >
                               {{ getSpecialUpdateTitle(event.subType, event) }}
                             </span>
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                            <span
+                              class="text-sm text-gray-500 dark:text-gray-400"
+                              :title="formatDateUtil(event.createdAt)"
+                            >
                               {{ formatRelativeTime(event.createdAt) }}
                             </span>
                           </div>
@@ -1087,11 +1117,12 @@
                           </div>
                           <div class="flex items-center justify-between flex-1">
                             <div
-                              class="text-sm text-gray-600 dark:text-gray-400 flex-1"
+                              class="text-sm text-txt-muted dark:text-gray-400 flex-1"
                               v-html="formatTicketUpdateDescription(event.data)"
                             ></div>
                             <span
-                              class="text-sm text-gray-500 dark:text-gray-400 ml-4 flex-shrink-0"
+                              class="text-sm text-txt-muted dark:text-gray-400 ml-4 flex-shrink-0"
+                              :title="formatDateUtil(event.createdAt)"
                             >
                               {{ formatRelativeTime(event.createdAt) }}
                             </span>
@@ -1336,7 +1367,7 @@
         >
           <div class="flex items-center gap-3 flex-1 min-w-0">
             <div
-              class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-sm"
+              class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-soft-xs"
               :style="getAvatarStyle(targetUser.user.department?.name || '')"
             >
               {{
@@ -1839,7 +1870,7 @@ const getDeadlineClass = (date?: string) => {
 
 const getDeadlineTextClass = (date?: string) => {
   const info = getDeadlineInfoFromDate(date);
-  if (!info) return 'text-gray-900 dark:text-gray-100';
+  if (!info) return 'text-txt-primary dark:text-gray-100';
 
   if (info.isOverdue) return 'text-red-600 dark:text-red-400';
   // Red when 6 hours or less remaining

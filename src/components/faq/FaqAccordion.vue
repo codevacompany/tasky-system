@@ -1,7 +1,7 @@
 <template>
   <div
     class="faq-accordion bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 transition-shadow duration-200"
-    :class="{ 'shadow-sm': isOpen }"
+    :class="{ 'shadow-soft-xs': isOpen }"
   >
     <button
       class="w-full flex items-center justify-between px-5 py-4 text-left transition-colors duration-200 focus:outline-none"

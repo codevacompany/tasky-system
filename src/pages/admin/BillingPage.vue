@@ -1,12 +1,12 @@
 <template>
   <div class="p-6 max-w-[1600px] mx-auto">
     <header class="mb-8 flex items-center justify-between">
-      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Gerenciar Assinaturas</h1>
+      <h1 class="text-2xl font-semibold text-txt-primary dark:text-white">Gerenciar Assinaturas</h1>
       <button
         v-if="!hasTrial && currentSubscription?.hasSubscription"
         @click="handleManageSubscription"
         :disabled="isLoadingPortal"
-        class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors disabled:opacity-50"
+        class="text-sm text-gray-600 dark:text-gray-400 hover:text-txt-primary dark:hover:text-gray-200 transition-colors disabled:opacity-50"
       >
         Ver faturas anteriores
       </button>
@@ -66,7 +66,7 @@
       class="mb-8 bg-white dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
     >
       <div class="flex items-center gap-2 mb-4">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <h2 class="text-lg font-semibold text-txt-primary dark:text-white">
           {{ currentSubscription.subscription.planName }}
         </h2>
         <span
@@ -85,7 +85,7 @@
         <!-- Left Column: Price and Trial Info -->
         <div>
           <div class="flex items-baseline gap-2 mb-4">
-            <span class="text-3xl font-bold text-gray-900 dark:text-white">
+            <span class="text-3xl font-bold text-txt-primary dark:text-white">
               R$ {{ currentSubscription.billing?.basePlanCost.toFixed(0) || '0' }}
             </span>
             <span class="text-gray-600 dark:text-gray-400">/ mês</span>
@@ -103,7 +103,7 @@
 
         <!-- Middle Column: Features List -->
         <div class="pl-4">
-          <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">
+          <h3 class="text-sm font-medium text-txt-primary dark:text-white mb-3">
             O que está incluído:
           </h3>
           <ul class="space-y-2">
@@ -164,7 +164,7 @@
               />
             </svg>
             <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span class="text-2xl font-bold text-gray-900 dark:text-white">
+              <span class="text-2xl font-bold text-txt-primary dark:text-white">
                 {{ currentSubscription.userStats.totalUsers }}
               </span>
               <span class="text-xs text-gray-600 dark:text-gray-400">
@@ -172,7 +172,7 @@
               </span>
             </div>
           </div>
-          <p class="text-sm font-medium text-gray-900 dark:text-white mt-3">Usuários</p>
+          <p class="text-sm font-medium text-txt-primary dark:text-white mt-3">Usuários</p>
           <div v-if="currentSubscription.billing?.exceedsLimit" class="mt-2">
             <span class="text-xs text-orange-600 dark:text-orange-400">
               ⚠️ Limite excedido: +{{ currentSubscription.billing.additionalUsers }} usuário{{
@@ -208,7 +208,7 @@
         </div>
         <!-- Header Content -->
         <div v-else class="mb-4">
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Atualizar plano</h2>
+          <h2 class="text-xl font-semibold text-txt-primary dark:text-white mb-2">Atualizar plano</h2>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Nossos planos são criados para se adequar ao tamanho do seu projeto. Pague uma taxa fixa
             por um plano definido, mais um pouco extra se ultrapassar. Atualize para o próximo nível
@@ -218,7 +218,7 @@
             <span
               :class="
                 !isYearlyBilling
-                  ? 'text-gray-900 dark:text-white font-medium'
+                  ? 'text-txt-primary dark:text-white font-medium'
                   : 'text-gray-500 dark:text-gray-400'
               "
             >
@@ -228,7 +228,7 @@
             <span
               :class="
                 isYearlyBilling
-                  ? 'text-gray-900 dark:text-white font-medium'
+                  ? 'text-txt-primary dark:text-white font-medium'
                   : 'text-gray-500 dark:text-gray-400'
               "
             >
@@ -279,7 +279,7 @@
           :key="plan.slug"
           class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 flex flex-col"
         >
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{{ plan.name }}</h3>
+          <h3 class="text-lg font-semibold text-txt-primary dark:text-white mb-2">{{ plan.name }}</h3>
 
           <div v-if="plan.slug === 'customizado'" class="mb-4">
             <div class="text-sm text-gray-700 dark:text-gray-300">
@@ -290,7 +290,7 @@
           </div>
           <div v-else class="mb-4">
             <div class="flex items-baseline gap-2">
-              <span class="text-3xl font-bold text-gray-900 dark:text-white">
+              <span class="text-3xl font-bold text-txt-primary dark:text-white">
                 R$
                 {{
                   isYearlyBilling && plan.priceYearly
@@ -318,7 +318,7 @@
           </button>
           <button
             v-else
-            class="w-full py-2 px-4 text-sm font-medium rounded-md transition-colors mb-6 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="w-full py-2 px-4 text-sm font-medium rounded-md transition-colors mb-6 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-txt-primary dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="(isCurrentPlan(plan.slug) && !hasTrial) || isSubscribing"
             @click="handleSubscription(plan.slug)"
           >

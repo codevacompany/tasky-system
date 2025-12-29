@@ -11,12 +11,12 @@
           class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-between items-center"
         >
           <h2
-            class="m-0 text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"
+            class="m-0 text-lg font-semibold text-txt-primary dark:text-white flex items-center gap-2"
           >
             Perfil
           </h2>
           <button
-            class="text-gray-900 dark:text-white opacity-70 bg-none border-none cursor-pointer p-1 text-2xl leading-none rounded hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+            class="text-txt-primary dark:text-white opacity-70 bg-none border-none cursor-pointer p-1 text-2xl leading-none rounded hover:opacity-100 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
             @click="closeModal"
           >
             ×
@@ -32,7 +32,7 @@
                 <span class="initials">{{ userInitials }}</span>
               </div>
               <div class="flex-1 min-w-0">
-                <h4 class="m-0 text-base font-semibold text-gray-900 dark:text-white">
+                <h4 class="m-0 text-base font-semibold text-txt-primary dark:text-white">
                   {{ user?.firstName }} {{ user?.lastName }}
                 </h4>
                 <p
@@ -51,7 +51,7 @@
               <router-link
                 to="/faq"
                 @click="closeModal"
-                class="flex items-center gap-3 px-6 py-3.5 text-gray-900 hover:text-gray-900 dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
+                class="flex items-center gap-3 px-6 py-3.5 text-txt-primary hover:text-txt-primary dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
                   <font-awesome-icon icon="question-circle" />
@@ -63,7 +63,7 @@
                 v-if="isTenantAdmin"
                 to="/assinaturas"
                 @click="closeModal"
-                class="flex items-center gap-3 px-6 py-3.5 text-gray-900 hover:text-gray-900 dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
+                class="flex items-center gap-3 px-6 py-3.5 text-txt-primary hover:text-txt-primary dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
                   <font-awesome-icon icon="credit-card" />
@@ -73,7 +73,7 @@
 
               <div
                 ref="temaButtonRef"
-                class="flex items-center gap-3 px-6 py-3.5 text-gray-900 dark:text-white cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700 relative"
+                class="flex items-center gap-3 px-6 py-3.5 text-txt-primary dark:text-white cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700 relative"
                 :class="{
                   'bg-blue-50 dark:bg-blue-900/10': showThemeModal,
                 }"
@@ -90,7 +90,7 @@
               </div>
 
               <div
-                class="flex items-center gap-3 px-6 py-3.5 text-gray-900 dark:text-white cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
+                class="flex items-center gap-3 px-6 py-3.5 text-txt-primary dark:text-white cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
                 @click="openChangePasswordModal"
               >
                 <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
@@ -161,7 +161,7 @@
               :class="
                 !userPreferencesStore.isDarkMode
                   ? 'text-blue-600 dark:text-blue-400'
-                  : 'text-gray-900 dark:text-white'
+                  : 'text-txt-primary dark:text-white'
               "
               >Claro</span
             >
@@ -202,7 +202,7 @@
               :class="
                 userPreferencesStore.isDarkMode
                   ? 'text-blue-600 dark:text-blue-400'
-                  : 'text-gray-900 dark:text-white'
+                  : 'text-txt-primary dark:text-white'
               "
               >Escuro</span
             >
@@ -229,14 +229,14 @@
         <div class="mb-6">
           <label
             for="currentPassword"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            class="block mb-2 text-sm font-medium text-txt-primary dark:text-white"
             >Senha Atual</label
           >
           <Input
             id="currentPassword"
             v-model="passwordForm.currentPassword"
             type="password"
-            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
+            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-txt-primary dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
             :class="{ 'border-red-500': passwordForm.errors.currentPassword }"
             placeholder="Digite sua senha atual"
             required
@@ -248,14 +248,14 @@
         <div class="mb-6">
           <label
             for="newPassword"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            class="block mb-2 text-sm font-medium text-txt-primary dark:text-white"
             >Nova Senha</label
           >
           <Input
             id="newPassword"
             v-model="passwordForm.newPassword"
             type="password"
-            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
+            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-txt-primary dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
             :class="{ 'border-red-500': passwordForm.errors.newPassword }"
             placeholder="Digite sua nova senha"
             required
@@ -267,14 +267,14 @@
         <div class="mb-6">
           <label
             for="confirmPassword"
-            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            class="block mb-2 text-sm font-medium text-txt-primary dark:text-white"
             >Confirmar Nova Senha</label
           >
           <Input
             id="confirmPassword"
             v-model="passwordForm.confirmPassword"
             type="password"
-            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
+            class="w-full px-3 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-md text-sm text-txt-primary dark:text-white bg-white dark:bg-gray-800 transition-all duration-200 focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)]"
             :class="{ 'border-red-500': passwordForm.errors.confirmPassword }"
             placeholder="Confirme sua nova senha"
             required
@@ -284,7 +284,7 @@
           </span>
         </div>
         <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-md mb-6">
-          <p class="m-0 mb-2 text-xs font-medium text-gray-900 dark:text-white">
+          <p class="m-0 mb-2 text-xs font-medium text-txt-primary dark:text-white">
             A senha deve conter:
           </p>
           <ul class="m-0 p-0 list-none">

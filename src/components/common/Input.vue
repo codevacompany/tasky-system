@@ -44,7 +44,7 @@ const emit = defineEmits<{
 }>();
 
 const baseClasses =
-  'w-full px-3 border border-inputBorder rounded text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white transition-colors disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-75 dark:disabled:bg-gray-900 dark:disabled:text-gray-500';
+  'w-full px-3 border border-inputBorder rounded-[5px] text-sm text-gray-800 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white transition-colors disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-75 dark:disabled:bg-gray-900 dark:disabled:text-gray-500 placeholder:text-txt-light';
 
 const paddingClass = computed(() => paddingMap[props.padding] ?? paddingMap.normal);
 
