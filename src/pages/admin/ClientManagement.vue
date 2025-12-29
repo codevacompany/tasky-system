@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="mb-8">
       <div class="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Gestão de Clientes test</h1>
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Gestão de Clientes</h1>
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div class="relative min-w-[300px] max-w-[400px]">
             <font-awesome-icon
@@ -42,9 +42,9 @@
             <span class="block text-xl font-semibold text-gray-900 dark:text-white my-1">{{
               stats.activeClients
             }}</span>
-            <span class="block text-sm text-green-600 dark:text-green-400">
+            <!-- <span class="block text-sm text-green-600 dark:text-green-400">
               <font-awesome-icon icon="arrow-up" /> 12% este mês
-            </span>
+            </span> -->
           </div>
         </div>
 
@@ -61,9 +61,9 @@
             <span class="block text-xl font-semibold text-gray-900 dark:text-white my-1">{{
               stats.totalUsers
             }}</span>
-            <span class="block text-sm text-green-600 dark:text-green-400">
+            <!-- <span class="block text-sm text-green-600 dark:text-green-400">
               <font-awesome-icon icon="arrow-up" /> 8% este mês
-            </span>
+            </span> -->
           </div>
         </div>
 
@@ -80,9 +80,9 @@
             <span class="block text-xl font-semibold text-gray-900 dark:text-white my-1">{{
               stats.monthlyTickets
             }}</span>
-            <span class="block text-sm text-red-600 dark:text-red-400">
+            <!-- <span class="block text-sm text-red-600 dark:text-red-400">
               <font-awesome-icon icon="arrow-down" /> 5% este mês
-            </span>
+            </span> -->
           </div>
         </div>
 
@@ -99,9 +99,9 @@
             <span class="block text-xl font-semibold text-gray-900 dark:text-white my-1">{{
               formatCurrency(stats.monthlyRevenue)
             }}</span>
-            <span class="block text-sm text-green-600 dark:text-green-400">
+            <!-- <span class="block text-sm text-green-600 dark:text-green-400">
               <font-awesome-icon icon="arrow-up" /> 15% este mês
-            </span>
+            </span> -->
           </div>
         </div>
       </div>
@@ -912,7 +912,7 @@ const stats = computed(() => {
     activeClients: globalStats.value.totalActiveClients,
     totalUsers: globalStats.value.totalUsers,
     monthlyTickets: globalStats.value.totalMonthlyTickets,
-    monthlyRevenue: 89500.0, // This remains mocked as per user requirement
+    monthlyRevenue: 0.0, // This remains mocked
   };
 });
 
@@ -939,7 +939,7 @@ const clients = computed(() => {
       email: user.email,
       department: user.departmentName,
       profile: user.role,
-      status: user.isActive ? 'ATIVO' : 'SUSPENSO',
+      status: user.isActive ? 'ATIVO' : 'INATIVO',
       lastAccess: user.lastAccess,
       loginCount: user.loginCount || 0,
       lastLogin: user.lastLogin,

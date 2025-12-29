@@ -1282,7 +1282,7 @@ body.dark-mode label {
   text-align: center;
   text-decoration: none;
   white-space: nowrap;
-  border-radius: 4px;
+  border-radius: 5px;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;

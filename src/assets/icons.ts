@@ -103,6 +103,9 @@ import {
   faAnglesUp,
   faEquals,
   faArchive,
+  faArrowLeft,
+  faPen,
+  faUserTimes
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -219,6 +222,9 @@ const icons = [
   faEquals,
   faArchive,
   faCommentRegular,
+  faArrowLeft,
+  faPen,
+  faUserTimes
 ];
 
 library.add(...icons);

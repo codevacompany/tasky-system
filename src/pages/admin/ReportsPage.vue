@@ -325,14 +325,14 @@
               <!-- Top Contributors -->
               <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_USERS_ANALYTICS"
-                info-message="Ranking dos colaboradores com melhor desempenho em resolução de tarefas no período selecionado. O ranking pode ser ordenado por % de Desempenho (que considera a taxa de resolução e o volume de tarefas), Tempo de Resolução (quanto menor, melhor) ou Taxa de Atraso (porcentagem de tarefas enviadas para verificação após o prazo - quanto menor, melhor)."
+                info-message="Ranking dos colaboradores com melhor desempenho no período selecionado. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%), utilizando o modelo Wilson para correção estatística. Nota: Para ter um score, o colaborador precisa ter pelo menos 10 tarefas atribuídas no período."
               >
                 <template #title>Top Colaboradores</template>
                 <template #subtitle>{{ currentPeriodLabel }}</template>
                 <template #header-actions>
                   <Select
                     :options="[
-                      { value: 'efficiency', label: '% de Desempenho' },
+                      { value: 'efficiency', label: 'Score' },
                       { value: 'resolution_time', label: 'Tempo de Resolução' },
                       { value: 'overdue_rate', label: 'Taxa de Atraso' },
                     ]"
@@ -352,7 +352,7 @@
                     <div class="text-center">
                       {{
                         topUsersSortBy === 'efficiency'
-                          ? '% Desempenho'
+                          ? 'Score'
                           : topUsersSortBy === 'resolution_time'
                             ? 'Tempo de Resolução'
                             : 'Taxa de Atraso'
@@ -445,7 +445,7 @@
                           v-else
                           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
                         >
-                          {{ formatPercentage(user.overdueRate / 100) }}
+                          {{ formatPercentage(user.deliveryOverdueRate / 100) }}
                         </span>
                       </div>
                     </div>
@@ -461,10 +461,22 @@
 
                   <div
                     v-else
-                    class="flex items-center justify-center py-8 text-gray-500 dark:text-gray-400"
+                    class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400"
                   >
-                    <font-awesome-icon icon="info-circle" class="mr-2" />
-                    <p class="text-sm">Nenhum colaborador encontrado</p>
+                    <font-awesome-icon icon="info-circle" class="text-xl mb-2" />
+                    <p class="text-sm text-center">
+                      {{
+                        topUsersSortBy === 'efficiency'
+                          ? 'Nenhum colaborador com 10+ tarefas encontrado'
+                          : 'Nenhum colaborador encontrado'
+                      }}
+                    </p>
+                    <p
+                      v-if="topUsersSortBy === 'efficiency'"
+                      class="text-xs text-center mt-1 text-gray-400 dark:text-gray-500"
+                    >
+                      Score requer mínimo de 10 tarefas
+                    </p>
                   </div>
                 </div>
               </BaseStatsWidget>
@@ -472,14 +484,14 @@
               <!-- Top Setores -->
               <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_DEPARTMENT_ANALYTICS"
-                info-message="Ranking dos setores com melhor desempenho em resolução de tarefas no período selecionado. O ranking pode ser ordenado por % de Desempenho (que considera a taxa de resolução e o volume de tarefas), Tempo de Resolução (quanto menor, melhor) ou Taxa de Atraso (porcentagem de tarefas enviadas para verificação após o prazo - quanto menor, melhor)."
+                info-message="Ranking dos setores com melhor desempenho no período selecionado. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%), utilizando o modelo Wilson para correção estatística."
               >
                 <template #title>Top Setores</template>
                 <template #subtitle>{{ currentPeriodLabel }}</template>
                 <template #header-actions>
                   <Select
                     :options="[
-                      { value: 'efficiency', label: '% de Desempenho' },
+                      { value: 'efficiency', label: 'Score' },
                       { value: 'resolution_time', label: 'Tempo de Resolução' },
                       { value: 'overdue_rate', label: 'Taxa de Atraso' },
                     ]"
@@ -499,7 +511,7 @@
                     <div class="text-center">
                       {{
                         topDepartmentsSortBy === 'efficiency'
-                          ? '% Desempenho'
+                          ? 'Score'
                           : topDepartmentsSortBy === 'resolution_time'
                             ? 'Tempo de Resolução'
                             : 'Taxa de Atraso'
@@ -568,12 +580,15 @@
                         }}</span>
                       </div>
                       <div class="text-center">
-                        <span
-                          v-if="topDepartmentsSortBy === 'efficiency'"
-                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
-                        >
-                          {{ formatPercentage(dept.efficiencyScore) }}
-                        </span>
+                        <template v-if="topDepartmentsSortBy === 'efficiency'">
+                          <span
+                            v-if="dept.efficiencyScore !== undefined"
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
+                          >
+                            {{ formatPercentage(dept.efficiencyScore) }}
+                          </span>
+                          <span v-else class="text-gray-400 dark:text-gray-500"> - </span>
+                        </template>
                         <span
                           v-else-if="topDepartmentsSortBy === 'resolution_time'"
                           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
@@ -584,7 +599,7 @@
                           v-else
                           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
                         >
-                          {{ formatPercentage(dept.overdueRate / 100) }}
+                          {{ formatPercentage(dept.deliveryOverdueRate / 100) }}
                         </span>
                       </div>
                     </div>
@@ -600,10 +615,22 @@
 
                   <div
                     v-else
-                    class="flex items-center justify-center py-8 text-gray-500 dark:text-gray-400"
+                    class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400"
                   >
-                    <font-awesome-icon icon="info-circle" class="mr-2" />
-                    <p class="text-sm">Nenhum setor encontrado</p>
+                    <font-awesome-icon icon="info-circle" class="text-xl mb-2" />
+                    <p class="text-sm text-center">
+                      {{
+                        topDepartmentsSortBy === 'efficiency'
+                          ? 'Nenhum setor com 10+ tarefas encontrado'
+                          : 'Nenhum setor encontrado'
+                      }}
+                    </p>
+                    <p
+                      v-if="topDepartmentsSortBy === 'efficiency'"
+                      class="text-xs text-center mt-1 text-gray-400 dark:text-gray-500"
+                    >
+                      Score requer mínimo de 10 tarefas
+                    </p>
                   </div>
                 </div>
               </BaseStatsWidget>
@@ -1149,67 +1176,102 @@
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Top Performing -->
                 <BaseStatsWidget
-                  info-message="Esta seção mostra os setores com melhor desempenho em termos de % de Desempenho. Os setores são ordenados pela maior % de Desempenho, calculado usando o método Wilson Score, que considera a taxa de resolução e o volume de tarefas."
+                  info-message="Esta seção mostra os setores com melhor Score. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%)."
                 >
-                  <template #title>Melhor Desempenho</template>
-                  <template #subtitle>Setores com maior % de Desempenho</template>
+                  <template #title>Maiores Scores</template>
+                  <template #subtitle>Setores com maior Score</template>
 
                   <div>
-                    <div class="space-y-4">
-                      <div
-                        v-for="dept in departmentStats
-                          .slice()
-                          .sort((a, b) => b.efficiencyScore - a.efficiencyScore)
-                          .slice(0, 3)"
-                        :key="dept.departmentId"
-                        class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
-                      >
-                        <div>
-                          <div class="font-medium text-gray-900 dark:text-white">
-                            {{ dept.departmentName }}
+                    <template v-if="topPerformingDepartments.length > 0">
+                      <div class="space-y-4">
+                        <div
+                          v-for="dept in topPerformingDepartments"
+                          :key="dept.departmentId"
+                          class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
+                        >
+                          <div>
+                            <div class="font-medium text-gray-900 dark:text-white">
+                              {{ dept.departmentName }}
+                            </div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                              {{ dept.resolvedTickets }}/{{ dept.totalTickets }} tarefas
+                            </div>
                           </div>
-                          <div class="text-sm text-gray-600 dark:text-gray-400">
-                            {{ dept.resolvedTickets }}/{{ dept.totalTickets }} tarefas
+                          <div class="text-lg font-bold text-green-600 dark:text-green-400">
+                            {{ formatPercentage(dept.efficiencyScore) }}
                           </div>
-                        </div>
-                        <div class="text-lg font-bold text-green-600 dark:text-green-400">
-                          {{ formatPercentage(dept.efficiencyScore) }}
                         </div>
                       </div>
+                    </template>
+                    <div
+                      v-else
+                      class="flex flex-col items-center justify-center min-h-[300px] text-center"
+                    >
+                      <div
+                        class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4"
+                      >
+                        <font-awesome-icon
+                          icon="building"
+                          class="text-2xl text-gray-400 dark:text-gray-500"
+                        />
+                      </div>
+                      <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                        Não há setores com bom desempenho
+                      </p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Os setores aparecerão aqui quando atingirem um bom Score de Desempenho
+                      </p>
                     </div>
                   </div>
                 </BaseStatsWidget>
 
                 <!-- Needs Improvement -->
                 <BaseStatsWidget
-                  info-message="Esta seção mostra os setores que necessitam de melhoria em termos de % de Desempenho. Os setores são ordenados pela menor % de Desempenho, calculado usando o método Wilson Score, que considera a taxa de resolução e o volume de tarefas."
+                  info-message="Esta seção mostra os setores com menor Score. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%)."
                 >
-                  <template #title>Pior Desempenho</template>
-                  <template #subtitle>Setores com menor % de Desempenho</template>
+                  <template #title>Menores Scores</template>
+                  <template #subtitle>Setores com menor Score</template>
 
                   <div>
-                    <div class="space-y-4">
-                      <div
-                        v-for="dept in departmentStats
-                          .slice()
-                          .filter((dept) => dept.efficiencyScore > 0)
-                          .sort((a, b) => a.efficiencyScore - b.efficiencyScore)
-                          .slice(0, 3)"
-                        :key="dept.departmentId"
-                        class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
-                      >
-                        <div>
-                          <div class="font-medium text-gray-900 dark:text-white">
-                            {{ dept.departmentName }}
+                    <template v-if="worstPerformingDepartments.length > 0">
+                      <div class="space-y-4">
+                        <div
+                          v-for="dept in worstPerformingDepartments"
+                          :key="dept.departmentId"
+                          class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
+                        >
+                          <div>
+                            <div class="font-medium text-gray-900 dark:text-white">
+                              {{ dept.departmentName }}
+                            </div>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                              {{ dept.resolvedTickets }}/{{ dept.totalTickets }} tarefas
+                            </div>
                           </div>
-                          <div class="text-sm text-gray-600 dark:text-gray-400">
-                            {{ dept.resolvedTickets }}/{{ dept.totalTickets }} tarefas
+                          <div class="text-lg font-bold text-red-600 dark:text-red-400">
+                            {{ formatPercentage(dept.efficiencyScore) }}
                           </div>
-                        </div>
-                        <div class="text-lg font-bold text-red-600 dark:text-red-400">
-                          {{ formatPercentage(dept.efficiencyScore) }}
                         </div>
                       </div>
+                    </template>
+                    <div
+                      v-else
+                      class="flex flex-col items-center justify-center min-h-[300px] text-center"
+                    >
+                      <div
+                        class="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4"
+                      >
+                        <font-awesome-icon
+                          icon="building"
+                          class="text-2xl text-gray-400 dark:text-gray-500"
+                        />
+                      </div>
+                      <p class="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
+                        Não há setores com baixo desempenho
+                      </p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Todos os setores estão com um bom score de Desempenho
+                      </p>
                     </div>
                   </div>
                 </BaseStatsWidget>
@@ -1267,10 +1329,10 @@
               <!-- Top vs Underperforming Users -->
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <BaseStatsWidget
-                  info-message="Esta seção mostra os colaboradores com melhor desempenho em termos de % de Desempenho. Os colaboradores são ordenados pela maior % de Desempenho, calculado usando o método Wilson Score, que considera a taxa de resolução e o volume de tarefas."
+                  info-message="Esta seção mostra os colaboradores com melhor Score. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%)."
                 >
-                  <template #title>Melhor Desempenho</template>
-                  <template #subtitle>Colaboradores com maior % de Desempenho</template>
+                  <template #title>Maiores Scores</template>
+                  <template #subtitle>Colaboradores com maior Score</template>
 
                   <div>
                     <template v-if="topPerformers.length > 0">
@@ -1310,17 +1372,17 @@
                         Não há colaboradores com bom desempenho
                       </p>
                       <p class="text-xs text-gray-500 dark:text-gray-400">
-                        Os colaboradores aparecerão aqui quando atingirem um bom % de Desempenho
+                        Os colaboradores aparecerão aqui quando atingirem um bom Score de Desempenho
                       </p>
                     </div>
                   </div>
                 </BaseStatsWidget>
 
                 <BaseStatsWidget
-                  info-message="Esta seção mostra os colaboradores que necessitam de melhoria em termos de % de Desempenho. Os colaboradores são ordenados pela menor % de Desempenho, calculado usando o método Wilson Score, que considera a taxa de resolução e o volume de tarefas (Colaboradores sem dados não são exibidos)."
+                  info-message="Esta seção mostra os colaboradores com menor Score. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%)."
                 >
-                  <template #title>Pior Desempenho</template>
-                  <template #subtitle>Colaboradores com menor % de Desempenho</template>
+                  <template #title>Menores Scores</template>
+                  <template #subtitle>Colaboradores com menor Score</template>
 
                   <div>
                     <template v-if="worstPerformers.length > 0">
@@ -1360,7 +1422,7 @@
                         Não há colaboradores com baixo desempenho
                       </p>
                       <p class="text-xs text-gray-500 dark:text-gray-400">
-                        Todos os colaboradores estão com um bom % de Desempenho
+                        Todos os colaboradores estão com um bom score de Desempenho
                       </p>
                     </div>
                   </div>
@@ -1638,70 +1700,6 @@
                   </div>
                 </div>
               </BaseStatsWidget>
-
-              <!-- Status Distribution Trends -->
-              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <BaseStatsWidget
-                  info-message="Esta análise mostra quanto tempo em média as tarefas permanecem em cada status. Tempos altos em determinados status podem indicar gargalos no processo. Os dados são apresentados com barras proporcionais ao tempo médio de cada status."
-                >
-                  <template #title>Tempo Médio Por Status</template>
-
-                  <div class="flex flex-col lg:flex-row">
-                    <div class="p-6 lg:w-1/3 border-r border-gray-200 dark:border-gray-700">
-                      <p class="text-sm font-medium text-gray-900 dark:text-white mb-4">
-                        Análise de tempo por status:
-                      </p>
-                      <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                        <p>
-                          Esta análise mostra quanto tempo em média as tarefas permanecem em cada
-                          status.
-                        </p>
-                        <p>
-                          Tempos altos em determinados status podem indicar gargalos no processo.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div class="p-6 lg:w-2/3">
-                      <div class="space-y-3">
-                        <template v-if="sortedStatusDurations.length">
-                          <div
-                            v-for="(duration, index) in sortedStatusDurations"
-                            :key="index"
-                            class="space-y-1"
-                          >
-                            <div class="flex justify-between items-center text-sm">
-                              <span class="text-gray-700 dark:text-gray-300">{{
-                                formatSnakeToNaturalCase(
-                                  (duration.status as any)?.key ??
-                                    (duration.status as unknown as string),
-                                )
-                              }}</span>
-                              <span class="font-medium text-gray-900 dark:text-white">
-                                {{ formatTimeInSecondsCompact(duration.averageDurationSeconds) }}
-                              </span>
-                            </div>
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                              <div
-                                class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
-                                :class="{
-                                  'min-w-[2px]': duration.averageDurationSeconds === 0,
-                                }"
-                                :style="{
-                                  width:
-                                    duration.averageDurationSeconds === 0
-                                      ? '2px'
-                                      : `${(duration.averageDurationSeconds / sortedStatusDurations[0].averageDurationSeconds) * 100}%`,
-                                }"
-                              ></div>
-                            </div>
-                          </div>
-                        </template>
-                      </div>
-                    </div>
-                  </div>
-                </BaseStatsWidget>
-              </div>
             </template>
 
             <!-- Upgrade prompt if user doesn't have permission -->
@@ -2442,7 +2440,6 @@ const loadData = async () => {
       resolvedTickets: dept.resolvedTickets || 0,
       resolutionRate: dept.resolutionRate || 0,
       averageAcceptanceTimeSeconds: dept.averageAcceptanceTimeSeconds || 0,
-      averageTotalTimeSeconds: dept.averageTotalTimeSeconds || 0,
     }));
 
     // Distribuição por Status
@@ -2862,10 +2859,32 @@ const topFiveDepartments = computed(() => {
       .sort((a, b) => (a.averageResolutionTimeSeconds || 0) - (b.averageResolutionTimeSeconds || 0))
       .slice(0, 5);
   } else if (topDepartmentsSortBy.value === 'overdue_rate') {
-    return copy.sort((a, b) => (a.overdueRate || 0) - (b.overdueRate || 0)).slice(0, 5);
+    return copy
+      .sort((a, b) => (a.deliveryOverdueRate || 0) - (b.deliveryOverdueRate || 0))
+      .slice(0, 5);
   } else {
-    return copy.sort((a, b) => b.efficiencyScore - a.efficiencyScore).slice(0, 5);
+    // When sorting by efficiency, only show departments with valid scores (10+ tickets)
+    return copy
+      .filter((dept) => dept.efficiencyScore !== undefined)
+      .sort((a, b) => (b.efficiencyScore || 0) - (a.efficiencyScore || 0))
+      .slice(0, 5);
   }
+});
+
+const topPerformingDepartments = computed(() => {
+  if (!departmentStats.value) return [];
+  return [...departmentStats.value]
+    .filter((dept) => dept.efficiencyScore !== undefined)
+    .sort((a, b) => (b.efficiencyScore || 0) - (a.efficiencyScore || 0))
+    .slice(0, 3);
+});
+
+const worstPerformingDepartments = computed(() => {
+  if (!departmentStats.value) return [];
+  return [...departmentStats.value]
+    .filter((dept) => dept.efficiencyScore !== undefined)
+    .sort((a, b) => (a.efficiencyScore || 0) - (b.efficiencyScore || 0))
+    .slice(0, 3);
 });
 
 const sortedDepartmentsByResolutionTime = computed(() => {
@@ -3066,18 +3085,12 @@ const departmentStatsSummary = computed(() => {
       sum + dept.averageAcceptanceTimeSeconds * dept.resolvedTickets,
     0,
   );
-  const totalTotalTime = departmentStats.value.reduce(
-    (sum: number, dept: DepartmentStats) =>
-      sum + dept.averageTotalTimeSeconds * dept.resolvedTickets,
-    0,
-  );
 
   return {
     totalTickets: departmentTenantStats.value?.totalTickets ?? totalTickets,
     totalResolved,
     averageResolutionTimeSeconds: totalResolved ? totalResolutionTime / totalResolved : 0,
     averageAcceptanceTimeSeconds: totalResolved ? totalAcceptanceTime / totalResolved : 0,
-    averageTotalTimeSeconds: totalResolved ? totalTotalTime / totalResolved : 0,
   };
 });
 
@@ -3151,7 +3164,6 @@ const handleTopDepartmentsSortByChange = async () => {
       resolvedTickets: dept.resolvedTickets || 0,
       resolutionRate: dept.resolutionRate || 0,
       averageAcceptanceTimeSeconds: dept.averageAcceptanceTimeSeconds || 0,
-      averageTotalTimeSeconds: dept.averageTotalTimeSeconds || 0,
     }));
   } catch (err: unknown) {
     console.error('Erro ao carregar estatísticas de setores:', err);
@@ -3881,7 +3893,6 @@ const exportToExcel = async () => {
           'Taxa Resolução',
           'Tempo Aceite',
           'Tempo Resolução',
-          'Tempo Total',
         ],
         ...departmentStats.value.map((dept) => [
           dept.departmentName,
@@ -3890,7 +3901,6 @@ const exportToExcel = async () => {
           formatPercentage(dept.resolutionRate),
           formatTimeInSeconds(dept.averageAcceptanceTimeSeconds),
           formatTimeInSeconds(dept.averageResolutionTimeSeconds),
-          formatTimeInSeconds(dept.averageTotalTimeSeconds),
         ]),
       ];
       const deptSheet = XLSX.utils.aoa_to_sheet(deptData);
@@ -4017,10 +4027,9 @@ const exportToCSV = async () => {
     // Department Statistics
     if (departmentStats.value && departmentStats.value.length > 0) {
       csvContent += '=== ESTATÍSTICAS POR SETOR ===\n';
-      csvContent +=
-        'Setor,Total Tarefas,Resolvidas,Taxa Resolução,Tempo Aceite,Tempo Resolução,Tempo Total\n';
+      csvContent += 'Setor,Total Tarefas,Resolvidas,Taxa Resolução,Tempo Aceite,Tempo Resolução\n';
       departmentStats.value.forEach((dept) => {
-        csvContent += `${dept.departmentName},${dept.totalTickets},${dept.resolvedTickets},${formatPercentage(dept.resolutionRate)},${formatTimeInSeconds(dept.averageAcceptanceTimeSeconds)},${formatTimeInSeconds(dept.averageResolutionTimeSeconds)},${formatTimeInSeconds(dept.averageTotalTimeSeconds)}\n`;
+        csvContent += `${dept.departmentName},${dept.totalTickets},${dept.resolvedTickets},${formatPercentage(dept.resolutionRate)},${formatTimeInSeconds(dept.averageAcceptanceTimeSeconds)},${formatTimeInSeconds(dept.averageResolutionTimeSeconds)}\n`;
       });
       csvContent += '\n';
     }

@@ -19,6 +19,10 @@ export const ticketCommentService = {
     return apiClient.get<TicketComment[]>(`/ticket-comments/ticket/${ticketId}`);
   },
 
+  async getMentionableUsers(ticketId: string): Promise<AxiosResponse<any[]>> {
+    return apiClient.get<any[]>(`/ticket-comments/ticket/${ticketId}/mentionable-users`);
+  },
+
   async update(uuid: string, data: UpdateTicketCommentDto): Promise<AxiosResponse<TicketComment>> {
     return apiClient.patch<TicketComment>(`/ticket-comments/${uuid}`, data);
   },

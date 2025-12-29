@@ -556,7 +556,7 @@
             <div class="p-4">
               <div v-if="!isEditingName">
                 <h1
-                  class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-gray-100 leading-tight"
+                  class="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white leading-tight"
                   @click="startEditingName"
                   :class="{
                     'cursor-text hover:text-gray-600 dark:hover:text-gray-400 transition-colors':
@@ -591,18 +591,18 @@
                 <button
                   v-if="canEditTicket"
                   class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 dark:border-gray-600 gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
-                  @click="openFileInput"
-                  title="Anexar arquivo"
-                >
-                  <font-awesome-icon icon="paperclip" class="text-sm" /> Anexo
-                </button>
-                <button
-                  v-if="canEditTicket"
-                  class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 dark:border-gray-600 gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
                   @click="scrollToTarefas"
                   title="Tarefas"
                 >
                   <font-awesome-icon icon="tasks" class="text-sm" /> Subtarefas
+                </button>
+                <button
+                  v-if="canEditTicket"
+                  class="inline-flex items-center justify-center px-2 py-1.5 border border-gray-300 dark:border-gray-600 gap-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm text-gray-600 dark:text-gray-100 rounded-md transition-colors whitespace-nowrap"
+                  @click="openFileInput"
+                  title="Anexar arquivo"
+                >
+                  <font-awesome-icon icon="paperclip" class="text-sm" /> Anexos
                 </button>
               </div>
             </div>
@@ -610,7 +610,7 @@
             <!-- Description Section -->
             <div class="my-2 px-4 sm:px-6 dark:border-gray-700">
               <h3
-                class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-1"
+                class="font-semibold text-[16.5px] text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-1"
               >
                 <font-awesome-icon icon="align-left" class="text-gray-600 dark:text-gray-300" />
                 Descrição
@@ -657,7 +657,7 @@
             <!-- Attachments Section -->
             <div
               v-if="loadedTicket.files.length > 0"
-              class="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700"
+              class="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-600"
             >
               <div class="flex items-center justify-between mb-4">
                 <h3 class="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
@@ -784,9 +784,9 @@
             </div>
 
             <!-- Activities Section -->
-            <div class="p-4 sm:p-6 border-t border-gray-200">
+            <div class="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-600">
               <h3
-                class="font-semibold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2"
+                class="font-semibold text-[16.5px] text-gray-900 dark:text-white mb-6 flex items-center gap-2"
               >
                 <font-awesome-icon
                   :icon="['far', 'comment']"
@@ -805,7 +805,7 @@
               >
                 <div class="space-y-4">
                   <div
-                    class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden"
+                    class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden activity-comment-editor"
                   >
                     <QuillEditor
                       :key="editorKey"
@@ -815,13 +815,14 @@
                       theme="snow"
                       :options="editorOptions"
                       @text-change="handleQuillTextChange"
+                      @ready="initializeQuillMention"
                     />
                   </div>
                   <div class="flex justify-end">
                     <button
                       @click="comment()"
                       :disabled="isCommentLoading"
-                      class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      class="btn btn-primary inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <LoadingSpinner v-if="isCommentLoading" :size="16" />
                       <font-awesome-icon v-else icon="paper-plane" />
@@ -834,7 +835,7 @@
 
               <div
                 v-else
-                class="mb-6 flex items-center gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300 rounded-lg border border-yellow-200 dark:border-yellow-800"
+                class="mb-6 flex items-center gap-3 p-4 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-400 rounded-lg border border-yellow-200 dark:border-yellow-800"
               >
                 <font-awesome-icon icon="info-circle" />
                 <p class="text-sm">
@@ -850,90 +851,149 @@
 
                 <div v-for="event in timeline" :key="event.data.id" class="relative">
                   <!-- Comment -->
-                  <div v-if="event.type === 'comment'" class="flex gap-4 relative">
-                    <div class="flex-1 min-w-0 pb-4 overflow-hidden">
+                  <div v-if="event.type === 'comment'" class="flex flex-col gap-1 pb-6 relative">
+                    <!-- Header: Avatar, Name, Time, Options -->
+                    <div class="flex items-center gap-3">
+                      <!-- Avatar -->
+                      <div
+                        class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-sm"
+                        :style="getAvatarStyle(event.data.user.department?.name || '')"
+                      >
+                        {{
+                          getUserInitials({
+                            firstName: event.data.user.firstName,
+                            lastName: event.data.user.lastName,
+                          })
+                        }}
+                      </div>
+
+                      <div class="flex items-center justify-between flex-1 min-w-0">
+                        <!-- Name and Relative Time -->
+                        <div class="flex items-center gap-2 min-w-0">
+                          <span
+                            class="font-bold text-gray-900 dark:text-gray-100 text-[15px] truncate"
+                          >
+                            {{ event.data.user.firstName }} {{ event.data.user.lastName }}
+                          </span>
+                          <span class="text-gray-400 dark:text-gray-500 text-xs">•</span>
+                          <span class="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                            {{ formatRelativeTime(event.createdAt) }}
+                          </span>
+                        </div>
+
+                        <!-- Options Menu -->
+                        <div
+                          v-if="isMyComment(event.data.user.id)"
+                          class="relative comment-menu-container"
+                        >
+                          <button
+                            @click.stop="
+                              openCommentMenuId =
+                                openCommentMenuId === event.data.uuid ? null : event.data.uuid
+                            "
+                            class="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all"
+                            title="Opções"
+                          >
+                            <font-awesome-icon icon="ellipsis" class="text-sm" />
+                          </button>
+                          <div
+                            v-if="openCommentMenuId === event.data.uuid"
+                            class="absolute right-0 top-9 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl py-1 min-w-[200px]"
+                            @click.stop
+                          >
+                            <Tooltip
+                              message="O tempo para executar essa ação esgotou"
+                              :width="'220px'"
+                              position="center"
+                              v-if="!isCommentActionable(event.createdAt)"
+                              class="w-full"
+                            >
+                              <button
+                                disabled
+                                class="w-full px-4 py-2 text-left text-sm text-gray-400 dark:text-gray-500 cursor-not-allowed flex items-center gap-2 opacity-60"
+                              >
+                                <font-awesome-icon icon="pen" class="text-xs" />
+                                Editar
+                              </button>
+                            </Tooltip>
+                            <button
+                              v-else
+                              @click="startEditingComment(event.data)"
+                              class="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors flex items-center gap-2"
+                            >
+                              <font-awesome-icon icon="pen" class="text-xs" />
+                              Editar
+                            </button>
+
+                            <Tooltip
+                              message="O tempo para executar essa ação esgotou"
+                              :width="'220px'"
+                              position="center"
+                              v-if="!isCommentActionable(event.createdAt)"
+                              class="w-full"
+                            >
+                              <button
+                                disabled
+                                class="w-full px-4 py-2 text-left text-sm text-gray-400 dark:text-gray-500 cursor-not-allowed flex items-center gap-2 opacity-60"
+                              >
+                                <font-awesome-icon icon="trash" class="text-xs" />
+                                Excluir
+                              </button>
+                            </Tooltip>
+                            <button
+                              v-else
+                              @click="handleDeleteCommentClick(event.data.uuid)"
+                              class="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2"
+                            >
+                              <font-awesome-icon icon="trash" class="text-xs" />
+                              Excluir
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Comment Body Bubble -->
+                    <div class="ml-11">
                       <div
                         :class="[
-                          'rounded-lg p-3 border overflow-hidden',
+                          'rounded-lg px-4 py-3 border shadow-sm transition-all duration-200',
                           isMyComment(event.data.user.id)
-                            ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                            : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600',
+                            ? 'bg-blue-50/30 dark:bg-blue-800/10 border-blue-100 dark:border-blue-900/30'
+                            : 'bg-white dark:bg-gray-700/30 border-gray-200 dark:border-gray-700/50',
                         ]"
-                        :style="
-                          isMyComment(event.data.user.id) && !userPreferencesStore.isDarkMode
-                            ? {
-                                backgroundColor: '#FAFBFD',
-                                borderColor: '#E5E7EB',
-                              }
-                            : isMyComment(event.data.user.id) && userPreferencesStore.isDarkMode
-                              ? {
-                                  backgroundColor: '#2a3441',
-                                  borderColor: '#374151',
-                                }
-                              : undefined
-                        "
                       >
-                        <div class="flex items-center gap-3 mb-1">
+                        <div v-if="editingCommentUuid === event.data.uuid" class="space-y-4">
                           <div
-                            class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-sm"
-                            :style="getAvatarStyle(event.data.user.department?.name || '')"
+                            class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden activity-comment-editor"
                           >
-                            {{
-                              getUserInitials({
-                                firstName: event.data.user.firstName,
-                                lastName: event.data.user.lastName,
-                              })
-                            }}
+                            <QuillEditor
+                              v-model:content="editingCommentContent"
+                              contentType="html"
+                              theme="snow"
+                              :options="editorOptions"
+                              @ready="initializeQuillMention"
+                            />
                           </div>
-                          <div class="flex items-center justify-between flex-1">
-                            <span
-                              :class="[
-                                'font-medium',
-                                isMyComment(event.data.user.id)
-                                  ? 'text-gray-900 dark:text-gray-100'
-                                  : 'text-gray-900 dark:text-gray-100',
-                              ]"
+                          <div class="flex gap-2 justify-end">
+                            <button
+                              @click="cancelEditingComment"
+                              class="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
                             >
-                              {{ event.data.user.firstName }} {{ event.data.user.lastName }}
-                            </span>
-                            <div class="flex items-center gap-2">
-                              <span class="text-sm text-gray-500 dark:text-gray-400">
-                                {{ formatRelativeTime(event.createdAt) }}
-                              </span>
-                              <div
-                                v-if="isMyComment(event.data.user.id)"
-                                class="relative comment-menu-container"
-                              >
-                                <button
-                                  @click.stop="
-                                    openCommentMenuId =
-                                      openCommentMenuId === event.data.uuid ? null : event.data.uuid
-                                  "
-                                  class="flex-shrink-0 w-6 h-6 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                                  title="Opções"
-                                >
-                                  <font-awesome-icon icon="ellipsis-vertical" class="text-xs" />
-                                </button>
-                                <div
-                                  v-if="openCommentMenuId === event.data.uuid"
-                                  class="absolute right-0 top-8 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 min-w-[120px]"
-                                  @click.stop
-                                >
-                                  <button
-                                    @click="handleDeleteCommentClick(event.data.uuid)"
-                                    class="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2"
-                                  >
-                                    <font-awesome-icon icon="trash" class="text-xs" />
-                                    Excluir
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
+                              Cancelar
+                            </button>
+                            <button
+                              @click="saveEditedComment"
+                              class="px-3 py-2 text-xs btn-primary font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-[5px] transition-colors"
+                            >
+                              Salvar
+                            </button>
                           </div>
                         </div>
                         <div
-                          class="comment-text prose prose-sm max-w-none dark:prose-invert ml-11"
-                          style="font-size: 15px"
+                          v-else
+                          class="comment-text prose prose-sm max-w-none dark:prose-invert text-gray-700 dark:text-gray-300"
+                          style="font-size: 15px; line-height: 1.5"
                           v-html="convertUrlsToLinks(event.data.content)"
                         ></div>
                       </div>
@@ -992,7 +1052,7 @@
                                   : event.subType === 'cancellation'
                                     ? 'text-red-900 dark:text-red-200'
                                     : event.subType === 'correction'
-                                      ? 'text-yellow-900 dark:text-yellow-200'
+                                      ? 'text-yellow-900 dark:text-yellow-300/90'
                                       : 'text-gray-700 dark:text-gray-300',
                               ]"
                             >
@@ -1004,19 +1064,11 @@
                           </div>
                         </div>
                         <div
-                          :class="[
-                            'text-sm ml-11',
-                            event.subType === 'disapproval'
-                              ? 'text-red-700 dark:text-red-300'
-                              : event.subType === 'cancellation'
-                                ? 'text-red-700 dark:text-red-300'
-                                : event.subType === 'correction'
-                                  ? 'text-yellow-700 dark:text-yellow-300'
-                                  : 'text-gray-600 dark:text-gray-400',
-                          ]"
-                        >
-                          {{ event.data.content }}
-                        </div>
+                          class="text-sm text-gray-600 dark:text-gray-400 description-text prose prose-sm max-w-none dark:prose-invert"
+                          v-html="
+                            convertUrlsToLinks(getSpecialUpdateDescription(event.subType, event))
+                          "
+                        ></div>
                       </div>
                     </div>
                   </div>
@@ -1412,6 +1464,7 @@
 import BaseModal from '../common/BaseModal.vue';
 import Input from '../common/Input.vue';
 import Select from '../common/Select.vue';
+import Tooltip from '../common/Tooltip.vue';
 import { CancellationReason, DefaultTicketStatus, type Ticket, type TicketComment } from '@/models';
 import type { ChecklistItem } from '@/models/checklist';
 import { checklistService } from '@/services/checklistService';
@@ -1448,6 +1501,8 @@ import TicketChecklist from './TicketChecklist.vue';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import pt from 'vue-datepicker-next/locale/pt-br.es';
+import QuillMention, { type MentionData } from '@/utils/quill-mention';
+import type { User } from '@/models';
 
 interface SpecialUpdateEvent {
   data?: {
@@ -1470,6 +1525,8 @@ const quillEditor = ref<any>(null);
 const editorKey = ref(0);
 const isCommentLoading = ref(false);
 const comments = ref<TicketComment[]>([]);
+const mentionableUsers = ref<User[]>([]);
+const quillMentionInstance = ref<QuillMention | null>(null);
 const ticketUpdates = ref<TicketUpdate[]>([]);
 const loadedTicket = ref<Ticket | null>(null);
 const isLoadingTicket = ref(false);
@@ -1496,6 +1553,8 @@ const nameInput = ref<HTMLInputElement | null>(null);
 
 // Comment menu state
 const openCommentMenuId = ref<string | null>(null);
+const editingCommentUuid = ref<string | null>(null);
+const editingCommentContent = ref('');
 
 const confirmationModal = ref({
   isOpen: false,
@@ -2218,6 +2277,84 @@ const handleQuillTextChange = () => {
   // This is handled in processRichTextContent
 };
 
+const restoreQuillFocus = () => {
+  // Focus restoration that works even with mentions in the editor
+  nextTick(() => {
+    if (!quillEditor.value) return;
+    const quill = quillEditor.value.getQuill?.();
+    if (!quill || !quill.root || !(quill.root instanceof HTMLElement)) return;
+
+    const currentSelection = quill.getSelection();
+    const cursorPosition = currentSelection ? currentSelection.index : quill.getLength();
+    const editor = quill.root;
+
+    // CRITICAL: When there are mentions, we need to set DOM selection directly
+    try {
+      // Get the leaf node at cursor position
+      const [leaf, offset] = quill.getLeaf(cursorPosition);
+      if (leaf && leaf.domNode) {
+        const domNode = leaf.domNode;
+
+        // If it's a text node, set selection directly in DOM
+        if (domNode.nodeType === Node.TEXT_NODE) {
+          const range = document.createRange();
+          const textLength = domNode.textContent?.length || 0;
+          const safeOffset = Math.min(offset, textLength);
+          range.setStart(domNode, safeOffset);
+          range.setEnd(domNode, safeOffset);
+
+          const selection = window.getSelection();
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+        }
+      }
+
+      // Focus the editor
+      editor.focus();
+      quill.setSelection(cursorPosition, 'user');
+    } catch {
+      // Fallback: click and focus
+      editor.click();
+      editor.focus();
+      quill.setSelection(cursorPosition, 'user');
+    }
+  });
+};
+
+const initializeQuillMention = (quillInstance?: any) => {
+  nextTick(() => {
+    let quill = quillInstance;
+
+    // If no instance passed, try to get from ref (fallback for when called without args)
+    if (!quill && quillEditor.value && quillEditor.value.getQuill) {
+      quill = quillEditor.value.getQuill();
+    }
+
+    if (quill) {
+      // Initialize mentions for this specific quill instance
+      // We don't necessarily need to track all instances if only one is active for autocomplete at a time
+      new QuillMention(quill, mentionableUsers.value, restoreQuillFocus);
+    }
+  });
+};
+
+const fetchMentionableUsers = async () => {
+  if (!loadedTicket.value?.customId) return;
+
+  try {
+    const response = await ticketCommentService.getMentionableUsers(loadedTicket.value.customId);
+    mentionableUsers.value = response.data;
+    // Update QuillMention instance if it exists
+    if (quillMentionInstance.value) {
+      quillMentionInstance.value.updateMentionableUsers(mentionableUsers.value);
+    } else {
+      initializeQuillMention();
+    }
+  } catch (error) {
+    console.error('Error fetching mentionable users:', error);
+  }
+};
+
 const comment = async () => {
   // Create a temporary div to strip HTML and check if content is actually empty
   const tempDiv = document.createElement('div');
@@ -2240,11 +2377,15 @@ const comment = async () => {
   try {
     const processedContent = await processRichTextContent(newComment.value);
 
+    // Extract mentions from the content
+    const mentions: MentionData[] = QuillMention.extractMentions(processedContent);
+
     await ticketCommentService.create({
       ticketId: loadedTicket.value!.id,
       ticketCustomId: loadedTicket.value!.customId,
       userId: userStore.user!.id,
       content: processedContent,
+      mentions: mentions.length > 0 ? mentions : undefined,
     });
 
     // Clear the editor immediately after successful submission
@@ -2349,6 +2490,48 @@ const handleDeleteCommentClick = (commentUuid: string) => {
   );
 };
 
+const startEditingComment = (comment: TicketComment) => {
+  editingCommentUuid.value = comment.uuid;
+  editingCommentContent.value = comment.content;
+  openCommentMenuId.value = null;
+};
+
+const cancelEditingComment = () => {
+  editingCommentUuid.value = null;
+  editingCommentContent.value = '';
+};
+
+const saveEditedComment = async () => {
+  if (!editingCommentUuid.value) return;
+
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = editingCommentContent.value;
+  const hasContent =
+    tempDiv.textContent?.trim() || tempDiv.querySelector('img') || tempDiv.querySelector('iframe');
+
+  if (!hasContent) {
+    toast.error('Comentário não pode estar vazio');
+    return;
+  }
+
+  try {
+    const processedContent = await processRichTextContent(editingCommentContent.value);
+    const mentions = QuillMention.extractMentions(processedContent);
+
+    await ticketCommentService.update(editingCommentUuid.value, {
+      content: processedContent,
+      mentions: mentions.length > 0 ? mentions : undefined,
+    });
+
+    toast.success('Comentário atualizado com sucesso');
+    editingCommentUuid.value = null;
+    editingCommentContent.value = '';
+    fetchComments();
+  } catch {
+    toast.error('Erro ao atualizar comentário');
+  }
+};
+
 const fetchTicketUpdates = async () => {
   try {
     if (loadedTicket.value) {
@@ -2439,6 +2622,14 @@ const isReviewer = computed(() => userStore.user?.id === loadedTicket.value?.rev
 
 const isMyComment = (userId: number) => {
   return userStore.user?.id === userId;
+};
+
+const isCommentActionable = (createdAt: string) => {
+  if (!createdAt) return false;
+  const commentDate = new Date(createdAt);
+  const now = new Date();
+  const diffInMinutes = (now.getTime() - commentDate.getTime()) / (1000 * 60);
+  return diffInMinutes <= 5;
 };
 
 const sortedTargetUsers = computed(() => {
@@ -2550,6 +2741,10 @@ const getSpecialUpdateTitle = (subType: string, event?: SpecialUpdateEvent) => {
   return baseTitle;
 };
 
+const getSpecialUpdateDescription = (_subType: string, event?: SpecialUpdateEvent) => {
+  return event?.data?.content || '';
+};
+
 const loadChecklistItems = async () => {
   if (!loadedTicket.value) return;
   try {
@@ -2574,7 +2769,6 @@ const loadChecklistItems = async () => {
 const scrollToTarefas = async () => {
   showTarefasSection.value = true;
   await nextTick();
-  await nextTick(); // Double nextTick to ensure DOM is updated
   if (tarefasSectionRef.value) {
     tarefasSectionRef.value.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
@@ -2596,6 +2790,7 @@ const fetchTicket = async (customId: string) => {
     fetchComments();
     fetchTicketUpdates();
     loadChecklistItems();
+    fetchMentionableUsers();
     // Update link colors after ticket is loaded
     updateDescriptionLinksColor();
 
@@ -2693,6 +2888,11 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
   document.removeEventListener('keydown', handleImageViewerKeyboard);
+  // Destroy QuillMention instance
+  if (quillMentionInstance.value) {
+    quillMentionInstance.value.destroy();
+    quillMentionInstance.value = null;
+  }
   // Ensure body scroll is restored
   document.body.style.overflow = '';
 });
@@ -3375,7 +3575,7 @@ const confirmDueDate = async () => {
 
 .dark :deep(.ql-container) {
   background-color: #374151 !important;
-  color: #f3f4f6 !important;
+  color: #ffffff !important;
 }
 
 :deep(.ql-editor.ql-blank::before) {
@@ -5294,19 +5494,6 @@ body.dark-mode [data-v-a180df51] .comment-text a:hover,
   align-items: center;
 }
 
-.btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
 .btn-save {
   background: #10b981;
   color: white;
@@ -5541,19 +5728,6 @@ body.dark-mode [data-v-a180df51] .comment-text a:hover,
   display: flex;
   gap: 0.5rem;
   align-items: center;
-}
-
-.btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .btn-save {
@@ -5830,7 +6004,7 @@ body.dark-mode [data-v-a180df51] .comment-text a:hover,
 
 .dark .description-text strong,
 :deep(.dark) .description-text strong {
-  color: #f3f4f6 !important;
+  color: #ffffff !important;
 }
 
 .dark .description-text a,
@@ -6210,5 +6384,72 @@ body.dark-mode [data-v-a180df51] .description-text a[style*='color'],
 
 .skeleton-shimmer {
   animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+/* Mention styles */
+:deep(.ql-editor .mention) {
+  background-color: #dbeafe;
+  color: #1e40af;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: default;
+  user-select: none; /* Prevent text selection */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.dark :deep(.ql-editor .mention) {
+  background-color: #1e3a8a;
+  color: #93c5fd;
+}
+
+:deep(.comment-text .mention) {
+  background-color: #dbeafe;
+  color: #1e40af;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: default;
+}
+
+.dark :deep(.comment-text .mention) {
+  background-color: #1e3a8a;
+  color: #93c5fd;
+}
+
+/* Quill mention selector styles */
+.quill-mention-selector {
+  font-family: inherit;
+}
+
+.quill-mention-selector .mention-item:hover {
+  background-color: #f3f4f6 !important;
+}
+
+.dark .quill-mention-selector {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.dark .quill-mention-selector .mention-item {
+  color: #e5e7eb;
+}
+
+.dark .quill-mention-selector .mention-item:hover,
+.dark .quill-mention-selector .mention-item.active {
+  background-color: #374151 !important;
+}
+
+.activity-comment-editor :deep(.ql-container) {
+  min-height: 120px;
+  border: none;
+}
+
+.activity-comment-editor :deep(.ql-editor) {
+  min-height: 120px;
+  max-height: 400px;
+  overflow-y: auto;
 }
 </style>

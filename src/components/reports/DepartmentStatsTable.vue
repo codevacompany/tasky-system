@@ -89,13 +89,15 @@
 
       <template #column-efficiencyScore="{ value }">
         <span
+          v-if="value !== undefined"
           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
         >
           {{ formatPercentage(value) }}
         </span>
+        <span v-else class="text-gray-400 dark:text-gray-500"> - </span>
       </template>
 
-      <template #column-overdueRate="{ value }">
+      <template #column-deliveryOverdueRate="{ value }">
         <span
           :class="[
             'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
@@ -137,7 +139,8 @@ const formatOverdueRate = (value?: number) => {
 
 // Get overdue rate badge class
 const getOverdueBadgeClass = (rate?: number) => {
-  if (rate === undefined || rate === null) return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+  if (rate === undefined || rate === null)
+    return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
 
   // Lower is better for overdue rate
   if (rate <= 10) {
@@ -159,7 +162,6 @@ interface Props {
     totalResolved: number;
     averageResolutionTimeSeconds: number;
     averageAcceptanceTimeSeconds: number;
-    averageTotalTimeSeconds: number;
   } | null;
   isLoading?: boolean;
 }
@@ -253,19 +255,19 @@ const tableHeaders = computed<TableHeader<DepartmentStats>[]>(() => [
   },
   {
     key: 'efficiencyScore',
-    label: '% de Desempenho',
+    label: 'Score',
     sortable: true,
     sortKey: 'efficiencyScore',
     align: 'center',
     sortDirection: sortKey.value === 'efficiencyScore' ? sortDirection.value : 'none',
   },
   {
-    key: 'overdueRate',
+    key: 'deliveryOverdueRate',
     label: '% de Atraso',
     sortable: true,
-    sortKey: 'overdueRate',
+    sortKey: 'deliveryOverdueRate',
     align: 'center',
-    sortDirection: sortKey.value === 'overdueRate' ? sortDirection.value : 'none',
+    sortDirection: sortKey.value === 'deliveryOverdueRate' ? sortDirection.value : 'none',
   },
 ]);
 

@@ -1,82 +1,123 @@
 <template>
-  <section class="max-w-4xl mx-auto py-4 px-4 sm:py-7 sm:px-2">
-    <!-- Mobile-first responsive header -->
-    <div
-      class="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:mb-2"
-    >
-      <h1
-        class="text-2xl sm:text-[28px] font-semibold text-gray-900 dark:text-white text-center sm:text-left"
-      >
-        FAQ - Central de Ajuda
-      </h1>
-      <!-- Search input - full width on mobile, constrained on larger screens -->
-      <div class="flex items-center relative w-full sm:min-w-[280px] sm:max-w-[400px] sm:w-auto">
-        <Input
-          v-model="searchTerm"
-          type="text"
-          placeholder="Digite sua dúvida"
-          class="w-full py-2 pr-10 sm:pr-12 pl-3 sm:pl-4 border border-gray-300 dark:border-gray-600 rounded-md text-sm sm:text-base bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-200 focus:outline-none focus:border-blue-600 dark:focus:border-blue-400"
-        />
-        <font-awesome-icon
-          icon="search"
-          class="absolute right-2.5 sm:right-3 text-gray-400 dark:text-gray-500 text-base sm:text-lg pointer-events-none"
-        />
-      </div>
+  <section class="w-full mx-auto py-8 px-4 sm:py-6 sm:px-6">
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-3">FAQ</h1>
+      <p class="text-gray-500 dark:text-gray-400 text-base sm:text-lg">
+        Encontre respostas para as dúvidas mais comuns sobre o uso do Tasky Pro.
+      </p>
     </div>
 
-    <p
-      class="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-6 sm:mb-8 ml-0.5 text-center sm:text-left"
-    >
-      Encontre respostas para as dúvidas mais comuns sobre o uso do Tasky Pro.
-    </p>
+    <!-- Search -->
+    <div class="flex items-center relative w-full max-w-md mx-auto mb-10">
+      <Input
+        v-model="searchTerm"
+        type="text"
+        placeholder="Buscar pergunta..."
+        class="w-full py-3 pr-12 pl-4 border border-gray-300 dark:border-gray-600 rounded-lg text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 focus:border-transparent"
+      />
+      <font-awesome-icon
+        icon="search"
+        class="absolute right-4 text-gray-400 dark:text-gray-500 text-lg pointer-events-none"
+      />
+    </div>
 
-    <div class="flex flex-col gap-3 sm:gap-5">
-      <Accordion
-        v-for="(section, idx) in filteredSections"
-        :key="section.title"
-        :title="section.title"
-        :icon="section.icon"
-        @toggle="(isOpen) => handleAccordionToggle(idx, isOpen)"
-      >
-        <div class="flex flex-col gap-4 sm:gap-6">
-          <FaqItem
-            v-for="faq in section.faqs"
-            :key="faq.question"
-            :question="faq.question"
-            :answer="faq.answer"
-          />
-          <div
-            v-if="section.faqs.length === 0"
-            class="text-center text-gray-500 dark:text-gray-400 mt-6 sm:mt-8 text-base sm:text-lg flex flex-col sm:flex-row items-center gap-2 justify-center"
-          >
-            <font-awesome-icon icon="info-circle" />
-            <span>Nenhuma resposta encontrada para sua busca.</span>
+    <!-- Main container using grid to ensure absolute centering of FAQ -->
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_minmax(0,768px)_1fr] gap-x-12 px-4 sm:px-6">
+      <!-- Sidebar Column (hidden on mobile/tablet) -->
+      <aside class="hidden lg:block relative">
+        <div
+          class="sticky top-24 w-56 ml-auto bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm"
+          style="max-height: calc(100vh - 120px); overflow-y: auto"
+        >
+          <nav>
+            <h3
+              class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-3"
+            >
+              Seções
+            </h3>
+            <ul class="space-y-1">
+              <li v-for="section in sections" :key="section.slug">
+                <a
+                  :href="'#' + section.slug"
+                  class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors duration-150"
+                  :class="
+                    activeSection === section.slug
+                      ? 'bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-medium'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                  "
+                  @click.prevent="scrollToSection(section.slug)"
+                >
+                  <font-awesome-icon
+                    :icon="section.icon"
+                    class="w-4 text-gray-400 dark:text-gray-500"
+                  />
+                  <span class="truncate">{{ section.title }}</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- FAQ Content Column (Always Centered) -->
+      <div class="space-y-10 w-full mx-auto">
+        <div
+          v-for="section in filteredSections"
+          :key="section.title"
+          :id="section.slug"
+          v-show="section.faqs.length > 0"
+        >
+          <!-- Section Title -->
+          <div class="flex items-center gap-3 mb-4">
+            <font-awesome-icon
+              :icon="section.icon"
+              class="text-gray-400 dark:text-gray-500 text-base"
+            />
+            <h2 class="text-xl font-semibold text-secondary dark:text-gray-100">
+              {{ section.title }}
+            </h2>
+          </div>
+
+          <!-- Questions -->
+          <div class="space-y-3">
+            <FaqAccordion
+              v-for="faq in section.faqs"
+              :key="faq.question"
+              :question="faq.question"
+              :answer="faq.answer"
+            />
           </div>
         </div>
-      </Accordion>
-      <div
-        v-if="filteredSections.every((section) => section.faqs.length === 0)"
-        class="text-center text-gray-500 dark:text-gray-400 mt-6 sm:mt-8 text-base sm:text-lg flex flex-col sm:flex-row items-center gap-2 justify-center"
-      >
-        <font-awesome-icon icon="info-circle" />
-        <span>Nenhuma resposta encontrada para sua busca.</span>
-      </div>
-    </div>
 
-    <!-- <ChatSupportButton /> -->
+        <!-- No results -->
+        <div
+          v-if="filteredSections.every((section) => section.faqs.length === 0)"
+          class="text-center text-gray-500 dark:text-gray-400 py-12 text-base flex flex-col items-center gap-3"
+        >
+          <font-awesome-icon icon="search" class="text-3xl text-gray-300 dark:text-gray-600" />
+          <span>Nenhuma resposta encontrada para "{{ searchTerm }}"</span>
+        </div>
+      </div>
+
+      <!-- Right Spacer Column (Important for keeping FAQ centered) -->
+      <div class="hidden lg:block"></div>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import Accordion from '@/components/common/Accordion.vue';
-import FaqItem from '@/components/faq/FaqItem.vue';
-import ChatSupportButton from '@/components/faq/ChatSupportButton.vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import FaqAccordion from '@/components/faq/FaqAccordion.vue';
 import Input from '@/components/common/Input.vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
 
 const sections = ref([
   {
     title: 'Sobre o Sistema',
+    slug: 'sobre-o-sistema',
     icon: 'info-circle',
     faqs: [
       {
@@ -98,6 +139,7 @@ const sections = ref([
   },
   {
     title: 'Acesso e Conta',
+    slug: 'acesso-e-conta',
     icon: 'user-circle',
     faqs: [
       {
@@ -118,7 +160,8 @@ const sections = ref([
   },
   {
     title: 'Tarefas',
-    icon: 'ticket',
+    slug: 'tarefas',
+    icon: 'tasks',
     faqs: [
       {
         question: 'Como crio uma nova tarefa?',
@@ -208,6 +251,7 @@ const sections = ref([
   },
   {
     title: 'Funções de Colaboradores',
+    slug: 'funcoes-de-colaboradores',
     icon: 'users',
     faqs: [
       {
@@ -223,12 +267,13 @@ const sections = ref([
       {
         question: 'Quais são as permissões da função "Administrador"?',
         answer:
-          '<ul style="margin:0;padding-left:1.2em;list-style-type:disc;list-style-position:outside;"><li>Pode criar e receber tarefas.</li><li>Pode ver todas as tarefas da empresa, incluindo as tarefas privadas.</li><li>Pode ser escolhido como revisor de tarefas que um colaborador criar para si próprio caso o setor não possua um Supervisor.</li><li>Tem acesso a relatórios gerais, estatísticaspor setor e por colaborador.</li></ul>',
+          '<ul style="margin:0;padding-left:1.2em;list-style-type:disc;list-style-position:outside;"><li>Pode criar e receber tarefas.</li><li>Pode ver todas as tarefas da empresa, incluindo as tarefas privadas.</li><li>Pode ser escolhido como revisor de tarefas que um colaborador criar para si próprio caso o setor não possua um Supervisor.</li><li>Tem acesso a relatórios gerais, estatísticas por setor e por colaborador.</li></ul>',
       },
     ],
   },
   {
     title: 'Notificações',
+    slug: 'notificacoes',
     icon: 'bell',
     faqs: [
       {
@@ -249,6 +294,7 @@ const sections = ref([
   },
   {
     title: 'Relatórios e Analytics',
+    slug: 'relatorios-e-analytics',
     icon: 'chart-line',
     faqs: [
       {
@@ -261,15 +307,58 @@ const sections = ref([
         answer:
           'Na tela de relatórios, clique em "Exportar" e escolha o formato desejado (XLSX, CSV).',
       },
+    ],
+  },
+  {
+    title: 'Métricas de Desempenho',
+    slug: 'metricas-de-desempenho',
+    icon: 'star',
+    faqs: [
       {
-        question: 'O que é o % de Desempenho e como é calculado?',
+        question: 'Como é calculado o meu Score de Desempenho?',
         answer:
-          'O % de Desempenho é uma métrica que avalia a performance de colaboradores e setores considerando tanto a taxa de resolução quanto o volume de tarefas. Ele é calculado usando o método estatístico Wilson Score, que ajusta a taxa de resolução (tarefas resolvidas / total de tarefas) considerando a confiabilidade estatística baseada no número de tarefas. Isso significa que um colaborador com 100% de resolução em apenas 1 tarefa terá um desempenho menor que outro com 70% de resolução em 100 tarefas, pois o segundo tem mais dados que comprovam sua performance. O método garante que rankings sejam mais justos e confiáveis, dando maior peso a performances com maior volume de dados.',
+          'O Score de Desempenho é uma métrica composta equilibrada que avalia quatro pilares fundamentais: <br>1. <b>Entrega no Prazo (40%)</b>: Baseado no cumprimento dos prazos finais.<br>2. <b>Qualidade da Entrega (30%)</b>: Avalia se as tarefas são aceitas sem precisar retornar para ajustes.<br>3. <b>Aprovação do Trabalho (15%)</b>: Percentual de tarefas finalizadas com sucesso.<br>4. <b>Verificação no Prazo (15%)</b>: Para revisores, mede a agilidade na análise de tarefas em até 24h úteis.',
+      },
+      {
+        question: 'O que acontece se eu retirar uma tarefa da verificação?',
+        answer:
+          'Se você enviou uma tarefa para verificação e depois a moveu de volta para "Em Andamento" (retração), o que contará para sua métrica de "Entrega no Prazo" será a data do seu último envio definitivo para a verificação.',
+      },
+      {
+        question: 'Como funciona o prazo de 24 horas para verificação?',
+        answer:
+          'O sistema monitora o tempo entre a entrada da tarefa no status "Aguardando Verificação" e a conclusão da análise pelo revisor. Para manter um score alto, essa análise deve ser feita em até 24 horas úteis. O tempo é pausado em finais de semana.',
+      },
+      {
+        question: 'Qual a diferença entre Tempo de Aceite e Tempo de Resolução?',
+        answer:
+          '<b>Tempo de Aceite</b>: Tempo desde a criação/atribuição da tarefa até o momento em que você a aceita (status "Em Andamento").<br><b>Tempo de Resolução</b>: Tempo líquido em que você trabalhou efetivamente na tarefa (status "Em Andamento"). Ciclos em que a tarefa está aguardando verificação por outra pessoa não contam contra seu tempo de resolução, assim como o tempo que outro colaborador está trabalhando em uma tarefa em grupo também não contam para você.',
+      },
+      {
+        question: 'Uma tarefa devolvida afeta meu score?',
+        answer:
+          'Sim. Tarefas que retornam para correção impactam o índice de <b>Qualidade da Entrega</b> (com peso de 30% no score final). Isso incentiva que o trabalho seja entregue revisado e completo na primeira tentativa, reduzindo ciclos de retrabalho.',
+      },
+      {
+        question: 'Os tempos de aceite e resolução afetam meu score?',
+        answer:
+          'Não. Os tempos de aceite e resolução servem apenas para fins de análise e como critério de desempate entre colaboradores ou setores.',
+      },
+      {
+        question: 'Preciso ter os menores tempos de aceite e resolução possíveis?',
+        answer:
+          'Não necessariamente. É mais importante que você entregue tarefas com qualidade e no prazo. Não aceite tarefas que ainda não pode começar a fazer pois isso impactará no seu tempo de resolução, já que o tempo começa a contar a partir do momento em que aceita a tarefa. Também não se preocupe em terminar tarefas rápido demais, pois o mais importante é que a entrega seja feita com qualidade e esteja dentro do prazo.',
+      },
+      {
+        question: 'Por que meu score parece baixo se eu fiz tudo certo?',
+        answer:
+          'Se você tem poucas tarefas concluídas, o sistema aplica o <b>Wilson Score</b>. Este método estatístico é "cauteloso" com volumes pequenos de dados para evitar que uma única tarefa bem-sucedida dê 100% de pontuação. Conforme você aumenta seu volume de entregas mantendo a qualidade, o score subirá de forma consistente e estável.',
       },
     ],
   },
   {
     title: 'Segurança e Privacidade',
+    slug: 'seguranca-e-privacidade',
     icon: 'lock',
     faqs: [
       {
@@ -281,6 +370,7 @@ const sections = ref([
   },
   {
     title: 'Suporte e Contato',
+    slug: 'suporte-e-contato',
     icon: 'envelope',
     faqs: [
       {
@@ -293,7 +383,7 @@ const sections = ref([
 ]);
 
 const searchTerm = ref('');
-const openSections = ref<boolean[]>([]);
+const activeSection = ref('');
 
 const filteredSections = computed(() => {
   return sections.value.map((section) => {
@@ -309,16 +399,47 @@ const filteredSections = computed(() => {
   });
 });
 
-function handleAccordionToggle(idx: number, isOpen: boolean) {
-  openSections.value[idx] = isOpen;
-}
+const scrollToSection = (slug: string) => {
+  const el = document.getElementById(slug);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth' });
+    activeSection.value = slug;
+  }
+};
 
-// Initialize all sections as closed
-watch(
-  filteredSections,
-  (newVal) => {
-    openSections.value = newVal.map(() => false);
-  },
-  { immediate: true },
-);
+const updateActiveSection = () => {
+  const scrollPosition = window.scrollY + 150;
+  for (const section of sections.value) {
+    const el = document.getElementById(section.slug);
+    if (el) {
+      const top = el.offsetTop;
+      const bottom = top + el.offsetHeight;
+      if (scrollPosition >= top && scrollPosition < bottom) {
+        activeSection.value = section.slug;
+        return;
+      }
+    }
+  }
+};
+
+onMounted(() => {
+  if (route.hash) {
+    const slug = route.hash.replace('#', '');
+    activeSection.value = slug;
+    const el = document.querySelector(route.hash);
+    if (el) {
+      setTimeout(() => {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    }
+  } else if (sections.value.length > 0) {
+    activeSection.value = sections.value[0].slug;
+  }
+
+  window.addEventListener('scroll', updateActiveSection);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', updateActiveSection);
+});
 </script>
