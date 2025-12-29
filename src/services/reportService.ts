@@ -39,7 +39,7 @@ export interface UserStatistics {
   averageResolutionTimeSeconds: number;
   averageAcceptanceTimeSeconds: number;
   resolutionRate: number;
-  efficiencyScore: number;
+  efficiencyScore?: number;
   deliveryOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
   detailedMetrics?: DetailedMetrics; // Optional detailed metrics for user stats explanation
 }
@@ -52,7 +52,7 @@ export interface DepartmentStats {
   averageResolutionTimeSeconds: number;
   averageAcceptanceTimeSeconds: number;
   resolutionRate: number;
-  efficiencyScore: number;
+  efficiencyScore?: number;
   deliveryOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
   userCount: number;
 }
@@ -329,11 +329,13 @@ export const reportService = {
     sort = 'top',
     period?: string,
     sortBy: 'efficiency' | 'resolution_time' | 'overdue_rate' = 'efficiency',
+    excludeUnscored = true,
   ): Promise<UserRankingResponseDto> {
     const params = new URLSearchParams({
       limit: limit.toString(),
       sort,
       sortBy,
+      excludeUnscored: excludeUnscored.toString(),
     });
     if (all) params.append('all', 'true');
     if (period) params.append('period', period);

@@ -307,11 +307,6 @@ const sections = ref([
         answer:
           'Na tela de relatórios, clique em "Exportar" e escolha o formato desejado (XLSX, CSV).',
       },
-      {
-        question: 'O que é o % de Desempenho e como é calculado?',
-        answer:
-          'O % de Desempenho é uma métrica que avalia a performance de colaboradores e setores considerando tanto a taxa de resolução quanto o volume de tarefas. Ele é calculado usando o método estatístico Wilson Score, que ajusta a taxa de resolução (tarefas resolvidas / total de tarefas) considerando a confiabilidade estatística baseada no número de tarefas. Isso significa que um colaborador com 100% de resolução em apenas 1 tarefa terá um desempenho menor que outro com 70% de resolução em 100 tarefas, pois o segundo tem mais dados que comprovam sua performance. O método garante que rankings sejam mais justos e confiáveis, dando maior peso a performances com maior volume de dados.',
-      },
     ],
   },
   {

@@ -216,12 +216,22 @@
                 class="text-yellow-500 dark:text-yellow-400 text-2xl"
               />
             </div>
-            <p id="efficiencyScore" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-              {{ userStats ? (userStats.efficiencyScore * 100).toFixed(0) : '0' }}%
-            </p>
-            <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
-              Score de Desempenho
-            </h3>
+            <template v-if="userStats?.efficiencyScore !== undefined">
+              <p id="efficiencyScore" class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                {{ (userStats.efficiencyScore * 100).toFixed(0) }}%
+              </p>
+              <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                Score de Desempenho
+              </h3>
+            </template>
+            <template v-else>
+              <p class="text-base font-medium text-gray-600 dark:text-gray-300 mb-1 text-center">
+                Score indisponível
+              </p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
+                Mínimo de 10 tarefas necessário
+              </p>
+            </template>
           </div>
         </div>
       </div>

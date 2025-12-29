@@ -48,7 +48,7 @@
                   </span>
                 </p>
 
-                <div class="space-y-4">
+                <div v-if="hasEnoughTickets" class="space-y-4">
                   <!-- Completion Index -->
                   <div :class="completionColors.bg + ' p-4 rounded-lg'">
                     <div class="flex items-center justify-between mb-2">
@@ -57,7 +57,7 @@
                           Entrega no prazo
                         </h4>
                         <InfoTooltip
-                          message="Avalia o cumprimento do prazo de envio de tarefas.Poucas tarefas podem impactar o resultado. Essa métrica representa 40% do score final."
+                          message="Avalia o cumprimento do prazo de envio de tarefas. Poucas tarefas podem impactar o resultado pois é feita uma normalização na porcentagem pelo volume de tarefas. Essa métrica representa 40% do score final."
                           class="mt-[1px]"
                         />
                       </div>
@@ -86,6 +86,9 @@
                               }.`
                             : 'nenhuma tarefa entregue.'
                         }}
+                      </p>
+                      <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                        Obs: Poucas tarefas podem impactar o resultado.
                       </p>
                     </div>
                   </div>
@@ -124,7 +127,7 @@
                                   : `${userStats.detailedMetrics.totalCompleted - userStats.detailedMetrics.rejectedCount} aprovadas`
                               }${
                                 userStats.detailedMetrics.rejectedCount > 0
-                                  ? `, ${userStats.detailedMetrics.rejectedCount} rejeitada${
+                                  ? `, ${userStats.detailedMetrics.rejectedCount} reprovada${
                                       userStats.detailedMetrics.rejectedCount !== 1 ? 's' : ''
                                     }`
                                   : ''
@@ -206,7 +209,7 @@
                         <span class="font-medium">Neste período:</span>
                         {{
                           userStats.detailedMetrics.totalVerified > 0
-                            ? `${userStats.detailedMetrics.onTimeVerified} verificação${
+                            ? `${userStats.detailedMetrics.onTimeVerified} verificaç${
                                 userStats.detailedMetrics.onTimeVerified !== 1 ? 'ões' : 'ão'
                               } no prazo de ${userStats.detailedMetrics.totalVerified} tota${
                                 userStats.detailedMetrics.totalVerified !== 1 ? 'is' : 'l'
@@ -233,7 +236,9 @@
                       </div>
                       <div class="text-right">
                         <div :class="'text-3xl font-bold ' + efficiencyScoreColors.text">
-                          {{ Math.round(userStats.efficiencyScore * 100) }}%
+                          {{
+                            efficiencyScore !== undefined ? Math.round(efficiencyScore * 100) : '-'
+                          }}%
                         </div>
                         <div :class="'text-sm font-medium ' + efficiencyScoreColors.text">
                           {{ efficiencyScoreColors.label }}
@@ -253,6 +258,27 @@
                   <p class="text-xs text-gray-500 dark:text-gray-500">
                     (Obs: Os tempos médios de aceite e resolução servem apenas para fins de análise
                     e critérios de desempate entre colaboradores ou setores.)
+                  </p>
+                </div>
+                <div
+                  v-else
+                  class="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-8 flex flex-col items-center justify-center text-center"
+                >
+                  <div
+                    class="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4"
+                  >
+                    <font-awesome-icon
+                      icon="info-circle"
+                      class="text-2xl text-blue-600 dark:text-blue-400"
+                    />
+                  </div>
+                  <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-2">
+                    Dados insuficientes para gerar seu score
+                  </h4>
+                  <p class="text-sm text-gray-600 dark:text-gray-400 max-w-md">
+                    Para que seu Score de Desempenho seja calculado com precisão, é necessário ter
+                    pelo menos 10 tarefas registradas nos últimos 3 meses. Continue utilizando o
+                    sistema e seu score aparecerá em breve!
                   </p>
                 </div>
               </section>
@@ -348,7 +374,10 @@ const goToFaq = () => {
   router.push('/faq#metricas-de-desempenho');
 };
 
-// Get indices from backend (calculated server-side for consistency)
+const hasEnoughTickets = computed(() => {
+  return (props.userStats?.detailedMetrics?.totalEntries ?? 0) >= 10;
+});
+
 const completionIndex = computed(() => {
   return props.userStats?.detailedMetrics?.completionIndex ?? 0;
 });
@@ -411,11 +440,11 @@ const returnColors = computed(() => getPerformanceColorClasses(returnIndex.value
 
 // Efficiency Score (final score)
 const efficiencyScore = computed(() => {
-  return props.userStats?.efficiencyScore ?? 0;
+  return props.userStats?.efficiencyScore;
 });
 
 const efficiencyScoreColors = computed(() => {
-  const score = efficiencyScore.value * 100; // Convert to percentage (0-100)
+  const score = (efficiencyScore.value ?? 0) * 100; // Convert to percentage (0-100)
   if (score >= 85) {
     return {
       bg: 'bg-green-50 dark:bg-green-900/20',
