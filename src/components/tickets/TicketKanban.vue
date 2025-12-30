@@ -1,6 +1,6 @@
 <template>
   <div
-    class="kanban-container flex gap-4 py-2.5 px-2 overflow-x-auto h-[calc(100vh-234px)] bg-white dark:bg-gray-900 rounded-lg relative w-full"
+    class="kanban-container flex gap-4 pt-2 pb-2.5 px-2 overflow-x-auto h-[calc(100vh-220px)] bg-white dark:bg-gray-900 rounded-lg relative w-full"
   >
     <!-- Skeleton while loading columns or tickets -->
     <template
@@ -38,7 +38,7 @@
       >
         <div class="p-2 text-center flex-shrink-0">
           <h3
-            class="m-0 inline-flex items-center gap-3 text-base font-semibold text-txt-primary dark:text-white py-2"
+            class="m-0 inline-flex items-center gap-3 text-base font-semibold text-txt-primary dark:text-white py-1.5"
           >
             {{ column.name }}
             <span
