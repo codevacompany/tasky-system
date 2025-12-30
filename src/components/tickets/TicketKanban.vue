@@ -174,7 +174,7 @@
                     title="Anexos"
                   >
                     <font-awesome-icon icon="paperclip" />
-                    <span class="text-xs min-w-4">{{ ticket.files?.length || 0 }}</span>
+                    <span class="text-xs">{{ ticket.files?.length || 0 }}</span>
                   </div>
                   <div
                     v-if="(ticket.comments?.length || 0) > 0"

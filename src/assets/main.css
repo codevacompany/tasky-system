@@ -15,7 +15,7 @@
 
   /* Cores derivadas das RGB */
   --primary-color: rgb(var(--primary-rgb));
-  --primary-dark: rgb(51, 78, 194);
+  --primary-dark: rgb(39, 71, 212);
   --primary-light: rgb(108, 134, 242);
   --secondary-dark-color: #00143b; /* Solid color for backgrounds */
   --secondary-dark: linear-gradient(
