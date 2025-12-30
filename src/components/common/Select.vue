@@ -43,10 +43,11 @@
           v-if="isOpen && !disabled"
           :class="[
             'fixed z-[10000] bg-white dark:bg-gray-800 rounded-md border border-gray-200 dark:border-gray-700 shadow-lg overflow-auto',
+            isOpeningUpwards ? 'origin-bottom' : 'origin-top',
             props.dropdownMaxHeight &&
             (props.dropdownMaxHeight.startsWith('max-h-') || props.dropdownMaxHeight.includes('['))
               ? props.dropdownMaxHeight
-              : props.dropdownMaxHeight || 'max-h-60',
+              : props.dropdownMaxHeight || 'max-h-[200px]',
           ]"
           ref="dropdownMenu"
           :style="{
@@ -114,6 +115,7 @@ const dropdownStyle = ref<{ top: string; left: string; width: string }>({
   left: '0px',
   width: '0px',
 });
+const isOpeningUpwards = ref(false);
 
 const selectedLabel = computed(() => {
   const selectedOption = props.options.find((opt) => opt.value === props.modelValue);
@@ -129,9 +131,28 @@ const updateDropdownPosition = async () => {
 
   await nextTick();
   const rect = selectContainer.value.getBoundingClientRect();
+  const windowHeight = window.innerHeight;
+  const padding = 4;
+
+  let top = rect.bottom + padding;
+
+  if (dropdownMenu.value) {
+    const dropdownHeight = dropdownMenu.value.offsetHeight;
+    const spaceBelow = windowHeight - rect.bottom;
+    const spaceAbove = rect.top;
+
+    if (spaceBelow < dropdownHeight + padding && spaceAbove > spaceBelow) {
+      top = rect.top - dropdownHeight - padding;
+      isOpeningUpwards.value = true;
+    } else {
+      isOpeningUpwards.value = false;
+    }
+  } else {
+    isOpeningUpwards.value = false;
+  }
 
   dropdownStyle.value = {
-    top: `${rect.bottom + 4}px`,
+    top: `${top}px`,
     left: `${rect.left}px`,
     width: `${rect.width}px`,
   };

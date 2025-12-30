@@ -1002,19 +1002,28 @@
                               @ready="initializeQuillMention"
                             />
                           </div>
-                          <div class="flex gap-2 justify-end">
-                            <button
-                              @click="cancelEditingComment"
-                              class="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-                            >
-                              Cancelar
-                            </button>
-                            <button
-                              @click="saveEditedComment"
-                              class="px-3 py-2 text-xs btn-primary font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-[5px] transition-colors"
-                            >
-                              Salvar
-                            </button>
+                          <div class="flex items-center justify-between mt-2">
+                            <div class="text-[11px] text-txt-muted dark:text-gray-400 font-medium">
+                              Edição será desabilitada às
+                              {{ getCommentExpirationTime(event.createdAt) }}
+                            </div>
+                            <div class="flex gap-2">
+                              <button
+                                @click="cancelEditingComment"
+                                class="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                              >
+                                Cancelar
+                              </button>
+                              <button
+                                @click="saveEditedComment"
+                                :disabled="
+                                  !isCommentActionable(event.createdAt) || isCommentLoading
+                                "
+                                class="px-3 py-2 text-xs bg-secondary font-medium text-white rounded-[5px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {{ isCommentLoading ? 'Salvando...' : 'Salvar' }}
+                              </button>
+                            </div>
                           </div>
                         </div>
                         <div
@@ -1600,6 +1609,15 @@ const confirmationModal = ref({
   showUserSelector: false,
   targetUsers: [] as Array<{ userId: number; userName: string; order: number }>,
   isLoading: false,
+});
+
+const nowRef = ref(new Date());
+const nowInterval = setInterval(() => {
+  nowRef.value = new Date();
+}, 10000); // update every 10 seconds
+
+onUnmounted(() => {
+  clearInterval(nowInterval);
 });
 
 const editorOptions = {
@@ -2533,7 +2551,7 @@ const cancelEditingComment = () => {
 };
 
 const saveEditedComment = async () => {
-  if (!editingCommentUuid.value) return;
+  if (!editingCommentUuid.value || isCommentLoading.value) return;
 
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = editingCommentContent.value;
@@ -2545,6 +2563,7 @@ const saveEditedComment = async () => {
     return;
   }
 
+  isCommentLoading.value = true;
   try {
     const processedContent = await processRichTextContent(editingCommentContent.value);
     const mentions = QuillMention.extractMentions(processedContent);
@@ -2560,6 +2579,8 @@ const saveEditedComment = async () => {
     fetchComments();
   } catch {
     toast.error('Erro ao atualizar comentário');
+  } finally {
+    isCommentLoading.value = false;
   }
 };
 
@@ -2658,9 +2679,15 @@ const isMyComment = (userId: number) => {
 const isCommentActionable = (createdAt: string) => {
   if (!createdAt) return false;
   const commentDate = new Date(createdAt);
-  const now = new Date();
-  const diffInMinutes = (now.getTime() - commentDate.getTime()) / (1000 * 60);
-  return diffInMinutes <= 5;
+  const diffInMinutes = (nowRef.value.getTime() - commentDate.getTime()) / (1000 * 60);
+  return diffInMinutes <= 10;
+};
+
+const getCommentExpirationTime = (createdAt: string) => {
+  if (!createdAt) return '';
+  const commentDate = new Date(createdAt);
+  const expirationDate = new Date(commentDate.getTime() + 10 * 60 * 1000);
+  return expirationDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 };
 
 const sortedTargetUsers = computed(() => {
