@@ -17,7 +17,9 @@
           <div
             class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700"
           >
-            <h2 class="text-xl font-bold text-txt-primary dark:text-white">Entenda seu Desempenho</h2>
+            <h2 class="text-xl font-bold text-txt-primary dark:text-white">
+              Entenda seu Desempenho
+            </h2>
             <button
               @click="$emit('close')"
               class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
@@ -48,7 +50,7 @@
                   </span>
                 </p>
 
-                <div v-if="hasEnoughTickets" class="space-y-4">
+                <div v-if="shouldShowScore" class="space-y-4">
                   <!-- Completion Index -->
                   <div :class="completionColors.bg + ' p-4 rounded-lg'">
                     <div class="flex items-center justify-between mb-2">
@@ -374,8 +376,8 @@ const goToFaq = () => {
   router.push('/faq#metricas-de-desempenho');
 };
 
-const hasEnoughTickets = computed(() => {
-  return (props.userStats?.detailedMetrics?.totalEntries ?? 0) >= 10;
+const shouldShowScore = computed(() => {
+  return props.userStats?.efficiencyScore !== undefined;
 });
 
 const completionIndex = computed(() => {
