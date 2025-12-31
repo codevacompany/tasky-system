@@ -31,7 +31,7 @@
                     :class="{
                       'menu-item-active': isActive('/'),
                     }"
-                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-txt-secondary dark:text-gray-300 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover relative gap-2"
+                    class="nav-menu-item flex items-center px-4 py-2 text-[14px] text-txt-secondary dark:text-gray-300 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover relative gap-2"
                   >
                     <font-awesome-icon icon="home" class="text-sm" />
                     Início
@@ -44,7 +44,7 @@
                     :class="{
                       'menu-item-active': isActive('/minhas-tarefas'),
                     }"
-                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-txt-secondary dark:text-gray-300 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover relative gap-2"
+                    class="nav-menu-item flex items-center px-4 py-2 text-[14px] text-txt-secondary dark:text-gray-300 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover relative gap-2"
                   >
                     <font-awesome-icon icon="tasks" class="text-sm" />
                     Tarefas
@@ -57,7 +57,7 @@
                     :class="{
                       'menu-item-active': isActive('/admin/relatorios'),
                     }"
-                    class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-txt-secondary dark:text-gray-300 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover cursor-pointer relative gap-2"
+                    class="nav-menu-item flex items-center px-4 py-2 text-[14px] text-txt-secondary dark:text-gray-300 font-medium transition-all duration-200 whitespace-nowrap menu-item-hover cursor-pointer relative gap-2"
                   >
                     <font-awesome-icon icon="chart-line" class="text-sm" />
                     Relatórios
@@ -81,7 +81,7 @@
                       isActive('/admin/clientes') ||
                       isActive('/admin/cadastros'),
                   }"
-                  class="nav-menu-item flex items-center px-4 py-2 text-[15px] text-txt-secondary dark:text-gray-300 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer relative"
+                  class="nav-menu-item flex items-center px-4 py-2 text-[14px] text-txt-secondary dark:text-gray-300 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer relative"
                 >
                   Administração
                   <font-awesome-icon
@@ -92,7 +92,7 @@
                 </div>
                 <div
                   v-show="showAdminDropdown"
-                  class="absolute top-[calc(100%-3px)] left-0 text-[15px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] z-50 mt-1 flex flex-col"
+                  class="absolute top-[calc(100%-3px)] left-0 text-[14px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] z-50 mt-1 flex flex-col"
                 >
                   <router-link
                     v-if="isTenantAdmin"
@@ -186,18 +186,18 @@
         <div class="flex items-center gap-6">
           <button
             v-if="userStore.hasActiveSubscription !== false"
-            class="btn btn-primary flex items-center gap-2 text-[15px]"
+            class="btn btn-primary flex items-center gap-2 text-[14px]"
             @click="openTicketModal"
           >
             <font-awesome-icon icon="plus" />
-            <span class="hidden sm:inline">Nova Tarefa</span>
+            <span class="hidden sm:inline text-[13.5px]">Nova Tarefa</span>
           </button>
 
           <div
             class="flex text-gray-800 dark:text-gray-200 relative cursor-pointer ml-6"
             @click="toggleNotificationsModal"
           >
-            <font-awesome-icon :icon="['far', 'bell']" class="text-xl text-txt-secondary dark:text-gray-200" />
+            <font-awesome-icon :icon="['far', 'bell']" class="text-lg text-txt-secondary dark:text-gray-200" />
             <span v-if="unreadCount && unreadCount > 0" class="notification-badge">{{
               unreadCount
             }}</span>
@@ -207,7 +207,7 @@
             to="/sync"
             class="hidden sm:flex text-slate-500 dark:text-slate-400 p-2 rounded cursor-pointer transition-all duration-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary"
           >
-            <div class="flex flex-col items-center gap-0.5 text-[15px]">
+            <div class="flex flex-col items-center gap-0.5 text-[14px]">
               <font-awesome-icon icon="comments" />
               <span class="text-xs font-medium">Sync</span>
             </div>
@@ -218,13 +218,13 @@
             @click="toggleProfileModal"
           >
             <div
-              class="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-semibold"
+              class="w-[29px] h-[29px] rounded-full overflow-hidden flex items-center justify-center text-white text-xs font-semibold"
               :style="avatarStyle"
             >
               <span>{{ userInitials }}</span>
             </div>
             <div class="ml-2 mr-3 hidden sm:block">
-              <span class="text-txt-secondary dark:text-gray-200 font-medium text-[15px]">{{
+              <span class="text-txt-secondary dark:text-gray-200 font-medium text-[14px]">{{
                 user?.firstName
               }}</span>
               <font-awesome-icon icon="chevron-down" class="text-sm font-bold ml-2 text-txt-secondary dark:text-gray-200" />
@@ -576,7 +576,7 @@ onUnmounted(() => {
 
 <style scoped>
 .notification-badge {
-  @apply absolute -top-2 -right-1 bg-red-500 text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center font-bold min-w-[16px];
+  @apply absolute -top-2 -right-1.5 bg-red-500 text-white text-[8px] rounded-full w-[15px] h-[15px] flex items-center justify-center font-bold min-w-[16px];
 }
 
 .menu-item-hover:hover {
