@@ -69,12 +69,11 @@
               >
                 <div
                   class="font-semibold text-sm leading-5 text-txt-primary dark:text-white text-left flex-1 break-words m-0 p-0"
-                  :class="hasRightIcons(ticket) ? 'line-clamp-2' : ''"
                 >
                   {{ ticket.name }}
                 </div>
               </div>
-              <div v-if="hasRightIcons(ticket)" class="flex items-center gap-2 ml-3 flex-shrink-0">
+              <div v-if="hasRightIcons(ticket)" class="flex items-center gap-2 ml-1 flex-shrink-0">
                 <font-awesome-icon
                   v-if="ticket.isPrivate"
                   icon="lock"
