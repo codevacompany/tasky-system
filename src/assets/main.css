@@ -17,10 +17,10 @@
   --primary-color: rgb(var(--primary-rgb));
   --primary-dark: rgb(39, 71, 212);
   --primary-light: rgb(108, 134, 242);
-  --secondary-dark-color: #00143b; /* Solid color for backgrounds */
+  --secondary-dark-color: #081940; /* Solid color for backgrounds */
   --secondary-dark: linear-gradient(
     135deg,
-    #00143b 0%,
+    #081940 0%,
     #142046 100%
   ); /* Gradient for backgrounds */
 
@@ -74,7 +74,7 @@
   --transition: all 0.2s ease-in-out;
 
   /* Layout */
-  --header-height: 58px;
+  --header-height: 54px;
   --sidebar-width: 260px;
   --sidebar-collapsed-width: 70px;
 }
@@ -1275,7 +1275,7 @@ body.dark-mode label {
   gap: 8px;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.85rem;
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.5;

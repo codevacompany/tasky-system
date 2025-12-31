@@ -34,11 +34,11 @@
       <div
         v-for="column in kanbanColumns"
         :key="column.id"
-        class="flex-1 min-w-[310px] w-0 bg-[#F8F9FB] dark:bg-gray-800 rounded-2xl shadow-soft-xs relative flex flex-col h-full"
+        class="flex-1 min-w-[302px] w-0 bg-[#F8F9FB] dark:bg-gray-800 rounded-2xl shadow-soft-xs relative flex flex-col h-full"
       >
         <div class="p-2 text-center flex-shrink-0">
           <h3
-            class="m-0 inline-flex items-center gap-3 text-base font-semibold text-txt-primary dark:text-white py-1.5"
+            class="m-0 inline-flex items-center gap-3 text-[15.5px] font-semibold text-txt-primary dark:text-white py-1.5"
           >
             {{ column.name }}
             <span
@@ -49,12 +49,12 @@
           </h3>
         </div>
 
-        <div class="p-1.5 flex flex-col flex-1 overflow-y-auto min-h-0">
+        <div class="px-1.5 py-0.5 flex flex-col flex-1 overflow-y-auto min-h-0">
           <div
             v-for="ticket in getTicketsByColumn(column)"
             :key="ticket.customId"
             :class="[
-              'min-h-[100px] flex-shrink-0 bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border shadow-soft-xs mb-3.5 flex flex-col hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
+              'min-h-[100px] bg-gre flex-shrink-0 bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border shadow-soft-xs mb-3.5 flex flex-col hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
               ticket.ticketStatus?.key === DefaultTicketStatus.Returned ||
               ticket.status === DefaultTicketStatus.Returned
                 ? 'border-orange-300 dark:border-orange-600 dark:bg-orange-900/10 hover:border-orange-400 dark:hover:border-orange-500'
@@ -63,10 +63,9 @@
             ]"
             @click="openTicketDetails(ticket)"
           >
-            <div class="flex justify-between items-start gap-3 mb-2 w-full p-0">
+            <div class="flex justify-between items-start gap-3 mb-[3px] w-full p-0">
               <div
                 class="flex-1 min-w-0 flex items-start"
-                :class="{ 'pb-1': hasRightIcons(ticket) }"
               >
                 <div
                   class="font-semibold text-sm leading-5 text-txt-primary dark:text-white text-left flex-1 break-words m-0 p-0"

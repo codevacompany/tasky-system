@@ -590,7 +590,7 @@
                 </h1>
               </div>
 
-              <div v-else class="space-y-4">
+              <div v-else class="space-y-3">
                 <input
                   v-model="editingName"
                   class="w-full text-xl sm:text-2xl font-bold px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -3145,7 +3145,7 @@ const saveTicketName = async () => {
       loadedTicket.value.name = editingName.value.trim();
     }
 
-    toast.success('Assunto da tarefa atualizado com sucesso');
+    toast.success('Assunto atualizado com sucesso');
     refreshSelectedTicket();
   } catch {
     toast.error('Erro ao atualizar nome da tarefa');
