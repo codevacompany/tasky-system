@@ -36,7 +36,7 @@
       <div class="p-0 text-center">
         <button
           v-if="notifications.some((n) => !n.read)"
-          class="block w-full px-3 py-3 bg-gray-900 dark:bg-gray-600 border-none text-white text-sm font-medium cursor-pointer text-center transition-all duration-200 hover:bg-gray-700 dark:hover:bg-gray-500 hover:-translate-y-px active:translate-y-0 focus:outline-2 focus:outline-blue-500 focus:outline-offset-2 select-none"
+          class="block w-full px-3 py-2.5 bg-gray-900 dark:bg-gray-600 border-none text-white text-[13.5px] font-medium cursor-pointer text-center transition-all duration-200 hover:bg-gray-700 dark:hover:bg-gray-500 hover:-translate-y-px active:translate-y-0 focus:outline-2 focus:outline-blue-500 focus:outline-offset-2 select-none"
           @click="markAllAsRead"
         >
           Marcar todas como lidas
