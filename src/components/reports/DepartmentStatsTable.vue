@@ -128,13 +128,13 @@ import { formatTimeInSecondsCompact, debounce } from '@/utils/generic-helper';
 // Format percentage helper
 const formatPercentage = (value?: number) => {
   if (value == null || isNaN(value)) return '0%';
-  return `${(value * 100).toFixed(1)}%`;
+  return `${Math.round(value * 100)}%`;
 };
 
 // Format overdue rate helper (already a percentage)
 const formatOverdueRate = (value?: number) => {
   if (value == null || isNaN(value)) return '0%';
-  return `${value.toFixed(1)}%`;
+  return `${Math.round(value)}%`;
 };
 
 // Get overdue rate badge class

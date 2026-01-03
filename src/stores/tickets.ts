@@ -133,6 +133,10 @@ export const useTicketsStore = defineStore('tickets', () => {
   const isPollingActive = ref<boolean>(false);
   let pollingTimerId: number | null = null;
 
+  // Change detection state for efficient polling
+  const lastKnownUpdateCount = ref<number>(0);
+  const lastKnownUpdateTimestamp = ref<string | null>(null);
+
   // Status columns cache
   const statusColumns = ref<TicketsState['statusColumns']>({
     data: [],
@@ -653,15 +657,53 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
   }
 
+  /**
+   * Check if tickets have changed by comparing the update checksum.
+   * Returns true if there are changes and tickets should be refetched.
+   */
+  async function checkForChanges(): Promise<boolean> {
+    try {
+      const response = await ticketService.getChangeChecksum();
+      const { count, latestUpdate } = response.data;
+
+      // Check if either count changed or there's a newer update
+      const hasChanges =
+        count !== lastKnownUpdateCount.value || latestUpdate !== lastKnownUpdateTimestamp.value;
+
+      // Update our cached values
+      lastKnownUpdateCount.value = count;
+      lastKnownUpdateTimestamp.value = latestUpdate;
+
+      return hasChanges;
+    } catch (error) {
+      console.error('Error checking for ticket changes:', error);
+      // On error, assume changes to be safe
+      return true;
+    }
+  }
+
   async function startPolling() {
     if (isPollingActive.value) return;
 
+    // Initial fetch - always fetch on start
     await refreshAllTickets();
+
+    try {
+      const response = await ticketService.getChangeChecksum();
+      lastKnownUpdateCount.value = response.data.count;
+      lastKnownUpdateTimestamp.value = response.data.latestUpdate;
+    } catch (error) {
+      console.error('Error getting initial checksum:', error);
+    }
 
     isPollingActive.value = true;
 
-    pollingTimerId = window.setInterval(() => {
-      refreshAllTickets();
+    // Poll the lightweight checksum endpoint, only refresh if changes detected
+    pollingTimerId = window.setInterval(async () => {
+      const hasChanges = await checkForChanges();
+      if (hasChanges) {
+        refreshAllTickets();
+      }
     }, globalRefreshInterval.value);
   }
 
@@ -737,6 +779,9 @@ export const useTicketsStore = defineStore('tickets', () => {
     };
     hasNewReceivedTickets.value = false;
     previousReceivedTicketIds.value = [];
+    // Reset change detection state
+    lastKnownUpdateCount.value = 0;
+    lastKnownUpdateTimestamp.value = null;
     if (isPollingActive.value) {
       stopPolling();
     }

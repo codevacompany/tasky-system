@@ -4,7 +4,7 @@
   >
     <!-- Header -->
     <div
-      class="flex flex-col sm:flex-row sm:justify-between sm:items-center p-6 border-b border-gray-200 dark:border-gray-700"
+      class="flex flex-col sm:flex-row sm:justify-between sm:items-center px-6 py-5 border-b border-gray-200 dark:border-gray-700"
     >
       <div class="flex items-center gap-2 mb-4 sm:mb-0">
         <div>
@@ -30,7 +30,7 @@
     </div>
 
     <!-- Content -->
-    <div class="p-6">
+    <div class="px-4 py-6">
       <slot></slot>
     </div>
   </div>
