@@ -188,10 +188,7 @@ export const ticketService = {
     return apiClient.post(`/tickets/${customId}/assignee`, { targetUserId, order });
   },
 
-  async removeAssignee(
-    customId: string,
-    targetUserId: number,
-  ): Promise<AxiosResponse<Ticket>> {
+  async removeAssignee(customId: string, targetUserId: number): Promise<AxiosResponse<Ticket>> {
     return apiClient.delete(`/tickets/${customId}/assignee/${targetUserId}`);
   },
 
@@ -201,5 +198,16 @@ export const ticketService = {
 
   async sendToNextDepartment(customId: string): Promise<AxiosResponse<Ticket>> {
     return apiClient.post(`/tickets/${customId}/send-to-next-department`);
+  },
+
+  /**
+   * Get a lightweight change checksum for efficient polling.
+   * Returns count and latest update timestamp.
+   * Use this to detect if any tickets have changed before fetching full data.
+   */
+  async getChangeChecksum(): Promise<
+    AxiosResponse<{ count: number; latestUpdate: string | null }>
+  > {
+    return apiClient.get('/ticket-updates/change-checksum');
   },
 };

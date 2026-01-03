@@ -74,7 +74,7 @@
   --transition: all 0.2s ease-in-out;
 
   /* Layout */
-  --header-height: 54px;
+  --header-height: 55px;
   --sidebar-width: 260px;
   --sidebar-collapsed-width: 70px;
 }

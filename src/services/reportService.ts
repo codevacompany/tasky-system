@@ -164,6 +164,16 @@ export interface PerformanceTrendsResponseDto {
   totalResolved: number;
 }
 
+export interface CategoryCountDto {
+  categoryId: number;
+  categoryName: string;
+  ticketCount: number;
+}
+
+export interface CategoryCountResponseDto {
+  categories: CategoryCountDto[];
+}
+
 export const reportService = {
   /**
    * Fetches tenant-level statistics including total tickets, resolution rate, and average times.
@@ -212,6 +222,18 @@ export const reportService = {
    */
   async getTicketsByPriority(period?: string): Promise<TicketPriorityCountResponseDto> {
     const response = await apiClient.get('/stats/by-priority', {
+      params: period ? { period } : undefined,
+    });
+    return response.data;
+  },
+
+  /**
+   * Fetches top 5 categories by ticket count.
+   * Used in ReportsPage.vue:
+   * - Top Categorias widget (Overview tab): Horizontal bar chart showing top 5 categories
+   */
+  async getTopCategoriesByTicketCount(period?: string): Promise<CategoryCountResponseDto> {
+    const response = await apiClient.get('/stats/by-category', {
       params: period ? { period } : undefined,
     });
     return response.data;

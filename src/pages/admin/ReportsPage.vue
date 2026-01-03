@@ -328,7 +328,6 @@
                 info-message="Ranking dos colaboradores com melhor desempenho no período selecionado. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%), utilizando o modelo Wilson para correção estatística. Nota: Para ter um score, o colaborador precisa ter pelo menos 10 tarefas atribuídas no período."
               >
                 <template #title>Top Colaboradores</template>
-                <template #subtitle>{{ currentPeriodLabel }}</template>
                 <template #header-actions>
                   <Select
                     :options="[
@@ -487,7 +486,6 @@
                 info-message="Ranking dos setores com melhor desempenho no período selecionado. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%), utilizando o modelo Wilson para correção estatística."
               >
                 <template #title>Top Setores</template>
-                <template #subtitle>{{ currentPeriodLabel }}</template>
                 <template #header-actions>
                   <Select
                     :options="[
@@ -639,7 +637,7 @@
             <!-- Cycle Time Section -->
             <div
               v-permission="PERMISSIONS.VIEW_ADVANCED_ANALYTICS"
-              class="grid grid-cols-1 lg:grid-cols-2 gap-6"
+              class="grid grid-cols-1 lg:grid-cols-3 gap-6"
             >
               <!-- Cycle Time per Department -->
               <BaseStatsWidget
@@ -647,51 +645,51 @@
               >
                 <template #title>Tempo de Resolução Por Setor</template>
 
-                <div class="px-6 py-1">
-                  <div class="space-y-3">
-                    <template v-if="sortedDepartmentsByResolutionTime.length">
+                <div class="space-y-4">
+                  <template v-if="sortedDepartmentsByResolutionTime.length">
+                    <div
+                      v-for="dept in sortedDepartmentsByResolutionTime"
+                      :key="dept.departmentId"
+                      class="flex items-center gap-6"
+                    >
                       <div
-                        v-for="dept in sortedDepartmentsByResolutionTime"
-                        :key="dept.departmentId"
-                        class="space-y-1"
+                        class="w-24 text-sm text-gray-500 dark:text-gray-400 text-right flex-shrink-0"
                       >
-                        <div class="flex justify-between items-center text-[13px]">
-                          <span class="text-gray-700 dark:text-gray-300">{{
-                            dept.departmentName
-                          }}</span>
-                          <span class="font-medium text-txt-primary dark:text-white">
-                            {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds) }}
-                          </span>
-                        </div>
-                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                          <div
-                            class="h-2 rounded-full relative"
-                            :class="{
-                              'min-w-[2px]': dept.averageResolutionTimeSeconds === 0,
-                            }"
-                            :style="{
-                              width:
-                                dept.averageResolutionTimeSeconds === 0
-                                  ? '2px'
-                                  : getBarWidth(dept.averageResolutionTimeSeconds),
-                              backgroundColor: getBarColor(dept.averageResolutionTimeSeconds),
-                            }"
-                          ></div>
+                        {{ dept.departmentName }}
+                      </div>
+                      <div class="flex-1 flex items-center gap-3">
+                        <div
+                          class="h-10 rounded-lg transition-all duration-300"
+                          :class="{
+                            'min-w-[2px]': dept.averageResolutionTimeSeconds === 0,
+                          }"
+                          :style="{
+                            width:
+                              dept.averageResolutionTimeSeconds === 0
+                                ? '2px'
+                                : getBarWidth(dept.averageResolutionTimeSeconds),
+                            backgroundColor: getBarColor(dept.averageResolutionTimeSeconds),
+                          }"
+                        ></div>
+                        <div
+                          class="text-sm font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap"
+                        >
+                          {{ formatTimeInSecondsCompact(dept.averageResolutionTimeSeconds) }}
                         </div>
                       </div>
-                    </template>
-                    <template v-else>
-                      <div
-                        class="h-40 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
-                      >
-                        <font-awesome-icon icon="circle-info" class="text-xl mb-2" />
-                        <p class="text-sm font-medium">Sem dados para exibir</p>
-                        <p class="text-xs mt-1">
-                          Ainda não há durações registradas no período selecionado
-                        </p>
-                      </div>
-                    </template>
-                  </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div
+                      class="h-40 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                    >
+                      <font-awesome-icon icon="circle-info" class="text-xl mb-2" />
+                      <p class="text-sm font-medium">Sem dados para exibir</p>
+                      <p class="text-xs mt-1">
+                        Ainda não há durações registradas no período selecionado
+                      </p>
+                    </div>
+                  </template>
                 </div>
               </BaseStatsWidget>
 
@@ -701,41 +699,87 @@
               >
                 <template #title>Tempo Médio Por Status</template>
 
-                <div class="flex flex-col lg:flex-row">
-                  <div class="px-6 py-1 w-full">
-                    <div class="space-y-3">
-                      <template v-if="sortedStatusDurations.length">
+                <div class="space-y-4 pr-1">
+                  <template v-if="sortedStatusDurations.length">
+                    <div
+                      v-for="(duration, index) in sortedStatusDurations"
+                      :key="index"
+                      class="flex items-center gap-6"
+                    >
+                      <div
+                        class="w-32 text-sm text-gray-500 dark:text-gray-400 text-right flex-shrink-0"
+                      >
+                        {{
+                          formatSnakeToNaturalCase(
+                            (duration.status as any)?.key ?? (duration.status as unknown as string),
+                          )
+                        }}
+                      </div>
+                      <div class="flex-1 flex items-center gap-3">
                         <div
-                          v-for="(duration, index) in sortedStatusDurations"
-                          :key="index"
-                          class="space-y-1"
+                          class="bg-blue-500 h-10 rounded-lg transition-all duration-300"
+                          :class="{
+                            'min-w-[2px]': duration.averageDurationSeconds === 0,
+                          }"
+                          :style="{
+                            width: getStatusBarWidth(duration.averageDurationSeconds),
+                          }"
+                        ></div>
+                        <div
+                          class="text-sm font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap"
                         >
-                          <div class="flex justify-between items-center text-[13px]">
-                            <span class="text-gray-700 dark:text-gray-300">{{
-                              formatSnakeToNaturalCase(
-                                (duration.status as any)?.key ??
-                                  (duration.status as unknown as string),
-                              )
-                            }}</span>
-                            <span class="font-medium text-txt-primary dark:text-white">
-                              {{ formatTimeInSecondsCompact(duration.averageDurationSeconds) }}
-                            </span>
-                          </div>
-                          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                            <div
-                              class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
-                              :class="{
-                                'min-w-[2px]': duration.averageDurationSeconds === 0,
-                              }"
-                              :style="{
-                                width: getStatusBarWidth(duration.averageDurationSeconds),
-                              }"
-                            ></div>
-                          </div>
+                          {{ formatTimeInSecondsCompact(duration.averageDurationSeconds) }}
                         </div>
-                      </template>
+                      </div>
                     </div>
-                  </div>
+                  </template>
+                </div>
+              </BaseStatsWidget>
+
+              <!-- Top Categories Chart -->
+              <BaseStatsWidget
+                info-message="Esta análise mostra as 5 categorias com mais tarefas criadas no período selecionado. Ajuda a identificar quais tipos de solicitações são mais comuns."
+              >
+                <template #title>Tarefas Por Categoria</template>
+
+                <div class="space-y-4 pr-1">
+                  <template v-if="topCategories.length">
+                    <div
+                      v-for="category in topCategories"
+                      :key="category.categoryId"
+                      class="flex items-center gap-6"
+                    >
+                      <div
+                        class="w-32 text-sm text-gray-500 dark:text-gray-400 text-right flex-shrink-0"
+                      >
+                        {{ category.categoryName }}
+                      </div>
+                      <div class="flex-1 flex items-center gap-3">
+                        <div
+                          class="h-10 rounded-lg transition-all duration-300 bg-blue-500"
+                          :style="{
+                            width: getCategoryBarWidth(category.ticketCount),
+                          }"
+                        ></div>
+                        <div
+                          class="text-sm font-medium text-gray-600 dark:text-gray-400 whitespace-nowrap"
+                        >
+                          {{ category.ticketCount }}
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div
+                      class="h-40 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                    >
+                      <font-awesome-icon icon="circle-info" class="text-xl mb-2" />
+                      <p class="text-sm font-medium">Sem dados para exibir</p>
+                      <p class="text-xs mt-1">
+                        Ainda não há categorias registradas no período selecionado
+                      </p>
+                    </div>
+                  </template>
                 </div>
               </BaseStatsWidget>
             </div>
@@ -1662,18 +1706,22 @@
                       </p>
                       <div v-if="inProgressTimeSeries" class="grid grid-cols-1 gap-4 mt-6">
                         <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                          <span class="block text-lg font-semibold text-txt-primary dark:text-white">{{
-                            formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
-                          }}</span>
+                          <span
+                            class="block text-lg font-semibold text-txt-primary dark:text-white"
+                            >{{
+                              formatTimeInSecondsCompact(inProgressTimeSeries.averageDuration)
+                            }}</span
+                          >
                           <span class="text-xs text-gray-500 dark:text-gray-400"
                             >Média últimos
                             {{ inProgressPeriodLabelMap[selectedInProgressPeriod] }}</span
                           >
                         </div>
                         <div class="text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                          <span class="block text-lg font-semibold text-txt-primary dark:text-white">{{
-                            getTotalInProgressCount()
-                          }}</span>
+                          <span
+                            class="block text-lg font-semibold text-txt-primary dark:text-white"
+                            >{{ getTotalInProgressCount() }}</span
+                          >
                           <span class="text-xs text-gray-500 dark:text-gray-400"
                             >Número de tarefas</span
                           >
@@ -2348,6 +2396,7 @@ const priorityClassMap: Record<string, string> = {
 
 const statusDurations = ref<StatusDurationDto[]>([]);
 const departmentData = ref<DepartmentStats[]>([]);
+const topCategories = ref<import('@/services/reportService').CategoryCountDto[]>([]);
 
 const loadData = async () => {
   loading.value = true;
@@ -2368,6 +2417,7 @@ const loadData = async () => {
       topFiveUsersResult,
       worstFiveUsersResult,
       topEfficiencyUsersResult,
+      topCategoriesResult,
     ] = await Promise.all([
       reportService.getTenantStatistics({
         period: selectedStatsPeriod.value as StatsPeriod,
@@ -2406,6 +2456,7 @@ const loadData = async () => {
         selectedStatsPeriod.value as StatsPeriod,
         'efficiency',
       ), // Melhor Desempenho - always sorted by efficiency
+      reportService.getTopCategoriesByTicketCount(selectedStatsPeriod.value as StatsPeriod), // Top 5 Categorias - uses global period filter
     ]);
 
     // Fetch initial department stats table data
@@ -2431,6 +2482,9 @@ const loadData = async () => {
           count: 0,
         }));
     }
+
+    // Store top categories
+    topCategories.value = topCategoriesResult.categories || [];
 
     // Store department data - directly from the API response
     departmentData.value = departmentStatsResult.map((dept) => ({
@@ -3325,6 +3379,17 @@ const getBarWidth = (resolutionTimeSeconds: number) => {
   return `${(resolutionTimeSeconds / maxTime) * 100}%`;
 };
 
+// Get bar width for category chart
+const getCategoryBarWidth = (ticketCount: number) => {
+  if (!topCategories.value.length) return '0%';
+
+  const maxCount = Math.max(...topCategories.value.map((c) => c.ticketCount));
+
+  if (maxCount === 0) return '0%';
+
+  return `${(ticketCount / maxCount) * 100}%`;
+};
+
 // Get bar color based on resolution time (green for low, red for high)
 const getBarColor = (resolutionTimeSeconds: number) => {
   if (!sortedDepartmentsByResolutionTime.value.length) return '#9ca3af'; // gray
@@ -3340,10 +3405,10 @@ const getBarColor = (resolutionTimeSeconds: number) => {
 
   // Interpolate from green (low) to red (high)
   // Green: rgb(34, 197, 94) = #22c55e
-  // Red: rgb(239, 68, 68) = #ef4444
-  const r = Math.round(34 + (239 - 34) * (percentage / 100));
-  const g = Math.round(197 - (197 - 68) * (percentage / 100));
-  const b = Math.round(94 - (94 - 68) * (percentage / 100));
+  // Red: rgb(237, 94, 94) = #ed5e5e
+  const r = Math.round(34 + (237 - 34) * (percentage / 100));
+  const g = Math.round(197 - (197 - 94) * (percentage / 100));
+  const b = Math.round(94 - (94 - 94) * (percentage / 100));
 
   return `rgb(${r}, ${g}, ${b})`;
 };
@@ -3813,7 +3878,7 @@ const exportToExcel = async () => {
       ticketsByStatus.value.labels.forEach((label, index) => {
         const count = ticketsByStatus.value.datasets[0].data[index];
         const percentage =
-          totalStatusTickets > 0 ? ((count / totalStatusTickets) * 100).toFixed(1) : '0.0';
+          totalStatusTickets > 0 ? Math.round((count / totalStatusTickets) * 100) : '0';
         generalData.push([label, count, `${percentage}%`]);
       });
     }
@@ -3831,7 +3896,7 @@ const exportToExcel = async () => {
       ticketsByPriority.value.labels.forEach((label, index) => {
         const count = ticketsByPriority.value.datasets[0].data[index];
         const percentage =
-          totalPriorityTickets > 0 ? ((count / totalPriorityTickets) * 100).toFixed(1) : '0.0';
+          totalPriorityTickets > 0 ? Math.round((count / totalPriorityTickets) * 100) : '0';
         generalData.push([label, count, `${percentage}%`]);
       });
     }
@@ -4004,7 +4069,7 @@ const exportToCSV = async () => {
     ticketsByStatus.value.labels.forEach((label, index) => {
       const count = ticketsByStatus.value.datasets[0].data[index];
       const percentage =
-        totalStatusTickets > 0 ? ((count / totalStatusTickets) * 100).toFixed(1) : '0.0';
+        totalStatusTickets > 0 ? Math.round((count / totalStatusTickets) * 100) : '0';
       csvContent += `${label},${count},${percentage}%\n`;
     });
     csvContent += '\n';
@@ -4019,7 +4084,7 @@ const exportToCSV = async () => {
     ticketsByPriority.value.labels.forEach((label, index) => {
       const count = ticketsByPriority.value.datasets[0].data[index];
       const percentage =
-        totalPriorityTickets > 0 ? ((count / totalPriorityTickets) * 100).toFixed(1) : '0.0';
+        totalPriorityTickets > 0 ? Math.round((count / totalPriorityTickets) * 100) : '0';
       csvContent += `${label},${count},${percentage}%\n`;
     });
     csvContent += '\n';
