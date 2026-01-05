@@ -34,7 +34,7 @@
       <div
         v-for="column in kanbanColumns"
         :key="column.id"
-        class="flex-1 min-w-[302px] w-0 bg-[#F8F9FB] dark:bg-gray-800 rounded-2xl shadow-soft-xs relative flex flex-col h-full"
+        class="flex-1 min-w-[302px] w-0 bg-[#F8F9FB] dark:bg-gray-800 rounded-xl shadow-soft-xs relative flex flex-col h-full"
       >
         <div class="p-2 text-center flex-shrink-0">
           <h3
@@ -64,9 +64,7 @@
             @click="openTicketDetails(ticket)"
           >
             <div class="flex justify-between items-start gap-3 mb-[3px] w-full p-0">
-              <div
-                class="flex-1 min-w-0 flex items-start"
-              >
+              <div class="flex-1 min-w-0 flex items-start">
                 <div
                   class="font-semibold text-sm leading-5 text-txt-primary dark:text-white text-left flex-1 break-words m-0 p-0"
                   :class="hasRightIcons(ticket) ? 'line-clamp-2' : ''"
@@ -294,6 +292,42 @@
       </div>
     </div>
   </BaseModal>
+
+  <!-- Acceptance Confirmation Modal -->
+  <BaseModal
+    v-if="showAcceptanceAlert"
+    :is-open="showAcceptanceAlert"
+    @close="showAcceptanceAlert = false"
+    :show-footer="false"
+    title="Aceitar Tarefa"
+  >
+    <div class="p-6 text-center">
+      <div class="text-3xl text-blue-700 dark:text-blue-400 mb-4">
+        <font-awesome-icon icon="info-circle" />
+      </div>
+      <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed mb-6">
+        Para visualizar os detalhes desta tarefa, você precisa aceitá-la clicando no botão
+        "Aceitar".
+      </p>
+      <div class="flex justify-center gap-4">
+        <button
+          class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="showAcceptanceAlert = false"
+          :disabled="isAccepting"
+        >
+          Cancelar
+        </button>
+        <button
+          class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          @click="handleAlertAcceptance"
+          :disabled="isAccepting"
+        >
+          <font-awesome-icon v-if="isAccepting" icon="spinner" spin class="text-sm" />
+          {{ isAccepting ? '' : 'Aceitar' }}
+        </button>
+      </div>
+    </div>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
@@ -327,6 +361,8 @@ const kanbanColumns = computed(() => ticketsStore.statusColumns.data);
 
 const showVerificationAlert = ref(false);
 const pendingVerificationTicket = ref<Ticket | null>(null);
+const showAcceptanceAlert = ref(false);
+const pendingAcceptanceTicket = ref<Ticket | null>(null);
 
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
@@ -475,8 +511,20 @@ const openTicketDetails = (ticket: Ticket) => {
     return;
   }
 
-  // If ticket is awaiting verification and user is the reviewer, show confirmation first
   const currentStatus = ticket.ticketStatus?.key || ticket.status || '';
+
+  // Check if it's a pending ticket for the target user (not in department view where they can see others' tickets)
+  if (
+    currentStatus === DefaultTicketStatus.Pending &&
+    userStore.user?.id === ticket.currentTargetUserId &&
+    props.activeTab !== 'setor'
+  ) {
+    pendingAcceptanceTicket.value = ticket;
+    showAcceptanceAlert.value = true;
+    return;
+  }
+
+  // If ticket is awaiting verification and user is the reviewer, show confirmation first
   if (
     currentStatus === DefaultTicketStatus.AwaitingVerification &&
     ticket.reviewer?.id === userStore.user?.id
@@ -500,6 +548,7 @@ const handleStartVerification = async (ticket: Ticket) => {
 };
 
 const isVerifying = ref(false);
+const isAccepting = ref(false);
 
 const handleAlertVerification = async () => {
   if (!pendingVerificationTicket.value) return;
@@ -515,6 +564,32 @@ const handleAlertVerification = async () => {
     toast.error('Erro ao iniciar verificação');
   } finally {
     isVerifying.value = false;
+  }
+};
+
+const handleAlertAcceptance = async () => {
+  if (!pendingAcceptanceTicket.value) return;
+
+  isAccepting.value = true;
+  try {
+    // Accept the ticket
+    await ticketService.accept(pendingAcceptanceTicket.value.customId);
+    toast.success('Tarefa aceita com sucesso');
+
+    // Fetch updated ticket details
+    await ticketsStore.fetchTicketDetails(pendingAcceptanceTicket.value.customId);
+
+    // Close modal and open ticket details
+    showAcceptanceAlert.value = false;
+    const acceptedTicket = pendingAcceptanceTicket.value;
+    pendingAcceptanceTicket.value = null;
+
+    // Emit viewTicket to open details
+    emit('viewTicket', acceptedTicket);
+  } catch (error) {
+    toast.error('Erro ao aceitar tarefa');
+  } finally {
+    isAccepting.value = false;
   }
 };
 
