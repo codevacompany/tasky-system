@@ -444,7 +444,7 @@
                           v-else
                           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
                         >
-                          {{ formatPercentage(user.deliveryOverdueRate / 100) }}
+                          {{ formatPercentage(user.sentToVerificationOverdueRate / 100) }}
                         </span>
                       </div>
                     </div>
@@ -597,7 +597,7 @@
                           v-else
                           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
                         >
-                          {{ formatPercentage(dept.deliveryOverdueRate / 100) }}
+                          {{ formatPercentage(dept.sentToVerificationOverdueRate / 100) }}
                         </span>
                       </div>
                     </div>
@@ -2914,7 +2914,9 @@ const topFiveDepartments = computed(() => {
       .slice(0, 5);
   } else if (topDepartmentsSortBy.value === 'overdue_rate') {
     return copy
-      .sort((a, b) => (a.deliveryOverdueRate || 0) - (b.deliveryOverdueRate || 0))
+      .sort(
+        (a, b) => (a.sentToVerificationOverdueRate || 0) - (b.sentToVerificationOverdueRate || 0),
+      )
       .slice(0, 5);
   } else {
     // When sorting by efficiency, only show departments with valid scores (10+ tickets)

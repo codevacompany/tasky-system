@@ -97,7 +97,7 @@
         <span v-else class="text-gray-400 dark:text-gray-500"> - </span>
       </template>
 
-      <template #column-deliveryOverdueRate="{ value }">
+      <template #column-completionOverdueRate="{ value }">
         <span
           :class="[
             'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
@@ -262,12 +262,12 @@ const tableHeaders = computed<TableHeader<DepartmentStats>[]>(() => [
     sortDirection: sortKey.value === 'efficiencyScore' ? sortDirection.value : 'none',
   },
   {
-    key: 'deliveryOverdueRate',
+    key: 'completionOverdueRate',
     label: '% de Atraso',
     sortable: true,
-    sortKey: 'deliveryOverdueRate',
+    sortKey: 'completionOverdueRate',
     align: 'center',
-    sortDirection: sortKey.value === 'deliveryOverdueRate' ? sortDirection.value : 'none',
+    sortDirection: sortKey.value === 'completionOverdueRate' ? sortDirection.value : 'none',
   },
 ]);
 

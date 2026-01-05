@@ -67,6 +67,8 @@ interface Props {
   departments: Department[];
   allUsers: User[];
   targetUsers?: TargetUser[];
+  isPrivate?: boolean;
+  currentUserId?: number | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -76,6 +78,8 @@ const props = withDefaults(defineProps<Props>(), {
       userId: null,
     },
   ],
+  isPrivate: false,
+  currentUserId: null,
 });
 
 const emit = defineEmits<{
@@ -104,11 +108,16 @@ const getUserOptionsForDepartment = (index: number) => {
     .map((tu, idx) => (idx !== index ? tu.userId : null))
     .filter((id) => id !== null);
 
-  const usersInDepartment = props.allUsers.filter(
+  let usersInDepartment = props.allUsers.filter(
     (user) =>
       user.department?.id === targetUser.departmentId &&
       (!selectedUserIds.includes(user.id) || targetUser.userId === user.id),
   );
+
+  // Filter out current user if creating a private ticket
+  if (props.isPrivate && props.currentUserId) {
+    usersInDepartment = usersInDepartment.filter((user) => user.id !== props.currentUserId);
+  }
 
   return [
     { value: '', label: 'Selecione um usuário' },

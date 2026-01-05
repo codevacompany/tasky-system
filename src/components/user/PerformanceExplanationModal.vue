@@ -59,7 +59,7 @@
                           Entrega no prazo
                         </h4>
                         <InfoTooltip
-                          message="Avalia o cumprimento do prazo de envio de tarefas. Poucas tarefas podem impactar o resultado pois é feita uma normalização na porcentagem pelo volume de tarefas. Essa métrica representa 40% do score final."
+                          message="Avalia o cumprimento do prazo de envio de tarefas. Para este índice, o sistema utiliza uma correção estatística que evita que um volume baixo de tarefas distorça o resultado. Esta métrica representa 40% do score final."
                           class="mt-[1px]"
                         />
                       </div>
