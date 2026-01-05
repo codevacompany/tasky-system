@@ -559,6 +559,41 @@
         </div>
       </div>
     </BaseModal>
+
+    <!-- Modal de Aceitação de Tarefa -->
+    <BaseModal
+      v-if="showAcceptanceAlert"
+      title="Aceitar Tarefa"
+      @close="showAcceptanceAlert = false"
+      :show-footer="false"
+    >
+      <div class="p-6 text-center">
+        <div class="text-3xl text-blue-700 dark:text-blue-400 mb-4">
+          <font-awesome-icon icon="info-circle" />
+        </div>
+        <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed mb-6">
+          Para visualizar os detalhes desta tarefa, você precisa aceitá-la clicando no botão
+          "Aceitar".
+        </p>
+        <div class="flex justify-center gap-4">
+          <button
+            class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            @click="showAcceptanceAlert = false"
+            :disabled="isAcceptanceAlertLoading"
+          >
+            Cancelar
+          </button>
+          <button
+            class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            @click="handleAlertAcceptance"
+            :disabled="isAcceptanceAlertLoading"
+          >
+            <LoadingSpinner v-if="isAcceptanceAlertLoading" :size="16" />
+            <span v-if="!isAcceptanceAlertLoading">Aceitar</span>
+          </button>
+        </div>
+      </div>
+    </BaseModal>
   </div>
 </template>
 
@@ -720,6 +755,9 @@ const ticketForDueDate = ref<Ticket | null>(null);
 const isDueDateModalLoading = ref(false);
 
 const isVerificationAlertLoading = ref(false);
+const showAcceptanceAlert = ref(false);
+const pendingAcceptanceTicket = ref<Ticket | null>(null);
+const isAcceptanceAlertLoading = ref(false);
 
 const displayedTickets = computed(() => {
   switch (props.tableType) {
@@ -834,12 +872,25 @@ const openTicketDetails = (ticket: Ticket) => {
     return;
   }
 
+  const status = getTicketStatus(ticket);
+
+  // Check if it's a pending ticket for the target user (not in department view where they can see others' tickets)
+  if (
+    status === DefaultTicketStatus.Pending &&
+    userStore.user?.id === ticket.currentTargetUserId &&
+    props.tableType !== 'setor'
+  ) {
+    pendingAcceptanceTicket.value = ticket;
+    showAcceptanceAlert.value = true;
+    return;
+  }
+
   // Se for o solicitante e o ticket estiver aguardando verificação
   if (
     (props.tableType === 'criadas' ||
       props.tableType === 'recebidas' ||
       props.tableType === 'gerais') &&
-    getTicketStatus(ticket) === DefaultTicketStatus.AwaitingVerification &&
+    status === DefaultTicketStatus.AwaitingVerification &&
     userStore.user?.id === ticket.reviewer?.id
   ) {
     pendingVerificationTicket.value = ticket;
@@ -1138,6 +1189,42 @@ const handleAlertVerification = async () => {
     } finally {
       isVerificationAlertLoading.value = false;
     }
+  }
+};
+
+const handleAlertAcceptance = async () => {
+  if (!pendingAcceptanceTicket.value) return;
+
+  isAcceptanceAlertLoading.value = true;
+  try {
+    // Check if ticket has due date
+    if (!pendingAcceptanceTicket.value.dueAt) {
+      // Close acceptance alert and show due date modal
+      showAcceptanceAlert.value = false;
+      ticketForDueDate.value = pendingAcceptanceTicket.value;
+      showDueDateModal.value = true;
+      isAcceptanceAlertLoading.value = false;
+      return;
+    }
+
+    // Accept the ticket
+    await ticketService.accept(pendingAcceptanceTicket.value.customId);
+    toast.success('Tarefa aceita com sucesso');
+
+    await refreshTickets();
+    await ticketsStore.fetchTicketDetails(pendingAcceptanceTicket.value.customId);
+
+    // Close modal and open ticket details
+    showAcceptanceAlert.value = false;
+    const acceptedTicket = pendingAcceptanceTicket.value;
+    pendingAcceptanceTicket.value = null;
+
+    // Emit viewTicket to open details
+    emit('viewTicket', acceptedTicket);
+  } catch {
+    toast.error('Erro ao aceitar a tarefa');
+  } finally {
+    isAcceptanceAlertLoading.value = false;
   }
 };
 

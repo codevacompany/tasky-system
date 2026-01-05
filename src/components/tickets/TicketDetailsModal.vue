@@ -43,15 +43,6 @@
             </button>
 
             <button
-              v-else-if="isTargetUser && ticketStatus === DefaultTicketStatus.Pending"
-              class="inline-flex items-center gap-1.5 px-3 py-2 bg-green-600 hover:bg-green-700 text-sm text-white font-medium rounded-md transition-colors"
-              @click="acceptTicket(loadedTicket?.customId)"
-            >
-              <font-awesome-icon icon="check" class="text-xs" />
-              Aceitar
-            </button>
-
-            <button
               v-if="
                 isTargetUser && ticketStatus === DefaultTicketStatus.InProgress && !isLastTargetUser
               "
@@ -1603,6 +1594,7 @@ const confirmationModal = ref({
   action: null as
     | ((data?: { reason: string; description: string; targetUserId?: number }) => Promise<void>)
     | null,
+  cancelAction: null as (() => void) | null,
   hasInput: false,
   reasonOptions: [] as { value: string; label: string }[],
   context: '', // add context property
@@ -1911,12 +1903,14 @@ const openConfirmationModal = (
   context = '',
   showUserSelector = false,
   targetUsers: Array<{ userId: number; userName: string; order: number }> = [],
+  cancelAction: (() => void) | null = null,
 ) => {
   confirmationModal.value = {
     isOpen: true,
     title,
     message,
     action,
+    cancelAction,
     hasInput,
     reasonOptions,
     context,
@@ -1927,8 +1921,13 @@ const openConfirmationModal = (
 };
 
 const closeConfirmationModal = () => {
+  // Execute cancel action if exists
+  if (confirmationModal.value.cancelAction) {
+    confirmationModal.value.cancelAction();
+  }
   confirmationModal.value.isOpen = false;
   confirmationModal.value.action = null;
+  confirmationModal.value.cancelAction = null;
   confirmationModal.value.isLoading = false;
 };
 
@@ -1960,6 +1959,9 @@ const handleCancel = () => {
   } else if (confirmationModal.value.context === 'start-correction') {
     closeConfirmationModal();
     emit('close'); // Close the ticket details modal without starting correction
+  } else if (confirmationModal.value.context === 'accept-pending') {
+    closeConfirmationModal();
+    emit('close'); // Close the ticket details modal without accepting
   } else {
     closeConfirmationModal();
   }
@@ -2875,6 +2877,37 @@ const fetchTicket = async (customId: string) => {
         false,
         [],
         'start-verification', // pass context
+      );
+    }
+
+    // Check if ticket is pending and user is the target user
+    if (
+      userStore.user?.id === ticket.currentTargetUserId &&
+      (ticket.ticketStatus?.key === DefaultTicketStatus.Pending ||
+        ticket.status === DefaultTicketStatus.Pending) &&
+      !confirmationModal.value.isOpen
+    ) {
+      openConfirmationModal(
+        'Aceitar Tarefa',
+        'Para visualizar os detalhes desta tarefa, você precisa aceitá-la. Deseja aceitar esta tarefa agora?',
+        async () => {
+          try {
+            // Check if ticket has due date
+            if (!ticket.dueAt) {
+              toast.warning('Defina uma data de conclusão antes de aceitar a tarefa.');
+              return;
+            }
+
+            await ticketService.accept(ticket.customId);
+            toast.success('Tarefa aceita com sucesso');
+            loadedTicket.value = await ticketsStore.fetchTicketDetails(ticket.customId);
+          } catch {
+            toast.error('Erro ao aceitar a tarefa');
+          }
+        },
+        false,
+        [],
+        'accept-pending', // pass context
       );
     }
   } catch (error) {
