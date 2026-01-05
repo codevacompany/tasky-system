@@ -24,13 +24,18 @@
             <div
               class="w-[34px] h-[34px] bg-gray-300 dark:bg-gray-600 rounded-full animate-pulse-custom flex-shrink-0"
             ></div>
-            <div class="flex-1">
+            <div class="w-[166px]">
               <div
                 class="h-4 w-32 bg-gray-300 dark:bg-gray-600 rounded mb-2 animate-pulse-custom"
               ></div>
               <div class="h-3 w-24 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
             </div>
-            <div class="h-4 w-48 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+            <div class="flex-1">
+              <div class="h-4 w-48 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
+            </div>
+            <div
+              class="h-4 w-12 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom flex-shrink-0"
+            ></div>
           </div>
         </div>
         <div v-else-if="tickets.length === 0" class="py-12 text-center h-[300px]">
@@ -107,6 +112,14 @@
                 {{ ticket.name }}
               </p>
             </div>
+            <!-- Last Update -->
+            <div
+              class="flex items-center gap-1.5 text-xs text-txt-muted dark:text-gray-300 opacity-70 whitespace-nowrap"
+              title="Última atualização"
+            >
+              <!-- <font-awesome-icon icon="clock-rotate-left" /> -->
+              <span>{{ formatRelativeTime(ticket.createdAt) }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -131,9 +144,14 @@
                 class="h-4 w-16 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom ml-auto"
               ></div>
             </td>
-            <td class="px-3 py-3 text-center border-b border-gray-200 dark:border-gray-700">
+            <td class="px-3 py-3 border-b border-gray-200 dark:border-gray-700">
               <div
                 class="h-6 w-20 bg-gray-300 dark:bg-gray-600 rounded-full animate-pulse-custom mx-auto"
+              ></div>
+            </td>
+            <td class="px-3 py-3 pr-8 border-b border-gray-200 dark:border-gray-700">
+              <div
+                class="h-4 w-12 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom ml-auto"
               ></div>
             </td>
           </tr>
@@ -160,7 +178,7 @@
             </td>
             <td
               :class="[
-                'px-3 py-3 text-center text-sm text-txt-primary dark:text-white whitespace-nowrap w-1/2',
+                'px-3 py-3 text-center text-sm text-txt-primary dark:text-white whitespace-nowrap w-1/4',
                 index < 4 ? 'border-b border-gray-200 dark:border-gray-700' : '',
               ]"
             >
@@ -171,6 +189,18 @@
                 ]"
                 >{{ formatSnakeToNaturalCase(getTicketStatus(ticket)) }}</span
               >
+            </td>
+            <td
+              :class="[
+                'px-3 py-3 text-right text-xs text-gray-500 dark:text-gray-400 opacity-70 whitespace-nowrap w-1/4 pr-8',
+                index < 4 ? 'border-b border-gray-200 dark:border-gray-700' : '',
+              ]"
+              title="Última atualização"
+            >
+              <div class="flex items-center justify-end gap-1.5">
+                <font-awesome-icon icon="clock-rotate-left" />
+                <span>{{ formatRelativeTime(ticket.updatedAt) }}</span>
+              </div>
             </td>
           </tr>
           <tr v-if="!isLoading && tickets.length === 0" class="last:border-b-0">
@@ -206,7 +236,7 @@ import { computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { DefaultTicketStatus, type Ticket } from '@/models';
-import { formatDate } from '@/utils/date';
+import { formatDate, formatRelativeTime } from '@/utils/date';
 import {
   calculateDeadline,
   formatSnakeToNaturalCase,

@@ -102,6 +102,7 @@
               :options="privateOptions"
               :modelValue="isPrivateValue"
               @update:modelValue="updateIsPrivate"
+              :disabled="isPrivateDisabled"
             />
           </div>
         </div>
@@ -110,6 +111,8 @@
           :departments="departments"
           :allUsers="allUsers"
           v-model:targetUsers="targetUsers"
+          :isPrivate="formData.isPrivate"
+          :currentUserId="currentUserId"
           class="col-span-2"
         />
       </div>
@@ -181,7 +184,7 @@
           </div>
         </div>
 
-        <div class="col-span-2 flex  gap-4 mt-2">
+        <div class="col-span-2 flex gap-4 mt-2">
           <button
             class="py-[10px] px-3 border border-dashed border-gray-300 dark:border-gray-600 rounded text-sm text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-800 dark:hover:text-gray-300 transition-colors"
             type="button"
@@ -371,7 +374,7 @@
     <template #footer>
       <button
         type="button"
-        class="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-[5px] text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         @click="handleCancel"
         :disabled="isLoading"
       >
@@ -380,12 +383,12 @@
       <button
         ref="confirmButtonRef"
         type="button"
-        class="w-full sm:w-auto px-4 py-2 btn btn-primary hover:opacity-95 text-white rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        class="w-full sm:w-auto min-w-20 px-4 py-2 bg-secondary hover:opacity-95 text-white text-sm font-medium rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         @click="handleConfirm"
         :disabled="isLoading"
       >
-        <font-awesome-icon v-if="isLoading" icon="spinner" spin />
-        <span>{{ currentStep === 1 ? 'Próximo' : 'Criar Tarefa' }}</span>
+        <LoadingSpinner v-if="isLoading" :size="16" :color="'white'" />
+        <span v-else>{{ currentStep === 1 ? 'Próximo' : 'Criar Tarefa' }}</span>
       </button>
     </template>
   </BaseModal>
@@ -414,6 +417,7 @@ import TargetUsersSelector from '@/components/common/TargetUsersSelector.vue';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import pt from 'vue-datepicker-next/locale/pt-br.es';
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
 const emit = defineEmits<{
   (e: 'close'): void;
@@ -561,15 +565,17 @@ const userOptions = computed(() => {
   ];
 });
 
+// Watch targetUsers to automatically set isPrivate to false if current user is selected
 watch(
-  () => formData.value.isPrivate,
-  (isPrivate, wasPrivate) => {
-    if (isPrivate && selectedUser.value && Number(selectedUser.value) === currentUserId) {
+  () => targetUsers.value,
+  (newTargetUsers) => {
+    const hasCurrentUserAsTarget = newTargetUsers.some((tu) => tu.userId === currentUserId);
+    if (hasCurrentUserAsTarget && formData.value.isPrivate) {
       formData.value.isPrivate = false;
-      selectedUser.value = null;
-      toast.warning('Você não pode criar uma tarefa privada para si mesmo.');
+      toast.info('Tarefa privada desabilitada: você está selecionado como destinatário.');
     }
   },
+  { deep: true },
 );
 
 const categoryOptions = computed(() => [
@@ -603,7 +609,17 @@ const isPrivateValue = computed(() => {
   return formData.value.isPrivate.toString();
 });
 
+const isPrivateDisabled = computed(() => {
+  // Disable if current user is selected as a target
+  return targetUsers.value.some((tu) => tu.userId === currentUserId);
+});
+
 const updateIsPrivate = (value: string) => {
+  // Prevent setting to true if current user is a target
+  if (value === 'true' && isPrivateDisabled.value) {
+    toast.warning('Você não pode criar uma tarefa privada para si mesmo.');
+    return;
+  }
   formData.value.isPrivate = value === 'true';
 };
 
