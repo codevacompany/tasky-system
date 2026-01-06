@@ -1,51 +1,44 @@
 <template>
-  <div
+  <BaseModal
     v-if="isOpen"
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000] animate-in fade-in duration-300"
+    :is-open="isOpen"
+    @close="close"
+    :show-footer="false"
+    :is-full-screen-mobile="true"
+    title="Assinatura Necessária"
   >
-    <div
-      class="bg-white dark:bg-gray-800 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] w-[90%] max-w-[550px] relative animate-in slide-in-from-bottom-4 duration-400"
-    >
-      <div
-        class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full cursor-pointer text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-txt-primary dark:hover:text-gray-200 transition-all duration-200"
-        @click="close"
-      >
-        <font-awesome-icon icon="times" />
+    <div class="flex flex-col items-center text-center px-4 sm:px-6 py-6 pb-10">
+      <div class="w-full max-w-[280px] aspect-square flex items-center justify-center mb-6">
+        <img
+          src="@/assets/images/landing/business-upgrade.jpg"
+          alt="Upgrade de plano"
+          class="w-full h-auto rounded-lg shadow-sm"
+        />
       </div>
 
-      <div class="flex flex-col items-center text-center px-6 py-6 pb-10">
-        <div class="w-[280px] h-[280px] flex items-center justify-center mb-6">
-          <img
-            src="@/assets/images/landing/business-upgrade.jpg"
-            alt="Upgrade de plano"
-            class="w-full h-auto rounded-lg"
-          />
-        </div>
+      <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-txt-primary dark:text-white px-2">
+        Assine um plano para usar o Tasky Pro
+      </h2>
 
-        <h2 class="text-2xl font-semibold mb-4 text-txt-primary dark:text-white">
-          Assine um plano para usar o Tasky Pro
-        </h2>
+      <p class="text-sm sm:text-base leading-6 mb-6 max-w-[460px] text-gray-700 dark:text-gray-300">
+        Seu período de teste terminou. Para continuar usando o Tasky Pro com sua equipe, você
+        precisa assinar um dos planos disponíveis.
+      </p>
 
-        <p class="text-base leading-6 mb-6 max-w-[460px] text-gray-700 dark:text-gray-300">
-          Seu período de teste terminou. Para continuar usando o Tasky Pro com sua equipe, você
-          precisa assinar um dos planos disponíveis.
-        </p>
-
-        <div class="flex gap-4 mt-2">
-          <button
-            class="px-5 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium cursor-pointer transition-all duration-200"
-            @click="close"
-          >
-            Escolher plano agora
-          </button>
-        </div>
+      <div class="flex flex-col sm:flex-row gap-4 mt-2 w-full sm:w-auto px-4 sm:px-0">
+        <button
+          class="w-full sm:w-auto px-5 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium cursor-pointer transition-all duration-200"
+          @click="close"
+        >
+          Escolher plano agora
+        </button>
       </div>
     </div>
-  </div>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
+import BaseModal from './BaseModal.vue';
 
 defineProps({
   isOpen: {

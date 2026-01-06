@@ -1,144 +1,129 @@
 <template>
-  <Teleport to="body">
-    <div
-      v-if="isOpen"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000] animate-in fade-in duration-300"
-      @click.self="close"
-    >
-      <div
-        class="bg-white dark:bg-gray-800 rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] w-[90%] max-w-[550px] max-h-[90vh] overflow-y-auto relative animate-in slide-in-from-bottom-4 duration-400 mx-auto"
-        @click.stop
+  <BaseModal
+    v-if="isOpen"
+    :is-open="isOpen"
+    @close="close"
+    :show-footer="false"
+    :is-full-screen-mobile="true"
+    :title="isReturningUser ? 'Atualização dos Termos' : 'Bem-vindo ao Tasky Pro!'"
+    :closeOnClickOutside="termsAccepted && privacyPolicyAccepted"
+  >
+    <div class="flex flex-col items-center text-center px-4 sm:px-6 py-6 pb-8">
+      <div class="w-full max-w-[200px] sm:max-w-[240px] flex items-center justify-center mb-5">
+        <img
+          src="@/assets/images/landing/management-drawing.png"
+          alt="Task Management"
+          class="w-full h-auto"
+        />
+      </div>
+
+      <h2 class="text-xl sm:text-2xl font-semibold mb-4 text-txt-primary dark:text-white px-2">
+        <template v-if="isReturningUser"> Atualização dos Termos de Uso </template>
+        <template v-else> Bem-vindo ao Tasky Pro! </template>
+      </h2>
+
+      <p
+        v-if="isReturningUser"
+        class="text-sm sm:text-base leading-6 mb-5 max-w-[450px] text-gray-700 dark:text-gray-300"
       >
-        <!-- Close button - disabled if terms not accepted -->
-        <div
-          v-if="termsAccepted && privacyPolicyAccepted"
-          class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full cursor-pointer text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-txt-primary dark:hover:text-gray-200 transition-all duration-200"
-          @click="close"
+        Nossos Termos de Uso e Política de Privacidade foram atualizados. Para continuar utilizando
+        o Tasky Pro, é necessário aceitar os novos termos.
+      </p>
+      <template v-else>
+        <p
+          v-if="isTenantAdmin"
+          class="text-sm sm:text-base leading-6 mb-5 max-w-[450px] text-gray-700 dark:text-gray-300"
         >
-          <font-awesome-icon icon="times" />
-        </div>
-        <div
+          Vamos começar! Você e sua equipe podem usar o Tasky Pro gratuitamente por 14 dias. Explore
+          nosso guia ou comece agora mesmo a organizar suas tarefas.
+        </p>
+        <p
           v-else
-          class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-full text-gray-400 dark:text-gray-600 cursor-not-allowed"
+          class="text-sm sm:text-base leading-6 mb-5 max-w-[450px] text-gray-700 dark:text-gray-300"
         >
-          <font-awesome-icon icon="times" />
-        </div>
+          Explore nosso guia para conhecer todas as funcionalidades ou comece agora mesmo a
+          organizar suas tarefas e colaborar com sua equipe.
+        </p>
+      </template>
 
-        <div class="flex flex-col items-center text-center px-6 py-6 pb-8">
-          <div class="w-[240px] flex items-center justify-center mb-5">
-            <img
-              src="@/assets/images/landing/management-drawing.png"
-              alt="Task Management"
-              class="w-full h-auto"
+      <!-- Terms Acceptance Section -->
+      <div class="w-full max-w-[400px] mb-5 text-left px-2 sm:px-0">
+        <div class="mb-4">
+          <label class="flex items-start gap-4 cursor-pointer">
+            <input
+              v-model="termsAccepted"
+              type="checkbox"
+              class="mt-1 w-5 h-5 flex-shrink-0 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />
-          </div>
-
-          <h2 class="text-2xl font-semibold mb-4 text-txt-primary dark:text-white">
-            <template v-if="isReturningUser"> Atualização dos Termos de Uso </template>
-            <template v-else> Bem-vindo ao Tasky Pro! </template>
-          </h2>
-
-          <p
-            v-if="isReturningUser"
-            class="text-base leading-6 mb-5 max-w-[450px] text-gray-700 dark:text-gray-300"
-          >
-            Nossos Termos de Uso e Política de Privacidade foram atualizados. Para continuar
-            utilizando o Tasky Pro, é necessário aceitar os novos termos.
-          </p>
-          <template v-else>
-            <p
-              v-if="isTenantAdmin"
-              class="text-base leading-6 mb-5 max-w-[450px] text-gray-700 dark:text-gray-300"
-            >
-              Vamos começar! Você e sua equipe podem usar o Tasky Pro gratuitamente por 14 dias.
-              Explore nosso guia ou comece agora mesmo a organizar suas tarefas.
-            </p>
-            <p
-              v-else
-              class="text-base leading-6 mb-5 max-w-[450px] text-gray-700 dark:text-gray-300"
-            >
-              Explore nosso guia para conhecer todas as funcionalidades ou comece agora mesmo a
-              organizar suas tarefas e colaborar com sua equipe.
-            </p>
-          </template>
-
-          <!-- Terms Acceptance Section -->
-          <div class="w-full max-w-[450px] mb-5 text-left ml-8">
-            <div class="mb-4">
-              <label class="flex items-start gap-3 cursor-pointer">
-                <input
-                  v-model="termsAccepted"
-                  type="checkbox"
-                  class="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                />
-                <span class="text-sm text-gray-700 dark:text-gray-300">
-                  Concordo com os
-                  <a
-                    href="https://taskypro.com.br/termos-de-uso.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
-                    >Termos de Uso</a
-                  >
-                  do Tasky Pro
-                </span>
-              </label>
-            </div>
-            <div>
-              <label class="flex items-start gap-3 cursor-pointer">
-                <input
-                  v-model="privacyPolicyAccepted"
-                  type="checkbox"
-                  class="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                />
-                <span class="text-sm text-gray-700 dark:text-gray-300">
-                  Concordo com a
-                  <a
-                    href="https://taskypro.com.br/politica-de-privacidade.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
-                    >Política de Privacidade</a
-                  >
-                  do Tasky Pro
-                </span>
-              </label>
-            </div>
-          </div>
-
-          <div class="flex gap-4 mt-2" :class="{ 'justify-center': isReturningUser }">
-            <button
-              :disabled="!termsAccepted || !privacyPolicyAccepted"
-              :class="[
-                'px-6 py-3 rounded-md font-medium cursor-pointer transition-all duration-200',
-                termsAccepted && privacyPolicyAccepted
-                  ? isReturningUser
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-txt-primary dark:text-gray-100 border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  : 'bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-600 border border-gray-300 dark:border-gray-700 cursor-not-allowed',
-              ]"
-              @click="handleAccept"
-            >
-              {{ isReturningUser ? 'Continuar' : 'Começar' }}
-            </button>
-            <button
-              v-if="!isReturningUser"
-              :disabled="!termsAccepted || !privacyPolicyAccepted"
-              :class="[
-                'px-6 py-3 rounded-md font-medium cursor-pointer transition-all duration-200',
-                termsAccepted && privacyPolicyAccepted
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-600 border border-gray-300 dark:border-gray-700 cursor-not-allowed',
-              ]"
-              @click="handleAcceptAndOpenGuide"
-            >
-              Abrir Guia
-            </button>
-          </div>
+            <span class="text-sm text-gray-700 dark:text-gray-300 leading-tight pt-0.5">
+              Concordo com os
+              <a
+                href="https://taskypro.com.br/termos-de-uso.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+                >Termos de Uso</a
+              >
+              do Tasky Pro
+            </span>
+          </label>
+        </div>
+        <div>
+          <label class="flex items-start gap-4 cursor-pointer">
+            <input
+              v-model="privacyPolicyAccepted"
+              type="checkbox"
+              class="mt-1 w-5 h-5 flex-shrink-0 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+            />
+            <span class="text-sm text-gray-700 dark:text-gray-300 leading-tight pt-0.5">
+              Concordo com a
+              <a
+                href="https://taskypro.com.br/politica-de-privacidade.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
+                >Política de Privacidade</a
+              >
+              do Tasky Pro
+            </span>
+          </label>
         </div>
       </div>
+
+      <div
+        class="flex flex-col sm:flex-row gap-3 mt-2 w-full sm:w-auto px-2 sm:px-0"
+        :class="{ 'sm:justify-center': isReturningUser }"
+      >
+        <button
+          :disabled="!termsAccepted || !privacyPolicyAccepted"
+          :class="[
+            'px-6 py-3.5 rounded-md font-medium cursor-pointer transition-all duration-200 w-full sm:w-auto',
+            termsAccepted && privacyPolicyAccepted
+              ? isReturningUser
+                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
+                : 'bg-gray-100 dark:bg-gray-700 text-txt-primary dark:text-gray-100 border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
+              : 'bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-600 border border-gray-300 dark:border-gray-700 cursor-not-allowed',
+          ]"
+          @click="handleAccept"
+        >
+          {{ isReturningUser ? 'Continuar' : 'Começar Agora' }}
+        </button>
+        <button
+          v-if="!isReturningUser"
+          :disabled="!termsAccepted || !privacyPolicyAccepted"
+          :class="[
+            'px-6 py-3.5 rounded-md font-medium cursor-pointer transition-all duration-200 w-full sm:w-auto',
+            termsAccepted && privacyPolicyAccepted
+              ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm font-semibold'
+              : 'bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-600 border border-gray-300 dark:border-gray-700 cursor-not-allowed',
+          ]"
+          @click="handleAcceptAndOpenGuide"
+        >
+          Abrir Guia do Tasky
+        </button>
+      </div>
     </div>
-  </Teleport>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
@@ -148,6 +133,7 @@ import { useRoles } from '@/composables/useRoles';
 import { userService } from '@/services/userService';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
+import BaseModal from './BaseModal.vue';
 
 defineProps({
   isOpen: {

@@ -264,30 +264,36 @@
     :is-open="showVerificationAlert"
     @close="showVerificationAlert = false"
     :show-footer="false"
+    :is-full-screen-mobile="true"
     title="Iniciar Verificação"
   >
-    <div class="p-6 text-center">
+    <div class="px-4 sm:px-6 py-6 sm:py-8 text-center">
       <div class="text-3xl text-purple-700 dark:text-purple-400 mb-4">
         <font-awesome-icon icon="info-circle" />
       </div>
-      <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed mb-6">
-        Para visualizar os detalhes desta tarefa, você precisa iniciar a verificação clicando no
-        botão "Verificar".
+
+      <h3 class="text-lg font-semibold text-txt-primary dark:text-white mb-3">
+        Deseja iniciar a revisão?
+      </h3>
+
+      <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-relaxed mb-8">
+        Para visualizar os detalhes desta tarefa, você precisa iniciar a verificação agora.
       </p>
-      <div class="flex justify-center gap-4">
+
+      <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
         <button
-          class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200"
+          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200"
           @click="showVerificationAlert = false"
         >
           Cancelar
         </button>
         <button
-          class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           @click="handleAlertVerification"
           :disabled="isVerifying"
         >
           <font-awesome-icon v-if="isVerifying" icon="spinner" spin class="text-sm" />
-          {{ isVerifying ? '' : 'Verificar' }}
+          {{ isVerifying ? '' : 'Verificar Agora' }}
         </button>
       </div>
     </div>
@@ -299,31 +305,37 @@
     :is-open="showAcceptanceAlert"
     @close="showAcceptanceAlert = false"
     :show-footer="false"
+    :is-full-screen-mobile="true"
     title="Aceitar Tarefa"
   >
-    <div class="p-6 text-center">
+    <div class="px-4 sm:px-6 py-6 sm:py-8 text-center">
       <div class="text-3xl text-blue-700 dark:text-blue-400 mb-4">
         <font-awesome-icon icon="info-circle" />
       </div>
-      <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed mb-6">
-        Para visualizar os detalhes desta tarefa, você precisa aceitá-la clicando no botão
-        "Aceitar".
+
+      <h3 class="text-lg font-semibold text-txt-primary dark:text-white mb-3">
+        Aceite esta tarefa
+      </h3>
+
+      <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-relaxed mb-8">
+        Para visualizar os detalhes desta tarefa, você precisa aceitá-la primeiro.
       </p>
-      <div class="flex justify-center gap-4">
+
+      <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
         <button
-          class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-500 hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           @click="showAcceptanceAlert = false"
           :disabled="isAccepting"
         >
           Cancelar
         </button>
         <button
-          class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           @click="handleAlertAcceptance"
           :disabled="isAccepting"
         >
           <font-awesome-icon v-if="isAccepting" icon="spinner" spin class="text-sm" />
-          {{ isAccepting ? '' : 'Aceitar' }}
+          {{ isAccepting ? '' : 'Aceitar Agora' }}
         </button>
       </div>
     </div>

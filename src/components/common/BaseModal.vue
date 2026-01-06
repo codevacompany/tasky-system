@@ -11,7 +11,7 @@
         :class="[
           'bg-white dark:bg-gray-800 shadow-lg flex flex-col overflow-hidden animate-modalSlideIn',
           isFullScreenMobile
-            ? 'w-full h-full sm:h-auto sm:max-h-[94vh] sm:min-w-[500px] sm:rounded-md sm:mx-4 sm:max-w-4xl'
+            ? 'w-full h-full sm:h-auto sm:max-h-[94vh] sm:min-w-[500px] sm:rounded-md sm:mx-4 max-w-[1280px]'
             : 'min-w-[95vw] sm:min-w-[500px] max-h-[calc(90vh-100px)] sm:max-h-[94vh] rounded-md mx-4',
         ]"
       >
