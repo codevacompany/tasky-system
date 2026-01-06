@@ -28,9 +28,9 @@
       </div>
 
       <!-- Cards de Estatísticas -->
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+      <div class="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <div
-          class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center gap-4 shadow-soft-xs border border-gray-200 dark:border-gray-700"
+          class="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 flex items-center gap-3 sm:gap-4 shadow-soft-xs border border-gray-200 dark:border-gray-700"
         >
           <div
             class="w-12 h-12 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xl"
@@ -49,7 +49,7 @@
         </div>
 
         <div
-          class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center gap-4 shadow-soft-xs border border-gray-200 dark:border-gray-700"
+          class="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 flex items-center gap-3 sm:gap-4 shadow-soft-xs border border-gray-200 dark:border-gray-700"
         >
           <div
             class="w-12 h-12 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xl"
@@ -68,7 +68,7 @@
         </div>
 
         <div
-          class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center gap-4 shadow-soft-xs border border-gray-200 dark:border-gray-700"
+          class="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 flex items-center gap-3 sm:gap-4 shadow-soft-xs border border-gray-200 dark:border-gray-700"
         >
           <div
             class="w-12 h-12 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xl"
@@ -87,7 +87,7 @@
         </div>
 
         <div
-          class="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center gap-4 shadow-soft-xs border border-gray-200 dark:border-gray-700"
+          class="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 flex items-center gap-3 sm:gap-4 shadow-soft-xs border border-gray-200 dark:border-gray-700"
         >
           <div
             class="w-12 h-12 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xl"
@@ -493,7 +493,7 @@
                           <th
                             class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
                           >
-                          setor
+                            setor
                           </th>
                           <th
                             class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"

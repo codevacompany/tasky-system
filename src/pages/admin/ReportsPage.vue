@@ -117,10 +117,10 @@
             Métricas e indicadores importantes do desempenho da sua empresa
           </p>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <!-- Total de Tickets -->
           <div
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-3 sm:p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <font-awesome-icon icon="ticket" class="text-blue-500 dark:text-blue-400 text-2xl" />
@@ -133,7 +133,7 @@
 
           <!-- Taxa de Resolução -->
           <div
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-3 sm:p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <font-awesome-icon

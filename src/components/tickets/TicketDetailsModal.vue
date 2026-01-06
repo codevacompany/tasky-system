@@ -5,6 +5,7 @@
     @close="closeModal"
     :showFooter="false"
     :hasCustomHeader="true"
+    :isFullScreenMobile="true"
   >
     <template #custom-header>
       <div
@@ -12,10 +13,10 @@
       >
         <div class="flex items-center gap-3">
           <div v-if="loadedTicket">
-            <h2 class="text-lg sm:text-lg font-semibold text-txt-primary dark:text-gray-100">
+            <h2 class="text-sm sm:text-lg font-semibold text-txt-primary dark:text-gray-100">
               Detalhes da Tarefa
             </h2>
-            <p class="text-gray-600 font-medium dark:text-gray-400">
+            <p class="text-xs sm:text-sm text-gray-600 font-medium dark:text-gray-400">
               {{ loadedTicket.customId }}
             </p>
           </div>
@@ -26,106 +27,97 @@
         </div>
 
         <!-- Action Buttons in Header -->
-        <div class="flex items-center gap-2 ml-4" v-if="loadedTicket">
-          <div
-            class="flex items-center gap-2"
-            v-if="
-              isTargetUser || (isReviewer && ticketStatus === DefaultTicketStatus.UnderVerification)
-            "
-          >
+        <div
+          class="flex items-center gap-2 ml-2 sm:ml-4 relative actions-dropdown-container"
+          v-if="loadedTicket"
+        >
+          <!-- Desktop View: Show all buttons -->
+          <div class="hidden sm:flex items-center gap-2">
             <button
-              v-if="isTargetUser && ticketStatus === DefaultTicketStatus.Pending && isSelfAssigned"
-              class="inline-flex items-center gap-1.5 px-3 py-2 bg-green-600 hover:bg-green-700 text-sm text-white font-medium rounded-md transition-colors"
-              @click="startTicket(loadedTicket?.customId)"
+              v-for="action in headerActions"
+              :key="action.id"
+              :class="[
+                'inline-flex items-center gap-1.5 px-3 py-2 text-sm text-white font-medium rounded-md transition-colors whitespace-nowrap',
+                action.color,
+              ]"
+              @click="action.onClick"
             >
-              <font-awesome-icon icon="play" class="text-xs" />
-              Iniciar
-            </button>
-
-            <button
-              v-if="
-                isTargetUser && ticketStatus === DefaultTicketStatus.InProgress && !isLastTargetUser
-              "
-              class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-sm text-white font-medium rounded-md transition-colors"
-              @click="sendToNextDepartment(loadedTicket.customId)"
-            >
-              <font-awesome-icon icon="arrow-right" class="text-xs" />
-              {{ isNextUserSameDepartment ? 'Próximo Colaborador' : 'Próximo Setor' }}
-            </button>
-
-            <button
-              v-if="
-                isTargetUser && ticketStatus === DefaultTicketStatus.InProgress && isLastTargetUser
-              "
-              class="inline-flex items-center gap-1.5 px-3 py-2 bg-primary hover:bg-blue-700 text-sm text-white font-medium rounded-md transition-colors"
-              @click="sendForReview(loadedTicket.customId)"
-            >
-              <font-awesome-icon icon="arrow-right" class="text-xs" />
-              Enviar Para Verificação
-            </button>
-
-            <button
-              v-if="isTargetUser && ticketStatus === DefaultTicketStatus.AwaitingVerification"
-              class="inline-flex items-center gap-1.5 px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-sm text-white font-medium rounded-md transition-colors"
-              @click="cancelVerificationRequest(loadedTicket.customId)"
-            >
-              <font-awesome-icon icon="undo" class="text-xs" />
-              Cancelar Envio
-            </button>
-
-            <button
-              v-if="isTargetUser && ticketStatus === DefaultTicketStatus.Returned"
-              class="inline-flex items-center gap-1.5 px-3 py-2 bg-orange-600 hover:bg-orange-700 text-sm text-white font-medium rounded-md transition-colors"
-              @click="correctTicket(loadedTicket.customId)"
-            >
-              <font-awesome-icon icon="wrench" class="text-xs" />
-              Corrigir
-            </button>
-
-            <button
-              v-if="isReviewer && ticketStatus === DefaultTicketStatus.UnderVerification"
-              class="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-sm text-white font-medium rounded-md transition-colors"
-              @click="approveTicket(loadedTicket.customId)"
-            >
-              <font-awesome-icon icon="check-double" class="text-xs" />
-              Aprovar
-            </button>
-
-            <button
-              v-if="isReviewer && ticketStatus === DefaultTicketStatus.UnderVerification"
-              class="inline-flex items-center gap-1.5 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-sm text-white font-medium rounded-md transition-colors"
-              @click="requestCorrection(loadedTicket.customId)"
-            >
-              <font-awesome-icon icon="undo" class="text-xs" />
-              Correção
-            </button>
-
-            <button
-              v-if="isReviewer && ticketStatus === DefaultTicketStatus.UnderVerification"
-              class="inline-flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-sm text-white font-medium rounded-md transition-colors"
-              @click="rejectTicket(loadedTicket.customId)"
-            >
-              <font-awesome-icon icon="times" class="text-xs" />
-              Reprovar
+              <font-awesome-icon :icon="action.icon" class="text-xs" />
+              {{ action.label }}
             </button>
           </div>
 
-          <button
-            v-if="
-              isRequester &&
-              ticketStatus !== DefaultTicketStatus.Completed &&
-              ticketStatus !== DefaultTicketStatus.Rejected &&
-              ticketStatus !== DefaultTicketStatus.Canceled
-            "
-            class="inline-flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-sm text-white font-medium rounded-md transition-colors"
-            @click="cancelTicket(loadedTicket.customId)"
-          >
-            <font-awesome-icon icon="ban" class="text-xs" />
-            Cancelar Tarefa
-          </button>
+          <!-- Mobile View: Split Button or single button -->
+          <div class="flex sm:hidden items-center">
+            <template v-if="headerActions.length === 1">
+              <button
+                :class="[
+                  'inline-flex items-center gap-1.5 px-2 py-1.5 text-[11px] text-white font-medium rounded-md transition-colors whitespace-nowrap',
+                  headerActions[0].color,
+                ]"
+                @click="headerActions[0].onClick"
+              >
+                <font-awesome-icon :icon="headerActions[0].icon" class="text-[10px]" />
+                {{ headerActions[0].label }}
+              </button>
+            </template>
+            <template v-else-if="headerActions.length > 1">
+              <div class="flex items-stretch rounded-md overflow-hidden shadow-sm">
+                <!-- Primary Action -->
+                <button
+                  :class="[
+                    'inline-flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] text-white font-medium transition-colors border-r border-white/20',
+                    (headerActions.find((a) => a.isPrimary) || headerActions[0]).color,
+                  ]"
+                  @click="(headerActions.find((a) => a.isPrimary) || headerActions[0]).onClick()"
+                >
+                  <font-awesome-icon
+                    :icon="(headerActions.find((a) => a.isPrimary) || headerActions[0]).icon"
+                    class="text-[10px]"
+                  />
+                  {{ (headerActions.find((a) => a.isPrimary) || headerActions[0]).label }}
+                </button>
+                <!-- Toggle -->
+                <button
+                  :class="[
+                    'px-2 py-1.5 text-white transition-colors flex items-center justify-center',
+                    (headerActions.find((a) => a.isPrimary) || headerActions[0]).color,
+                  ]"
+                  @click.stop="toggleActionsDropdown"
+                >
+                  <font-awesome-icon
+                    :icon="isActionsDropdownOpen ? 'chevron-up' : 'chevron-down'"
+                    class="text-[10px]"
+                  />
+                </button>
+              </div>
+
+              <!-- Dropdown Menu -->
+              <div
+                v-if="isActionsDropdownOpen"
+                class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-[1100] py-1 animate-modalSlideIn"
+              >
+                <button
+                  v-for="action in headerActions.filter(
+                    (a) => a !== (headerActions.find((p) => p.isPrimary) || headerActions[0]),
+                  )"
+                  :key="action.id"
+                  class="w-full text-left px-4 py-3 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+                  @click="action.onClick"
+                >
+                  <font-awesome-icon
+                    :icon="action.icon"
+                    class="w-3.5 h-3.5"
+                    :class="action.color?.includes('bg-red') ? 'text-red-500' : 'text-primary'"
+                  />
+                  {{ action.label }}
+                </button>
+              </div>
+            </template>
+          </div>
 
           <button
-            class="bg-transparent border-none text-xl text-gray-400 ml-8 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer p-1.5 rounded-full flex items-center justify-center transition-colors ml-2"
+            class="bg-transparent border-none text-xl text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer p-1.5 rounded-full flex items-center justify-center transition-colors"
             @click="closeModal"
           >
             <font-awesome-icon icon="times" />
@@ -135,7 +127,7 @@
     </template>
 
     <div
-      class="relative w-[85vw] max-w-[1280px] mx-auto p-3 sm:p-0 h-[calc(100vh-200px)] max-h-[650px] flex flex-col"
+      class="relative w-full sm:w-[85vw] max-w-[1280px] mx-auto p-3 sm:p-0 h-full sm:h-[calc(100vh-200px)] sm:max-h-[650px] flex flex-col"
     >
       <!-- Skeleton Loading State -->
       <div
@@ -1586,6 +1578,153 @@ const nameInput = ref<HTMLInputElement | null>(null);
 const openCommentMenuId = ref<string | null>(null);
 const editingCommentUuid = ref<string | null>(null);
 const editingCommentContent = ref('');
+const isActionsDropdownOpen = ref(false);
+
+const headerActions = computed(() => {
+  const actions: any[] = [];
+  if (!loadedTicket.value) return actions;
+
+  const currentStatus = ticketStatus.value;
+
+  // Pending
+  if (isTargetUser.value && currentStatus === DefaultTicketStatus.Pending && isSelfAssigned.value) {
+    actions.push({
+      id: 'start',
+      label: 'Iniciar',
+      icon: 'play',
+      color: 'bg-green-600 hover:bg-green-700',
+      onClick: () => {
+        startTicket(loadedTicket.value!.customId);
+        isActionsDropdownOpen.value = false;
+      },
+      isPrimary: true,
+    });
+  }
+
+  // In Progress
+  if (isTargetUser.value && currentStatus === DefaultTicketStatus.InProgress) {
+    if (!isLastTargetUser.value) {
+      actions.push({
+        id: 'next',
+        label: isNextUserSameDepartment.value ? 'Próximo' : 'Póx. Setor',
+        icon: 'arrow-right',
+        color: 'bg-blue-600 hover:bg-blue-700',
+        onClick: () => {
+          sendToNextDepartment(loadedTicket.value!.customId);
+          isActionsDropdownOpen.value = false;
+        },
+        isPrimary: true,
+      });
+    } else {
+      actions.push({
+        id: 'review',
+        label: 'Enviar Para Verificação',
+        icon: 'arrow-right',
+        color: 'bg-primary hover:bg-blue-700',
+        onClick: () => {
+          sendForReview(loadedTicket.value!.customId);
+          isActionsDropdownOpen.value = false;
+        },
+        isPrimary: true,
+      });
+    }
+  }
+
+  // Awaiting Verification (Target User side)
+  if (isTargetUser.value && currentStatus === DefaultTicketStatus.AwaitingVerification) {
+    actions.push({
+      id: 'undo-envio',
+      label: 'Cancelar',
+      icon: 'undo',
+      color: 'bg-yellow-600 hover:bg-yellow-700',
+      onClick: () => {
+        cancelVerificationRequest(loadedTicket.value!.customId);
+        isActionsDropdownOpen.value = false;
+      },
+      isPrimary: true,
+    });
+  }
+
+  // Returned
+  if (isTargetUser.value && currentStatus === DefaultTicketStatus.Returned) {
+    actions.push({
+      id: 'correct',
+      label: 'Corrigir',
+      icon: 'wrench',
+      color: 'bg-orange-600 hover:bg-orange-700',
+      onClick: () => {
+        correctTicket(loadedTicket.value!.customId);
+        isActionsDropdownOpen.value = false;
+      },
+      isPrimary: true,
+    });
+  }
+
+  // Under Verification (Reviewer side)
+  if (isReviewer.value && currentStatus === DefaultTicketStatus.UnderVerification) {
+    actions.push({
+      id: 'approve',
+      label: 'Aprovar',
+      icon: 'check-double',
+      color: 'bg-emerald-600 hover:bg-emerald-700',
+      onClick: () => {
+        approveTicket(loadedTicket.value!.customId);
+        isActionsDropdownOpen.value = false;
+      },
+      isPrimary: true,
+    });
+    actions.push({
+      id: 'request-correction',
+      label: 'Correção',
+      icon: 'undo',
+      color: 'bg-purple-600 hover:bg-purple-700',
+      onClick: () => {
+        requestCorrection(loadedTicket.value!.customId);
+        isActionsDropdownOpen.value = false;
+      },
+      isPrimary: false,
+    });
+    actions.push({
+      id: 'reject',
+      label: 'Reprovar',
+      icon: 'times',
+      color: 'bg-red-600 hover:bg-red-700',
+      onClick: () => {
+        rejectTicket(loadedTicket.value!.customId);
+        isActionsDropdownOpen.value = false;
+      },
+      isPrimary: false,
+    });
+  }
+
+  // Cancel Ticket (Requester)
+  if (
+    isRequester.value &&
+    ![
+      DefaultTicketStatus.Completed,
+      DefaultTicketStatus.Rejected,
+      DefaultTicketStatus.Canceled,
+    ].includes(currentStatus as DefaultTicketStatus)
+  ) {
+    actions.push({
+      id: 'cancel-ticket',
+      label: 'Cancelar',
+      icon: 'ban',
+      color: 'bg-red-600 hover:bg-red-700',
+      onClick: () => {
+        cancelTicket(loadedTicket.value!.customId);
+        isActionsDropdownOpen.value = false;
+      },
+      isPrimary: actions.length === 0,
+    });
+  }
+
+  return actions;
+});
+
+const toggleActionsDropdown = () => {
+  isActionsDropdownOpen.value = !isActionsDropdownOpen.value;
+};
 
 const confirmationModal = ref({
   isOpen: false,
@@ -2967,6 +3106,9 @@ const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as HTMLElement;
   if (!target.closest('.comment-menu-container')) {
     openCommentMenuId.value = null;
+  }
+  if (!target.closest('.actions-dropdown-container')) {
+    isActionsDropdownOpen.value = false;
   }
 };
 

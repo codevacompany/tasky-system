@@ -15,9 +15,9 @@
         >
           <!-- Header -->
           <div
-            class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700"
+            class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700"
           >
-            <h2 class="text-xl font-bold text-txt-primary dark:text-white">
+            <h2 class="text-lg sm:text-xl font-bold text-txt-primary dark:text-white">
               Entenda seu Desempenho
             </h2>
             <button
@@ -29,7 +29,7 @@
           </div>
 
           <!-- Content -->
-          <div class="overflow-y-auto p-6">
+          <div class="overflow-y-auto p-4 sm:p-6">
             <div class="space-y-6">
               <!-- Score de Desempenho Section -->
               <section>
@@ -52,10 +52,14 @@
 
                 <div v-if="shouldShowScore" class="space-y-4">
                   <!-- Completion Index -->
-                  <div :class="completionColors.bg + ' p-4 rounded-lg'">
-                    <div class="flex items-center justify-between mb-2">
+                  <div :class="completionColors.bg + ' p-3 sm:p-4 rounded-lg'">
+                    <div
+                      class="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-1 sm:gap-2"
+                    >
                       <div class="flex items-center gap-2">
-                        <h4 class="font-semibold text-txt-primary dark:text-white">
+                        <h4
+                          class="text-sm sm:text-base font-semibold text-txt-primary dark:text-white"
+                        >
                           Entrega no prazo
                         </h4>
                         <InfoTooltip
@@ -66,7 +70,7 @@
 
                       <span
                         v-if="userStats?.detailedMetrics"
-                        :class="'text-sm font-bold ' + completionColors.text"
+                        :class="'text-xs sm:text-sm font-bold ' + completionColors.text"
                       >
                         {{ completionColors.label }} · {{ Math.round(completionIndex * 100) }}%
                       </span>
@@ -96,10 +100,14 @@
                   </div>
 
                   <!-- Rejection Index -->
-                  <div :class="rejectionColors.bg + ' p-4 rounded-lg'">
-                    <div class="flex items-center justify-between mb-2">
+                  <div :class="rejectionColors.bg + ' p-3 sm:p-4 rounded-lg'">
+                    <div
+                      class="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-1 sm:gap-2"
+                    >
                       <div class="flex items-center gap-2">
-                        <h4 class="font-semibold text-txt-primary dark:text-white">
+                        <h4
+                          class="text-sm sm:text-base font-semibold text-txt-primary dark:text-white"
+                        >
                           Aprovação do trabalho
                         </h4>
                         <InfoTooltip
@@ -109,7 +117,7 @@
                       </div>
                       <span
                         v-if="userStats?.detailedMetrics"
-                        :class="'text-sm font-bold ' + rejectionColors.text"
+                        :class="'text-xs sm:text-sm font-bold ' + rejectionColors.text"
                       >
                         {{ rejectionColors.label }} · {{ Math.round(rejectionIndex * 100) }}%
                       </span>
@@ -141,10 +149,14 @@
                   </div>
 
                   <!-- Return Index -->
-                  <div :class="returnColors.bg + ' p-4 rounded-lg'">
-                    <div class="flex items-center justify-between mb-2">
+                  <div :class="returnColors.bg + ' p-3 sm:p-4 rounded-lg'">
+                    <div
+                      class="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-1 sm:gap-2"
+                    >
                       <div class="flex items-center gap-2">
-                        <h4 class="font-semibold text-txt-primary dark:text-white">
+                        <h4
+                          class="text-sm sm:text-base font-semibold text-txt-primary dark:text-white"
+                        >
                           Qualidade da entrega
                         </h4>
                         <InfoTooltip
@@ -154,7 +166,7 @@
                       </div>
                       <span
                         v-if="userStats?.detailedMetrics"
-                        :class="'text-sm font-bold ' + returnColors.text"
+                        :class="'text-xs sm:text-sm font-bold ' + returnColors.text"
                       >
                         {{ returnColors.label }} · {{ Math.round(returnIndex * 100) }}%
                       </span>
@@ -188,10 +200,14 @@
                   </div>
 
                   <!-- Verification Index -->
-                  <div :class="verificationColors.bg + ' p-4 rounded-lg'">
-                    <div class="flex items-center justify-between mb-2">
+                  <div :class="verificationColors.bg + ' p-3 sm:p-4 rounded-lg'">
+                    <div
+                      class="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-1 sm:gap-2"
+                    >
                       <div class="flex items-center gap-2">
-                        <h4 class="font-semibold text-txt-primary dark:text-white">
+                        <h4
+                          class="text-sm sm:text-base font-semibold text-txt-primary dark:text-white"
+                        >
                           Verificação no Prazo
                         </h4>
                         <InfoTooltip
@@ -201,7 +217,7 @@
                       </div>
                       <span
                         v-if="userStats?.detailedMetrics"
-                        :class="'text-sm font-bold ' + verificationColors.text"
+                        :class="'text-xs sm:text-sm font-bold ' + verificationColors.text"
                       >
                         {{ verificationColors.label }} · {{ Math.round(verificationIndex * 100) }}%
                       </span>
@@ -230,19 +246,25 @@
                       (efficiencyScoreColors.bg + ' ' + efficiencyScoreColors.border)
                     "
                   >
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between gap-2">
                       <div>
-                        <h4 class="text-lg font-bold text-txt-primary dark:text-white mb-1">
+                        <h4
+                          class="text-base sm:text-lg font-bold text-txt-primary dark:text-white mb-1"
+                        >
                           Score Final
                         </h4>
                       </div>
                       <div class="text-right">
-                        <div :class="'text-3xl font-bold ' + efficiencyScoreColors.text">
+                        <div
+                          :class="'text-2xl sm:text-3xl font-bold ' + efficiencyScoreColors.text"
+                        >
                           {{
                             efficiencyScore !== undefined ? Math.round(efficiencyScore * 100) : '-'
                           }}%
                         </div>
-                        <div :class="'text-sm font-medium ' + efficiencyScoreColors.text">
+                        <div
+                          :class="'text-xs sm:text-sm font-medium ' + efficiencyScoreColors.text"
+                        >
                           {{ efficiencyScoreColors.label }}
                         </div>
                       </div>
@@ -293,10 +315,14 @@
 
                 <div class="space-y-4">
                   <!-- Tempo Médio de Aceite -->
-                  <div class="bg-gray-50 dark:bg-gray-700/30 px-4 py-5 rounded-lg">
-                    <div class="flex items-center justify-between">
+                  <div class="bg-gray-50 dark:bg-gray-700/30 p-3 sm:px-4 sm:py-5 rounded-lg">
+                    <div
+                      class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2"
+                    >
                       <div class="flex items-center gap-2">
-                        <h4 class="font-semibold text-txt-primary dark:text-white">
+                        <h4
+                          class="text-sm sm:text-base font-semibold text-txt-primary dark:text-white"
+                        >
                           Tempo Médio de Aceite
                         </h4>
                         <InfoTooltip
@@ -305,7 +331,7 @@
                       </div>
                       <span
                         v-if="userStats"
-                        class="text-lg font-bold text-txt-primary dark:text-white"
+                        class="text-base sm:text-lg font-bold text-txt-primary dark:text-white"
                       >
                         {{ formatTimeShort(userStats.averageAcceptanceTimeSeconds) }}
                       </span>
@@ -313,10 +339,14 @@
                   </div>
 
                   <!-- Tempo Médio de Resolução -->
-                  <div class="bg-gray-50 dark:bg-gray-700/30 px-4 py-5 rounded-lg">
-                    <div class="flex items-center justify-between">
+                  <div class="bg-gray-50 dark:bg-gray-700/30 p-3 sm:px-4 sm:py-5 rounded-lg">
+                    <div
+                      class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2"
+                    >
                       <div class="flex items-center gap-2">
-                        <h4 class="font-semibold text-txt-primary dark:text-white">
+                        <h4
+                          class="text-sm sm:text-base font-semibold text-txt-primary dark:text-white"
+                        >
                           Tempo Médio de Resolução
                         </h4>
                         <InfoTooltip
@@ -326,7 +356,7 @@
 
                       <span
                         v-if="userStats"
-                        class="text-lg font-bold text-txt-primary dark:text-white"
+                        class="text-base sm:text-lg font-bold text-txt-primary dark:text-white"
                       >
                         {{ formatTimeShort(userStats.averageResolutionTimeSeconds) }}
                       </span>

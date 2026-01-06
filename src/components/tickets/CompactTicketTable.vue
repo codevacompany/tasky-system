@@ -3,18 +3,18 @@
     class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-soft-xs flex-1 min-w-0"
   >
     <div
-      class="flex justify-between items-center px-6 py-[22px] border-b border-gray-200 dark:border-gray-700"
+      class="flex justify-between items-center px-4 sm:px-6 py-4 sm:py-[22px] border-b border-gray-200 dark:border-gray-700"
     >
       <h2 class="text-sm font-semibold text-txt-primary dark:text-white m-0">{{ title }}</h2>
       <router-link
         :to="viewAllUrl"
-        class="text-sm text-primary-600 dark:text-blue-400 hover:text-primary-700 dark:hover:text-blue-300 font-medium transition-colors duration-200"
+        class="text-xs sm:text-sm text-primary-600 dark:text-blue-400 hover:text-primary-700 dark:hover:text-blue-300 font-medium transition-colors duration-200"
         >Ver todos</router-link
       >
     </div>
     <div v-if="title === 'Últimas Tarefas Criadas' || title === 'Últimas Tarefas Recebidas'">
       <!-- New Design for Received/Created Tickets -->
-      <div class="px-6 pb-6">
+      <div class="px-3 sm:px-6 pb-4 sm:pb-6">
         <div v-if="isLoading" class="space-y-4">
           <div
             v-for="n in 5"
@@ -59,13 +59,13 @@
           <div
             v-for="(ticket, index) in tickets"
             :key="ticket.id"
-            class="flex items-center gap-4 py-4 px-4 border dark:border-solid border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200 cursor-pointer"
+            class="flex items-center gap-2 sm:gap-4 py-3 sm:py-4 px-2 sm:px-4 border dark:border-solid border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200 cursor-pointer"
             @click="handleTicketClick(ticket)"
           >
             <!-- Avatar and User Info -->
-            <div class="flex items-center gap-3 flex-shrink-0 w-[200px]">
+            <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0 w-[140px] sm:w-[200px]">
               <div
-                class="w-[34px] h-[34px] rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0"
+                class="w-[30px] sm:w-[34px] h-[30px] sm:h-[34px] rounded-full flex items-center justify-center text-white text-[10px] sm:text-xs font-semibold flex-shrink-0"
                 :style="
                   title === 'Últimas Tarefas Criadas'
                     ? getAvatarStyle(
@@ -84,7 +84,9 @@
                 </template>
               </div>
               <div class="flex flex-col min-w-0">
-                <p class="text-sm font-semibold text-txt-primary dark:text-white m-0 truncate">
+                <p
+                  class="text-[13px] sm:text-sm font-semibold text-txt-primary dark:text-white m-0 truncate"
+                >
                   <template v-if="title === 'Últimas Tarefas Criadas'">
                     {{ getTargetUserName(ticket) }}
                   </template>
@@ -92,7 +94,9 @@
                     {{ getRequesterName(ticket) }}
                   </template>
                 </p>
-                <p class="text-xs text-txt-light font-medium dark:text-gray-400 m-0 truncate">
+                <p
+                  class="text-[11px] sm:text-xs text-txt-light font-medium dark:text-gray-400 m-0 truncate"
+                >
                   <template v-if="title === 'Últimas Tarefas Criadas'">
                     {{
                       ticket.currentTargetUser?.department?.name ||
@@ -108,13 +112,15 @@
             </div>
             <!-- Ticket Title -->
             <div class="flex-1 min-w-0 text-left">
-              <p class="text-sm font-medium text-txt-primary dark:text-white truncate m-0">
+              <p
+                class="text-[13px] sm:text-sm font-medium text-txt-primary dark:text-white truncate m-0"
+              >
                 {{ ticket.name }}
               </p>
             </div>
             <!-- Last Update -->
             <div
-              class="flex items-center gap-1.5 text-xs text-txt-muted dark:text-gray-300 opacity-70 whitespace-nowrap"
+              class="flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs text-txt-muted dark:text-gray-300 opacity-70 whitespace-nowrap"
               title="Última atualização"
             >
               <!-- <font-awesome-icon icon="clock-rotate-left" /> -->

@@ -246,12 +246,12 @@
         class="fixed top-0 left-0 h-full w-60 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out z-50 md:hidden"
       >
         <div
-          class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
+          class="flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700"
         >
           <img
             :src="userPreferencesStore.isDarkMode ? taskyWhiteLogo : taskyLogo"
             alt="Tasky Logo"
-            class="w-12 h-12 object-contain"
+            class="w-16 h-16 object-contain"
           />
           <button
             @click="closeMobileMenu"
@@ -271,7 +271,7 @@
                   }"
                   class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
                 >
-                  <font-awesome-icon icon="tachometer-alt-average" />
+                  <font-awesome-icon icon="home" />
                   Início
                 </div>
               </li>
@@ -284,7 +284,7 @@
                   }"
                   class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
                 >
-                  <font-awesome-icon icon="ticket" />
+                  <font-awesome-icon icon="tasks" />
                   Tarefas
                 </div>
               </li>

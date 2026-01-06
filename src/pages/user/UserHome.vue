@@ -28,17 +28,17 @@
           </div>
           <button
             @click="showPerformanceModal = true"
-            class="text-sm text-primary-600 dark:text-blue-400 hover:text-primary-700 dark:hover:text-blue-300 font-medium transition-colors"
+            class="text-xs sm:text-sm whitespace-nowrap mt-1 sm:mt-0 text-primary-600 dark:text-blue-400 hover:text-primary-700 dark:hover:text-blue-300 font-medium transition-colors"
           >
             Ver detalhes
           </button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+        <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-6">
           <!-- Pendentes -->
           <div
             v-if="isLoading"
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded animate-pulse-custom"></div>
@@ -50,7 +50,7 @@
           </div>
           <div
             v-else
-            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
+            class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
               <font-awesome-icon
@@ -64,7 +64,11 @@
             >
               {{ ticketsPendentes.total }}
             </p>
-            <h3 class="text-xs font-medium text-txt-muted dark:text-gray-400">Pendentes</h3>
+            <h3
+              class="text-[10px] sm:text-xs font-medium text-txt-muted dark:text-gray-400 text-center"
+            >
+              Pendentes
+            </h3>
           </div>
 
           <!-- Em Andamento -->
@@ -93,7 +97,11 @@
             >
               {{ ticketsEmAndamento.total }}
             </p>
-            <h3 class="text-xs font-medium text-txt-muted dark:text-gray-400">Em Andamento</h3>
+            <h3
+              class="text-[10px] sm:text-xs font-medium text-txt-muted dark:text-gray-400 text-center"
+            >
+              Em Andamento
+            </h3>
           </div>
 
           <!-- Finalizados -->
@@ -125,7 +133,11 @@
             >
               {{ ticketsFinalizados.total }}
             </p>
-            <h3 class="text-xs font-medium text-txt-muted dark:text-gray-400">Resolvidos</h3>
+            <h3
+              class="text-[10px] sm:text-xs font-medium text-txt-muted dark:text-gray-400 text-center"
+            >
+              Resolvidos
+            </h3>
           </div>
 
           <!-- Tempo Médio de Aceite -->
@@ -151,10 +163,15 @@
                 class="text-teal-600 dark:text-teal-400 text-2xl"
               />
             </div>
-            <p id="tempoMedioAceite" class="text-2xl font-bold text-txt-primary dark:text-white mb-1">
+            <p
+              id="tempoMedioAceite"
+              class="text-2xl font-bold text-txt-primary dark:text-white mb-1"
+            >
               {{ userStats ? formatTimeShort(userStats.averageAcceptanceTimeSeconds) : 'N/A' }}
             </p>
-            <h3 class="text-xs font-medium text-txt-muted dark:text-gray-400">
+            <h3
+              class="text-[10px] sm:text-xs font-medium text-txt-muted dark:text-gray-400 text-center"
+            >
               Tempo Médio de Aceite
             </h3>
           </div>
@@ -188,7 +205,9 @@
             >
               {{ userStats ? formatTimeShort(userStats.averageResolutionTimeSeconds) : 'N/A' }}
             </p>
-            <h3 class="text-xs font-medium text-txt-muted dark:text-gray-400">
+            <h3
+              class="text-[10px] sm:text-xs font-medium text-txt-muted dark:text-gray-400 text-center"
+            >
               Tempo Médio de Resolução
             </h3>
           </div>
@@ -217,15 +236,22 @@
               />
             </div>
             <template v-if="userStats?.efficiencyScore !== undefined">
-              <p id="efficiencyScore" class="text-2xl font-bold text-txt-primary dark:text-white mb-1">
+              <p
+                id="efficiencyScore"
+                class="text-2xl font-bold text-txt-primary dark:text-white mb-1"
+              >
                 {{ (userStats.efficiencyScore * 100).toFixed(0) }}%
               </p>
-              <h3 class="text-xs font-medium text-gray-500 dark:text-gray-400">
+              <h3
+                class="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 text-center"
+              >
                 Score de Desempenho
               </h3>
             </template>
             <template v-else>
-              <p class="text-base font-medium text-txt-secondary dark:text-gray-300 mb-1 text-center">
+              <p
+                class="text-base font-medium text-txt-secondary dark:text-gray-300 mb-1 text-center"
+              >
                 Score indisponível
               </p>
               <p class="text-xs text-txt-muted dark:text-gray-400 text-center">
