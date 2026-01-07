@@ -255,7 +255,7 @@
                 Score indisponível
               </p>
               <p class="text-xs text-txt-muted dark:text-gray-400 text-center">
-                Mínimo de 10 tarefas necessário
+                Mínimo de 5 tarefas necessário
               </p>
             </template>
           </div>

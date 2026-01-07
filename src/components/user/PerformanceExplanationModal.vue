@@ -63,7 +63,7 @@
                           Entrega no prazo
                         </h4>
                         <InfoTooltip
-                          message="Avalia o cumprimento do prazo de envio de tarefas. Para este índice, o sistema utiliza uma correção estatística que evita que um volume baixo de tarefas distorça o resultado. Esta métrica representa 40% do score final."
+                          message="Avalia o cumprimento do prazo de envio de tarefas. Para este índice, o sistema utiliza uma correção estatística que evita que um volume baixo de tarefas resulte em um valor alto. Esta métrica representa 40% do score final."
                           class="mt-[1px]"
                         />
                       </div>
@@ -94,7 +94,7 @@
                         }}
                       </p>
                       <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">
-                        Obs: Poucas tarefas podem impactar o resultado.
+                        Obs: Um baixo volume de tarefas pode impactar o resultado.
                       </p>
                     </div>
                   </div>
@@ -301,7 +301,7 @@
                   </h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400 max-w-md">
                     Para que seu Score de Desempenho seja calculado com precisão, é necessário ter
-                    pelo menos 10 tarefas registradas nos últimos 3 meses. Continue utilizando o
+                    pelo menos 5 tarefas registradas nos últimos 3 meses. Continue utilizando o
                     sistema e seu score aparecerá em breve!
                   </p>
                 </div>

@@ -325,7 +325,7 @@
               <!-- Top Contributors -->
               <BaseStatsWidget
                 v-permission="PERMISSIONS.VIEW_USERS_ANALYTICS"
-                info-message="Ranking dos colaboradores com melhor desempenho no período selecionado. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%), utilizando o modelo Wilson para correção estatística. Nota: Para ter um score, o colaborador precisa ter pelo menos 10 tarefas atribuídas no período."
+                info-message="Ranking dos colaboradores com melhor desempenho no período selecionado. O Score é um índice abrangente (0-100%) que pondera: Conclusão no prazo (35%), Verificação no prazo (30%), Taxa de Reprovação (25%) e Taxa de Devolução (10%), utilizando o modelo Wilson para correção estatística. Nota: Para ter um score, o colaborador precisa ter pelo menos 5 tarefas atribuídas no período."
               >
                 <template #title>Top Colaboradores</template>
                 <template #header-actions>
@@ -474,7 +474,7 @@
                       v-if="topUsersSortBy === 'efficiency'"
                       class="text-xs text-center mt-1 text-gray-400 dark:text-gray-500"
                     >
-                      Score requer mínimo de 10 tarefas
+                      Score requer mínimo de 5 tarefas
                     </p>
                   </div>
                 </div>
@@ -627,7 +627,7 @@
                       v-if="topDepartmentsSortBy === 'efficiency'"
                       class="text-xs text-center mt-1 text-gray-400 dark:text-gray-500"
                     >
-                      Score requer mínimo de 10 tarefas
+                      Score requer mínimo de 5 tarefas
                     </p>
                   </div>
                 </div>
