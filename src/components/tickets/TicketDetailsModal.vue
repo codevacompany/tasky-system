@@ -1481,11 +1481,95 @@
       </div>
     </div>
   </BaseModal>
+  <!-- Verification Confirmation Modal -->
+  <BaseModal
+    v-if="showVerificationAlert"
+    :is-open="showVerificationAlert"
+    @close="handleVerificationCancel"
+    :show-footer="false"
+    :is-full-screen-mobile="true"
+    title="Iniciar Verificação"
+  >
+    <div class="px-4 sm:px-6 py-6 sm:py-8 text-center">
+      <div class="text-3xl text-purple-700 dark:text-purple-400 mb-4">
+        <font-awesome-icon icon="info-circle" />
+      </div>
+
+      <h3 class="text-lg font-semibold text-txt-primary dark:text-white mb-3">
+        Deseja iniciar a revisão?
+      </h3>
+
+      <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-relaxed mb-8">
+        Para visualizar os detalhes desta tarefa, você precisa iniciar a verificação agora.
+      </p>
+
+      <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+        <button
+          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200"
+          @click="handleVerificationCancel"
+        >
+          Cancelar
+        </button>
+        <button
+          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          @click="handleVerificationConfirm"
+          :disabled="isVerifying"
+        >
+          <font-awesome-icon v-if="isVerifying" icon="spinner" spin class="text-sm" />
+          {{ isVerifying ? '' : 'Verificar Agora' }}
+        </button>
+      </div>
+    </div>
+  </BaseModal>
+
+  <!-- Acceptance Confirmation Modal -->
+  <BaseModal
+    v-if="showAcceptanceAlert"
+    :is-open="showAcceptanceAlert"
+    @close="handleAcceptanceCancel"
+    :show-footer="false"
+    :is-full-screen-mobile="true"
+    title="Aceitar Tarefa"
+  >
+    <div class="px-4 sm:px-6 py-6 sm:pb-7 text-center">
+      <div class="text-3xl text-blue-700 dark:text-blue-400 mb-4">
+        <font-awesome-icon icon="info-circle" />
+      </div>
+
+      <h3 class="text-lg font-semibold text-txt-primary dark:text-white mb-3">
+        Aceite esta tarefa
+      </h3>
+
+      <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-relaxed mb-2">
+        Para visualizar os detalhes desta tarefa, você precisa aceitá-la primeiro.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-8">
+        Ao aceitar, a tarefa será movida para o status "Em andamento".
+      </p>
+
+      <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+        <button
+          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-500 hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="handleAcceptanceCancel"
+          :disabled="isAccepting"
+        >
+          Cancelar
+        </button>
+        <button
+          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          @click="handleAcceptanceConfirm"
+          :disabled="isAccepting"
+        >
+          <font-awesome-icon v-if="isAccepting" icon="spinner" spin class="text-sm" />
+          {{ isAccepting ? '' : 'Aceitar Agora' }}
+        </button>
+      </div>
+    </div>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
 import BaseModal from '../common/BaseModal.vue';
-import Input from '../common/Input.vue';
 import Select from '../common/Select.vue';
 import Tooltip from '../common/Tooltip.vue';
 import { CancellationReason, DefaultTicketStatus, type Ticket, type TicketComment } from '@/models';
@@ -1505,7 +1589,6 @@ import {
   calculateDeadline,
   formatSnakeToNaturalCase,
   getUserInitials,
-  getAvatarColor,
   getAvatarStyle,
   enumToOptions,
   getDeadlineInfo,
@@ -1579,6 +1662,11 @@ const openCommentMenuId = ref<string | null>(null);
 const editingCommentUuid = ref<string | null>(null);
 const editingCommentContent = ref('');
 const isActionsDropdownOpen = ref(false);
+
+const showVerificationAlert = ref(false);
+const showAcceptanceAlert = ref(false);
+const isVerifying = ref(false);
+const isAccepting = ref(false);
 
 const headerActions = computed(() => {
   const actions: any[] = [];
@@ -1951,15 +2039,6 @@ const closeModal = () => {
   emit('close');
 };
 
-const formatDate = (date?: string) => {
-  if (!date) return '—';
-  const dateObj = new Date(date);
-  const day = dateObj.getDate().toString().padStart(2, '0');
-  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-  const year = dateObj.getFullYear();
-  return `${day}/${month}/${year}`;
-};
-
 const getPriorityClass = (priority: string) => {
   switch (priority) {
     case 'baixa':
@@ -2001,22 +2080,6 @@ const getDeadlineInfoFromDate = (date?: string) => {
   return info.isValid ? info : null;
 };
 
-const isPastDeadline = (date?: string) => {
-  const info = getDeadlineInfoFromDate(date);
-  return info ? info.isOverdue || info.businessDaysRemaining <= 2 : false;
-};
-
-const getDeadlineClass = (date?: string) => {
-  const info = getDeadlineInfoFromDate(date);
-  if (!info) return '';
-
-  if (info.isOverdue || info.businessDaysRemaining <= 2) {
-    return 'deadline-danger';
-  }
-
-  return 'deadline-normal';
-};
-
 const getDeadlineTextClass = (date?: string) => {
   const info = getDeadlineInfoFromDate(date);
   if (!info) return 'text-txt-primary dark:text-gray-100';
@@ -2026,6 +2089,57 @@ const getDeadlineTextClass = (date?: string) => {
   if (!info.isOverdue && info.hoursDifference <= 6) return 'text-red-600 dark:text-red-400';
   if (info.businessDaysRemaining <= 2) return 'text-orange-500 dark:text-orange-400';
   return 'text-green-600 dark:text-green-400';
+};
+
+const handleVerificationCancel = () => {
+  showVerificationAlert.value = false;
+  closeModal(); // Following TicketKanban behavior where closing the alert also closes the attempt to view (which in this context means closing the modal since it was opened via URL)
+};
+
+const handleVerificationConfirm = async () => {
+  if (!loadedTicket.value) return;
+
+  isVerifying.value = true;
+  try {
+    await ticketService.updateStatus(loadedTicket.value.customId, {
+      status: DefaultTicketStatus.UnderVerification,
+    });
+    showVerificationAlert.value = false;
+    loadedTicket.value = await ticketsStore.fetchTicketDetails(loadedTicket.value.customId);
+  } catch (error) {
+    toast.error('Erro ao iniciar verificação');
+  } finally {
+    isVerifying.value = false;
+  }
+};
+
+const handleAcceptanceCancel = () => {
+  showAcceptanceAlert.value = false;
+  closeModal(); // Following TicketKanban behavior where closing the alert also closes the attempt to view
+};
+
+const handleAcceptanceConfirm = async () => {
+  if (!loadedTicket.value) return;
+
+  isAccepting.value = true;
+  try {
+    // Check if ticket has due date
+    if (!loadedTicket.value.dueAt) {
+      toast.warning('Defina uma data de conclusão antes de aceitar a tarefa.');
+      showAcceptanceAlert.value = false;
+      showDueDateModal.value = true;
+      return;
+    }
+
+    await ticketService.accept(loadedTicket.value.customId);
+    toast.success('Tarefa aceita com sucesso');
+    showAcceptanceAlert.value = false;
+    loadedTicket.value = await ticketsStore.fetchTicketDetails(loadedTicket.value.customId);
+  } catch (error) {
+    toast.error('Erro ao aceitar a tarefa');
+  } finally {
+    isAccepting.value = false;
+  }
 };
 
 const isDeadlineOverdue = (date?: string) => {
@@ -2113,20 +2227,7 @@ const acceptTicket = async (ticketId: string) => {
     return;
   }
 
-  openConfirmationModal(
-    'Aceitar Tarefa',
-    'Tem certeza que deseja aceitar esta tarefa?',
-    async () => {
-      try {
-        await ticketService.accept(ticketId);
-        toast.success('Tarefa aceita com sucesso');
-
-        refreshSelectedTicket();
-      } catch {
-        toast.error('Erro ao aceitar a tarefa');
-      }
-    },
-  );
+  showAcceptanceAlert.value = true;
 };
 
 const sendToNextDepartment = async (ticketId: string) => {
@@ -3000,23 +3101,7 @@ const fetchTicket = async (customId: string) => {
         ticket.status === DefaultTicketStatus.AwaitingVerification) &&
       !confirmationModal.value.isOpen
     ) {
-      openConfirmationModal(
-        'Iniciar Verificação',
-        'Você tem certeza que deseja iniciar a verificação desta tarefa?',
-        async () => {
-          try {
-            await ticketService.updateStatus(ticket.customId, {
-              status: DefaultTicketStatus.UnderVerification,
-            });
-            loadedTicket.value = await ticketsStore.fetchTicketDetails(ticket.customId);
-          } catch {
-            toast.error('Erro ao iniciar verificação');
-          }
-        },
-        false,
-        [],
-        'start-verification', // pass context
-      );
+      showVerificationAlert.value = true;
     }
 
     // Check if ticket is pending and user is the target user
@@ -3026,28 +3111,7 @@ const fetchTicket = async (customId: string) => {
         ticket.status === DefaultTicketStatus.Pending) &&
       !confirmationModal.value.isOpen
     ) {
-      openConfirmationModal(
-        'Aceitar Tarefa',
-        'Para visualizar os detalhes desta tarefa, você precisa aceitá-la. Deseja aceitar esta tarefa agora?',
-        async () => {
-          try {
-            // Check if ticket has due date
-            if (!ticket.dueAt) {
-              toast.warning('Defina uma data de conclusão antes de aceitar a tarefa.');
-              return;
-            }
-
-            await ticketService.accept(ticket.customId);
-            toast.success('Tarefa aceita com sucesso');
-            loadedTicket.value = await ticketsStore.fetchTicketDetails(ticket.customId);
-          } catch {
-            toast.error('Erro ao aceitar a tarefa');
-          }
-        },
-        false,
-        [],
-        'accept-pending', // pass context
-      );
+      showAcceptanceAlert.value = true;
     }
   } catch (error) {
     console.error('Error fetching ticket:', error);
@@ -3610,19 +3674,7 @@ const isSelfAssigned = computed(
 );
 
 const startTicket = async (ticketId: string) => {
-  openConfirmationModal(
-    'Iniciar Tarefa',
-    'Tem certeza que deseja iniciar esta tarefa?',
-    async () => {
-      try {
-        await ticketService.accept(ticketId);
-        toast.success('Tarefa iniciada com sucesso');
-        refreshSelectedTicket();
-      } catch {
-        toast.error('Erro ao iniciar a tarefa');
-      }
-    },
-  );
+  showAcceptanceAlert.value = true;
 };
 
 const showReviewerModal = ref(false);

@@ -267,7 +267,7 @@
     :is-full-screen-mobile="true"
     title="Iniciar Verificação"
   >
-    <div class="px-4 sm:px-6 py-6 sm:py-8 text-center">
+    <div class="px-4 sm:px-6 py-6 sm:pb-7 text-center">
       <div class="text-3xl text-purple-700 dark:text-purple-400 mb-4">
         <font-awesome-icon icon="info-circle" />
       </div>
@@ -308,7 +308,7 @@
     :is-full-screen-mobile="true"
     title="Aceitar Tarefa"
   >
-    <div class="px-4 sm:px-6 py-6 sm:py-8 text-center">
+    <div class="px-4 sm:px-6 py-6 sm:pb-7 text-center">
       <div class="text-3xl text-blue-700 dark:text-blue-400 mb-4">
         <font-awesome-icon icon="info-circle" />
       </div>
@@ -317,8 +317,11 @@
         Aceite esta tarefa
       </h3>
 
-      <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-relaxed mb-8">
+      <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-relaxed mb-2">
         Para visualizar os detalhes desta tarefa, você precisa aceitá-la primeiro.
+      </p>
+      <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-8">
+        Ao aceitar, a tarefa será movida para o status "Em andamento".
       </p>
 
       <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">

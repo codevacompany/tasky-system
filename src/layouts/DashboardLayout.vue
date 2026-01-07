@@ -186,15 +186,15 @@
         <div class="flex items-center gap-6">
           <button
             v-if="userStore.hasActiveSubscription !== false"
-            class="btn btn-primary flex items-center gap-2 text-[14px]"
+            class="btn btn-primary flex items-center gap-2"
             @click="openTicketModal"
           >
-            <font-awesome-icon icon="plus" />
-            <span class="hidden sm:inline text-[13.5px]">Nova Tarefa</span>
+            <font-awesome-icon icon="plus" class="text-xs sm:text-[13.5px]"/>
+            <span class="text-xs sm:text-[13.5px]">Nova Tarefa</span>
           </button>
 
           <div
-            class="flex text-gray-800 dark:text-gray-200 relative cursor-pointer ml-6"
+            class="flex text-gray-800 dark:text-gray-200 relative cursor-pointer sm:ml-6"
             @click="toggleNotificationsModal"
           >
             <font-awesome-icon :icon="['far', 'bell']" class="text-lg text-txt-secondary dark:text-gray-200" />

@@ -571,10 +571,14 @@
         <div class="text-3xl text-blue-700 dark:text-blue-400 mb-4">
           <font-awesome-icon icon="info-circle" />
         </div>
-        <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed mb-6">
+        <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed mb-2">
           Para visualizar os detalhes desta tarefa, você precisa aceitá-la clicando no botão
           "Aceitar".
         </p>
+        <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-8">
+          Ao aceitar, a tarefa será movida para o status "Em andamento".
+        </p>
+
         <div class="flex justify-center gap-4">
           <button
             class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
