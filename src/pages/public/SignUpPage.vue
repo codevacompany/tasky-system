@@ -16,7 +16,7 @@
                   step > idx + 1
                     ? 'bg-blue-600 border-blue-600 text-white'
                     : step === idx + 1
-                      ? 'border-blue-400 text-blue-600'
+                      ? 'border-blue-500 text-primary'
                       : 'border-gray-300 text-gray-400',
                 ]"
               >
@@ -44,7 +44,7 @@
       <div class="w-full max-w-md lg:max-w-lg mt-8 lg:mt-10 h-[70%] flex items-center">
         <div class="w-full max-w-md lg:max-w-lg space-y-6">
           <div class="text-center lg:text-left">
-            <h2 v-if="step === 1" class="text-primary text-sm lg:text-[15.5px] font-semibold mb-1 sm:mb-4">
+            <h2 v-if="step === 1" class="text-primary text-sm lg:text-[15.5px] font-semibold mb-1 xl:mb-3">
               Comece seus 14 dias de teste gratuito hoje.
             </h2>
             <h2
@@ -267,14 +267,14 @@
             <a
               href="https://taskypro.com.br/politica-de-privacidade"
               target="_blank"
-              class="text-primary hover:underline"
+              class="text-blue-700 hover:underline"
               >Política de Privacidade</a
             >
             e
             <a
               href="https://taskypro.com.br/termos-de-uso"
               target="_blank"
-              class="text-primary hover:underline"
+              class="text-blue-700 hover:underline"
               >Termos de Uso</a
             >.
           </p>
@@ -285,7 +285,7 @@
               Já tem uma conta?
               <router-link
                 to="/login"
-                class="text-primary hover:text-blue-700 hover:underline transition-colors font-medium"
+                class="text-gray-700 hover:text-gray-800 hover:underline transition-colors font-medium"
               >
                 Ir para login
               </router-link>
@@ -296,7 +296,7 @@
       <img
         src="@/assets/images/tasky-pro-black.png"
         alt="Tasky Logo"
-        class="w-16 sm:w-24 absolute bottom-8"
+        class="w-16 xl:w-24 absolute bottom-5 xl:bottom-8 "
       />
     </div>
 
@@ -632,10 +632,6 @@ async function submitSignUp() {
 
 :deep(.text-white) {
   color: #ffffff !important;
-}
-
-:deep(a:hover) {
-  color: #2563eb !important;
 }
 
 :deep(svg) {

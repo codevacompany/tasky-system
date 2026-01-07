@@ -1006,9 +1006,13 @@ const handleRejectTicket = async (ticket: Ticket) => {
   }
 };
 
-const toggleView = () => {
+const toggleView = async () => {
   isKanbanView.value = !isKanbanView.value;
   localStorageService.setTicketsViewPreference(isKanbanView.value ? 'kanban' : 'table');
+
+  // Reset to first page and refresh tickets when switching views
+  currentPage.value = 1;
+  await fetchTicketsWithFilters();
 };
 
 const navigateToArchived = () => {
