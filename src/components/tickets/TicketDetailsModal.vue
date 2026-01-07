@@ -16,7 +16,7 @@
             <h2 class="text-sm sm:text-lg font-semibold text-txt-primary dark:text-gray-100">
               Detalhes da Tarefa
             </h2>
-            <p class="text-xs sm:text-sm text-gray-600 font-medium dark:text-gray-400">
+            <p class="text-xs sm:text-base text-gray-600 font-medium dark:text-gray-400">
               {{ loadedTicket.customId }}
             </p>
           </div>
@@ -117,7 +117,7 @@
           </div>
 
           <button
-            class="bg-transparent border-none text-xl text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer p-1.5 rounded-full flex items-center justify-center transition-colors"
+            class="bg-transparent border-none text-xl text-gray-400 sm:ml-8 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer p-1.5 rounded-full flex items-center justify-center transition-colors sm:ml-2"
             @click="closeModal"
           >
             <font-awesome-icon icon="times" />
@@ -1722,7 +1722,7 @@ const headerActions = computed(() => {
   if (isTargetUser.value && currentStatus === DefaultTicketStatus.AwaitingVerification) {
     actions.push({
       id: 'undo-envio',
-      label: 'Cancelar',
+      label: 'Cancelar Envio',
       icon: 'undo',
       color: 'bg-yellow-600 hover:bg-yellow-700',
       onClick: () => {
@@ -5356,10 +5356,6 @@ body.dark-mode [data-v-a180df51] .comment-text a:hover,
 
 .add-file-button:hover {
   background-color: #e2e3e7;
-}
-
-.hidden {
-  display: none;
 }
 
 .file-item.pending {
