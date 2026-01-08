@@ -1002,7 +1002,7 @@ const closeModal = () => {
 };
 
 const uploadFilesToS3 = async () => {
-  const uploadedUrls: string[] = [];
+  const uploadedFiles: Array<{ url: string; name: string; mimeType: string; size: number }> = [];
 
   for (const file of selectedFiles.value) {
     try {
@@ -1015,14 +1015,19 @@ const uploadFilesToS3 = async () => {
       });
 
       const fileUrl = data.url.split('?')[0];
-      uploadedUrls.push(fileUrl);
+      uploadedFiles.push({
+        url: fileUrl,
+        name: file.name,
+        mimeType: file.type,
+        size: file.size,
+      });
     } catch (error) {
       console.error('Erro ao fazer upload do arquivo:', file.name, error);
       throw error;
     }
   }
 
-  return uploadedUrls;
+  return uploadedFiles;
 };
 
 const handleSubmit = async () => {

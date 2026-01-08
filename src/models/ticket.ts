@@ -79,7 +79,7 @@ export interface CreateTicketDto {
   dueAt?: string;
   canceledAt?: string;
   isPrivate: boolean;
-  files?: string[];
+  files?: Array<{ url: string; name: string; mimeType: string; size: number }>;
 }
 
 export interface UpdateTicketDto {
