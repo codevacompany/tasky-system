@@ -208,7 +208,9 @@
         </div>
         <!-- Header Content -->
         <div v-else class="mb-4">
-          <h2 class="text-xl font-semibold text-txt-primary dark:text-white mb-2">Atualizar plano</h2>
+          <h2 class="text-xl font-semibold text-txt-primary dark:text-white mb-2">
+            Atualizar plano
+          </h2>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Nossos planos são criados para se adequar ao tamanho do seu projeto. Pague uma taxa fixa
             por um plano definido, mais um pouco extra se ultrapassar. Atualize para o próximo nível
@@ -279,7 +281,9 @@
           :key="plan.slug"
           class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 flex flex-col"
         >
-          <h3 class="text-lg font-semibold text-txt-primary dark:text-white mb-2">{{ plan.name }}</h3>
+          <h3 class="text-lg font-semibold text-txt-primary dark:text-white mb-2">
+            {{ plan.name }}
+          </h3>
 
           <div v-if="plan.slug === 'customizado'" class="mb-4">
             <div class="text-sm text-gray-700 dark:text-gray-300">
@@ -319,7 +323,16 @@
           <button
             v-else
             class="w-full py-2 px-4 text-sm font-medium rounded-md transition-colors mb-6 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-txt-primary dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-            :disabled="(isCurrentPlan(plan.slug) && !hasTrial) || isSubscribing"
+            :disabled="
+              (isCurrentPlan(plan.slug) && !hasTrial) ||
+              isSubscribing ||
+              isPlanInsufficientForCurrentUsers(plan)
+            "
+            :title="
+              isPlanInsufficientForCurrentUsers(plan)
+                ? `Você possui mais usuários do que este plano suporta.`
+                : ''
+            "
             @click="handleSubscription(plan.slug)"
           >
             {{ getButtonText(plan.slug) }}
@@ -632,17 +645,31 @@ const handleSimulateCustomPlan = () => {
   router.push('/assinaturas/simular-plano-customizado');
 };
 
+const isPlanInsufficientForCurrentUsers = (plan: SubscriptionPlan) => {
+  if (!plan.maxUsers || plan.slug === 'customizado') {
+    return false;
+  }
+
+  const currentUsers = currentSubscription.value?.userStats?.totalUsers || 0;
+  return currentUsers > plan.maxUsers;
+};
+
 const handleSubscription = async (slug: string) => {
   const plan = availablePlans.value.find((p) => p.slug === slug);
   if (!plan) return;
 
   if (slug === 'customizado') {
-    // This should not happen anymore as we have a separate button
     handleSimulateCustomPlan();
     return;
   }
 
-  // If there's an active subscription (not trial), redirect to customer portal
+  if (isPlanInsufficientForCurrentUsers(plan)) {
+    toast.error(
+      `Este plano suporta apenas ${plan.maxUsers} usuários. Você possui ${currentSubscription.value?.userStats?.totalUsers} usuários ativos.`,
+    );
+    return;
+  }
+
   if (hasActiveSubscription.value) {
     if (!user.value?.tenantId) {
       toast.error('Erro ao identificar o tenant');
@@ -668,7 +695,6 @@ const handleSubscription = async (slug: string) => {
     return;
   }
 
-  // Otherwise, proceed with checkout for new subscriptions
   try {
     isSubscribing.value = true;
     const billingInterval = isYearlyBilling.value ? 'yearly' : 'monthly';
