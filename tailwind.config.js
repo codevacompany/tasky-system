@@ -38,6 +38,7 @@ export default {
           muted: '#64748b', // Slate-500: Secondary info/Captions
           light: '#8e93a7ff', // Slate-400: Placeholders/Disabled (Light)
           disabled: '#cbd5e1', // Slate-300: Disabled states
+          highlight: '#4263eb',
         },
         // Surface colors for backgrounds and borders
         surface: {

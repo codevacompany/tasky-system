@@ -26,7 +26,7 @@
           <!-- View Menu Popup -->
           <div
             v-if="showViewMenu"
-            class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
+            class="absolute left-0 sm:left-auto sm:right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
             @click.stop
           >
             <div class="py-1">
@@ -113,19 +113,19 @@
           <div class="flex flex-col border-b-1 border-gray-200 dark:border-gray-700">
             <!-- Mobile-friendly tabs -->
             <div
-              class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 px-6 gap-3 lg:gap-0 relative"
+              class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 px-4 sm:px-6 gap-3 lg:gap-0 relative"
             >
               <div
                 class="flex items-center justify-start lg:absolute xl:left-1/2 xl:transform xl:-translate-x-1/2 w-full xl:w-auto"
               >
                 <div
-                  class="flex items-center justify-start lg:justify-center p-0.5 bg-[#f4f5f8] dark:bg-gray-700 rounded-full overflow-x-auto"
-                  style="height: 36px; min-width: fit-content"
+                  class="flex items-center justify-start lg:justify-center p-0.5 bg-[#f4f5f8] dark:bg-gray-700 rounded-full w-full lg:w-auto"
+                  style="height: 36px"
                 >
-                  <div class="flex items-center gap-0 flex-shrink-0">
+                  <div class="flex items-center gap-0 w-full lg:w-auto flex-shrink-0">
                     <button
                       :class="[
-                        'relative px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
+                        'relative flex-1 lg:flex-none px-2.5 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'recebidas'
                           ? 'bg-white dark:bg-gray-800 text-txt-primary dark:text-white shadow-soft-xs'
                           : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
@@ -136,12 +136,12 @@
                       Recebidas
                       <span
                         v-if="ticketsStore.hasNewReceivedTickets && activeTab !== 'recebidas'"
-                        class="absolute top-[13px] left-[6px] w-[5px] h-[5px] bg-blue-500 rounded-full"
+                        class="absolute top-[13px] left-1 sm:left-2 w-[5px] h-[5px] bg-blue-500 rounded-full"
                       ></span>
                     </button>
                     <button
                       :class="[
-                        'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
+                        'flex-1 lg:flex-none px-2.5 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'criadas'
                           ? 'bg-white dark:bg-gray-800 text-txt-primary dark:text-white shadow-soft-xs'
                           : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
@@ -154,7 +154,7 @@
                     </button>
                     <button
                       :class="[
-                        'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
+                        'flex-1 lg:flex-none px-2.5 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'setor'
                           ? 'bg-white dark:bg-gray-800 text-txt-primary dark:text-white shadow-soft-xs'
                           : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
@@ -168,7 +168,7 @@
                     <button
                       v-if="isTenantAdmin"
                       :class="[
-                        'px-3 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
+                        'flex-1 lg:flex-none px-2.5 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'gerais'
                           ? 'bg-white dark:bg-gray-800 text-txt-primary dark:text-white shadow-soft-xs'
                           : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
@@ -176,7 +176,8 @@
                       style="font-size: 13px"
                       @click="switchTab('gerais')"
                     >
-                      Tarefas Gerais
+                      <span class="hidden sm:inline">Tarefas Gerais</span>
+                      <span class="sm:hidden">Gerais</span>
                     </button>
                   </div>
                 </div>
@@ -1005,9 +1006,13 @@ const handleRejectTicket = async (ticket: Ticket) => {
   }
 };
 
-const toggleView = () => {
+const toggleView = async () => {
   isKanbanView.value = !isKanbanView.value;
   localStorageService.setTicketsViewPreference(isKanbanView.value ? 'kanban' : 'table');
+
+  // Reset to first page and refresh tickets when switching views
+  currentPage.value = 1;
+  await fetchTicketsWithFilters();
 };
 
 const navigateToArchived = () => {

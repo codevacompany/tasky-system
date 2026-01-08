@@ -6,17 +6,17 @@
     >
       <!-- Steps Indicator -->
       <div class="absolute top-6 left-1/2 -translate-x-1/2 w-full max-w-md lg:max-w-lg px-1 z-30">
-        <ol class="flex items-center justify-between w-full list-none p-0 m-0">
+        <ol class="flex items-center justify-between w-full list-none p-0 m-0 max-w-[300px] sm:max-w-[2500px] mx-auto">
           <li v-for="(s, idx) in steps" :key="s.key" class="flex items-center">
             <!-- Step with label below -->
-            <div class="flex flex-col items-center gap-2 min-w-[56px]">
+            <div class="flex flex-col items-center gap-1.5 sm:gap-2 min-w-[70px] sm:min-w-[56px]">
               <div
                 :class="[
-                  'w-9 h-9 rounded-full flex items-center justify-center border-2 text-sm font-semibold',
+                  'w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center border-2 text-sm font-semibold',
                   step > idx + 1
                     ? 'bg-blue-600 border-blue-600 text-white'
                     : step === idx + 1
-                      ? 'border-blue-400 text-blue-600'
+                      ? 'border-blue-500 text-primary'
                       : 'border-gray-300 text-gray-400',
                 ]"
               >
@@ -24,7 +24,7 @@
                 <span v-else>{{ idx + 1 }}</span>
               </div>
               <span
-                class="text-[11px] sm:text-xs font-medium whitespace-nowrap"
+                class="text-[10px] sm:text-xs font-medium whitespace-nowrap"
                 :class="[step >= idx + 1 ? 'text-txt-primary' : 'text-gray-400']"
               >
                 {{ idx === 0 ? 'Dados da Empresa' : idx === 1 ? 'Responsável' : 'Concluir' }}
@@ -32,7 +32,7 @@
             </div>
 
             <!-- Connector -->
-            <div v-if="idx < steps.length - 1" class="mx-3 w-12 sm:w-20 md:w-28">
+            <div v-if="idx < steps.length - 1" class="mx-1 sm:mx-3 w-6 sm:w-20 md:w-28">
               <div
                 :class="['h-0.5 w-full rounded', step > idx + 1 ? 'bg-blue-600' : 'bg-gray-200']"
               ></div>
@@ -44,8 +44,8 @@
       <div class="w-full max-w-md lg:max-w-lg mt-8 lg:mt-10 h-[70%] flex items-center">
         <div class="w-full max-w-md lg:max-w-lg space-y-6">
           <div class="text-center lg:text-left">
-            <h2 v-if="step === 1" class="text-blue-600 text-sm lg:text-base font-semibold mb-2">
-              Vamos começar!
+            <h2 v-if="step === 1" class="text-primary text-sm lg:text-[15.5px] font-semibold mb-1 xl:mb-3">
+              Comece seus 14 dias de teste gratuito hoje.
             </h2>
             <h2
               v-else-if="step === 2"
@@ -70,7 +70,7 @@
                 type="text"
                 required
                 placeholder="Nome da empresa"
-                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
             </div>
 
@@ -84,7 +84,7 @@
                   placeholder="CNPJ (12.345.678/0001-99)"
                   @input="form.cnpj = maskCNPJ(form.cnpj)"
                   @blur="cnpjTouched = true"
-                  class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
+                  class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
                 />
                 <span
                   v-if="cnpjTouched && cnpjError"
@@ -101,7 +101,7 @@
                   placeholder="Telefone ((11) 91234-5678)"
                   @input="form.companyPhone = maskPhone(form.companyPhone)"
                   maxlength="15"
-                  class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
+                  class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
                 />
               </div>
             </div>
@@ -114,7 +114,7 @@
                 placeholder="E-mail (empresa@email.com)"
                 @input="form.companyEmail = maskEmail(form.companyEmail)"
                 @blur="companyEmailTouched = true"
-                class="w-full px-4 py-3 lg:py-3.5 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
+                class="w-full px-4 py-3 lg:py-3.5 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
               <span
                 v-if="companyEmailTouched && companyEmailError"
@@ -126,7 +126,7 @@
 
             <button
               type="submit"
-              class="w-full py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-[4px] transition-colors text-sm lg:text-base mt-6"
+              class="w-full py-2.5 lg:py-3 bg-primary hover:bg-blue-700 text-white font-semibold rounded-[5px] transition-colors text-sm lg:text-base mt-6"
             >
               Avançar
             </button>
@@ -144,7 +144,7 @@
                 type="text"
                 required
                 placeholder="Nome do responsável"
-                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
             </div>
 
@@ -157,7 +157,7 @@
                 placeholder="CPF (123.456.789-00)"
                 @input="form.contactCpf = maskCPF(form.contactCpf)"
                 @blur="contactCpfTouched = true"
-                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
               <span
                 v-if="contactCpfTouched && contactCpfError"
@@ -175,7 +175,7 @@
                 placeholder="E-mail (nome@email.com)"
                 @input="form.contactEmail = maskEmail(form.contactEmail)"
                 @blur="contactEmailTouched = true"
-                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
               <span
                 v-if="contactEmailTouched && contactEmailError"
@@ -193,14 +193,14 @@
                 placeholder="Telefone ((11) 91234-5678)"
                 @input="form.contactPhone = maskPhone(form.contactPhone)"
                 maxlength="15"
-                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[4px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
               />
             </div>
 
             <div class="flex flex-col gap-3 mt-6">
               <button
                 type="button"
-                class="w-full sm:w-auto px-6 py-2.5 lg:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-[4px] transition-colors text-sm lg:text-base"
+                class="w-full sm:w-auto px-6 py-2.5 lg:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-[5px] transition-colors text-sm lg:text-base"
                 @click="prevStep"
               >
                 Voltar
@@ -208,7 +208,7 @@
               <button
                 type="submit"
                 :disabled="isSubmitting"
-                class="w-full sm:flex-1 py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-[4px] transition-colors text-sm lg:text-base"
+                class="w-full sm:flex-1 py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-[5px] transition-colors text-sm lg:text-base"
               >
                 <span v-if="isSubmitting">Enviando...</span>
                 <span v-else>Concluir Cadastro</span>
@@ -263,7 +263,20 @@
 
           <!-- Terms Text -->
           <p v-if="step < 3" class="text-xs lg:text-sm text-gray-500 text-center mt-6">
-            Ao cadastrar, você concorda com nossa Política de Privacidade e Termos de Uso.
+            Ao cadastrar, você concorda com nossa
+            <a
+              href="https://taskypro.com.br/politica-de-privacidade"
+              target="_blank"
+              class="text-blue-700 hover:underline"
+              >Política de Privacidade</a
+            >
+            e
+            <a
+              href="https://taskypro.com.br/termos-de-uso"
+              target="_blank"
+              class="text-blue-700 hover:underline"
+              >Termos de Uso</a
+            >.
           </p>
 
           <!-- Login Link -->
@@ -272,7 +285,7 @@
               Já tem uma conta?
               <router-link
                 to="/login"
-                class="text-blue-600 hover:text-blue-700 hover:underline transition-colors font-medium"
+                class="text-gray-700 hover:text-gray-800 hover:underline transition-colors font-medium"
               >
                 Ir para login
               </router-link>
@@ -280,33 +293,28 @@
           </div>
         </div>
       </div>
+      <img
+        src="@/assets/images/tasky-pro-black.png"
+        alt="Tasky Logo"
+        class="w-16 xl:w-24 absolute bottom-5 xl:bottom-8 "
+      />
     </div>
 
     <div
-      class="hidden lg:flex flex-1 lg:flex-2 primary-gradient flex items-center justify-center p-6 lg:p-12 order-first lg:order-last min-h-64 lg:min-h-screen"
+      class="hidden lg:flex flex-1 lg:flex-2 bg-cover bg-center relative flex items-center justify-center p-6 lg:p-12 order-first lg:order-last min-h-64 lg:min-h-screen"
+      :style="{ backgroundImage: `url(${teamSuccessPhoto})` }"
     >
-      <div class="text-center max-w-lg">
-        <div class="mb-6 lg:mb-8">
-          <img
-            src="@/assets/images/tasky-pro-white.png"
-            alt="Tasky Logo"
-            class="h-auto w-32 lg:w-40 mx-auto"
-          />
-        </div>
-        <h2 class="text-xl lg:text-3xl font-bold text-white mb-3 lg:mb-4">
-          Transforme a gestão da sua empresa
+      <!-- Dark Overlay -->
+      <div class="absolute inset-0 bg-[#000814]/80"></div>
+
+      <div class="relative z-10 text-center max-w-2xl px-4">
+        <h2 class="text-[38px] font-bold text-white mb-6 leading-tight">
+          Transforme a gestão da sua equipe <span class="gradient-text">ainda hoje.</span>
         </h2>
-        <p class="text-sm lg:text-lg text-white mb-6 lg:mb-8">
-          Organize tarefas, otimize processos e aumente a produtividade da sua equipe com o Tasky
-          Pro.
+        <p class="text-[18px] text-gray-300 font-medium leading-relaxed">
+          Junte-se a mais de 50 empresas que escalaram seus resultados organizando tarefas e prazos
+          em um só lugar.
         </p>
-        <div class="flex justify-center">
-          <img
-            src="@/assets/images/landing/hero-image.png"
-            alt="Dashboard Tasky"
-            class="max-w-full h-auto rounded-lg max-w-xs lg:max-w-md"
-          />
-        </div>
       </div>
     </div>
 
@@ -325,7 +333,7 @@
 
   <!-- WhatsApp Button -->
   <a
-    href="https://wa.me/SEUNUMEROAQUI"
+    href="https://api.whatsapp.com/send/?phone=5511999619803&text=Ol%C3%A1%21+Gostaria+de+tirar+algumas+d%C3%BAvidas.&type=phone_number&app_absent=0"
     target="_blank"
     class="fixed bottom-4 right-4 lg:bottom-6 lg:right-6 z-20 bg-green-500 hover:bg-green-600 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
   >
@@ -354,6 +362,7 @@ import { ref, reactive, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { signupService } from '@/services/signupService';
 import { toast } from 'vue3-toastify';
+import teamSuccessPhoto from '@/assets/images/team_success_photo.png';
 import {
   maskCPF,
   maskCNPJ,
@@ -625,14 +634,6 @@ async function submitSignUp() {
   color: #ffffff !important;
 }
 
-:deep(a) {
-  color: #374151 !important;
-}
-
-:deep(a:hover) {
-  color: #2563eb !important;
-}
-
 :deep(svg) {
   color: inherit !important;
 }
@@ -667,5 +668,12 @@ async function submitSignUp() {
   box-shadow:
     0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #4263eb 0%, #667eea 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 </style>

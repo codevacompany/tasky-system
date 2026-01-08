@@ -12,7 +12,7 @@ export interface TenantStatistics {
   averageAcceptanceTimeSeconds: number;
   resolutionRate: number;
   efficiencyScore: number;
-  deliveryOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
+  sentToVerificationOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
   ticketTrends: TrendStats;
 }
 
@@ -40,7 +40,7 @@ export interface UserStatistics {
   averageAcceptanceTimeSeconds: number;
   resolutionRate: number;
   efficiencyScore?: number;
-  deliveryOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
+  sentToVerificationOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
   detailedMetrics?: DetailedMetrics; // Optional detailed metrics for user stats explanation
 }
 
@@ -53,7 +53,8 @@ export interface DepartmentStats {
   averageAcceptanceTimeSeconds: number;
   resolutionRate: number;
   efficiencyScore?: number;
-  deliveryOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
+  sentToVerificationOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
+  completionOverdueRate: number; // Percentage of completed tickets that were actually completed after dueAt
   userCount: number;
 }
 
@@ -150,7 +151,7 @@ export type UserRankingItemDto = {
   efficiencyScore: number; // Wilson Score for ranking
   averageAcceptanceTimeSeconds: number;
   averageResolutionTimeSeconds: number;
-  deliveryOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
+  sentToVerificationOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
   avatarUrl?: string;
   isActive: boolean;
 };
@@ -162,6 +163,16 @@ export type UserRankingResponseDto = {
 export interface PerformanceTrendsResponseDto {
   totalCreated: number;
   totalResolved: number;
+}
+
+export interface CategoryCountDto {
+  categoryId: number;
+  categoryName: string;
+  ticketCount: number;
+}
+
+export interface CategoryCountResponseDto {
+  categories: CategoryCountDto[];
 }
 
 export const reportService = {
@@ -212,6 +223,18 @@ export const reportService = {
    */
   async getTicketsByPriority(period?: string): Promise<TicketPriorityCountResponseDto> {
     const response = await apiClient.get('/stats/by-priority', {
+      params: period ? { period } : undefined,
+    });
+    return response.data;
+  },
+
+  /**
+   * Fetches top 5 categories by ticket count.
+   * Used in ReportsPage.vue:
+   * - Top Categorias widget (Overview tab): Horizontal bar chart showing top 5 categories
+   */
+  async getTopCategoriesByTicketCount(period?: string): Promise<CategoryCountResponseDto> {
+    const response = await apiClient.get('/stats/by-category', {
       params: period ? { period } : undefined,
     });
     return response.data;

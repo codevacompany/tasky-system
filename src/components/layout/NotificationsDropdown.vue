@@ -1,7 +1,7 @@
 <template>
   <div class="fixed inset-0 bg-transparent z-[999] pointer-events-auto" @click="closeModal">
     <div
-      class="fixed top-[var(--header-height)] right-5 w-[90vw] sm:w-[420px] bg-white dark:bg-gray-800 rounded shadow-[0_2px_8px_rgba(0,0,0,0.15)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] z-[1000] overflow-hidden border border-gray-200 dark:border-gray-700"
+      class="fixed top-[var(--header-height)] left-1/2 -translate-x-1/2 w-[95vw] sm:left-auto sm:right-5 sm:translate-x-0 sm:w-[420px] bg-white dark:bg-gray-800 rounded shadow-[0_2px_8px_rgba(0,0,0,0.15)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] z-[1000] overflow-hidden border border-gray-200 dark:border-gray-700"
       @click.stop
     >
       <div
@@ -9,8 +9,11 @@
       >
         <h2 class="text-base font-medium text-txt-primary dark:text-white m-0">Notificações</h2>
         <div class="flex items-center gap-2">
-          <span class="text-xs text-gray-600 dark:text-gray-400"
+          <span class="hidden sm:inline text-xs text-gray-600 dark:text-gray-400"
             >Mostrar apenas itens não lidos</span
+          >
+          <span class="inline sm:hidden text-xs text-gray-600 dark:text-gray-400"
+            >Apenas não lidos</span
           >
           <label class="inline-flex items-center cursor-pointer">
             <input type="checkbox" v-model="showOnlyUnread" class="sr-only peer" />

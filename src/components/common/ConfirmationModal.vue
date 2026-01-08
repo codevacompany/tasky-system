@@ -7,6 +7,7 @@
     :confirmButtonText="'Confirmar'"
     :cancelButtonText="'Cancelar'"
     :showFooter="false"
+    :isFullScreenMobile="isFullScreenMobile"
   >
     <div class="confirmation-content">
       <p>{{ message }}</p>
@@ -80,23 +81,33 @@ import BaseModal from './BaseModal.vue';
 import LoadingSpinner from './LoadingSpinner.vue';
 import Input from './Input.vue';
 
-const props = withDefaults(defineProps<{
-  title: string;
-  message: string;
-  hasInput?: boolean;
-  reasonOptions?: { value: string; label: string }[];
-  showUserSelector?: boolean;
-  targetUsers?: Array<{ userId: number; userName: string; order: number; departmentName?: string }>;
-  loading?: boolean;
-}>(), {
-  title: 'Ação Necessária',
-  message: '',
-  hasInput: false,
-  reasonOptions: () => [],
-  showUserSelector: false,
-  targetUsers: () => [],
-  loading: false,
-});
+const props = withDefaults(
+  defineProps<{
+    title: string;
+    message: string;
+    hasInput?: boolean;
+    reasonOptions?: { value: string; label: string }[];
+    showUserSelector?: boolean;
+    targetUsers?: Array<{
+      userId: number;
+      userName: string;
+      order: number;
+      departmentName?: string;
+    }>;
+    loading?: boolean;
+    isFullScreenMobile?: boolean;
+  }>(),
+  {
+    title: 'Ação Necessária',
+    message: '',
+    hasInput: false,
+    reasonOptions: () => [],
+    showUserSelector: false,
+    targetUsers: () => [],
+    loading: false,
+    isFullScreenMobile: false,
+  },
+);
 
 const emit = defineEmits<{
   (e: 'confirm', data?: { reason: string; description: string; targetUserId?: number }): void;
@@ -154,19 +165,37 @@ const handleCancel = () => {
 
 <style scoped>
 .confirmation-content {
-  min-width: 500px;
-  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .confirmation-content {
+    min-width: 450px;
+  }
 }
 
 .confirmation-content p {
   margin: 0 0 1rem 0;
   color: var(--text-color);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   line-height: 1.5;
 }
 
+@media (min-width: 640px) {
+  .confirmation-content p {
+    font-size: 1rem;
+  }
+}
+
 .input-fields {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
+}
+
+@media (min-width: 640px) {
+  .input-fields {
+    margin-top: 1.5rem;
+  }
 }
 
 .form-group {
@@ -193,17 +222,33 @@ const handleCancel = () => {
 }
 
 .form-group textarea {
-  min-height: 100px;
+  min-height: 80px;
   resize: vertical;
+}
+
+@media (min-width: 640px) {
+  .form-group textarea {
+    min-height: 100px;
+  }
 }
 
 .confirmation-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
   border-top: 1px solid var(--border-color);
+}
+
+@media (min-width: 480px) {
+  .confirmation-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+  }
 }
 
 .action-btn {
@@ -211,8 +256,8 @@ const handleCancel = () => {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  min-width: 120px;
+  padding: 0.625rem 1rem;
+  width: 100%;
   border-radius: 6px;
   border: none;
   font-size: 0.875rem;
@@ -221,6 +266,14 @@ const handleCancel = () => {
   transition: all 0.2s ease;
   color: white;
   position: relative;
+}
+
+@media (min-width: 480px) {
+  .action-btn {
+    width: auto;
+    min-width: 120px;
+    padding: 0.75rem 1.25rem;
+  }
 }
 
 .action-btn:disabled {

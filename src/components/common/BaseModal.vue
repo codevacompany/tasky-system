@@ -8,7 +8,19 @@
       <LoadingSpinner v-if="isLoading" :size="50" :color="'white'" />
       <div
         v-else
-        class="bg-white dark:bg-gray-800 rounded-md shadow-lg min-w-[95vw] sm:min-w-[500px] max-h-[calc(90vh-100px)] sm:max-h-[94vh] flex flex-col overflow-hidden animate-modalSlideIn mx-4"
+        :class="[
+          'bg-white dark:bg-gray-800 shadow-lg flex flex-col overflow-hidden animate-modalSlideIn',
+          // Rounded corners - always except when full screen mobile
+          isFullScreenMobile ? '' : 'rounded-md',
+          // Margins - only when not full screen mobile
+          isFullScreenMobile ? '' : 'mx-4',
+          // Mobile sizing - conditional, with desktop reset
+          isFullScreenMobile
+            ? 'w-full h-full sm:w-auto sm:h-auto'
+            : 'min-w-[95vw] max-h-[calc(90vh-100px)]',
+          // Desktop - original classes, always the same
+          'sm:rounded-md sm:min-w-[500px] sm:max-h-[94vh] sm:mx-4',
+        ]"
       >
         <div v-if="hasCustomHeader">
           <slot name="custom-header"></slot>
@@ -80,6 +92,7 @@ const props = defineProps({
   confirmButtonText: { type: String, default: 'Confirmar' },
   hasCustomHeader: { type: Boolean, default: false },
   closeOnClickOutside: { type: Boolean, default: true },
+  isFullScreenMobile: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['close', 'cancel', 'confirm']);

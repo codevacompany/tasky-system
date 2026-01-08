@@ -96,7 +96,7 @@
         <!-- Footer -->
         <div class="px-6 pb-6 sm:px-8 sm:pb-8 text-center">
           <p class="text-sm text-gray-600">Deseja ter o Tasky Pro na sua empresa?</p>
-          <router-link to="/cadastrar" class="text-sm text-gray-800 hover:underline font-medium">
+          <router-link to="/cadastrar" class="text-sm text-gray-700 hover:text-gray-800 hover:underline font-medium">
             Cadastre aqui
           </router-link>
         </div>
@@ -246,13 +246,5 @@ onMounted(() => {
 
 :deep(label) {
   color: #374151 !important;
-}
-
-:deep(a) {
-  color: #1f2937 !important;
-}
-
-:deep(a:hover) {
-  color: #4b5563 !important;
 }
 </style>

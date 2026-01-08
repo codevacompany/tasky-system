@@ -4,6 +4,7 @@
     @close="closeModal"
     :closeOnClickOutside="false"
     :confirmButtonLoading="isLoading"
+    :isFullScreenMobile="true"
   >
     <template #custom-header>
       <div class="primary-gradient flex items-center justify-between p-3 sm:p-4 text-white">
@@ -22,20 +23,20 @@
       </div>
     </template>
     <!-- Step Indicator -->
-    <div class="flex items-center justify-center gap-2 mb-6 -mt-1 relative">
-      <div class="flex items-center gap-2">
+    <div class="flex items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-10 mt-2 sm:mt-1 px-2">
+      <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-3 flex-1 sm:flex-none">
         <div
           :class="[
-            'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors',
+            'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-medium transition-colors z-10',
             currentStep === 1 ? 'bg-blue-600 text-white' : 'bg-green-600 text-white',
           ]"
         >
-          <font-awesome-icon v-if="currentStep === 2" icon="check" class="text-xs" />
+          <font-awesome-icon v-if="currentStep === 2" icon="check" class="text-[10px] sm:text-xs" />
           <span v-else>1</span>
         </div>
         <span
           :class="[
-            'text-sm font-medium',
+            'text-[10px] sm:text-sm font-medium text-center whitespace-nowrap',
             currentStep === 1
               ? 'text-txt-primary dark:text-white'
               : 'text-gray-500 dark:text-gray-400',
@@ -43,11 +44,13 @@
           >Informações Básicas</span
         >
       </div>
-      <div class="w-12 h-0.5 bg-gray-300 dark:bg-gray-600"></div>
-      <div class="flex items-center gap-2">
+
+      <div class="w-8 sm:w-16 h-px bg-gray-200 dark:bg-gray-700 mt-3.5 sm:mt-0"></div>
+
+      <div class="flex flex-col sm:flex-row items-center gap-1 sm:gap-3 flex-1 sm:flex-none">
         <div
           :class="[
-            'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors',
+            'w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-medium transition-colors z-10',
             currentStep === 2
               ? 'bg-blue-600 text-white'
               : 'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-400',
@@ -57,7 +60,7 @@
         </div>
         <span
           :class="[
-            'text-sm font-medium',
+            'text-[10px] sm:text-sm font-medium text-center whitespace-nowrap',
             currentStep === 2
               ? 'text-txt-primary dark:text-white'
               : 'text-gray-500 dark:text-gray-400',
@@ -66,7 +69,10 @@
         >
       </div>
     </div>
-    <form @submit.prevent="handleSubmit" class="md:min-w-[748px] min-h-[320px] -mt-2.5">
+    <form
+      @submit.prevent="handleSubmit"
+      class="w-full md:min-w-[748px] min-h-[320px] -mt-1 sm:-mt-2.5"
+    >
       <!-- Step 1: Basic Information -->
       <div v-if="currentStep === 1" class="space-y-5">
         <!-- Assunto -->
@@ -102,6 +108,7 @@
               :options="privateOptions"
               :modelValue="isPrivateValue"
               @update:modelValue="updateIsPrivate"
+              :disabled="isPrivateDisabled"
             />
           </div>
         </div>
@@ -110,15 +117,17 @@
           :departments="departments"
           :allUsers="allUsers"
           v-model:targetUsers="targetUsers"
+          :isPrivate="formData.isPrivate"
+          :currentUserId="currentUserId"
           class="col-span-2"
         />
       </div>
 
       <!-- Step 2: Additional Details -->
-      <div v-if="currentStep === 2" class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-5">
+      <div v-if="currentStep === 2" class="mt-4 sm:mt-8 flex flex-col gap-5">
         <!-- Descrição -->
-        <div class="col-span-1 md:col-span-2 flex flex-col gap-1.5 w-full sm:w-[748px]">
-          <label for="description" class="text-sm text-gray-800 dark:text-gray-200"
+        <div class="flex flex-col gap-1.5 w-full">
+          <label for="description" class="text-sm font-medium text-gray-800 dark:text-gray-200"
             >Descrição: <span class="text-red-500">*</span></label
           >
           <div class="quill-wrapper" ref="quillWrapperRef">
@@ -129,74 +138,71 @@
               :options="editorOptions"
             />
           </div>
-          <textarea
-            class="hidden"
-            id="description"
-            v-model="formData.description"
-            required
-            rows="4"
-          ></textarea>
         </div>
 
         <!-- Categoria and Concluir até -->
-        <div class="flex flex-col gap-1.5">
-          <label for="category" class="text-sm text-gray-800 dark:text-gray-200"
-            >Categoria: <span class="text-red-500">*</span></label
-          >
-          <Select
-            :options="categoryOptions"
-            :modelValue="selectedCategory?.toString() || ''"
-            @update:modelValue="updateSelectedCategory"
-          />
-        </div>
-
-        <div class="col-span-1 flex flex-col gap-1.5">
-          <label for="dueAt" class="text-sm text-gray-800 dark:text-gray-200">Concluir até:</label>
-          <div class="w-full">
-            <DatePicker
-              :value="formData.dueAt"
-              type="datetime"
-              format="DD/MM/YYYY HH:mm"
-              value-type="format"
-              :lang="pt"
-              :placeholder="'Selecione data e hora'"
-              :clearable="true"
-              :editable="false"
-              :disabled-date="disabledDate"
-              @change="handleDatePickerChange"
-              @input="
-                (val: any) => {
-                  console.log('@input event:', val);
-                  formData.dueAt = val || null;
-                }
-              "
-              :input-class="'w-full px-[14px] py-2.5 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-800 dark:text-white bg-white dark:bg-gray-800'"
-              :placeholder-class="'text-gray-500 dark:text-gray-400'"
-              :time-picker-options="{
-                start: '08:00',
-                step: '00:15',
-                end: '23:45',
-              }"
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div class="flex flex-col gap-1.5">
+            <label for="category" class="text-sm font-medium text-gray-800 dark:text-gray-200"
+              >Categoria: <span class="text-red-500">*</span></label
+            >
+            <Select
+              :options="categoryOptions"
+              :modelValue="selectedCategory?.toString() || ''"
+              @update:modelValue="updateSelectedCategory"
             />
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label for="dueAt" class="text-sm font-medium text-gray-800 dark:text-gray-200"
+              >Concluir até:</label
+            >
+            <div class="w-full">
+              <DatePicker
+                :value="formData.dueAt"
+                type="datetime"
+                format="DD/MM/YYYY HH:mm"
+                value-type="format"
+                :lang="pt"
+                :placeholder="'Selecione data e hora'"
+                :clearable="true"
+                :editable="false"
+                :disabled-date="disabledDate"
+                @change="handleDatePickerChange"
+                @input="
+                  (val: any) => {
+                    console.log('@input event:', val);
+                    formData.dueAt = val || null;
+                  }
+                "
+                :input-class="'w-full px-[14px] py-2.5 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-800 dark:text-white bg-white dark:bg-gray-800'"
+                :placeholder-class="'text-gray-500 dark:text-gray-400'"
+                :time-picker-options="{
+                  start: '08:00',
+                  step: '00:15',
+                  end: '23:45',
+                }"
+              />
+            </div>
           </div>
         </div>
 
-        <div class="col-span-2 flex  gap-4 mt-2">
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-2">
           <button
-            class="py-[10px] px-3 border border-dashed border-gray-300 dark:border-gray-600 rounded text-sm text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-800 dark:hover:text-gray-300 transition-colors"
+            class="w-full sm:w-auto py-[10px] px-3 border border-dashed border-gray-300 dark:border-gray-600 rounded text-sm text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-800 dark:hover:text-gray-300 transition-colors"
             type="button"
             @click="handleSubtasksClick"
           >
-            <font-awesome-icon icon="tasks" /> Adicionar Subtarefas
+            <font-awesome-icon icon="tasks" class="mr-2" /> Adicionar Subtarefas
           </button>
 
           <!-- Anexar Arquivos Button -->
           <input class="hidden" type="file" id="fileUpload" multiple @change="handleFileChange" />
           <label
-            class="py-[10px] px-5 border border-dashed border-gray-300 dark:border-gray-600 rounded text-sm text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-800 dark:hover:text-gray-300 transition-colors hover:cursor-pointer"
+            class="w-full sm:w-auto py-[10px] px-5 border border-dashed border-gray-300 dark:border-gray-600 rounded text-sm text-gray-600 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-800 dark:hover:text-gray-300 transition-colors hover:cursor-pointer flex items-center justify-center sm:justify-start"
             for="fileUpload"
           >
-            <font-awesome-icon icon="paperclip" /> Anexar Arquivos
+            <font-awesome-icon icon="paperclip" class="mr-2" /> Anexar Arquivos
           </label>
         </div>
 
@@ -371,7 +377,7 @@
     <template #footer>
       <button
         type="button"
-        class="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-[5px] text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         @click="handleCancel"
         :disabled="isLoading"
       >
@@ -380,12 +386,12 @@
       <button
         ref="confirmButtonRef"
         type="button"
-        class="w-full sm:w-auto px-4 py-2 btn btn-primary hover:opacity-95 text-white rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        class="w-full sm:w-auto min-w-20 px-4 py-2 bg-secondary hover:opacity-95 text-white text-sm font-medium rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         @click="handleConfirm"
         :disabled="isLoading"
       >
-        <font-awesome-icon v-if="isLoading" icon="spinner" spin />
-        <span>{{ currentStep === 1 ? 'Próximo' : 'Criar Tarefa' }}</span>
+        <LoadingSpinner v-if="isLoading" :size="16" :color="'white'" />
+        <span v-else>{{ currentStep === 1 ? 'Próximo' : 'Criar Tarefa' }}</span>
       </button>
     </template>
   </BaseModal>
@@ -414,6 +420,7 @@ import TargetUsersSelector from '@/components/common/TargetUsersSelector.vue';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 import pt from 'vue-datepicker-next/locale/pt-br.es';
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 
 const emit = defineEmits<{
   (e: 'close'): void;
@@ -561,15 +568,17 @@ const userOptions = computed(() => {
   ];
 });
 
+// Watch targetUsers to automatically set isPrivate to false if current user is selected
 watch(
-  () => formData.value.isPrivate,
-  (isPrivate, wasPrivate) => {
-    if (isPrivate && selectedUser.value && Number(selectedUser.value) === currentUserId) {
+  () => targetUsers.value,
+  (newTargetUsers) => {
+    const hasCurrentUserAsTarget = newTargetUsers.some((tu) => tu.userId === currentUserId);
+    if (hasCurrentUserAsTarget && formData.value.isPrivate) {
       formData.value.isPrivate = false;
-      selectedUser.value = null;
-      toast.warning('Você não pode criar uma tarefa privada para si mesmo.');
+      toast.info('Tarefa privada desabilitada: você está selecionado como destinatário.');
     }
   },
+  { deep: true },
 );
 
 const categoryOptions = computed(() => [
@@ -603,23 +612,42 @@ const isPrivateValue = computed(() => {
   return formData.value.isPrivate.toString();
 });
 
+const isPrivateDisabled = computed(() => {
+  // Disable if current user is selected as a target
+  return targetUsers.value.some((tu) => tu.userId === currentUserId);
+});
+
 const updateIsPrivate = (value: string) => {
+  // Prevent setting to true if current user is a target
+  if (value === 'true' && isPrivateDisabled.value) {
+    toast.warning('Você não pode criar uma tarefa privada para si mesmo.');
+    return;
+  }
   formData.value.isPrivate = value === 'true';
 };
 
-const editorOptions = {
-  modules: {
-    toolbar: [
-      [{ size: ['small', false, 'large', 'huge'] }],
-      [{ header: [1, 2, 3, 4, 5, 6, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      ['blockquote', 'code-block'],
-      [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
-      ['link', 'image', 'video'],
-    ],
-  },
-  placeholder: 'Adicione uma descrição',
-};
+const editorOptions = computed(() => {
+  const isMobile = window.innerWidth < 640;
+  return {
+    modules: {
+      toolbar: isMobile
+        ? [
+            ['bold', 'italic', 'underline'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            ['link', 'image'],
+          ]
+        : [
+            [{ size: ['small', false, 'large', 'huge'] }],
+            [{ header: [1, 2, 3, 4, 5, 6, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            ['blockquote', 'code-block'],
+            [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
+            ['link', 'image', 'video'],
+          ],
+    },
+    placeholder: 'Adicione uma descrição',
+  };
+});
 
 // Update handlers for Select components
 const updateSelectedDepartment = (value: string) => {
@@ -1269,5 +1297,53 @@ body.dark-mode #newTicketModal .mx-datepicker .mx-input-wrapper > *:last-child *
   color: #9ca3af !important;
   fill: #9ca3af !important;
   stroke: #9ca3af !important;
+}
+
+/* Quill Editor Mobile Optimizations */
+:deep(.ql-toolbar.ql-snow) {
+  border-color: #e5e7eb;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  background-color: #f9fafb;
+  padding: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dark :deep(.ql-toolbar.ql-snow) {
+  border-color: #374151;
+  background-color: #1f2937;
+}
+
+:deep(.ql-container.ql-snow) {
+  border-color: #e5e7eb;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  min-height: 150px;
+  font-family: inherit;
+}
+
+.dark :deep(.ql-container.ql-snow) {
+  border-color: #374151;
+}
+
+:deep(.ql-editor) {
+  font-size: 14px;
+}
+
+:deep(.ql-editor.ql-blank::before) {
+  color: #9ca3af;
+  font-style: normal;
+}
+
+@media (max-width: 640px) {
+  :deep(.ql-toolbar.ql-snow) {
+    padding: 4px;
+  }
+
+  :deep(.ql-formats) {
+    margin-right: 8px !important;
+  }
 }
 </style>
