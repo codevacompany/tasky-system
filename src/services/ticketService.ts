@@ -164,8 +164,11 @@ export const ticketService = {
     return apiClient.post(`/tickets/${customId}/request-correction`, data);
   },
 
-  async addFiles(customId: string, fileUrls: string[]): Promise<AxiosResponse<Ticket>> {
-    return apiClient.post(`/tickets/${customId}/files`, { files: fileUrls });
+  async addFiles(
+    customId: string,
+    files: Array<{ url: string; name: string; mimeType: string; size: number }>,
+  ): Promise<AxiosResponse<Ticket>> {
+    return apiClient.post(`/tickets/${customId}/files`, { files });
   },
 
   async deleteFile(fileId: number): Promise<AxiosResponse<{ message: string }>> {
