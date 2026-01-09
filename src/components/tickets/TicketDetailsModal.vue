@@ -691,7 +691,7 @@
                   <!-- Image Preview Card -->
                   <div
                     v-if="isImageFile(file)"
-                    class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 transition-all aspect-[4/3] flex items-center justify-center max-w-[140px]"
+                    class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 transition-all aspect-[4/3] w-[140px] flex items-center justify-center"
                     @click="openImageViewer(file)"
                   >
                     <img
@@ -725,7 +725,7 @@
                   <!-- Non-Image File Card -->
                   <div
                     v-else
-                    class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 transition-all aspect-[4/3] flex items-center justify-center max-w-[140px]"
+                    class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 transition-all aspect-[4/3] w-[140px] flex items-center justify-center"
                     @click="downloadFile(file)"
                   >
                     <div class="text-primary dark:text-blue-400">
@@ -758,7 +758,7 @@
                 <div
                   v-for="(file, i) in selectedFiles"
                   :key="`new-${i}`"
-                  class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden aspect-[4/3] max-w-[140px]"
+                  class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden aspect-[4/3] w-[140px]"
                 >
                   <!-- Skeleton for image/file icon area -->
                   <div class="w-full h-full flex items-center justify-center p-4">
@@ -1695,7 +1695,7 @@ const headerActions = computed(() => {
     if (!isLastTargetUser.value) {
       actions.push({
         id: 'next',
-        label: isNextUserSameDepartment.value ? 'Próximo' : 'Póx. Setor',
+        label: isNextUserSameDepartment.value ? 'Próximo Colaborador' : 'Próximo Setor',
         icon: 'arrow-right',
         color: 'bg-blue-600 hover:bg-blue-700',
         onClick: () => {

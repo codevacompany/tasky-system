@@ -225,7 +225,7 @@
               <!-- Image Preview Card -->
               <div
                 v-if="isImageFile(file)"
-                class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 transition-all aspect-[4/3] flex items-center justify-center max-w-[140px]"
+                class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 transition-all aspect-[4/3] w-[140px] flex items-center justify-center"
               >
                 <img
                   :src="getFilePreviewUrl(file)"
@@ -253,7 +253,7 @@
               <!-- Non-Image File Card -->
               <div
                 v-else
-                class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 transition-all aspect-[4/3] flex items-center justify-center max-w-[140px]"
+                class="relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 transition-all aspect-[4/3] w-[140px] flex items-center justify-center"
               >
                 <div class="text-primary dark:text-blue-400">
                   <font-awesome-icon icon="file" size="3x" />
