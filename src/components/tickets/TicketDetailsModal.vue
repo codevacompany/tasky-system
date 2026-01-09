@@ -3223,7 +3223,7 @@ const handleFileChange = async (event: Event) => {
   isUploading.value = true;
 
   try {
-    const uploadedUrls: string[] = [];
+    const uploadedFiles: Array<{ url: string; name: string; mimeType: string; size: number }> = [];
 
     for (const file of files) {
       try {
@@ -3236,7 +3236,12 @@ const handleFileChange = async (event: Event) => {
         });
 
         const fileUrl = data.url.split('?')[0];
-        uploadedUrls.push(fileUrl);
+        uploadedFiles.push({
+          url: fileUrl,
+          name: file.name,
+          mimeType: file.type,
+          size: file.size,
+        });
       } catch (error) {
         console.error('Erro ao fazer upload do arquivo:', file.name, error);
         toast.error('Erro ao fazer upload do arquivo');
@@ -3244,8 +3249,8 @@ const handleFileChange = async (event: Event) => {
       }
     }
 
-    if (uploadedUrls.length > 0) {
-      const response = await ticketService.addFiles(loadedTicket.value.customId, uploadedUrls);
+    if (uploadedFiles.length > 0) {
+      const response = await ticketService.addFiles(loadedTicket.value.customId, uploadedFiles);
 
       if (response && response.data) {
         loadedTicket.value = response.data;
