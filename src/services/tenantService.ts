@@ -55,6 +55,14 @@ export interface TenantWithStats {
   // Users list
   users: UserWithStats[];
 
+  // Legal consent
+  termsAccepted: boolean;
+  termsAcceptedAt?: string;
+  termsVersion?: string;
+  privacyPolicyAccepted: boolean;
+  privacyPolicyAcceptedAt?: string;
+  privacyPolicyVersion?: string;
+
   // Subscription info
   subscription?: SubscriptionInfo;
 }
@@ -116,6 +124,17 @@ export const tenantService = {
 
   async getMe(): Promise<AxiosResponse<TenantWithStats>> {
     return apiClient.get('/tenants/me');
+  },
+
+  async getById(id: number): Promise<AxiosResponse<TenantWithStats>> {
+    return apiClient.get(`/tenants/${id}/details`);
+  },
+
+  async updateById(
+    id: number,
+    data: Partial<CreateTenantDto>,
+  ): Promise<AxiosResponse<{ message: string; TenantId: number }>> {
+    return apiClient.patch(`/tenants/${id}`, data);
   },
 
   async updateMe(

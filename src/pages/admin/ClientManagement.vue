@@ -311,11 +311,8 @@
             <template v-for="client in sortedClients" :key="client.id">
               <!-- Linha principal do cliente -->
               <tr
-                :class="[
-                  'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors',
-                  { 'bg-blue-50 dark:bg-blue-900/20': expandedClient === client.id },
-                ]"
-                @click="toggleClientExpansion(client.id)"
+                class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                @click="$router.push(`/admin/clientes/${client.id}`)"
               >
                 <td class="px-4 py-4 text-center" @click.stop>
                   <input
@@ -418,13 +415,14 @@
                 </td> -->
                 <td class="px-4 py-4">
                   <div class="flex items-center justify-center gap-1 relative">
-                    <button
+                    <router-link
+                      :to="`/admin/clientes/${client.id}`"
                       class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                      title="Usuários"
-                      @click.stop="toggleClientExpansion(client.id)"
+                      title="Ver Detalhes"
+                      @click.stop
                     >
-                      <font-awesome-icon icon="users" />
-                    </button>
+                      <font-awesome-icon icon="eye" />
+                    </router-link>
                     <button
                       class="w-8 h-8 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                       title="Mais opções"
@@ -469,159 +467,6 @@
                         </button> -->
                       </div>
                     </div>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- Linha expandida com detalhes dos usuários -->
-              <tr v-if="expandedClient === client.id" class="bg-gray-50 dark:bg-gray-800">
-                <td colspan="9" class="px-4 py-4">
-                  <div class="overflow-x-auto">
-                    <table class="w-full bg-white dark:bg-gray-900 rounded-lg overflow-hidden">
-                      <thead class="bg-gray-100 dark:bg-gray-700">
-                        <tr>
-                          <th
-                            class="px-3 py-2 text-left text-xs font-medium text-txt-primary dark:text-gray-100"
-                          >
-                            Nome
-                          </th>
-                          <th
-                            class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
-                          >
-                            Email
-                          </th>
-                          <th
-                            class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
-                          >
-                            setor
-                          </th>
-                          <th
-                            class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
-                          >
-                            Perfil
-                          </th>
-                          <th
-                            class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
-                          >
-                            Status
-                          </th>
-                          <th
-                            class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
-                          >
-                            Logins
-                          </th>
-                          <th
-                            class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
-                          >
-                            Último Login
-                          </th>
-                          <th
-                            class="px-3 py-2 text-center text-xs font-medium text-txt-primary dark:text-gray-100"
-                          >
-                            Ações
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                        <tr
-                          v-for="user in client.users"
-                          :key="user.id"
-                          class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                        >
-                          <td class="px-3 py-2">
-                            <div class="flex items-center gap-3">
-                              <div
-                                class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-medium"
-                              >
-                                {{ getUserInitials(user) }}
-                              </div>
-                              <span class="text-sm text-txt-primary dark:text-white"
-                                >{{ user.firstName }} {{ user.lastName }}</span
-                              >
-                            </div>
-                          </td>
-                          <td
-                            class="px-3 py-2 text-center text-sm text-txt-primary dark:text-gray-100"
-                          >
-                            {{ user.email }}
-                          </td>
-                          <td
-                            class="px-3 py-2 text-center text-sm text-txt-primary dark:text-gray-100"
-                          >
-                            {{ user.department }}
-                          </td>
-                          <td class="px-3 py-2 text-center">
-                            <span
-                              :class="[
-                                'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-                                {
-                                  'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200':
-                                    user.profile.toLowerCase() === 'admin',
-                                  'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200':
-                                    user.profile.toLowerCase() === 'normal',
-                                },
-                              ]"
-                            >
-                              {{ user.profile }}
-                            </span>
-                          </td>
-                          <td class="px-3 py-2 text-center">
-                            <span
-                              :class="[
-                                'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
-                                {
-                                  'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200':
-                                    user.status.toLowerCase() === 'ativo',
-                                  'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200':
-                                    user.status.toLowerCase() === 'suspenso',
-                                },
-                              ]"
-                            >
-                              {{ user.status }}
-                            </span>
-                          </td>
-                          <td
-                            class="px-3 py-2 text-center text-sm text-txt-primary dark:text-gray-100"
-                          >
-                            {{ user.loginCount || 0 }}
-                          </td>
-                          <td
-                            class="px-3 py-2 text-center text-sm text-txt-primary dark:text-gray-100"
-                          >
-                            {{
-                              user.lastLogin ? formatDateTime(user.lastLogin.toString()) : 'Nunca'
-                            }}
-                          </td>
-                          <td class="px-3 py-2">
-                            <div class="flex items-center justify-center gap-1">
-                              <button
-                                class="w-6 h-6 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                                title="Editar"
-                                @click="editUser(user)"
-                              >
-                                <font-awesome-icon icon="edit" />
-                              </button>
-                              <button
-                                class="w-6 h-6 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                                title="Alterar Status"
-                                @click="toggleUserStatus(user)"
-                              >
-                                <font-awesome-icon
-                                  :icon="user.status === 'ATIVO' ? 'ban' : 'check'"
-                                />
-                              </button>
-                              <button
-                                class="w-6 h-6 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-                                title="Resetar Senha"
-                                @click="resetPassword(user)"
-                              >
-                                <font-awesome-icon icon="key" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
                   </div>
                 </td>
               </tr>
@@ -733,95 +578,12 @@
         </div>
       </div>
     </div>
-
-    <!-- Password Reset Modal -->
-    <div
-      v-if="showPasswordResetModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-        <div class="flex items-center gap-3 mb-4">
-          <div
-            class="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center"
-          >
-            <font-awesome-icon icon="key" class="text-orange-600 dark:text-orange-400" />
-          </div>
-          <div>
-            <h3 class="text-lg font-semibold text-txt-primary dark:text-white">Redefinir Senha</h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Confirmar redefinição de senha</p>
-          </div>
-        </div>
-
-        <div v-if="!resetPasswordResult" class="mb-6">
-          <p class="text-gray-700 dark:text-gray-300 mb-4">
-            Uma nova senha será gerada automaticamente e enviada por email para o usuário
-            <strong>{{ userToReset?.firstName }} {{ userToReset?.lastName }}</strong>
-            ({{ userToReset?.email }}).
-          </p>
-
-          <div
-            class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mt-4"
-          >
-            <p class="text-sm text-blue-800 dark:text-blue-200">
-              <font-awesome-icon icon="info-circle" class="mr-2" />
-              A senha será gerada automaticamente pelo sistema e enviada por email para o usuário.
-            </p>
-          </div>
-        </div>
-
-        <div v-else class="mb-6">
-          <div
-            class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-4"
-          >
-            <div class="flex items-center gap-2 mb-2">
-              <font-awesome-icon icon="check-circle" class="text-green-600 dark:text-green-400" />
-              <span class="text-sm font-medium text-green-800 dark:text-green-200"
-                >Senha redefinida com sucesso!</span
-              >
-            </div>
-            <p class="text-sm text-green-700 dark:text-green-300 mb-3">
-              A nova senha foi enviada por email para {{ userToReset?.email }}
-            </p>
-          </div>
-        </div>
-
-        <div class="flex justify-end gap-3">
-          <button
-            v-if="!resetPasswordResult"
-            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-            @click="closePasswordResetModal"
-            :disabled="isResettingPassword"
-          >
-            Cancelar
-          </button>
-          <button
-            v-if="!resetPasswordResult"
-            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            @click="confirmPasswordReset"
-            :disabled="isResettingPassword"
-          >
-            <span v-if="isResettingPassword">
-              <font-awesome-icon icon="spinner" class="animate-spin mr-2" />
-              Redefinindo...
-            </span>
-            <span v-else>Confirmar Redefinição</span>
-          </button>
-          <button
-            v-if="resetPasswordResult"
-            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
-            @click="closePasswordResetModal"
-          >
-            Fechar
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { getUserInitials, formatSnakeToNaturalCase } from '@/utils/generic-helper';
+import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import Input from '@/components/common/Input.vue';
 import {
   tenantService,
@@ -829,7 +591,6 @@ import {
   type TenantStatsResponse,
   type UserWithStats,
 } from '@/services/tenantService';
-import { userService } from '@/services/userService';
 import { toast } from 'vue3-toastify';
 import { useRoles } from '@/composables/useRoles';
 import apiClient from '@/utils/axiosInstance';
@@ -855,7 +616,6 @@ const statusFilter = ref('');
 const planFilter = ref('');
 const currentPage = ref(1);
 const showNewClientModal = ref(false);
-const expandedClient = ref<number | null>(null);
 const selectedClients = ref<number[]>([]);
 const sortField = ref<SortableClientField>('name');
 const sortOrder = ref<'asc' | 'desc'>('asc');
@@ -901,12 +661,6 @@ const newClient = ref({
   email: '',
 });
 
-// Password reset modal
-const showPasswordResetModal = ref(false);
-const userToReset = ref<any>(null);
-const isResettingPassword = ref(false);
-const resetPasswordResult = ref<{ message: string } | null>(null);
-
 const stats = computed(() => {
   return {
     activeClients: globalStats.value.totalActiveClients,
@@ -931,19 +685,6 @@ const clients = computed(() => {
     userLimit: tenant.subscription?.maxUsers || tenant.totalUsers + 10,
     monthlyTickets: tenant.ticketsThisMonth,
     nextInvoice: '2024-04-15',
-    users: tenant.users.map((user: UserWithStats) => ({
-      id: user.id,
-      uuid: user.uuid,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      department: user.departmentName,
-      profile: user.role,
-      status: user.isActive ? 'ATIVO' : 'INATIVO',
-      lastAccess: user.lastAccess,
-      loginCount: user.loginCount || 0,
-      lastLogin: user.lastLogin,
-    })),
   }));
 });
 
@@ -1076,10 +817,6 @@ const sortedClients = computed(() => {
   return sorted;
 });
 
-const toggleClientExpansion = (clientId: number) => {
-  expandedClient.value = expandedClient.value === clientId ? null : clientId;
-};
-
 const formatCNPJ = (cnpj: string) => {
   return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
 };
@@ -1112,61 +849,6 @@ const getStatusLabel = (status?: string) => {
     default:
       return 'Sem Assinatura';
   }
-};
-
-const editClient = (client: any) => {
-  console.log('Editar cliente:', client);
-};
-
-const manageUsers = (client: any) => {
-  // Implementar gestão de usuários
-  console.log('Gerenciar usuários:', client);
-};
-
-const manageSettings = (client: any) => {
-  // Implementar configurações
-  console.log('Configurações:', client);
-};
-
-const showOptions = (client: any) => {
-  // Implementar menu de opções
-  console.log('Opções:', client);
-};
-
-const editUser = (user: any) => {
-  // Implementar edição de usuário
-  console.log('Editar usuário:', user);
-};
-
-const toggleUserStatus = (user: any) => {
-  // Implementar alteração de status
-  console.log('Alternar status do usuário:', user);
-};
-
-const resetPassword = (user: any) => {
-  userToReset.value = user;
-  showPasswordResetModal.value = true;
-};
-
-const confirmPasswordReset = async () => {
-  if (!userToReset.value) return;
-
-  try {
-    isResettingPassword.value = true;
-    const response = await userService.resetPasswordWithRandomPassword(userToReset.value.uuid);
-    resetPasswordResult.value = response.data;
-    toast.success('Senha redefinida com sucesso!');
-  } catch (error: any) {
-    toast.error(error?.response?.data?.message || 'Erro ao redefinir senha');
-  } finally {
-    isResettingPassword.value = false;
-  }
-};
-
-const closePasswordResetModal = () => {
-  showPasswordResetModal.value = false;
-  userToReset.value = null;
-  resetPasswordResult.value = null;
 };
 
 const renewTrial = async (client: any) => {

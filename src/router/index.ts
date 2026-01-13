@@ -131,6 +131,11 @@ const routes: RouteRecordRaw[] = [
         meta: { roles: [RoleName.GlobalAdmin] },
       },
       {
+        path: 'clientes/:id',
+        component: () => import('@/pages/admin/TenantDetails.vue'),
+        meta: { roles: [RoleName.GlobalAdmin] },
+      },
+      {
         path: 'clientes/:id/usuarios',
         component: ClientUsers,
         meta: { roles: [RoleName.GlobalAdmin] },

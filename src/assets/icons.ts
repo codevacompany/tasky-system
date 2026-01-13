@@ -105,7 +105,11 @@ import {
   faArchive,
   faArrowLeft,
   faPen,
-  faUserTimes
+  faUserTimes,
+  faFilePdf,
+  faCloudUploadAlt,
+  faFileInvoiceDollar,
+  faLayerGroup,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -224,7 +228,11 @@ const icons = [
   faCommentRegular,
   faArrowLeft,
   faPen,
-  faUserTimes
+  faUserTimes,
+  faFilePdf,
+  faCloudUploadAlt,
+  faFileInvoiceDollar,
+  faLayerGroup,
 ];
 
 library.add(...icons);
