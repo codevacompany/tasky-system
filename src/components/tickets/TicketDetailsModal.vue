@@ -6686,23 +6686,6 @@ body.dark-mode [data-v-a180df51] .description-text a[style*='color'],
   color: #60a5fa !important;
 }
 
-/* Skeleton shimmer animation */
-@keyframes skeleton-shimmer {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-.skeleton-shimmer {
-  animation: skeleton-shimmer 1.5s ease-in-out infinite;
-}
-
 /* Mention styles - NUCLEAR SPECIFICITY */
 /* Light mode mentions */
 :deep(span.mention[data-mention]),

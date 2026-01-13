@@ -1,14 +1,22 @@
 <template>
-  <div class="p-6 max-w-[1600px] mx-auto">
-    <header class="mb-8 flex items-center justify-between">
-      <h1 class="text-2xl font-semibold text-txt-primary dark:text-white">Gerenciar Assinaturas</h1>
+  <div class="p-4 md:p-6 md:pt-0 max-w-[1500px]">
+    <header
+      class="mb-8 flex items-center justify-between bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700"
+    >
+      <div>
+        <h1 class="text-2xl font-bold text-txt-primary dark:text-white m-0">Plano e Faturamento</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 m-0">
+          Gerencie sua assinatura, veja detalhes do plano e histórico de cobranças.
+        </p>
+      </div>
       <button
         v-if="!hasTrial && currentSubscription?.hasSubscription"
         @click="handleManageSubscription"
         :disabled="isLoadingPortal"
-        class="text-sm text-gray-600 dark:text-gray-400 hover:text-txt-primary dark:hover:text-gray-200 transition-colors disabled:opacity-50"
+        class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors disabled:opacity-50"
       >
-        Ver faturas anteriores
+        <font-awesome-icon icon="external-link-alt" class="text-xs" />
+        Portal de Cobrança do Stripe
       </button>
     </header>
 
@@ -208,7 +216,9 @@
         </div>
         <!-- Header Content -->
         <div v-else class="mb-4">
-          <h2 class="text-xl font-semibold text-txt-primary dark:text-white mb-2">Atualizar plano</h2>
+          <h2 class="text-xl font-semibold text-txt-primary dark:text-white mb-2">
+            Atualizar plano
+          </h2>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Nossos planos são criados para se adequar ao tamanho do seu projeto. Pague uma taxa fixa
             por um plano definido, mais um pouco extra se ultrapassar. Atualize para o próximo nível
@@ -279,7 +289,9 @@
           :key="plan.slug"
           class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 flex flex-col"
         >
-          <h3 class="text-lg font-semibold text-txt-primary dark:text-white mb-2">{{ plan.name }}</h3>
+          <h3 class="text-lg font-semibold text-txt-primary dark:text-white mb-2">
+            {{ plan.name }}
+          </h3>
 
           <div v-if="plan.slug === 'customizado'" class="mb-4">
             <div class="text-sm text-gray-700 dark:text-gray-300">
@@ -629,7 +641,7 @@ const getButtonText = (slug: string) => {
 };
 
 const handleSimulateCustomPlan = () => {
-  router.push('/assinaturas/simular-plano-customizado');
+  router.push('/admin/configuracoes/assinaturas/simular-plano-customizado');
 };
 
 const handleSubscription = async (slug: string) => {
@@ -721,34 +733,4 @@ const handleManageSubscription = async () => {
 };
 </script>
 
-<style scoped>
-.skeleton-shimmer {
-  animation: shimmer 1.5s infinite;
-  background: linear-gradient(
-    90deg,
-    rgba(229, 231, 235, 0.4) 0%,
-    rgba(229, 231, 235, 0.6) 50%,
-    rgba(229, 231, 235, 0.4) 100%
-  );
-  background-size: 200% 100%;
-}
-
-.dark .skeleton-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(55, 65, 81, 0.4) 0%,
-    rgba(55, 65, 81, 0.6) 50%,
-    rgba(55, 65, 81, 0.4) 100%
-  );
-  background-size: 200% 100%;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-</style>
+<style scoped></style>

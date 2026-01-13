@@ -1770,3 +1770,35 @@ body.dark-mode .Toastify__toast-theme--light .Toastify__close-button {
 body.dark-mode .Toastify__toast-theme--light .Toastify__progress-bar {
   background: linear-gradient(90deg, #4f46e5, #7c3aed) !important;
 }
+
+/* Skeleton Loading */
+.skeleton-shimmer {
+  animation: shimmer 1.5s infinite;
+  background: linear-gradient(
+    90deg,
+    rgba(229, 231, 235, 0.4) 0%,
+    rgba(229, 231, 235, 0.6) 50%,
+    rgba(229, 231, 235, 0.4) 100%
+  );
+  background-size: 200% 100%;
+}
+
+.dark .skeleton-shimmer,
+body.dark-mode .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(55, 65, 81, 0.4) 0%,
+    rgba(55, 65, 81, 0.6) 50%,
+    rgba(55, 65, 81, 0.4) 100%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

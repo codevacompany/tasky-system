@@ -28,6 +28,17 @@ export interface TenantWithStats {
   name: string;
   cnpj?: string;
   email?: string;
+  billingEmail?: string;
+  phoneNumber?: string;
+  cep?: string;
+  state?: string;
+  city?: string;
+  neighborhood?: string;
+  street?: string;
+  number?: string;
+  complement?: string;
+  companySize?: string;
+  mainActivity?: string;
   customKey: string;
   isActive: boolean;
   createdAt: string;
@@ -67,7 +78,18 @@ export interface CreateTenantDto {
   name: string;
   customKey: string;
   email?: string;
+  billingEmail?: string;
   cnpj?: string;
+  phoneNumber?: string;
+  cep?: string;
+  state?: string;
+  city?: string;
+  neighborhood?: string;
+  street?: string;
+  number?: string;
+  complement?: string;
+  companySize?: string;
+  mainActivity?: string;
 }
 
 export const tenantService = {
@@ -88,7 +110,17 @@ export const tenantService = {
     return apiClient.get(url);
   },
 
-  async createTenant(data: CreateTenantDto): Promise<AxiosResponse<any>> {
+  async createTenant(data: CreateTenantDto): Promise<AxiosResponse<TenantWithStats>> {
     return apiClient.post('/tenants', data);
+  },
+
+  async getMe(): Promise<AxiosResponse<TenantWithStats>> {
+    return apiClient.get('/tenants/me');
+  },
+
+  async updateMe(
+    data: Partial<CreateTenantDto>,
+  ): Promise<AxiosResponse<{ message: string; TenantId: number }>> {
+    return apiClient.patch('/tenants/me', data);
   },
 };
