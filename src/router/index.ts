@@ -15,8 +15,6 @@ import ClientSettings from '@/pages/admin/ClientSettings.vue';
 import SyncPage from '@/pages/user/SyncPage.vue';
 import { localStorageService } from '@/utils/localStorageService';
 import SignUpManagement from '@/pages/admin/SignUpManagement.vue';
-import BillingPage from '@/pages/admin/BillingPage.vue';
-import CustomPlanSimulationPage from '@/pages/admin/CustomPlanSimulationPage.vue';
 import { RoleName } from '@/models';
 import { useUserStore } from '@/stores/user';
 
@@ -66,8 +64,14 @@ const routes: RouteRecordRaw[] = [
       },
       { path: 'faq', component: () => import('@/pages/user/FAQ.vue') },
       { path: 'sync', component: SyncPage },
-      { path: 'assinaturas', component: BillingPage },
-      { path: 'assinaturas/simular-plano-customizado', component: CustomPlanSimulationPage },
+      {
+        path: 'assinaturas',
+        redirect: '/admin/configuracoes/assinaturas',
+      },
+      {
+        path: 'assinaturas/simular-plano-customizado',
+        redirect: '/admin/configuracoes/assinaturas/simular-plano-customizado',
+      },
     ],
     meta: { requiresAuth: true },
   },
@@ -99,8 +103,36 @@ const routes: RouteRecordRaw[] = [
         meta: { roles: [RoleName.TenantAdmin] },
       },
       {
+        path: 'configuracoes',
+        component: () => import('@/pages/admin/AdminSettings.vue'),
+        meta: { roles: [RoleName.TenantAdmin] },
+        children: [
+          {
+            path: '',
+            redirect: '/admin/configuracoes/empresa',
+          },
+          {
+            path: 'empresa',
+            component: () => import('@/pages/admin/TenantSettings.vue'),
+          },
+          {
+            path: 'assinaturas',
+            component: () => import('@/pages/admin/BillingPage.vue'),
+          },
+          {
+            path: 'assinaturas/simular-plano-customizado',
+            component: () => import('@/pages/admin/CustomPlanSimulationPage.vue'),
+          },
+        ],
+      },
+      {
         path: 'clientes',
         component: ClientManagement,
+        meta: { roles: [RoleName.GlobalAdmin] },
+      },
+      {
+        path: 'clientes/:id',
+        component: () => import('@/pages/admin/TenantDetails.vue'),
         meta: { roles: [RoleName.GlobalAdmin] },
       },
       {

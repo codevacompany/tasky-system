@@ -11,6 +11,7 @@ import 'vue3-toastify/dist/index.css';
 import './assets/icons';
 import { localStorageService } from './utils/localStorageService';
 import { vPermission, vAnyPermission, vAllPermissions } from './directives/permission';
+import { vMaska } from 'maska/vue';
 
 // Initialize dark mode at startup
 if (localStorageService.isDarkMode()) {
@@ -26,6 +27,7 @@ app.component('font-awesome-icon', FontAwesomeIcon);
 app.directive('permission', vPermission);
 app.directive('any-permission', vAnyPermission);
 app.directive('all-permissions', vAllPermissions);
+app.directive('maska', vMaska);
 
 app.use(Vue3Toastify, {
   autoClose: 3000,

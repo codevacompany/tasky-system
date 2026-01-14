@@ -59,6 +59,25 @@ export interface BillingCalculation {
   description: string;
 }
 
+export interface Payment {
+  id: number;
+  amount: number | string;
+  dueDate: string;
+  paidAt: string | null;
+  status: string;
+  method: string | null;
+  description: string | null;
+  invoiceUrl: string | null;
+  invoiceSentAt: string | null;
+  externalTransactionId: string | null;
+  createdAt: string;
+  tenantSubscription?: {
+    subscriptionPlan?: {
+      name: string;
+    };
+  };
+}
+
 export interface BillingSummary {
   currentBilling: BillingCalculation;
   nextBillingDate: string | null;
@@ -168,6 +187,28 @@ class SubscriptionService {
   ): Promise<{ url: string }> {
     const response = await apiClient.post(`/tenant-subscriptions/tenant/${tenantId}/portal`, {
       returnUrl,
+    });
+    return response.data;
+  }
+
+  async getTenantPayments(tenantId: number): Promise<Payment[]> {
+    const response = await apiClient.get(`/tenant-subscriptions/tenant/${tenantId}/payments`);
+    return response.data;
+  }
+
+  async sendInvoiceEmail(
+    paymentId: number,
+    data: { email: string; invoiceLink?: string; file?: File },
+  ): Promise<Payment> {
+    const formData = new FormData();
+    formData.append('email', data.email);
+    if (data.invoiceLink) formData.append('invoiceLink', data.invoiceLink);
+    if (data.file) formData.append('file', data.file);
+
+    const response = await apiClient.post(`/payments/${paymentId}/send-invoice`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
     return response.data;
   }
