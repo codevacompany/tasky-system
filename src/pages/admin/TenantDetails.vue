@@ -239,7 +239,7 @@
                   >E-mail de Faturamento</span
                 >
                 <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {{ tenant.billingEmail || tenant.email }}
+                  {{ tenant.billingEmail || 'Não informado' }}
                 </p>
               </div>
               <div class="space-y-1">
@@ -783,7 +783,7 @@
 
             <div>
               <label class="block mb-2 text-sm font-bold text-gray-700 dark:text-gray-300"
-                >Link da Nota Fiscal (Opcional)</label
+                >Link da Nota Fiscal</label
               >
               <Input
                 v-model="invoiceForm.invoiceLink"
@@ -955,7 +955,7 @@ const openInvoiceModal = (payment: Payment) => {
   selectedPaymentForInvoice.value = payment;
   invoiceForm.value = {
     email: tenant.value?.billingEmail || tenant.value?.email || '',
-    invoiceLink: payment.invoiceUrl || '',
+    invoiceLink: '',
     file: null,
   };
   isInvoiceModalOpen.value = true;
@@ -972,6 +972,10 @@ const sendInvoice = async () => {
   if (!selectedPaymentForInvoice.value) return;
   if (!invoiceForm.value.email) {
     toast.error('O e-mail é obrigatório.');
+    return;
+  }
+  if (!invoiceForm.value.invoiceLink) {
+    toast.error('O link da nota fiscal é obrigatório.');
     return;
   }
 
