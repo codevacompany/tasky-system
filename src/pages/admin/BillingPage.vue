@@ -331,7 +331,16 @@
           <button
             v-else
             class="w-full py-2 px-4 text-sm font-medium rounded-md transition-colors mb-6 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-txt-primary dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-            :disabled="(isCurrentPlan(plan.slug) && !hasTrial) || isSubscribing"
+            :disabled="
+              (isCurrentPlan(plan.slug) && !hasTrial) ||
+              isSubscribing ||
+              isPlanInsufficientForCurrentUsers(plan)
+            "
+            :title="
+              isPlanInsufficientForCurrentUsers(plan)
+                ? `Você possui mais usuários do que este plano suporta.`
+                : ''
+            "
             @click="handleSubscription(plan.slug)"
           >
             {{ getButtonText(plan.slug) }}
@@ -644,17 +653,31 @@ const handleSimulateCustomPlan = () => {
   router.push('/admin/configuracoes/assinaturas/simular-plano-customizado');
 };
 
+const isPlanInsufficientForCurrentUsers = (plan: SubscriptionPlan) => {
+  if (!plan.maxUsers || plan.slug === 'customizado') {
+    return false;
+  }
+
+  const currentUsers = currentSubscription.value?.userStats?.totalUsers || 0;
+  return currentUsers > plan.maxUsers;
+};
+
 const handleSubscription = async (slug: string) => {
   const plan = availablePlans.value.find((p) => p.slug === slug);
   if (!plan) return;
 
   if (slug === 'customizado') {
-    // This should not happen anymore as we have a separate button
     handleSimulateCustomPlan();
     return;
   }
 
-  // If there's an active subscription (not trial), redirect to customer portal
+  if (isPlanInsufficientForCurrentUsers(plan)) {
+    toast.error(
+      `Este plano suporta apenas ${plan.maxUsers} usuários. Você possui ${currentSubscription.value?.userStats?.totalUsers} usuários ativos.`,
+    );
+    return;
+  }
+
   if (hasActiveSubscription.value) {
     if (!user.value?.tenantId) {
       toast.error('Erro ao identificar o tenant');
@@ -680,7 +703,6 @@ const handleSubscription = async (slug: string) => {
     return;
   }
 
-  // Otherwise, proceed with checkout for new subscriptions
   try {
     isSubscribing.value = true;
     const billingInterval = isYearlyBilling.value ? 'yearly' : 'monthly';
