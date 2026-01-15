@@ -70,8 +70,8 @@ export const authService = {
   async validateVerificationCode(data: {
     email: string;
     code: string;
-  }): Promise<AxiosResponse<{ verificationCode: any; token: string }>> {
-    return apiClient.post<{ verificationCode: any; token: string }>(
+  }): Promise<AxiosResponse<{ verificationCode: unknown; token: string }>> {
+    return apiClient.post<{ verificationCode: unknown; token: string }>(
       '/auth/reset-password/validate',
       data,
     );
