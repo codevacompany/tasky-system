@@ -301,7 +301,7 @@
                   </h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400 max-w-md">
                     Para que seu Score de Desempenho seja calculado com precisão, é necessário ter
-                    pelo menos 5 tarefas registradas nos últimos 3 meses. Continue utilizando o
+                    pelo menos 5 tarefas finalizadas nos últimos 3 meses. Continue utilizando o
                     sistema e seu score aparecerá em breve!
                   </p>
                 </div>
