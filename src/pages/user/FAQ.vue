@@ -13,7 +13,7 @@
       <Input
         v-model="searchTerm"
         type="text"
-        placeholder="Buscar pergunta..."
+        placeholder="Buscar pergunta"
         class="w-full py-3 pr-12 pl-4 border border-gray-300 dark:border-gray-600 rounded-lg text-base bg-white dark:bg-gray-800 text-txt-primary dark:text-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-600 focus:border-transparent"
       />
       <font-awesome-icon
