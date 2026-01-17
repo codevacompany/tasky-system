@@ -1,0 +1,24 @@
+name: Deploy Production System (Frontend)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            export PATH=$PATH:/usr/bin:/usr/local/bin
+            cd /var/www/tasky-prod/tasky-system
+            git pull origin main
+            npm install
+            npm run build
