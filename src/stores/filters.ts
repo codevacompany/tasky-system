@@ -153,7 +153,6 @@ export const useFiltersStore = defineStore('filters', {
 
         if (!hasExistingFilters || force) {
           this.contexts[contextKey].filters = {
-            ...this.contexts[contextKey].filters,
             ...urlFilters,
           };
         }
@@ -167,14 +166,19 @@ export const useFiltersStore = defineStore('filters', {
         );
 
         this.contexts[contextKey].filters = {
-          ...this.contexts[contextKey].filters,
           ...cleanedFilters,
         };
       }
     },
 
     initialize(routeName: string, initialFilters: FilterParams = {}, skipUrlRead = false) {
+      const isNewRoute = this.routeName !== routeName;
       this.routeName = routeName;
+      this.currentContext = null;
+
+      if (isNewRoute) {
+        this.filters = {};
+      }
 
       if (!skipUrlRead && Object.keys(initialFilters).length === 0) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -196,9 +200,9 @@ export const useFiltersStore = defineStore('filters', {
           }
         });
 
-        this.filters = { ...(this.filters || {}), ...urlFilters };
+        this.filters = { ...urlFilters };
       } else {
-        this.filters = { ...(this.filters || {}), ...initialFilters };
+        this.filters = { ...initialFilters };
       }
     },
 
@@ -346,6 +350,10 @@ export const useFiltersStore = defineStore('filters', {
           filtersToUse[key] !== null &&
           String(filtersToUse[key]).trim() !== ''
         ) {
+
+          if (key === 'page' && String(filtersToUse[key]) === '1') {
+            return;
+          }
           let urlKey = key === 'name' ? 'search' : key;
           if (key === 'departmentUuid') {
             urlKey = 'setor';
