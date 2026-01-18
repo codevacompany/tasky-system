@@ -267,9 +267,10 @@ onMounted(() => {
 });
 
 watch(
-  () => filtersStore.filters,
+  () => filtersStore.currentFilters,
   () => {
     loadCategories();
+    filtersStore.syncUrl();
   },
   { deep: true },
 );

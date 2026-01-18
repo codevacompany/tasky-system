@@ -567,9 +567,10 @@ onMounted(() => {
 });
 
 watch(
-  () => filtersStore.filters,
+  () => filtersStore.currentFilters,
   () => {
     loadUsers();
+    filtersStore.syncUrl();
   },
   { deep: true },
 );
