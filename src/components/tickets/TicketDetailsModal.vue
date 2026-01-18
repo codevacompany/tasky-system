@@ -858,7 +858,7 @@
 
                 <div v-for="event in timeline" :key="event.data.id" class="relative">
                   <!-- Comment -->
-                  <div v-if="event.type === 'comment'" class="flex flex-col gap-1 pb-6 relative">
+                  <div v-if="event.type === 'comment'" class="flex flex-col gap-1 pb-6 pl-2 relative">
                     <!-- Header: Avatar, Name, Time, Options -->
                     <div class="flex items-center gap-3">
                       <!-- Avatar -->
