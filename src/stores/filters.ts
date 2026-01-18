@@ -19,6 +19,8 @@ interface FiltersState {
   isLoading: boolean;
   routeName: string;
   _navigating: boolean;
+  _searchTimeout: NodeJS.Timeout | null;
+  _currentSearchValue: string;
 }
 
 export const useFiltersStore = defineStore('filters', {
@@ -29,6 +31,8 @@ export const useFiltersStore = defineStore('filters', {
     isLoading: false,
     routeName: '',
     _navigating: false,
+    _searchTimeout: null,
+    _currentSearchValue: '',
   }),
 
   getters: {
@@ -176,6 +180,11 @@ export const useFiltersStore = defineStore('filters', {
       this.routeName = routeName;
       this.currentContext = null;
 
+      if (this._searchTimeout) {
+        clearTimeout(this._searchTimeout);
+        this._searchTimeout = null;
+      }
+
       if (isNewRoute) {
         this.filters = {};
       }
@@ -316,13 +325,23 @@ export const useFiltersStore = defineStore('filters', {
           context._searchTimeout = null;
         }, SEARCH_DEBOUNCE_DELAY);
       } else {
-        const searchValue = value;
+        this._currentSearchValue = value;
 
-        if (searchValue.trim() === '') {
-          this.clearFilter('name');
-        } else {
-          this.applyFilters({ name: searchValue });
+        if (this._searchTimeout) {
+          clearTimeout(this._searchTimeout);
+          this._searchTimeout = null;
         }
+
+        this._searchTimeout = setTimeout(() => {
+          const searchValue = this._currentSearchValue;
+
+          if (searchValue.trim() === '') {
+            this.clearFilter('name');
+          } else {
+            this.applyFilters({ name: searchValue });
+          }
+          this._searchTimeout = null;
+        }, SEARCH_DEBOUNCE_DELAY);
       }
     },
 
@@ -350,7 +369,6 @@ export const useFiltersStore = defineStore('filters', {
           filtersToUse[key] !== null &&
           String(filtersToUse[key]).trim() !== ''
         ) {
-
           if (key === 'page' && String(filtersToUse[key]) === '1') {
             return;
           }
