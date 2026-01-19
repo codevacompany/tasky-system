@@ -858,7 +858,10 @@
 
                 <div v-for="event in timeline" :key="event.data.id" class="relative">
                   <!-- Comment -->
-                  <div v-if="event.type === 'comment'" class="flex flex-col gap-1 pb-6 pl-2 relative">
+                  <div
+                    v-if="event.type === 'comment'"
+                    class="flex flex-col gap-1 pb-6 pl-2 relative"
+                  >
                     <!-- Header: Avatar, Name, Time, Options -->
                     <div class="flex items-center gap-3">
                       <!-- Avatar -->
@@ -3081,9 +3084,11 @@ const scrollToTarefas = async () => {
   }
 };
 
-const fetchTicket = async (customId: string) => {
-  isLoadingTicket.value = true;
-  showTarefasSection.value = false;
+const fetchTicket = async (customId: string, silent = false) => {
+  if (!silent) {
+    isLoadingTicket.value = true;
+    showTarefasSection.value = false;
+  }
   try {
     const ticket = await ticketsStore.fetchTicketDetails(customId);
     loadedTicket.value = ticket;
@@ -3116,10 +3121,12 @@ const fetchTicket = async (customId: string) => {
     }
   } catch (error) {
     console.error('Error fetching ticket:', error);
-    toast.error('Erro ao carregar tarefa');
-    emit('close');
+    if (!silent) {
+      toast.error('Erro ao carregar tarefa');
+      emit('close');
+    }
   } finally {
-    isLoadingTicket.value = false;
+    if (!silent) isLoadingTicket.value = false;
   }
 };
 
@@ -3137,6 +3144,17 @@ watch(
     }
   },
   { immediate: true },
+);
+
+// Watch for real-time updates to the selected ticket
+watch(
+  () => ticketsStore.lastTicketUpdateEvent,
+  (event) => {
+    if (event && event.customId === props.ticketCustomId) {
+      // Silent refresh when the ticket is updated via SSE
+      fetchTicket(event.customId, true);
+    }
+  },
 );
 
 // Watch for dark mode changes and update link colors

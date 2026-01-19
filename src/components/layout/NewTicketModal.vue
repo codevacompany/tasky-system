@@ -1103,11 +1103,6 @@ const handleSubmit = async () => {
     };
 
     await ticketService.create(ticketData);
-    await Promise.all([
-      ticketsStore.fetchMyTickets(),
-      ticketsStore.fetchReceivedTickets(),
-      ticketsStore.fetchDepartmentTickets(),
-    ]);
 
     toast.success('Tarefa criada com sucesso!');
     emit('ticketCreated');

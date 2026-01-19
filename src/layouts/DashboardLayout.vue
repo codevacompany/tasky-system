@@ -564,14 +564,34 @@ const connectToNotificationStream = async () => {
       try {
         const payload = JSON.parse(event.data);
 
-        if (payload?.unreadCount !== undefined) {
-          if (unreadCount.value !== undefined && payload.unreadCount > unreadCount.value) {
-            playNotificationSound();
+        // Handle Notification events
+        if (payload?.type === 'notification') {
+          if (payload.unreadCount !== undefined) {
+            if (unreadCount.value !== undefined && payload.unreadCount > unreadCount.value) {
+              playNotificationSound();
+            }
+            unreadCount.value = payload.unreadCount;
           }
-          unreadCount.value = payload.unreadCount;
+        } else if (payload?.type === 'ticket_update' && payload.ticket) {
+          const ticketsStore = useTicketsStore();
+          ticketsStore.updateTicketInCollections(payload.ticket);
+
+          // Record the update event to trigger UI silent refreshes
+          ticketsStore.lastTicketUpdateEvent = {
+            ticketId: payload.ticket.id,
+            customId: payload.ticket.customId,
+            timestamp: Date.now(),
+          };
+
+          if (
+            ticketsStore.selectedTicket &&
+            ticketsStore.selectedTicket.customId === payload.ticket.customId
+          ) {
+            ticketsStore.selectedTicket = payload.ticket;
+          }
         }
       } catch (e) {
-        console.error('Error parsing notification event:', e);
+        console.error('Error parsing SSE event:', e);
       }
     };
 
