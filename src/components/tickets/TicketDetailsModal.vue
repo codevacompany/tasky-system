@@ -858,7 +858,10 @@
 
                 <div v-for="event in timeline" :key="event.data.id" class="relative">
                   <!-- Comment -->
-                  <div v-if="event.type === 'comment'" class="flex flex-col gap-1 pb-6 relative">
+                  <div
+                    v-if="event.type === 'comment'"
+                    class="flex flex-col gap-1 pl-2 pb-6 relative"
+                  >
                     <!-- Header: Avatar, Name, Time, Options -->
                     <div class="flex items-center gap-3">
                       <!-- Avatar -->
@@ -969,8 +972,8 @@
                         :class="[
                           'rounded-lg px-4 py-3 border shadow-soft-xs transition-all duration-200',
                           isMyComment(event.data.user.id)
-                            ? 'bg-blue-50/30 dark:bg-blue-800/10 border-blue-100 dark:border-blue-900/30'
-                            : 'bg-white dark:bg-gray-700/30 border-gray-200 dark:border-gray-700/50',
+                            ? 'bg-blue-50/30 dark:bg-[#1e2532] border-blue-100 dark:border-blue-900/30'
+                            : 'bg-white dark:bg-[#222933] border-gray-200 dark:border-gray-700/50',
                         ]"
                       >
                         <div v-if="editingCommentUuid === event.data.uuid" class="space-y-4">
@@ -1026,11 +1029,11 @@
                         :class="[
                           'rounded-lg p-4 border',
                           event.subType === 'disapproval'
-                            ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                            ? 'bg-red-50 dark:bg-[#322732] border-red-200 dark:border-red-800'
                             : event.subType === 'cancellation'
-                              ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                              ? 'bg-red-50 dark:bg-[#322732] border-red-200 dark:border-red-800'
                               : event.subType === 'correction'
-                                ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
+                                ? 'bg-yellow-50 dark:bg-[#302e30] border-yellow-200 dark:border-yellow-800'
                                 : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600',
                         ]"
                       >
