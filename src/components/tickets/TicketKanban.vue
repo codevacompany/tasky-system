@@ -58,7 +58,9 @@
               ticket.ticketStatus?.key === DefaultTicketStatus.Returned ||
               ticket.status === DefaultTicketStatus.Returned
                 ? 'border-orange-300 dark:border-orange-600 dark:bg-orange-900/10 hover:border-orange-400 dark:hover:border-orange-500'
-                : 'border-gray-200 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500',
+                : isReviewerOnly(ticket)
+                  ? 'border-purple-300 dark:border-purple-600/70 dark:bg-purple-900/10 hover:border-purple-400 dark:hover:border-purple-500'
+                  : 'border-gray-200 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500',
               shouldBeGrayscale(ticket) ? 'opacity-60 grayscale-[0.3]' : '',
             ]"
             @click="openTicketDetails(ticket)"
@@ -88,6 +90,13 @@
                   title="Tarefa devolvida"
                 >
                   <font-awesome-icon icon="undo" class="text-xs" />
+                </div>
+                <div
+                  v-else-if="isReviewerOnly(ticket)"
+                  class="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 flex-shrink-0"
+                  title="Aguardando verificação"
+                >
+                  <font-awesome-icon icon="user-check" class="text-xs" />
                 </div>
               </div>
             </div>
@@ -405,6 +414,17 @@ const isCurrentTargetUser = (ticket: Ticket) => {
   return userStore.user.id === ticket.currentTargetUserId;
 };
 
+const isReviewerOnly = (ticket: Ticket) => {
+  // Only show badge in "recebidas" tab
+  if (props.activeTab !== 'recebidas') return false;
+  if (!userStore.user?.id) return false;
+
+  // User is reviewer but not the current target user
+  return (
+    ticket.reviewer?.id === userStore.user.id && ticket.currentTargetUserId !== userStore.user.id
+  );
+};
+
 const hasRightIcons = (ticket: Ticket) => {
   return (
     (ticket.comments?.length ?? 0) > 0 ||
@@ -412,7 +432,8 @@ const hasRightIcons = (ticket: Ticket) => {
     (ticket.files?.length ?? 0) > 0 ||
     getChecklistProgress(ticket) !== null ||
     ticket.ticketStatus?.key === DefaultTicketStatus.Returned ||
-    ticket.status === DefaultTicketStatus.Returned
+    ticket.status === DefaultTicketStatus.Returned ||
+    isReviewerOnly(ticket)
   );
 };
 

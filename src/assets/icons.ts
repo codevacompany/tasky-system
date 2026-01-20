@@ -110,6 +110,7 @@ import {
   faCloudUploadAlt,
   faFileInvoiceDollar,
   faLayerGroup,
+  faClipboardCheck,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -233,6 +234,7 @@ const icons = [
   faCloudUploadAlt,
   faFileInvoiceDollar,
   faLayerGroup,
+  faClipboardCheck,
 ];
 
 library.add(...icons);

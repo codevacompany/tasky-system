@@ -121,6 +121,17 @@
           :currentUserId="currentUserId"
           class="col-span-2"
         />
+        <!-- Reviewer Selector (Only for Admins and Supervisors) -->
+        <div v-if="isAdminOrSupervisor" class="flex flex-col gap-1.5">
+          <label class="text-sm text-gray-800 dark:text-gray-200">
+            Revisor: <span class="text-gray-500 text-xs">(Opcional)</span>
+          </label>
+          <Select
+            :options="reviewerOptions"
+            :modelValue="reviewerValue"
+            @update:modelValue="updateReviewer"
+          />
+        </div>
       </div>
 
       <!-- Step 2: Additional Details -->
@@ -405,7 +416,7 @@ import { departmentService } from '@/services/departmentService';
 import { userService } from '@/services/userService';
 import { categoryService } from '@/services/categoryService';
 import { toast } from 'vue3-toastify';
-import { TicketPriority, type Category, type Department, type User } from '@/models';
+import { TicketPriority, type Category, type Department, type User, RoleName } from '@/models';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
@@ -432,6 +443,7 @@ const ticketsStore = useTicketsStore();
 const departments = ref<Department[]>([]);
 const availableUsers = ref<User[]>([]);
 const allUsers = ref<User[]>([]);
+const reviewerUsers = ref<User[]>([]);
 const selectedDepartment = ref<number | null>(null);
 const selectedUser = ref<number | null>(null);
 const categories = ref<Category[]>([]);
@@ -517,6 +529,7 @@ const formData = ref({
   requesterId: useUserStore().user?.id || null,
   categoryId: null as number | null,
   isPrivate: false,
+  reviewerId: null as number | null,
 });
 
 // Separate ref for DatePicker (Date object)
@@ -664,6 +677,28 @@ const updateSelectedCategory = (value: string) => {
   selectedCategory.value = value ? parseInt(value) : null;
 };
 
+// Reviewer-related computed properties
+const isAdminOrSupervisor = computed(() => {
+  const user = useUserStore().user;
+  return user?.role?.name === RoleName.TenantAdmin || user?.role?.name === RoleName.Supervisor;
+});
+
+const reviewerOptions = computed(() => [
+  { value: '', label: 'Selecione um revisor' },
+  ...reviewerUsers.value.map((user) => ({
+    value: user.id.toString(),
+    label: `${user.firstName} ${user.lastName}`,
+  })),
+]);
+
+const reviewerValue = computed(() => {
+  return formData.value.reviewerId?.toString() || '';
+});
+
+const updateReviewer = (value: string) => {
+  formData.value.reviewerId = value ? parseInt(value) : null;
+};
+
 const parseDateTime = (dateString: string): Date | null => {
   if (!dateString) return null;
   try {
@@ -730,6 +765,18 @@ const loadAllUsers = async () => {
   }
 };
 
+const loadReviewers = async () => {
+  try {
+    const { data } = await userService.fetch({ limit: 100 });
+    // Filter only admins and supervisors
+    reviewerUsers.value = data.items.filter(
+      (user) => user.role?.name === RoleName.TenantAdmin || user.role?.name === RoleName.Supervisor,
+    );
+  } catch {
+    toast.error('Erro ao carregar revisores');
+  }
+};
+
 const updateUsersList = async () => {
   if (!selectedDepartment.value) {
     availableUsers.value = [];
@@ -792,6 +839,7 @@ const resetForm = () => {
     requesterId: useUserStore().user!.id,
     categoryId: null,
     isPrivate: false,
+    reviewerId: null,
   };
   dueAtDate.value = null;
   selectedDepartment.value = null;
@@ -913,6 +961,7 @@ onMounted(() => {
   loadDepartments();
   loadCategories();
   loadAllUsers();
+  loadReviewers();
 
   // Set up MutationObserver to detect Quill dropdowns
   nextTick(() => {
@@ -1097,6 +1146,7 @@ const handleSubmit = async () => {
       dueAt: dueAtISO,
       categoryId: selectedCategory.value ?? null,
       isPrivate: formData.value.isPrivate,
+      reviewerId: formData.value.reviewerId,
       files: fileUrls,
       targetUserIds,
       checklistItems: checklistItems.value,
