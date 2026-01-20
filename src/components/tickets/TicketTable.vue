@@ -32,6 +32,13 @@
             class="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0"
             title="Tarefa Privada"
           />
+          <div
+            v-if="isReviewerOnly(item)"
+            class="flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 flex-shrink-0"
+            title="Para Verificação"
+          >
+            <font-awesome-icon icon="user-check" class="text-xs" />
+          </div>
         </div>
       </template>
 
@@ -271,7 +278,10 @@
               <font-awesome-icon icon="arrow-right" class="text-xs md:text-sm" />
             </button>
             <button
-              v-else-if="getTicketStatus(item) === DefaultTicketStatus.Returned"
+              v-else-if="
+                getTicketStatus(item) === DefaultTicketStatus.Returned &&
+                item.currentTargetUserId === userStore.user?.id
+              "
               class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 hover:bg-orange-600 text-white transition-colors duração-200"
               @click.stop="handleCorrectTicket(item)"
               title="Corrigir"
@@ -385,13 +395,23 @@
               <font-awesome-icon icon="check-circle" class="text-xs md:text-sm" />
             </div>
             <button
-              v-else-if="getTicketStatus(item) === DefaultTicketStatus.AwaitingVerification"
+              v-else-if="
+                getTicketStatus(item) === DefaultTicketStatus.AwaitingVerification &&
+                isReviewer(item)
+              "
               class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duração-200"
               @click.stop="handleStartVerification(item)"
               title="Verificar"
             >
               <font-awesome-icon icon="search" class="text-xs md:text-sm" />
             </button>
+            <div
+              v-else-if="getTicketStatus(item) === DefaultTicketStatus.AwaitingVerification"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 text-white"
+              title="Aguardando Verificação"
+            >
+              <font-awesome-icon icon="hourglass-half" spin class="text-xs md:text-sm" />
+            </div>
             <div
               v-if="
                 isReviewer(item) && getTicketStatus(item) === DefaultTicketStatus.UnderVerification
@@ -1118,19 +1138,19 @@ const handleRequestCorrection = async (ticket: Ticket) => {
     async (data?: { reason: string; description: string }) => {
       try {
         if (data?.reason && data?.description) {
-          await ticketService.requestCorrection(ticket.uuid, {
+          await ticketService.requestCorrection(ticket.customId, {
             reason: data.reason,
             details: data.description,
           });
         } else {
-          await ticketService.updateStatus(ticket.uuid, {
+          await ticketService.updateStatus(ticket.customId, {
             status: DefaultTicketStatus.Returned,
           });
         }
 
         toast.success('Correção solicitada com sucesso');
 
-        await ticketsStore.fetchTicketDetails(ticket.uuid);
+        await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
         toast.error('Erro ao solicitar correção');
       }
@@ -1148,19 +1168,19 @@ const handleRejectTicket = async (ticket: Ticket) => {
     async (data?: { reason: string; description: string }) => {
       try {
         if (data?.reason && data?.description) {
-          await ticketService.reject(ticket.uuid, {
+          await ticketService.reject(ticket.customId, {
             reason: data.reason,
             details: data.description,
           });
         } else {
-          await ticketService.updateStatus(ticket.uuid, {
+          await ticketService.updateStatus(ticket.customId, {
             status: DefaultTicketStatus.Rejected,
           });
         }
 
         toast.success('Tarefa reprovada com sucesso');
 
-        await ticketsStore.fetchTicketDetails(ticket.uuid);
+        await ticketsStore.fetchTicketDetails(ticket.customId);
       } catch {
         toast.error('Erro ao reprovar a tarefa');
       }
@@ -1251,6 +1271,17 @@ const handleCorrectTicket = async (ticket: Ticket) => {
 };
 
 const isReviewer = (ticket: Ticket) => userStore.user?.id === ticket.reviewer?.id;
+
+const isReviewerOnly = (ticket: Ticket) => {
+  // Only show badge in "recebidas" tab
+  if (props.tableType !== 'recebidas') return false;
+  if (!userStore.user?.id) return false;
+
+  // User is reviewer but not the current target user
+  return (
+    ticket.reviewer?.id === userStore.user.id && ticket.currentTargetUserId !== userStore.user.id
+  );
+};
 
 const isSelfAssigned = (ticket: Ticket) =>
   ticket.targetUsers && ticket.targetUsers.some((tu) => tu.userId === ticket.requester.id);
