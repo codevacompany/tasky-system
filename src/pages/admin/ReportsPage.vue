@@ -2328,6 +2328,7 @@ const topDepartmentsLoading = ref(false);
 const topPerformers = computed(() => {
   if (!topUsers.value?.users) return [];
   return [...topUsers.value.users]
+    .filter((user) => user.efficiencyScore !== undefined && user.efficiencyScore !== null)
     .sort((a, b) => b.efficiencyScore - a.efficiencyScore)
     .slice(0, 3);
 });
@@ -2335,7 +2336,7 @@ const topPerformers = computed(() => {
 const worstPerformers = computed(() => {
   if (!worstFiveUsers.value?.users) return [];
   return [...worstFiveUsers.value.users]
-    .filter((user) => user.efficiencyScore > 0)
+    .filter((user) => user.efficiencyScore !== undefined && user.efficiencyScore !== null)
     .sort((a, b) => a.efficiencyScore - b.efficiencyScore)
     .slice(0, 3);
 });
@@ -2821,7 +2822,7 @@ const createdVsCompletedChartData = computed(() => {
 
 // Funções Auxiliares
 const formatPercentage = (value?: number) => {
-  if (value === undefined) return '0%';
+  if (value === undefined || value === null) return '-';
   return `${Math.round(value * 100)}%`;
 };
 
