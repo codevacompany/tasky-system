@@ -553,7 +553,8 @@ const openTicketDetails = (ticket: Ticket) => {
   if (
     currentStatus === DefaultTicketStatus.Pending &&
     userStore.user?.id === ticket.currentTargetUserId &&
-    props.activeTab !== 'setor'
+    props.activeTab !== 'setor' &&
+    ticket.dueAt
   ) {
     pendingAcceptanceTicket.value = ticket;
     showAcceptanceAlert.value = true;
@@ -608,6 +609,15 @@ const handleAlertAcceptance = async () => {
 
   isAccepting.value = true;
   try {
+    // If ticket doesn't have a due date, we must open details to set it
+    if (!pendingAcceptanceTicket.value.dueAt) {
+      showAcceptanceAlert.value = false;
+      const ticketToView = pendingAcceptanceTicket.value;
+      pendingAcceptanceTicket.value = null;
+      emit('viewTicket', ticketToView);
+      return;
+    }
+
     // Accept the ticket
     await ticketService.accept(pendingAcceptanceTicket.value.customId);
     toast.success('Tarefa aceita com sucesso');

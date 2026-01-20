@@ -1231,7 +1231,7 @@
     v-if="showDueDateModal"
     title="Definir Prazo de Conclusão"
     :showFooter="true"
-    @close="showDueDateModal = false"
+    @close="handleDueDateCancel"
   >
     <div class="p-4">
       <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -1269,7 +1269,7 @@
       <div class="flex justify-end gap-2">
         <button
           class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          @click="showDueDateModal = false"
+          @click="handleDueDateCancel"
           :disabled="isDueDateModalLoading"
         >
           Cancelar
@@ -2122,6 +2122,11 @@ const handleAcceptanceCancel = () => {
   closeModal(); // Following TicketKanban behavior where closing the alert also closes the attempt to view
 };
 
+const handleDueDateCancel = () => {
+  showDueDateModal.value = false;
+  closeModal();
+};
+
 const handleAcceptanceConfirm = async () => {
   if (!loadedTicket.value) return;
 
@@ -2129,7 +2134,6 @@ const handleAcceptanceConfirm = async () => {
   try {
     // Check if ticket has due date
     if (!loadedTicket.value.dueAt) {
-      toast.warning('Defina uma data de conclusão antes de aceitar a tarefa.');
       showAcceptanceAlert.value = false;
       showDueDateModal.value = true;
       return;
