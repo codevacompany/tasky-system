@@ -68,11 +68,7 @@
                 class="w-[30px] sm:w-[34px] h-[30px] sm:h-[34px] rounded-full flex items-center justify-center text-white text-[10px] sm:text-xs font-semibold flex-shrink-0"
                 :style="
                   title === 'Últimas Tarefas Criadas'
-                    ? getAvatarStyle(
-                        ticket.currentTargetUser?.department?.name ||
-                          ticket.targetUsers?.[0]?.user?.department?.name ||
-                          '',
-                      )
+                    ? getAvatarStyle(getTargetUserDepartment(ticket))
                     : getAvatarStyle(ticket.requester?.department?.name || '')
                 "
               >
@@ -98,11 +94,7 @@
                   class="text-[11px] sm:text-xs text-txt-light font-medium dark:text-gray-400 m-0 truncate"
                 >
                   <template v-if="title === 'Últimas Tarefas Criadas'">
-                    {{
-                      ticket.currentTargetUser?.department?.name ||
-                      ticket.targetUsers?.[0]?.user?.department?.name ||
-                      '-'
-                    }}
+                    {{ getTargetUserDepartment(ticket) }}
                   </template>
                   <template v-else>
                     {{ ticket.requester?.department?.name || '-' }}
@@ -178,7 +170,7 @@
               <div class="flex flex-col gap-1">
                 <p class="text-sm font-medium truncate">{{ ticket.name }}</p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">
-                  {{ ticket.targetUsers?.[0]?.user?.department?.name || '-' }}
+                  {{ getTargetUserDepartment(ticket) }}
                 </p>
               </div>
             </td>
@@ -362,6 +354,20 @@ function getTargetUserInitials(ticket: Ticket): string {
     return getUserInitials(ticket.targetUsers[0].user);
   }
   return '??';
+}
+
+function getTargetUserDepartment(ticket: Ticket): string {
+  if (ticket.currentTargetUser?.department?.name) {
+    return ticket.currentTargetUser.department.name;
+  }
+  if (
+    ticket.targetUsers &&
+    ticket.targetUsers.length > 0 &&
+    ticket.targetUsers[0]?.user?.department?.name
+  ) {
+    return ticket.targetUsers[0].user.department.name;
+  }
+  return '-';
 }
 
 function getRequesterName(ticket: Ticket): string {
