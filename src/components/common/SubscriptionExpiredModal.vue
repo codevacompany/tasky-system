@@ -12,7 +12,7 @@
         <img
           src="@/assets/images/landing/business-upgrade.jpg"
           alt="Upgrade de plano"
-          class="w-full h-auto rounded-lg shadow-sm"
+          class="w-full h-auto"
         />
       </div>
 

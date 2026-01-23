@@ -96,7 +96,10 @@
         <!-- Footer -->
         <div class="px-6 pb-6 sm:px-8 sm:pb-8 text-center">
           <p class="text-sm text-gray-600">Deseja ter o Tasky Pro na sua empresa?</p>
-          <router-link to="/cadastrar" class="text-sm text-gray-700 hover:text-gray-800 hover:underline font-medium">
+          <router-link
+            to="/cadastrar"
+            class="text-sm text-gray-700 hover:text-gray-800 hover:underline font-medium"
+          >
             Cadastre aqui
           </router-link>
         </div>
@@ -137,7 +140,7 @@ const login = async () => {
     }
 
     if (userStore.hasActiveSubscription === false) {
-      router.push({ path: '/assinaturas', query: { trialExpired: '1' } });
+      router.push({ path: '/admin/configuracoes/assinaturas', query: { trialExpired: '1' } });
     } else {
       router.push('/');
     }

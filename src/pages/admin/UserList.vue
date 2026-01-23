@@ -331,10 +331,7 @@ const userToReset = ref<User | null>(null);
 const resetPasswordResult = ref<any>(null);
 
 const filteredUsers = computed(() => {
-  if (showInactiveUsers.value) {
-    return users.value;
-  }
-  return users.value.filter((user) => user.isActive);
+  return users.value;
 });
 
 const initialConfig = computed(() => ({
@@ -443,6 +440,7 @@ const loadUsers = async () => {
   const filters: any = {
     name: filtersStore.currentSearch,
     page: filtersStore.currentPage,
+    isActive: showInactiveUsers.value ? 'all' : undefined,
   };
 
   if (filtersStore.currentSortBy) {
@@ -577,6 +575,11 @@ watch(
 
 watch(searchTerm, (newValue) => {
   filtersStore.setSearch(newValue);
+});
+
+watch(showInactiveUsers, () => {
+  filtersStore.setPage(1);
+  loadUsers();
 });
 
 // Sync store search value back to local ref when it changes (e.g., from URL)
