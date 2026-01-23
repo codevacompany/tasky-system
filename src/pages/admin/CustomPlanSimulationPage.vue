@@ -226,7 +226,7 @@ const handleSubscribe = async () => {
 
     try {
       isSubscribing.value = true;
-      const returnUrl = `${window.location.origin}/assinaturas`;
+      const returnUrl = `${window.location.origin}/admin/configuracoes/assinaturas`;
       const { url } = await subscriptionService.createCustomerPortalSession(
         userStore.user.tenantId,
         returnUrl,

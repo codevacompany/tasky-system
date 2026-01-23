@@ -9,15 +9,6 @@
           Gerencie sua assinatura, veja detalhes do plano e histórico de cobranças.
         </p>
       </div>
-      <button
-        v-if="!hasTrial && currentSubscription?.hasSubscription"
-        @click="handleManageSubscription"
-        :disabled="isLoadingPortal"
-        class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors disabled:opacity-50"
-      >
-        <font-awesome-icon icon="external-link-alt" class="text-xs" />
-        Portal de Cobrança do Stripe
-      </button>
     </header>
 
     <!-- Current Subscription Section Skeleton -->
@@ -306,8 +297,8 @@
                 R$
                 {{
                   isYearlyBilling && plan.priceYearly
-                    ? (Number(plan.priceYearly) / 12).toFixed(0)
-                    : Number(plan.priceMonthly).toFixed(0)
+                    ? (Number(plan.priceYearly) / 12).toFixed(2)
+                    : Number(plan.priceMonthly).toFixed(2)
                 }}
               </span>
               <span class="text-gray-600 dark:text-gray-400">
@@ -686,7 +677,7 @@ const handleSubscription = async (slug: string) => {
 
     try {
       isSubscribing.value = true;
-      const returnUrl = `${window.location.origin}/assinaturas`;
+      const returnUrl = `${window.location.origin}/admin/configuracoes/assinaturas`;
       const { url } = await subscriptionService.createCustomerPortalSession(
         user.value.tenantId,
         returnUrl,
@@ -738,7 +729,7 @@ const handleManageSubscription = async () => {
 
   try {
     isLoadingPortal.value = true;
-    const returnUrl = `${window.location.origin}/admin/billing`;
+    const returnUrl = `${window.location.origin}/admin/configuracoes/assinaturas`;
     const { url } = await subscriptionService.createCustomerPortalSession(
       user.value.tenantId,
       returnUrl,

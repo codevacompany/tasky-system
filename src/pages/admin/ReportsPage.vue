@@ -607,8 +607,11 @@
                     v-else-if="!departmentStats || departmentStats.length === 0"
                     class="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400"
                   >
-                    <font-awesome-icon icon="spinner" spin class="text-xl mb-2" />
-                    <p class="text-sm">Carregando setores...</p>
+                    <font-awesome-icon icon="info-circle" class="text-xl mb-2" />
+                    <p class="text-sm text-center">Nenhum setor encontrado</p>
+                    <p class="text-xs text-center mt-1 text-gray-400 dark:text-gray-500">
+                      Não há dados para os filtros selecionados
+                    </p>
                   </div>
 
                   <div
@@ -731,6 +734,17 @@
                           {{ formatTimeInSecondsCompact(duration.averageDurationSeconds) }}
                         </div>
                       </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div
+                      class="h-40 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400"
+                    >
+                      <font-awesome-icon icon="circle-info" class="text-xl mb-2" />
+                      <p class="text-sm font-medium">Sem dados para exibir</p>
+                      <p class="text-xs mt-1">
+                        Ainda não há durações registradas no período selecionado
+                      </p>
                     </div>
                   </template>
                 </div>
@@ -1344,7 +1358,7 @@
                   comparativas de produtividade.
                 </p>
                 <router-link
-                  to="/assinaturas"
+                  to="/admin/configuracoes/assinaturas"
                   class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
                 >
                   <font-awesome-icon icon="arrow-up" />
@@ -1494,7 +1508,7 @@
                   Acesse estatísticas detalhadas por colaborador e rankings de produtividade.
                 </p>
                 <router-link
-                  to="/assinaturas"
+                  to="/admin/configuracoes/assinaturas"
                   class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
                 >
                   <font-awesome-icon icon="arrow-up" />
@@ -1772,7 +1786,7 @@
                   avançados sobre o comportamento dos tickets.
                 </p>
                 <router-link
-                  to="/assinaturas"
+                  to="/admin/configuracoes/assinaturas"
                   class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-medium transition-colors"
                 >
                   <font-awesome-icon icon="arrow-up" />
@@ -2471,18 +2485,6 @@ const loadData = async () => {
       ...duration,
       averageDuration: duration.averageDurationSeconds / 3600, // Converter segundos para horas
     }));
-
-    if (!statusDurations.value.length) {
-      statusDurations.value = statusOrder
-        .filter((s) => !['finalizado', 'cancelado', 'reprovado'].includes(s.key))
-        .map((s) => ({
-          status: s.key as DefaultTicketStatus,
-          averageDurationSeconds: 0,
-          averageDuration: 0,
-          totalDurationSeconds: 0,
-          count: 0,
-        }));
-    }
 
     // Store top categories
     topCategories.value = topCategoriesResult.categories || [];
