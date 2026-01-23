@@ -142,9 +142,9 @@ export function formatTimeInSecondsCompact(seconds?: number) {
   if (days > 0) {
     return hours > 0 ? `${days}d ${hours}h` : `${days}d`;
   } else if (hours > 0) {
-    return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+    return minutes > 0 ? `${hours}h ${minutes}min` : `${hours}h`;
   } else if (minutes > 0) {
-    return `${minutes}m`;
+    return `${minutes}min`;
   } else {
     return `${secs}s`;
   }

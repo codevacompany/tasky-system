@@ -3513,7 +3513,7 @@ const cycleTimeBarOptions = computed<ChartOptions>(() => {
             if (days > 0) {
               return `${days}d ${remainingHours}h`;
             } else {
-              return `${remainingHours}h ${Math.floor((hours - remainingHours) * 60)}m`;
+              return `${remainingHours}h ${Math.floor((hours - remainingHours) * 60)}min`;
             }
           },
         },
@@ -3718,17 +3718,17 @@ const formatTimeInHours = (hours: number): string => {
     return `${wholeHours}h`;
   }
 
-  return `${wholeHours}h ${minutes}m`;
+  return `${wholeHours}h ${minutes}min`;
 };
 
 // Format hours: show in minutes if < 1 hour, or in hours if >= 1 hour
 const formatAverageTime = (hours: number): string => {
-  if (!hours || hours === 0) return '0m';
+  if (!hours || hours === 0) return '0min';
 
   // If less than 1 hour, show in minutes
   if (hours < 1) {
     const minutes = Math.round(hours * 60);
-    return `${minutes}m`;
+    return `${minutes}min`;
   }
 
   // If 1 hour or more, show in hours (with minutes if needed)
@@ -3739,7 +3739,7 @@ const formatAverageTime = (hours: number): string => {
     return `${wholeHours}h`;
   }
 
-  return `${wholeHours}h ${minutes}m`;
+  return `${wholeHours}h ${minutes}min`;
 };
 
 // Get total count of tickets in "in progress" status
