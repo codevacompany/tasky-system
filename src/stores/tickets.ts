@@ -67,6 +67,11 @@ interface TicketsState {
   recentReceivedTickets: Ticket[];
   recentCreatedTickets: Ticket[];
   selectedTicket: Ticket | null;
+  lastTicketUpdateEvent: {
+    ticketId: number;
+    customId: string;
+    timestamp: number;
+  } | null;
   globalRefreshInterval: number;
   isPollingActive: boolean;
   statusColumns: {
@@ -129,7 +134,12 @@ export const useTicketsStore = defineStore('tickets', () => {
   const recentReceivedTickets = ref<Ticket[]>([]);
   const recentCreatedTickets = ref<Ticket[]>([]);
   const selectedTicket = ref<Ticket | null>(null);
-  const globalRefreshInterval = ref<number>(90000); // 90 seconds default
+  const lastTicketUpdateEvent = ref<{
+    ticketId: number;
+    customId: string;
+    timestamp: number;
+  } | null>(null);
+  const globalRefreshInterval = ref<number>(600000); // 10 minutes default
   const isPollingActive = ref<boolean>(false);
   let pollingTimerId: number | null = null;
 
@@ -597,18 +607,57 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   function updateTicketInCollections(updatedTicket: Ticket) {
-    const updateInCollection = (collection: Ticket[]) => {
-      const index = collection.findIndex((t) => t.customId === updatedTicket.customId);
+    const userStore = useUserStore();
+    const currentUserId = userStore.user?.id;
+    const currentDeptId = userStore.user?.departmentId;
+
+    const findAndReplace = (collectionObj: {
+      data: Ticket[];
+      totalCount: number;
+      currentPage: number;
+    }) => {
+      const index = collectionObj.data.findIndex((t) => t.customId === updatedTicket.customId);
       if (index !== -1) {
-        collection[index] = updatedTicket;
+        // Merge with existing data to avoid losing properties not sent in the partial update
+        collectionObj.data[index] = { ...collectionObj.data[index], ...updatedTicket };
+        return true;
       }
+      return false;
     };
 
-    updateInCollection(myTickets.value.data);
-    updateInCollection(receivedTickets.value.data);
-    updateInCollection(departmentTickets.value.data);
-    updateInCollection(archivedTickets.value.data);
-    updateInCollection(tenantTickets.value.data);
+    // My Tickets
+    if (!findAndReplace(myTickets.value)) {
+      if (updatedTicket.requester?.id === currentUserId && myTickets.value.currentPage === 1) {
+        myTickets.value.data.unshift(updatedTicket);
+        myTickets.value.totalCount++;
+      }
+    }
+
+    // Received Tickets
+    if (!findAndReplace(receivedTickets.value)) {
+      const isMeTarget = updatedTicket.targetUsers?.some((tu) => tu.userId === currentUserId);
+      if (isMeTarget && receivedTickets.value.currentPage === 1) {
+        receivedTickets.value.data.unshift(updatedTicket);
+        receivedTickets.value.totalCount++;
+      }
+    }
+
+    // Department Tickets
+    if (!findAndReplace(departmentTickets.value)) {
+      const anyTargetMeDept = updatedTicket.targetUsers?.some(
+        (tu) => tu.user?.departmentId === currentDeptId,
+      );
+      const requesterMeDept = updatedTicket.requester?.departmentId === currentDeptId;
+
+      if ((requesterMeDept || anyTargetMeDept) && departmentTickets.value.currentPage === 1) {
+        departmentTickets.value.data.unshift(updatedTicket);
+        departmentTickets.value.totalCount++;
+      }
+    }
+
+    // Other collections (just update if exists)
+    findAndReplace(archivedTickets.value);
+    findAndReplace(tenantTickets.value);
   }
 
   function removeTicketFromCollections(ticketId: string) {
@@ -881,6 +930,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     archivedTickets,
     tenantTickets,
     selectedTicket,
+    lastTicketUpdateEvent,
     globalRefreshInterval,
     isPollingActive,
     statusColumns,

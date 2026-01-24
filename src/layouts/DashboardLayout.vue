@@ -189,7 +189,7 @@
             class="btn btn-primary flex items-center gap-2"
             @click="openTicketModal"
           >
-            <font-awesome-icon icon="plus" class="text-xs sm:text-[13.5px]"/>
+            <font-awesome-icon icon="plus" class="text-xs sm:text-[13.5px]" />
             <span class="text-xs sm:text-[13.5px]">Nova Tarefa</span>
           </button>
 
@@ -197,7 +197,10 @@
             class="flex text-gray-800 dark:text-gray-200 relative cursor-pointer sm:ml-6"
             @click="toggleNotificationsModal"
           >
-            <font-awesome-icon :icon="['far', 'bell']" class="text-lg text-txt-secondary dark:text-gray-200" />
+            <font-awesome-icon
+              :icon="['far', 'bell']"
+              class="text-lg text-txt-secondary dark:text-gray-200"
+            />
             <span v-if="unreadCount && unreadCount > 0" class="notification-badge">{{
               unreadCount
             }}</span>
@@ -227,7 +230,10 @@
               <span class="text-txt-secondary dark:text-gray-200 font-medium text-[14px]">{{
                 user?.firstName
               }}</span>
-              <font-awesome-icon icon="chevron-down" class="text-sm font-bold ml-2 text-txt-secondary dark:text-gray-200" />
+              <font-awesome-icon
+                icon="chevron-down"
+                class="text-sm font-bold ml-2 text-txt-secondary dark:text-gray-200"
+              />
             </div>
           </div>
         </div>
@@ -454,7 +460,8 @@ const showProfileModal = ref(false);
 const showNotificationsModal = ref(false);
 const unreadCount = ref<number | undefined>(undefined);
 let notificationsIntervalId: number | null = null;
-// let source: EventSource | null = null;
+const source = ref<EventSource | null>(null);
+const reconnectionTimeout = ref<number | null>(null);
 
 const showAdminDropdown = ref(false);
 const showMobileMenu = ref(false);
@@ -540,24 +547,86 @@ const initializeTicketPolling = () => {
   }
 };
 
+const connectToNotificationStream = async () => {
+  if (source.value) {
+    source.value.close();
+  }
+
+  try {
+    const response = await notificationService.getStreamTicket();
+    const streamTicket = response.data.streamTicket;
+
+    const streamUrl = `${import.meta.env.VITE_API_BASE_URL}/notifications/stream?streamTicket=${streamTicket}`;
+
+    source.value = new EventSource(streamUrl);
+
+    source.value.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+
+        // Handle Notification events
+        if (payload?.type === 'notification') {
+          if (payload.unreadCount !== undefined) {
+            if (unreadCount.value !== undefined && payload.unreadCount > unreadCount.value) {
+              playNotificationSound();
+            }
+            unreadCount.value = payload.unreadCount;
+          }
+        } else if (payload?.type === 'ticket_update' && payload.ticket) {
+          const ticketsStore = useTicketsStore();
+          ticketsStore.updateTicketInCollections(payload.ticket);
+
+          // Record the update event to trigger UI silent refreshes
+          ticketsStore.lastTicketUpdateEvent = {
+            ticketId: payload.ticket.id,
+            customId: payload.ticket.customId,
+            timestamp: Date.now(),
+          };
+
+          if (
+            ticketsStore.selectedTicket &&
+            ticketsStore.selectedTicket.customId === payload.ticket.customId
+          ) {
+            ticketsStore.selectedTicket = payload.ticket;
+          }
+        }
+      } catch (e) {
+        console.error('Error parsing SSE event:', e);
+      }
+    };
+
+    source.value.onerror = (err) => {
+      console.error('SSE connection error:', err);
+      source.value?.close();
+
+      // Try to reconnect after 5 seconds
+      if (reconnectionTimeout.value) clearTimeout(reconnectionTimeout.value);
+      reconnectionTimeout.value = setTimeout(() => {
+        connectToNotificationStream();
+      }, 5000) as unknown as number;
+    };
+  } catch (err) {
+    console.error('Error fetching stream ticket:', err);
+    // Retry after 10 seconds if ticket request fails
+    if (reconnectionTimeout.value) clearTimeout(reconnectionTimeout.value);
+    reconnectionTimeout.value = setTimeout(() => {
+      connectToNotificationStream();
+    }, 10000) as unknown as number;
+  }
+};
+
 onMounted(() => {
   // Only fetch notifications if terms have been accepted
   if (userStore.user?.termsAccepted && userStore.user?.privacyPolicyAccepted) {
     fetchUnreadCount();
     initializeTicketPolling();
+    connectToNotificationStream();
   }
 
-  //let's use a polling strategy for now
+  // Keep a long polling as backup (10 minutes) for unread count consistency if connection drops
   notificationsIntervalId = setInterval(() => {
     fetchUnreadCount();
-  }, 90000) as unknown as number;
-
-  // source = new EventSource(`${import.meta.env.VITE_API_BASE_URL}/notifications/stream/${user?.id}`);
-  // source.onmessage = () => {
-  //   playNotificationSound();
-  //   fetchUnreadCount();
-  //   toast.info('Nova notificação recebida.');
-  // };
+  }, 600000) as unknown as number;
 
   document.addEventListener('click', handleClickOutside);
 });
@@ -569,7 +638,13 @@ onUnmounted(() => {
 
   ticketsStore.stopPolling();
 
-  // source?.close();
+  if (source.value) {
+    source.value.close();
+  }
+
+  if (reconnectionTimeout.value) {
+    clearTimeout(reconnectionTimeout.value);
+  }
   document.removeEventListener('click', handleClickOutside);
 });
 </script>
