@@ -64,14 +64,6 @@ const routes: RouteRecordRaw[] = [
       },
       { path: 'faq', component: () => import('@/pages/user/FAQ.vue') },
       { path: 'sync', component: SyncPage },
-      {
-        path: 'assinaturas',
-        redirect: '/admin/configuracoes/assinaturas',
-      },
-      {
-        path: 'assinaturas/simular-plano-customizado',
-        redirect: '/admin/configuracoes/assinaturas/simular-plano-customizado',
-      },
     ],
     meta: { requiresAuth: true },
   },
@@ -209,8 +201,12 @@ router.beforeEach(async (to, from, next) => {
     return next('/');
   }
 
-  if (requiresAuth && userStore.hasActiveSubscription === false && to.path !== '/assinaturas') {
-    return next('/assinaturas');
+  if (
+    requiresAuth &&
+    userStore.hasActiveSubscription === false &&
+    !to.path.includes('/admin/configuracoes/assinaturas')
+  ) {
+    return next('/admin/configuracoes/assinaturas');
   }
 
   // Check if user has accepted terms (except for accept-terms endpoint and public pages)
@@ -218,7 +214,7 @@ router.beforeEach(async (to, from, next) => {
     requiresAuth &&
     userStore.user &&
     (!userStore.user.termsAccepted || !userStore.user.privacyPolicyAccepted) &&
-    to.path !== '/assinaturas' &&
+    !to.path.includes('/admin/configuracoes/assinaturas') &&
     !to.path.includes('/accept-terms')
   ) {
     // Don't redirect if already on home page (modal will show)

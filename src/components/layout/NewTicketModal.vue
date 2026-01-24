@@ -77,40 +77,43 @@
       <div v-if="currentStep === 1" class="space-y-5">
         <!-- Assunto -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5">
-          <div class="col-span-1 md:col-span-4 flex flex-col gap-1.5">
-            <label for="title" class="text-sm text-gray-800 dark:text-gray-200"
-              >Assunto: <span class="text-red-500">*</span></label
-            >
+          <FormField
+            label="Assunto:"
+            htmlFor="title"
+            :required="true"
+            class="col-span-1 md:col-span-4"
+          >
             <Input
               id="title"
               v-model="formData.name"
               placeholder="Digite o assunto da tarefa"
               required
             />
-          </div>
+          </FormField>
         </div>
 
         <div class="grid grid-cols-2 gap-4 md:gap-5">
-          <div class="col-span-1 flex flex-col gap-1.5">
-            <label class="text-sm text-gray-800 dark:text-gray-200"
-              >Prioridade: <span class="text-red-500">*</span></label
-            >
+          <FormField label="Prioridade:" :required="true" class="col-span-1">
             <Select
               :options="priorityOptions"
               :modelValue="priorityValue"
               @update:modelValue="updatePriority"
             />
-          </div>
+          </FormField>
 
-          <div class="col-span-1 flex flex-col gap-1.5">
-            <label class="text-sm text-gray-800 dark:text-gray-200">É privado?</label>
+          <FormField
+            label="É privado?"
+            class="col-span-1"
+            tooltip="Tarefas privadas só podem ser visualizadas pelos usuários envolvidos e por administradores. Supervisores podem ver as tarefas privadas no quadro ou na lista mas não podem ver os detalhes da tarefa."
+            tooltipWidth="320px"
+          >
             <Select
               :options="privateOptions"
               :modelValue="isPrivateValue"
               @update:modelValue="updateIsPrivate"
               :disabled="isPrivateDisabled"
             />
-          </div>
+          </FormField>
         </div>
 
         <TargetUsersSelector
@@ -121,15 +124,26 @@
           :currentUserId="currentUserId"
           class="col-span-2"
         />
+        <!-- Reviewer Selector (Only for Admins and Supervisors) -->
+        <FormField
+          v-if="isAdminOrSupervisor"
+          label="Revisor:"
+          :optional="true"
+          tooltip="Se nenhum revisor for selecionado, você será automaticamente definido como revisor da tarefa."
+          tooltipWidth="280px"
+        >
+          <Select
+            :options="reviewerOptions"
+            :modelValue="reviewerValue"
+            @update:modelValue="updateReviewer"
+          />
+        </FormField>
       </div>
 
       <!-- Step 2: Additional Details -->
       <div v-if="currentStep === 2" class="mt-4 sm:mt-8 flex flex-col gap-5">
         <!-- Descrição -->
-        <div class="flex flex-col gap-1.5 w-full">
-          <label for="description" class="text-sm font-medium text-gray-800 dark:text-gray-200"
-            >Descrição: <span class="text-red-500">*</span></label
-          >
+        <FormField label="Descrição:" htmlFor="description" :required="true" class="w-full">
           <div class="quill-wrapper" ref="quillWrapperRef">
             <QuillEditor
               v-model:content="formData.description"
@@ -138,25 +152,24 @@
               :options="editorOptions"
             />
           </div>
-        </div>
+        </FormField>
 
         <!-- Categoria and Concluir até -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <div class="flex flex-col gap-1.5">
-            <label for="category" class="text-sm font-medium text-gray-800 dark:text-gray-200"
-              >Categoria: <span class="text-red-500">*</span></label
-            >
+          <FormField label="Categoria:" htmlFor="category" :required="true">
             <Select
               :options="categoryOptions"
               :modelValue="selectedCategory?.toString() || ''"
               @update:modelValue="updateSelectedCategory"
             />
-          </div>
+          </FormField>
 
-          <div class="flex flex-col gap-1.5">
-            <label for="dueAt" class="text-sm font-medium text-gray-800 dark:text-gray-200"
-              >Concluir até:</label
-            >
+          <FormField
+            label="Concluir até:"
+            htmlFor="dueAt"
+            tooltip="Se nenhuma data de conclusão for definida, o usuário destinatário será obrigado a definir uma antes de aceitar a tarefa."
+            tooltipWidth="300px"
+          >
             <div class="w-full">
               <DatePicker
                 :value="formData.dueAt"
@@ -184,7 +197,7 @@
                 }"
               />
             </div>
-          </div>
+          </FormField>
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-2">
@@ -405,7 +418,7 @@ import { departmentService } from '@/services/departmentService';
 import { userService } from '@/services/userService';
 import { categoryService } from '@/services/categoryService';
 import { toast } from 'vue3-toastify';
-import { TicketPriority, type Category, type Department, type User } from '@/models';
+import { TicketPriority, type Category, type Department, type User, RoleName } from '@/models';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
@@ -416,6 +429,7 @@ import { awsService } from '@/services/awsService';
 import BaseModal from '@/components/common/BaseModal.vue';
 import Input from '@/components/common/Input.vue';
 import Select from '@/components/common/Select.vue';
+import FormField from '@/components/common/FormField.vue';
 import TargetUsersSelector from '@/components/common/TargetUsersSelector.vue';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
@@ -432,6 +446,7 @@ const ticketsStore = useTicketsStore();
 const departments = ref<Department[]>([]);
 const availableUsers = ref<User[]>([]);
 const allUsers = ref<User[]>([]);
+const reviewerUsers = ref<User[]>([]);
 const selectedDepartment = ref<number | null>(null);
 const selectedUser = ref<number | null>(null);
 const categories = ref<Category[]>([]);
@@ -517,6 +532,7 @@ const formData = ref({
   requesterId: useUserStore().user?.id || null,
   categoryId: null as number | null,
   isPrivate: false,
+  reviewerId: null as number | null,
 });
 
 // Separate ref for DatePicker (Date object)
@@ -664,6 +680,28 @@ const updateSelectedCategory = (value: string) => {
   selectedCategory.value = value ? parseInt(value) : null;
 };
 
+// Reviewer-related computed properties
+const isAdminOrSupervisor = computed(() => {
+  const user = useUserStore().user;
+  return user?.role?.name === RoleName.TenantAdmin || user?.role?.name === RoleName.Supervisor;
+});
+
+const reviewerOptions = computed(() => [
+  { value: '', label: 'Selecione um revisor' },
+  ...reviewerUsers.value.map((user) => ({
+    value: user.id.toString(),
+    label: `${user.firstName} ${user.lastName}`,
+  })),
+]);
+
+const reviewerValue = computed(() => {
+  return formData.value.reviewerId?.toString() || '';
+});
+
+const updateReviewer = (value: string) => {
+  formData.value.reviewerId = value ? parseInt(value) : null;
+};
+
 const parseDateTime = (dateString: string): Date | null => {
   if (!dateString) return null;
   try {
@@ -730,6 +768,18 @@ const loadAllUsers = async () => {
   }
 };
 
+const loadReviewers = async () => {
+  try {
+    const { data } = await userService.fetch({ limit: 100 });
+    // Filter only admins and supervisors
+    reviewerUsers.value = data.items.filter(
+      (user) => user.role?.name === RoleName.TenantAdmin || user.role?.name === RoleName.Supervisor,
+    );
+  } catch {
+    toast.error('Erro ao carregar revisores');
+  }
+};
+
 const updateUsersList = async () => {
   if (!selectedDepartment.value) {
     availableUsers.value = [];
@@ -792,6 +842,7 @@ const resetForm = () => {
     requesterId: useUserStore().user!.id,
     categoryId: null,
     isPrivate: false,
+    reviewerId: null,
   };
   dueAtDate.value = null;
   selectedDepartment.value = null;
@@ -913,6 +964,7 @@ onMounted(() => {
   loadDepartments();
   loadCategories();
   loadAllUsers();
+  loadReviewers();
 
   // Set up MutationObserver to detect Quill dropdowns
   nextTick(() => {
@@ -1097,6 +1149,7 @@ const handleSubmit = async () => {
       dueAt: dueAtISO,
       categoryId: selectedCategory.value ?? null,
       isPrivate: formData.value.isPrivate,
+      reviewerId: formData.value.reviewerId,
       files: fileUrls,
       targetUserIds,
       checklistItems: checklistItems.value,
