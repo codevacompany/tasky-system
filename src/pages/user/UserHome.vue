@@ -387,12 +387,20 @@ onMounted(async () => {
 
   isLoading.value = true;
 
-  if (ticketsStore.receivedTickets.currentPage !== 1) {
-    await ticketsStore.fetchReceivedTickets(1);
+  const fetchPromises = [];
+  if (
+    ticketsStore.receivedTickets.currentPage !== 1 ||
+    ticketsStore.receivedTickets.data.length === 0
+  ) {
+    fetchPromises.push(ticketsStore.fetchReceivedTickets(1));
   }
 
-  if (ticketsStore.myTickets.currentPage !== 1) {
-    await ticketsStore.fetchMyTickets(1);
+  if (ticketsStore.myTickets.currentPage !== 1 || ticketsStore.myTickets.data.length === 0) {
+    fetchPromises.push(ticketsStore.fetchMyTickets(1));
+  }
+
+  if (fetchPromises.length > 0) {
+    await Promise.all(fetchPromises);
   }
 
   try {
