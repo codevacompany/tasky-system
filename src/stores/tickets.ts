@@ -625,20 +625,67 @@ export const useTicketsStore = defineStore('tickets', () => {
       return false;
     };
 
+    const isMeRequester = updatedTicket.requester?.id === currentUserId;
+    const isMeTarget = updatedTicket.targetUsers?.some((tu) => tu.userId === currentUserId);
+
+    const viewPreference = localStorageService.getTicketsViewPreference();
+    const isKanbanView = viewPreference === 'kanban';
+
     // My Tickets
     if (!findAndReplace(myTickets.value)) {
-      if (updatedTicket.requester?.id === currentUserId && myTickets.value.currentPage === 1) {
-        myTickets.value.data.unshift(updatedTicket);
+      if (isMeRequester) {
+        if (myTickets.value.currentPage === 1) {
+          myTickets.value.data.unshift(updatedTicket);
+          if (!isKanbanView && myTickets.value.data.length > 10) {
+            myTickets.value.data.pop();
+          }
+        }
         myTickets.value.totalCount++;
+      }
+    }
+
+    // Recent Created Tickets
+    const recentCreatedIndex = recentCreatedTickets.value.findIndex(
+      (t) => t.customId === updatedTicket.customId,
+    );
+    if (recentCreatedIndex !== -1) {
+      recentCreatedTickets.value[recentCreatedIndex] = {
+        ...recentCreatedTickets.value[recentCreatedIndex],
+        ...updatedTicket,
+      };
+    } else if (isMeRequester) {
+      recentCreatedTickets.value.unshift(updatedTicket);
+      if (recentCreatedTickets.value.length > 5) {
+        recentCreatedTickets.value.pop();
       }
     }
 
     // Received Tickets
     if (!findAndReplace(receivedTickets.value)) {
-      const isMeTarget = updatedTicket.targetUsers?.some((tu) => tu.userId === currentUserId);
-      if (isMeTarget && receivedTickets.value.currentPage === 1) {
-        receivedTickets.value.data.unshift(updatedTicket);
+      if (isMeTarget) {
+        if (receivedTickets.value.currentPage === 1) {
+          receivedTickets.value.data.unshift(updatedTicket);
+          if (!isKanbanView && receivedTickets.value.data.length > 10) {
+            receivedTickets.value.data.pop();
+          }
+        }
         receivedTickets.value.totalCount++;
+      }
+    }
+
+    // Recent Received Tickets
+    const recentReceivedIndex = recentReceivedTickets.value.findIndex(
+      (t) => t.customId === updatedTicket.customId,
+    );
+    if (recentReceivedIndex !== -1) {
+      recentReceivedTickets.value[recentReceivedIndex] = {
+        ...recentReceivedTickets.value[recentReceivedIndex],
+        ...updatedTicket,
+      };
+    } else if (isMeTarget) {
+      recentReceivedTickets.value.unshift(updatedTicket);
+      if (recentReceivedTickets.value.length > 5) {
+        recentReceivedTickets.value.pop();
       }
     }
 
@@ -649,8 +696,13 @@ export const useTicketsStore = defineStore('tickets', () => {
       );
       const requesterMeDept = updatedTicket.requester?.departmentId === currentDeptId;
 
-      if ((requesterMeDept || anyTargetMeDept) && departmentTickets.value.currentPage === 1) {
-        departmentTickets.value.data.unshift(updatedTicket);
+      if (requesterMeDept || anyTargetMeDept) {
+        if (departmentTickets.value.currentPage === 1) {
+          departmentTickets.value.data.unshift(updatedTicket);
+          if (!isKanbanView && departmentTickets.value.data.length > 10) {
+            departmentTickets.value.data.pop();
+          }
+        }
         departmentTickets.value.totalCount++;
       }
     }
@@ -661,8 +713,12 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   function removeTicketFromCollections(ticketId: string) {
-    const removeFromCollection = (collection: Ref<{ data: Ticket[] }>) => {
+    const removeFromCollection = (collection: Ref<{ data: Ticket[]; totalCount: number }>) => {
+      const originalLength = collection.value.data.length;
       collection.value.data = collection.value.data.filter((t) => t.customId !== ticketId);
+      if (collection.value.data.length < originalLength) {
+        collection.value.totalCount--;
+      }
     };
 
     removeFromCollection(myTickets);
@@ -670,6 +726,12 @@ export const useTicketsStore = defineStore('tickets', () => {
     removeFromCollection(departmentTickets);
     removeFromCollection(archivedTickets);
     removeFromCollection(tenantTickets);
+
+    // Also remove from recent lists
+    recentCreatedTickets.value = recentCreatedTickets.value.filter((t) => t.customId !== ticketId);
+    recentReceivedTickets.value = recentReceivedTickets.value.filter(
+      (t) => t.customId !== ticketId,
+    );
   }
 
   async function refreshAllTickets() {

@@ -3106,6 +3106,7 @@ const fetchTicket = async (customId: string, silent = false) => {
 
     // Check if ticket is awaiting verification and user is reviewer
     if (
+      !silent &&
       userStore.user?.id === ticket.reviewer?.id &&
       (ticket.ticketStatus?.key === DefaultTicketStatus.AwaitingVerification ||
         ticket.status === DefaultTicketStatus.AwaitingVerification) &&
@@ -3116,6 +3117,7 @@ const fetchTicket = async (customId: string, silent = false) => {
 
     // Check if ticket is pending and user is the target user
     if (
+      !silent &&
       userStore.user?.id === ticket.currentTargetUserId &&
       (ticket.ticketStatus?.key === DefaultTicketStatus.Pending ||
         ticket.status === DefaultTicketStatus.Pending) &&
