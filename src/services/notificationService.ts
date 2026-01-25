@@ -1,4 +1,4 @@
-import type { Notification, CreateNotificationDto, UpdateNotificationDto } from '@/models';
+import type { Notification, CreateNotificationDto } from '@/models';
 import type { PaginatedResponse } from '@/types/http';
 import apiClient from '@/utils/axiosInstance';
 import type { AxiosResponse } from 'axios';
@@ -35,5 +35,9 @@ export const notificationService = {
 
   async delete(uuid: string): Promise<AxiosResponse<{ message: string }>> {
     return apiClient.delete(`/notifications/${uuid}`);
+  },
+
+  async getStreamTicket(): Promise<AxiosResponse<{ streamTicket: string }>> {
+    return apiClient.post(`/notifications/stream-ticket`);
   },
 };

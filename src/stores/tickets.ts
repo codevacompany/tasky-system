@@ -67,6 +67,11 @@ interface TicketsState {
   recentReceivedTickets: Ticket[];
   recentCreatedTickets: Ticket[];
   selectedTicket: Ticket | null;
+  lastTicketUpdateEvent: {
+    ticketId: number;
+    customId: string;
+    timestamp: number;
+  } | null;
   globalRefreshInterval: number;
   isPollingActive: boolean;
   statusColumns: {
@@ -129,7 +134,12 @@ export const useTicketsStore = defineStore('tickets', () => {
   const recentReceivedTickets = ref<Ticket[]>([]);
   const recentCreatedTickets = ref<Ticket[]>([]);
   const selectedTicket = ref<Ticket | null>(null);
-  const globalRefreshInterval = ref<number>(90000); // 90 seconds default
+  const lastTicketUpdateEvent = ref<{
+    ticketId: number;
+    customId: string;
+    timestamp: number;
+  } | null>(null);
+  const globalRefreshInterval = ref<number>(600000); // 10 minutes default
   const isPollingActive = ref<boolean>(false);
   let pollingTimerId: number | null = null;
 
@@ -597,23 +607,118 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   function updateTicketInCollections(updatedTicket: Ticket) {
-    const updateInCollection = (collection: Ticket[]) => {
-      const index = collection.findIndex((t) => t.customId === updatedTicket.customId);
+    const userStore = useUserStore();
+    const currentUserId = userStore.user?.id;
+    const currentDeptId = userStore.user?.departmentId;
+
+    const findAndReplace = (collectionObj: {
+      data: Ticket[];
+      totalCount: number;
+      currentPage: number;
+    }) => {
+      const index = collectionObj.data.findIndex((t) => t.customId === updatedTicket.customId);
       if (index !== -1) {
-        collection[index] = updatedTicket;
+        // Merge with existing data to avoid losing properties not sent in the partial update
+        collectionObj.data[index] = { ...collectionObj.data[index], ...updatedTicket };
+        return true;
       }
+      return false;
     };
 
-    updateInCollection(myTickets.value.data);
-    updateInCollection(receivedTickets.value.data);
-    updateInCollection(departmentTickets.value.data);
-    updateInCollection(archivedTickets.value.data);
-    updateInCollection(tenantTickets.value.data);
+    const isMeRequester = updatedTicket.requester?.id === currentUserId;
+    const isMeTarget = updatedTicket.targetUsers?.some((tu) => tu.userId === currentUserId);
+
+    const viewPreference = localStorageService.getTicketsViewPreference();
+    const isKanbanView = viewPreference === 'kanban';
+
+    // My Tickets
+    if (!findAndReplace(myTickets.value)) {
+      if (isMeRequester) {
+        if (myTickets.value.currentPage === 1) {
+          myTickets.value.data.unshift(updatedTicket);
+          if (!isKanbanView && myTickets.value.data.length > 10) {
+            myTickets.value.data.pop();
+          }
+        }
+        myTickets.value.totalCount++;
+      }
+    }
+
+    // Recent Created Tickets
+    const recentCreatedIndex = recentCreatedTickets.value.findIndex(
+      (t) => t.customId === updatedTicket.customId,
+    );
+    if (recentCreatedIndex !== -1) {
+      recentCreatedTickets.value[recentCreatedIndex] = {
+        ...recentCreatedTickets.value[recentCreatedIndex],
+        ...updatedTicket,
+      };
+    } else if (isMeRequester) {
+      recentCreatedTickets.value.unshift(updatedTicket);
+      if (recentCreatedTickets.value.length > 5) {
+        recentCreatedTickets.value.pop();
+      }
+    }
+
+    // Received Tickets
+    if (!findAndReplace(receivedTickets.value)) {
+      if (isMeTarget) {
+        if (receivedTickets.value.currentPage === 1) {
+          receivedTickets.value.data.unshift(updatedTicket);
+          if (!isKanbanView && receivedTickets.value.data.length > 10) {
+            receivedTickets.value.data.pop();
+          }
+        }
+        receivedTickets.value.totalCount++;
+      }
+    }
+
+    // Recent Received Tickets
+    const recentReceivedIndex = recentReceivedTickets.value.findIndex(
+      (t) => t.customId === updatedTicket.customId,
+    );
+    if (recentReceivedIndex !== -1) {
+      recentReceivedTickets.value[recentReceivedIndex] = {
+        ...recentReceivedTickets.value[recentReceivedIndex],
+        ...updatedTicket,
+      };
+    } else if (isMeTarget) {
+      recentReceivedTickets.value.unshift(updatedTicket);
+      if (recentReceivedTickets.value.length > 5) {
+        recentReceivedTickets.value.pop();
+      }
+    }
+
+    // Department Tickets
+    if (!findAndReplace(departmentTickets.value)) {
+      const anyTargetMeDept = updatedTicket.targetUsers?.some(
+        (tu) => tu.user?.departmentId === currentDeptId,
+      );
+      const requesterMeDept = updatedTicket.requester?.departmentId === currentDeptId;
+
+      if (requesterMeDept || anyTargetMeDept) {
+        if (departmentTickets.value.currentPage === 1) {
+          departmentTickets.value.data.unshift(updatedTicket);
+          if (!isKanbanView && departmentTickets.value.data.length > 10) {
+            departmentTickets.value.data.pop();
+          }
+        }
+        departmentTickets.value.totalCount++;
+      }
+    }
+
+    // Other collections (just update if exists)
+    findAndReplace(archivedTickets.value);
+    findAndReplace(tenantTickets.value);
   }
 
   function removeTicketFromCollections(ticketId: string) {
-    const removeFromCollection = (collection: Ref<{ data: Ticket[] }>) => {
+    const removeFromCollection = (collection: Ref<{ data: Ticket[]; totalCount: number }>) => {
+      const originalLength = collection.value.data.length;
       collection.value.data = collection.value.data.filter((t) => t.customId !== ticketId);
+      if (collection.value.data.length < originalLength) {
+        collection.value.totalCount--;
+      }
     };
 
     removeFromCollection(myTickets);
@@ -621,6 +726,12 @@ export const useTicketsStore = defineStore('tickets', () => {
     removeFromCollection(departmentTickets);
     removeFromCollection(archivedTickets);
     removeFromCollection(tenantTickets);
+
+    // Also remove from recent lists
+    recentCreatedTickets.value = recentCreatedTickets.value.filter((t) => t.customId !== ticketId);
+    recentReceivedTickets.value = recentReceivedTickets.value.filter(
+      (t) => t.customId !== ticketId,
+    );
   }
 
   async function refreshAllTickets() {
@@ -881,6 +992,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     archivedTickets,
     tenantTickets,
     selectedTicket,
+    lastTicketUpdateEvent,
     globalRefreshInterval,
     isPollingActive,
     statusColumns,
