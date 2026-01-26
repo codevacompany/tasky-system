@@ -399,12 +399,26 @@ const getSortedTargetUsers = (ticket: Ticket) => {
 };
 
 const shouldBeGrayscale = (ticket: Ticket) => {
-  return (
-    !isCurrentTargetUser(ticket) &&
-    (ticket.ticketStatus?.key === DefaultTicketStatus.Pending ||
-      ticket.ticketStatus?.key === DefaultTicketStatus.InProgress ||
-      ticket.ticketStatus?.key === DefaultTicketStatus.Returned)
-  );
+  const status = ticket.ticketStatus?.key || ticket.status;
+
+  if (props.activeTab === 'recebidas') {
+    return (
+      !isCurrentTargetUser(ticket) &&
+      (status === DefaultTicketStatus.Pending ||
+        status === DefaultTicketStatus.InProgress ||
+        status === DefaultTicketStatus.Returned)
+    );
+  }
+
+  if (props.activeTab === 'criadas') {
+    return (
+      (status === DefaultTicketStatus.AwaitingVerification ||
+        status === DefaultTicketStatus.UnderVerification) &&
+      ticket.reviewer?.id !== userStore.user?.id
+    );
+  }
+
+  return false;
 };
 
 const isCurrentTargetUser = (ticket: Ticket) => {
