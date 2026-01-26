@@ -432,7 +432,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import NewTicketModal from '@/components/layout/NewTicketModal.vue';
 import ProfileModal from '@/components/layout/ProfileModal.vue';
 import NotificationsDropdown from '@/components/layout/NotificationsDropdown.vue';
@@ -549,6 +549,7 @@ const initializeTicketPolling = () => {
 
 const connectToNotificationStream = async () => {
   if (source.value) {
+    console.log('Closing existing EventSource connection');
     source.value.close();
   }
 
@@ -559,6 +560,7 @@ const connectToNotificationStream = async () => {
     const streamUrl = `${import.meta.env.VITE_API_BASE_URL}/notifications/stream?streamTicket=${streamTicket}`;
 
     source.value = new EventSource(streamUrl);
+    console.log('Connected to notification stream');
 
     source.value.onmessage = (event) => {
       try {
@@ -615,18 +617,39 @@ const connectToNotificationStream = async () => {
   }
 };
 
-onMounted(() => {
-  // Only fetch notifications if terms have been accepted
+// TODO: Refactor this
+const isInitialized = ref(false);
+
+const initializeDashboardFeatures = () => {
+  if (isInitialized.value) return;
+
   if (userStore.user?.termsAccepted && userStore.user?.privacyPolicyAccepted) {
+    isInitialized.value = true;
     fetchUnreadCount();
     initializeTicketPolling();
     connectToNotificationStream();
   }
+};
+
+watch(
+  () => [userStore.user?.termsAccepted, userStore.user?.privacyPolicyAccepted, userStore.user?.id],
+  () => {
+    if (userStore.user) {
+      initializeDashboardFeatures();
+    }
+  },
+  { immediate: true },
+);
+
+onMounted(() => {
+  initializeDashboardFeatures();
 
   // Keep a long polling as backup (10 minutes) for unread count consistency if connection drops
   notificationsIntervalId = setInterval(() => {
-    fetchUnreadCount();
-  }, 600000) as unknown as number;
+    if (userStore.user?.termsAccepted && userStore.user?.privacyPolicyAccepted) {
+      fetchUnreadCount();
+    }
+  }, 180000) as unknown as number;
 
   document.addEventListener('click', handleClickOutside);
 });
