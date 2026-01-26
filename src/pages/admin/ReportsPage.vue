@@ -466,7 +466,7 @@
                     <p class="text-sm text-center">
                       {{
                         topUsersSortBy === 'efficiency'
-                          ? 'Nenhum colaborador com 10+ tarefas encontrado'
+                          ? 'Nenhum colaborador com 5+ tarefas encontrado'
                           : 'Nenhum colaborador encontrado'
                       }}
                     </p>
@@ -622,7 +622,7 @@
                     <p class="text-sm text-center">
                       {{
                         topDepartmentsSortBy === 'efficiency'
-                          ? 'Nenhum setor com 10+ tarefas encontrado'
+                          ? 'Nenhum setor com 5+ tarefas encontrado'
                           : 'Nenhum setor encontrado'
                       }}
                     </p>
@@ -2922,7 +2922,7 @@ const topFiveDepartments = computed(() => {
       )
       .slice(0, 5);
   } else {
-    // When sorting by efficiency, only show departments with valid scores (10+ tickets)
+    // When sorting by efficiency, only show departments with valid scores (5+ tickets)
     return copy
       .filter((dept) => dept.efficiencyScore !== undefined)
       .sort((a, b) => (b.efficiencyScore || 0) - (a.efficiencyScore || 0))

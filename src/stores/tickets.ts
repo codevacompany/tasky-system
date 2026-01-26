@@ -838,50 +838,23 @@ export const useTicketsStore = defineStore('tickets', () => {
     stopPolling();
   }
 
-  function clear() {
-    myTickets.value = {
+  function clearCache() {
+    const emptyCollection = () => ({
       data: [],
       isLoading: false,
       error: null,
       totalCount: 0,
       lastFetched: null,
       currentPage: 1,
-    };
-    receivedTickets.value = {
-      data: [],
-      isLoading: false,
-      error: null,
-      totalCount: 0,
-      lastFetched: null,
-      currentPage: 1,
-    };
-    departmentTickets.value = {
-      data: [],
-      isLoading: false,
-      error: null,
-      totalCount: 0,
-      lastFetched: null,
-      currentPage: 1,
-    };
-    archivedTickets.value = {
-      data: [],
-      isLoading: false,
-      error: null,
-      totalCount: 0,
-      lastFetched: null,
-      currentPage: 1,
-    };
-    tenantTickets.value = {
-      data: [],
-      isLoading: false,
-      error: null,
-      totalCount: 0,
-      lastFetched: null,
-      currentPage: 1,
-    };
+    });
+
+    myTickets.value = emptyCollection();
+    receivedTickets.value = emptyCollection();
+    departmentTickets.value = emptyCollection();
+    archivedTickets.value = emptyCollection();
+    tenantTickets.value = emptyCollection();
     recentReceivedTickets.value = [];
     recentCreatedTickets.value = [];
-    selectedTicket.value = null;
     statusColumns.value = {
       data: [],
       isLoading: false,
@@ -890,6 +863,11 @@ export const useTicketsStore = defineStore('tickets', () => {
     };
     hasNewReceivedTickets.value = false;
     previousReceivedTicketIds.value = [];
+  }
+
+  function clear() {
+    clearCache();
+    selectedTicket.value = null;
     // Reset change detection state
     lastKnownUpdateCount.value = 0;
     lastKnownUpdateTimestamp.value = null;
@@ -1020,7 +998,8 @@ export const useTicketsStore = defineStore('tickets', () => {
     stopPolling,
     setRefreshInterval,
     $dispose,
-    clear, // Added clear method
+    clear,
+    clearCache, // Export clearCache
     resetNewReceivedTicketsFlag,
 
     // Pagination control

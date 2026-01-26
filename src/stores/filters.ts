@@ -299,6 +299,17 @@ export const useFiltersStore = defineStore('filters', {
         this.filters = clearedFilters;
       }
     },
+    resetAllPages() {
+      if (this.filters.page) {
+        this.filters.page = 1;
+      }
+
+      Object.keys(this.contexts).forEach((contextKey) => {
+        if (this.contexts[contextKey].filters.page) {
+          this.contexts[contextKey].filters.page = 1;
+        }
+      });
+    },
 
     setSearch(value: string) {
       const context =

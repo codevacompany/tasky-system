@@ -1007,10 +1007,15 @@ const handleRejectTicket = async (ticket: Ticket) => {
 };
 
 const toggleView = async () => {
-  isKanbanView.value = !isKanbanView.value;
-  localStorageService.setTicketsViewPreference(isKanbanView.value ? 'kanban' : 'table');
+  const newView = !isKanbanView.value;
+  isKanbanView.value = newView;
+  localStorageService.setTicketsViewPreference(newView ? 'kanban' : 'table');
 
-  // Reset to first page and refresh tickets when switching views
+  // Clear all cached tickets and reset pages for all tabs when switching views
+  ticketsStore.clearCache();
+  filtersStore.resetAllPages();
+
+  // Reset to first page and refresh tickets for the current tab
   currentPage.value = 1;
   await fetchTicketsWithFilters();
 };
