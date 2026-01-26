@@ -79,82 +79,83 @@
 
           <!-- Data Rows -->
           <template v-else>
-          <tr
-            v-for="(item, idx) in data"
-            :key="getRowKey(item, idx)"
-            :class="[
-              'transition-colors duration-200',
-              selectedItems.includes(getRowId(item))
-                ? 'bg-blue-50 dark:bg-blue-900/20'
-                : 'hover:bg-gray-50 dark:hover:bg-gray-700',
-              clickable ? 'cursor-pointer' : '',
-            ]"
-            @click="clickable && handleRowClick(item)"
-          >
-            <!-- Batch Selection Cell -->
-            <td v-if="showBatchActions" class="relative w-12 px-6 sm:w-16 sm:px-8">
-              <input
-                v-if="isItemSelectable(item)"
-                type="checkbox"
-                :checked="isItemSelected(getRowId(item))"
-                class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                @change="toggleItemSelection(getRowId(item))"
-                @click.stop
-              />
-            </td>
-
-            <!-- Data Cells -->
-            <td
-              v-for="(header, headerIdx) in headers"
-              :key="headerIdx"
+            <tr
+              v-for="(item, idx) in data"
+              :key="getRowKey(item, idx)"
               :class="[
-                getCellClasses(header, headerIdx),
-                columnWidths[headerIdx],
-                headerIdx === 0 ? 'pl-6' : '',
+                'transition-colors duration-200',
+                selectedItems.includes(getRowId(item))
+                  ? 'bg-blue-50 dark:bg-blue-900/20'
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-700',
+                clickable ? 'cursor-pointer' : '',
+                rowClassName ? rowClassName(item) : '',
               ]"
-              @click="header.clickable && handleCellClick(item, header)"
+              @click="clickable && handleRowClick(item)"
             >
-              <!-- Custom Column Content -->
-              <div
-                v-if="$slots[`column-${String(header.key)}`]"
-                :class="getCellWrapperClasses(header)"
-              >
-                <slot
-                  :name="`column-${String(header.key)}`"
-                  :value="getValue(item, header.key)"
-                  :item="item"
-                  :header="header"
+              <!-- Batch Selection Cell -->
+              <td v-if="showBatchActions" class="relative w-12 px-6 sm:w-16 sm:px-8">
+                <input
+                  v-if="isItemSelectable(item)"
+                  type="checkbox"
+                  :checked="isItemSelected(getRowId(item))"
+                  class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  @change="toggleItemSelection(getRowId(item))"
+                  @click.stop
                 />
-              </div>
-              <!-- Default Cell Rendering -->
-              <div v-else class="truncate" :class="getCellContentClasses(header)">
-                {{ formatValue(getValue(item, header.key), header) }}
-              </div>
-            </td>
+              </td>
 
-            <!-- Actions Cell -->
-            <td
-              v-if="hasActions"
-              :class="[
-                'px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-right border-b border-gray-200 dark:border-gray-700',
-                actionsColumnWidth,
-              ]"
-            >
-              <div class="flex gap-0.5 md:gap-1 justify-end">
-                <slot name="actions" :item="item" :index="idx" />
-
-                <button
-                  v-if="showDeleteButton && isDeletable(item)"
-                  type="button"
-                  class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
-                  @click.stop="handleDelete(item)"
-                  title="Excluir"
+              <!-- Data Cells -->
+              <td
+                v-for="(header, headerIdx) in headers"
+                :key="headerIdx"
+                :class="[
+                  getCellClasses(header, headerIdx),
+                  columnWidths[headerIdx],
+                  headerIdx === 0 ? 'pl-6' : '',
+                ]"
+                @click="header.clickable && handleCellClick(item, header)"
+              >
+                <!-- Custom Column Content -->
+                <div
+                  v-if="$slots[`column-${String(header.key)}`]"
+                  :class="getCellWrapperClasses(header)"
                 >
-                  <font-awesome-icon icon="trash" class="text-xs md:text-sm" />
-                </button>
-              </div>
-            </td>
-          </tr>
+                  <slot
+                    :name="`column-${String(header.key)}`"
+                    :value="getValue(item, header.key)"
+                    :item="item"
+                    :header="header"
+                  />
+                </div>
+                <!-- Default Cell Rendering -->
+                <div v-else class="truncate" :class="getCellContentClasses(header)">
+                  {{ formatValue(getValue(item, header.key), header) }}
+                </div>
+              </td>
+
+              <!-- Actions Cell -->
+              <td
+                v-if="hasActions"
+                :class="[
+                  'px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm text-right border-b border-gray-200 dark:border-gray-700',
+                  actionsColumnWidth,
+                ]"
+              >
+                <div class="flex gap-0.5 md:gap-1 justify-end">
+                  <slot name="actions" :item="item" :index="idx" />
+
+                  <button
+                    v-if="showDeleteButton && isDeletable(item)"
+                    type="button"
+                    class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
+                    @click.stop="handleDelete(item)"
+                    title="Excluir"
+                  >
+                    <font-awesome-icon icon="trash" class="text-xs md:text-sm" />
+                  </button>
+                </div>
+              </td>
+            </tr>
           </template>
         </tbody>
       </table>
@@ -231,6 +232,7 @@ export interface DataTableProps<T = any> {
   rowKey?: keyof T | ((item: T, index: number) => string | number);
   deletableKey?: keyof T | string;
   selectableKey?: keyof T | string;
+  rowClassName?: (item: T) => string;
 }
 
 // Props

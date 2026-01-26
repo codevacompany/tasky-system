@@ -136,12 +136,12 @@
                       Recebidas
                       <span
                         v-if="ticketsStore.hasNewReceivedTickets && activeTab !== 'recebidas'"
-                        class="absolute top-[13px] left-1 sm:left-2 w-[5px] h-[5px] bg-blue-500 rounded-full"
+                        class="absolute top-[13px] left-1 sm:left-1.5 w-[5px] h-[5px] bg-blue-500 rounded-full"
                       ></span>
                     </button>
                     <button
                       :class="[
-                        'flex-1 lg:flex-none px-2.5 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
+                        'relative flex-1 lg:flex-none px-2.5 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
                         activeTab === 'criadas'
                           ? 'bg-white dark:bg-gray-800 text-txt-primary dark:text-white shadow-soft-xs'
                           : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
@@ -151,6 +151,12 @@
                     >
                       <span class="hidden sm:inline">Criadas por Mim</span>
                       <span class="sm:hidden">Criadas</span>
+                      <span
+                        v-if="
+                          ticketsStore.hasNewAwaitingVerificationTickets && activeTab !== 'criadas'
+                        "
+                        class="absolute top-[13px] left-1 sm:left-1.5 w-[5px] h-[5px] bg-blue-500 rounded-full"
+                      ></span>
                     </button>
                     <button
                       :class="[
@@ -769,9 +775,11 @@ const switchTab = async (tab: TicketsTab, skipUrlSync = false) => {
   const previousTab = activeTab.value;
   activeTab.value = tab;
 
-  // Reset new received tickets flag when switching to 'recebidas' tab
+  // Reset indicators when switching to relevant tabs
   if (tab === 'recebidas') {
     ticketsStore.resetNewReceivedTicketsFlag();
+  } else if (tab === 'criadas') {
+    ticketsStore.resetNewAwaitingVerificationFlag();
   }
 
   if (tab === 'setor' || tab === 'recebidas') {

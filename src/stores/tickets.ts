@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed, type Ref } from 'vue';
-import type { Ticket, DefaultTicketStatus, TicketPriority } from '@/models';
+import type { Ticket } from '@/models';
+import { DefaultTicketStatus, TicketPriority } from '@/models';
 import type { StatusColumn } from '@/models/statusColumn';
 import { statusColumnService } from '@/services/statusColumnService';
 import { ticketService } from '@/services/ticketService';
@@ -156,6 +157,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   });
 
   const hasNewReceivedTickets = ref<boolean>(false);
+  const hasNewAwaitingVerificationTickets = ref<boolean>(false);
   const previousReceivedTicketIds = ref<string[]>([]);
 
   // Getters
@@ -631,9 +633,27 @@ export const useTicketsStore = defineStore('tickets', () => {
     const viewPreference = localStorageService.getTicketsViewPreference();
     const isKanbanView = viewPreference === 'kanban';
 
+    const isAwaitingVerification =
+      updatedTicket.status === DefaultTicketStatus.AwaitingVerification ||
+      updatedTicket.ticketStatus?.key === DefaultTicketStatus.AwaitingVerification;
+
     // My Tickets
-    if (!findAndReplace(myTickets.value)) {
+    const wasUpdatedInMyTickets = findAndReplace(myTickets.value);
+
+    const checkIsMeReviewer = () => {
+      if (updatedTicket.reviewer?.id === currentUserId) return true;
+      const ticketInCollection = myTickets.value.data.find(
+        (t) => t.customId === updatedTicket.customId,
+      );
+      return ticketInCollection?.reviewer?.id === currentUserId;
+    };
+
+    if (!wasUpdatedInMyTickets) {
       if (isMeRequester) {
+        if (isAwaitingVerification && checkIsMeReviewer()) {
+          hasNewAwaitingVerificationTickets.value = true;
+        }
+
         if (myTickets.value.currentPage === 1) {
           myTickets.value.data.unshift(updatedTicket);
           if (!isKanbanView && myTickets.value.data.length > 10) {
@@ -642,6 +662,8 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         myTickets.value.totalCount++;
       }
+    } else if (isMeRequester && isAwaitingVerification && checkIsMeReviewer()) {
+      hasNewAwaitingVerificationTickets.value = true;
     }
 
     // Recent Created Tickets
@@ -663,6 +685,13 @@ export const useTicketsStore = defineStore('tickets', () => {
     // Received Tickets
     if (!findAndReplace(receivedTickets.value)) {
       if (isMeTarget) {
+        hasNewReceivedTickets.value = true;
+
+        // Update previousReceivedTicketIds to avoid double notification on next poll
+        if (!previousReceivedTicketIds.value.includes(updatedTicket.customId)) {
+          previousReceivedTicketIds.value.unshift(updatedTicket.customId);
+        }
+
         if (receivedTickets.value.currentPage === 1) {
           receivedTickets.value.data.unshift(updatedTicket);
           if (!isKanbanView && receivedTickets.value.data.length > 10) {
@@ -880,6 +909,10 @@ export const useTicketsStore = defineStore('tickets', () => {
     hasNewReceivedTickets.value = false;
   }
 
+  function resetNewAwaitingVerificationFlag() {
+    hasNewAwaitingVerificationTickets.value = false;
+  }
+
   function setMyTicketsPage(
     page: number,
     filters?: {
@@ -975,6 +1008,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     isPollingActive,
     statusColumns,
     hasNewReceivedTickets,
+    hasNewAwaitingVerificationTickets, // Export state
 
     // Recent tickets
     recentReceivedTickets,
@@ -1001,6 +1035,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     clear,
     clearCache, // Export clearCache
     resetNewReceivedTicketsFlag,
+    resetNewAwaitingVerificationFlag, // Export reset action
 
     // Pagination control
     setCurrentPage,

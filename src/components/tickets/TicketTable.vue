@@ -9,6 +9,7 @@
       rowKey="customId"
       minWidth="1000px"
       :showActions="true"
+      :rowClassName="getRowClassName"
       @rowClick="openTicketDetails"
       @pageChange="changePage"
       @sort="handleSort"
@@ -1413,6 +1414,27 @@ const shouldHighlightTargetUser = (ticket: Ticket, userId: number) => {
   }
 
   return ticket.currentTargetUserId === userId;
+};
+
+const getRowClassName = (ticket: Ticket) => {
+  const status = getTicketStatus(ticket);
+  let shouldBeGrayscale = false;
+
+  if (props.tableType === 'recebidas') {
+    const isCurrentTargetUser = userStore.user?.id === ticket.currentTargetUserId;
+    shouldBeGrayscale =
+      !isCurrentTargetUser &&
+      (status === DefaultTicketStatus.Pending ||
+        status === DefaultTicketStatus.InProgress ||
+        status === DefaultTicketStatus.Returned);
+  } else if (props.tableType === 'criadas') {
+    shouldBeGrayscale =
+      (status === DefaultTicketStatus.AwaitingVerification ||
+        status === DefaultTicketStatus.UnderVerification) &&
+      ticket.reviewer?.id !== userStore.user?.id;
+  }
+
+  return shouldBeGrayscale ? 'opacity-60 grayscale-[0.3]' : '';
 };
 </script>
 
