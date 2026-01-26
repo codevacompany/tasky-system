@@ -139,7 +139,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     customId: string;
     timestamp: number;
   } | null>(null);
-  const globalRefreshInterval = ref<number>(600000); // 10 minutes default
+  const globalRefreshInterval = ref<number>(180000); // 3 minutes default
   const isPollingActive = ref<boolean>(false);
   let pollingTimerId: number | null = null;
 
