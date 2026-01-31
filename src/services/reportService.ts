@@ -17,7 +17,7 @@ export interface TenantStatistics {
 }
 
 export interface DetailedMetrics {
-  onTimeCompleted: number; // Number of tickets completed on time (sent to verification before dueAt)
+  sentToVerificationOnTime: number; // Number of tickets sent to verification before dueAt
   totalCompleted: number; // Total number of completed tickets
   onTimeVerified: number; // Number of verification cycles completed on time (within 24h)
   totalVerified: number; // Total number of verification cycles
@@ -25,6 +25,7 @@ export interface DetailedMetrics {
   returnedCount: number; // Total number of tickets that were returned
   totalClosed: number; // Total number of closed tickets
   totalEntries: number; // Total number of ticket assignments
+  completionIndexTicketsTotal: number; // Total number of tickets in completion index
   completionIndex: number; // Wilson Score for completion (0-1)
   verificationIndex: number; // Wilson Score for verification (0-1)
   rejectionIndex: number; // Quality index based on rejection rate (0-1)
