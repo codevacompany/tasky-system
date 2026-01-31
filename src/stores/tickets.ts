@@ -8,6 +8,7 @@ import { ticketService } from '@/services/ticketService';
 import { useUserStore } from './user';
 import { useRoles } from '@/composables/useRoles';
 import { localStorageService } from '@/utils/localStorageService';
+import { DEFAULT_POLLING_INTERVAL_MS } from '@/utils/constants';
 
 export type TicketListFilters = {
   status?: DefaultTicketStatus | null;
@@ -140,7 +141,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     customId: string;
     timestamp: number;
   } | null>(null);
-  const globalRefreshInterval = ref<number>(180000); // 3 minutes default
+  const globalRefreshInterval = ref<number>(DEFAULT_POLLING_INTERVAL_MS);
   const isPollingActive = ref<boolean>(false);
   let pollingTimerId: number | null = null;
 
