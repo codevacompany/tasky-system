@@ -300,7 +300,7 @@ import ConfirmationModal from '@/components/common/ConfirmationModal.vue';
 import DataTable from '@/components/common/DataTable.vue';
 import Switch from '@/components/common/Switch.vue';
 import ActionDropdown from '@/components/common/ActionDropdown.vue';
-import type { TableHeader, PaginationInfo } from '@/components/common/DataTable.vue';
+import type { PaginationInfo } from '@/components/common/DataTable.vue';
 import { toast } from 'vue3-toastify';
 import { useUserStore } from '@/stores/user';
 import { useFiltersStore } from '@/stores/filters';
@@ -451,6 +451,7 @@ const loadUsers = async () => {
   try {
     const response = await userService.fetch(filters);
     users.value = response.data.items;
+    console.log(response.data);
     totalPages.value = response.data.totalPages;
   } catch {
     toast.error('Erro ao carregar usuários. Tente novamente.');
