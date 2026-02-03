@@ -2,11 +2,11 @@
  * Application-wide constants
  */
 
-export const DEFAULT_POLLING_INTERVAL_MS = 600000;
+export const DEFAULT_POLLING_INTERVAL_MS = 150000;
 
 export const POLLING_INTERVALS = {
   /** 10 minutes - default polling interval */
-  DEFAULT: 600000,
+  DEFAULT: 150000,
   /** 10 seconds - for frequent updates */
   FREQUENT: 10000,
   /** 30 seconds - for moderate updates */
