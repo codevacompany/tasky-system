@@ -1,6 +1,24 @@
 import Quill from 'quill';
 import type { User } from '@/models';
 
+// Type for Quill instance with all properties we use
+type QuillInstance = InstanceType<typeof Quill> & {
+  container: HTMLElement;
+  root: HTMLElement;
+  getSelection: () => { index: number; length: number } | null;
+  getText: () => string;
+  getContents: () => { ops: Array<{ insert?: string | object }> };
+  getBounds: (index: number) => { top: number; left: number; height: number };
+  getLength: () => number;
+  getLeaf: (index: number) => [{ domNode: Node } | null, number];
+  setSelection: (index: number, length: number, source?: string) => void;
+  deleteText: (index: number, length: number, source?: string) => void;
+  insertText: (index: number, text: string, source?: string) => void;
+  insertEmbed: (index: number, type: string, value: object, source?: string) => void;
+  focus: () => void;
+  on: (event: string, handler: (...args: unknown[]) => void) => void;
+};
+
 const Embed = Quill.import('blots/embed');
 
 class MentionBlot extends Embed {
@@ -48,7 +66,7 @@ export interface MentionData {
 }
 
 export class QuillMention {
-  private quill: any;
+  private quill: QuillInstance;
   private mentionableUsers: User[] = [];
   private mentionSelector: HTMLElement | null = null;
   private selectedIndex: number = 0;
@@ -56,8 +74,9 @@ export class QuillMention {
   private searchTerm: string = '';
   private currentFilteredUsers: User[] = []; // Cache da lista filtrada atual
   private onMentionInserted?: () => void; // Callback para restaurar foco
+  private mentionInsertionInProgress: boolean = false; // Flag to prevent double insertion
 
-  constructor(quill: any, mentionableUsers: User[], onMentionInserted?: () => void) {
+  constructor(quill: QuillInstance, mentionableUsers: User[], onMentionInserted?: () => void) {
     this.quill = quill;
     this.mentionableUsers = mentionableUsers;
     this.onMentionInserted = onMentionInserted;
@@ -80,7 +99,7 @@ export class QuillMention {
 
     // Also listen on document as fallback
     document.addEventListener('keydown', this.handleKeyDown.bind(this), true);
-    document.addEventListener('click', this.handleClickOutside.bind(this));
+    document.addEventListener('click', this.handleClickOutside.bind(this), false);
   }
 
   private handleTextChange(_delta: unknown, _oldDelta: unknown, source: string) {
@@ -276,19 +295,22 @@ export class QuillMention {
   }
 
   private handleClickOutside(event: MouseEvent) {
+    const target = event.target as Node;
+
     // Don't hide if clicking inside the mention selector
-    if (this.mentionSelector && this.mentionSelector.contains(event.target as Node)) {
-      // Allow the click event to process on the mention item
+    if (this.mentionSelector && this.mentionSelector.contains(target)) {
       return;
     }
 
     // Hide if clicking outside both the selector and the quill editor
     const quillContainer = this.quill.container;
-    if (!quillContainer.contains(event.target as Node)) {
+    if (!quillContainer.contains(target)) {
       // Use setTimeout to allow click events on mention items to process first
       setTimeout(() => {
-        this.hideMentionSelector();
-      }, 200);
+        if (!this.mentionInsertionInProgress && this.mentionSelector) {
+          this.hideMentionSelector();
+        }
+      }, 150);
     }
   }
 
@@ -325,6 +347,10 @@ export class QuillMention {
   }
 
   private createMentionSelector() {
+    if (this.mentionSelector) {
+      return;
+    }
+
     this.mentionSelector = document.createElement('div');
     this.mentionSelector.className = 'quill-mention-selector';
     this.mentionSelector.style.cssText = `
@@ -342,6 +368,28 @@ export class QuillMention {
     `;
 
     document.body.appendChild(this.mentionSelector);
+  }
+
+  private handleMentionItemClick(user: User) {
+    // Prevent double insertion if both mousedown and click fire
+    if (this.mentionInsertionInProgress) {
+      return;
+    }
+    this.mentionInsertionInProgress = true;
+
+    // Reset flag after a short delay
+    setTimeout(() => {
+      this.mentionInsertionInProgress = false;
+    }, 100);
+
+    // Keep Quill focused
+    const editor = this.quill.root;
+    if (editor && editor instanceof HTMLElement) {
+      editor.focus({ preventScroll: true });
+    }
+
+    // Insert mention immediately
+    this.insertMention(user);
   }
 
   private updateMentionSelector() {
@@ -366,6 +414,8 @@ export class QuillMention {
       const isActive = index === this.selectedIndex;
       const item = document.createElement('div');
       item.className = `mention-item ${isActive ? 'active' : ''}`;
+      item.setAttribute('data-user-index', index.toString());
+      item.setAttribute('data-user-id', user.id.toString());
       item.style.cssText = `
         display: flex;
         align-items: center;
@@ -407,36 +457,22 @@ export class QuillMention {
       item.appendChild(avatar);
       item.appendChild(info);
 
-      // Use mousedown to handle the selection (more reliable than click)
-      item.addEventListener('mousedown', (e) => {
+      // Store user data on the item
+      item.setAttribute('data-user-index', index.toString());
+      item.setAttribute('data-user-id', user.id.toString());
+
+      // Attach click handlers directly to each item - this is more reliable than delegation
+      const handleItemClick = (e: MouseEvent | PointerEvent) => {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
+        this.handleMentionItemClick(user);
+      };
 
-        // CRITICAL: Keep Quill focused
-        const editor = this.quill.root;
-        if (editor && editor instanceof HTMLElement) {
-          editor.focus({ preventScroll: true });
-        }
-
-        // Store the user to insert
-        const userToInsert = user;
-        const mentionStart = this.currentMentionStart;
-
-        // Restore mention start if needed
-        if (this.currentMentionStart === -1 && mentionStart !== -1) {
-          this.currentMentionStart = mentionStart;
-        }
-
-        // Insert mention immediately
-        this.insertMention(userToInsert);
-      });
-
-      // Also handle click as fallback
-      item.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      });
+      // Use both pointerdown and click for maximum compatibility
+      item.addEventListener('pointerdown', handleItemClick, true);
+      item.addEventListener('mousedown', handleItemClick, true);
+      item.addEventListener('click', handleItemClick, true);
 
       item.addEventListener('mouseenter', () => {
         this.selectedIndex = index;
@@ -474,25 +510,18 @@ export class QuillMention {
       return;
     }
 
-    // Store the mention start position before any operations
+    // Store mention start BEFORE hiding selector (which resets it to -1)
     const mentionStart = this.currentMentionStart;
 
     // Get current text to find where the search term ends
     const text = this.quill.getText();
     const editor = this.quill.root;
 
-    // CRITICAL: Maintain focus BEFORE hiding selector
+    // Maintain focus and hide selector
     if (editor && editor instanceof HTMLElement) {
       editor.focus({ preventScroll: true });
     }
-
-    // Hide selector
     this.hideMentionSelector();
-
-    // Maintain focus after hiding
-    if (editor && editor instanceof HTMLElement) {
-      editor.focus({ preventScroll: true });
-    }
 
     // Find the actual end of the search term (up to next space/newline or end of text)
     let actualEnd = mentionStart + 1;
