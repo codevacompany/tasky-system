@@ -208,10 +208,14 @@ export const useTicketsStore = defineStore('tickets', () => {
   // Actions
   async function fetchMyTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     const userStore = useUserStore();
-    if (!userStore.user) return;
+    if (!userStore.user) {
+      myTickets.value.isLoading = false;
+      return;
+    }
 
     // Don't fetch if terms haven't been accepted
     if (!userStore.user.termsAccepted || !userStore.user.privacyPolicyAccepted) {
+      myTickets.value.isLoading = false;
       return;
     }
 
@@ -290,10 +294,14 @@ export const useTicketsStore = defineStore('tickets', () => {
 
   async function fetchReceivedTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     const userStore = useUserStore();
-    if (!userStore.user) return;
+    if (!userStore.user) {
+      receivedTickets.value.isLoading = false;
+      return;
+    }
 
     // Don't fetch if terms haven't been accepted
     if (!userStore.user.termsAccepted || !userStore.user.privacyPolicyAccepted) {
+      receivedTickets.value.isLoading = false;
       return;
     }
 
@@ -383,10 +391,14 @@ export const useTicketsStore = defineStore('tickets', () => {
 
   async function fetchDepartmentTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     const userStore = useUserStore();
-    if (!userStore.user?.departmentId) return;
+    if (!userStore.user?.departmentId) {
+      departmentTickets.value.isLoading = false;
+      return;
+    }
 
     // Don't fetch if terms haven't been accepted
     if (!userStore.user.termsAccepted || !userStore.user.privacyPolicyAccepted) {
+      departmentTickets.value.isLoading = false;
       return;
     }
 
@@ -514,12 +526,16 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   async function fetchTenantTickets(page?: number, limit = 10, filters?: TicketListFilters) {
-    if (!isTenantAdmin.value) return;
+    if (!isTenantAdmin.value) {
+      tenantTickets.value.isLoading = false;
+      return;
+    }
 
     const userStore = useUserStore();
 
     // Don't fetch if terms haven't been accepted
     if (!userStore.user?.termsAccepted || !userStore.user?.privacyPolicyAccepted) {
+      tenantTickets.value.isLoading = false;
       return;
     }
 
