@@ -4,15 +4,17 @@
       <!-- Header -->
       <div class="mb-6">
         <h1 class="text-2xl font-bold text-txt-primary dark:text-white mb-2">Meu Perfil</h1>
-        <p class="text-sm text-gray-600 dark:text-gray-400">
-          Gerencie suas informações pessoais e preferências da conta
-        </p>
+        <p class="text-sm text-txt-secondary dark:text-txt-light">Gerencie suas informações pessoais</p>
       </div>
 
       <!-- Profile Card -->
-      <div class="bg-white dark:bg-gray-800 mb-8 rounded-lg shadow-soft-xs border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div
+        class="bg-white dark:bg-gray-800 mb-8 rounded-lg shadow-soft-xs border border-gray-200 dark:border-gray-700 overflow-hidden"
+      >
         <!-- Profile Header Section -->
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-800 px-6 py-8 border-b border-gray-200 dark:border-gray-700">
+        <div
+          class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-800 px-6 py-8 border-b border-gray-200 dark:border-gray-700"
+        >
           <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <!-- Avatar -->
             <div
@@ -27,11 +29,14 @@
               <h2 class="text-2xl font-bold text-txt-primary dark:text-white mb-1">
                 {{ user?.firstName }} {{ user?.lastName }}
               </h2>
-              <p v-if="user?.department?.name" class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              <p
+                v-if="user?.department?.name"
+                class="text-sm text-txt-secondary dark:text-txt-light mb-2"
+              >
                 <font-awesome-icon icon="building" class="mr-2" />
                 {{ user.department.name }}
               </p>
-              <p class="text-sm text-gray-600 dark:text-gray-400">
+              <p class="text-sm text-txt-secondary dark:text-txt-light">
                 <font-awesome-icon icon="envelope" class="mr-2" />
                 {{ user?.email }}
               </p>
@@ -55,7 +60,7 @@
                 <h3 class="text-lg font-semibold text-txt-primary dark:text-white mb-1">
                   Informações Pessoais
                 </h3>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
+                <p class="text-sm text-txt-secondary dark:text-txt-light">
                   Atualize suas informações de perfil
                 </p>
               </div>
@@ -163,23 +168,22 @@
                 padding="relaxed"
                 class="w-full bg-gray-50 dark:bg-gray-900/50 cursor-not-allowed"
               />
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p class="mt-1 text-xs text-txt-muted dark:text-txt-light">
                 Entre em contato com o administrador para alterar seu setor
               </p>
             </div>
 
             <!-- Action Buttons -->
-            <div v-if="isEditing" class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div
+              v-if="isEditing"
+              class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700"
+            >
               <button
                 type="submit"
                 :disabled="isSaving || !hasChanges"
                 class="flex-1 sm:flex-none px-6 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-md transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                <font-awesome-icon
-                  v-if="isSaving"
-                  icon="spinner"
-                  class="animate-spin"
-                />
+                <font-awesome-icon v-if="isSaving" icon="spinner" class="animate-spin" />
                 <font-awesome-icon v-else icon="check" />
                 {{ isSaving ? 'Salvando...' : 'Salvar alterações' }}
               </button>
@@ -187,7 +191,7 @@
                 type="button"
                 @click="cancelEditing"
                 :disabled="isSaving"
-                class="flex-1 sm:flex-none px-6 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                class="flex-1 sm:flex-none px-6 py-2.5 text-sm font-medium text-txt-secondary dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancelar
               </button>
