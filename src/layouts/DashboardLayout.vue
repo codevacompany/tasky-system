@@ -445,6 +445,7 @@ import { useRoles } from '@/composables';
 import { getAvatarStyle } from '@/utils/generic-helper';
 import taskyLogo from '@/assets/images/tasky-pro-black.png';
 import taskyWhiteLogo from '@/assets/images/tasky-pro-white.png';
+import { DEFAULT_POLLING_INTERVAL_MS } from '@/utils/constants';
 
 const userStore = useUserStore();
 const user = userStore.user;
@@ -649,7 +650,7 @@ onMounted(() => {
     if (userStore.user?.termsAccepted && userStore.user?.privacyPolicyAccepted) {
       fetchUnreadCount();
     }
-  }, 180000) as unknown as number;
+  }, DEFAULT_POLLING_INTERVAL_MS) as unknown as number;
 
   document.addEventListener('click', handleClickOutside);
 });
