@@ -1378,6 +1378,7 @@
                 :items-per-page="userStatsLimit"
                 :average-resolution-time-seconds="statistics?.averageResolutionTimeSeconds"
                 :average-acceptance-time-seconds="statistics?.averageAcceptanceTimeSeconds"
+                :summary="userStatsSummary"
                 :is-loading="userStatsLoading"
                 @page-change="handleUserStatsPageChange"
                 @sort-change="handleUserStatsSortChange"
@@ -3150,6 +3151,16 @@ const departmentStatsSummary = computed(() => {
     totalResolved,
     averageResolutionTimeSeconds: totalResolved ? totalResolutionTime / totalResolved : 0,
     averageAcceptanceTimeSeconds: totalResolved ? totalAcceptanceTime / totalResolved : 0,
+  };
+});
+
+const userStatsSummary = computed(() => {
+  if (!statistics.value) return null;
+
+  return {
+    totalTickets: statistics.value.totalTickets,
+    totalResolved: statistics.value.resolvedTickets,
+    averageResolutionTimeSeconds: statistics.value.averageResolutionTimeSeconds,
   };
 });
 

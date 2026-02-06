@@ -79,18 +79,16 @@
                       <p v-if="userStats?.detailedMetrics">
                         <span class="font-medium">Neste período:</span>
                         {{
-                          userStats.detailedMetrics.totalCompleted > 0
-                            ? `${userStats.detailedMetrics.totalCompleted} tarefa${
-                                userStats.detailedMetrics.onTimeCompleted !== 1 ? 's' : ''
-                              } entregue${
-                                userStats.detailedMetrics.onTimeCompleted !== 1 ? 's' : ''
+                          (userStats.detailedMetrics.completionIndexTicketsTotal ?? 0) > 0
+                            ? `${userStats.detailedMetrics.completionIndexTicketsTotal ?? 0} tarefa${
+                                (userStats.detailedMetrics.completionIndexTicketsTotal ?? 0) !== 1 ? 's' : ''
                               }, ${
-                                userStats.detailedMetrics.onTimeCompleted ===
-                                userStats.detailedMetrics.totalCompleted
+                                (userStats.detailedMetrics.sentToVerificationOnTime ?? 0) ===
+                                (userStats.detailedMetrics.completionIndexTicketsTotal ?? 0)
                                   ? 'todas no prazo'
-                                  : `${userStats.detailedMetrics.onTimeCompleted} no prazo`
+                                  : `${userStats.detailedMetrics.sentToVerificationOnTime ?? 0} no prazo`
                               }.`
-                            : 'nenhuma tarefa entregue.'
+                            : 'nenhuma tarefa concluída.'
                         }}
                       </p>
                       <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">

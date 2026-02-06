@@ -25,7 +25,34 @@
       </div>
     </div>
 
-    <!-- Summary section removed as it requires full dataset aggregation which is not available with server-side pagination -->
+    <div v-if="props.summary" class="p-6 border-b border-gray-200 dark:border-gray-700">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            {{ props.summary.totalTickets }}
+          </div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Total de Tickets</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-green-600 dark:text-green-400">
+            {{ props.summary.totalResolved }}
+          </div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Tickets Resolvidos</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+            {{ formatTimeInSecondsCompact(props.summary.averageResolutionTimeSeconds) }}
+          </div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Tempo Médio de Resolução</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">
+            {{ props.totalItems }}
+          </div>
+          <div class="text-sm text-gray-600 dark:text-gray-400">Colaboradores Ativos</div>
+        </div>
+      </div>
+    </div>
 
     <DataTable
       :data="users"
@@ -121,6 +148,11 @@ interface Props {
   itemsPerPage: number;
   averageResolutionTimeSeconds?: number;
   averageAcceptanceTimeSeconds?: number;
+  summary: {
+    totalTickets: number;
+    totalResolved: number;
+    averageResolutionTimeSeconds: number;
+  } | null;
   isLoading?: boolean;
 }
 
@@ -130,6 +162,7 @@ const props = withDefaults(defineProps<Props>(), {
   totalItems: 0,
   currentPage: 1,
   itemsPerPage: 10,
+  summary: null,
 });
 
 const emit = defineEmits<{
