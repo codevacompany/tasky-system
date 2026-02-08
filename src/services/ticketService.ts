@@ -110,6 +110,17 @@ export const ticketService = {
     });
   },
 
+  async search(params: {
+    name?: string;
+    status?: DefaultTicketStatus;
+    departmentUuid?: string;
+    targetUserUuid?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
+    return apiClient.get('/tickets/search', { params });
+  },
+
   async getArchived(params?: {
     name?: string;
     priority?: TicketPriority;
