@@ -77,19 +77,64 @@
                     </div>
                     <div class="text-sm text-gray-600 dark:text-gray-400">
                       <p v-if="userStats?.detailedMetrics">
-                        <span class="font-medium">Neste período:</span>
-                        {{
-                          (userStats.detailedMetrics.completionIndexTicketsTotal ?? 0) > 0
-                            ? `${userStats.detailedMetrics.completionIndexTicketsTotal ?? 0} tarefa${
-                                (userStats.detailedMetrics.completionIndexTicketsTotal ?? 0) !== 1 ? 's' : ''
-                              }, ${
-                                (userStats.detailedMetrics.sentToVerificationOnTime ?? 0) ===
-                                (userStats.detailedMetrics.completionIndexTicketsTotal ?? 0)
-                                  ? 'todas no prazo'
-                                  : `${userStats.detailedMetrics.sentToVerificationOnTime ?? 0} no prazo`
-                              }.`
-                            : 'nenhuma tarefa concluída.'
-                        }}
+                        <span class="font-medium">Neste período: </span>
+                        <template
+                          v-if="(userStats.detailedMetrics.completionIndexTicketsTotal ?? 0) > 0"
+                        >
+                          <span
+                            :title="
+                              (userStats.detailedMetrics.completionIndexTicketCustomIds ?? [])
+                                .length
+                                ? (
+                                    userStats.detailedMetrics.completionIndexTicketCustomIds ?? []
+                                  ).join(', ')
+                                : undefined
+                            "
+                          >
+                            {{ userStats.detailedMetrics.completionIndexTicketsTotal ?? 0 }}
+                          </span>
+                          tarefa{{
+                            (userStats.detailedMetrics.completionIndexTicketsTotal ?? 0) !== 1
+                              ? 's'
+                              : ''
+                          }},
+                          <span
+                            v-if="
+                              (userStats.detailedMetrics.sentToVerificationOnTime ?? 0) ===
+                              (userStats.detailedMetrics.completionIndexTicketsTotal ?? 0)
+                            "
+                            :title="
+                              (
+                                userStats.detailedMetrics.sentToVerificationOnTimeTicketCustomIds ??
+                                []
+                              ).length
+                                ? (
+                                    userStats.detailedMetrics
+                                      .sentToVerificationOnTimeTicketCustomIds ?? []
+                                  ).join(', ')
+                                : undefined
+                            "
+                          >
+                            todas no prazo
+                          </span>
+                          <span
+                            v-else
+                            :title="
+                              (
+                                userStats.detailedMetrics.sentToVerificationOnTimeTicketCustomIds ??
+                                []
+                              ).length
+                                ? (
+                                    userStats.detailedMetrics
+                                      .sentToVerificationOnTimeTicketCustomIds ?? []
+                                  ).join(', ')
+                                : undefined
+                            "
+                          >
+                            {{ userStats.detailedMetrics.sentToVerificationOnTime ?? 0 }} no prazo </span
+                          >.
+                        </template>
+                        <template v-else>nenhuma tarefa concluída.</template>
                       </p>
                       <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">
                         Obs: Um baixo volume de tarefas pode impactar o resultado.
