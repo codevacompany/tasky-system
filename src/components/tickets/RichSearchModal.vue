@@ -324,26 +324,38 @@ const userOptions = computed(() => {
   return options;
 });
 
+/**
+ * Highlight search query in text, but only at word starts (prefix-only search).
+ * E.g. query "a" highlights "A" in "Admin" and "a" in "agora", not the "a" in "Testando" or "Nova".
+ */
 function highlightMatch(text: string, query: string): string {
   if (!text || !query || !query.trim()) return escapeHtml(text);
 
   const q = query.trim().toLowerCase();
   const normalized = text.toLowerCase();
-  const idx = normalized.indexOf(q);
+  const markClass = 'bg-yellow-200 dark:bg-yellow-800/60 text-inherit rounded px-[1px]';
+  let result = '';
+  let pos = 0;
 
-  if (idx === -1) return escapeHtml(text);
+  while (pos < normalized.length) {
+    const idx = normalized.indexOf(q, pos);
+    if (idx === -1) {
+      result += escapeHtml(text.slice(pos));
+      break;
+    }
+    // Only highlight if at start of string or after a non-word character (word boundary)
+    const atWordStart = idx === 0 || !/\w/.test(text[idx - 1]);
+    if (atWordStart) {
+      result += escapeHtml(text.slice(pos, idx));
+      result += `<mark class="${markClass}">${escapeHtml(text.slice(idx, idx + q.length))}</mark>`;
+      pos = idx + q.length;
+    } else {
+      result += escapeHtml(text.slice(pos, idx + 1));
+      pos = idx + 1;
+    }
+  }
 
-  const before = text.slice(0, idx);
-  const match = text.slice(idx, idx + q.length);
-  const after = text.slice(idx + q.length);
-
-  return (
-    escapeHtml(before) +
-    '<mark class="bg-yellow-200 dark:bg-yellow-800/60 text-inherit rounded px-[1px]">' +
-    escapeHtml(match) +
-    '</mark>' +
-    escapeHtml(after)
-  );
+  return result || escapeHtml(text);
 }
 
 function escapeHtml(s: string): string {
