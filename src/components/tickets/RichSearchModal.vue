@@ -56,7 +56,10 @@
             >
               <font-awesome-icon icon="sliders" class="w-3.5 h-3.5" />
               Filtros
-              <span v-if="activeFiltersCount" class="ml-1 text-xs bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+              <span
+                v-if="activeFiltersCount"
+                class="ml-1 text-xs bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+              >
                 {{ activeFiltersCount }}
               </span>
             </button>
@@ -82,7 +85,9 @@
                   <Select v-model="departmentFilter" :options="departmentOptions" compact />
                 </div>
                 <div class="flex flex-col gap-1">
-                  <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Responsável</span>
+                  <span class="text-xs font-medium text-gray-500 dark:text-gray-400"
+                    >Responsável</span
+                  >
                   <Select
                     v-model="assigneeFilter"
                     :options="userOptions"
@@ -359,6 +364,8 @@ function formatTicketMeta(ticket: Ticket): string {
   return parts.join(' • ');
 }
 
+let searchAbortController: AbortController | null = null;
+
 const performSearch = debounce(async () => {
   const q = searchQuery.value.trim();
   if (!q) {
@@ -368,6 +375,9 @@ const performSearch = debounce(async () => {
     isSearching.value = false;
     return;
   }
+
+  searchAbortController?.abort();
+  searchAbortController = new AbortController();
 
   currentPage.value = 1;
   isLoading.value = true;
@@ -381,11 +391,12 @@ const performSearch = debounce(async () => {
     if (departmentFilter.value) params.departmentUuid = departmentFilter.value;
     if (assigneeFilter.value) params.targetUserUuid = assigneeFilter.value;
 
-    const res = await ticketService.search(params);
+    const res = await ticketService.search(params, searchAbortController.signal);
     results.value = res.data.items;
     totalCount.value = res.data.total;
     highlightedIndex.value = 0;
   } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') return;
     console.error('Search failed:', err);
     results.value = [];
     totalCount.value = 0;
@@ -393,7 +404,7 @@ const performSearch = debounce(async () => {
     isLoading.value = false;
     isSearching.value = false;
   }
-}, 300);
+}, 500);
 
 async function loadMore() {
   const q = searchQuery.value.trim();
@@ -411,7 +422,7 @@ async function loadMore() {
     if (departmentFilter.value) params.departmentUuid = departmentFilter.value;
     if (assigneeFilter.value) params.targetUserUuid = assigneeFilter.value;
 
-    const res = await ticketService.search(params);
+    const res = await ticketService.search(params, undefined);
     results.value = [...results.value, ...res.data.items];
     currentPage.value = nextPage;
   } catch (err) {
