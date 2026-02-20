@@ -6,7 +6,8 @@
       @click="toggleDropdown"
       :disabled="disabled"
       :class="[
-        'appearance-none w-full px-[14px] py-2.5 pr-10 text-sm font-medium rounded border border-inputBorder transition-colors cursor-pointer relative text-left',
+        'appearance-none w-full px-[14px] pr-10 text-sm font-medium rounded-[5px] border border-inputBorder transition-colors cursor-pointer relative text-left',
+        props.compact ? 'py-1.5' : 'py-2.5',
         'focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/10',
         'hover:border-gray-300',
         disabled
@@ -97,6 +98,7 @@ const props = defineProps<{
   disabled?: boolean;
   placeholder?: string;
   dropdownMaxHeight?: string; // Tailwind class like 'max-h-40' or custom value like '200px'
+  compact?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -213,12 +215,13 @@ watch(isOpen, async (newValue) => {
 });
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
+  // Use capture phase so we receive clicks before modal's @click.stop prevents propagation
+  document.addEventListener('click', handleClickOutside, true);
   document.addEventListener('keydown', handleEscape);
 });
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
+  document.removeEventListener('click', handleClickOutside, true);
   document.removeEventListener('keydown', handleEscape);
   window.removeEventListener('scroll', handleScroll, true);
   window.removeEventListener('resize', handleResize);

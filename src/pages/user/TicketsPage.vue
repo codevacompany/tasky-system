@@ -193,19 +193,6 @@
               <div
                 class="flex items-center justify-start gap-2 mt-4 lg:mt-0 lg:justify-end lg:ml-auto"
               >
-                <div class="relative w-full max-w-xs lg:w-56">
-                  <font-awesome-icon
-                    icon="search"
-                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-txt-light/80 dark:text-gray-500 w-3.5 h-3.5 pointer-events-none"
-                  />
-                  <Input
-                    v-model="searchTerm"
-                    type="text"
-                    placeholder="Buscar tarefas"
-                    padding="tight"
-                    class="pl-9 pr-3 w-full text-sm transition-all duration-200"
-                  />
-                </div>
                 <button
                   class="relative flex items-center gap-2 px-4 py-2 border border-inputBorder dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
                   @click="showFiltersModal = true"
@@ -436,13 +423,6 @@ const getInitialTab = (): TicketsTab => {
 };
 
 const activeTab = ref<TicketsTab>(getInitialTab());
-
-const searchTerm = computed({
-  get: () => filtersStore.currentSearch || '',
-  set: (value: string) => {
-    filtersStore.setSearch(value);
-  },
-});
 
 const modalStatusFilter = ref<string>('');
 const modalPriorityFilter = ref<string>('');
@@ -1241,10 +1221,6 @@ watch(
   },
   { deep: true },
 );
-
-watch(searchTerm, () => {
-  filtersStore.setPage(1);
-});
 </script>
 
 <style scoped>
