@@ -1,14 +1,13 @@
 <template>
   <BaseModal
-    v-if="isOpen"
-    :is-open="isOpen"
     @close="close"
     :show-footer="false"
     :is-full-screen-mobile="true"
     :title="isReturningUser ? 'Atualização dos Termos' : 'Bem-vindo ao Tasky Pro!'"
     :closeOnClickOutside="termsAccepted && privacyPolicyAccepted"
+    :blurBackdrop="true"
   >
-    <div class="flex flex-col items-center text-center px-4 sm:px-6 py-6 pb-8">
+    <div class="flex flex-col items-center text-center px-4 sm:px-6 pb-8">
       <div class="w-full max-w-[200px] sm:max-w-[240px] flex items-center justify-center mb-5">
         <img
           src="@/assets/images/landing/management-drawing.png"
@@ -131,21 +130,12 @@ import { ref, computed } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { useRoles } from '@/composables/useRoles';
 import { userService } from '@/services/userService';
-import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import BaseModal from './BaseModal.vue';
-
-defineProps({
-  isOpen: {
-    type: Boolean,
-    default: false,
-  },
-});
 
 const emit = defineEmits(['close', 'openGuide']);
 
 const userStore = useUserStore();
-const router = useRouter();
 const { isTenantAdmin } = useRoles();
 
 const termsAccepted = ref(false);
@@ -196,12 +186,8 @@ const handleAcceptAndOpenGuide = async () => {
       privacyPolicyVersion: '1.0',
     });
 
-    // Refresh user data
-    await userStore.whoami();
-
     emit('openGuide');
-    emit('close');
-    router.push('/faq');
+    await userStore.whoami({ silent: true });
   } catch (error: any) {
     console.error('Error accepting terms:', error);
     toast.error(error?.response?.data?.message || 'Erro ao aceitar termos. Tente novamente.');

@@ -1,7 +1,12 @@
 <template>
   <Teleport to="body">
     <div
-      class="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]"
+      :class="[
+        'fixed inset-0 flex items-center justify-center z-[1000]',
+        blurBackdrop
+          ? 'bg-black/50 backdrop-blur-sm'
+          : 'bg-black/50',
+      ]"
       id="newTicketModal"
       @click.self="closeOnClickOutside ? close() : null"
     >
@@ -93,6 +98,8 @@ const props = defineProps({
   hasCustomHeader: { type: Boolean, default: false },
   closeOnClickOutside: { type: Boolean, default: true },
   isFullScreenMobile: { type: Boolean, default: false },
+  /** When true, backdrop uses blur (e.g. backdrop-blur-sm) like WelcomeModal */
+  blurBackdrop: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['close', 'cancel', 'confirm']);
