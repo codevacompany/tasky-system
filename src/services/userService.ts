@@ -70,4 +70,8 @@ export const userService = {
   }): Promise<AxiosResponse<User>> {
     return apiClient.post<User>('/users/accept-terms', data);
   },
+
+  async completeOnboarding(): Promise<AxiosResponse<User>> {
+    return apiClient.post<User>('/users/complete-onboarding');
+  },
 };
