@@ -56,14 +56,49 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Loading State -->
-          <tr v-if="isLoading">
-            <td :colspan="colspan" class="px-3 md:px-4 py-6 md:py-8 text-center">
-              <div class="flex justify-center items-center">
-                <LoadingSpinner :size="28" />
-              </div>
-            </td>
-          </tr>
+          <!-- Loading State: skeleton rows -->
+          <template v-if="isLoading">
+            <tr
+              v-for="n in 5"
+              :key="`skeleton-${n}`"
+              class="border-b border-gray-200 dark:border-gray-700"
+            >
+              <td
+                v-if="showBatchActions"
+                class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 w-12 sm:w-16"
+              >
+                <div
+                  class="w-4 h-4 rounded bg-gray-200 dark:bg-gray-700 skeleton-shimmer"
+                />
+              </td>
+              <td
+                v-for="(header, headerIdx) in headers"
+                :key="headerIdx"
+                :class="[
+                  getCellClasses(header, headerIdx),
+                  columnWidths[headerIdx],
+                  headerIdx === 0 ? 'pl-6' : '',
+                ]"
+              >
+                <div
+                  :class="getCellWrapperClasses(header)"
+                  class="flex items-center min-w-0"
+                >
+                  <div
+                    class="h-4 rounded bg-gray-200 dark:bg-gray-700 skeleton-shimmer max-w-[140px] w-full"
+                  />
+                </div>
+              </td>
+              <td
+                v-if="hasActions"
+                class="px-3 md:px-4 py-2 md:py-3 text-right border-b border-gray-200 dark:border-gray-700 w-[8%]"
+              >
+                <div
+                  class="h-8 w-8 rounded-md bg-gray-200 dark:bg-gray-700 skeleton-shimmer ml-auto"
+                />
+              </td>
+            </tr>
+          </template>
 
           <!-- Empty State -->
           <tr v-else-if="!data || data.length === 0">
@@ -197,7 +232,6 @@
 
 <script setup lang="ts" generic="T">
 import { ref, computed, watch } from 'vue';
-import LoadingSpinner from './LoadingSpinner.vue';
 
 // Types
 export interface TableHeader<T = any> {

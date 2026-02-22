@@ -1,7 +1,9 @@
 <template>
-  <section id="colaboradoresSection" class="p-6">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-      <h1 class="text-2xl font-bold text-txt-primary dark:text-white">Colaboradores</h1>
+  <section id="colaboradoresSection" class="p-5 sm:px-6 sm:py-6 lg:px-8 lg:py-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <h1 class="text-xl sm:text-2xl font-bold text-txt-primary dark:text-white tracking-tight">
+        Colaboradores
+      </h1>
       <button
         id="newColaboradorBtn"
         class="flex items-center gap-2 px-4 py-2 btn btn-primary text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
@@ -12,31 +14,123 @@
       </button>
     </div>
 
-    <div class="flex flex-col sm:flex-row gap-4 mb-6">
-      <div class="w-64">
-        <div class="relative">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-soft-xs flex items-center gap-4"
+      >
+        <div
+          class="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center shrink-0"
+        >
           <font-awesome-icon
-            icon="search"
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-txt-light/80 dark:text-gray-500 w-4 h-4 pointer-events-none"
-          />
-          <Input
-            id="searchTickets"
-            v-model="searchTerm"
-            type="text"
-            :placeholder="filterConfig.search.placeholder"
-            padding="tight"
-            class="pl-10 pr-4 w-full text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 dark:border-gray-600 dark:bg-gray-800"
+            icon="users"
+            class="text-lg text-primary-600 dark:text-primary-400"
           />
         </div>
+        <div>
+          <p class="text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider">
+            Total
+          </p>
+          <p class="text-xl font-bold text-primary-600 dark:text-primary-400">
+            {{ stats.total }}
+          </p>
+        </div>
       </div>
-
-      <div class="flex items-center">
-        <Switch v-model="showInactiveUsers" label="Mostrar usuários inativos" />
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-soft-xs flex items-center gap-4"
+      >
+        <div
+          class="w-12 h-12 rounded-xl bg-green-50 dark:bg-green-900/20 flex items-center justify-center shrink-0"
+        >
+          <font-awesome-icon
+            icon="user-check"
+            class="text-lg text-green-600 dark:text-green-400"
+          />
+        </div>
+        <div>
+          <p class="text-xs font-medium text-green-600 dark:text-green-400 uppercase tracking-wider">
+            Ativos
+          </p>
+          <p class="text-xl font-bold text-green-600 dark:text-green-400">
+            {{ stats.active }}
+          </p>
+        </div>
+      </div>
+      <div
+        class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-soft-xs flex items-center gap-4"
+      >
+        <div
+          class="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center shrink-0"
+        >
+          <font-awesome-icon
+            icon="user-slash"
+            class="text-lg text-gray-500 dark:text-gray-400"
+          />
+        </div>
+        <div>
+          <p class="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+            Inativos
+          </p>
+          <p class="text-xl font-bold text-gray-600 dark:text-gray-400">
+            {{ stats.inactive }}
+          </p>
+        </div>
       </div>
     </div>
 
     <div
-      class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-soft-xs overflow-hidden"
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 sm:p-6 shadow-soft-xs mb-6"
+    >
+      <h2 class="text-lg font-bold text-txt-primary dark:text-white tracking-tight">
+        Gestão de colaboradores
+      </h2>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        Visualize e gerencie os usuários do sistema e convites pendentes.
+      </p>
+    </div>
+
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-soft-xs mb-6"
+    >
+      <div class="flex flex-col sm:flex-row gap-4 sm:items-center sm:gap-6 flex-wrap">
+        <div class="w-full sm:w-1/4 min-w-0">
+          <label for="searchTickets" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+            Buscar
+          </label>
+          <div class="relative">
+            <font-awesome-icon
+              icon="search"
+              class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 pointer-events-none"
+            />
+            <Input
+              id="searchTickets"
+              v-model="searchTerm"
+              type="text"
+              :placeholder="filterConfig.search.placeholder"
+              padding="normal"
+              class="pl-10 pr-4 w-full text-gray-700 dark:text-gray-300 text-sm border-gray-200 dark:border-gray-600 rounded-[5px] focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all dark:bg-gray-700/50"
+            />
+          </div>
+        </div>
+        <div class="w-full sm:w-1/4 min-w-0">
+          <label for="sortUsers" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+            Ordenar por
+          </label>
+          <Select
+            id="sortUsers"
+            v-model="sortByValue"
+            :options="sortUserOptions"
+            placeholder="Ordenar por..."
+            class="w-full"
+          />
+        </div>
+        <div class="flex items-center gap-3 border-t sm:border-t-0 pt-4 sm:pt-6 border-gray-100 dark:border-gray-700 sm:flex-1">
+          <Switch v-model="showInactiveUsers" label="Mostrar usuários inativos" />
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-soft-xs overflow-hidden"
     >
       <DataTable
         :data="initialConfig.items"
@@ -55,12 +149,14 @@
         <template #column-name="{ item }">
           <div class="flex items-center gap-3">
             <div
-              class="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-blue-600 text-white text-sm font-bold"
+              class="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600 text-white text-sm font-bold shrink-0"
             >
               <span>{{ getUserInitials(item) }}</span>
             </div>
-            <div class="font-medium text-txt-primary dark:text-gray-100">
-              {{ item.firstName }} {{ item.lastName }}
+            <div>
+              <span class="font-semibold text-txt-primary dark:text-gray-100">
+                {{ item.firstName }} {{ item.lastName }}
+              </span>
             </div>
           </div>
         </template>
@@ -72,31 +168,29 @@
         </template>
 
         <template #column-department="{ value }">
-          <span class="text-sm text-txt-primary dark:text-gray-100">
-            {{ value?.name || 'N/A' }}
+          <span class="text-sm text-gray-600 dark:text-gray-300">
+            {{ value?.name || '—' }}
           </span>
         </template>
 
         <template #column-role="{ value }">
           <span
             :class="[
-              'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium',
-              value?.name === 'Tenant Admin'
-                ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300'
-                : 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
+              'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold',
+              getRoleBadgeClass(value?.name),
             ]"
           >
-            {{ value?.name || 'N/A' }}
+            {{ value?.name || '—' }}
           </span>
         </template>
 
         <template #column-isActive="{ value }">
           <span
             :class="[
-              'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium',
+              'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold',
               value
-                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300'
-                : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300',
+                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
             ]"
           >
             {{ value ? 'Ativo' : 'Inativo' }}
@@ -162,14 +256,20 @@
         </template>
 
         <template #empty>
-          <div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
-            <font-awesome-icon icon="users" class="text-3xl mb-3" />
-            <p class="text-sm font-medium mb-1">
+          <div
+            class="flex flex-col items-center justify-center py-12 px-4 text-center bg-gray-50/50 dark:bg-gray-800/30 rounded-xl mx-4 mb-4"
+          >
+            <div
+              class="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4"
+            >
+              <font-awesome-icon icon="users" class="text-2xl text-gray-400 dark:text-gray-500" />
+            </div>
+            <p class="text-sm font-semibold text-txt-primary dark:text-white mb-1">
               {{
                 users.length === 0 ? 'Nenhum usuário encontrado' : 'Nenhum usuário ativo encontrado'
               }}
             </p>
-            <p class="text-xs">
+            <p class="text-xs text-gray-500 dark:text-gray-400 max-w-sm">
               {{
                 users.length === 0
                   ? searchTerm
@@ -300,6 +400,7 @@ import ConfirmationModal from '@/components/common/ConfirmationModal.vue';
 import DataTable from '@/components/common/DataTable.vue';
 import Switch from '@/components/common/Switch.vue';
 import ActionDropdown from '@/components/common/ActionDropdown.vue';
+import Select from '@/components/common/Select.vue';
 import type { PaginationInfo } from '@/components/common/DataTable.vue';
 import { toast } from 'vue3-toastify';
 import { useUserStore } from '@/stores/user';
@@ -308,6 +409,18 @@ import Input from '@/components/common/Input.vue';
 
 const userStore = useUserStore();
 const filtersStore = useFiltersStore();
+
+const SORT_USER_OPTIONS = [
+  { value: '', label: 'Padrão' },
+  { value: 'firstName_asc', label: 'Nome (A–Z)' },
+  { value: 'firstName_desc', label: 'Nome (Z–A)' },
+  { value: 'email_asc', label: 'Email (A–Z)' },
+  { value: 'email_desc', label: 'Email (Z–A)' },
+  { value: 'department.name_asc', label: 'Setor (A–Z)' },
+  { value: 'department.name_desc', label: 'Setor (Z–A)' },
+] as const;
+
+const sortUserOptions = SORT_USER_OPTIONS.map((o) => ({ value: o.value, label: o.label }));
 
 const users = ref<User[]>([]);
 const isModalOpen = ref(false);
@@ -333,6 +446,23 @@ const resetPasswordResult = ref<any>(null);
 const filteredUsers = computed(() => {
   return users.value;
 });
+
+const stats = computed(() => {
+  const total = users.value.length;
+  const active = users.value.filter((u) => u.isActive).length;
+  return { total, active, inactive: total - active };
+});
+
+const getRoleBadgeClass = (roleName: string | undefined): string => {
+  if (!roleName) return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300';
+  if (roleName === 'Administrador Global')
+    return 'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300';
+  if (roleName === 'Administrador')
+    return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+  if (roleName === 'Supervisor')
+    return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300';
+  return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+};
 
 const initialConfig = computed(() => ({
   items: filteredUsers.value,
@@ -412,6 +542,24 @@ const paginationInfo = computed(
     totalPages: totalPages.value,
   }),
 );
+
+const sortByValue = computed({
+  get() {
+    const by = filtersStore.currentSortBy;
+    const order = filtersStore.currentSortOrder;
+    if (!by || !order) return '';
+    return `${by}_${order}`;
+  },
+  set(value: string) {
+    if (!value) {
+      filtersStore.clearFilter('sortBy');
+      filtersStore.clearFilter('sortOrder');
+      return;
+    }
+    const [sortBy, sortOrder] = value.split('_') as [string, 'asc' | 'desc'];
+    filtersStore.applyFilters({ sortBy, sortOrder });
+  },
+});
 
 const getUserInitials = (user: User): string => {
   if (user.firstName && user.lastName) {
