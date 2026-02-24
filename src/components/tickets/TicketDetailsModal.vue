@@ -6,6 +6,7 @@
     :showFooter="false"
     :hasCustomHeader="true"
     :isFullScreenMobile="true"
+    desktop-width-class="sm:w-auto sm:max-w-[1360px] sm:h-auto"
   >
     <template #custom-header>
       <div

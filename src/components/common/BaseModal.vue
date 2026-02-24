@@ -14,11 +14,11 @@
           isFullScreenMobile ? '' : 'rounded-md',
           // Margins - only when not full screen mobile
           isFullScreenMobile ? '' : 'mx-4',
-          // Mobile sizing - conditional, with desktop reset
+          // Mobile sizing - conditional, with configurable fixed desktop width when using full-screen mobile mode
           isFullScreenMobile
-            ? 'w-full h-full sm:w-auto sm:h-auto'
+            ? `w-full h-full ${desktopWidthClass || 'sm:w-[780px] sm:h-auto'}`
             : 'min-w-[95vw] max-h-[calc(90vh-100px)]',
-          // Desktop - original classes, always the same
+          // Desktop defaults: rounded, height + horizontal margin
           'sm:rounded-md sm:min-w-[500px] sm:max-h-[94vh] sm:mx-4',
         ]"
       >
@@ -93,6 +93,8 @@ const props = defineProps({
   hasCustomHeader: { type: Boolean, default: false },
   closeOnClickOutside: { type: Boolean, default: true },
   isFullScreenMobile: { type: Boolean, default: false },
+  // Optional Tailwind classes to control desktop width when isFullScreenMobile is true
+  desktopWidthClass: { type: String, default: '' },
 });
 
 const emit = defineEmits(['close', 'cancel', 'confirm']);
