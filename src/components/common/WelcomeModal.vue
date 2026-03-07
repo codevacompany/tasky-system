@@ -3,6 +3,7 @@
     @close="close"
     :show-footer="false"
     :is-full-screen-mobile="true"
+    desktop-width-class="sm:w-[600px] sm:h-auto"
     :title="isReturningUser ? 'Atualização dos Termos' : 'Bem-vindo ao Tasky Pro!'"
     :closeOnClickOutside="termsAccepted && privacyPolicyAccepted"
     :blurBackdrop="true"
