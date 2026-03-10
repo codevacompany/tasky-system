@@ -3313,10 +3313,14 @@ const canEditTicket = computed(() => {
   return isUserInvolved && isTicketActive;
 });
 
+// Requester can edit assignee (add/edit/remove) when ticket is pending or in progress
 const canRequesterEditAssignee = computed(() => {
   if (!loadedTicket.value || !isRequester.value) return false;
   const currentStatus = loadedTicket.value?.ticketStatus?.key || loadedTicket.value?.status || '';
-  return currentStatus === DefaultTicketStatus.Pending;
+  return (
+    currentStatus === DefaultTicketStatus.Pending ||
+    currentStatus === DefaultTicketStatus.InProgress
+  );
 });
 
 const canViewEditAssigneeIcon = computed(() => {
