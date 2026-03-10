@@ -1,10 +1,12 @@
 <template>
-  <section id="categoriasSection" class="p-6">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-      <h1 class="text-2xl font-bold text-txt-primary dark:text-white">Categorias</h1>
+  <section id="categoriasSection" class="p-5 sm:px-6 sm:py-6 lg:px-8 lg:py-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <h1 class="text-xl sm:text-2xl font-bold text-txt-primary dark:text-white tracking-tight">
+        Categorias
+      </h1>
       <button
         id="newCategoriaBtn"
-        class="flex items-center gap-2 px-4 py-2 btn btn-primary text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+        class="flex items-center gap-2 px-4 py-2 btn btn-primary text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors shrink-0"
         @click="openModal"
       >
         <font-awesome-icon icon="plus" />
@@ -12,27 +14,57 @@
       </button>
     </div>
 
-    <div class="flex flex-col sm:flex-row gap-4 mb-6">
-      <div class="w-64">
-        <div class="relative">
-          <font-awesome-icon
-            icon="search"
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-txt-light/80 dark:text-gray-500 w-4 h-4 pointer-events-none"
-          />
-          <Input
-            id="searchCategories"
-            v-model="searchTerm"
-            type="text"
-            :placeholder="filterConfig.search.placeholder"
-            padding="tight"
-            class="pl-10 pr-4 w-full text-gray-700 dark:text-gray-300 text-sm transition-all duration-200 dark:border-gray-600 dark:bg-gray-800"
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 sm:p-6 shadow-soft-xs mb-6"
+    >
+      <h2 class="text-lg font-bold text-txt-primary dark:text-white tracking-tight">
+        Gestão de Categorias
+      </h2>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        Visualize e gerencie as categorias do sistema.
+      </p>
+    </div>
+
+    <div
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-soft-xs mb-6"
+    >
+      <div class="flex flex-col sm:flex-row gap-4 sm:items-center sm:gap-6">
+        <div class="w-full sm:w-1/4 min-w-0">
+          <label for="searchCategories" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+            Buscar
+          </label>
+          <div class="relative">
+            <font-awesome-icon
+              icon="search"
+              class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4 pointer-events-none"
+            />
+            <Input
+              id="searchCategories"
+              v-model="searchTerm"
+              type="text"
+              :placeholder="filterConfig.search.placeholder"
+              padding="normal"
+              class="pl-10 pr-4 w-full text-gray-700 dark:text-gray-300 text-sm border-gray-200 dark:border-gray-600 rounded-[5px] focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all dark:bg-gray-700/50"
+            />
+          </div>
+        </div>
+        <div class="w-full sm:w-1/4 min-w-0">
+          <label for="sortCategories" class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
+            Ordenar por
+          </label>
+          <Select
+            id="sortCategories"
+            v-model="sortByValue"
+            :options="sortOptions"
+            placeholder="Ordenar por..."
+            class="w-full"
           />
         </div>
       </div>
     </div>
 
     <div
-      class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-soft-xs overflow-hidden"
+      class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-soft-xs overflow-hidden"
     >
       <DataTable
         :data="initialConfig.items"
@@ -49,27 +81,64 @@
         @sort="handleSort"
       >
         <template #column-name="{ item }">
-          <div class="font-medium text-txt-primary dark:text-gray-100">
-            {{ item.name }}
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-blue-600 text-white"
+            >
+              <font-awesome-icon icon="tags" class="w-5 h-5" />
+            </div>
+            <div>
+              <span class="font-semibold text-txt-primary dark:text-gray-100">
+                {{ item.name }}
+              </span>
+            </div>
           </div>
         </template>
 
         <template #actions="{ item }">
-          <div class="flex items-center justify-center gap-2">
+          <ActionDropdown v-slot="{ close }">
             <button
-              class="w-8 h-8 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 transition-all duration-200"
-              @click.stop="openEditModal(item)"
-              title="Editar categoria"
+              @click.stop="
+                openEditModal(item);
+                close();
+              "
+              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
             >
-              <font-awesome-icon icon="edit" />
+              <font-awesome-icon icon="edit" class="w-4" />
+              <span>Editar</span>
             </button>
+            <div class="h-px bg-gray-100 dark:bg-gray-700 my-1" />
             <button
-              class="w-8 h-8 rounded bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center hover:bg-red-600 hover:text-white dark:hover:bg-red-600 transition-all duration-200"
-              @click.stop="confirmDelete(item)"
-              title="Excluir categoria"
+              @click.stop="
+                confirmDelete(item);
+                close();
+              "
+              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
             >
-              <font-awesome-icon icon="trash" />
+              <font-awesome-icon icon="trash" class="w-4" />
+              <span>Excluir</span>
             </button>
+          </ActionDropdown>
+        </template>
+
+        <template #empty>
+          <div
+            class="flex flex-col items-center justify-center py-12 px-4 text-center bg-gray-50/50 dark:bg-gray-800/30 rounded-xl mx-4 mb-4"
+          >
+            <div
+              class="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center mb-4"
+            >
+              <font-awesome-icon
+                icon="tags"
+                class="text-2xl text-white"
+              />
+            </div>
+            <p class="text-sm font-semibold text-txt-primary dark:text-white mb-1">
+              Nenhuma categoria encontrada
+            </p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 max-w-sm">
+              {{ searchTerm ? 'Tente ajustar o filtro de busca.' : 'Comece criando uma nova categoria.' }}
+            </p>
           </div>
         </template>
       </DataTable>
@@ -102,6 +171,8 @@ import NewCategoryModal from '@/components/categories/NewCategoryModal.vue';
 import EditCategoryModal from '@/components/categories/EditCategoryModal.vue';
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue';
 import DataTable from '@/components/common/DataTable.vue';
+import ActionDropdown from '@/components/common/ActionDropdown.vue';
+import Select from '@/components/common/Select.vue';
 import type { TableHeader, PaginationInfo } from '@/components/common/DataTable.vue';
 import { toast } from 'vue3-toastify';
 import { AxiosError } from 'axios';
@@ -109,6 +180,14 @@ import { useFiltersStore } from '@/stores/filters';
 import Input from '@/components/common/Input.vue';
 
 const filtersStore = useFiltersStore();
+
+const SORT_OPTIONS = [
+  { value: '', label: 'Padrão' },
+  { value: 'name_asc', label: 'Nome (A–Z)' },
+  { value: 'name_desc', label: 'Nome (Z–A)' },
+] as const;
+
+const sortOptions = SORT_OPTIONS.map((o) => ({ value: o.value, label: o.label }));
 
 const categories = ref<Category[]>([]);
 const isModalOpen = ref(false);
@@ -119,6 +198,24 @@ const totalPages = ref(1);
 const showDeleteConfirmation = ref(false);
 const categoryToDelete = ref<Category | null>(null);
 const categoryToEdit = ref<Category | null>(null);
+
+const sortByValue = computed({
+  get() {
+    const by = filtersStore.currentSortBy;
+    const order = filtersStore.currentSortOrder;
+    if (!by || !order) return '';
+    return `${by}_${order}`;
+  },
+  set(value: string) {
+    if (!value) {
+      filtersStore.clearFilter('sortBy');
+      filtersStore.clearFilter('sortOrder');
+      return;
+    }
+    const [sortBy, sortOrder] = value.split('_') as [string, 'asc' | 'desc'];
+    filtersStore.applyFilters({ sortBy, sortOrder });
+  },
+});
 
 const headers = computed((): TableHeader[] => [
   {
