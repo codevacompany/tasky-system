@@ -447,11 +447,7 @@ const filteredUsers = computed(() => {
   return users.value;
 });
 
-const stats = computed(() => {
-  const total = users.value.length;
-  const active = users.value.filter((u) => u.isActive).length;
-  return { total, active, inactive: total - active };
-});
+const stats = ref({ total: 0, active: 0, inactive: 0 });
 
 const getRoleBadgeClass = (roleName: string | undefined): string => {
   if (!roleName) return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300';
@@ -585,22 +581,32 @@ const handleSort = (sortKey: string) => {
 const loadUsers = async () => {
   isLoading.value = true;
 
-  const filters: any = {
-    name: filtersStore.currentSearch,
-    page: filtersStore.currentPage,
-    isActive: showInactiveUsers.value ? 'all' : undefined,
-  };
-
-  if (filtersStore.currentSortBy) {
-    filters.sortBy = filtersStore.currentSortBy;
-    filters.sortOrder = filtersStore.currentSortOrder;
-  }
-
   try {
-    const response = await userService.fetch(filters);
-    users.value = response.data.items;
-    console.log(response.data);
-    totalPages.value = response.data.totalPages;
+    const baseFilters: any = {
+      name: filtersStore.currentSearch,
+    };
+
+    if (filtersStore.currentSortBy) {
+      baseFilters.sortBy = filtersStore.currentSortBy;
+      baseFilters.sortOrder = filtersStore.currentSortOrder;
+    }
+
+    // Main list request (respects current page and active/inactive toggle)
+    const listFilters: any = {
+      ...baseFilters,
+      page: filtersStore.currentPage,
+      includeInactiveUsers: showInactiveUsers.value,
+    };
+
+    const [listResponse, statsResponse] = await Promise.all([
+      userService.fetch(listFilters),
+      userService.getStats(),
+    ]);
+
+    users.value = listResponse.data.items;
+    totalPages.value = listResponse.data.totalPages;
+
+    stats.value = statsResponse.data;
   } catch {
     toast.error('Erro ao carregar usuários. Tente novamente.');
   } finally {

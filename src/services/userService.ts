@@ -14,8 +14,15 @@ export const userService = {
     limit?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
+    includeInactiveUsers?: boolean;
   }): Promise<AxiosResponse<PaginatedResponse<User>>> {
     return apiClient.get<PaginatedResponse<User>>('/users', { params });
+  },
+
+  async getStats(): Promise<
+    AxiosResponse<{ total: number; active: number; inactive: number }>
+  > {
+    return apiClient.get('/users/stats');
   },
 
   async getByEmail(email: string): Promise<AxiosResponse<User>> {
