@@ -15,10 +15,12 @@
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+      <!-- Total card -->
       <div
         class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-soft-xs flex items-center gap-4"
       >
         <div
+          v-if="statsLoaded"
           class="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center shrink-0"
         >
           <font-awesome-icon
@@ -26,19 +28,37 @@
             class="text-lg text-primary-600 dark:text-primary-400"
           />
         </div>
-        <div>
-          <p class="text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider">
+        <div
+          v-else
+          class="w-12 h-12 rounded-xl bg-gray-200 dark:bg-gray-700 skeleton-shimmer flex items-center justify-center shrink-0"
+        ></div>
+        <div class="flex flex-col gap-1">
+          <p
+            v-if="statsLoaded"
+            class="text-xs font-medium text-primary-600 dark:text-primary-400 uppercase tracking-wider"
+          >
             Total
           </p>
-          <p class="text-xl font-bold text-primary-600 dark:text-primary-400">
+          <div
+            v-else
+            class="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"
+          ></div>
+          <p v-if="statsLoaded" class="text-xl font-bold text-primary-600 dark:text-primary-400">
             {{ stats.total }}
           </p>
+          <div
+            v-else
+            class="h-6 w-10 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"
+          ></div>
         </div>
       </div>
+
+      <!-- Active card -->
       <div
         class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-soft-xs flex items-center gap-4"
       >
         <div
+          v-if="statsLoaded"
           class="w-12 h-12 rounded-xl bg-green-50 dark:bg-green-900/20 flex items-center justify-center shrink-0"
         >
           <font-awesome-icon
@@ -46,19 +66,37 @@
             class="text-lg text-green-600 dark:text-green-400"
           />
         </div>
-        <div>
-          <p class="text-xs font-medium text-green-600 dark:text-green-400 uppercase tracking-wider">
+        <div
+          v-else
+          class="w-12 h-12 rounded-xl bg-gray-200 dark:bg-gray-700 skeleton-shimmer flex items-center justify-center shrink-0"
+        ></div>
+        <div class="flex flex-col gap-1">
+          <p
+            v-if="statsLoaded"
+            class="text-xs font-medium text-green-600 dark:text-green-400 uppercase tracking-wider"
+          >
             Ativos
           </p>
-          <p class="text-xl font-bold text-green-600 dark:text-green-400">
+          <div
+            v-else
+            class="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"
+          ></div>
+          <p v-if="statsLoaded" class="text-xl font-bold text-green-600 dark:text-green-400">
             {{ stats.active }}
           </p>
+          <div
+            v-else
+            class="h-6 w-10 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"
+          ></div>
         </div>
       </div>
+
+      <!-- Inactive card -->
       <div
         class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-soft-xs flex items-center gap-4"
       >
         <div
+          v-if="statsLoaded"
           class="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center shrink-0"
         >
           <font-awesome-icon
@@ -66,13 +104,28 @@
             class="text-lg text-gray-500 dark:text-gray-400"
           />
         </div>
-        <div>
-          <p class="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+        <div
+          v-else
+          class="w-12 h-12 rounded-xl bg-gray-200 dark:bg-gray-700 skeleton-shimmer flex items-center justify-center shrink-0"
+        ></div>
+        <div class="flex flex-col gap-1">
+          <p
+            v-if="statsLoaded"
+            class="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider"
+          >
             Inativos
           </p>
-          <p class="text-xl font-bold text-gray-600 dark:text-gray-400">
+          <div
+            v-else
+            class="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"
+          ></div>
+          <p v-if="statsLoaded" class="text-xl font-bold text-gray-600 dark:text-gray-400">
             {{ stats.inactive }}
           </p>
+          <div
+            v-else
+            class="h-6 w-10 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"
+          ></div>
         </div>
       </div>
     </div>
@@ -447,11 +500,8 @@ const filteredUsers = computed(() => {
   return users.value;
 });
 
-const stats = computed(() => {
-  const total = users.value.length;
-  const active = users.value.filter((u) => u.isActive).length;
-  return { total, active, inactive: total - active };
-});
+const stats = ref({ total: 0, active: 0, inactive: 0 });
+const statsLoaded = ref(false);
 
 const getRoleBadgeClass = (roleName: string | undefined): string => {
   if (!roleName) return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300';
@@ -584,23 +634,35 @@ const handleSort = (sortKey: string) => {
 
 const loadUsers = async () => {
   isLoading.value = true;
-
-  const filters: any = {
-    name: filtersStore.currentSearch,
-    page: filtersStore.currentPage,
-    isActive: showInactiveUsers.value ? 'all' : undefined,
-  };
-
-  if (filtersStore.currentSortBy) {
-    filters.sortBy = filtersStore.currentSortBy;
-    filters.sortOrder = filtersStore.currentSortOrder;
-  }
+  statsLoaded.value = false;
 
   try {
-    const response = await userService.fetch(filters);
-    users.value = response.data.items;
-    console.log(response.data);
-    totalPages.value = response.data.totalPages;
+    const baseFilters: any = {
+      name: filtersStore.currentSearch,
+    };
+
+    if (filtersStore.currentSortBy) {
+      baseFilters.sortBy = filtersStore.currentSortBy;
+      baseFilters.sortOrder = filtersStore.currentSortOrder;
+    }
+
+    // Main list request (respects current page and active/inactive toggle)
+    const listFilters: any = {
+      ...baseFilters,
+      page: filtersStore.currentPage,
+      includeInactiveUsers: showInactiveUsers.value,
+    };
+
+    const [listResponse, statsResponse] = await Promise.all([
+      userService.fetch(listFilters),
+      userService.getStats(),
+    ]);
+
+    users.value = listResponse.data.items;
+    totalPages.value = listResponse.data.totalPages;
+
+    stats.value = statsResponse.data;
+    statsLoaded.value = true;
   } catch {
     toast.error('Erro ao carregar usuários. Tente novamente.');
   } finally {

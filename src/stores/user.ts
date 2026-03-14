@@ -26,9 +26,11 @@ export const useUserStore = defineStore('auth', () => {
     hasActiveSubscription.value = value;
   };
 
-  const whoami = async (): Promise<boolean> => {
+  const whoami = async (options?: { silent?: boolean }): Promise<boolean> => {
     try {
-      setAppLoading(true);
+      if (!options?.silent) {
+        setAppLoading(true);
+      }
       const response = await apiClient.get<{ user: User; hasActiveSubscription?: boolean }>(
         '/auth/whoami',
       );
@@ -42,7 +44,9 @@ export const useUserStore = defineStore('auth', () => {
       setHasActiveSubscription(undefined);
       return false;
     } finally {
-      setAppLoading(false);
+      if (!options?.silent) {
+        setAppLoading(false);
+      }
     }
   };
 
