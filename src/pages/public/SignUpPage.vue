@@ -465,9 +465,9 @@ function nextStep() {
   }
 
   if (step.value < 2) {
-    trackCustom('SignupStepCompleted', {
-      step: step.value,
-      step_name: step.value === 1 ? 'company_data' : 'owner',
+    trackCustom('SignUpStepCompleted', {
+      etapa: step.value,
+      nome_etapa: step.value === 1 ? 'dados_empresa' : 'responsavel',
     });
     step.value++;
   } else if (step.value === 2) {
