@@ -361,6 +361,7 @@
 import { ref, reactive, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { signupService } from '@/services/signupService';
+import { useFacebookPixel } from '@/composables/useFacebookPixel';
 import { toast } from 'vue3-toastify';
 import teamSuccessPhoto from '@/assets/images/team_success_photo.png';
 import {
@@ -376,6 +377,7 @@ import { AxiosError } from 'axios';
 import Input from '@/components/common/Input.vue';
 
 const router = useRouter();
+const { track, trackCustom } = useFacebookPixel();
 const step = ref(1);
 const steps = [{ key: 'company' }, { key: 'owner' }, { key: 'done' }];
 
@@ -463,6 +465,10 @@ function nextStep() {
   }
 
   if (step.value < 2) {
+    trackCustom('SignupStepCompleted', {
+      step: step.value,
+      step_name: step.value === 1 ? 'company_data' : 'owner',
+    });
     step.value++;
   } else if (step.value === 2) {
     step.value = 3;
@@ -502,6 +508,8 @@ async function submitSignUp() {
     };
 
     await signupService.createSignUp(payload);
+    track('Lead');
+    track('CompleteRegistration');
     step.value = 3;
   } catch (error: unknown) {
     if (error instanceof AxiosError && error.response?.status === 409) {
