@@ -67,16 +67,23 @@
       <template #column-departmentName="{ item }">
         <div class="flex items-center gap-3">
           <div
-            class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300"
+            class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300 shrink-0"
           >
             <font-awesome-icon icon="building" class="w-5 h-5" />
           </div>
-          <div class="min-w-0">
-            <p class="text-sm font-medium text-txt-primary dark:text-white truncate">
-              {{ item.departmentName }}
-            </p>
-          </div>
+          <span class="text-sm font-medium text-txt-primary dark:text-gray-100 truncate">
+            {{ item.departmentName }}
+          </span>
         </div>
+      </template>
+
+      <template #column-viewDetails="{ item }">
+        <router-link
+          :to="{ name: 'DepartmentStatsDetail', params: { id: String(item.departmentId) } }"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
+        >
+          Ver detalhes
+        </router-link>
       </template>
 
       <template #column-averageAcceptanceTimeSeconds="{ value }">
@@ -268,6 +275,12 @@ const tableHeaders = computed<TableHeader<DepartmentStats>[]>(() => [
     sortKey: 'completionOverdueRate',
     align: 'center',
     sortDirection: sortKey.value === 'completionOverdueRate' ? sortDirection.value : 'none',
+  },
+  {
+    key: 'viewDetails',
+    label: '',
+    sortable: false,
+    align: 'center',
   },
 ]);
 

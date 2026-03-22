@@ -111,12 +111,16 @@ import {
   faFileInvoiceDollar,
   faLayerGroup,
   faClipboardCheck,
+  faStopwatch,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
   faBell as faBellRegular,
   faClock as faClockRegular,
   faComment as faCommentRegular,
+  faCircleCheck as faCircleCheckRegular,
+  faRectangleList as faRectangleListRegular,
+  faHourglass as faHourglassRegular,
 } from '@fortawesome/free-regular-svg-icons';
 
 const icons = [
@@ -235,6 +239,10 @@ const icons = [
   faFileInvoiceDollar,
   faLayerGroup,
   faClipboardCheck,
+  faStopwatch,
+  faCircleCheckRegular,
+  faRectangleListRegular,
+  faHourglassRegular,
 ];
 
 library.add(...icons);

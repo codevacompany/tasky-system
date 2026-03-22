@@ -52,6 +52,8 @@ export interface DepartmentStats {
   departmentName: string;
   totalTickets: number;
   resolvedTickets: number;
+  /** Closed tickets (resolved + rejected). Used for "X de Y resolvidas" (among closed only). */
+  closedTickets?: number;
   averageResolutionTimeSeconds: number;
   averageAcceptanceTimeSeconds: number;
   resolutionRate: number;
