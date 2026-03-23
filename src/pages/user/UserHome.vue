@@ -1,20 +1,18 @@
 <template>
   <div class="relative">
-    <!-- Blur overlay for background content only -->
-    <div
-      v-if="showWelcomeModal"
-      class="fixed inset-0 bg-white/30 dark:bg-black/30 backdrop-blur-sm z-[999] pointer-events-none"
-    ></div>
-
     <section
       id="dashboardSection"
       class="p-5 sm:px-6 sm:pt-4 sm:pb-10 transition-all duration-300"
-      :class="{ 'pointer-events-none': showWelcomeModal }"
     >
       <WelcomeModal
-        :isOpen="showWelcomeModal"
+        v-if="showWelcomeModal"
         @close="closeWelcomeModal"
         @openGuide="openUserGuide"
+      />
+      <TutorialGuideModal
+        v-if="showTutorialModal"
+        :videos="tutorialVideos"
+        @close="handleTutorialClose"
       />
 
       <!-- Estatísticas -->
@@ -288,7 +286,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { reportService, type UserStatistics } from '@/services/reportService';
 import { DefaultTicketStatus, type Ticket } from '@/models';
 import { useUserStore } from '@/stores/user';
@@ -297,15 +295,23 @@ import { toast } from 'vue3-toastify';
 import CompactTicketTable from '@/components/tickets/CompactTicketTable.vue';
 import { formatTimeShort } from '@/utils/generic-helper';
 import WelcomeModal from '@/components/common/WelcomeModal.vue';
+import TutorialGuideModal from '@/components/common/TutorialGuideModal.vue';
 import PerformanceExplanationModal from '@/components/user/PerformanceExplanationModal.vue';
-import { useRouter } from 'vue-router';
+import { getTutorialVideosByRole } from '@/config/tutorialVideos';
+import { userService } from '@/services/userService';
 
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
-const router = useRouter();
 const isLoading = ref(true);
 const userStats = ref<UserStatistics | null>(null);
 const showPerformanceModal = ref(false);
+const showTutorialModal = ref(false);
+/** When true, open tutorial modal as soon as welcome modal closes (after whoami). */
+const pendingOpenTutorial = ref(false);
+
+const tutorialVideos = computed(() =>
+  getTutorialVideosByRole(userStore.user?.role?.name)
+);
 const latestReceivedTickets = computed(() => ticketsStore.recentReceivedTickets);
 const latestCreatedTickets = computed(() => ticketsStore.recentCreatedTickets);
 
@@ -374,8 +380,31 @@ const closeWelcomeModal = () => {
 };
 
 const openUserGuide = () => {
-  router.push('/faq');
+  pendingOpenTutorial.value = true;
 };
+
+const handleTutorialClose = async (payload: { completed: boolean }) => {
+  showTutorialModal.value = false;
+  if (payload.completed) {
+    try {
+      await userService.completeOnboarding();
+      await userStore.whoami({ silent: true });
+    } catch (e) {
+      console.error('Failed to mark onboarding complete', e);
+    }
+  }
+};
+
+// Open tutorial when welcome modal has closed (showWelcomeModal became false after whoami)
+watch(
+  () => showWelcomeModal.value,
+  (isWelcomeOpen) => {
+    if (!isWelcomeOpen && pendingOpenTutorial.value) {
+      pendingOpenTutorial.value = false;
+      showTutorialModal.value = true;
+    }
+  }
+);
 
 onMounted(async () => {
   // Don't fetch data if terms haven't been accepted

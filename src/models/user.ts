@@ -22,6 +22,7 @@ export interface User {
   privacyPolicyAccepted?: boolean;
   privacyPolicyAcceptedAt?: string | Date | null;
   privacyPolicyVersion?: string | null;
+  completedOnboarding?: boolean;
 }
 
 export interface CreateUserDto {

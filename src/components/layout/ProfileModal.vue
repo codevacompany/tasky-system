@@ -49,6 +49,17 @@
           <div class="py-4">
             <div class="flex flex-col">
               <router-link
+                to="/perfil"
+                @click="closeModal"
+                class="flex items-center gap-3 px-6 py-3.5 text-txt-primary hover:text-txt-primary dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
+                  <font-awesome-icon icon="user" />
+                </div>
+                <span class="flex-1 text-sm text font-medium">Perfil</span>
+              </router-link>
+
+              <router-link
                 to="/faq"
                 @click="closeModal"
                 class="flex items-center gap-3 px-6 py-3.5 text-txt-primary hover:text-txt-primary dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"

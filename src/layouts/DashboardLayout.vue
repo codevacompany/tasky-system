@@ -186,15 +186,27 @@
         <div class="flex items-center gap-6">
           <button
             v-if="userStore.hasActiveSubscription !== false"
-            class="btn btn-primary flex items-center gap-2"
+            class="btn btn-primary flex items-center gap-2 order-1 md:order-2"
             @click="openTicketModal"
           >
             <font-awesome-icon icon="plus" class="text-xs sm:text-[13.5px]" />
             <span class="text-xs sm:text-[13.5px]">Nova Tarefa</span>
           </button>
 
+          <button
+            v-if="userStore.hasActiveSubscription !== false && !isGlobalAdmin"
+            class="flex items-center justify-center md:justify-between md:gap-2 sm:px-[14px] xl:w-48 sm:py-[7px] sm:w-10 sm:h-10 md:w-auto md:h-auto sm:border border-inputBorder dark:border-gray-600 text-txt-secondary sm:text-txt-muted dark:text-gray-300 rounded-full text-sm font-medium sm:bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors whitespace-nowrap order-2 md:order-1"
+            @click="openRichSearch"
+          >
+            <span class="flex items-center gap-2">
+              <font-awesome-icon icon="search" class="w-3.5 h-3.5" />
+              <span class="hidden md:inline">Pesquisar</span>
+            </span>
+            <span class="hidden sm:inline text-gray-400 dark:text-gray-400 text-xs">Ctrl+K</span>
+          </button>
+
           <div
-            class="flex text-gray-800 dark:text-gray-200 relative cursor-pointer sm:ml-6"
+            class="flex text-gray-800 dark:text-gray-200 relative cursor-pointer sm:ml-6 order-3"
             @click="toggleNotificationsModal"
           >
             <font-awesome-icon
@@ -217,7 +229,7 @@
           </router-link> -->
 
           <div
-            class="flex items-center cursor-pointer text-gray-800 dark:text-gray-200 mr-4"
+            class="flex items-center cursor-pointer text-gray-800 dark:text-gray-200 mr-4 order-4"
             @click="toggleProfileModal"
           >
             <div
@@ -295,6 +307,21 @@
                 </div>
               </li>
             </router-link>
+            <li
+              v-if="!isGlobalAdmin && userStore.hasActiveSubscription !== false"
+              class="cursor-pointer"
+              @click="
+                openRichSearch();
+                closeMobileMenu();
+              "
+            >
+              <div
+                class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover"
+              >
+                <font-awesome-icon icon="search" />
+                Buscar tarefas
+              </div>
+            </li>
             <router-link
               v-if="isTenantAdmin || isSupervisor"
               to="/admin/relatorios"
@@ -428,6 +455,8 @@
       @close="toggleNotificationsModal"
       @notifications-read="fetchUnreadCount"
     />
+
+    <RichSearchModal v-if="showRichSearch" @close="closeRichSearch" />
   </div>
 </template>
 
@@ -435,8 +464,10 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import NewTicketModal from '@/components/layout/NewTicketModal.vue';
 import ProfileModal from '@/components/layout/ProfileModal.vue';
+import RichSearchModal from '@/components/tickets/RichSearchModal.vue';
 import NotificationsDropdown from '@/components/layout/NotificationsDropdown.vue';
 import { useUserStore } from '@/stores/user';
+import { showRichSearch, openRichSearch, closeRichSearch } from '@/stores/richSearch';
 import { useUserPreferencesStore } from '@/stores/userPreferences';
 import { useTicketsStore } from '@/stores/tickets';
 import { useRoute } from 'vue-router';
@@ -538,6 +569,16 @@ function playNotificationSound() {
 const handleClickOutside = (event: MouseEvent) => {
   if (adminDropdownRef.value && !adminDropdownRef.value.contains(event.target as Node)) {
     showAdminDropdown.value = false;
+  }
+};
+
+const handleGlobalKeydown = (e: KeyboardEvent) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    e.stopPropagation();
+    if (userStore.hasActiveSubscription !== false && !isGlobalAdmin.value) {
+      openRichSearch();
+    }
   }
 };
 
@@ -653,6 +694,7 @@ onMounted(() => {
   }, DEFAULT_POLLING_INTERVAL_MS) as unknown as number;
 
   document.addEventListener('click', handleClickOutside);
+  document.addEventListener('keydown', handleGlobalKeydown, true);
 });
 
 onUnmounted(() => {
@@ -670,6 +712,7 @@ onUnmounted(() => {
     clearTimeout(reconnectionTimeout.value);
   }
   document.removeEventListener('click', handleClickOutside);
+  document.removeEventListener('keydown', handleGlobalKeydown, true);
 });
 </script>
 
