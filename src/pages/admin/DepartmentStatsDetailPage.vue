@@ -1,25 +1,31 @@
 <template>
   <div class="p-5 sm:px-6 sm:pt-4 sm:pb-10">
-    <!-- Back link -->
-    <div class="mb-3">
+    <div class="mb-4">
       <router-link
         :to="{ name: 'AdminReports', query: { tab: 'setores' } }"
-        class="inline-flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+        class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-txt-secondary dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-md transition-colors"
       >
         <font-awesome-icon icon="arrow-left" />
         Voltar
       </router-link>
     </div>
 
-    <!-- Skeleton loading -->
     <div v-if="loading" class="space-y-8">
-      <div class="mb-8 flex items-center gap-4">
-        <div class="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer" />
-        <div class="flex-1" />
+      <div
+        class="mb-8 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 sm:p-6 shadow-soft-xs"
+      >
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+          <div>
+            <div
+              class="h-8 w-56 max-w-full bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer mb-2"
+            />
+          </div>
+          <div
+            class="h-4 w-64 max-w-full bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer sm:mt-1"
+          />
+        </div>
       </div>
-      <div class="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer mb-2" />
 
-      <!-- First row: 4 stat cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <div
           v-for="n in 4"
@@ -28,14 +34,15 @@
         >
           <div class="flex justify-between items-start gap-2 mb-3">
             <div class="h-4 w-28 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer" />
-            <div class="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 skeleton-shimmer shrink-0" />
+            <div
+              class="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 skeleton-shimmer shrink-0"
+            />
           </div>
           <div class="h-9 w-16 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer mb-2" />
           <div class="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer" />
         </div>
       </div>
 
-      <!-- Second row: 4 metric cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <div
           v-for="n in 4"
@@ -53,7 +60,6 @@
         </div>
       </div>
 
-      <!-- Colaboradores card -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <div
           class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-soft-xs"
@@ -72,7 +78,9 @@
               />
             </div>
           </div>
-          <div class="h-3 w-full max-w-xs mt-3 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer" />
+          <div
+            class="h-3 w-full max-w-xs mt-3 bg-gray-200 dark:bg-gray-700 rounded skeleton-shimmer"
+          />
         </div>
       </div>
     </div>
@@ -88,25 +96,29 @@
     </div>
 
     <template v-else>
-      <!-- Header: icon left, name + period right -->
-      <div class="mb-8 flex items-center gap-4">
-        <div class="min-w-0">
-          <h1 class="text-2xl font-bold text-txt-primary dark:text-white">
-            {{ department.departmentName }}
-          </h1>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            Estatísticas do período: {{ periodLabel }}
-          </p>
+      <div
+        class="mb-8 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 sm:p-6 shadow-soft-xs"
+      >
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+          <div class="min-w-0">
+            <h1 class="text-2xl font-bold text-txt-primary dark:text-white">
+              {{ department.departmentName }}
+            </h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400 sm:mt-1 sm:text-right">
+              Período: {{ periodLabel }}
+            </p>
+          </div>
         </div>
       </div>
 
-      <!-- First row: cards with title top-left, value + subtitle below, icon top-right -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         <div
           class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-soft-xs relative"
         >
           <div class="flex justify-between items-start gap-2 mb-1">
-            <span class="text-sm font-medium text-txt-primary dark:text-white">Total de tarefas</span>
+            <span class="text-sm font-medium text-txt-primary dark:text-white"
+              >Total de tarefas</span
+            >
             <div
               class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-gray-100 dark:bg-gray-700 text-blue-600 dark:text-blue-400"
             >
@@ -132,13 +144,17 @@
           <div class="text-3xl font-bold text-txt-primary dark:text-white">
             {{ department.resolvedTickets }}
           </div>
-          <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ resolvedPercentage }}% do total</div>
+          <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+            {{ resolvedPercentage }}% do total
+          </div>
         </div>
         <div
           class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-soft-xs relative"
         >
           <div class="flex justify-between items-start gap-2 mb-1">
-            <span class="text-sm font-medium text-txt-primary dark:text-white">Tempo médio de aceite</span>
+            <span class="text-sm font-medium text-txt-primary dark:text-white"
+              >Tempo médio de aceite</span
+            >
             <div
               class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-gray-100 dark:bg-gray-700 text-amber-600 dark:text-amber-400"
             >
@@ -154,7 +170,9 @@
           class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-soft-xs relative"
         >
           <div class="flex justify-between items-start gap-2 mb-1">
-            <span class="text-sm font-medium text-txt-primary dark:text-white">Tempo médio de resolução</span>
+            <span class="text-sm font-medium text-txt-primary dark:text-white"
+              >Tempo médio de resolução</span
+            >
             <div
               class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-gray-100 dark:bg-gray-700 text-green-600 dark:text-green-400"
             >
@@ -168,9 +186,7 @@
         </div>
       </div>
 
-      <!-- Second row: Score, Taxa de resolução, Atraso verificação, Atraso entrega -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-        <!-- Score de desempenho - circular progress -->
         <div
           class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-soft-xs"
         >
@@ -217,7 +233,6 @@
           </div>
         </div>
 
-        <!-- Taxa de resolução - same design as Score (large circular progress, % inside) -->
         <div
           class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-soft-xs"
         >
@@ -258,7 +273,6 @@
           </div>
         </div>
 
-        <!-- Atraso na verificação - bar color by percentage -->
         <div
           class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-soft-xs"
         >
@@ -289,7 +303,6 @@
           </p>
         </div>
 
-        <!-- Atraso na entrega - bar color by percentage -->
         <div
           class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-soft-xs"
         >
@@ -320,9 +333,7 @@
         </div>
       </div>
 
-      <!-- Third row: Colaboradores -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-        <!-- Colaboradores card: header (icon + label), then count + avatars, then description -->
         <div
           class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-soft-xs"
         >
@@ -351,7 +362,9 @@
             </div>
           </div>
           <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5">
-            Atribuídos ao setor{{ department.departmentName ? ` de ${department.departmentName.toLowerCase()}` : '' }}
+            Atribuídos ao setor{{
+              department.departmentName ? ` de ${department.departmentName.toLowerCase()}` : ''
+            }}
           </p>
         </div>
       </div>
@@ -413,12 +426,10 @@ const resolutionPercent = computed(() => {
   return Math.min(100, Math.round((v ?? 0) * 100));
 });
 
-/** Backend resolution rate (0–100): resolved / closed tickets only */
 const displayResolutionPercentValue = computed(() => resolutionPercent.value);
 
 const displayResolutionPercent = computed(() => `${resolutionPercent.value}%`);
 
-/** Subtitle for Taxa de resolução: "X de Y resolvidas" using closed tickets only */
 const resolutionRateSubtitle = computed(() => {
   const d = department.value;
   if (!d) return '';
@@ -513,5 +524,5 @@ async function loadDepartment() {
 }
 
 onMounted(loadDepartment);
-watch([() => route.params.id, () => route.query.period], loadDepartment);
+watch([() => route.params.id, period], loadDepartment);
 </script>

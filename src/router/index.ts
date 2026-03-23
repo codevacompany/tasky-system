@@ -88,6 +88,12 @@ const routes: RouteRecordRaw[] = [
         meta: { roles: [RoleName.TenantAdmin, RoleName.Supervisor] },
       },
       {
+        path: 'relatorios/colaboradores/:id',
+        name: 'UserStatsDetail',
+        component: () => import('@/pages/admin/UserStatsDetailPage.vue'),
+        meta: { roles: [RoleName.TenantAdmin, RoleName.Supervisor] },
+      },
+      {
         path: 'usuarios',
         component: UserList,
         meta: { roles: [RoleName.TenantAdmin] },
