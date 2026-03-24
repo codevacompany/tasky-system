@@ -4,137 +4,23 @@
     <div
       class="flex-1 lg:flex-2 bg-white flex flex-col justify-center items-center px-4 py-8 lg:px-8 lg:py-0 shadow-lg lg:shadow-2xl relative"
     >
-      <!-- Steps Indicator -->
-      <div class="absolute top-6 left-1/2 -translate-x-1/2 w-full max-w-md lg:max-w-lg px-1 z-30">
-        <ol class="flex items-center justify-between w-full list-none p-0 m-0 max-w-[300px] sm:max-w-[2500px] mx-auto">
-          <li v-for="(s, idx) in steps" :key="s.key" class="flex items-center">
-            <!-- Step with label below -->
-            <div class="flex flex-col items-center gap-1.5 sm:gap-2 min-w-[70px] sm:min-w-[56px]">
-              <div
-                :class="[
-                  'w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center border-2 text-sm font-semibold',
-                  step > idx + 1
-                    ? 'bg-blue-600 border-blue-600 text-white'
-                    : step === idx + 1
-                      ? 'border-blue-500 text-primary'
-                      : 'border-gray-300 text-gray-400',
-                ]"
-              >
-                <font-awesome-icon v-if="step > idx + 1" icon="check" />
-                <span v-else>{{ idx + 1 }}</span>
-              </div>
-              <span
-                class="text-[10px] sm:text-xs font-medium whitespace-nowrap"
-                :class="[step >= idx + 1 ? 'text-txt-primary' : 'text-gray-400']"
-              >
-                {{ idx === 0 ? 'Dados da Empresa' : idx === 1 ? 'Responsável' : 'Concluir' }}
-              </span>
-            </div>
-
-            <!-- Connector -->
-            <div v-if="idx < steps.length - 1" class="mx-1 sm:mx-3 w-6 sm:w-20 md:w-28">
-              <div
-                :class="['h-0.5 w-full rounded', step > idx + 1 ? 'bg-blue-600' : 'bg-gray-200']"
-              ></div>
-            </div>
-          </li>
-        </ol>
-      </div>
-
       <div class="w-full max-w-md lg:max-w-lg mt-8 lg:mt-10 h-[70%] flex items-center">
         <div class="w-full max-w-md lg:max-w-lg space-y-6">
-          <div class="text-center lg:text-left">
-            <h2 v-if="step === 1" class="text-primary text-sm lg:text-[15.5px] font-semibold mb-1 xl:mb-3">
+          <div v-if="step === 1" class="text-center lg:text-left">
+            <h2 class="text-primary text-sm lg:text-[15.5px] font-semibold mb-1 xl:mb-3">
               Comece seus 14 dias de teste gratuito hoje.
             </h2>
-            <h2
-              v-else-if="step === 2"
-              class="text-blue-600 text-sm lg:text-base font-semibold mb-2"
-            >
-              Estamos quase lá
-            </h2>
-
-            <h1 v-if="step === 1" class="text-xl lg:text-2xl font-bold text-txt-primary">
-              Informações da empresa
+            <h1 class="text-xl lg:text-2xl font-bold text-txt-primary">
+              Cadastro
             </h1>
-            <h1 v-else-if="step === 2" class="text-xl lg:text-2xl font-bold text-txt-primary">
-              Informações do Responsável
-            </h1>
+            <p class="text-sm text-gray-600 mt-2">
+              Preencha os dados do responsável e informe o CNPJ ao final. Nome e telefone da empresa vêm da Receita Federal; o e-mail da empresa é obtido do CNPJ quando disponível.
+            </p>
           </div>
 
-          <!-- Step 1 Form -->
-          <form v-if="step === 1" @submit.prevent="nextStep" class="space-y-4 lg:space-y-5">
-            <div>
-              <Input
-                v-model="form.companyName"
-                type="text"
-                required
-                placeholder="Nome da empresa"
-                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
-              />
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <Input
-                  v-model="form.cnpj"
-                  type="text"
-                  required
-                  maxlength="18"
-                  placeholder="CNPJ (12.345.678/0001-99)"
-                  @input="form.cnpj = maskCNPJ(form.cnpj)"
-                  @blur="cnpjTouched = true"
-                  class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
-                />
-                <span
-                  v-if="cnpjTouched && cnpjError"
-                  class="text-red-600 text-xs lg:text-sm mt-1 block"
-                >
-                  {{ cnpjError }}
-                </span>
-              </div>
-              <div>
-                <Input
-                  v-model="form.companyPhone"
-                  type="tel"
-                  required
-                  placeholder="Telefone ((11) 91234-5678)"
-                  @input="form.companyPhone = maskPhone(form.companyPhone)"
-                  maxlength="15"
-                  class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Input
-                v-model="form.companyEmail"
-                type="email"
-                required
-                placeholder="E-mail (empresa@email.com)"
-                @input="form.companyEmail = maskEmail(form.companyEmail)"
-                @blur="companyEmailTouched = true"
-                class="w-full px-4 py-3 lg:py-3.5 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
-              />
-              <span
-                v-if="companyEmailTouched && companyEmailError"
-                class="text-red-600 text-xs lg:text-sm mt-1 block"
-              >
-                {{ companyEmailError }}
-              </span>
-            </div>
-
-            <button
-              type="submit"
-              class="w-full py-2.5 lg:py-3 bg-primary hover:bg-blue-700 text-white font-semibold rounded-[5px] transition-colors text-sm lg:text-base mt-6"
-            >
-              Avançar
-            </button>
-          </form>
-
-          <!-- Step 2 Form -->
+          <!-- Single signup form -->
           <form
-            v-else-if="step === 2"
+            v-if="step === 1"
             @submit.prevent="submitSignUp"
             class="space-y-4 lg:space-y-5"
           >
@@ -150,29 +36,10 @@
 
             <div>
               <Input
-                v-model="form.contactCpf"
-                type="text"
-                required
-                maxlength="14"
-                placeholder="CPF (123.456.789-00)"
-                @input="form.contactCpf = maskCPF(form.contactCpf)"
-                @blur="contactCpfTouched = true"
-                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
-              />
-              <span
-                v-if="contactCpfTouched && contactCpfError"
-                class="text-red-600 text-xs lg:text-sm mt-1 block"
-              >
-                {{ contactCpfError }}
-              </span>
-            </div>
-
-            <div>
-              <Input
                 v-model="form.contactEmail"
                 type="email"
                 required
-                placeholder="E-mail (nome@email.com)"
+                placeholder="E-mail corporativo"
                 @input="form.contactEmail = maskEmail(form.contactEmail)"
                 @blur="contactEmailTouched = true"
                 class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
@@ -197,21 +64,33 @@
               />
             </div>
 
-            <div class="flex flex-col gap-3 mt-6">
-              <button
-                type="button"
-                class="w-full sm:w-auto px-6 py-2.5 lg:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-[5px] transition-colors text-sm lg:text-base"
-                @click="prevStep"
+            <div>
+              <Input
+                v-model="form.cnpj"
+                type="text"
+                required
+                maxlength="18"
+                placeholder="CNPJ da empresa"
+                @input="form.cnpj = maskCNPJ(form.cnpj)"
+                @blur="cnpjTouched = true"
+                class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
+              />
+              <span
+                v-if="cnpjTouched && cnpjError"
+                class="text-red-600 text-xs lg:text-sm mt-1 block"
               >
-                Voltar
-              </button>
+                {{ cnpjError }}
+              </span>
+            </div>
+
+            <div class="mt-6">
               <button
                 type="submit"
                 :disabled="isSubmitting"
-                class="w-full sm:flex-1 py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-[5px] transition-colors text-sm lg:text-base"
+                class="w-full py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-[5px] transition-colors text-sm lg:text-base"
               >
                 <span v-if="isSubmitting">Enviando...</span>
-                <span v-else>Concluir Cadastro</span>
+                <span v-else>Concluir cadastro</span>
               </button>
             </div>
           </form>
@@ -262,7 +141,7 @@
           </div>
 
           <!-- Terms Text -->
-          <p v-if="step < 3" class="text-xs lg:text-sm text-gray-500 text-center mt-6">
+          <p v-if="step < 2" class="text-xs lg:text-sm text-gray-500 text-center mt-6">
             Ao cadastrar, você concorda com nossa
             <a
               href="https://taskypro.com.br/politica-de-privacidade"
@@ -280,7 +159,7 @@
           </p>
 
           <!-- Login Link -->
-          <div v-if="step < 3" class="text-center mt-4 mb-8 lg:mb-12">
+          <div v-if="step < 2" class="text-center mt-4 mb-8 lg:mb-12">
             <p class="text-sm text-gray-600">
               Já tem uma conta?
               <router-link
@@ -358,63 +237,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue';
+import { ref, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { signupService } from '@/services/signupService';
 import { useFacebookPixel } from '@/composables/useFacebookPixel';
 import { toast } from 'vue3-toastify';
 import teamSuccessPhoto from '@/assets/images/team_success_photo.png';
-import {
-  maskCPF,
-  maskCNPJ,
-  maskPhone,
-  maskEmail,
-  validateEmail,
-  validateCPF,
-  validateCNPJ,
-} from '@/utils/form-helpers';
+import { maskCNPJ, maskPhone, maskEmail, validateEmail, validateCNPJ } from '@/utils/form-helpers';
 import { AxiosError } from 'axios';
 import Input from '@/components/common/Input.vue';
 
 const router = useRouter();
 const { track, trackCustom } = useFacebookPixel();
+/** 1 = form, 2 = success */
 const step = ref(1);
-const steps = [{ key: 'company' }, { key: 'owner' }, { key: 'done' }];
 
 const form = reactive({
-  // Step 1
-  companyName: '',
   cnpj: '',
-  companyEmail: '',
-  companyPhone: '',
-  // Step 2
   contactName: '',
-  contactCpf: '',
   contactEmail: '',
   contactPhone: '',
 });
 
-const companyEmailError = ref('');
 const contactEmailError = ref('');
-const companyEmailTouched = ref(false);
 const contactEmailTouched = ref(false);
-const contactCpfError = ref('');
-const contactCpfTouched = ref(false);
 const cnpjError = ref('');
 const cnpjTouched = ref(false);
 
 const isSubmitting = ref(false);
-
-watch(
-  () => form.companyEmail,
-  (val) => {
-    if (!val || validateEmail(val)) {
-      companyEmailError.value = '';
-    } else {
-      companyEmailError.value = 'E-mail inválido';
-    }
-  },
-);
 
 watch(
   () => form.contactEmail,
@@ -423,18 +273,6 @@ watch(
       contactEmailError.value = '';
     } else {
       contactEmailError.value = 'E-mail inválido';
-    }
-  },
-);
-
-watch(
-  () => form.contactCpf,
-  (val) => {
-    if (!val) {
-      contactCpfError.value = '';
-    } else {
-      const isValid = validateCPF(val);
-      contactCpfError.value = isValid ? '' : 'CPF inválido';
     }
   },
 );
@@ -451,33 +289,6 @@ watch(
   },
 );
 
-const progressWidth = computed(() => {
-  if (step.value === 1) return '50%';
-  if (step.value === 2) return '100%';
-  return '100%';
-});
-
-function nextStep() {
-  if (form.cnpj && !validateCNPJ(form.cnpj)) {
-    cnpjTouched.value = true;
-    cnpjError.value = 'CNPJ inválido';
-    return;
-  }
-
-  if (step.value < 2) {
-    trackCustom('SignUpStepCompleted', {
-      etapa: step.value,
-      nome_etapa: step.value === 1 ? 'dados_empresa' : 'responsavel',
-    });
-    step.value++;
-  } else if (step.value === 2) {
-    step.value = 3;
-  }
-}
-function prevStep() {
-  if (step.value > 1) step.value--;
-}
-
 function goToLogin() {
   router.push('/login');
 }
@@ -485,20 +296,17 @@ function goToLogin() {
 async function submitSignUp() {
   if (isSubmitting.value) return;
 
-  if (!validateCPF(form.contactCpf)) {
-    contactCpfTouched.value = true;
-    contactCpfError.value = 'CPF inválido';
+  cnpjTouched.value = true;
+  if (!form.cnpj || !validateCNPJ(form.cnpj)) {
+    cnpjError.value = 'CNPJ inválido';
     return;
   }
 
   isSubmitting.value = true;
   try {
     const payload = {
-      companyName: form.companyName,
-      email: form.companyEmail,
       cnpj: form.cnpj.replace(/[^\d]/g, ''),
       contactName: form.contactName,
-      contactCpf: form.contactCpf.replace(/[^\d]/g, ''),
       contactEmail: form.contactEmail,
       contactPhone: form.contactPhone.replace(/[^\d]/g, ''),
       termsAccepted: true,
@@ -508,12 +316,18 @@ async function submitSignUp() {
     };
 
     await signupService.createSignUp(payload);
+    trackCustom('SignUpStepCompleted', {
+      etapa: 1,
+      nome_etapa: 'cadastro_completo',
+    });
     track('Lead');
     track('CompleteRegistration');
-    step.value = 3;
+    step.value = 2;
   } catch (error: unknown) {
     if (error instanceof AxiosError && error.response?.status === 409) {
       toast.error('Empresa já cadastrada. Por favor, faça login.');
+    } else if (error instanceof AxiosError && error.response?.data?.message) {
+      toast.error(error.response.data.message as string);
     } else {
       toast.error('Ocorreu um erro ao enviar seu cadastro. Por favor, tente novamente.');
     }

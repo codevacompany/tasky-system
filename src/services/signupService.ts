@@ -5,11 +5,8 @@ import { useUserStore } from '@/stores/user';
 import { localStorageService } from '@/utils/localStorageService';
 
 interface SignUpPayload {
-  companyName: string;
-  email: string;
   cnpj: string;
   contactName: string;
-  contactCpf: string;
   contactEmail: string;
   contactPhone: string;
   termsAccepted: boolean;
