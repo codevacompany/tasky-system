@@ -105,7 +105,7 @@
                   {{ signup.contactEmail || '-' }}
                 </td>
                 <td class="px-4 py-4 text-txt-primary dark:text-gray-100">
-                  {{ signup.contactPhone || '-' }}
+                  {{ formatPhone(signup.contactPhone) || '-' }}
                 </td>
                 <td class="px-4 py-4">
                   <span
@@ -219,7 +219,7 @@
                           <strong>E-mail:</strong> {{ signup.contactEmail || '-' }}
                         </div>
                         <div class="mb-1">
-                          <strong>Telefone:</strong> {{ signup.contactPhone || '-' }}
+                          <strong>Telefone:</strong> {{ formatPhone(signup.contactPhone) || '-' }}
                         </div>
                       </div>
                     </div>
@@ -447,6 +447,27 @@ function formatStatus(status: string) {
     default:
       return status.toUpperCase();
   }
+}
+
+function formatPhone(phone?: string | null) {
+  const digits = (phone || '').replace(/\D/g, '');
+  if (!digits) return '';
+
+  // Expected output: (84) 999999999 (DDD + 9 digits)
+  if (digits.length >= 11) {
+    const ddd = digits.slice(0, 2);
+    const rest = digits.slice(2, 11);
+    return `(${ddd}) ${rest}`;
+  }
+
+  // Fallback for shorter values (e.g. legacy 10-digit numbers)
+  if (digits.length >= 10) {
+    const ddd = digits.slice(0, 2);
+    const rest = digits.slice(2, 10);
+    return `(${ddd}) ${rest}`;
+  }
+
+  return digits;
 }
 
 function canApproveSignup(signup: CompanySignUp): boolean {
