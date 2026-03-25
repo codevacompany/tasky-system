@@ -2,11 +2,16 @@
   <div class="min-h-screen flex flex-col lg:flex-row bg-gray-50">
     <!-- Left Section - Form -->
     <div
-      class="flex-1 lg:flex-2 bg-white flex flex-col justify-center items-center px-4 py-8 lg:px-8 lg:py-0 shadow-lg lg:shadow-2xl relative"
+      class="flex-1 lg:flex-2 bg-white flex flex-col items-center px-4 pt-8 pb-8 lg:px-8 lg:pt-10 lg:pb-10 shadow-lg lg:shadow-2xl"
     >
-      <div class="w-full max-w-md lg:max-w-lg mt-8 lg:mt-10 h-[70%] flex items-center">
+      <img
+        src="@/assets/images/tasky-pro-black.png"
+        alt="Tasky Pro"
+        class="w-16 xl:w-[115px] shrink-0 mt-2 mb-9"
+      />
+      <div class="w-full max-w-md lg:max-w-lg flex-1 flex flex-col justify-center min-h-0">
         <div class="w-full max-w-md lg:max-w-lg space-y-6">
-          <div v-if="step === 1" class="text-center lg:text-left">
+          <div v-if="!signupCompleted" class="text-center lg:text-left">
             <h2 class="text-primary text-sm lg:text-[15.5px] font-semibold mb-1 xl:mb-3">
               Comece seus 14 dias de teste gratuito hoje.
             </h2>
@@ -14,13 +19,13 @@
               Cadastro
             </h1>
             <p class="text-sm text-gray-600 mt-2">
-              Preencha os dados do responsável e informe o CNPJ ao final. Nome e telefone da empresa vêm da Receita Federal; o e-mail da empresa é obtido do CNPJ quando disponível.
+              Preencha os dados do responsável e o CNPJ da empresa. O CNPJ é opcional, podendo ser informado posteriormente. Nós entraremos em contato através do telefone informado.
             </p>
           </div>
 
           <!-- Single signup form -->
           <form
-            v-if="step === 1"
+            v-if="!signupCompleted"
             @submit.prevent="submitSignUp"
             class="space-y-4 lg:space-y-5"
           >
@@ -57,7 +62,7 @@
                 v-model="form.contactPhone"
                 type="tel"
                 required
-                placeholder="Telefone ((11) 91234-5678)"
+                placeholder="Telefone"
                 @input="form.contactPhone = maskPhone(form.contactPhone)"
                 maxlength="15"
                 class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
@@ -68,9 +73,8 @@
               <Input
                 v-model="form.cnpj"
                 type="text"
-                required
                 maxlength="18"
-                placeholder="CNPJ da empresa"
+                placeholder="CNPJ da empresa (opcional)"
                 @input="form.cnpj = maskCNPJ(form.cnpj)"
                 @blur="cnpjTouched = true"
                 class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
@@ -90,7 +94,7 @@
                 class="w-full py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-[5px] transition-colors text-sm lg:text-base"
               >
                 <span v-if="isSubmitting">Enviando...</span>
-                <span v-else>Concluir cadastro</span>
+                <span v-else>Cadastrar</span>
               </button>
             </div>
           </form>
@@ -120,7 +124,7 @@
                 Cadastro realizado com sucesso!
               </h2>
               <p class="text-gray-600 text-sm lg:text-base mb-6">
-                Obrigado por se cadastrar.<br />Em breve entraremos em contato com você.
+                Obrigado por se cadastrar.<br />Em breve entraremos em contato com você fornecendo suas credenciais de acesso.
               </p>
 
               <div class="flex flex-col sm:flex-row gap-3">
@@ -141,7 +145,7 @@
           </div>
 
           <!-- Terms Text -->
-          <p v-if="step < 2" class="text-xs lg:text-sm text-gray-500 text-center mt-6">
+          <p v-if="!signupCompleted" class="text-xs lg:text-sm text-gray-500 text-center mt-6">
             Ao cadastrar, você concorda com nossa
             <a
               href="https://taskypro.com.br/politica-de-privacidade"
@@ -159,7 +163,7 @@
           </p>
 
           <!-- Login Link -->
-          <div v-if="step < 2" class="text-center mt-4 mb-8 lg:mb-12">
+          <div v-if="!signupCompleted" class="text-center mt-4 mb-8 lg:mb-12">
             <p class="text-sm text-gray-600">
               Já tem uma conta?
               <router-link
@@ -172,11 +176,6 @@
           </div>
         </div>
       </div>
-      <img
-        src="@/assets/images/tasky-pro-black.png"
-        alt="Tasky Logo"
-        class="w-16 xl:w-24 absolute bottom-5 xl:bottom-8 "
-      />
     </div>
 
     <div
@@ -237,7 +236,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue';
+import { onMounted, ref, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { signupService } from '@/services/signupService';
 import { useFacebookPixel } from '@/composables/useFacebookPixel';
@@ -249,8 +248,11 @@ import Input from '@/components/common/Input.vue';
 
 const router = useRouter();
 const { track, trackCustom } = useFacebookPixel();
-/** 1 = form, 2 = success */
-const step = ref(1);
+const signupCompleted = ref(false);
+
+onMounted(() => {
+  track('PageView');
+});
 
 const form = reactive({
   cnpj: '',
@@ -296,8 +298,8 @@ function goToLogin() {
 async function submitSignUp() {
   if (isSubmitting.value) return;
 
-  cnpjTouched.value = true;
-  if (!form.cnpj || !validateCNPJ(form.cnpj)) {
+  if (form.cnpj && !validateCNPJ(form.cnpj)) {
+    cnpjTouched.value = true;
     cnpjError.value = 'CNPJ inválido';
     return;
   }
@@ -305,7 +307,7 @@ async function submitSignUp() {
   isSubmitting.value = true;
   try {
     const payload = {
-      cnpj: form.cnpj.replace(/[^\d]/g, ''),
+      cnpj: form.cnpj ? form.cnpj.replace(/[^\d]/g, '') : undefined,
       contactName: form.contactName,
       contactEmail: form.contactEmail,
       contactPhone: form.contactPhone.replace(/[^\d]/g, ''),
@@ -316,13 +318,7 @@ async function submitSignUp() {
     };
 
     await signupService.createSignUp(payload);
-    trackCustom('SignUpStepCompleted', {
-      etapa: 1,
-      nome_etapa: 'cadastro_completo',
-    });
-    track('Lead');
-    track('CompleteRegistration');
-    step.value = 2;
+    signupCompleted.value = true;
   } catch (error: unknown) {
     if (error instanceof AxiosError && error.response?.status === 409) {
       toast.error('Empresa já cadastrada. Por favor, faça login.');

@@ -7,8 +7,8 @@ export enum SignUpStatus {
 
 export interface CompanySignUp {
   id: number;
-  companyName: string;
-  email: string;
+  companyName?: string;
+  email?: string;
   phoneNumber?: string;
   cnpj?: string;
   cep?: string;
@@ -21,7 +21,7 @@ export interface CompanySignUp {
   companySize?: string;
   mainActivity?: string;
   contactName: string;
-  contactCpf: string;
+  contactCpf?: string;
   contactEmail: string;
   contactPhone: string;
   status: SignUpStatus;
