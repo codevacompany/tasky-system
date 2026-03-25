@@ -99,11 +99,13 @@
                   { 'bg-blue-50 dark:bg-blue-900/20': expandedId === signup.id },
                 ]"
               >
-                <td class="px-4 py-4 text-txt-primary dark:text-gray-100">{{ signup.companyName }}</td>
+                <td class="px-4 py-4 text-txt-primary dark:text-gray-100">{{ signup.companyName || '-' }}</td>
                 <td class="px-4 py-4 text-txt-primary dark:text-gray-100">{{ signup.cnpj || '-' }}</td>
-                <td class="px-4 py-4 text-txt-primary dark:text-gray-100">{{ signup.email }}</td>
                 <td class="px-4 py-4 text-txt-primary dark:text-gray-100">
-                  {{ signup.phoneNumber || '-' }}
+                  {{ signup.contactEmail || '-' }}
+                </td>
+                <td class="px-4 py-4 text-txt-primary dark:text-gray-100">
+                  {{ formatPhone(signup.contactPhone) || '-' }}
                 </td>
                 <td class="px-4 py-4">
                   <span
@@ -130,11 +132,29 @@
                 </td>
                 <td class="px-4 py-4" @click.stop>
                   <div class="flex items-center justify-center gap-2">
+                    <button
+                      v-if="signup.status !== SignUpStatus.COMPLETED"
+                      class="w-8 h-8 rounded flex items-center justify-center text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+                      @click="openEditModal(signup)"
+                      title="Editar cadastro"
+                    >
+                      <font-awesome-icon icon="pen" />
+                    </button>
                     <template v-if="signup.status === SignUpStatus.PENDING">
                       <button
-                        class="w-8 h-8 rounded flex items-center justify-center text-green-600 hover:bg-green-100 dark:hover:bg-green-900/20 hover:text-green-700 dark:hover:text-green-400 transition-colors"
-                        @click="approveSignup(signup)"
-                        title="Confirmar cadastro"
+                        class="w-8 h-8 rounded flex items-center justify-center transition-colors"
+                        :class="
+                          canApproveSignup(signup)
+                            ? 'text-green-600 hover:bg-green-100 dark:hover:bg-green-900/20 hover:text-green-700 dark:hover:text-green-400'
+                            : 'text-gray-300 dark:text-gray-600 cursor-not-allowed opacity-60'
+                        "
+                        :disabled="!canApproveSignup(signup)"
+                        @click="canApproveSignup(signup) && approveSignup(signup)"
+                        :title="
+                          canApproveSignup(signup)
+                            ? 'Confirmar cadastro'
+                            : 'Informe o CNPJ e complete os dados da empresa antes de aprovar'
+                        "
                       >
                         <font-awesome-icon icon="check-circle" />
                       </button>
@@ -199,7 +219,7 @@
                           <strong>E-mail:</strong> {{ signup.contactEmail || '-' }}
                         </div>
                         <div class="mb-1">
-                          <strong>Telefone:</strong> {{ signup.contactPhone || '-' }}
+                          <strong>Telefone:</strong> {{ formatPhone(signup.contactPhone) || '-' }}
                         </div>
                       </div>
                     </div>
@@ -246,16 +266,95 @@
       </div>
     </div>
   </div>
+
+  <div
+    v-if="showEditModal"
+    class="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 p-4"
+    @click.self="closeEditModal"
+  >
+    <div class="w-full max-w-xl rounded-xl bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700">
+      <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-txt-primary dark:text-gray-100">Editar cadastro</h3>
+        <button
+          class="w-8 h-8 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
+          @click="closeEditModal"
+          :disabled="isSavingEdit"
+        >
+          <font-awesome-icon icon="times" />
+        </button>
+      </div>
+      <form class="p-5 space-y-4" @submit.prevent="saveEdit">
+        <div>
+          <label class="block text-sm font-medium text-txt-primary dark:text-gray-100 mb-1">
+            Nome do responsável
+          </label>
+          <Input v-model="editForm.contactName" type="text" required class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-txt-primary dark:text-gray-100 mb-1">
+            E-mail do responsável
+          </label>
+          <Input v-model="editForm.contactEmail" type="email" required class="w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-txt-primary dark:text-gray-100 mb-1">
+            Telefone do responsável
+          </label>
+          <Input
+            v-model="editForm.contactPhone"
+            type="tel"
+            required
+            maxlength="15"
+            @input="editForm.contactPhone = maskPhone(editForm.contactPhone)"
+            class="w-full"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-txt-primary dark:text-gray-100 mb-1">
+            CNPJ (opcional)
+          </label>
+          <Input
+            v-model="editForm.cnpj"
+            type="text"
+            maxlength="18"
+            @input="editForm.cnpj = maskCNPJ(editForm.cnpj)"
+            class="w-full"
+          />
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Se informado, os dados da empresa serão atualizados automaticamente a partir do CNPJ.
+          </p>
+        </div>
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button
+            type="button"
+            class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+            @click="closeEditModal"
+            :disabled="isSavingEdit"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-60"
+            :disabled="isSavingEdit"
+          >
+            {{ isSavingEdit ? 'Salvando...' : 'Salvar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, reactive } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { toast } from 'vue3-toastify';
 import { signupService } from '@/services/signupService';
 import { SignUpStatus } from '@/models/SignUp';
 import type { CompanySignUp } from '@/models/SignUp';
 import Input from '@/components/common/Input.vue';
+import { maskCNPJ, maskPhone, validateCNPJ } from '@/utils/form-helpers';
 
 const searchTerm = ref('');
 const signups = ref<CompanySignUp[]>([]);
@@ -268,6 +367,15 @@ const pagination = ref({
   itemsPerPage: 10,
 });
 let autoRefreshInterval: number | null = null;
+const showEditModal = ref(false);
+const isSavingEdit = ref(false);
+const editingSignupId = ref<number | null>(null);
+const editForm = reactive({
+  contactName: '',
+  contactEmail: '',
+  contactPhone: '',
+  cnpj: '',
+});
 
 // Fetch signups from API
 async function fetchSignups() {
@@ -308,10 +416,10 @@ const filteredSignups = computed(() => {
   const term = searchTerm.value.toLowerCase();
   return signups.value.filter(
     (signup) =>
-      signup.companyName.toLowerCase().includes(term) ||
+      (signup.companyName || '').toLowerCase().includes(term) ||
       signup.cnpj?.toLowerCase().includes(term) ||
       false ||
-      signup.email.toLowerCase().includes(term) ||
+      (signup.email || '').toLowerCase().includes(term) ||
       signup.contactEmail.toLowerCase().includes(term),
   );
 });
@@ -341,6 +449,34 @@ function formatStatus(status: string) {
   }
 }
 
+function formatPhone(phone?: string | null) {
+  const digits = (phone || '').replace(/\D/g, '');
+  if (!digits) return '';
+
+  // Expected output: (84) 999999999 (DDD + 9 digits)
+  if (digits.length >= 11) {
+    const ddd = digits.slice(0, 2);
+    const rest = digits.slice(2, 11);
+    return `(${ddd}) ${rest}`;
+  }
+
+  // Fallback for shorter values (e.g. legacy 10-digit numbers)
+  if (digits.length >= 10) {
+    const ddd = digits.slice(0, 2);
+    const rest = digits.slice(2, 10);
+    return `(${ddd}) ${rest}`;
+  }
+
+  return digits;
+}
+
+function canApproveSignup(signup: CompanySignUp): boolean {
+  const cnpjDigits = (signup.cnpj || '').replace(/\D/g, '');
+  const hasCnpj = cnpjDigits.length === 14;
+  const hasCompany = (signup.companyName || '').trim().length > 0;
+  return hasCnpj && hasCompany;
+}
+
 function getStatusIcon(status: string) {
   switch (status) {
     case SignUpStatus.COMPLETED:
@@ -357,18 +493,19 @@ function getStatusIcon(status: string) {
 async function approveSignup(signup: CompanySignUp) {
   try {
     await signupService.approveSignup(signup.id);
-    toast.success(`Cadastro de ${signup.companyName} confirmado!`);
+    toast.success(`Cadastro de ${signup.companyName || signup.contactName} confirmado!`);
     fetchSignups(); // Refresh the list
   } catch (err) {
     console.error('Error confirming signup:', err);
-    toast.error('Erro ao confirmar cadastro');
+    const errorMessage = (err as any)?.response?.data?.message || 'Erro ao confirmar cadastro';
+    toast.error(errorMessage);
   }
 }
 
 async function rejectSignup(signup: CompanySignUp) {
   try {
     await signupService.rejectSignup(signup.id);
-    toast.success(`Cadastro de ${signup.companyName} rejeitado.`);
+    toast.success(`Cadastro de ${signup.companyName || signup.contactName} rejeitado.`);
     fetchSignups(); // Refresh the list
   } catch (err) {
     console.error('Error rejecting signup:', err);
@@ -383,6 +520,51 @@ async function resendEmail(signup: CompanySignUp) {
   } catch (err) {
     console.error('Error resending email:', err);
     toast.error('Erro ao reenviar e-mail');
+  }
+}
+
+function openEditModal(signup: CompanySignUp) {
+  editingSignupId.value = signup.id;
+  editForm.contactName = signup.contactName || '';
+  editForm.contactEmail = signup.contactEmail || '';
+  editForm.contactPhone = signup.contactPhone || '';
+  editForm.cnpj = signup.cnpj || '';
+  showEditModal.value = true;
+}
+
+function closeEditModal() {
+  if (isSavingEdit.value) return;
+  showEditModal.value = false;
+  editingSignupId.value = null;
+}
+
+async function saveEdit() {
+  if (!editingSignupId.value) return;
+
+  if (editForm.cnpj && !validateCNPJ(editForm.cnpj)) {
+    toast.error('CNPJ inválido');
+    return;
+  }
+
+  isSavingEdit.value = true;
+  try {
+    await signupService.updateSignup(editingSignupId.value, {
+      contactName: editForm.contactName.trim(),
+      contactEmail: editForm.contactEmail.trim(),
+      contactPhone: editForm.contactPhone.replace(/[^\d]/g, ''),
+      cnpj: editForm.cnpj.replace(/[^\d]/g, ''),
+    });
+    
+    toast.success('Cadastro atualizado com sucesso');
+    isSavingEdit.value = false;
+
+    closeEditModal();
+    await fetchSignups();
+  } catch (err) {
+    const errorMessage = (err as any)?.response?.data?.message || 'Erro ao atualizar cadastro';
+    toast.error(errorMessage);
+  } finally {
+    isSavingEdit.value = false;
   }
 }
 

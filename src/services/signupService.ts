@@ -5,17 +5,22 @@ import { useUserStore } from '@/stores/user';
 import { localStorageService } from '@/utils/localStorageService';
 
 interface SignUpPayload {
-  companyName: string;
-  email: string;
-  cnpj: string;
+  cnpj?: string;
   contactName: string;
-  contactCpf: string;
   contactEmail: string;
   contactPhone: string;
   termsAccepted: boolean;
   termsVersion?: string;
   privacyPolicyAccepted: boolean;
   privacyPolicyVersion?: string;
+}
+
+interface UpdateSignUpPayload {
+  /** Digits only, or empty string to clear CNPJ / company enrichment */
+  cnpj: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
 }
 
 interface PaginationParams {
@@ -49,6 +54,10 @@ class SignupService {
 
   async resendEmail(id: number) {
     return apiClient.post(`${this.baseUrl}/${id}/resend-email`);
+  }
+
+  async updateSignup(id: number, data: UpdateSignUpPayload) {
+    return apiClient.patch(`${this.baseUrl}/${id}`, data);
   }
 
   async completeRegistration(
