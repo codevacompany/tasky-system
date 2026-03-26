@@ -29,6 +29,10 @@ export const notificationService = {
     return apiClient.post<Notification>(`/notifications/mark-as-read`);
   },
 
+  async markAsSeen(): Promise<AxiosResponse<Notification>> {
+    return apiClient.post<Notification>(`/notifications/mark-as-seen`);
+  },
+
   async markAsRead(id: number): Promise<AxiosResponse<Notification>> {
     return apiClient.post<Notification>(`/notifications/${id}/mark-as-read`);
   },
