@@ -16,6 +16,7 @@ export interface Notification {
   type: NotificationType;
   message: string;
   read: boolean;
+  seen: boolean;
   createdBy: User;
   targetUser: User;
   resourceId: number;
