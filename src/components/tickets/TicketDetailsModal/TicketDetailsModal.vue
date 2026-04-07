@@ -217,7 +217,10 @@
       </div>
 
       <!-- Actual Content -->
-      <div v-else-if="loadedTicket" class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
+      <div
+        v-else-if="loadedTicket"
+        class="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0"
+      >
         <!-- Left Sidebar -->
         <div class="lg:col-span-1 overflow-y-auto pr-4 space-y-4">
           <div
@@ -1133,6 +1136,7 @@
           </div>
         </div>
       </div>
+
     </div>
   </BaseModal>
 
@@ -1193,99 +1197,25 @@
     @cancel="handleCancel"
   />
 
-  <BaseModal
-    v-if="showReviewerModal"
-    title="Selecione o Revisor"
-    :showFooter="true"
-    @close="closeReviewerModal"
-  >
-    <div class="p-4">
-      <Select
-        v-model="reviewerSelection"
-        :options="reviewerOptions"
-        placeholder="Selecione o revisor"
-      />
-    </div>
-    <template #footer>
-      <div class="flex justify-end gap-2">
-        <button
-          class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          @click="showReviewerModal = false"
-          :disabled="isReviewerModalLoading"
-        >
-          Cancelar
-        </button>
-        <button
-          class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[100px]"
-          @click="confirmReviewerSelection"
-          :disabled="isReviewerModalLoading"
-        >
-          <LoadingSpinner v-if="isReviewerModalLoading" :size="16" />
-          <span v-if="!isReviewerModalLoading">Confirmar</span>
-        </button>
-      </div>
-    </template>
-  </BaseModal>
+  <ReviewerSelectionModal
+    :is-open="showReviewerModal"
+    :reviewer-options="reviewerOptions"
+    v-model:reviewerSelection="reviewerSelection"
+    :is-reviewer-modal-loading="isReviewerModalLoading"
+    @cancel="closeReviewerModal"
+    @confirm="confirmReviewerSelection"
+  />
 
   <!-- Due Date Modal -->
-  <BaseModal
-    v-if="showDueDateModal"
-    title="Definir Prazo de Conclusão"
-    :showFooter="true"
-    @close="handleDueDateCancel"
-  >
-    <div class="p-4">
-      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        Esta tarefa não possui um prazo definido. Para aceitar a tarefa, defina uma data estimada de
-        conclusão:
-      </p>
-      <div class="flex flex-col gap-2">
-        <label for="dueDate" class="text-sm font-medium text-gray-700 dark:text-gray-300">
-          Data de Conclusão:
-        </label>
-        <div class="w-full">
-          <DatePicker
-            :value="dueDateValue"
-            type="datetime"
-            format="DD/MM/YYYY HH:mm"
-            value-type="format"
-            :lang="pt"
-            :placeholder="'Selecione data e hora'"
-            :clearable="true"
-            :editable="false"
-            :disabled-date="disabledWeekendDate"
-            @change="handleDatePickerChange"
-            :input-class="'w-full px-[14px] py-2.5 border border-gray-200 dark:border-gray-700 rounded text-sm text-gray-800 dark:text-white bg-white dark:bg-gray-800'"
-            :placeholder-class="'text-gray-500 dark:text-gray-400'"
-            :time-picker-options="{
-              start: '00:00',
-              step: '00:15',
-              end: '23:45',
-            }"
-          />
-        </div>
-      </div>
-    </div>
-    <template #footer>
-      <div class="flex justify-end gap-2">
-        <button
-          class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          @click="handleDueDateCancel"
-          :disabled="isDueDateModalLoading"
-        >
-          Cancelar
-        </button>
-        <button
-          class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[100px]"
-          @click="confirmDueDate"
-          :disabled="!dueDateValue || isDueDateModalLoading"
-        >
-          <LoadingSpinner v-if="isDueDateModalLoading" :size="16" />
-          <span v-if="!isDueDateModalLoading">Confirmar</span>
-        </button>
-      </div>
-    </template>
-  </BaseModal>
+  <DueDateModal
+    :is-open="showDueDateModal"
+    :due-date-value="dueDateValue"
+    :disabled-weekend-date="disabledWeekendDate"
+    :is-due-date-modal-loading="isDueDateModalLoading"
+    @cancel="handleDueDateCancel"
+    @confirm="confirmDueDate"
+    @date-change="handleDatePickerChange"
+  />
 
   <!-- Image Viewer Modal -->
   <div
@@ -1348,236 +1278,43 @@
     </div>
   </div>
 
-  <!-- Edit Target Users Modal -->
-  <BaseModal
-    v-if="showEditTargetUsersModal"
-    title="Gerenciar Responsáveis"
-    :showFooter="false"
+  <EditTargetUsersModal
+    :is-open="showEditTargetUsersModal"
+    :ticket="loadedTicket"
+    :can-add-new-assignee="canAddNewAssignee"
+    :can-edit-target-user="canEditTargetUser"
+    :can-remove-target-user="canRemoveTargetUser"
     @close="closeEditTargetUsersModal"
-  >
-    <div class="p-4 sm:p-6" style="overflow: visible">
-      <div v-if="!isEditingAssignee && !isAddingAssignee" class="space-y-3">
-        <div
-          v-for="targetUser in sortedTargetUsers"
-          :key="targetUser.userId"
-          class="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
-        >
-          <div class="flex items-center gap-3 flex-1 min-w-0">
-            <div
-              class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-soft-xs"
-              :style="getAvatarStyle(targetUser.user.department?.name || '')"
-            >
-              {{
-                getUserInitials({
-                  firstName: targetUser.user.firstName,
-                  lastName: targetUser.user.lastName,
-                })
-              }}
-            </div>
-            <div class="flex-1 min-w-0">
-              <div
-                class="flex items-center gap-2"
-                :class="{
-                  'font-semibold text-blue-600 dark:text-blue-400':
-                    sortedTargetUsers.length > 1 &&
-                    targetUser.userId === loadedTicket?.currentTargetUserId,
-                }"
-              >
-                <span class="text-sm"
-                  >{{ targetUser.user.firstName }} {{ targetUser.user.lastName }}</span
-                >
-                <div
-                  v-if="!targetUser.user.isActive"
-                  class="flex items-center gap-1"
-                  title="Conta desativada"
-                >
-                  <font-awesome-icon icon="exclamation-triangle" class="text-orange-500 text-xs" />
-                  <span class="text-orange-500 text-xs">Desativado</span>
-                </div>
-              </div>
-              <p
-                v-if="targetUser.user.department?.name"
-                class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"
-              >
-                {{ targetUser.user.department.name }}
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2 ml-3">
-            <font-awesome-icon
-              v-if="canEditTargetUser(targetUser.userId)"
-              icon="edit"
-              class="text-gray-400 text-sm cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-              @click="startEditingAssignee(targetUser.userId)"
-              title="Editar responsável"
-            />
-            <font-awesome-icon
-              v-if="canRemoveTargetUser(targetUser.userId)"
-              icon="trash"
-              class="text-gray-400 text-sm cursor-pointer hover:text-red-600 dark:hover:text-red-400 transition-colors"
-              @click="removeTargetUser(targetUser.userId)"
-              title="Remover responsável"
-            />
-          </div>
-        </div>
+    @refresh="refreshSelectedTicket"
+    @remove-target-user="removeTargetUser"
+  />
 
-        <button
-          v-if="canAddNewAssignee"
-          @click="startAddingAssignee"
-          class="w-full mt-3 px-4 py-2.5 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:border-blue-500 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center justify-center gap-2"
-        >
-          <font-awesome-icon icon="plus" class="text-xs" />
-          Adicionar Responsável
-        </button>
-      </div>
-
-      <div v-else-if="isAddingAssignee" class="space-y-4" style="overflow: visible">
-        <div
-          class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50"
-          style="overflow: visible"
-        >
-          <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Adicionar Responsável
-          </p>
-          <div class="relative" style="overflow: visible; z-index: 1">
-            <DepartmentUserSelector
-              v-model="newAssigneeSelection"
-              @change="saveNewAssignee"
-              placeholder="Selecionar responsável"
-              :excludedUserIds="excludedUserIds"
-            />
-          </div>
-          <div class="flex gap-2 mt-3">
-            <button
-              @click="cancelAddingAssignee"
-              class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div v-else class="space-y-4" style="overflow: visible">
-        <div
-          class="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50"
-          style="overflow: visible"
-        >
-          <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Editar Responsável
-          </p>
-          <div class="relative" style="overflow: visible; z-index: 1">
-            <DepartmentUserSelector
-              v-model="assigneeSelection"
-              @change="saveAssigneeChange"
-              placeholder="Selecionar responsável"
-              :excludedUserIds="excludedUserIds"
-            />
-          </div>
-          <div class="flex gap-2 mt-3">
-            <button
-              @click="cancelEditingAssignee"
-              class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </BaseModal>
-  <!-- Verification Confirmation Modal -->
-  <BaseModal
-    v-if="showVerificationAlert"
+  <!-- Extracted Gate Modals -->
+  <VerificationConfirmationModal
     :is-open="showVerificationAlert"
-    @close="handleVerificationCancel"
-    :show-footer="false"
-    :is-full-screen-mobile="true"
-    title="Iniciar Verificação"
-  >
-    <div class="px-4 sm:px-6 py-6 sm:py-8 text-center">
-      <div class="text-3xl text-purple-700 dark:text-purple-400 mb-4">
-        <font-awesome-icon icon="info-circle" />
-      </div>
+    :is-verifying="isVerifying"
+    @cancel="handleVerificationCancel"
+    @confirm="handleVerificationConfirm"
+  />
 
-      <h3 class="text-lg font-semibold text-txt-primary dark:text-white mb-3">
-        Deseja iniciar a revisão?
-      </h3>
-
-      <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-relaxed mb-8">
-        Para visualizar os detalhes desta tarefa, você precisa iniciar a verificação agora.
-      </p>
-
-      <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-        <button
-          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200"
-          @click="handleVerificationCancel"
-        >
-          Cancelar
-        </button>
-        <button
-          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          @click="handleVerificationConfirm"
-          :disabled="isVerifying"
-        >
-          <font-awesome-icon v-if="isVerifying" icon="spinner" spin class="text-sm" />
-          {{ isVerifying ? '' : 'Verificar Agora' }}
-        </button>
-      </div>
-    </div>
-  </BaseModal>
-
-  <!-- Acceptance Confirmation Modal -->
-  <BaseModal
-    v-if="showAcceptanceAlert"
+  <AcceptanceConfirmationModal
     :is-open="showAcceptanceAlert"
-    @close="handleAcceptanceCancel"
-    :show-footer="false"
-    :is-full-screen-mobile="true"
-    title="Aceitar Tarefa"
-  >
-    <div class="px-4 sm:px-6 py-6 sm:pb-7 text-center">
-      <div class="text-3xl text-blue-700 dark:text-blue-400 mb-4">
-        <font-awesome-icon icon="info-circle" />
-      </div>
+    :is-accepting="isAccepting"
+    @cancel="handleAcceptanceCancel"
+    @confirm="handleAcceptanceConfirm"
+  />
 
-      <h3 class="text-lg font-semibold text-txt-primary dark:text-white mb-3">
-        Aceite esta tarefa
-      </h3>
-
-      <p class="text-gray-700 dark:text-gray-300 text-sm sm:text-base leading-relaxed mb-2">
-        Para visualizar os detalhes desta tarefa, você precisa aceitá-la primeiro.
-      </p>
-      <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-8">
-        Ao aceitar, a tarefa será movida para o status "Em andamento".
-      </p>
-
-      <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-        <button
-          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-500 hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          @click="handleAcceptanceCancel"
-          :disabled="isAccepting"
-        >
-          Cancelar
-        </button>
-        <button
-          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          @click="handleAcceptanceConfirm"
-          :disabled="isAccepting"
-        >
-          <font-awesome-icon v-if="isAccepting" icon="spinner" spin class="text-sm" />
-          {{ isAccepting ? '' : 'Aceitar Agora' }}
-        </button>
-      </div>
-    </div>
-  </BaseModal>
 </template>
 
 <script setup lang="ts">
-import BaseModal from '../common/BaseModal.vue';
-import Select from '../common/Select.vue';
-import Tooltip from '../common/Tooltip.vue';
+import BaseModal from '@/components/common/BaseModal.vue';
+import Tooltip from '@/components/common/Tooltip.vue';
 import { CancellationReason, DefaultTicketStatus, type Ticket, type TicketComment } from '@/models';
+import AcceptanceConfirmationModal from './AcceptanceConfirmationModal.vue';
+import VerificationConfirmationModal from './VerificationConfirmationModal.vue';
+import ReviewerSelectionModal from './ReviewerSelectionModal.vue';
+import EditTargetUsersModal from './EditTargetUsersModal.vue';
+import DueDateModal from './DueDateModal.vue';
 import type { ChecklistItem } from '@/models/checklist';
 import { checklistService } from '@/services/checklistService';
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
@@ -1589,7 +1326,7 @@ import { useTicketsStore } from '@/stores/tickets';
 import { useUserPreferencesStore } from '@/stores/userPreferences';
 import { toast } from 'vue3-toastify';
 import { formatRelativeTime, formatDate as formatDateUtil } from '@/utils/date';
-import ConfirmationModal from '../common/ConfirmationModal.vue';
+import ConfirmationModal from '@/components/common/ConfirmationModal.vue';
 import {
   calculateDeadline,
   formatSnakeToNaturalCase,
@@ -1606,12 +1343,9 @@ import axios from 'axios';
 import { CorrectionReason, DisapprovalReason } from '@/models';
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import DepartmentUserSelector from '@/components/common/DepartmentUserSelector.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
-import TicketChecklist from './TicketChecklist.vue';
-import DatePicker from 'vue-datepicker-next';
+import TicketChecklist from '@/components/tickets/TicketChecklist.vue';
 import 'vue-datepicker-next/index.css';
-import pt from 'vue-datepicker-next/locale/pt-br.es';
 import QuillMention, { type MentionData } from '@/utils/quill-mention';
 import type { User } from '@/models';
 
@@ -1672,7 +1406,6 @@ const showVerificationAlert = ref(false);
 const showAcceptanceAlert = ref(false);
 const isVerifying = ref(false);
 const isAccepting = ref(false);
-
 const headerActions = computed(() => {
   const actions: any[] = [];
   if (!loadedTicket.value) return actions;
@@ -3504,133 +3237,7 @@ const closeAddMenu = () => {
   showAddMenu.value = false;
 };
 
-const isEditingAssignee = ref(false);
-const isAddingAssignee = ref(false);
-const currentlyEditingUser = ref<number | null>(null);
-const assigneeSelection = ref<{ departmentId: number | null; userId: number | null }>({
-  departmentId: null,
-  userId: null,
-});
-const newAssigneeSelection = ref<{ departmentId: number | null; userId: number | null }>({
-  departmentId: null,
-  userId: null,
-});
 const showEditTargetUsersModal = ref(false);
-
-// Compute excluded user IDs - users that are already assigned to the ticket (excluding the one being edited)
-const excludedUserIds = computed(() => {
-  if (!loadedTicket.value?.targetUsers) return [];
-
-  // If editing, exclude all users except the one being edited
-  // If adding, exclude all users
-  if (currentlyEditingUser.value) {
-    return loadedTicket.value.targetUsers
-      .filter((tu) => tu.userId !== currentlyEditingUser.value)
-      .map((tu) => tu.userId)
-      .filter((id): id is number => id !== null && id !== undefined);
-  }
-
-  // When adding, exclude all existing target users
-  return loadedTicket.value.targetUsers
-    .map((tu) => tu.userId)
-    .filter((id): id is number => id !== null && id !== undefined);
-});
-
-const startEditingAssignee = (targetUserId?: number) => {
-  if (!canRequesterEditAssignee.value) return;
-
-  // Determine which user to edit - either the passed targetUserId or currentTargetUserId
-  const userIdToEdit = targetUserId ?? loadedTicket.value?.currentTargetUserId ?? null;
-
-  if (!userIdToEdit) return;
-
-  // Check if the specific user can be edited
-  if (!canEditTargetUser(userIdToEdit)) return;
-
-  currentlyEditingUser.value = userIdToEdit;
-
-  // Find the target user to populate the selector
-  const targetUser = loadedTicket.value?.targetUsers?.find((tu) => tu.userId === userIdToEdit);
-
-  assigneeSelection.value = {
-    departmentId: targetUser?.user?.departmentId || null,
-    userId: userIdToEdit,
-  };
-  isEditingAssignee.value = true;
-};
-
-const cancelEditingAssignee = () => {
-  isEditingAssignee.value = false;
-  currentlyEditingUser.value = null;
-  assigneeSelection.value = {
-    departmentId: null,
-    userId: null,
-  };
-};
-
-const saveAssigneeChange = async (selection: { department: any; user: any }) => {
-  if (!selection.user || !loadedTicket.value) return;
-
-  try {
-    // Find the order of the user being edited - order is 1-based in the database
-    const editingUser = loadedTicket.value.targetUsers?.find(
-      (tu) => tu.userId === currentlyEditingUser.value,
-    );
-    const order = editingUser?.order || 1;
-
-    await ticketService.updateAssignee(loadedTicket.value.customId, selection.user.id, order);
-
-    await refreshSelectedTicket();
-    isEditingAssignee.value = false;
-    currentlyEditingUser.value = null;
-    assigneeSelection.value = {
-      departmentId: null,
-      userId: null,
-    };
-    toast.success('Sucesso');
-  } catch (error) {
-    console.error('Erro ao alterar responsável:', error);
-    toast.error('Erro ao alterar responsável');
-  }
-};
-
-const startAddingAssignee = () => {
-  isAddingAssignee.value = true;
-  isEditingAssignee.value = false;
-  currentlyEditingUser.value = null;
-  newAssigneeSelection.value = {
-    departmentId: null,
-    userId: null,
-  };
-};
-
-const cancelAddingAssignee = () => {
-  isAddingAssignee.value = false;
-  newAssigneeSelection.value = {
-    departmentId: null,
-    userId: null,
-  };
-};
-
-const saveNewAssignee = async (selection: { department: any; user: any }) => {
-  if (!selection.user || !loadedTicket.value) return;
-
-  try {
-    await ticketService.addAssignee(loadedTicket.value.customId, selection.user.id);
-
-    await refreshSelectedTicket();
-    isAddingAssignee.value = false;
-    newAssigneeSelection.value = {
-      departmentId: null,
-      userId: null,
-    };
-    toast.success('Responsável adicionado com sucesso!');
-  } catch (error: any) {
-    console.error('Erro ao adicionar responsável:', error);
-    const errorMessage = error.response?.data?.message || 'Erro ao adicionar responsável';
-    toast.error(errorMessage);
-  }
-};
 
 const removeTargetUser = async (targetUserId: number) => {
   if (!loadedTicket.value) return;
@@ -3674,32 +3281,10 @@ const removeTargetUser = async (targetUserId: number) => {
 
 const openEditTargetUsersModal = () => {
   showEditTargetUsersModal.value = true;
-  isEditingAssignee.value = false;
-  isAddingAssignee.value = false;
-  currentlyEditingUser.value = null;
-  assigneeSelection.value = {
-    departmentId: null,
-    userId: null,
-  };
-  newAssigneeSelection.value = {
-    departmentId: null,
-    userId: null,
-  };
 };
 
 const closeEditTargetUsersModal = () => {
   showEditTargetUsersModal.value = false;
-  isEditingAssignee.value = false;
-  isAddingAssignee.value = false;
-  currentlyEditingUser.value = null;
-  assigneeSelection.value = {
-    departmentId: null,
-    userId: null,
-  };
-  newAssigneeSelection.value = {
-    departmentId: null,
-    userId: null,
-  };
 };
 
 const isSelfAssigned = computed(
