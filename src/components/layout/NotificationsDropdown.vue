@@ -171,6 +171,24 @@ const closeModal = () => {
   emit('close');
 };
 
+const markFetchedAsSeen = async (fetchedNotifications: Notification[]) => {
+  const unseenIds = fetchedNotifications.filter((n) => !n.seen).map((n) => n.id);
+  if (unseenIds.length === 0) return;
+
+  try {
+    await notificationService.markAsSeen();
+
+    const unseenSet = new Set(unseenIds);
+    notifications.value = notifications.value.map((notification) =>
+      unseenSet.has(notification.id) ? { ...notification, seen: true } : notification,
+    );
+
+    emit('notifications-read');
+  } catch {
+    // Do not block dropdown rendering if the "seen" update fails.
+  }
+};
+
 const fetchNotifications = async (page: number = 1, append: boolean = false) => {
   if (append) {
     isLoadingMore.value = true;
@@ -190,12 +208,11 @@ const fetchNotifications = async (page: number = 1, append: boolean = false) => 
       notifications.value = response.data.items;
     }
 
+    void markFetchedAsSeen(response.data.items);
+
     currentPage.value = response.data.page;
     totalPages.value = response.data.totalPages;
 
-    if (!append) {
-      emit('notifications-read');
-    }
   } catch {
     toast.error('Erro ao carregar notificações. Tente novamente.');
   } finally {

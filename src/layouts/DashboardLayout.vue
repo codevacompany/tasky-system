@@ -213,8 +213,8 @@
               :icon="['far', 'bell']"
               class="text-lg text-txt-secondary dark:text-gray-200"
             />
-            <span v-if="unreadCount && unreadCount > 0" class="notification-badge">{{
-              unreadCount
+            <span v-if="unseenCount && unseenCount > 0" class="notification-badge">{{
+              unseenCount
             }}</span>
           </div>
 
@@ -453,7 +453,7 @@
     <NotificationsDropdown
       v-if="showNotificationsModal"
       @close="toggleNotificationsModal"
-      @notifications-read="fetchUnreadCount"
+      @notifications-read="fetchUnseenCount"
     />
 
     <RichSearchModal v-if="showRichSearch" @close="closeRichSearch" />
@@ -490,7 +490,7 @@ const { isGlobalAdmin, isTenantAdmin, isSupervisor, isAdmin } = useRoles();
 const isTicketModalOpen = ref(false);
 const showProfileModal = ref(false);
 const showNotificationsModal = ref(false);
-const unreadCount = ref<number | undefined>(undefined);
+const unseenCount = ref<number | undefined>(undefined);
 let notificationsIntervalId: number | null = null;
 const source = ref<EventSource | null>(null);
 const reconnectionTimeout = ref<number | null>(null);
@@ -500,14 +500,14 @@ const showMobileMenu = ref(false);
 const showMobileAdminDropdown = ref(false);
 const adminDropdownRef = ref<HTMLElement | null>(null);
 
-const fetchUnreadCount = async () => {
+const fetchUnseenCount = async () => {
   try {
     const response = await notificationService.count();
 
-    if (unreadCount.value !== undefined && response.data.count > unreadCount.value) {
+    if (unseenCount.value !== undefined && response.data.count > unseenCount.value) {
       playNotificationSound();
     }
-    unreadCount.value = response.data.count;
+    unseenCount.value = response.data.count;
   } catch {
     console.error('Error fetching unread count.');
   }
@@ -526,6 +526,12 @@ const toggleProfileModal = () => {
 };
 
 const toggleNotificationsModal = () => {
+  const isOpening = !showNotificationsModal.value;
+
+  if (isOpening) {
+    unseenCount.value = 0;
+  }
+
   showNotificationsModal.value = !showNotificationsModal.value;
 };
 
@@ -610,11 +616,11 @@ const connectToNotificationStream = async () => {
 
         // Handle Notification events
         if (payload?.type === 'notification') {
-          if (payload.unreadCount !== undefined) {
-            if (unreadCount.value !== undefined && payload.unreadCount > unreadCount.value) {
+          if (payload.unseenCount !== undefined) {
+            if (unseenCount.value !== undefined && payload.unseenCount > unseenCount.value) {
               playNotificationSound();
             }
-            unreadCount.value = payload.unreadCount;
+            unseenCount.value = payload.unseenCount;
           }
         } else if (payload?.type === 'ticket_update' && payload.ticket) {
           const ticketsStore = useTicketsStore();
@@ -667,7 +673,7 @@ const initializeDashboardFeatures = () => {
 
   if (userStore.user?.termsAccepted && userStore.user?.privacyPolicyAccepted) {
     isInitialized.value = true;
-    fetchUnreadCount();
+    fetchUnseenCount();
     initializeTicketPolling();
     connectToNotificationStream();
   }
@@ -686,10 +692,10 @@ watch(
 onMounted(() => {
   initializeDashboardFeatures();
 
-  // Keep a long polling as backup (10 minutes) for unread count consistency if connection drops
+  // Keep a long polling as backup (10 minutes) for unseen count consistency if connection drops
   notificationsIntervalId = setInterval(() => {
     if (userStore.user?.termsAccepted && userStore.user?.privacyPolicyAccepted) {
-      fetchUnreadCount();
+      fetchUnseenCount();
     }
   }, DEFAULT_POLLING_INTERVAL_MS) as unknown as number;
 
