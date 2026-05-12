@@ -75,13 +75,9 @@
             @click="currentIndex = idx"
           />
         </div>
-        <button
-          type="button"
-          class="px-4 py-2 rounded-md bg-primary-600 dark:bg-blue-600 text-white text-sm font-medium hover:bg-primary-700 dark:hover:bg-blue-700 transition-colors"
-          @click="isLast ? close() : goNext()"
-        >
+        <Button variant="secondary" type="button" class="rounded-md px-4 py-2" @click="isLast ? close() : goNext()">
           {{ isLast ? 'Concluir' : 'Próximo >' }}
-        </button>
+        </Button>
       </div>
     </div>
   </BaseModal>
@@ -90,6 +86,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import BaseModal from './BaseModal.vue';
+import Button from './Button.vue';
 import type { TutorialVideo } from '@/config/tutorialVideos';
 
 const props = withDefaults(

@@ -26,12 +26,14 @@
       </p>
 
       <div class="flex flex-col sm:flex-row gap-4 mt-2 w-full sm:w-auto px-4 sm:px-0">
-        <button
-          class="w-full sm:w-auto px-5 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium cursor-pointer transition-all duration-200"
+        <Button
+          variant="secondary"
+          type="button"
+          class="w-full px-5 py-3.5 sm:w-auto rounded-md font-medium"
           @click="close"
         >
           Escolher plano agora
-        </button>
+        </Button>
       </div>
     </div>
   </BaseModal>
@@ -39,6 +41,7 @@
 
 <script setup lang="ts">
 import BaseModal from './BaseModal.vue';
+import Button from './Button.vue';
 
 defineProps({
   isOpen: {

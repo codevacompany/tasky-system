@@ -298,18 +298,17 @@
           </div>
         </div>
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
-          <button
-            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-            @click="clearFilters"
-          >
+          <Button variant="outlined" type="button" class="rounded-md px-4 py-2 text-sm" @click="clearFilters">
             Limpar
-          </button>
-          <button
-            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+          </Button>
+          <Button
+            variant="secondary"
+            type="button"
+            class="rounded-md px-4 py-2 text-sm font-medium"
             @click="applyFilters"
           >
             Aplicar
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -355,19 +354,18 @@
           </div>
         </div>
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
-          <button
-            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-            @click="cancelCorrection"
-          >
+          <Button variant="outlined" type="button" class="rounded-md px-4 py-2 text-sm" @click="cancelCorrection">
             Cancelar
-          </button>
-          <button
-            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          </Button>
+          <Button
+            variant="secondary"
+            type="button"
+            class="rounded-md px-4 py-2 text-sm font-medium"
             @click="confirmCorrection"
             :disabled="!newCompletionDate"
           >
             Confirmar
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -387,6 +385,7 @@ import TicketTable from '@/components/tickets/TicketTable.vue';
 import TicketKanban from '@/components/tickets/TicketKanban.vue';
 import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
 import Select from '@/components/common/Select.vue';
+import Button from '@/components/common/Button.vue';
 import Input from '@/components/common/Input.vue';
 import { toast } from 'vue3-toastify';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';

@@ -584,13 +584,10 @@
                   placeholder="Nome da tarefa"
                 />
                 <div class="flex gap-3">
-                  <button @click="saveTicketName" class="btn btn-primary">Salvar</button>
-                  <button
-                    @click="cancelEditingName"
-                    class="btn px-4 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
-                  >
+                  <Button variant="primary" type="button" @click="saveTicketName">Salvar</Button>
+                  <Button variant="outlined" type="button" class="rounded-lg px-4 py-2" @click="cancelEditingName">
                     Cancelar
-                  </button>
+                  </Button>
                 </div>
               </div>
               <div class="flex items-center gap-2 mt-3">
@@ -646,13 +643,10 @@
                   />
                 </div>
                 <div class="flex gap-3">
-                  <button @click="saveTicketDescription" class="btn btn-primary">Salvar</button>
-                  <button
-                    @click="cancelEditingDescription"
-                    class="btn px-4 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
-                  >
+                  <Button variant="primary" type="button" @click="saveTicketDescription">Salvar</Button>
+                  <Button variant="outlined" type="button" class="rounded-lg px-4 py-2" @click="cancelEditingDescription">
                     Cancelar
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -827,16 +821,18 @@
                     />
                   </div>
                   <div class="flex justify-end">
-                    <button
+                    <Button
+                      variant="primary"
+                      type="button"
+                      class="rounded-lg px-4 py-2"
                       @click="comment()"
                       :disabled="isCommentLoading"
-                      class="btn btn-primary inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <LoadingSpinner v-if="isCommentLoading" :size="16" />
                       <font-awesome-icon v-else icon="paper-plane" />
                       <span v-if="isCommentLoading">Enviando...</span>
                       <span v-else>Enviar Comentário</span>
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -995,12 +991,14 @@
                               {{ getCommentExpirationTime(event.createdAt) }}
                             </div>
                             <div class="flex gap-2">
-                              <button
+                              <Button
+                                variant="outlined"
+                                type="button"
+                                class="!min-h-0 rounded px-3 py-1.5 text-xs"
                                 @click="cancelEditingComment"
-                                class="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
                               >
                                 Cancelar
-                              </button>
+                              </Button>
                               <button
                                 @click="saveEditedComment"
                                 :disabled="
@@ -1208,21 +1206,25 @@
     </div>
     <template #footer>
       <div class="flex justify-end gap-2">
-        <button
-          class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        <Button
+          variant="outlined"
+          type="button"
+          class="rounded px-4 py-2"
           @click="showReviewerModal = false"
           :disabled="isReviewerModalLoading"
         >
           Cancelar
-        </button>
-        <button
-          class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[100px]"
+        </Button>
+        <Button
+          variant="secondary"
+          type="button"
+          class="min-w-[100px] rounded px-4 py-2"
           @click="confirmReviewerSelection"
           :disabled="isReviewerModalLoading"
         >
           <LoadingSpinner v-if="isReviewerModalLoading" :size="16" />
           <span v-if="!isReviewerModalLoading">Confirmar</span>
-        </button>
+        </Button>
       </div>
     </template>
   </BaseModal>
@@ -1268,21 +1270,25 @@
     </div>
     <template #footer>
       <div class="flex justify-end gap-2">
-        <button
-          class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        <Button
+          variant="outlined"
+          type="button"
+          class="rounded px-4 py-2"
           @click="handleDueDateCancel"
           :disabled="isDueDateModalLoading"
         >
           Cancelar
-        </button>
-        <button
-          class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[100px]"
+        </Button>
+        <Button
+          variant="secondary"
+          type="button"
+          class="min-w-[100px] rounded px-4 py-2"
           @click="confirmDueDate"
           :disabled="!dueDateValue || isDueDateModalLoading"
         >
           <LoadingSpinner v-if="isDueDateModalLoading" :size="16" />
           <span v-if="!isDueDateModalLoading">Confirmar</span>
-        </button>
+        </Button>
       </div>
     </template>
   </BaseModal>
@@ -1448,12 +1454,9 @@
             />
           </div>
           <div class="flex gap-2 mt-3">
-            <button
-              @click="cancelAddingAssignee"
-              class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
-            >
+            <Button variant="outlined" type="button" class="rounded-lg px-3 py-1.5 text-sm" @click="cancelAddingAssignee">
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -1475,12 +1478,9 @@
             />
           </div>
           <div class="flex gap-2 mt-3">
-            <button
-              @click="cancelEditingAssignee"
-              class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
-            >
+            <Button variant="outlined" type="button" class="rounded-lg px-3 py-1.5 text-sm" @click="cancelEditingAssignee">
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -1509,12 +1509,14 @@
       </p>
 
       <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-        <button
-          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200"
+        <Button
+          variant="outlined"
+          type="button"
+          class="w-full min-w-[120px] rounded-md px-8 py-3.5 text-sm sm:w-auto sm:py-3"
           @click="handleVerificationCancel"
         >
           Cancelar
-        </button>
+        </Button>
         <button
           class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           @click="handleVerificationConfirm"
@@ -1553,13 +1555,15 @@
       </p>
 
       <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-        <button
-          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-500 hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        <Button
+          variant="outlined"
+          type="button"
+          class="w-full min-w-[120px] rounded-md px-8 py-3.5 text-sm sm:w-auto sm:py-3"
           @click="handleAcceptanceCancel"
           :disabled="isAccepting"
         >
           Cancelar
-        </button>
+        </Button>
         <button
           class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           @click="handleAcceptanceConfirm"
@@ -1575,6 +1579,7 @@
 
 <script setup lang="ts">
 import BaseModal from '../common/BaseModal.vue';
+import Button from '@/components/common/Button.vue';
 import Select from '../common/Select.vue';
 import Tooltip from '../common/Tooltip.vue';
 import { CancellationReason, DefaultTicketStatus, type Ticket, type TicketComment } from '@/models';

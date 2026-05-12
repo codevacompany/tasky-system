@@ -6,20 +6,20 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#4263eb',
-          50: '#f0f3fe',
-          100: '#dde4fc',
-          200: '#c3d1fa',
-          300: '#99b4f7',
-          400: '#698df1',
-          500: '#4263eb',
-          600: '#3047e0',
-          700: '#2835cd',
-          800: '#262ca7',
-          900: '#242b84',
-          950: '#1a1d51',
-          dark: '#334ec2',
-          light: '#6c86f2',
+          DEFAULT: '#5564db',
+          50: '#f3f5fe',
+          100: '#e6eafc',
+          200: '#d0d8f7',
+          300: '#b4c0f1',
+          400: '#6a78e4',
+          500: '#5564db',
+          600: '#4858cc',
+          700: '#3e4bb3',
+          800: '#364096',
+          900: '#323a78',
+          950: '#1e2248',
+          dark: '#3e4bb3',
+          light: '#6a78e4',
         },
         secondary: {
           DEFAULT: '#091940',
@@ -43,10 +43,10 @@ export default {
         // Surface colors for backgrounds and borders
         surface: {
           DEFAULT: '#ffffff',
-          extraSoft: '#f9fafb',
-          soft: '#f3f5f8',
-          secondary: '#f5f8fb',
-          alt: '#f8fafc', // Slate-50
+          extraSoft: '#fcfdff',
+          soft: '#f6f8fb',
+          medium: '#e8ecf4',
+          dark: '#d1d9e8',
           border: '#dde3ebff', // Slate-200
         },
       },

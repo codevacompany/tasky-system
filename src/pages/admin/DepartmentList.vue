@@ -4,14 +4,16 @@
       <h1 class="text-xl sm:text-2xl font-bold text-txt-primary dark:text-white tracking-tight">
         Setores
       </h1>
-      <button
+      <Button
         id="newSetorBtn"
-        class="flex items-center gap-2 px-4 py-2 btn btn-primary text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors shrink-0"
+        variant="primary"
+        type="button"
+        class="shrink-0 rounded-md"
         @click="openModal"
       >
         <font-awesome-icon icon="plus" />
         <span>Novo Setor</span>
-      </button>
+      </Button>
     </div>
 
     <div
@@ -83,7 +85,7 @@
         <template #column-name="{ item }">
           <div class="flex items-center gap-3">
             <div
-              class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-blue-600 text-white"
+              class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-primary-500 dark:bg-blue-600 text-white"
             >
               <font-awesome-icon icon="building" class="w-5 h-5" />
             </div>
@@ -182,6 +184,7 @@ import { toast } from 'vue3-toastify';
 import { AxiosError } from 'axios';
 import { useFiltersStore } from '@/stores/filters';
 import Input from '@/components/common/Input.vue';
+import Button from '@/components/common/Button.vue';
 
 const filtersStore = useFiltersStore();
 

@@ -84,14 +84,15 @@
             </small>
           </div>
 
-          <button
+          <Button
             type="submit"
-            class="btn btn-primary btn-block"
+            variant="primary"
+            class="w-full min-h-[46px] rounded"
             :disabled="isLoading || !isFormValid"
           >
             <LoadingSpinner v-if="isLoading" :size="22" />
             <span v-else>Finalizar cadastro</span>
-          </button>
+          </Button>
         </form>
       </div>
 
@@ -107,6 +108,7 @@ import { ref, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
+import Button from '@/components/common/Button.vue';
 import { signupService } from '@/services/signupService';
 import Input from '@/components/common/Input.vue';
 
@@ -364,22 +366,6 @@ const completeRegistration = async () => {
 
 .strength-text.strong {
   color: #28a745;
-}
-
-.btn-primary {
-  width: 100%;
-  height: 46px;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-primary:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
 }
 
 .login-footer {

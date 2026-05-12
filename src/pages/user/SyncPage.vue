@@ -240,11 +240,13 @@
                         class="text-lg text-blue-600 dark:text-blue-400"
                       />
                       <span>Esta mensagem requer confirmação de visualização</span>
-                      <button
-                        class="ml-auto px-4 py-2 bg-blue-600 text-white border-none rounded cursor-pointer transition-colors duration-200 hover:bg-blue-700"
+                      <Button
+                        variant="secondary"
+                        type="button"
+                        class="ml-auto rounded px-4 py-2"
                       >
                         Mostrar Mensagem
-                      </button>
+                      </Button>
                     </div>
                   </div>
                   <div v-else class="mb-2">
@@ -378,13 +380,15 @@
                 @close="closeMentionSelector"
               />
             </div>
-            <button
-              class="w-11 h-11 rounded-full border-none bg-blue-600 text-white cursor-pointer transition-all duration-200 flex items-center justify-center mt-0.5 hover:bg-blue-700 hover:scale-105 disabled:bg-gray-200 disabled:cursor-not-allowed disabled:transform-none"
+            <Button
+              variant="secondary"
+              type="button"
+              class="mt-0.5 !h-11 !w-11 !min-h-0 !rounded-full !p-0 hover:scale-105 disabled:scale-100"
               @click="sendMessage"
               :disabled="!newMessage.trim()"
             >
               <font-awesome-icon icon="paper-plane" class="text-lg" />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -405,6 +409,7 @@ import { toast } from 'vue3-toastify';
 import { formatRelativeTime } from '@/utils/date';
 import MentionSelector from '@/components/MentionSelector.vue';
 import Input from '@/components/common/Input.vue';
+import Button from '@/components/common/Button.vue';
 
 const userStore = useUserStore();
 const messageStore = useMessageStore();

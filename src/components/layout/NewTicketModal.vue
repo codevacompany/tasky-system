@@ -353,20 +353,12 @@
               ref="itemInputRef"
             />
             <div class="flex items-center gap-2">
-              <button
-                type="button"
-                @click="addChecklistItem"
-                class="px-4 py-2 btn btn-primary hover:opacity-95 text-white text-sm font-medium rounded transition-colors"
-              >
+              <Button type="button" variant="primary" class="px-4 py-2" @click="addChecklistItem">
                 Adicionar
-              </button>
-              <button
-                type="button"
-                @click="cancelAddChecklist"
-                class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded transition-colors"
-              >
+              </Button>
+              <Button variant="outlined" type="button" class="px-4 py-2" @click="cancelAddChecklist">
                 Cancelar
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -388,24 +380,25 @@
     </form>
 
     <template #footer>
-      <button
+      <Button
         type="button"
-        class="w-full sm:w-auto px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-[5px] text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        variant="outlined"
+        class="w-full sm:w-auto"
         @click="handleCancel"
         :disabled="isLoading"
       >
         {{ currentStep === 1 ? 'Cancelar' : 'Voltar' }}
-      </button>
-      <button
-        ref="confirmButtonRef"
+      </Button>
+      <Button
         type="button"
-        class="w-full sm:w-auto min-w-20 px-4 py-2 bg-secondary hover:opacity-95 text-white text-sm font-medium rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        variant="primary"
+        class="w-full sm:w-auto min-w-20 px-4 py-2"
         @click="handleConfirm"
         :disabled="isLoading"
       >
         <LoadingSpinner v-if="isLoading" :size="16" :color="'white'" />
         <span v-else>{{ currentStep === 1 ? 'Próximo' : 'Criar Tarefa' }}</span>
-      </button>
+      </Button>
     </template>
   </BaseModal>
 </template>
@@ -427,6 +420,7 @@ import '@vueup/vue-quill/dist/vue-quill.snow.css';
 import axios from 'axios';
 import { awsService } from '@/services/awsService';
 import BaseModal from '@/components/common/BaseModal.vue';
+import Button from '@/components/common/Button.vue';
 import Input from '@/components/common/Input.vue';
 import Select from '@/components/common/Select.vue';
 import FormField from '@/components/common/FormField.vue';
@@ -1177,13 +1171,6 @@ const handleSubmit = async () => {
 
 :deep(.mx-input-wrapper) {
   width: 100%;
-}
-
-/* Override button height to match input height */
-#newTicketModal label.btn.btn-primary[for='fileUpload'] {
-  height: auto !important;
-  padding-top: 0.625rem !important;
-  padding-bottom: 0.625rem !important;
 }
 
 #newTicketModal button[title='Limpar arquivos selecionados'] {

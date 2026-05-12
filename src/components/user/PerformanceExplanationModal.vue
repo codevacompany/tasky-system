@@ -412,12 +412,9 @@
 
           <!-- Footer -->
           <div class="flex justify-end p-5 pr-6 border-t border-gray-200 dark:border-gray-700">
-            <button
-              @click="$emit('close')"
-              class="btn btn-primary px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            >
+            <Button variant="secondary" type="button" class="rounded-lg px-4 py-2" @click="$emit('close')">
               Entendi
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -431,6 +428,7 @@ import type { UserStatistics } from '@/services/reportService';
 import { useRouter } from 'vue-router';
 import { formatTimeShort } from '@/utils/generic-helper';
 import InfoTooltip from '@/components/common/InfoTooltip.vue';
+import Button from '@/components/common/Button.vue';
 
 const router = useRouter();
 
