@@ -11,12 +11,14 @@
           </h2>
         </div>
         <div>
-          <button
-            class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+          <Button
+            variant="secondary"
+            type="button"
+            class="rounded-md px-4 py-2 text-sm font-medium"
             @click="saveSettings"
           >
             <font-awesome-icon icon="save" /> Salvar Alterações
-          </button>
+          </Button>
         </div>
       </div>
     </header>
@@ -228,6 +230,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import Input from '@/components/common/Input.vue';
+import Button from '@/components/common/Button.vue';
 
 type IntegrationKey = keyof typeof settings.value.integracoes;
 

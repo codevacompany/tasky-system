@@ -51,9 +51,9 @@
             class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
-              <font-awesome-icon
-                icon="clock"
-                class="text-orange-500 dark:text-orange-400 text-2xl"
+              <ClockIcon
+                class="h-7 w-7 text-orange-500 dark:text-orange-400"
+                aria-hidden="true"
               />
             </div>
             <p
@@ -87,7 +87,10 @@
             class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
-              <font-awesome-icon icon="spinner" class="text-blue-500 dark:text-blue-400 text-2xl" />
+              <ArrowPathIcon
+                class="h-7 w-7 text-blue-500 dark:text-blue-400"
+                aria-hidden="true"
+              />
             </div>
             <p
               id="inProgressTicketsCount"
@@ -120,9 +123,9 @@
             class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
-              <font-awesome-icon
-                icon="check-circle"
-                class="text-green-500 dark:text-green-400 text-2xl"
+              <CheckCircleIcon
+                class="h-7 w-7 text-green-500 dark:text-green-400"
+                aria-hidden="true"
               />
             </div>
             <p
@@ -156,9 +159,9 @@
             class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
-              <font-awesome-icon
-                icon="hourglass-half"
-                class="text-teal-600 dark:text-teal-400 text-2xl"
+              <HandThumbUpIcon
+                class="h-7 w-7 text-teal-600 dark:text-teal-400"
+                aria-hidden="true"
               />
             </div>
             <p
@@ -192,9 +195,9 @@
             class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
-              <font-awesome-icon
-                icon="calendar-check"
-                class="text-indigo-500 dark:text-indigo-400 text-2xl"
+              <ClipboardDocumentCheckIcon
+                class="h-7 w-7 text-indigo-500 dark:text-indigo-400"
+                aria-hidden="true"
               />
             </div>
             <p
@@ -228,9 +231,9 @@
             class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-surface-extraSoft dark:bg-gray-700/30"
           >
             <div class="mb-3">
-              <font-awesome-icon
-                icon="star"
-                class="text-yellow-500 dark:text-yellow-400 text-2xl"
+              <StarIcon
+                class="h-7 w-7 text-yellow-500 dark:text-yellow-400"
+                aria-hidden="true"
               />
             </div>
             <template v-if="userStats?.efficiencyScore !== undefined">
@@ -299,6 +302,14 @@ import TutorialGuideModal from '@/components/common/TutorialGuideModal.vue';
 import PerformanceExplanationModal from '@/components/user/PerformanceExplanationModal.vue';
 import { getTutorialVideosByRole } from '@/config/tutorialVideos';
 import { userService } from '@/services/userService';
+import {
+  ClockIcon,
+  ArrowPathIcon,
+  CheckCircleIcon,
+  HandThumbUpIcon,
+  ClipboardDocumentCheckIcon,
+  StarIcon,
+} from '@heroicons/vue/24/solid';
 
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();

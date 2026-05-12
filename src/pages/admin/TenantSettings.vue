@@ -43,15 +43,17 @@
             Informações de identificação e endereço da sua empresa.
           </p>
         </div>
-        <button
-          class="flex items-center gap-2 px-6 py-2.5 btn-primary text-white rounded-[5px] text-sm font-semibold hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        <Button
+          variant="primary"
+          type="button"
+          class="rounded-[5px] px-6 py-2.5 text-sm font-semibold shadow-lg shadow-blue-500/20 transition-all duration-200"
           :disabled="isSaving || isLoading"
           @click="saveSettings"
         >
           <font-awesome-icon v-if="isSaving" icon="spinner" spin />
           <font-awesome-icon v-else icon="save" />
           {{ isSaving ? 'Salvando...' : 'Salvar' }}
-        </button>
+        </Button>
       </div>
 
       <div class="space-y-8">
@@ -231,6 +233,7 @@ import { tenantService } from '@/services/tenantService';
 import Input from '@/components/common/Input.vue';
 import { toast } from 'vue3-toastify';
 import axios from 'axios';
+import Button from '@/components/common/Button.vue';
 
 const isLoading = ref(true);
 const isSaving = ref(false);

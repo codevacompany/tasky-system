@@ -312,13 +312,15 @@
             </div>
           </div>
 
-          <button
+          <Button
             v-if="plan.slug === 'customizado'"
-            class="btn btn-primary w-full py-2 px-4 text-sm font-medium rounded-md transition-all mb-6 disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="primary"
+            type="button"
+            class="mb-6 w-full rounded-md py-2 px-4 text-sm font-medium transition-all"
             @click="handleSimulateCustomPlan"
           >
             Simular
-          </button>
+          </Button>
           <button
             v-else
             class="w-full py-2 px-4 text-sm font-medium rounded-md transition-colors mb-6 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-txt-primary dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -384,6 +386,7 @@ import { subscriptionService } from '@/services/subscriptionService';
 import { useUserStore } from '@/stores/user';
 import { authService } from '@/services/authService';
 import SubscriptionExpiredModal from '@/components/common/SubscriptionExpiredModal.vue';
+import Button from '@/components/common/Button.vue';
 
 interface Payment {
   id: number;

@@ -211,12 +211,15 @@
           Anterior
         </button>
 
-        <button
-          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md hover:bg-blue-700 transition-colors"
-          disabled
+        <Button
+          variant="secondary"
+          type="button"
+          class="pointer-events-none cursor-default rounded-md px-4 py-2 shadow-none"
+          aria-current="page"
+          tabindex="-1"
         >
           {{ pagination.currentPage }}
-        </button>
+        </Button>
 
         <button
           class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-gray-800"
@@ -232,6 +235,7 @@
 
 <script setup lang="ts" generic="T">
 import { ref, computed, watch } from 'vue';
+import Button from '@/components/common/Button.vue';
 
 // Types
 export interface TableHeader<T = any> {

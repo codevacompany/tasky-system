@@ -117,12 +117,9 @@
           >
             Adicionar
           </button>
-          <button
-            @click="cancelAddItem"
-            class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-md transition-colors"
-          >
+          <Button variant="outlined" type="button" class="rounded-md px-3 py-1.5 text-sm" @click="cancelAddItem">
             Cancelar
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -156,6 +153,7 @@ import { toast } from 'vue3-toastify';
 import { formatDate } from '@/utils/date';
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue';
 import Input from '@/components/common/Input.vue';
+import Button from '@/components/common/Button.vue';
 
 const props = defineProps<{
   ticketId: number;

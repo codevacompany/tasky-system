@@ -11,7 +11,7 @@
           class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"
         ></div>
         <p class="text-gray-700 dark:text-gray-300 text-base sm:text-lg font-medium text-center">
-          Carregando dados dos relatórios...
+          Carregando dados...
         </p>
       </div>
     </div>
@@ -53,15 +53,17 @@
             </h1>
           </div>
           <div class="flex gap-2 sm:gap-3">
-            <button
+            <Button
               v-permission="PERMISSIONS.EXPORT_REPORTS && isAdmin"
+              variant="primary"
+              type="button"
+              class="rounded-md px-3 py-2 text-xs font-medium sm:px-4 sm:text-sm"
               @click="openExportModal"
-              class="flex items-center gap-2 px-3 sm:px-4 py-2 btn btn-primary text-xs sm:text-sm text-white rounded-md font-medium transition-colors"
             >
               <font-awesome-icon icon="file-export" />
               <span class="hidden sm:inline">Exportar Relatório</span>
               <span class="sm:hidden">Exportar</span>
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -77,8 +79,8 @@
               :class="[
                 'flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0',
                 currentTab === tab.id
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600',
+                  ? 'border-primary text-primary hover:text-primary-dark dark:border-blue-500 dark:text-blue-500 dark:hover:text-blue-500'
+                  : 'border-transparent text-txt-muted dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600',
               ]"
             >
               <font-awesome-icon :icon="tab.icon" class="text-xs sm:text-sm" />
@@ -123,7 +125,10 @@
             class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-3 sm:p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
           >
             <div class="mb-3">
-              <font-awesome-icon icon="ticket" class="text-blue-500 dark:text-blue-400 text-2xl" />
+              <TicketIcon
+                class="h-7 w-7 text-blue-500 dark:text-blue-400"
+                aria-hidden="true"
+              />
             </div>
             <p class="text-2xl font-bold text-txt-primary dark:text-white mb-1">
               {{ statistics?.totalTickets || 0 }}
@@ -136,9 +141,9 @@
             class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-3 sm:p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
           >
             <div class="mb-3">
-              <font-awesome-icon
-                icon="chart-pie"
-                class="text-purple-500 dark:text-purple-400 text-2xl"
+              <ChartPieIcon
+                class="h-7 w-7 text-purple-500 dark:text-purple-400"
+                aria-hidden="true"
               />
             </div>
             <p class="text-2xl font-bold text-txt-primary dark:text-white mb-1">
@@ -152,9 +157,9 @@
             class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
           >
             <div class="mb-3">
-              <font-awesome-icon
-                icon="calendar-check"
-                class="text-indigo-500 dark:text-indigo-400 text-2xl"
+              <ClipboardDocumentCheckIcon
+                class="h-7 w-7 text-indigo-500 dark:text-indigo-400"
+                aria-hidden="true"
               />
             </div>
             <p class="text-2xl font-bold text-txt-primary dark:text-white mb-1">
@@ -170,9 +175,9 @@
             class="border border-solid border-gray-200 dark:border-gray-700 rounded-lg p-6 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700/30"
           >
             <div class="mb-3">
-              <font-awesome-icon
-                icon="hourglass-half"
-                class="text-teal-600 dark:text-teal-400 text-2xl"
+              <HandThumbUpIcon
+                class="h-7 w-7 text-teal-600 dark:text-teal-400"
+                aria-hidden="true"
               />
             </div>
             <p class="text-2xl font-bold text-txt-primary dark:text-white mb-1">
@@ -1357,13 +1362,15 @@
                   Acesse estatísticas detalhadas por setor, performance de setores e análises
                   comparativas de produtividade.
                 </p>
-                <router-link
-                  to="/admin/configuracoes/assinaturas"
-                  class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
+                <Button
+                  variant="secondary"
+                  type="button"
+                  class="rounded-md px-6 py-3"
+                  @click="router.push('/admin/configuracoes/assinaturas')"
                 >
                   <font-awesome-icon icon="arrow-up" />
                   Fazer Upgrade do Plano
-                </router-link>
+                </Button>
               </div>
             </div>
           </div>
@@ -1508,13 +1515,15 @@
                 <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
                   Acesse estatísticas detalhadas por colaborador e rankings de produtividade.
                 </p>
-                <router-link
-                  to="/admin/configuracoes/assinaturas"
-                  class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
+                <Button
+                  variant="secondary"
+                  type="button"
+                  class="rounded-md px-6 py-3"
+                  @click="router.push('/admin/configuracoes/assinaturas')"
                 >
                   <font-awesome-icon icon="arrow-up" />
                   Fazer Upgrade do Plano
-                </router-link>
+                </Button>
               </div>
             </div>
           </div>
@@ -1824,15 +1833,17 @@
           </div>
         </button>
 
-        <button
+        <Button
+          variant="secondary"
+          type="button"
+          class="rounded-lg px-6 py-3"
           @click="exportToExcel"
-          class="flex items-center justify-center gap-3 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
         >
           <font-awesome-icon icon="file-excel" />
           <div class="text-left">
             <div class="font-semibold">Excel (XLSX)</div>
           </div>
-        </button>
+        </Button>
       </div>
     </div>
   </BaseModal>
@@ -1892,6 +1903,13 @@ import BaseStatsWidget from '@/components/common/BaseStatsWidget.vue';
 import { toast } from 'vue3-toastify';
 import * as XLSX from 'xlsx';
 import BaseModal from '@/components/common/BaseModal.vue';
+import Button from '@/components/common/Button.vue';
+import {
+  TicketIcon,
+  ChartPieIcon,
+  ClipboardDocumentCheckIcon,
+  HandThumbUpIcon,
+} from '@heroicons/vue/24/solid';
 import JSZip from 'jszip';
 import { useUserPreferencesStore } from '@/stores/userPreferences';
 import { useStatsFiltersStore } from '@/stores/statsFiltersStore';

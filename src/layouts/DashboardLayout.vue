@@ -5,10 +5,10 @@
         class="flex items-center justify-between p-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-[var(--header-height)] sticky top-0 z-50 shadow-soft-xs"
       >
         <div
-          class="hidden md:flex items-center justify-center px-6 min-w-[150px] bg-gray-100 dark:bg-gray-900 h-full relative shadow-soft-xs"
+          class="hidden md:flex items-center justify-center px-6 min-w-[150px] bg-[var(--secondary-dark-color)] dark:bg-gray-900 h-full relative shadow-soft-xs"
         >
           <img
-            :src="userPreferencesStore.isDarkMode ? taskyWhiteLogo : taskyLogo"
+            :src="userPreferencesStore.isDarkMode ? taskyWhiteLogo : taskyWhiteLogo"
             alt="Tasky Logo"
             class="h-[34px] block mx-auto"
           />
@@ -184,18 +184,20 @@
         </div>
 
         <div class="flex items-center gap-6">
-          <button
+          <Button
             v-if="userStore.hasActiveSubscription !== false"
-            class="btn btn-primary flex items-center gap-2 order-1 md:order-2"
+            variant="primary"
+            type="button"
+            class="order-1 md:order-2"
             @click="openTicketModal"
           >
             <font-awesome-icon icon="plus" class="text-xs sm:text-[13.5px]" />
             <span class="text-xs sm:text-[13.5px]">Nova Tarefa</span>
-          </button>
+          </Button>
 
           <button
             v-if="userStore.hasActiveSubscription !== false && !isGlobalAdmin"
-            class="flex items-center justify-center md:justify-between md:gap-2 sm:px-[14px] xl:w-48 sm:py-[7px] sm:w-10 sm:h-10 md:w-auto md:h-auto sm:border border-inputBorder dark:border-gray-600 text-txt-secondary sm:text-txt-muted dark:text-gray-300 rounded-full text-sm font-medium sm:bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors whitespace-nowrap order-2 md:order-1"
+            class="flex items-center justify-center mr-1 md:justify-between md:gap-2 sm:px-[14px] xl:w-48 sm:py-[7px] sm:w-10 sm:h-10 md:w-auto md:h-auto sm:border border-inputBorder dark:border-gray-600 text-txt-secondary sm:text-txt-muted dark:text-gray-300 rounded-full text-sm font-medium sm:bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors whitespace-nowrap order-2 md:order-1"
             @click="openRichSearch"
           >
             <span class="flex items-center gap-2">
@@ -213,9 +215,15 @@
               :icon="['far', 'bell']"
               class="text-lg text-txt-secondary dark:text-gray-200"
             />
-            <span v-if="unseenCount && unseenCount > 0" class="notification-badge">{{
-              unseenCount
-            }}</span>
+            <span
+              v-if="unseenCount && unseenCount > 0"
+              :class="[
+                'notification-badge',
+                unseenCount > 9 ? 'notification-badge-wide' : 'notification-badge-circle',
+              ]"
+            >
+              {{ unseenCount > 9 ? '9+' : unseenCount }}
+            </span>
           </div>
 
           <!-- <router-link
@@ -463,6 +471,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import NewTicketModal from '@/components/layout/NewTicketModal.vue';
+import Button from '@/components/common/Button.vue';
 import ProfileModal from '@/components/layout/ProfileModal.vue';
 import RichSearchModal from '@/components/tickets/RichSearchModal.vue';
 import NotificationsDropdown from '@/components/layout/NotificationsDropdown.vue';
@@ -724,7 +733,15 @@ onUnmounted(() => {
 
 <style scoped>
 .notification-badge {
-  @apply absolute -top-2 -right-1.5 bg-red-500 text-white text-[8px] rounded-full w-[15px] h-[15px] flex items-center justify-center font-bold min-w-[16px];
+  @apply absolute -top-2 bg-red-500 text-white text-[9px] rounded-full flex items-center justify-center font-bold leading-none;
+}
+
+.notification-badge-circle {
+  @apply -right-1.5 size-[15px] shrink-0;
+}
+
+.notification-badge-wide {
+  @apply -right-2 h-[15px] min-w-[18px] px-[3px];
 }
 
 .menu-item-hover:hover {
@@ -757,8 +774,8 @@ onUnmounted(() => {
 }
 
 .menu-item-active {
-  color: #003566;
-  border-bottom: 2px solid #003566;
+  color: #1C2260;
+  border-bottom: 2px solid #1C2260;
 }
 
 .dark-mode .menu-item-active {

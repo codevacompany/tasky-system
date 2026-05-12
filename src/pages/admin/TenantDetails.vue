@@ -89,11 +89,9 @@
               <font-awesome-icon icon="edit" class="mr-2" />
               Editar Empresa
             </button>
-            <button
-              class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20"
-            >
+            <Button variant="secondary" type="button" class="rounded-lg px-4 py-2 text-sm font-medium shadow-lg shadow-blue-500/20">
               Gerenciar Assinatura
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -728,20 +726,19 @@
           </form>
         </div>
         <div class="p-6 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3">
-          <button
-            @click="isEditModalOpen = false"
-            class="px-5 py-2 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-          >
+          <Button variant="outlined" type="button" class="rounded-lg px-5 py-2 text-sm font-semibold" @click="isEditModalOpen = false">
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="secondary"
+            type="button"
+            class="rounded-lg px-8 py-2 text-sm font-bold shadow-lg shadow-blue-500/20"
             @click="updateTenant"
             :disabled="isSaving"
-            class="px-8 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50"
           >
             <font-awesome-icon v-if="isSaving" icon="spinner" spin class="mr-2" />
             Salvar Alterações
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -851,21 +848,20 @@
           </div>
         </div>
         <div class="p-6 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3">
-          <button
-            @click="isInvoiceModalOpen = false"
-            class="px-5 py-2 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-          >
+          <Button variant="outlined" type="button" class="rounded-lg px-5 py-2 text-sm font-semibold" @click="isInvoiceModalOpen = false">
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="secondary"
+            type="button"
+            class="rounded-lg px-8 py-2 text-sm font-bold shadow-lg shadow-blue-500/20"
             @click="sendInvoice"
             :disabled="isSendingEmail"
-            class="px-8 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 flex items-center gap-2"
           >
             <font-awesome-icon v-if="isSendingEmail" icon="spinner" spin />
             <font-awesome-icon v-else icon="paper-plane" />
             {{ isSendingEmail ? 'Enviando...' : 'Enviar Agora' }}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -930,30 +926,36 @@
         </div>
 
         <div class="flex justify-end gap-3">
-          <button
+          <Button
             v-if="!resetPasswordResult"
-            class="px-5 py-2 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors border border-gray-200 dark:border-gray-700"
+            variant="outlined"
+            type="button"
+            class="rounded-lg px-5 py-2 text-sm font-semibold"
             @click="closePasswordResetModal"
             :disabled="isResettingPassword"
           >
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
             v-if="!resetPasswordResult"
-            class="px-6 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 flex items-center gap-2"
+            variant="secondary"
+            type="button"
+            class="rounded-lg px-6 py-2 text-sm font-bold shadow-lg shadow-blue-500/20"
             @click="confirmPasswordReset"
             :disabled="isResettingPassword"
           >
             <font-awesome-icon v-if="isResettingPassword" icon="spinner" spin />
             <span>{{ isResettingPassword ? 'Redefinindo...' : 'Confirmar Redefinição' }}</span>
-          </button>
-          <button
+          </Button>
+          <Button
             v-if="resetPasswordResult"
-            class="px-8 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition-all"
+            variant="secondary"
+            type="button"
+            class="rounded-lg px-8 py-2 text-sm font-bold shadow-lg shadow-blue-500/20"
             @click="closePasswordResetModal"
           >
             Concluído
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -971,6 +973,7 @@ import type { TenantWithStats, UserWithStats } from '@/services/tenantService';
 import type { Payment } from '@/services/subscriptionService';
 import { toast } from 'vue3-toastify';
 import Input from '@/components/common/Input.vue';
+import Button from '@/components/common/Button.vue';
 import { format as formatDateFns } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
