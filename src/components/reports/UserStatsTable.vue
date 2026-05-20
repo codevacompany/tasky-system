@@ -124,6 +124,15 @@
         </span>
       </template>
 
+      <template #column-viewDetails="{ item }">
+        <router-link
+          :to="detailLinkFor(item)"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
+        >
+          Ver detalhes
+        </router-link>
+      </template>
+
       <template #empty>
         <p class="text-sm text-gray-500 dark:text-gray-400">Nenhum colaborador encontrado</p>
       </template>
@@ -133,6 +142,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 import DataTable, {
   type TableHeader,
   type PaginationInfo,
@@ -250,7 +260,20 @@ const tableHeaders = computed<TableHeader<UserRankingItemDto>[]>(() => [
     align: 'center',
     sortDirection: sortKey.value === 'sentToVerificationOverdueRate' ? sortDirection.value : 'none',
   },
+  {
+    key: 'viewDetails',
+    label: '',
+    sortable: false,
+    align: 'center',
+  },
 ]);
+
+function detailLinkFor(item: UserRankingItemDto): RouteLocationRaw {
+  return {
+    name: 'UserStatsDetail',
+    params: { id: String(item.userId) },
+  };
+}
 
 // Handle sort
 const handleSort = (sortKeyParam: string) => {
@@ -312,12 +335,8 @@ const getInitials = (firstName: string, lastName: string): string => {
 
 // Get avatar color class
 const getAvatarColorClass = (userId: number): string => {
-  return 'avatar-blue';
+  return 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300';
 };
 </script>
 
-<style scoped>
-.avatar-blue {
-  @apply bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300;
-}
-</style>
+<style scoped></style>

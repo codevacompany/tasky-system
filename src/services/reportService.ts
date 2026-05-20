@@ -35,6 +35,9 @@ export interface DetailedMetrics {
 }
 
 export interface UserStatistics {
+  userFirstName?: string;
+  userLastName?: string;
+  userDepartmentName?: string;
   totalTickets: number;
   openTickets: number;
   closedTickets: number;
@@ -44,6 +47,7 @@ export interface UserStatistics {
   resolutionRate: number;
   efficiencyScore?: number;
   sentToVerificationOverdueRate: number; // Percentage of completed tickets that were sent to verification after dueAt
+  completionOverdueRate: number; // Percentage of completed tickets that were actually completed after dueAt
   detailedMetrics?: DetailedMetrics; // Optional detailed metrics for user stats explanation
 }
 
@@ -52,6 +56,8 @@ export interface DepartmentStats {
   departmentName: string;
   totalTickets: number;
   resolvedTickets: number;
+  /** Closed tickets (resolved + rejected). Used for "X de Y resolvidas" (among closed only). */
+  closedTickets?: number;
   averageResolutionTimeSeconds: number;
   averageAcceptanceTimeSeconds: number;
   resolutionRate: number;
@@ -197,11 +203,16 @@ export const reportService = {
   },
 
   /**
-   * Fetches user-level statistics for the current logged-in user.
-   * Currently not used in ReportsPage.vue (reserved for future user-specific dashboard).
+   * Fetches user-level statistics for the current user, or for another user when `userId` is set
+   * (TenantAdmin / same-department Supervisor only).
    */
-  async getUserStatistics(): Promise<UserStatistics> {
-    const response = await apiClient.get('/stats/by-user');
+  async getUserStatistics(params?: { period?: string; userId?: number }): Promise<UserStatistics> {
+    const response = await apiClient.get('/stats/by-user', {
+      params: {
+        ...(params?.period ? { period: params.period } : {}),
+        ...(params?.userId != null ? { userId: params.userId } : {}),
+      },
+    });
     return response.data;
   },
 

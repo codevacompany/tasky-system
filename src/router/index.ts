@@ -77,7 +77,20 @@ const routes: RouteRecordRaw[] = [
       { path: '', component: UserHome },
       {
         path: 'relatorios',
+        name: 'AdminReports',
         component: ReportsPage,
+        meta: { roles: [RoleName.TenantAdmin, RoleName.Supervisor] },
+      },
+      {
+        path: 'relatorios/setores/:id',
+        name: 'DepartmentStatsDetail',
+        component: () => import('@/pages/admin/DepartmentStatsDetailPage.vue'),
+        meta: { roles: [RoleName.TenantAdmin, RoleName.Supervisor] },
+      },
+      {
+        path: 'relatorios/colaboradores/:id',
+        name: 'UserStatsDetail',
+        component: () => import('@/pages/admin/UserStatsDetailPage.vue'),
         meta: { roles: [RoleName.TenantAdmin, RoleName.Supervisor] },
       },
       {
