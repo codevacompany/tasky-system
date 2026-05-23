@@ -724,7 +724,7 @@ onUnmounted(() => {
 
 <style scoped>
 .notification-badge {
-  @apply absolute -top-2 -right-1.5 bg-red-500 text-white text-[8px] rounded-full w-[15px] h-[15px] flex items-center justify-center font-bold min-w-[16px];
+  @apply absolute -top-2 -right-1.5 bg-red-500 text-white text-[8.5px] rounded-full w-[16px] h-[16px] flex items-center justify-center font-bold min-w-[16px];
 }
 
 .menu-item-hover:hover {

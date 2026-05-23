@@ -36,7 +36,7 @@
               />
             </svg>
             <div class="absolute inset-0 flex items-center justify-center">
-              <span class="text-[8px] font-medium text-gray-700 dark:text-gray-300">
+              <span class="text-[8.5px] font-medium text-gray-700 dark:text-gray-300">
                 {{ progressPercentage }}%
               </span>
             </div>
