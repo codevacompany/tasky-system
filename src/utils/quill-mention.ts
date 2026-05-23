@@ -2,7 +2,7 @@ import Quill from 'quill';
 import type { User } from '@/models';
 
 // Type for Quill instance with all properties we use
-type QuillInstance = InstanceType<typeof Quill> & {
+export type QuillInstance = InstanceType<typeof Quill> & {
   container: HTMLElement;
   root: HTMLElement;
   getSelection: () => { index: number; length: number } | null;
