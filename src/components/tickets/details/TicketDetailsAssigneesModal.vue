@@ -98,12 +98,9 @@
             />
           </div>
           <div class="flex gap-2 mt-3">
-            <button
-              @click="cancelAddingAssignee"
-              class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
-            >
+            <Button variant="outlined" type="button" class="text-sm" @click="cancelAddingAssignee">
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -125,12 +122,9 @@
             />
           </div>
           <div class="flex gap-2 mt-3">
-            <button
-              @click="cancelEditingAssignee"
-              class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
-            >
+            <Button variant="outlined" type="button" class="text-sm" @click="cancelEditingAssignee">
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -141,6 +135,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import BaseModal from '@/components/common/BaseModal.vue';
+import Button from '@/components/common/Button.vue';
 import DepartmentUserSelector from '@/components/common/DepartmentUserSelector.vue';
 import { useTicketDetailsAssigneesModal } from '@/composables/ticket-details/useTicketDetailsAssigneesModal';
 import { getAvatarStyle, getUserInitials } from '@/utils/generic-helper';

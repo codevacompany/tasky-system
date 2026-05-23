@@ -39,21 +39,19 @@
     </div>
     <template #footer>
       <div class="flex justify-end gap-2">
-        <button
-          class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          @click="handleDueDateCancel"
-          :disabled="isDueDateModalLoading"
-        >
+        <Button variant="outlined" type="button" @click="handleDueDateCancel" :disabled="isDueDateModalLoading">
           Cancelar
-        </button>
-        <button
-          class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[100px]"
+        </Button>
+        <Button
+          variant="primary"
+          type="button"
+          class="min-w-[100px]"
           @click="confirmDueDate"
           :disabled="!dueDateValue || isDueDateModalLoading"
         >
           <LoadingSpinner v-if="isDueDateModalLoading" :size="16" />
           <span v-if="!isDueDateModalLoading">Confirmar</span>
-        </button>
+        </Button>
       </div>
     </template>
   </BaseModal>
@@ -61,6 +59,7 @@
 
 <script setup lang="ts">
 import BaseModal from '@/components/common/BaseModal.vue';
+import Button from '@/components/common/Button.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';

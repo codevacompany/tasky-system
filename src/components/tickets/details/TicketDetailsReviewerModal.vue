@@ -14,21 +14,19 @@
     </div>
     <template #footer>
       <div class="flex justify-end gap-2">
-        <button
-          class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          @click="closeReviewerModal"
-          :disabled="isReviewerModalLoading"
-        >
+        <Button variant="outlined" type="button" @click="closeReviewerModal" :disabled="isReviewerModalLoading">
           Cancelar
-        </button>
-        <button
-          class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[100px]"
+        </Button>
+        <Button
+          variant="primary"
+          type="button"
+          class="min-w-[100px]"
           @click="confirmReviewerSelection"
           :disabled="isReviewerModalLoading"
         >
           <LoadingSpinner v-if="isReviewerModalLoading" :size="16" />
           <span v-if="!isReviewerModalLoading">Confirmar</span>
-        </button>
+        </Button>
       </div>
     </template>
   </BaseModal>
@@ -37,6 +35,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import BaseModal from '@/components/common/BaseModal.vue';
+import Button from '@/components/common/Button.vue';
 import Select from '@/components/common/Select.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { useTicketDetailsInjected } from '@/composables/ticket-details/useTicketDetailsInjected';

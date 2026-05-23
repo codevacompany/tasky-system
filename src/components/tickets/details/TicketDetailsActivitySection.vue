@@ -34,16 +34,12 @@
         />
       </div>
       <div class="flex justify-end">
-        <button
-              @click="comment"
-          :disabled="isCommentLoading"
-          class="btn btn-primary inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <Button variant="primary" type="button" @click="comment" :disabled="isCommentLoading">
           <LoadingSpinner v-if="isCommentLoading" :size="16" />
           <font-awesome-icon v-else icon="paper-plane" />
           <span v-if="isCommentLoading">Enviando...</span>
           <span v-else>Enviar Comentário</span>
-        </button>
+        </Button>
       </div>
     </div>
   </div>
@@ -199,21 +195,18 @@
                   {{ getCommentExpirationTime(event.createdAt) }}
                 </div>
                 <div class="flex gap-2">
-                  <button
-                    @click="cancelEditingComment"
-                    class="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
-                  >
+                  <Button variant="outlined" type="button" class="text-xs px-3 py-1.5" @click="cancelEditingComment">
                     Cancelar
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    type="button"
+                    class="text-xs px-3 py-2"
                     @click="saveEditedComment"
-                    :disabled="
-                      !isCommentActionable(event.createdAt) || isCommentLoading
-                    "
-                    class="px-3 py-2 text-xs bg-secondary font-medium text-white rounded-[5px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    :disabled="!isCommentActionable(event.createdAt) || isCommentLoading"
                   >
                     {{ isCommentLoading ? 'Salvando...' : 'Salvar' }}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -341,6 +334,7 @@ import { computed } from 'vue';
 import { DefaultTicketStatus, type TicketComment } from '@/models';
 import type { TicketUpdate } from '@/models/ticketUpdate';
 import { useTicketDetailsInjected } from '@/composables/ticket-details/useTicketDetailsInjected';
+import Button from '@/components/common/Button.vue';
 import Tooltip from '@/components/common/Tooltip.vue';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import { QuillEditor } from '@vueup/vue-quill';

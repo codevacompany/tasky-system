@@ -18,20 +18,19 @@
         Para visualizar os detalhes desta tarefa, você precisa iniciar a verificação agora.
       </p>
       <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-        <button
-          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200"
-          @click="handleVerificationCancel"
-        >
+        <Button variant="outlined" type="button" class="w-full sm:w-auto min-w-[120px]" @click="handleVerificationCancel">
           Cancelar
-        </button>
-        <button
-          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        </Button>
+        <Button
+          variant="primary"
+          type="button"
+          class="w-full sm:w-auto min-w-[120px] bg-purple-700 hover:bg-purple-800 dark:bg-purple-700 dark:hover:bg-purple-800"
           @click="handleVerificationConfirm"
           :disabled="isVerifying"
         >
           <font-awesome-icon v-if="isVerifying" icon="spinner" spin class="text-sm" />
           {{ isVerifying ? '' : 'Verificar Agora' }}
-        </button>
+        </Button>
       </div>
     </div>
   </BaseModal>
@@ -56,21 +55,25 @@
         Ao aceitar, a tarefa será movida para o status "Em andamento".
       </p>
       <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-        <button
-          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-500 hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        <Button
+          variant="outlined"
+          type="button"
+          class="w-full sm:w-auto min-w-[120px]"
           @click="handleAcceptanceCancel"
           :disabled="isAccepting"
         >
           Cancelar
-        </button>
-        <button
-          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        </Button>
+        <Button
+          variant="primary"
+          type="button"
+          class="w-full sm:w-auto min-w-[120px]"
           @click="handleAcceptanceConfirm"
           :disabled="isAccepting"
         >
           <font-awesome-icon v-if="isAccepting" icon="spinner" spin class="text-sm" />
           {{ isAccepting ? '' : 'Aceitar Agora' }}
-        </button>
+        </Button>
       </div>
     </div>
   </BaseModal>
@@ -79,6 +82,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import BaseModal from '@/components/common/BaseModal.vue';
+import Button from '@/components/common/Button.vue';
 import { useTicketDetailsInjected } from '@/composables/ticket-details/useTicketDetailsInjected';
 
 const { ctx, workflow } = useTicketDetailsInjected();
