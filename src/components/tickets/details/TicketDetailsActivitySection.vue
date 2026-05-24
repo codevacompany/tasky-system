@@ -24,13 +24,14 @@
         class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden activity-comment-editor"
       >
         <QuillEditor
+          :ref="setQuillEditorRef"
           :key="editorKey"
           v-model:content="newComment"
           contentType="html"
           theme="snow"
           :options="editorOptions"
           @text-change="handleQuillTextChange"
-          @ready="initializeQuillMention"
+          @ready="onMainCommentEditorReady"
         />
       </div>
       <div class="flex justify-end">
@@ -190,7 +191,7 @@
                   contentType="html"
                   theme="snow"
                   :options="editorOptions"
-                  @ready="initializeQuillMention"
+                  @ready="onInlineCommentEditorReady"
                 />
               </div>
               <div class="flex items-center justify-between mt-2">
@@ -360,10 +361,15 @@ export type TimelineEvent =
 
 const { ctx, access, comments, display } = useTicketDetailsInjected();
 
+const setQuillEditorRef = (el: unknown) => {
+  ctx.quillEditor.value = el;
+};
+
 const {
   comment,
   handleQuillTextChange,
-  initializeQuillMention,
+  onMainCommentEditorReady,
+  onInlineCommentEditorReady,
   handleDeleteCommentClick,
   startEditingComment,
   cancelEditingComment,

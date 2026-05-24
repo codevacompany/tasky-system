@@ -87,6 +87,10 @@ export class QuillMention {
     this.mentionableUsers = users;
   }
 
+  isBoundTo(quill: QuillInstance) {
+    return this.quill.root === quill.root;
+  }
+
   private setupEventListeners() {
     this.quill.on('text-change', this.handleTextChange.bind(this));
     this.quill.on('selection-change', this.handleSelectionChange.bind(this));
@@ -354,14 +358,14 @@ export class QuillMention {
     this.mentionSelector = document.createElement('div');
     this.mentionSelector.className = 'quill-mention-selector';
     this.mentionSelector.style.cssText = `
-      position: absolute;
+      position: fixed;
       background: white;
       border: 1px solid #e5e7eb;
       border-radius: 8px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
       max-height: 200px;
       overflow-y: auto;
-      z-index: 10000;
+      z-index: 10001;
       min-width: 250px;
       padding: 4px;
       pointer-events: auto;
@@ -500,8 +504,8 @@ export class QuillMention {
     const bounds = this.quill.getBounds(selection.index);
     const container = this.quill.container.getBoundingClientRect();
 
-    this.mentionSelector.style.top = `${container.top + bounds.top + bounds.height + window.scrollY}px`;
-    this.mentionSelector.style.left = `${container.left + bounds.left + window.scrollX}px`;
+    this.mentionSelector.style.top = `${container.top + bounds.top + bounds.height}px`;
+    this.mentionSelector.style.left = `${container.left + bounds.left}px`;
   }
 
   private insertMention(user: User) {

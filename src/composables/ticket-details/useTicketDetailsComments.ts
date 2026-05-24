@@ -79,16 +79,69 @@ export function useTicketDetailsComments(
     });
   };
 
-  const initializeQuillMention = (quillInstance?: QuillInstance) => {
-    nextTick(() => {
-      let quill: QuillInstance | undefined = quillInstance;
-      if (!quill && quillEditor.value?.getQuill) {
-        quill = quillEditor.value.getQuill() as QuillInstance;
-      }
-      if (quill) {
-        new QuillMention(quill, mentionableUsers.value, restoreQuillFocus);
-      }
+  const inlineQuillMentionInstances = new Set<QuillMention>();
+
+  const resolveQuillInstance = (quillInstance?: QuillInstance): QuillInstance | undefined => {
+    if (quillInstance?.root) return quillInstance;
+    if (quillEditor.value?.getQuill) {
+      return quillEditor.value.getQuill() as QuillInstance;
+    }
+    return undefined;
+  };
+
+  const syncMentionableUsers = () => {
+    const users = mentionableUsers.value;
+    quillMentionInstance.value?.updateMentionableUsers(users);
+    inlineQuillMentionInstances.forEach((instance) => {
+      instance.updateMentionableUsers(users);
     });
+  };
+
+  const initializeQuillMention = (
+    quillInstance?: QuillInstance,
+    editorKind: 'main' | 'inline' = 'main',
+  ) => {
+    nextTick(() => {
+      const quill = resolveQuillInstance(quillInstance);
+      if (!quill) return;
+
+      if (editorKind === 'main') {
+        const existing = quillMentionInstance.value;
+        if (existing?.isBoundTo(quill)) {
+          existing.updateMentionableUsers(mentionableUsers.value);
+          return;
+        }
+        existing?.destroy();
+        quillMentionInstance.value = new QuillMention(
+          quill,
+          mentionableUsers.value,
+          restoreQuillFocus,
+        );
+        return;
+      }
+
+      inlineQuillMentionInstances.forEach((instance) => {
+        if (instance.isBoundTo(quill)) {
+          instance.updateMentionableUsers(mentionableUsers.value);
+        }
+      });
+
+      const alreadyBound = Array.from(inlineQuillMentionInstances).some((instance) =>
+        instance.isBoundTo(quill),
+      );
+      if (alreadyBound) return;
+
+      const instance = new QuillMention(quill, mentionableUsers.value, restoreQuillFocus);
+      inlineQuillMentionInstances.add(instance);
+    });
+  };
+
+  const onMainCommentEditorReady = (quillInstance: QuillInstance) => {
+    initializeQuillMention(quillInstance, 'main');
+  };
+
+  const onInlineCommentEditorReady = (quillInstance: QuillInstance) => {
+    initializeQuillMention(quillInstance, 'inline');
   };
 
   const fetchMentionableUsers = async () => {
@@ -97,10 +150,15 @@ export function useTicketDetailsComments(
     try {
       const response = await ticketCommentService.getMentionableUsers(loadedTicket.value.customId);
       mentionableUsers.value = response.data;
+
       if (quillMentionInstance.value) {
-        quillMentionInstance.value.updateMentionableUsers(mentionableUsers.value);
-      } else {
-        initializeQuillMention();
+        syncMentionableUsers();
+        return;
+      }
+
+      const quill = resolveQuillInstance();
+      if (quill) {
+        initializeQuillMention(quill, 'main');
       }
     } catch (error) {
       console.error('Error fetching mentionable users:', error);
@@ -395,6 +453,8 @@ export function useTicketDetailsComments(
       quillMentionInstance.value.destroy();
       quillMentionInstance.value = null;
     }
+    inlineQuillMentionInstances.forEach((instance) => instance.destroy());
+    inlineQuillMentionInstances.clear();
   };
 
   return {
@@ -403,6 +463,8 @@ export function useTicketDetailsComments(
     handleQuillTextChange,
     restoreQuillFocus,
     initializeQuillMention,
+    onMainCommentEditorReady,
+    onInlineCommentEditorReady,
     fetchMentionableUsers,
     comment,
     updateCommentLinksColor,
