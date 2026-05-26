@@ -114,20 +114,19 @@
       </div>
 
       <div class="flex gap-4">
-        <button
-          @click="router.back()"
-          class="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-txt-primary dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600"
-        >
+        <Button variant="outlined" type="button" class="flex-1 rounded-md py-2 px-4 text-sm font-medium" @click="router.back()">
           Cancelar
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="primary"
+          type="button"
+          class="flex-1 rounded-md py-2 px-4 text-sm font-medium transition-all"
           @click="handleSubscribe"
           :disabled="!userCount || userCount < 1 || isSubscribing"
-          class="btn btn-primary flex-1 py-2 px-4 text-sm font-medium rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span v-if="isSubscribing">Processando...</span>
           <span v-else>{{ subscriptionButtonText }}</span>
-        </button>
+        </Button>
       </div>
     </div>
   </div>
@@ -138,6 +137,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import Input from '@/components/common/Input.vue';
+import Button from '@/components/common/Button.vue';
 import Switch from '@/components/common/Switch.vue';
 import { subscriptionService } from '@/services/subscriptionService';
 import { useUserStore } from '@/stores/user';

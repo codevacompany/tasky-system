@@ -563,18 +563,17 @@
           </form>
         </div>
         <div class="flex justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
-          <button
-            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-            @click="showNewClientModal = false"
-          >
+          <Button variant="outlined" type="button" class="rounded-md px-4 py-2 text-sm font-medium" @click="showNewClientModal = false">
             Cancelar
-          </button>
-          <button
-            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+          </Button>
+          <Button
+            variant="secondary"
+            type="button"
+            class="rounded-md px-4 py-2 text-sm font-medium"
             @click="createNewClient"
           >
             Criar Cliente
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -585,6 +584,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import Input from '@/components/common/Input.vue';
+import Button from '@/components/common/Button.vue';
 import {
   tenantService,
   type TenantWithStats,

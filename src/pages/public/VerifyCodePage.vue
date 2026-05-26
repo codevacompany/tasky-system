@@ -46,14 +46,16 @@
             </div>
 
             <!-- Submit Button -->
-            <button
+            <Button
               type="submit"
+              variant="primary"
+              primary-tone="gradient"
               :disabled="isLoading || code.length !== 6"
-              class="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-[4px] shadow-soft-xs text-sm sm:text-base font-medium text-white btn-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mt-6"
+              class="mt-6 w-full justify-center py-2.5 px-4 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
               <LoadingSpinner v-if="isLoading" :size="20" class="mr-2" />
               <span v-if="!isLoading">Verificar</span>
-            </button>
+            </Button>
 
             <!-- Resend Code -->
             <div class="text-center">
@@ -89,6 +91,7 @@ import { ref, computed, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { toast } from 'vue3-toastify';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
+import Button from '@/components/common/Button.vue';
 
 const router = useRouter();
 
@@ -279,15 +282,6 @@ onMounted(async () => {
 
 :deep(.text-gray-400) {
   color: #9ca3af !important;
-}
-
-:deep(.btn-primary) {
-  background: linear-gradient(135deg, #00143b 0%, #142046 100%) !important;
-  color: #ffffff !important;
-}
-
-:deep(.btn-primary:hover) {
-  opacity: 0.9 !important;
 }
 
 :deep(input) {

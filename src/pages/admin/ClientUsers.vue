@@ -17,13 +17,15 @@
           >
             {{ client.usuariosAtivos }}/{{ client.limiteUsuarios }} usuários
           </span>
-          <button
-            class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          <Button
+            variant="secondary"
+            type="button"
+            class="rounded-md px-4 py-2 text-sm font-medium disabled:bg-gray-400"
             @click="showNewUserModal = true"
             :disabled="client.usuariosAtivos >= client.limiteUsuarios"
           >
             <font-awesome-icon icon="plus" /> Novo Usuário
-          </button>
+          </Button>
         </div>
       </div>
       <div class="flex flex-col sm:flex-row gap-4 mb-4">
@@ -266,18 +268,12 @@
           </form>
         </div>
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-600 flex justify-end gap-3">
-          <button
-            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-400 transition-colors"
-            @click="showNewUserModal = false"
-          >
+          <Button variant="outlined" type="button" class="rounded-md px-4 py-2 text-sm font-medium" @click="showNewUserModal = false">
             Cancelar
-          </button>
-          <button
-            class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
-            @click="saveNewUser"
-          >
+          </Button>
+          <Button variant="secondary" type="button" class="rounded-md px-4 py-2 text-sm font-medium" @click="saveNewUser">
             Criar Usuário
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -288,6 +284,7 @@
 import { ref, computed } from 'vue';
 import { getUserInitials } from '@/utils/generic-helper';
 import Input from '@/components/common/Input.vue';
+import Button from '@/components/common/Button.vue';
 
 // Estados
 const searchTerm = ref('');

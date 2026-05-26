@@ -41,12 +41,14 @@
         class="flex flex-col items-center justify-center py-12 text-red-600 dark:text-red-400"
       >
         <p class="mb-4">{{ error }}</p>
-        <button
+        <Button
+          variant="secondary"
+          type="button"
+          class="rounded-md px-4 py-2"
           @click="fetchSignups"
-          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
         >
           Tentar novamente
-        </button>
+        </Button>
       </div>
 
       <div v-if="!isLoading && !error" class="overflow-x-auto">
@@ -325,21 +327,23 @@
           </p>
         </div>
         <div class="pt-2 flex items-center justify-end gap-2">
-          <button
+          <Button
+            variant="outlined"
             type="button"
-            class="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+            class="rounded-md px-4 py-2"
             @click="closeEditModal"
             :disabled="isSavingEdit"
           >
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
-            class="px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-60"
+            variant="secondary"
+            class="rounded-md px-4 py-2 disabled:opacity-60"
             :disabled="isSavingEdit"
           >
             {{ isSavingEdit ? 'Salvando...' : 'Salvar' }}
-          </button>
+          </Button>
         </div>
       </form>
     </div>
@@ -349,6 +353,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, reactive } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import Button from '@/components/common/Button.vue';
 import { toast } from 'vue3-toastify';
 import { signupService } from '@/services/signupService';
 import { SignUpStatus } from '@/models/SignUp';

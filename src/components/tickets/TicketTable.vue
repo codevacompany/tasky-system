@@ -254,11 +254,13 @@
             >
               <font-awesome-icon icon="check" class="text-xs md:text-sm" />
             </button>
-            <button
+            <Button
               v-else-if="
                 getTicketStatus(item) === DefaultTicketStatus.InProgress && !isLastTargetUser(item)
               "
-              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors duração-200"
+              variant="secondary"
+              type="button"
+              class="!h-6 !w-6 !min-h-0 !p-0 md:!h-8 md:!w-8 rounded-md"
               @click.stop="handleSendToNextDepartment(item)"
               :title="
                 isNextUserSameDepartment(item)
@@ -267,7 +269,7 @@
               "
             >
               <font-awesome-icon icon="arrow-right" class="text-xs md:text-sm" />
-            </button>
+            </Button>
             <button
               v-else-if="
                 getTicketStatus(item) === DefaultTicketStatus.InProgress && isLastTargetUser(item)
@@ -352,14 +354,16 @@
           </template>
 
           <template v-else-if="tableType === 'criadas'">
-            <div
+            <Button
               v-if="getTicketStatus(item) === DefaultTicketStatus.Pending && isSelfAssigned(item)"
-              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition-colors duração-200"
+              variant="secondary"
+              type="button"
+              class="!h-6 !w-6 !min-h-0 !p-0 md:!h-8 md:!w-8 rounded-md"
               @click.stop="handleStartTicket(item)"
               title="Iniciar"
             >
               <font-awesome-icon icon="play" class="text-xs md:text-sm" />
-            </div>
+            </Button>
             <button
               v-else-if="getTicketStatus(item) === DefaultTicketStatus.Pending"
               class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 text-white"
@@ -527,21 +531,25 @@
       </div>
       <template #footer>
         <div class="flex justify-end gap-2">
-          <button
-            class="px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded text-gray-800 dark:text-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          <Button
+            variant="outlined"
+            type="button"
+            class="rounded px-4 py-2"
             @click="showDueDateModal = false"
             :disabled="isDueDateModalLoading"
           >
             Cancelar
-          </button>
-          <button
-            class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-w-[100px]"
+          </Button>
+          <Button
+            variant="secondary"
+            type="button"
+            class="min-w-[100px] rounded px-4 py-2"
             @click="confirmDueDate"
             :disabled="!dueDateValue || isDueDateModalLoading"
           >
             <LoadingSpinner v-if="isDueDateModalLoading" :size="16" />
             <span v-if="!isDueDateModalLoading">Confirmar</span>
-          </button>
+          </Button>
         </div>
       </template>
     </BaseModal>
@@ -562,13 +570,15 @@
           botão "Verificar".
         </p>
         <div class="flex justify-center gap-4">
-          <button
-            class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          <Button
+            variant="outlined"
+            type="button"
+            class="min-w-[120px] rounded-md px-8 py-3"
             @click="showVerificationAlert = false"
             :disabled="isVerificationAlertLoading"
           >
             Cancelar
-          </button>
+          </Button>
           <button
             class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             @click="handleAlertVerification"
@@ -601,13 +611,15 @@
         </p>
 
         <div class="flex justify-center gap-4">
-          <button
-            class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          <Button
+            variant="outlined"
+            type="button"
+            class="min-w-[120px] rounded-md px-8 py-3"
             @click="showAcceptanceAlert = false"
             :disabled="isAcceptanceAlertLoading"
           >
             Cancelar
-          </button>
+          </Button>
           <button
             class="px-8 py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             @click="handleAlertAcceptance"
@@ -635,6 +647,7 @@ import { useUserStore } from '@/stores/user';
 import { useTicketsStore, type TicketListFilters } from '@/stores/tickets';
 import { useRoles } from '@/composables/useRoles';
 import BaseModal from '../common/BaseModal.vue';
+import Button from '../common/Button.vue';
 import DataTable from '../common/DataTable.vue';
 import type { TableHeader, PaginationInfo } from '../common/DataTable.vue';
 import {

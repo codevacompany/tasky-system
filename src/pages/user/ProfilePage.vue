@@ -64,15 +64,16 @@
                   Atualize suas informações de perfil
                 </p>
               </div>
-              <button
+              <Button
                 v-if="!isEditing"
+                variant="secondary"
                 type="button"
+                class="rounded-md px-4 py-2 text-sm font-medium shadow-sm"
                 @click="startEditing"
-                class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-md transition-colors shadow-sm"
               >
                 <font-awesome-icon icon="edit" class="text-xs" />
                 Editar
-              </button>
+              </Button>
             </div>
 
             <!-- First Name -->
@@ -178,23 +179,25 @@
               v-if="isEditing"
               class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700"
             >
-              <button
+              <Button
                 type="submit"
+                variant="secondary"
+                class="flex-1 rounded-md px-6 py-2.5 text-sm font-medium shadow-sm sm:flex-none"
                 :disabled="isSaving || !hasChanges"
-                class="flex-1 sm:flex-none px-6 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-md transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <font-awesome-icon v-if="isSaving" icon="spinner" class="animate-spin" />
                 <font-awesome-icon v-else icon="check" />
                 {{ isSaving ? 'Salvando...' : 'Salvar alterações' }}
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="outlined"
                 type="button"
+                class="flex-1 rounded-md px-6 py-2.5 text-sm sm:flex-none"
                 @click="cancelEditing"
                 :disabled="isSaving"
-                class="flex-1 sm:flex-none px-6 py-2.5 text-sm font-medium text-txt-secondary dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancelar
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -209,6 +212,7 @@ import { useUserStore } from '@/stores/user';
 import { userService } from '@/services/userService';
 import { toast } from 'vue3-toastify';
 import Input from '@/components/common/Input.vue';
+import Button from '@/components/common/Button.vue';
 import { getAvatarStyle } from '@/utils/generic-helper';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';

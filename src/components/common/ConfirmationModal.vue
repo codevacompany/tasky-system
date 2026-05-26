@@ -58,18 +58,25 @@
       </div>
 
       <div class="confirmation-actions">
-        <button class="action-btn reject" @click="handleCancel" :disabled="loading">
-          <font-awesome-icon icon="times" /> Cancelar
-        </button>
-        <button
-          class="action-btn approve"
+        <Button
+          variant="outlined"
+          type="button"
+          class="w-full min-w-[120px] sm:w-auto"
+          @click="handleCancel"
+          :disabled="loading"
+        >
+          Cancelar
+        </Button>
+        <Button
+          variant="secondary"
+          type="button"
+          class="w-full min-w-[120px] gap-2 sm:w-auto"
           @click="handleConfirm"
           :disabled="(hasInput && (!inputReason || !inputDescription)) || loading"
         >
-          <LoadingSpinner v-if="loading" :size="16" class="spinner" />
-          <font-awesome-icon v-if="!loading" icon="check" />
+          <LoadingSpinner v-if="loading" :size="16" />
           <span v-if="!loading">Confirmar</span>
-        </button>
+        </Button>
       </div>
     </div>
   </BaseModal>
@@ -78,6 +85,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import BaseModal from './BaseModal.vue';
+import Button from './Button.vue';
 import LoadingSpinner from './LoadingSpinner.vue';
 import Input from './Input.vue';
 
@@ -249,57 +257,6 @@ const handleCancel = () => {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
   }
-}
-
-.action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  width: 100%;
-  border-radius: 6px;
-  border: none;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  color: white;
-  position: relative;
-}
-
-@media (min-width: 480px) {
-  .action-btn {
-    width: auto;
-    min-width: 120px;
-    padding: 0.75rem 1.25rem;
-  }
-}
-
-.action-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.action-btn .spinner {
-  opacity: 1 !important;
-  border-top-color: white !important;
-}
-
-.action-btn.approve {
-  background-color: #16a34a;
-}
-
-.action-btn.approve:hover {
-  background-color: #15803d;
-}
-
-.action-btn.reject {
-  background-color: #64748b;
-}
-
-.action-btn.reject:hover {
-  background-color: #475569;
 }
 
 .select-input {

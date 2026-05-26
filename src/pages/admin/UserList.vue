@@ -4,14 +4,16 @@
       <h1 class="text-xl sm:text-2xl font-bold text-txt-primary dark:text-white tracking-tight">
         Colaboradores
       </h1>
-      <button
+      <Button
         id="newColaboradorBtn"
-        class="flex items-center gap-2 px-4 py-2 btn btn-primary text-white rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+        variant="primary"
+        type="button"
+        class="rounded-md"
         @click="openModal"
       >
         <font-awesome-icon icon="plus" />
         <span>Novo Colaborador</span>
-      </button>
+      </Button>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
@@ -202,7 +204,7 @@
         <template #column-name="{ item }">
           <div class="flex items-center gap-3">
             <div
-              class="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600 text-white text-sm font-bold shrink-0"
+              class="w-10 h-10 rounded-xl flex items-center justify-center bg-primary-500 text-white text-sm font-bold shrink-0"
             >
               <span>{{ getUserInitials(item) }}</span>
             </div>
@@ -413,30 +415,36 @@
         </div>
 
         <div class="flex justify-end gap-3">
-          <button
+          <Button
             v-if="!resetPasswordResult"
-            class="px-5 py-2 text-sm font-semibold text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors border border-gray-200 dark:border-gray-700"
+            variant="outlined"
+            type="button"
+            class="rounded-lg px-5 py-2 text-sm font-semibold"
             @click="closePasswordResetModal"
             :disabled="isResettingPassword"
           >
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
             v-if="!resetPasswordResult"
-            class="px-6 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50 flex items-center gap-2"
+            variant="secondary"
+            type="button"
+            class="rounded-lg px-6 py-2 text-sm font-bold shadow-lg shadow-blue-500/20"
             @click="confirmPasswordReset"
             :disabled="isResettingPassword"
           >
             <font-awesome-icon v-if="isResettingPassword" icon="spinner" spin />
             <span>{{ isResettingPassword ? 'Redefinindo...' : 'Confirmar Redefinição' }}</span>
-          </button>
-          <button
+          </Button>
+          <Button
             v-if="resetPasswordResult"
-            class="px-8 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/20 transition-all"
+            variant="secondary"
+            type="button"
+            class="rounded-lg px-8 py-2 text-sm font-bold shadow-lg shadow-blue-500/20"
             @click="closePasswordResetModal"
           >
             Concluído
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -459,6 +467,7 @@ import { toast } from 'vue3-toastify';
 import { useUserStore } from '@/stores/user';
 import { useFiltersStore } from '@/stores/filters';
 import Input from '@/components/common/Input.vue';
+import Button from '@/components/common/Button.vue';
 
 const userStore = useUserStore();
 const filtersStore = useFiltersStore();

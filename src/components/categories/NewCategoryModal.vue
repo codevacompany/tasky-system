@@ -112,35 +112,4 @@ const createCategory = async () => {
   gap: 10px;
   margin-top: 1rem;
 }
-
-.btn {
-  width: 116px;
-  height: 36px;
-  padding: 0 16px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition:
-    background 0.3s ease,
-    transform 0.2s ease;
-}
-
-.btn-primary {
-  background-color: #3b82f6;
-  color: #fff;
-}
-
-.btn-primary:hover {
-  background-color: #2563eb;
-}
-
-.btn-secondary {
-  background-color: #e2e8f0;
-  color: #1e293b;
-}
-
-.btn-secondary:hover {
-  background-color: #cbd5e1;
-}
 </style>

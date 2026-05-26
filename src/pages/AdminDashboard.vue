@@ -123,12 +123,14 @@
     <div class="bg-white rounded-lg shadow-soft-xs mb-8">
       <div class="p-4 flex justify-between items-center border-b">
         <h2 class="text-lg font-semibold">Gestão de Usuários Admin</h2>
-        <button
+        <Button
+          variant="secondary"
+          type="button"
+          class="rounded-lg px-4 py-2"
           @click="openNovoAdmin"
-          class="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center hover:bg-blue-600 transition-colors"
         >
           <i class="fas fa-plus mr-2"></i> NOVO ADMIN
-        </button>
+        </Button>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full">
@@ -187,12 +189,14 @@
     <div class="bg-white rounded-lg shadow-soft-xs">
       <div class="p-4 flex justify-between items-center border-b">
         <h2 class="text-lg font-semibold">Controle de Recursos por Plano</h2>
-        <button
+        <Button
+          variant="secondary"
+          type="button"
+          class="rounded-lg px-4 py-2"
           @click="openConfigurarRecursos"
-          class="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center hover:bg-blue-600 transition-colors"
         >
           <i class="fas fa-cog mr-2"></i> CONFIGURAR RECURSOS
-        </button>
+        </Button>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full">
@@ -259,6 +263,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import Button from '@/components/common/Button.vue';
 import { useDashboardStore } from '../stores/dashboard';
 
 const store = useDashboardStore();

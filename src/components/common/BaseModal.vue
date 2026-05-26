@@ -54,27 +54,29 @@
           class="p-3 sm:p-4 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 border-t border-gray-200 dark:border-gray-700"
         >
           <slot name="footer">
-            <button
+            <Button
               v-if="showCancelButton"
+              variant="outlined"
               type="button"
-              class="w-full sm:w-auto px-4 py-2 btn bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-full sm:w-auto"
               @click="handleCancel"
               :disabled="confirmButtonLoading"
             >
               {{ cancelButtonText }}
-            </button>
-            <button
+            </Button>
+            <Button
               v-if="showConfirmButton"
               ref="confirmButtonRef"
+              variant="primary"
               type="button"
-              class="w-full sm:w-auto px-4 py-2 btn btn-primary hover:opacity-95 text-white rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              class="w-full sm:w-auto"
               @click="handleConfirm"
               :disabled="confirmButtonLoading"
               :style="confirmButtonMinWidth"
             >
               <LoadingSpinner v-if="confirmButtonLoading" :size="16" />
               <span ref="confirmTextRef" v-if="!confirmButtonLoading">{{ confirmButtonText }}</span>
-            </button>
+            </Button>
           </slot>
         </div>
       </div>
@@ -84,7 +86,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick, watch } from 'vue';
+import type { ComponentPublicInstance } from 'vue';
 import LoadingSpinner from './LoadingSpinner.vue';
+import Button from './Button.vue';
 
 const props = defineProps({
   title: { type: String, default: 'Ação Necessária' },
@@ -106,7 +110,7 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'cancel', 'confirm']);
 
-const confirmButtonRef = ref<HTMLButtonElement | null>(null);
+const confirmButtonRef = ref<ComponentPublicInstance | null>(null);
 const confirmTextRef = ref<HTMLSpanElement | null>(null);
 const buttonMinWidth = ref<number | null>(null);
 
@@ -119,9 +123,10 @@ const confirmButtonMinWidth = computed(() => {
 
 const measureButtonWidth = async () => {
   await nextTick();
-  if (confirmTextRef.value && confirmButtonRef.value) {
+  const btnEl = confirmButtonRef.value?.$el as HTMLElement | undefined;
+  if (confirmTextRef.value && btnEl) {
     const textWidth = confirmTextRef.value.offsetWidth;
-    const buttonPadding = 32; // px-4 (16px * 2)
+    const buttonPadding = 32; // horizontal padding estimate
     buttonMinWidth.value = textWidth + buttonPadding;
   }
 };

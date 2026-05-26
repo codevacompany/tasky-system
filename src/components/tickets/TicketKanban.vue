@@ -243,7 +243,7 @@
                     ticket.status !== DefaultTicketStatus.Completed
                   "
                   :class="[
-                    'flex items-center gap-1 px-2 py-1 rounded text-xs font-medium whitespace-nowrap',
+                    'flex items-center gap-1 px-1.5 py-1 rounded-md text-xs font-medium whitespace-nowrap',
                     getDeadlineClass(ticket.dueAt) === 'normal'
                       ? 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
                       : getDeadlineClass(ticket.dueAt) === 'warning'
@@ -290,12 +290,14 @@
       </p>
 
       <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-        <button
-          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200"
+        <Button
+          variant="outlined"
+          type="button"
+          class="w-full min-w-[120px] rounded-md px-8 py-3.5 text-sm sm:w-auto sm:py-3"
           @click="showVerificationAlert = false"
         >
           Cancelar
-        </button>
+        </Button>
         <button
           class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-purple-700 hover:bg-purple-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           @click="handleAlertVerification"
@@ -334,13 +336,15 @@
       </p>
 
       <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
-        <button
-          class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-gray-500 hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        <Button
+          variant="outlined"
+          type="button"
+          class="w-full min-w-[120px] rounded-md px-8 py-3.5 text-sm sm:w-auto sm:py-3"
           @click="showAcceptanceAlert = false"
           :disabled="isAccepting"
         >
           Cancelar
-        </button>
+        </Button>
         <button
           class="w-full sm:w-auto px-8 py-3.5 sm:py-3 min-w-[120px] rounded-md text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           @click="handleAlertAcceptance"
@@ -372,6 +376,7 @@ import { useRoles } from '@/composables/useRoles';
 import { ticketService } from '@/services/ticketService';
 import { toast } from 'vue3-toastify';
 import BaseModal from '@/components/common/BaseModal.vue';
+import Button from '@/components/common/Button.vue';
 
 const props = defineProps<{
   tickets: Ticket[];

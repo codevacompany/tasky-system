@@ -88,14 +88,15 @@
             </div>
 
             <div class="mt-6">
-              <button
+              <Button
                 type="submit"
+                variant="secondary"
                 :disabled="isSubmitting"
-                class="w-full py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-[5px] transition-colors text-sm lg:text-base"
+                class="w-full py-2.5 text-sm font-semibold lg:py-3 lg:text-base disabled:bg-blue-400"
               >
                 <span v-if="isSubmitting">Enviando...</span>
                 <span v-else>Cadastrar</span>
-              </button>
+              </Button>
             </div>
           </form>
 
@@ -134,12 +135,14 @@
                 >
                   Página Inicial
                 </a>
-                <button
-                  class="w-full sm:flex-1 py-2.5 lg:py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors text-sm lg:text-base"
+                <Button
+                  variant="secondary"
+                  type="button"
+                  class="w-full py-2.5 text-sm font-semibold sm:flex-1 lg:py-3 lg:text-base rounded-lg"
                   @click="goToLogin"
                 >
                   Fazer Login
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -245,6 +248,7 @@ import teamSuccessPhoto from '@/assets/images/team_success_photo.png';
 import { maskCNPJ, maskPhone, maskEmail, validateEmail, validateCNPJ } from '@/utils/form-helpers';
 import { AxiosError } from 'axios';
 import Input from '@/components/common/Input.vue';
+import Button from '@/components/common/Button.vue';
 
 const router = useRouter();
 const { track, trackCustom } = useFacebookPixel();

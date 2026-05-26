@@ -17,7 +17,7 @@
   --primary-color: rgb(var(--primary-rgb));
   --primary-dark: rgb(39, 71, 212);
   --primary-light: rgb(108, 134, 242);
-  --secondary-dark-color: #081940; /* Solid color for backgrounds */
+  --secondary-dark-color: #1C2260; /* Solid color for backgrounds */
   --secondary-dark: linear-gradient(
     135deg,
     #081940 0%,
@@ -57,7 +57,7 @@
   --disabled-bg: #f8f9fa;
 
   /* Cores dos botões */
-  --button-primary-color: var(--secondary-dark);
+  --button-primary-color: var(--secondary-dark-color);
   --button-secondary-color: #f5f7fa;
 
   /* Box shadows */
@@ -1269,110 +1269,6 @@ body.dark-mode label {
   color: #ddd;
 }
 
-/* Botões Padronizados */
-.btn {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 0.85rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.5;
-  text-align: center;
-  text-decoration: none;
-  white-space: nowrap;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  height: 36px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.btn-primary {
-  background: var(--button-primary-color);
-  color: #ffffff;
-}
-
-.btn-primary:hover {
-  /* transform: translateY(-2px); */
-  opacity: 0.9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.btn-secondary {
-  background-color: var(--button-secondary-color);
-  color: #1a2233;
-}
-
-.btn-secondary:hover {
-  background-color: #e8eaed;
-  /* transform: translateY(-2px); */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.btn-danger {
-  background-color: #f44336;
-  color: #ffffff;
-}
-
-.btn-danger:hover {
-  background-color: #d32f2f;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.btn-success {
-  background-color: var(--success-color);
-  color: white;
-}
-
-.btn-success:hover {
-  background-color: #05b681;
-}
-
-.btn-icon {
-  padding: 0.5rem;
-  background: none;
-  border: none;
-  color: #1a2233;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: none;
-}
-
-.btn-icon:hover {
-  color: #141b2a;
-  transform: translateY(-2px);
-}
-
-/* Dark mode */
-body.dark-mode .btn-primary {
-  background: var(--primary-dark);
-  color: white;
-}
-
-body.dark-mode .btn-primary:hover {
-  opacity: 0.9;
-}
-
-body.dark-mode .btn-secondary {
-  background-color: #272b3a;
-  color: #e2e2e2;
-}
-
-body.dark-mode .btn-secondary:hover {
-  background-color: #32374b;
-}
-
-body.dark-mode .btn-icon {
-  color: #e2e2e2;
-}
-
-body.dark-mode .btn-icon:hover {
-  color: #ffffff;
-}
 
 .header-action-btn {
   display: inline-flex;
