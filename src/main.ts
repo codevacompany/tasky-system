@@ -32,6 +32,7 @@ app.directive('maska', vMaska);
 app.use(Vue3Toastify, {
   autoClose: 3000,
   theme: 'light',
+  position: 'bottom-right',
 } as ToastContainerOptions);
 
 app.use(createPinia());
