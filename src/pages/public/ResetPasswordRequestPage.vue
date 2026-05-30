@@ -75,7 +75,7 @@
 import { authService } from '@/services/authService';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import Button from '@/components/common/Button.vue';
 import Input from '@/components/common/Input.vue';

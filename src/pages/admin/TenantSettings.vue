@@ -231,7 +231,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { tenantService } from '@/services/tenantService';
 import Input from '@/components/common/Input.vue';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import axios from 'axios';
 import Button from '@/components/common/Button.vue';
 

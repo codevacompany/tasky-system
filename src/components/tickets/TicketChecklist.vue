@@ -149,7 +149,7 @@
 import { ref, nextTick, computed } from 'vue';
 import type { ChecklistItem } from '@/models/checklist';
 import { checklistService } from '@/services/checklistService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import { formatDate } from '@/utils/date';
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue';
 import Input from '@/components/common/Input.vue';

@@ -6,7 +6,7 @@ import {
   DisapprovalReason,
 } from '@/models';
 import { ticketService } from '@/services/ticketService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import { enumToOptions } from '@/utils/generic-helper';
 import type { TicketDetailsContext } from './ticketDetailsContext';
 import type { useTicketDetailsAccess } from './useTicketDetailsAccess';

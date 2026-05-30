@@ -131,7 +131,7 @@ import { ref, computed } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { useRoles } from '@/composables/useRoles';
 import { userService } from '@/services/userService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import BaseModal from './BaseModal.vue';
 
 const emit = defineEmits(['close', 'openGuide']);

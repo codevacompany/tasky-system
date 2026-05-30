@@ -2,7 +2,7 @@ import type { TicketComment } from '@/models';
 import { ticketCommentService } from '@/services/ticketCommentService';
 import { computed, nextTick, onUnmounted, watch } from 'vue';
 import { TicketUpdateService } from '@/services/ticketUpdateService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import QuillMention, { type MentionData, type QuillInstance } from '@/utils/quill-mention';
 import type { TicketDetailsContext } from './ticketDetailsContext';
 import type { useTicketDetailsConfirmation } from './useTicketDetailsConfirmation';

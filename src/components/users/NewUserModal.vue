@@ -98,7 +98,7 @@ import BaseModal from '../common/BaseModal.vue';
 import Select from '../common/Select.vue';
 import Input from '../common/Input.vue';
 import { userService } from '@/services/userService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import { roleService } from '@/services/roleService';
 import type { CreateUserDto } from '@/models';
 

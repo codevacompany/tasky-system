@@ -243,7 +243,7 @@ import { onMounted, ref, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { signupService } from '@/services/signupService';
 import { useFacebookPixel } from '@/composables/useFacebookPixel';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import teamSuccessPhoto from '@/assets/images/team_success_photo.png';
 import { maskCNPJ, maskPhone, maskEmail, validateEmail, validateCNPJ } from '@/utils/form-helpers';
 import { AxiosError } from 'axios';

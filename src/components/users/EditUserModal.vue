@@ -97,7 +97,7 @@ import { departmentService } from '@/services/departmentService';
 import BaseModal from '../common/BaseModal.vue';
 import Select from '../common/Select.vue';
 import { userService } from '@/services/userService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import Input from '../common/Input.vue';
 import { roleService } from '@/services/roleService';

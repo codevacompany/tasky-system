@@ -1,7 +1,7 @@
 import { DefaultTicketStatus } from '@/models';
 import { ticketService } from '@/services/ticketService';
 import { nextTick } from 'vue';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import type { TicketDetailsContext } from './ticketDetailsContext';
 import type { useTicketDetailsAccess } from './useTicketDetailsAccess';
 import type { useTicketDetailsConfirmation } from './useTicketDetailsConfirmation';

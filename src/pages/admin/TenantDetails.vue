@@ -971,7 +971,7 @@ import { userService } from '@/services/userService';
 import ActionDropdown from '@/components/common/ActionDropdown.vue';
 import type { TenantWithStats, UserWithStats } from '@/services/tenantService';
 import type { Payment } from '@/services/subscriptionService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import Input from '@/components/common/Input.vue';
 import Button from '@/components/common/Button.vue';
 import { format as formatDateFns } from 'date-fns';

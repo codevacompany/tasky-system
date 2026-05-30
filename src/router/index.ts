@@ -201,6 +201,10 @@ router.beforeEach(async (to, from, next) => {
     return next('/login');
   }
 
+  if (!requiresAuth && loggedIn) {
+    return next('/');
+  }
+
   const hasRequiredRole = to.matched.every((record) => {
     if (!record.meta.roles) return true;
 

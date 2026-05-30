@@ -135,7 +135,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import Input from '@/components/common/Input.vue';
 import Button from '@/components/common/Button.vue';
 import Switch from '@/components/common/Switch.vue';

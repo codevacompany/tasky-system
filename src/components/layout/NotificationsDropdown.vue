@@ -129,7 +129,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { notificationService } from '@/services/notificationService';
 import type { Notification } from '@/models';
 import { NotificationType } from '@/models';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import { formatRelativeTime } from '@/utils/date';
 import { useUserStore } from '@/stores/user';
 import LoadingSpinner from '../common/LoadingSpinner.vue';

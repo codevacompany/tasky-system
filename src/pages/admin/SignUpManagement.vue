@@ -354,7 +354,7 @@
 import { ref, computed, onMounted, onUnmounted, reactive } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import Button from '@/components/common/Button.vue';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import { signupService } from '@/services/signupService';
 import { SignUpStatus } from '@/models/SignUp';
 import type { CompanySignUp } from '@/models/SignUp';

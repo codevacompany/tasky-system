@@ -410,7 +410,7 @@ import { ticketService } from '@/services/ticketService';
 import { departmentService } from '@/services/departmentService';
 import { userService } from '@/services/userService';
 import { categoryService } from '@/services/categoryService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import { TicketPriority, type Category, type Department, type User, RoleName } from '@/models';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';

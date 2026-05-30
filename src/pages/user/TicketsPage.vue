@@ -431,7 +431,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import Select from '@/components/common/Select.vue';
 import Button from '@/components/common/Button.vue';
 import Input from '@/components/common/Input.vue';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { localStorageService } from '@/utils/localStorageService';
 import { departmentService } from '@/services/departmentService';

@@ -463,7 +463,7 @@ import Switch from '@/components/common/Switch.vue';
 import ActionDropdown from '@/components/common/ActionDropdown.vue';
 import Select from '@/components/common/Select.vue';
 import type { PaginationInfo } from '@/components/common/DataTable.vue';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import { useUserStore } from '@/stores/user';
 import { useFiltersStore } from '@/stores/filters';
 import Input from '@/components/common/Input.vue';

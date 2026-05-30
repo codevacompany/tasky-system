@@ -210,7 +210,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { userService } from '@/services/userService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import Input from '@/components/common/Input.vue';
 import Button from '@/components/common/Button.vue';
 import { getAvatarStyle } from '@/utils/generic-helper';

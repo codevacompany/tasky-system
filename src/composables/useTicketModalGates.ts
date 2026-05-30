@@ -1,6 +1,6 @@
 import { ref, type Ref } from 'vue';
 import type { RouteLocationNormalizedLoaded, Router } from 'vue-router';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import type { Ticket } from '@/models';
 import { DefaultTicketStatus } from '@/models';
 import { ticketService } from '@/services/ticketService';

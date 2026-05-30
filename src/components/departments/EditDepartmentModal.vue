@@ -35,7 +35,7 @@ import { ref, watch } from 'vue';
 import BaseModal from '../common/BaseModal.vue';
 import Input from '../common/Input.vue';
 import { departmentService } from '@/services/departmentService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import type { Department } from '@/models';
 

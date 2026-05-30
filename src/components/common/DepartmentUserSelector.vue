@@ -114,7 +114,7 @@ import Input from '@/components/common/Input.vue';
 import type { Department, User } from '@/models';
 import { departmentService } from '@/services/departmentService';
 import { userService } from '@/services/userService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 
 interface Props {
   modelValue?: { departmentId: number | null; userId: number | null };

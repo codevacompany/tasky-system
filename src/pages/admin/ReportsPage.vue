@@ -1900,7 +1900,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import TabSelector from '@/components/common/TabSelector.vue';
 import Select from '@/components/common/Select.vue';
 import BaseStatsWidget from '@/components/common/BaseStatsWidget.vue';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import * as XLSX from 'xlsx';
 import BaseModal from '@/components/common/BaseModal.vue';
 import Button from '@/components/common/Button.vue';

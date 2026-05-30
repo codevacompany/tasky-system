@@ -36,7 +36,7 @@ import { ref, watch } from 'vue';
 import BaseModal from '../common/BaseModal.vue';
 import Input from '../common/Input.vue';
 import { categoryService } from '@/services/categoryService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import type { Category } from '@/models';
 
