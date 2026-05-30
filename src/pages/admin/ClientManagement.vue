@@ -591,7 +591,7 @@ import {
   type TenantStatsResponse,
   type UserWithStats,
 } from '@/services/tenantService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import { useRoles } from '@/composables/useRoles';
 import apiClient from '@/utils/axiosInstance';
 

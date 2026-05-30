@@ -1,6 +1,6 @@
 import { checklistService } from '@/services/checklistService';
 import { nextTick, onMounted, onUnmounted, watch } from 'vue';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import type { TicketDetailsContext } from './ticketDetailsContext';
 import type { useTicketDetailsComments } from './useTicketDetailsComments';
 import type { useTicketDetailsFiles } from './useTicketDetailsFiles';

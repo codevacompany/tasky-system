@@ -405,7 +405,7 @@ import type { Message, MessageReaction, MessageViewConfirmation, Mention } from 
 import { getUserInitials } from '@/utils/generic-helper';
 import { messageService } from '@/services/messageService';
 import { userService } from '@/services/userService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import { formatRelativeTime } from '@/utils/date';
 import MentionSelector from '@/components/MentionSelector.vue';
 import Input from '@/components/common/Input.vue';

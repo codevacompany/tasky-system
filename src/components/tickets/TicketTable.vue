@@ -641,7 +641,7 @@ import { TicketPriority, DefaultTicketStatus, DisapprovalReason, CorrectionReaso
 import LoadingSpinner from '../common/LoadingSpinner.vue';
 import { ticketService } from '@/services/ticketService';
 import { formatDate, getBusinessDayDifference } from '@/utils/date';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import ConfirmationModal from '../common/ConfirmationModal.vue';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore, type TicketListFilters } from '@/stores/tickets';

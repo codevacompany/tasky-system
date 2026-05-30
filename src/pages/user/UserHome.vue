@@ -294,7 +294,7 @@ import { reportService, type UserStatistics } from '@/services/reportService';
 import { DefaultTicketStatus, type Ticket } from '@/models';
 import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import CompactTicketTable from '@/components/tickets/CompactTicketTable.vue';
 import { formatTimeShort } from '@/utils/generic-helper';
 import WelcomeModal from '@/components/common/WelcomeModal.vue';

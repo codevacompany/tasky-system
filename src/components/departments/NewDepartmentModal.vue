@@ -33,7 +33,7 @@ import { ref } from 'vue';
 import BaseModal from '../common/BaseModal.vue';
 import Input from '../common/Input.vue';
 import { departmentService } from '@/services/departmentService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 
 const emit = defineEmits(['close', 'departmentCreated']);
 

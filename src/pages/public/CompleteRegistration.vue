@@ -106,7 +106,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import Button from '@/components/common/Button.vue';
 import { signupService } from '@/services/signupService';

@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { DefaultTicketStatus } from '@/models';
 import { ticketService } from '@/services/ticketService';
 import { userService } from '@/services/userService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import type { TicketDetailsContext } from './ticketDetailsContext';
 import type { DepartmentUserSelection } from './types';
 import type { useTicketDetailsAccess } from './useTicketDetailsAccess';

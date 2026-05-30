@@ -112,7 +112,7 @@ import { useTicketsStore } from '@/stores/tickets';
 import type { Ticket } from '@/models';
 import { TicketPriority } from '@/models';
 import TicketTable from '@/components/tickets/TicketTable.vue';
-import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
+import TicketDetailsModal from '@/components/tickets/TicketDetailsModal/TicketDetailsModal.vue';
 import Select from '@/components/common/Select.vue';
 import Button from '@/components/common/Button.vue';
 import Input from '@/components/common/Input.vue';

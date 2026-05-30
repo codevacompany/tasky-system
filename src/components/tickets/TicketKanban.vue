@@ -374,7 +374,7 @@ import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import { useRoles } from '@/composables/useRoles';
 import { ticketService } from '@/services/ticketService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import BaseModal from '@/components/common/BaseModal.vue';
 import Button from '@/components/common/Button.vue';
 

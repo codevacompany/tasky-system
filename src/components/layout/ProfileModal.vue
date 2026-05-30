@@ -368,7 +368,7 @@ import { useUserPreferencesStore } from '@/stores/userPreferences';
 import { authService } from '@/services/authService';
 import { userService } from '@/services/userService';
 import { useRouter } from 'vue-router';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import BaseModal from '@/components/common/BaseModal.vue';
 import { useRoles } from '@/composables';
 import { getAvatarStyle } from '@/utils/generic-helper';

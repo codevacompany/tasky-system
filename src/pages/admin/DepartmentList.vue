@@ -180,7 +180,7 @@ import DataTable from '@/components/common/DataTable.vue';
 import ActionDropdown from '@/components/common/ActionDropdown.vue';
 import Select from '@/components/common/Select.vue';
 import type { TableHeader, PaginationInfo } from '@/components/common/DataTable.vue';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import { AxiosError } from 'axios';
 import { useFiltersStore } from '@/stores/filters';
 import Input from '@/components/common/Input.vue';

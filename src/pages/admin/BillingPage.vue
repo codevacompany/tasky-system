@@ -379,7 +379,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import Switch from '@/components/common/Switch.vue';
 import { subscriptionService } from '@/services/subscriptionService';

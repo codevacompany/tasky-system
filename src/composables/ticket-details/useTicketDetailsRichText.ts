@@ -1,6 +1,6 @@
 import { awsService } from '@/services/awsService';
 import axios from 'axios';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 
 export const ticketDetailsEditorOptions = {
   modules: {

@@ -35,7 +35,7 @@ import { ref } from 'vue';
 import BaseModal from '../common/BaseModal.vue';
 import Input from '../common/Input.vue';
 import { categoryService } from '@/services/categoryService';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 
 const emit = defineEmits(['close', 'categoryCreated']);
 

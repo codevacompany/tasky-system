@@ -243,6 +243,45 @@
       </div>
     </div>
 
+    <div
+      v-if="isResolvingTicketQuery"
+      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 dark:bg-black/40"
+      aria-busy="true"
+    >
+      <LoadingSpinner :size="40" />
+    </div>
+
+    <ReturnedCorrectionStartModal
+      :is-open="showReturnedCorrectionGate"
+      :is-starting-correction="returnedCorrectionGateLoading"
+      @cancel="cancelReturnedCorrectionFromPage"
+      @confirm="confirmReturnedCorrectionFromPage"
+    />
+
+    <AcceptanceConfirmationModal
+      :is-open="showPendingAcceptanceGate"
+      :is-accepting="pendingAcceptanceLoading"
+      @cancel="cancelPendingAcceptanceFromPage"
+      @confirm="confirmPendingAcceptanceFromPage"
+    />
+
+    <DueDateModal
+      :is-open="showPendingDueDateModal"
+      :due-date-value="pendingAcceptDueDateValue"
+      :disabled-weekend-date="disabledWeekendDateForPendingAccept"
+      :is-due-date-modal-loading="pendingAcceptDueDateLoading"
+      @cancel="cancelPendingDueDateFromPage"
+      @confirm="confirmPendingDueDateFromPage"
+      @date-change="onPendingAcceptDateChange"
+    />
+
+    <VerificationConfirmationModal
+      :is-open="showAwaitingVerificationGate"
+      :is-verifying="awaitingVerificationGateLoading"
+      @cancel="cancelAwaitingVerificationFromPage"
+      @confirm="confirmAwaitingVerificationFromPage"
+    />
+
     <!-- Ticket Details Modal -->
     <TicketDetailsModal
       v-if="selectedTicketCustomId"
@@ -383,17 +422,23 @@ import { DefaultTicketStatus, TicketPriority } from '@/models';
 import { useRoles } from '@/composables/useRoles';
 import TicketTable from '@/components/tickets/TicketTable.vue';
 import TicketKanban from '@/components/tickets/TicketKanban.vue';
-import TicketDetailsModal from '@/components/tickets/TicketDetailsModal.vue';
+import TicketDetailsModal from '@/components/tickets/TicketDetailsModal/TicketDetailsModal.vue';
+import ReturnedCorrectionStartModal from '@/components/tickets/TicketDetailsModal/ReturnedCorrectionStartModal.vue';
+import AcceptanceConfirmationModal from '@/components/tickets/TicketDetailsModal/AcceptanceConfirmationModal.vue';
+import DueDateModal from '@/components/tickets/TicketDetailsModal/DueDateModal.vue';
+import VerificationConfirmationModal from '@/components/tickets/TicketDetailsModal/VerificationConfirmationModal.vue';
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import Select from '@/components/common/Select.vue';
 import Button from '@/components/common/Button.vue';
 import Input from '@/components/common/Input.vue';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import { formatSnakeToNaturalCase } from '@/utils/generic-helper';
 import { localStorageService } from '@/utils/localStorageService';
 import { departmentService } from '@/services/departmentService';
 import { userService } from '@/services/userService';
 import { useUserStore } from '@/stores/user';
 import type { Department, User } from '@/models';
+import { useTicketModalGates } from '@/composables/useTicketModalGates';
 
 const route = useRoute();
 const router = useRouter();
@@ -461,7 +506,6 @@ const isKanbanView = ref(false);
 const showViewMenu = ref(false);
 
 const showFiltersModal = ref(false);
-const selectedTicketCustomId = ref<string | null>(null);
 const isUpdatingUrl = ref(false);
 
 onMounted(async () => {
@@ -529,11 +573,7 @@ onMounted(async () => {
   }
 
   await fetchTicketsWithFilters();
-
-  const ticketCustomId = route.query.ticket as string;
-  if (ticketCustomId) {
-    selectedTicketCustomId.value = ticketCustomId;
-  }
+  await syncTicketModalFromRoute();
 
   document.addEventListener('click', handleClickOutside);
 });
@@ -896,13 +936,41 @@ const handleViewTicket = (ticket: Ticket) => {
   router.push({ query });
 };
 
-const closeTicketModal = () => {
-  selectedTicketCustomId.value = null;
-  // Remove ticket from URL query
-  const query = { ...route.query };
-  delete query.ticket;
-  router.push({ query });
-};
+const {
+  selectedTicketCustomId,
+  isResolvingTicketQuery,
+  showReturnedCorrectionGate,
+  returnedCorrectionGateLoading,
+  showPendingAcceptanceGate,
+  pendingAcceptanceLoading,
+  showPendingDueDateModal,
+  pendingAcceptDueDateValue,
+  pendingAcceptDueDateLoading,
+  showAwaitingVerificationGate,
+  awaitingVerificationGateLoading,
+  syncTicketModalFromRoute,
+  closeTicketModal,
+  confirmReturnedCorrectionFromPage,
+  cancelReturnedCorrectionFromPage,
+  confirmAwaitingVerificationFromPage,
+  cancelAwaitingVerificationFromPage,
+  disabledWeekendDateForPendingAccept,
+  onPendingAcceptDateChange,
+  cancelPendingAcceptanceFromPage,
+  confirmPendingAcceptanceFromPage,
+  cancelPendingDueDateFromPage,
+  confirmPendingDueDateFromPage,
+} = useTicketModalGates({
+  route,
+  router,
+  activeTab,
+  userId: computed(() => userStore.user?.id),
+  ticketStoreApi: {
+    getTicketById: (id) => ticketsStore.getTicketById(id),
+    fetchTicketDetails: (id) => ticketsStore.fetchTicketDetails(id),
+  },
+  fetchTicketsWithFilters,
+});
 
 const handleEditTicket = (ticket: Ticket) => {
   console.log('Editing ticket:', ticket);
@@ -1122,13 +1190,9 @@ watch(isTenantAdmin, (isAdmin) => {
 });
 
 watch(
-  () => route.query.ticket,
-  (newTicketCustomId) => {
-    if (newTicketCustomId && typeof newTicketCustomId === 'string') {
-      selectedTicketCustomId.value = newTicketCustomId;
-    } else if (!newTicketCustomId) {
-      selectedTicketCustomId.value = null;
-    }
+  () => [route.query.ticket, activeTab.value, userStore.user?.id] as const,
+  () => {
+    void syncTicketModalFromRoute();
   },
   { immediate: true },
 );

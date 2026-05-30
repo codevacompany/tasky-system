@@ -1,7 +1,7 @@
 import type { Ticket } from '@/models';
 import { ticketService } from '@/services/ticketService';
 import { ref, type Ref } from 'vue';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 
 export function useTicketDetailsDueDate(deps: {
   loadedTicket: Ref<Ticket | null>;

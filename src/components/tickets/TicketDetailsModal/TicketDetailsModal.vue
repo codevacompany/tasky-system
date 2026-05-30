@@ -341,6 +341,7 @@
           </div>
         </div>
       </div>
+
     </div>
   </BaseModal>
 
@@ -366,21 +367,21 @@
 </template>
 
 <script setup lang="ts">
-import BaseModal from '../common/BaseModal.vue';
+import BaseModal from '../../common/BaseModal.vue';
 import Button from '@/components/common/Button.vue';
 
-import ConfirmationModal from '../common/ConfirmationModal.vue';
+import ConfirmationModal from '../../common/ConfirmationModal.vue';
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import TicketChecklist from './TicketChecklist.vue';
-import TicketDetailsAssigneesModal from './details/TicketDetailsAssigneesModal.vue';
-import TicketDetailsSidebar from './details/TicketDetailsSidebar.vue';
-import TicketDetailsAttachments from './details/TicketDetailsAttachments.vue';
-import TicketDetailsActivitySection from './details/TicketDetailsActivitySection.vue';
-import TicketDetailsImageViewer from './details/TicketDetailsImageViewer.vue';
-import TicketDetailsDueDateModal from './details/TicketDetailsDueDateModal.vue';
-import TicketDetailsReviewerModal from './details/TicketDetailsReviewerModal.vue';
-import TicketDetailsWorkflowAlerts from './details/TicketDetailsWorkflowAlerts.vue';
+import TicketChecklist from '../TicketChecklist.vue';
+import TicketDetailsAssigneesModal from '../details/TicketDetailsAssigneesModal.vue';
+import TicketDetailsSidebar from '../details/TicketDetailsSidebar.vue';
+import TicketDetailsAttachments from '../details/TicketDetailsAttachments.vue';
+import TicketDetailsActivitySection from '../details/TicketDetailsActivitySection.vue';
+import TicketDetailsImageViewer from '../details/TicketDetailsImageViewer.vue';
+import TicketDetailsDueDateModal from '../details/TicketDetailsDueDateModal.vue';
+import TicketDetailsReviewerModal from '../details/TicketDetailsReviewerModal.vue';
+import TicketDetailsWorkflowAlerts from '../details/TicketDetailsWorkflowAlerts.vue';
 import { useTicketDetailsModal } from '@/composables/ticket-details/useTicketDetailsModal';
 
 const props = defineProps<{

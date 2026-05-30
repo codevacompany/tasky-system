@@ -11,10 +11,16 @@
     </div>
   </div>
   <router-view v-else />
+  <Toaster position="bottom-right" rich-colors :theme="isDarkMode ? 'dark' : 'light'" />
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
+import { Toaster } from 'vue-sonner';
 import { useUserStore } from '@/stores/user';
+import { useUserPreferencesStore } from '@/stores/userPreferences';
 
 const userStore = useUserStore();
+const preferencesStore = useUserPreferencesStore();
+const isDarkMode = computed(() => preferencesStore.isDarkMode);
 </script>

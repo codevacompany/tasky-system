@@ -2,7 +2,7 @@ import { computed } from 'vue';
 import { ticketService } from '@/services/ticketService';
 import { awsService } from '@/services/awsService';
 import axios from 'axios';
-import { toast } from 'vue3-toastify';
+import { toast } from 'vue-sonner';
 import type { TicketFile } from '@/models/ticketFile';
 import type { TicketDetailsContext } from './ticketDetailsContext';
 
