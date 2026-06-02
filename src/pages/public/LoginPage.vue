@@ -50,11 +50,20 @@
                 <Input
                   id="loginPassword"
                   v-model="password"
-                  type="password"
+                  :key="showPassword ? 'text' : 'password'"
+                  :type="showPassword ? 'text' : 'password'"
                   placeholder="Sua senha"
                   required
-                  class="block w-full pl-10 pr-3 sm:py-3 bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm sm:text-base rounded-[4px]"
+                  class="block w-full pl-10 pr-10 sm:py-3 bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm sm:text-base rounded-[4px]"
                 />
+                <button
+                  type="button"
+                  class="absolute inset-y-0 right-0 flex items-center gap-2.5 pl-2.5 pr-3 text-gray-400 hover:text-gray-600 transition-colors"
+                  @click="showPassword = !showPassword"
+                >
+                  <span class="h-4 w-px shrink-0 bg-gray-300" aria-hidden="true" />
+                  <font-awesome-icon :icon="showPassword ? 'eye-slash' : 'eye'" class="h-4 w-4" />
+                </button>
               </div>
             </div>
 
@@ -127,6 +136,7 @@ const email = ref('');
 const password = ref('');
 const rememberMe = ref(true); // Changed from false to true
 const isLoading = ref(false);
+const showPassword = ref(false);
 
 const REMEMBER_ME_KEY = 'tasky_remember_email';
 
