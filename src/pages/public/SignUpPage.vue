@@ -243,6 +243,7 @@ import { onMounted, ref, reactive, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { signupService } from '@/services/signupService';
 import { useFacebookPixel } from '@/composables/useFacebookPixel';
+import { useGoogleAnalyticsSignupPage } from '@/composables/useGoogleAnalytics';
 import { toast } from 'vue-sonner';
 import teamSuccessPhoto from '@/assets/images/team_success_photo.png';
 import { maskCNPJ, maskPhone, maskEmail, validateEmail, validateCNPJ } from '@/utils/form-helpers';
@@ -251,7 +252,8 @@ import Input from '@/components/common/Input.vue';
 import Button from '@/components/common/Button.vue';
 
 const router = useRouter();
-const { track, trackCustom } = useFacebookPixel();
+const { track } = useFacebookPixel();
+const { trackSignUpSuccess } = useGoogleAnalyticsSignupPage();
 const signupCompleted = ref(false);
 
 onMounted(() => {
@@ -322,6 +324,8 @@ async function submitSignUp() {
     };
 
     await signupService.createSignUp(payload);
+    trackSignUpSuccess();
+    track('Lead');
     signupCompleted.value = true;
   } catch (error: unknown) {
     if (error instanceof AxiosError && error.response?.status === 409) {
