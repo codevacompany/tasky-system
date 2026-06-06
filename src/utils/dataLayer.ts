@@ -20,15 +20,11 @@ export function trackPageView(pagePath: string, pageTitle?: string): void {
   });
 }
 
-/** Fires after signup API succeeds — GTM routes to GA4, Meta, etc. */
+/** Fires after signup API succeeds — actual conversion (not CTA intent). */
 export function trackSignUpSuccess(eventLabel = 'Cadastro concluído'): void {
   pushDataLayer({
     event: 'sign_up',
     method: 'formulario',
-    event_label: eventLabel,
-  });
-  pushDataLayer({
-    event: 'generate_lead',
     event_label: eventLabel,
   });
 }
