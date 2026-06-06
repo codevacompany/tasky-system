@@ -11,6 +11,9 @@ import './assets/icons';
 import { localStorageService } from './utils/localStorageService';
 import { vPermission, vAnyPermission, vAllPermissions } from './directives/permission';
 import { vMaska } from 'maska/vue';
+import { initGtm } from './utils/gtm';
+
+initGtm();
 
 // Initialize dark mode at startup
 if (localStorageService.isDarkMode()) {
