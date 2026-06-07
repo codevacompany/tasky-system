@@ -44,3 +44,19 @@ export interface UpdateUserDto {
   isAdmin?: boolean;
   isActive?: boolean;
 }
+
+export interface UserDeactivationPreview {
+  targetUserTicketCount: number;
+  reviewerTicketCount: number;
+  requiresTargetUserSelection: boolean;
+  requiresReviewerSelection: boolean;
+  useTenantAdminsForTargetUser: boolean;
+  departmentSupervisor: User | null;
+  targetUserOptions: User[];
+  reviewerOptions: User[];
+}
+
+export interface DeactivateUserDto {
+  newTargetUserId?: number;
+  newReviewerId?: number;
+}
