@@ -417,10 +417,9 @@ const closeModal = () => {
 const handleLogout = async () => {
   userStore.logout();
   ticketsStore.clear();
-
-  await router.push('/login');
-
   filtersStore.clearAllFilters();
+
+  router.push('/login');
 };
 
 const updateThemePopupPosition = () => {
