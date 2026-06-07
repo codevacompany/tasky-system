@@ -355,6 +355,15 @@
       @cancel="handleCancelAction"
     />
 
+    <DeactivateUserModal
+      v-if="isDeactivateModalOpen && userToDeactivate && deactivationPreview"
+      :user="userToDeactivate"
+      :preview="deactivationPreview"
+      :isSubmitting="isProcessing"
+      @confirm="handleDeactivateWithReassignment"
+      @cancel="closeDeactivateModal"
+    />
+
     <!-- Password Reset Confirmation Modal -->
     <div
       v-if="showPasswordResetModal"
@@ -454,9 +463,10 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue';
 import { userService } from '@/services/userService';
-import type { User } from '@/models';
+import type { User, UserDeactivationPreview } from '@/models';
 import NewUserModal from '@/components/users/NewUserModal.vue';
 import EditUserModal from '@/components/users/EditUserModal.vue';
+import DeactivateUserModal from '@/components/users/DeactivateUserModal.vue';
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue';
 import DataTable from '@/components/common/DataTable.vue';
 import Switch from '@/components/common/Switch.vue';
@@ -498,6 +508,10 @@ const isConfirmationModalOpen = ref(false);
 const confirmationTitle = ref('');
 const confirmationMessage = ref('');
 const pendingAction = ref<{ type: 'deactivate' | 'activate'; user: User } | null>(null);
+
+const isDeactivateModalOpen = ref(false);
+const userToDeactivate = ref<User | null>(null);
+const deactivationPreview = ref<UserDeactivationPreview | null>(null);
 
 // Password Reset Modal State
 const showPasswordResetModal = ref(false);
@@ -682,10 +696,30 @@ const loadUsers = async () => {
 const deactivateUser = async (user: User) => {
   if (isProcessing.value) return;
 
-  confirmationTitle.value = 'Confirmar Desativação';
-  confirmationMessage.value = `Tem certeza que deseja desativar o usuário ${user.firstName} ${user.lastName}?`;
-  pendingAction.value = { type: 'deactivate', user };
-  isConfirmationModalOpen.value = true;
+  isProcessing.value = true;
+
+  try {
+    const { data: preview } = await userService.getDeactivationPreview(user.uuid);
+    const needsReassignment =
+      preview.requiresTargetUserSelection || preview.reviewerTicketCount > 0;
+
+    if (needsReassignment) {
+      userToDeactivate.value = user;
+      deactivationPreview.value = preview;
+      isDeactivateModalOpen.value = true;
+      return;
+    }
+
+    confirmationTitle.value = 'Confirmar Desativação';
+    confirmationMessage.value = `Tem certeza que deseja desativar o usuário ${user.firstName} ${user.lastName}?`;
+    pendingAction.value = { type: 'deactivate', user };
+    isConfirmationModalOpen.value = true;
+  } catch (error: any) {
+    console.error('Erro ao carregar dados de desativação:', error);
+    toast.error(error?.response?.data?.message || 'Erro ao preparar desativação do usuário');
+  } finally {
+    isProcessing.value = false;
+  }
 };
 
 const activateUser = async (user: User) => {
@@ -708,7 +742,7 @@ const handleConfirmAction = async () => {
 
   try {
     if (type === 'deactivate') {
-      await userService.deactivate(user.uuid);
+      await userService.deactivateWithTicketReassignment(user.uuid, {});
       toast.success(`Usuário ${user.firstName} ${user.lastName} foi desativado com sucesso.`);
     } else {
       await userService.activate(user.uuid);
@@ -726,6 +760,35 @@ const handleConfirmAction = async () => {
 const handleCancelAction = () => {
   isConfirmationModalOpen.value = false;
   pendingAction.value = null;
+};
+
+const closeDeactivateModal = () => {
+  isDeactivateModalOpen.value = false;
+  userToDeactivate.value = null;
+  deactivationPreview.value = null;
+};
+
+const handleDeactivateWithReassignment = async (data: {
+  newTargetUserId?: number;
+  newReviewerId?: number;
+}) => {
+  if (!userToDeactivate.value) return;
+
+  isProcessing.value = true;
+
+  try {
+    await userService.deactivateWithTicketReassignment(userToDeactivate.value.uuid, data);
+    toast.success(
+      `Usuário ${userToDeactivate.value.firstName} ${userToDeactivate.value.lastName} foi desativado com sucesso.`,
+    );
+    closeDeactivateModal();
+    await loadUsers();
+  } catch (error: any) {
+    console.error('Erro ao desativar usuário:', error);
+    toast.error(error?.response?.data?.message || 'Erro ao desativar usuário');
+  } finally {
+    isProcessing.value = false;
+  }
 };
 
 const openModal = () => {

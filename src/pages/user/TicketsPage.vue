@@ -1085,7 +1085,7 @@ const clearFilters = () => {
   modalPriorityFilter.value = '';
   modalDepartmentFilter.value = '';
   modalUserFilter.value = '';
-  filtersStore.clearAllFilters();
+  filtersStore.clearAllFilters('current');
   fetchTicketsWithFilters();
   showFiltersModal.value = false;
 };
