@@ -21,6 +21,7 @@ export const ticketService = {
     priority?: TicketPriority;
     departmentUuid?: string;
     targetUserUuid?: string;
+    reviewerUuid?: string;
     page?: number;
     limit?: number;
     sortBy?: string;
@@ -41,7 +42,8 @@ export const ticketService = {
       status?: DefaultTicketStatus;
       priority?: TicketPriority;
       departmentUuid?: string;
-      targetUserId?: number;
+      targetUserUuid?: string;
+      reviewerUuid?: string;
       page?: number;
       limit?: number;
       sortBy?: string;
@@ -61,6 +63,8 @@ export const ticketService = {
       status?: DefaultTicketStatus;
       priority?: TicketPriority;
       departmentUuid?: string;
+      targetUserUuid?: string;
+      reviewerUuid?: string;
       page?: number;
       limit?: number;
       sortBy?: string;
@@ -98,6 +102,8 @@ export const ticketService = {
       status?: DefaultTicketStatus;
       priority?: TicketPriority;
       departmentUuid?: string;
+      targetUserUuid?: string;
+      reviewerUuid?: string;
       page?: number;
       limit?: number;
       sortBy?: string;
