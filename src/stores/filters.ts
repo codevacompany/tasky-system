@@ -148,8 +148,10 @@ export const useFiltersStore = defineStore('filters', {
             urlFilters.departmentUuid = value;
           } else if (key === 'prioridade') {
             urlFilters.priority = value;
-          } else if (key === 'colaborador') {
+          } else if (key === 'colaborador' || key === 'responsavel') {
             urlFilters.targetUserUuid = value;
+          } else if (key === 'revisor') {
+            urlFilters.reviewerUuid = value;
           } else {
             urlFilters[key] = value;
           }
@@ -202,8 +204,10 @@ export const useFiltersStore = defineStore('filters', {
             urlFilters.departmentUuid = value;
           } else if (key === 'prioridade') {
             urlFilters.priority = value;
-          } else if (key === 'colaborador') {
+          } else if (key === 'colaborador' || key === 'responsavel') {
             urlFilters.targetUserUuid = value;
+          } else if (key === 'revisor') {
+            urlFilters.reviewerUuid = value;
           } else {
             urlFilters[key] = value;
           }
@@ -422,7 +426,9 @@ export const useFiltersStore = defineStore('filters', {
           } else if (key === 'priority') {
             urlKey = 'prioridade';
           } else if (key === 'targetUserUuid') {
-            urlKey = 'colaborador';
+            urlKey = 'responsavel';
+          } else if (key === 'reviewerUuid') {
+            urlKey = 'revisor';
           }
           searchParams.set(urlKey, String(filtersToUse[key]));
         }

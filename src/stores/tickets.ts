@@ -16,6 +16,7 @@ export type TicketListFilters = {
   name?: string;
   departmentUuid?: string | null;
   targetUserUuid?: string | null;
+  reviewerUuid?: string | null;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 };
@@ -268,6 +269,12 @@ export const useTicketsStore = defineStore('tickets', () => {
         if (currentFilters.departmentUuid !== undefined && currentFilters.departmentUuid !== null) {
           params.departmentUuid = currentFilters.departmentUuid;
         }
+        if (currentFilters.targetUserUuid !== undefined && currentFilters.targetUserUuid !== null) {
+          params.targetUserUuid = currentFilters.targetUserUuid;
+        }
+        if (currentFilters.reviewerUuid !== undefined && currentFilters.reviewerUuid !== null) {
+          params.reviewerUuid = currentFilters.reviewerUuid;
+        }
         if (currentFilters.sortBy) {
           params.sortBy = currentFilters.sortBy;
         }
@@ -353,6 +360,12 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         if (currentFilters.departmentUuid !== undefined && currentFilters.departmentUuid !== null) {
           params.departmentUuid = currentFilters.departmentUuid;
+        }
+        if (currentFilters.targetUserUuid !== undefined && currentFilters.targetUserUuid !== null) {
+          params.targetUserUuid = currentFilters.targetUserUuid;
+        }
+        if (currentFilters.reviewerUuid !== undefined && currentFilters.reviewerUuid !== null) {
+          params.reviewerUuid = currentFilters.reviewerUuid;
         }
         if (currentFilters.sortBy) {
           params.sortBy = currentFilters.sortBy;
@@ -453,6 +466,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         if (currentFilters.targetUserUuid !== undefined && currentFilters.targetUserUuid !== null) {
           params.targetUserUuid = currentFilters.targetUserUuid;
+        }
+        if (currentFilters.reviewerUuid !== undefined && currentFilters.reviewerUuid !== null) {
+          params.reviewerUuid = currentFilters.reviewerUuid;
         }
         if (currentFilters.sortBy) {
           params.sortBy = currentFilters.sortBy;
@@ -591,6 +607,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         if (currentFilters.targetUserUuid !== undefined && currentFilters.targetUserUuid !== null) {
           params.targetUserUuid = currentFilters.targetUserUuid;
         }
+        if (currentFilters.reviewerUuid !== undefined && currentFilters.reviewerUuid !== null) {
+          params.reviewerUuid = currentFilters.reviewerUuid;
+        }
         if (currentFilters.sortBy) {
           params.sortBy = currentFilters.sortBy;
         }
@@ -645,10 +664,37 @@ export const useTicketsStore = defineStore('tickets', () => {
     };
 
     const isMeRequester = updatedTicket.requester?.id === currentUserId;
-    const isMeTarget = updatedTicket.targetUsers?.some((tu) => tu.userId === currentUserId);
 
     const viewPreference = localStorageService.getTicketsViewPreference();
     const isKanbanView = viewPreference === 'kanban';
+
+    const belongsInReceived = (ticket: Ticket): boolean => {
+      if (!currentUserId) return false;
+
+      const isTarget =
+        ticket.currentTargetUserId === currentUserId ||
+        ticket.targetUsers?.some((tu) => tu.userId === currentUserId);
+      const isReviewerNotRequester =
+        ticket.reviewer?.id === currentUserId && ticket.requester?.id !== currentUserId;
+
+      return Boolean(isTarget || isReviewerNotRequester);
+    };
+
+    const addTicketToReceived = () => {
+      hasNewReceivedTickets.value = true;
+
+      if (!previousReceivedTicketIds.value.includes(updatedTicket.customId)) {
+        previousReceivedTicketIds.value.unshift(updatedTicket.customId);
+      }
+
+      if (receivedTickets.value.currentPage === 1) {
+        receivedTickets.value.data.unshift(updatedTicket);
+        if (!isKanbanView && receivedTickets.value.data.length > 10) {
+          receivedTickets.value.data.pop();
+        }
+      }
+      receivedTickets.value.totalCount++;
+    };
 
     const isAwaitingVerification =
       updatedTicket.status === DefaultTicketStatus.AwaitingVerification ||
@@ -700,23 +746,22 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
 
     // Received Tickets
-    if (!findAndReplace(receivedTickets.value)) {
-      if (isMeTarget) {
-        hasNewReceivedTickets.value = true;
-
-        // Update previousReceivedTicketIds to avoid double notification on next poll
-        if (!previousReceivedTicketIds.value.includes(updatedTicket.customId)) {
-          previousReceivedTicketIds.value.unshift(updatedTicket.customId);
-        }
-
-        if (receivedTickets.value.currentPage === 1) {
-          receivedTickets.value.data.unshift(updatedTicket);
-          if (!isKanbanView && receivedTickets.value.data.length > 10) {
-            receivedTickets.value.data.pop();
-          }
-        }
-        receivedTickets.value.totalCount++;
+    const wasUpdatedInReceived = findAndReplace(receivedTickets.value);
+    if (wasUpdatedInReceived) {
+      const mergedTicket = receivedTickets.value.data.find(
+        (t) => t.customId === updatedTicket.customId,
+      );
+      if (mergedTicket && !belongsInReceived(mergedTicket)) {
+        receivedTickets.value.data = receivedTickets.value.data.filter(
+          (t) => t.customId !== updatedTicket.customId,
+        );
+        receivedTickets.value.totalCount = Math.max(0, receivedTickets.value.totalCount - 1);
+        previousReceivedTicketIds.value = previousReceivedTicketIds.value.filter(
+          (id) => id !== updatedTicket.customId,
+        );
       }
+    } else if (belongsInReceived(updatedTicket)) {
+      addTicketToReceived();
     }
 
     // Recent Received Tickets
@@ -724,11 +769,16 @@ export const useTicketsStore = defineStore('tickets', () => {
       (t) => t.customId === updatedTicket.customId,
     );
     if (recentReceivedIndex !== -1) {
-      recentReceivedTickets.value[recentReceivedIndex] = {
+      const mergedRecentTicket = {
         ...recentReceivedTickets.value[recentReceivedIndex],
         ...updatedTicket,
       };
-    } else if (isMeTarget) {
+      if (belongsInReceived(mergedRecentTicket)) {
+        recentReceivedTickets.value[recentReceivedIndex] = mergedRecentTicket;
+      } else {
+        recentReceivedTickets.value.splice(recentReceivedIndex, 1);
+      }
+    } else if (belongsInReceived(updatedTicket)) {
       recentReceivedTickets.value.unshift(updatedTicket);
       if (recentReceivedTickets.value.length > 5) {
         recentReceivedTickets.value.pop();

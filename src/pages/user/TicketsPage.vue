@@ -327,10 +327,20 @@
           </div>
           <div v-if="activeTab === 'setor' || activeTab === 'gerais'">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >Colaborador:</label
+              >Responsável:</label
             >
             <Select
               v-model="modalUserFilter"
+              :options="userOptions"
+              dropdown-max-height="max-h-[25vh]"
+            />
+          </div>
+          <div v-if="activeTab === 'setor' || activeTab === 'gerais'">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >Revisor:</label
+            >
+            <Select
+              v-model="modalReviewerFilter"
               :options="userOptions"
               dropdown-max-height="max-h-[25vh]"
             />
@@ -472,6 +482,7 @@ const modalStatusFilter = ref<string>('');
 const modalPriorityFilter = ref<string>('');
 const modalDepartmentFilter = ref<string>('');
 const modalUserFilter = ref<string>('');
+const modalReviewerFilter = ref<string>('');
 
 const statusFilter = computed({
   get: () => (filtersStore.currentFilters.status as string) || '',
@@ -533,8 +544,13 @@ onMounted(async () => {
   if (route.query.setor) {
     urlFilters.departmentUuid = route.query.setor as string;
   }
-  if (route.query.colaborador) {
+  if (route.query.responsavel) {
+    urlFilters.targetUserUuid = route.query.responsavel as string;
+  } else if (route.query.colaborador) {
     urlFilters.targetUserUuid = route.query.colaborador as string;
+  }
+  if (route.query.revisor) {
+    urlFilters.reviewerUuid = route.query.revisor as string;
   }
   if (route.query.page) {
     urlFilters.page = parseInt(route.query.page as string, 10);
@@ -717,6 +733,8 @@ const activeFiltersCount = computed(() => {
   if (activeTab.value === 'setor' || activeTab.value === 'gerais') {
     const userFilter = filtersStore.currentFilters.targetUserUuid;
     if (userFilter && userFilter !== '' && userFilter !== null) count++;
+    const reviewerFilter = filtersStore.currentFilters.reviewerUuid;
+    if (reviewerFilter && reviewerFilter !== '' && reviewerFilter !== null) count++;
   }
   return count;
 });
@@ -748,7 +766,13 @@ const syncUrlWithFilters = () => {
     (activeTab.value === 'setor' || activeTab.value === 'gerais') &&
     currentFilters.targetUserUuid
   ) {
-    query.colaborador = String(currentFilters.targetUserUuid);
+    query.responsavel = String(currentFilters.targetUserUuid);
+  }
+  if (
+    (activeTab.value === 'setor' || activeTab.value === 'gerais') &&
+    currentFilters.reviewerUuid
+  ) {
+    query.revisor = String(currentFilters.reviewerUuid);
   }
   const pageNum =
     typeof currentFilters.page === 'number'
@@ -878,6 +902,7 @@ const fetchTicketsWithFilters = async () => {
     name?: string;
     departmentUuid?: string | null;
     targetUserUuid?: string | null;
+    reviewerUuid?: string | null;
   } = {};
 
   if (currentFilters.priority && String(currentFilters.priority).trim() !== '') {
@@ -903,6 +928,10 @@ const fetchTicketsWithFilters = async () => {
 
   if ((storeType === 'department' || storeType === 'tenant') && currentFilters.targetUserUuid) {
     filters.targetUserUuid = String(currentFilters.targetUserUuid);
+  }
+
+  if ((storeType === 'department' || storeType === 'tenant') && currentFilters.reviewerUuid) {
+    filters.reviewerUuid = String(currentFilters.reviewerUuid);
   }
 
   await ticketsStore.setCurrentPage(storeType, currentPage.value, filters);
@@ -1085,6 +1114,7 @@ const clearFilters = () => {
   modalPriorityFilter.value = '';
   modalDepartmentFilter.value = '';
   modalUserFilter.value = '';
+  modalReviewerFilter.value = '';
   filtersStore.clearAllFilters('current');
   fetchTicketsWithFilters();
   showFiltersModal.value = false;
@@ -1100,6 +1130,7 @@ const applyFilters = () => {
   }
   if (activeTab.value === 'setor' || activeTab.value === 'gerais') {
     filtersToApply.targetUserUuid = modalUserFilter.value || undefined;
+    filtersToApply.reviewerUuid = modalReviewerFilter.value || undefined;
   }
   filtersStore.applyFilters(filtersToApply);
   syncUrlWithFilters();
@@ -1115,15 +1146,19 @@ watch(showFiltersModal, async (isOpen) => {
       modalDepartmentFilter.value = (filtersStore.currentFilters.departmentUuid as string) || '';
       if (activeTab.value === 'gerais') {
         modalUserFilter.value = (filtersStore.currentFilters.targetUserUuid as string) || '';
+        modalReviewerFilter.value = (filtersStore.currentFilters.reviewerUuid as string) || '';
       } else {
         modalUserFilter.value = '';
+        modalReviewerFilter.value = '';
       }
     } else {
       modalDepartmentFilter.value = '';
       if (activeTab.value === 'setor') {
         modalUserFilter.value = (filtersStore.currentFilters.targetUserUuid as string) || '';
+        modalReviewerFilter.value = (filtersStore.currentFilters.reviewerUuid as string) || '';
       } else {
         modalUserFilter.value = '';
+        modalReviewerFilter.value = '';
       }
     }
 
