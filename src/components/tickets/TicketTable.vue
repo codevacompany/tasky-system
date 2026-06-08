@@ -247,16 +247,27 @@
         <div class="flex gap-0.5 md:gap-1 justify-center">
           <template v-if="tableType === 'recebidas' || tableType === 'gerais'">
             <button
-              v-if="getTicketStatus(item) === DefaultTicketStatus.Pending"
+              v-if="
+                getTicketStatus(item) === DefaultTicketStatus.Pending && isCurrentTargetUser(item)
+              "
               class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors duration-200"
               @click.stop="handleAcceptTicket(item)"
               title="Aceitar"
             >
               <font-awesome-icon icon="check" class="text-xs md:text-sm" />
             </button>
+            <div
+              v-else-if="getTicketStatus(item) === DefaultTicketStatus.Pending"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-orange-500 text-white"
+              title="Não Iniciado"
+            >
+              <font-awesome-icon icon="clock" class="text-xs md:text-sm" />
+            </div>
             <Button
               v-else-if="
-                getTicketStatus(item) === DefaultTicketStatus.InProgress && !isLastTargetUser(item)
+                getTicketStatus(item) === DefaultTicketStatus.InProgress &&
+                isCurrentTargetUser(item) &&
+                !isLastTargetUser(item)
               "
               variant="secondary"
               type="button"
@@ -272,7 +283,9 @@
             </Button>
             <button
               v-else-if="
-                getTicketStatus(item) === DefaultTicketStatus.InProgress && isLastTargetUser(item)
+                getTicketStatus(item) === DefaultTicketStatus.InProgress &&
+                isCurrentTargetUser(item) &&
+                isLastTargetUser(item)
               "
               class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-purple-700 hover:bg-purple-800 text-white transition-colors duração-200"
               @click.stop="handleVerifyTicket(item)"
@@ -280,6 +293,13 @@
             >
               <font-awesome-icon icon="arrow-right" class="text-xs md:text-sm" />
             </button>
+            <div
+              v-else-if="getTicketStatus(item) === DefaultTicketStatus.InProgress"
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-blue-600 text-white"
+              title="Fazendo"
+            >
+              <font-awesome-icon icon="cog" class="text-xs md:text-sm" />
+            </div>
             <button
               v-else-if="
                 getTicketStatus(item) === DefaultTicketStatus.Returned &&
@@ -1055,6 +1075,10 @@ const handleCancel = () => {
 };
 
 const handleAcceptTicket = async (ticket: Ticket) => {
+  if (!isCurrentTargetUser(ticket)) {
+    return;
+  }
+
   if (!ticket.dueAt) {
     ticketForDueDate.value = ticket;
     showDueDateModal.value = true;
@@ -1286,6 +1310,9 @@ const handleCorrectTicket = async (ticket: Ticket) => {
 
 const isReviewer = (ticket: Ticket) => userStore.user?.id === ticket.reviewer?.id;
 
+const isCurrentTargetUser = (ticket: Ticket) =>
+  Boolean(userStore.user?.id && ticket.currentTargetUserId === userStore.user.id);
+
 const isReviewerOnly = (ticket: Ticket) => {
   // Only show badge in "recebidas" tab
   if (props.tableType !== 'recebidas') return false;
@@ -1434,9 +1461,8 @@ const getRowClassName = (ticket: Ticket) => {
   let shouldBeGrayscale = false;
 
   if (props.tableType === 'recebidas') {
-    const isCurrentTargetUser = userStore.user?.id === ticket.currentTargetUserId;
     shouldBeGrayscale =
-      !isCurrentTargetUser &&
+      !isCurrentTargetUser(ticket) &&
       (status === DefaultTicketStatus.Pending ||
         status === DefaultTicketStatus.InProgress ||
         status === DefaultTicketStatus.Returned);

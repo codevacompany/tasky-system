@@ -148,8 +148,10 @@ export const useFiltersStore = defineStore('filters', {
             urlFilters.departmentUuid = value;
           } else if (key === 'prioridade') {
             urlFilters.priority = value;
-          } else if (key === 'colaborador') {
+          } else if (key === 'colaborador' || key === 'responsavel') {
             urlFilters.targetUserUuid = value;
+          } else if (key === 'revisor') {
+            urlFilters.reviewerUuid = value;
           } else {
             urlFilters[key] = value;
           }
@@ -202,8 +204,10 @@ export const useFiltersStore = defineStore('filters', {
             urlFilters.departmentUuid = value;
           } else if (key === 'prioridade') {
             urlFilters.priority = value;
-          } else if (key === 'colaborador') {
+          } else if (key === 'colaborador' || key === 'responsavel') {
             urlFilters.targetUserUuid = value;
+          } else if (key === 'revisor') {
+            urlFilters.reviewerUuid = value;
           } else {
             urlFilters[key] = value;
           }
@@ -284,18 +288,51 @@ export const useFiltersStore = defineStore('filters', {
       }
     },
 
-    clearAllFilters() {
+    clearAllFilters(scope: 'all' | 'current' = 'all') {
+      if (scope === 'all') {
+        if (this._searchTimeout) {
+          clearTimeout(this._searchTimeout);
+          this._searchTimeout = null;
+        }
+        this._currentSearchValue = '';
+
+        Object.values(this.contexts).forEach((context) => {
+          if (context._searchTimeout) {
+            clearTimeout(context._searchTimeout);
+            context._searchTimeout = null;
+          }
+          context._currentSearchValue = '';
+        });
+
+        this.contexts = {};
+        this.filters = {};
+        this.currentContext = null;
+        this.routeName = '';
+        return;
+      }
+
       const targetFilters =
         this.currentContext && this.contexts[this.currentContext]
           ? this.contexts[this.currentContext].filters
           : this.filters;
 
       const { page } = targetFilters;
-      const clearedFilters = { page };
+      const clearedFilters = { page: page || 1 };
 
       if (this.currentContext && this.contexts[this.currentContext]) {
-        this.contexts[this.currentContext].filters = clearedFilters;
+        const context = this.contexts[this.currentContext];
+        if (context._searchTimeout) {
+          clearTimeout(context._searchTimeout);
+          context._searchTimeout = null;
+        }
+        context._currentSearchValue = '';
+        context.filters = clearedFilters;
       } else {
+        if (this._searchTimeout) {
+          clearTimeout(this._searchTimeout);
+          this._searchTimeout = null;
+        }
+        this._currentSearchValue = '';
         this.filters = clearedFilters;
       }
     },
@@ -389,7 +426,9 @@ export const useFiltersStore = defineStore('filters', {
           } else if (key === 'priority') {
             urlKey = 'prioridade';
           } else if (key === 'targetUserUuid') {
-            urlKey = 'colaborador';
+            urlKey = 'responsavel';
+          } else if (key === 'reviewerUuid') {
+            urlKey = 'revisor';
           }
           searchParams.set(urlKey, String(filtersToUse[key]));
         }

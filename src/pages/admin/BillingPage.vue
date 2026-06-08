@@ -164,7 +164,7 @@
             </svg>
             <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
               <span class="text-2xl font-bold text-txt-primary dark:text-white">
-                {{ currentSubscription.userStats.totalUsers }}
+                {{ currentSubscription.userStats.activeUsers }}
               </span>
               <span class="text-xs text-gray-600 dark:text-gray-400">
                 /{{ currentSubscription.subscription.maxUsers }}
@@ -533,13 +533,13 @@ const formatDate = (date: Date) => {
 
 const getUsagePercentage = () => {
   if (
-    !currentSubscription.value?.userStats?.totalUsers ||
+    !currentSubscription.value?.userStats?.activeUsers ||
     !currentSubscription.value?.subscription?.maxUsers
   ) {
     return 0;
   }
   const percentage =
-    (currentSubscription.value.userStats.totalUsers /
+    (currentSubscription.value.userStats.activeUsers /
       currentSubscription.value.subscription.maxUsers) *
     100;
   return Math.min(percentage, 100); // Ensure it doesn't exceed 100%
@@ -652,7 +652,7 @@ const isPlanInsufficientForCurrentUsers = (plan: SubscriptionPlan) => {
     return false;
   }
 
-  const currentUsers = currentSubscription.value?.userStats?.totalUsers || 0;
+  const currentUsers = currentSubscription.value?.userStats?.activeUsers || 0;
   return currentUsers > plan.maxUsers;
 };
 
@@ -667,7 +667,7 @@ const handleSubscription = async (slug: string) => {
 
   if (isPlanInsufficientForCurrentUsers(plan)) {
     toast.error(
-      `Este plano suporta apenas ${plan.maxUsers} usuários. Você possui ${currentSubscription.value?.userStats?.totalUsers} usuários ativos.`,
+      `Este plano suporta apenas ${plan.maxUsers} usuários. Você possui ${currentSubscription.value?.userStats?.activeUsers} usuários ativos.`,
     );
     return;
   }

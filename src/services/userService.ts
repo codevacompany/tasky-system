@@ -1,4 +1,4 @@
-import type { User, CreateUserDto, UpdateUserDto } from '@/models';
+import type { User, CreateUserDto, UpdateUserDto, UserDeactivationPreview, DeactivateUserDto } from '@/models';
 import type { PaginatedResponse } from '@/types/http';
 import apiClient from '@/utils/axiosInstance';
 import type { AxiosResponse } from 'axios';
@@ -46,6 +46,17 @@ export const userService = {
 
   async deactivate(uuid: string): Promise<AxiosResponse<User>> {
     return apiClient.patch<User>(`/users/${uuid}`, { isActive: false });
+  },
+
+  async getDeactivationPreview(uuid: string): Promise<AxiosResponse<UserDeactivationPreview>> {
+    return apiClient.get<UserDeactivationPreview>(`/users/${uuid}/deactivation-preview`);
+  },
+
+  async deactivateWithTicketReassignment(
+    uuid: string,
+    data: DeactivateUserDto,
+  ): Promise<AxiosResponse<User>> {
+    return apiClient.post<User>(`/users/${uuid}/deactivate`, data);
   },
 
   async activate(uuid: string): Promise<AxiosResponse<User>> {
