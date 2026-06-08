@@ -53,8 +53,8 @@
                 @click="closeModal"
                 class="flex items-center gap-3 px-6 py-3.5 text-txt-primary hover:text-txt-primary dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
-                  <font-awesome-icon icon="user" />
+                <div class="w-5 flex justify-center text-gray-600 dark:text-gray-400">
+                  <UserIcon class="w-5 h-5" aria-hidden="true" />
                 </div>
                 <span class="flex-1 text-sm text font-medium">Perfil</span>
               </router-link>
@@ -64,8 +64,8 @@
                 @click="closeModal"
                 class="flex items-center gap-3 px-6 py-3.5 text-txt-primary hover:text-txt-primary dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
-                  <font-awesome-icon icon="sliders" />
+                <div class="w-5 flex justify-center text-gray-600 dark:text-gray-400">
+                  <AdjustmentsHorizontalIcon class="w-5 h-5" aria-hidden="true" />
                 </div>
                 <span class="flex-1 text-sm text font-medium">Preferências</span>
               </router-link>
@@ -75,8 +75,8 @@
                 @click="closeModal"
                 class="flex items-center gap-3 px-6 py-3.5 text-txt-primary hover:text-txt-primary dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
-                  <font-awesome-icon icon="question-circle" />
+                <div class="w-5 flex justify-center text-gray-600 dark:text-gray-400">
+                  <QuestionMarkCircleIcon class="w-5 h-5" aria-hidden="true" />
                 </div>
                 <span class="flex-1 text-sm text font-medium">Ajuda</span>
               </router-link>
@@ -87,8 +87,8 @@
                 @click="closeModal"
                 class="flex items-center gap-3 px-6 py-3.5 text-txt-primary hover:text-txt-primary dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
-                  <font-awesome-icon icon="cog" />
+                <div class="w-5 flex justify-center text-gray-600 dark:text-gray-400">
+                  <Cog6ToothIcon class="w-5 h-5" aria-hidden="true" />
                 </div>
                 <span class="flex-1 text-sm text font-medium">Configurações da empresa</span>
               </router-link>
@@ -101,13 +101,14 @@
                 }"
                 @click="toggleThemeModal"
               >
-                <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
-                  <font-awesome-icon :icon="userPreferencesStore.isDarkMode ? 'moon' : 'sun'" />
+                <div class="w-5 flex justify-center text-gray-600 dark:text-gray-400">
+                  <MoonIcon v-if="userPreferencesStore.isDarkMode" class="w-5 h-5" aria-hidden="true" />
+                  <SunIcon v-else class="w-5 h-5" aria-hidden="true" />
                 </div>
                 <span class="flex-1 text-sm font-medium">Tema</span>
-                <font-awesome-icon
-                  icon="chevron-right"
-                  class="text-xs text-gray-600 dark:text-gray-400 opacity-50"
+                <ChevronRightIcon
+                  class="w-4 h-4 text-gray-600 dark:text-gray-400 opacity-50"
+                  aria-hidden="true"
                 />
               </div>
 
@@ -115,8 +116,8 @@
                 class="flex items-center gap-3 px-6 py-3.5 text-txt-primary dark:text-white cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
                 @click="openChangePasswordModal"
               >
-                <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
-                  <font-awesome-icon icon="key" />
+                <div class="w-5 flex justify-center text-gray-600 dark:text-gray-400">
+                  <KeyIcon class="w-5 h-5" aria-hidden="true" />
                 </div>
                 <span class="flex-1 text-sm font-medium">Alterar senha</span>
               </div>
@@ -125,8 +126,8 @@
                 class="flex items-center gap-3 px-6 py-3.5 text-red-600 cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-red-50 dark:hover:bg-red-900/10"
                 @click="handleLogout"
               >
-                <div class="w-5 flex justify-center text-base text-red-600">
-                  <font-awesome-icon icon="sign-out-alt" />
+                <div class="w-5 flex justify-center text-red-600">
+                  <ArrowRightOnRectangleIcon class="w-5 h-5" aria-hidden="true" />
                 </div>
                 <span class="flex-1 text-sm font-medium">Fazer Logout</span>
               </div>
@@ -148,92 +149,7 @@
       :style="themePopupStyle"
       @click.stop
     >
-      <div class="p-2 flex flex-col gap-1">
-        <div
-          class="flex items-center gap-3 px-3 py-3 rounded-md cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-          :class="{
-            'bg-blue-50 dark:bg-blue-900/10': !userPreferencesStore.isDarkMode,
-          }"
-          @click="setTheme('light')"
-        >
-          <div class="relative flex items-center justify-center">
-            <div
-              class="w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all duration-200"
-              :class="
-                !userPreferencesStore.isDarkMode
-                  ? 'border-blue-500 dark:border-blue-400'
-                  : 'border-gray-300 dark:border-gray-600'
-              "
-            >
-              <div
-                v-if="!userPreferencesStore.isDarkMode"
-                class="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400"
-              ></div>
-            </div>
-          </div>
-          <div
-            class="w-[50px] h-8 rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 flex-shrink-0 bg-white"
-          >
-            <div class="h-2.5 bg-gray-100 border-b border-gray-200"></div>
-            <div class="h-[22px] bg-white"></div>
-          </div>
-          <div class="flex-1 flex flex-col">
-            <span
-              class="text-sm font-medium"
-              :class="
-                !userPreferencesStore.isDarkMode
-                  ? 'text-blue-600 dark:text-blue-400'
-                  : 'text-txt-primary dark:text-white'
-              "
-              >Claro</span
-            >
-            <p class="m-0 text-xs text-gray-600 dark:text-gray-400">Tema padrão com fundo branco</p>
-          </div>
-        </div>
-        <div
-          class="flex items-center gap-3 px-3 py-3 rounded-md cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700"
-          :class="{
-            'bg-blue-50 dark:bg-blue-900/10': userPreferencesStore.isDarkMode,
-          }"
-          @click="setTheme('dark')"
-        >
-          <div class="relative flex items-center justify-center">
-            <div
-              class="w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all duration-200"
-              :class="
-                userPreferencesStore.isDarkMode
-                  ? 'border-blue-500 dark:border-blue-400'
-                  : 'border-gray-300 dark:border-gray-600'
-              "
-            >
-              <div
-                v-if="userPreferencesStore.isDarkMode"
-                class="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400"
-              ></div>
-            </div>
-          </div>
-          <div
-            class="w-[50px] h-8 rounded-md overflow-hidden border border-gray-200 dark:border-gray-700 flex-shrink-0 bg-gray-800"
-          >
-            <div class="h-2.5 bg-gray-700 border-b border-gray-600"></div>
-            <div class="h-[22px] bg-gray-800"></div>
-          </div>
-          <div class="flex-1 flex flex-col">
-            <span
-              class="text-sm font-medium"
-              :class="
-                userPreferencesStore.isDarkMode
-                  ? 'text-blue-600 dark:text-blue-400'
-                  : 'text-txt-primary dark:text-white'
-              "
-              >Escuro</span
-            >
-            <p class="m-0 text-xs text-gray-600 dark:text-gray-400">
-              Tema escuro para reduzir o cansaço visual
-            </p>
-          </div>
-        </div>
-      </div>
+      <ThemeSelector @selected="closeThemeModal" />
     </div>
 
     <BaseModal
@@ -384,6 +300,18 @@ import BaseModal from '@/components/common/BaseModal.vue';
 import { useRoles } from '@/composables';
 import { getAvatarStyle } from '@/utils/generic-helper';
 import Input from '@/components/common/Input.vue';
+import ThemeSelector from '@/components/user/ThemeSelector.vue';
+import {
+  AdjustmentsHorizontalIcon,
+  ArrowRightOnRectangleIcon,
+  ChevronRightIcon,
+  Cog6ToothIcon,
+  KeyIcon,
+  MoonIcon,
+  QuestionMarkCircleIcon,
+  SunIcon,
+  UserIcon,
+} from '@heroicons/vue/24/solid';
 import { useTicketsStore } from '@/stores/tickets';
 import { useFiltersStore } from '@/stores/filters';
 
@@ -492,11 +420,6 @@ const toggleThemeModal = () => {
 
 const closeThemeModal = () => {
   showThemeModal.value = false;
-};
-
-const setTheme = (theme: 'light' | 'dark') => {
-  userPreferencesStore.setTheme(theme);
-  closeThemeModal();
 };
 
 const handleResize = () => {

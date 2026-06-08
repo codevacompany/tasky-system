@@ -23,14 +23,23 @@
               "
             >
               <div
-                class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors text-inherit"
+                class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
                 :class="
                   isActive(item.path)
                     ? 'bg-primary-100 dark:bg-primary-900/30'
-                    : 'bg-gray-100 dark:bg-gray-700/40 group-hover:bg-gray-200 dark:group-hover:bg-gray-700/60'
+                    : 'bg-gray-50 dark:bg-gray-700/30 group-hover:bg-gray-100 dark:group-hover:bg-gray-700/50'
                 "
               >
-                <font-awesome-icon :icon="item.icon" class="text-inherit" />
+                <component
+                  :is="item.icon"
+                  class="w-5 h-5 transition-colors"
+                  :class="
+                    isActive(item.path)
+                      ? 'text-primary dark:text-primary-light'
+                      : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400'
+                  "
+                  aria-hidden="true"
+                />
               </div>
               <span>{{ item.label }}</span>
             </router-link>
@@ -52,15 +61,22 @@
 </template>
 
 <script setup lang="ts">
+import type { Component } from 'vue';
 import { useRoute } from 'vue-router';
+import { BellIcon, SwatchIcon } from '@heroicons/vue/24/solid';
 
 const route = useRoute();
 
-const menuItems = [
+const menuItems: { label: string; path: string; icon: Component }[] = [
   {
     label: 'Notificações',
     path: '/preferencias/notificacoes',
-    icon: 'bell',
+    icon: BellIcon,
+  },
+  {
+    label: 'Tema',
+    path: '/preferencias/tema',
+    icon: SwatchIcon,
   },
 ];
 

@@ -72,6 +72,10 @@ const routes: RouteRecordRaw[] = [
             path: 'notificacoes',
             component: () => import('@/pages/user/NotificationPreferencesPage.vue'),
           },
+          {
+            path: 'tema',
+            component: () => import('@/pages/user/ThemePreferencesPage.vue'),
+          },
         ],
       },
       { path: 'faq', component: () => import('@/pages/user/FAQ.vue') },
