@@ -63,6 +63,17 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/user/ArchivedTicketsPage.vue'),
       },
       { path: 'perfil', component: () => import('@/pages/user/ProfilePage.vue') },
+      {
+        path: 'preferencias',
+        component: () => import('@/pages/user/UserPreferences.vue'),
+        children: [
+          { path: '', redirect: '/preferencias/notificacoes' },
+          {
+            path: 'notificacoes',
+            component: () => import('@/pages/user/NotificationPreferencesPage.vue'),
+          },
+        ],
+      },
       { path: 'faq', component: () => import('@/pages/user/FAQ.vue') },
       { path: 'sync', component: SyncPage },
     ],

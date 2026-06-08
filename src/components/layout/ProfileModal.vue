@@ -8,7 +8,7 @@
     >
       <div class="w-full">
         <div
-          class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-between items-center"
+          class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-between items-center"
         >
           <h2
             class="m-0 text-lg font-semibold text-txt-primary dark:text-white flex items-center gap-2"
@@ -23,7 +23,7 @@
           </button>
         </div>
         <div class="p-0">
-          <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center gap-4">
               <div
                 class="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-semibold flex-shrink-0"
@@ -60,6 +60,17 @@
               </router-link>
 
               <router-link
+                to="/preferencias"
+                @click="closeModal"
+                class="flex items-center gap-3 px-6 py-3.5 text-txt-primary hover:text-txt-primary dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
+                  <font-awesome-icon icon="sliders" />
+                </div>
+                <span class="flex-1 text-sm text font-medium">Preferências</span>
+              </router-link>
+
+              <router-link
                 to="/faq"
                 @click="closeModal"
                 class="flex items-center gap-3 px-6 py-3.5 text-txt-primary hover:text-txt-primary dark:text-white no-underline cursor-pointer transition-all duration-200 border-none bg-none w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -79,7 +90,7 @@
                 <div class="w-5 flex justify-center text-base text-gray-600 dark:text-gray-400">
                   <font-awesome-icon icon="cog" />
                 </div>
-                <span class="flex-1 text-sm text font-medium">Configurações</span>
+                <span class="flex-1 text-sm text font-medium">Configurações da empresa</span>
               </router-link>
 
               <div
