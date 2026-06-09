@@ -2,7 +2,8 @@
   <Teleport to="body">
     <div class="fixed inset-0 bg-transparent z-[999] pointer-events-auto" @click="closeModal"></div>
     <div
-      class="fixed top-[var(--header-height)] right-4 w-[310px] bg-white dark:bg-gray-800 rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.1)] z-[1000] overflow-hidden transition-all duration-300 pointer-events-auto border border-gray-200 dark:border-gray-700"
+      class="fixed top-[var(--header-height)] right-4 w-[310px] bg-white dark:bg-gray-800 shadow-[0_8px_32px_rgba(0,0,0,0.1)] z-[1000] overflow-hidden transition-all duration-300 pointer-events-auto border border-gray-200 dark:border-gray-700"
+      data-app-modal
       id="profileModal"
       @click.stop
     >
@@ -145,7 +146,8 @@
     <div
       v-if="showThemeModal && temaButtonRef"
       ref="themePopupRef"
-      class="fixed bg-white dark:bg-gray-800 rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.15)] z-[1001] overflow-hidden border border-gray-200 dark:border-gray-700 min-w-[280px]"
+      class="fixed bg-white dark:bg-gray-800 shadow-[0_8px_32px_rgba(0,0,0,0.15)] z-[1001] overflow-hidden border border-gray-200 dark:border-gray-700 min-w-[280px]"
+      data-app-modal
       :style="themePopupStyle"
       @click.stop
     >

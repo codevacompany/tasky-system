@@ -67,6 +67,9 @@
 
   /* Border radius */
   --radius: 0.5rem;
+  --control-radius: 8px;
+  --button-radius: var(--control-radius);
+  --modal-radius: var(--control-radius);
   --radius-sm: 0.25rem;
   --radius-lg: 0.75rem;
 
@@ -582,7 +585,7 @@ body.dark-mode .section-content h1 {
   background-color: var(--primary);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--control-radius);
   cursor: pointer;
   transition: background-color 0.2s;
 }
@@ -743,7 +746,7 @@ body.dark-mode .section-content h1 {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 4px;
+  border-radius: var(--control-radius);
   background: transparent;
   border: none;
   color: var(--text-medium);
@@ -1128,7 +1131,7 @@ body.dark-mode .section-header h1 {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  border-radius: 4px;
+  border-radius: var(--control-radius);
   font-weight: 500;
   transition: all 0.2s ease;
 }
@@ -1146,7 +1149,7 @@ body.dark-mode .section-header h1 {
 .modal-content {
   width: 90%;
   max-width: 500px;
-  border-radius: 8px;
+  border-radius: var(--modal-radius);
   overflow: hidden;
 }
 
@@ -1171,11 +1174,11 @@ input[type='radio'] {
 
 select,
 input,
-text-area {
+textarea {
   background-color: white;
   padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: var(--control-radius);
   width: 100%;
   transition: border-color 0.2s;
 }
@@ -1278,7 +1281,7 @@ body.dark-mode label {
   background-color: var(--primary-color);
   color: white;
   border: none;
-  border-radius: var(--radius);
+  border-radius: var(--control-radius);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -1674,4 +1677,27 @@ body.dark-mode .skeleton-shimmer {
   100% {
     background-position: 200% 0;
   }
+}
+
+/* Standard button border radius across the app */
+button:not(.rounded-full):not(.btn-icon):not(.dark-mode-toggle):not(.theme-toggle),
+[data-app-button],
+input[type='button']:not(.rounded-full),
+input[type='submit']:not(.rounded-full),
+input[type='reset']:not(.rounded-full) {
+  border-radius: var(--control-radius);
+}
+
+/* Standard form control border radius across the app */
+input:not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']):not([type='hidden']):not([type='range']):not([type='color']):not(.rounded-full),
+select:not(.rounded-full),
+textarea:not(.rounded-full),
+[data-app-input],
+[data-app-select] {
+  border-radius: var(--control-radius);
+}
+
+/* Standard modal border radius across the app */
+[data-app-modal] {
+  border-radius: var(--modal-radius);
 }

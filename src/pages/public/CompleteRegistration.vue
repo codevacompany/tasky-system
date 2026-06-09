@@ -287,7 +287,7 @@ const completeRegistration = async () => {
   width: 100%;
   padding: 0.85rem 1rem 0.85rem 2.5rem;
   border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  border-radius: var(--control-radius);
   background-color: #f8f9fa;
   color: #333333;
   font-size: 1rem;

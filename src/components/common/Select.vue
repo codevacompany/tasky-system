@@ -1,12 +1,12 @@
 <template>
-  <div class="relative w-full" ref="selectContainer">
+  <div class="relative w-full" ref="selectContainer" data-app-select>
     <!-- Select Button -->
     <button
       type="button"
       @click="toggleDropdown"
       :disabled="disabled"
       :class="[
-        'appearance-none w-full px-[14px] pr-10 text-sm font-medium rounded-[5px] border border-inputBorder transition-colors cursor-pointer relative text-left',
+        'appearance-none w-full px-[14px] pr-10 text-sm font-medium rounded-[8px] border border-inputBorder transition-colors cursor-pointer relative text-left',
         props.compact ? 'py-1.5' : 'py-2.5',
         'focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/10',
         'hover:border-gray-300',

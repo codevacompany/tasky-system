@@ -1,6 +1,6 @@
 <template>
   <div
-    class="kanban-container flex gap-4 pt-2 pb-2.5 px-2 overflow-x-auto h-[calc(100vh-220px)] bg-white dark:bg-gray-900 rounded-lg relative w-full"
+    class="kanban-container flex gap-4 pt-2 pb-2 px-2 overflow-x-auto h-full min-h-0 bg-white dark:bg-gray-900 rounded-lg relative w-full"
   >
     <!-- Skeleton while loading columns or tickets -->
     <template
@@ -38,11 +38,11 @@
       >
         <div class="p-2 text-center flex-shrink-0">
           <h3
-            class="m-0 inline-flex items-center gap-3 text-[15.5px] font-semibold text-txt-primary dark:text-white py-1.5"
+            class="m-0 inline-flex items-center gap-2 text-[15px] font-semibold text-txt-primary dark:text-white py-1.5"
           >
             {{ column.name }}
             <span
-              class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded-xl text-xs text-gray-600 dark:text-gray-300"
+              class="inline-flex items-center justify-center min-w-[1.375rem] h-[1.375rem] px-1.5 rounded-[8px] bg-gray-200 dark:bg-gray-600 text-[12px] font-medium leading-none text-gray-600 dark:text-gray-300"
             >
               {{ getTicketsByColumn(column).length }}
             </span>
@@ -54,7 +54,7 @@
             v-for="ticket in getTicketsByColumn(column)"
             :key="ticket.customId"
             :class="[
-              'min-h-[100px] bg-gre flex-shrink-0 bg-white dark:bg-gray-700 rounded-lg p-3.5 cursor-pointer transition-all duration-200 border shadow-soft-xs mb-3.5 flex flex-col hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
+              'min-h-[100px] bg-gre flex-shrink-0 bg-white dark:bg-gray-700 rounded-xl p-3.5 cursor-pointer transition-all duration-200 border shadow-soft-xs mb-3.5 flex flex-col hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
               ticket.ticketStatus?.key === DefaultTicketStatus.Returned ||
               ticket.status === DefaultTicketStatus.Returned
                 ? 'border-orange-300 dark:border-orange-600 dark:bg-orange-900/10 hover:border-orange-400 dark:hover:border-orange-500'

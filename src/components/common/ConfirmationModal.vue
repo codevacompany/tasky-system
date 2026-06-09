@@ -223,7 +223,7 @@ const handleCancel = () => {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border-radius: var(--control-radius);
   font-size: 0.875rem;
   background-color: var(--input-bg);
   color: var(--text-color);
@@ -263,7 +263,7 @@ const handleCancel = () => {
   width: 100%;
   padding: 0.5rem;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border-radius: var(--control-radius);
   font-size: 0.875rem;
   background-color: var(--input-bg);
   color: var(--text-color);

@@ -200,7 +200,7 @@
       v-if="showNewUserModal"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]"
     >
-      <div class="bg-white dark:bg-gray-800 rounded-lg w-[90%] max-w-md shadow-lg">
+      <div data-app-modal class="bg-white dark:bg-gray-800 w-[90%] max-w-md shadow-lg">
         <div
           class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-600"
         >

@@ -13,10 +13,11 @@
       <LoadingSpinner v-if="isLoading" :size="50" :color="'white'" />
       <div
         v-else
+        data-app-modal
         :class="[
           'bg-white dark:bg-gray-800 shadow-lg flex flex-col overflow-hidden animate-modalSlideIn',
           // Rounded corners - always except when full screen mobile
-          isFullScreenMobile ? '' : 'rounded-md',
+          isFullScreenMobile ? '' : 'rounded-[var(--modal-radius)]',
           // Margins - only when not full screen mobile
           isFullScreenMobile ? '' : 'mx-4',
           // Mobile sizing - conditional, with configurable fixed desktop width when using full-screen mobile mode
@@ -24,7 +25,7 @@
             ? `w-full h-full ${desktopWidthClass || 'sm:w-[780px] sm:h-auto'}`
             : 'min-w-[95vw] max-h-[calc(90vh-100px)]',
           // Desktop defaults: rounded, height + horizontal margin
-          'sm:rounded-md sm:min-w-[500px] sm:max-h-[94vh] sm:mx-4',
+          'sm:rounded-[var(--modal-radius)] sm:min-w-[500px] sm:max-h-[94vh] sm:mx-4',
         ]"
       >
         <div v-if="hasCustomHeader">
