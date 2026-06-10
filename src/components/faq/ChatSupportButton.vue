@@ -10,7 +10,8 @@
 
     <div
       v-if="isOpen"
-      class="absolute bottom-20 right-0 w-[350px] h-[450px] bg-white rounded-xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 md:w-[350px] md:h-[450px] max-md:w-[300px] max-md:h-[400px]"
+      class="absolute bottom-20 right-0 w-[350px] h-[450px] bg-white flex flex-col overflow-hidden border border-gray-200 md:w-[350px] md:h-[450px] max-md:w-[300px] max-md:h-[400px] shadow-2xl"
+      data-app-modal
     >
       <div class="px-4 py-4 bg-blue-600 text-white font-semibold flex justify-between items-center">
         <span>Chat de Suporte</span>

@@ -21,6 +21,27 @@ export type TicketListFilters = {
   sortOrder?: 'asc' | 'desc';
 };
 
+const isUnfilteredTicketListFetch = (
+  filters: TicketListFilters | undefined,
+  page: number,
+): boolean => {
+  if (page !== 1) {
+    return false;
+  }
+
+  if (!filters) {
+    return true;
+  }
+
+  return !Object.entries(filters).some(([key, value]) => {
+    if (key === 'sortBy' || key === 'sortOrder') {
+      return false;
+    }
+
+    return value !== undefined && value !== null && String(value).trim() !== '';
+  });
+};
+
 interface TicketsState {
   myTickets: {
     data: Ticket[];
@@ -385,15 +406,18 @@ export const useTicketsStore = defineStore('tickets', () => {
         recentReceivedTickets.value = response.data.items.slice(0, 5);
       }
 
-      // Check for new tickets
-      const currentIds = response.data.items.map((ticket) => ticket.customId);
-      if (previousReceivedTicketIds.value.length > 0) {
-        const newIds = currentIds.filter((id) => !previousReceivedTicketIds.value.includes(id));
-        if (newIds.length > 0) {
-          hasNewReceivedTickets.value = true;
+      // Only track new tickets on unfiltered page-1 fetches so status/filter changes
+      // don't make existing tickets look newly arrived.
+      if (isUnfilteredTicketListFetch(currentFilters, pageToUse)) {
+        const currentIds = response.data.items.map((ticket) => ticket.customId);
+        if (previousReceivedTicketIds.value.length > 0) {
+          const newIds = currentIds.filter((id) => !previousReceivedTicketIds.value.includes(id));
+          if (newIds.length > 0) {
+            hasNewReceivedTickets.value = true;
+          }
         }
+        previousReceivedTicketIds.value = currentIds;
       }
-      previousReceivedTicketIds.value = currentIds;
     } catch (error) {
       receivedTickets.value.error = 'Failed to fetch received tickets';
       console.error('Error fetching received tickets:', error);

@@ -434,13 +434,13 @@ const {
 .quill-wrapper :deep(.ql-toolbar) {
   border: none !important;
   border-bottom: 1px solid #e5e7eb !important;
-  border-radius: 8px 8px 0 0 !important;
+  border-radius: var(--control-radius) var(--control-radius) 0 0 !important;
   background-color: #f9fafb;
 }
 
 .quill-wrapper :deep(.ql-container) {
   border: none !important;
-  border-radius: 0 0 8px 8px !important;
+  border-radius: 0 0 var(--control-radius) var(--control-radius) !important;
   min-height: 120px;
 }
 

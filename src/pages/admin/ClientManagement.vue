@@ -502,7 +502,7 @@
       v-if="showNewClientModal"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
-      <div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md shadow-xl">
+      <div data-app-modal class="bg-white dark:bg-gray-800 w-full max-w-md shadow-xl">
         <div
           class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700"
         >

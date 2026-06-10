@@ -1,11 +1,15 @@
 <template>
-  <section id="ticketsSection" class="px-4 pt-3 pb-4 md:px-6 md:pb-0">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-      <h1 class="text-2xl font-bold text-txt-primary dark:text-white">Tarefas</h1>
-      <div class="flex items-center gap-2">
-        <!-- View Toggle Button -->
+  <section
+    id="ticketsSection"
+    class="px-4 pt-4 md:px-6 md:pt-5"
+    :class="isKanbanView ? 'pb-2 flex flex-col h-[calc(100vh-var(--header-height)-1.25rem)]' : 'pb-4 md:pb-4'"
+  >
+    <div class="flex items-center gap-2 sm:gap-3 min-w-0 shrink-0">
+      <h1 class="text-2xl font-bold text-txt-primary dark:text-white shrink-0">Tarefas</h1>
+
+      <div class="flex items-center gap-2 shrink-0">
         <button
-          class="flex items-center justify-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
+          class="flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
           @click="toggleView"
           :title="isKanbanView ? 'Alternar para Tabela' : 'Alternar para Kanban'"
         >
@@ -13,24 +17,21 @@
           <span class="text-[13px] font-medium">{{ isKanbanView ? 'Tabela' : 'Kanban' }}</span>
         </button>
 
-        <!-- Options Menu Button -->
         <div class="relative view-menu-container">
           <button
-            class="flex items-center justify-center w-8 h-8 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
+            class="flex items-center justify-center w-[34px] h-[34px] border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
             @click.stop="showViewMenu = !showViewMenu"
             title="Opções"
           >
             <font-awesome-icon icon="ellipsis" class="w-4 h-4" />
           </button>
 
-          <!-- View Menu Popup -->
           <div
             v-if="showViewMenu"
             class="absolute left-0 sm:left-auto sm:right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
             @click.stop
           >
             <div class="py-1">
-              <!-- Tarefas arquivadas option -->
               <button
                 @click="navigateToArchived"
                 class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
@@ -42,203 +43,209 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Summary cards - moved to top, only visible in table view -->
-    <div v-if="!isKanbanView" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 mb-6">
-      <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-soft-xs cursor-pointer hover:-translate-y-1 transition-transform duration-200"
-        @click="setStatusFilter('')"
-        :title="'Mostrar todas as tarefas'"
-      >
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div
-              class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white"
-            >
-              <font-awesome-icon icon="ticket" />
-            </div>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total</span>
-          </div>
-          <span class="text-xl font-bold text-blue-600 dark:text-blue-400">{{ totalTickets }}</span>
-        </div>
-      </div>
-      <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-soft-xs cursor-pointer hover:-translate-y-1 transition-transform duration-200"
-        @click="setStatusFilter(DefaultTicketStatus.Pending)"
-        :title="'Filtrar por tarefas pendentes'"
-      >
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div
-              class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white"
-            >
-              <font-awesome-icon icon="clock" />
-            </div>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Pendentes</span>
-          </div>
-          <span class="text-xl font-bold text-orange-500 dark:text-orange-400">{{
-            pendingTickets
-          }}</span>
-        </div>
-      </div>
-      <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-soft-xs cursor-pointer hover:-translate-y-1 transition-transform duration-200"
-        @click="setStatusFilter(DefaultTicketStatus.InProgress)"
-        :title="'Filtrar por tarefas em andamento'"
-      >
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div
-              class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white"
-            >
-              <font-awesome-icon icon="spinner" />
-            </div>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Em Andamento</span>
-          </div>
-          <span class="text-xl font-bold text-blue-500 dark:text-blue-400">{{
-            inProgressTickets
-          }}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="mt-5">
-      <div class="min-h-[300px]">
-        <!-- Table Container with integrated tabs and controls -->
+      <div class="flex-1 flex justify-center min-w-0 overflow-x-auto">
         <div
-          class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-soft-xs"
+          class="inline-flex items-center gap-0.5 py-[3.25px] px-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full shadow-soft-sm"
         >
-          <!-- Integrated Tab Bar -->
-          <div class="flex flex-col border-b-1 border-gray-200 dark:border-gray-700">
-            <!-- Mobile-friendly tabs -->
+          <button
+            v-for="tab in tabItems"
+            :key="tab.id"
+            type="button"
+            :class="[
+              'relative flex items-center gap-2 px-2.5 sm:px-3 py-[5px] text-[13px] font-semibold rounded-full whitespace-nowrap transition-all duration-200 flex-shrink-0',
+              activeTab === tab.id
+                ? 'bg-gray-50 dark:bg-gray-900/20 text-primary dark:text-primary-light'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-gray-200',
+            ]"
+            @click="switchTab(tab.id)"
+          >
             <div
-              class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 px-4 sm:px-6 gap-3 lg:gap-0 relative"
+              class="w-6 h-6 rounded-md flex items-center justify-center transition-colors flex-shrink-0"
+              :class="
+                activeTab === tab.id
+                  ? 'bg-primary-100 dark:bg-primary-900/30'
+                  : 'bg-gray-50 dark:bg-gray-700/30'
+              "
             >
-              <div
-                class="flex items-center justify-start lg:absolute xl:left-1/2 xl:transform xl:-translate-x-1/2 w-full xl:w-auto"
-              >
-                <div
-                  class="flex items-center justify-start lg:justify-center p-0.5 bg-[#f4f5f8] dark:bg-gray-700 rounded-full w-full lg:w-auto"
-                  style="height: 36px"
-                >
-                  <div class="flex items-center gap-0 w-full lg:w-auto flex-shrink-0">
-                    <button
-                      :class="[
-                        'relative flex-1 lg:flex-none px-2.5 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
-                        activeTab === 'recebidas'
-                          ? 'bg-white dark:bg-gray-800 text-txt-primary dark:text-white shadow-soft-xs'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
-                      ]"
-                      style="font-size: 13px"
-                      @click="switchTab('recebidas')"
-                    >
-                      Recebidas
-                      <span
-                        v-if="ticketsStore.hasNewReceivedTickets && activeTab !== 'recebidas'"
-                        class="absolute top-[13px] left-1 sm:left-1.5 w-[5px] h-[5px] bg-blue-500 rounded-full"
-                      ></span>
-                    </button>
-                    <button
-                      :class="[
-                        'relative flex-1 lg:flex-none px-2.5 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
-                        activeTab === 'criadas'
-                          ? 'bg-white dark:bg-gray-800 text-txt-primary dark:text-white shadow-soft-xs'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
-                      ]"
-                      style="font-size: 13px"
-                      @click="switchTab('criadas')"
-                    >
-                      <span class="hidden sm:inline">Criadas por Mim</span>
-                      <span class="sm:hidden">Criadas</span>
-                      <span
-                        v-if="
-                          ticketsStore.hasNewAwaitingVerificationTickets && activeTab !== 'criadas'
-                        "
-                        class="absolute top-[13px] left-1 sm:left-1.5 w-[5px] h-[5px] bg-blue-500 rounded-full"
-                      ></span>
-                    </button>
-                    <button
-                      :class="[
-                        'flex-1 lg:flex-none px-2.5 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
-                        activeTab === 'setor'
-                          ? 'bg-white dark:bg-gray-800 text-txt-primary dark:text-white shadow-soft-xs'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
-                      ]"
-                      style="font-size: 13px"
-                      @click="switchTab('setor')"
-                    >
-                      <span class="hidden sm:inline">Tarefas do Setor</span>
-                      <span class="sm:hidden">Setor</span>
-                    </button>
-                    <button
-                      v-if="isTenantAdmin"
-                      :class="[
-                        'flex-1 lg:flex-none px-2.5 sm:px-4 py-1.5 font-medium cursor-pointer transition-all duration-200 rounded-full whitespace-nowrap',
-                        activeTab === 'gerais'
-                          ? 'bg-white dark:bg-gray-800 text-txt-primary dark:text-white shadow-soft-xs'
-                          : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-[#fBfBfB] dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-300',
-                      ]"
-                      style="font-size: 13px"
-                      @click="switchTab('gerais')"
-                    >
-                      <span class="hidden sm:inline">Tarefas Gerais</span>
-                      <span class="sm:hidden">Gerais</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Search and Filters Row -->
-              <div
-                class="flex items-center justify-start gap-2 mt-4 lg:mt-0 lg:justify-end lg:ml-auto"
-              >
-                <button
-                  class="relative flex items-center gap-2 px-4 py-2 border border-inputBorder dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors whitespace-nowrap"
-                  @click="showFiltersModal = true"
-                >
-                  <font-awesome-icon icon="sliders" class="w-3.5 h-3.5" />
-                  Filtros
-                  <span
-                    v-if="activeFiltersCount > 0"
-                    class="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-blue-600 text-white text-xs font-semibold rounded-full"
-                  >
-                    {{ activeFiltersCount }}
-                  </span>
-                </button>
-              </div>
+              <component
+                :is="tab.icon"
+                class="w-3.5 h-3.5 transition-colors"
+                :class="
+                  activeTab === tab.id
+                    ? 'text-primary dark:text-primary-light'
+                    : 'text-gray-400 dark:text-gray-500'
+                "
+                aria-hidden="true"
+              />
             </div>
-          </div>
+            <span class="hidden sm:inline">{{ tab.label }}</span>
+            <span class="sm:hidden">{{ tab.shortLabel }}</span>
+            <span
+              v-if="tab.id === 'recebidas' && ticketsStore.hasNewReceivedTickets && activeTab !== 'recebidas'"
+              class="absolute top-1.5 left-1.5 w-[5px] h-[5px] bg-primary rounded-full"
+            />
+            <span
+              v-if="tab.id === 'criadas' && ticketsStore.hasNewAwaitingVerificationTickets && activeTab !== 'criadas'"
+              class="absolute top-1.5 left-1.5 w-[5px] h-[5px] bg-primary rounded-full"
+            />
+          </button>
+        </div>
+      </div>
 
-          <!-- Content Area -->
-          <div class="overflow-x-auto px-2 pt-1.5 pb-1.5">
-            <TicketTable
-              v-if="!isKanbanView"
-              :tickets="tickets"
-              :isLoading="isLoading"
-              :tableType="activeTab"
-              :currentPage="currentPage"
-              :totalPages="totalPages"
-              :pagination="true"
-              @changePage="(page) => (currentPage = page)"
-              @viewTicket="handleViewTicket"
-              @editTicket="handleEditTicket"
-              @cancelTicket="handleCancelTicket"
-              @acceptTicket="handleAcceptTicket"
-              @verifyTicket="handleVerifyTicket"
-              @approveTicket="handleApproveTicket"
-              @requestCorrection="handleRequestCorrection"
-              @rejectTicket="handleRejectTicket"
-              @refresh="fetchTicketsWithFilters"
+      <button
+        type="button"
+        class="relative shrink-0 flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 whitespace-nowrap"
+        @click="showFiltersModal = true"
+      >
+        <font-awesome-icon icon="sliders" class="w-3.5 h-3.5" />
+        <span class="text-[13px] font-medium">Filtros</span>
+        <span
+          v-if="activeFiltersCount > 0"
+          class="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-primary text-white text-xs font-semibold rounded-full"
+        >
+          {{ activeFiltersCount }}
+        </span>
+      </button>
+    </div>
+
+    <div class="mt-5" :class="isKanbanView ? 'flex flex-1 flex-col min-h-0' : ''">
+      <div
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-soft-xs"
+        :class="isKanbanView ? 'flex flex-1 flex-col min-h-0' : 'min-h-[300px]'"
+      >
+        <div
+          v-if="!isKanbanView"
+          class="flex flex-wrap items-center gap-2 px-3 pt-3 pb-2.5 border-b border-gray-200 dark:border-gray-700"
+        >
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 pl-2.5 pr-2 py-1.5 rounded-lg border transition-colors cursor-pointer"
+            :class="
+              isStatChipActive('')
+                ? 'border-gray-500 dark:border-gray-500 bg-white dark:bg-gray-800'
+                : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+            "
+            @click="setStatusFilter('')"
+            title="Mostrar todas as tarefas"
+          >
+            <font-awesome-icon
+              icon="ticket"
+              class="w-3.5 h-3.5 shrink-0"
+              :class="isStatChipActive('') ? 'text-txt-primary dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'"
             />
-            <TicketKanban
-              v-else
-              :tickets="tickets"
-              :activeTab="activeTab"
-              :isLoading="isLoading"
-              @viewTicket="handleViewTicket"
+            <span
+              class="text-[13px] font-semibold whitespace-nowrap"
+              :class="isStatChipActive('') ? 'text-txt-primary dark:text-gray-100' : 'text-gray-600 dark:text-gray-300'"
+            >
+              Total
+            </span>
+            <span
+              class="inline-flex items-center justify-center min-w-[1.375rem] h-[1.375rem] px-1.5 rounded-[8px] text-[12px] font-semibold leading-none bg-gray-100 dark:bg-gray-700/50 text-txt-primary dark:text-gray-100"
+            >
+              {{ totalTickets }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 pl-2.5 pr-2 py-1.5 rounded-lg border transition-colors cursor-pointer"
+            :class="
+              isStatChipActive(DefaultTicketStatus.Pending)
+                ? 'border-orange-400 dark:border-orange-500/70 bg-white dark:bg-gray-800'
+                : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+            "
+            @click="setStatusFilter(DefaultTicketStatus.Pending)"
+            title="Filtrar por tarefas pendentes"
+          >
+            <font-awesome-icon
+              icon="clock"
+              class="w-3.5 h-3.5 shrink-0"
+              :class="isStatChipActive(DefaultTicketStatus.Pending) ? 'text-orange-500 dark:text-orange-400' : 'text-orange-500/80'"
             />
-          </div>
+            <span
+              class="text-[13px] font-semibold whitespace-nowrap"
+              :class="
+                isStatChipActive(DefaultTicketStatus.Pending)
+                  ? 'text-orange-600 dark:text-orange-400'
+                  : 'text-gray-600 dark:text-gray-300'
+              "
+            >
+              Pendentes
+            </span>
+            <span
+              class="inline-flex items-center justify-center min-w-[1.375rem] h-[1.375rem] px-1.5 rounded-[8px] text-[12px] font-semibold leading-none bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300"
+            >
+              {{ pendingTickets }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 pl-2.5 pr-2 py-1.5 rounded-lg border transition-colors cursor-pointer"
+            :class="
+              isStatChipActive(DefaultTicketStatus.InProgress)
+                ? 'border-blue-500 dark:border-blue-400/80 bg-white dark:bg-gray-800'
+                : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+            "
+            @click="setStatusFilter(DefaultTicketStatus.InProgress)"
+            title="Filtrar por tarefas em andamento"
+          >
+            <font-awesome-icon
+              icon="spinner"
+              class="w-3.5 h-3.5 shrink-0"
+              :class="
+                isStatChipActive(DefaultTicketStatus.InProgress)
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-blue-600/80 dark:text-blue-400/80'
+              "
+            />
+            <span
+              class="text-[13px] font-semibold whitespace-nowrap"
+              :class="
+                isStatChipActive(DefaultTicketStatus.InProgress)
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-gray-600 dark:text-gray-300'
+              "
+            >
+              Em Andamento
+            </span>
+            <span
+              class="inline-flex items-center justify-center min-w-[1.375rem] h-[1.375rem] px-1.5 rounded-[8px] text-[12px] font-semibold leading-none bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+            >
+              {{ inProgressTickets }}
+            </span>
+          </button>
+        </div>
+        <div
+          :class="isKanbanView ? 'flex flex-1 flex-col min-h-0 overflow-hidden px-2 pt-1.5 pb-1' : 'overflow-x-auto'"
+        >
+          <TicketTable
+            v-if="!isKanbanView"
+            :tickets="tickets"
+            :isLoading="isLoading"
+            :tableType="activeTab"
+            :currentPage="currentPage"
+            :totalPages="totalPages"
+            :pagination="true"
+            @changePage="(page) => (currentPage = page)"
+            @viewTicket="handleViewTicket"
+            @editTicket="handleEditTicket"
+            @cancelTicket="handleCancelTicket"
+            @acceptTicket="handleAcceptTicket"
+            @verifyTicket="handleVerifyTicket"
+            @approveTicket="handleApproveTicket"
+            @requestCorrection="handleRequestCorrection"
+            @rejectTicket="handleRejectTicket"
+            @refresh="fetchTicketsWithFilters"
+          />
+          <TicketKanban
+            v-else
+            :tickets="tickets"
+            :activeTab="activeTab"
+            :isLoading="isLoading"
+            @viewTicket="handleViewTicket"
+          />
         </div>
       </div>
     </div>
@@ -294,7 +301,7 @@
       v-if="showFiltersModal"
       class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
     >
-      <div class="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md shadow-xl">
+      <div data-app-modal class="bg-white dark:bg-gray-800 w-full max-w-md shadow-xl">
         <div
           class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700"
         >
@@ -367,7 +374,7 @@
       v-if="showCorrectionModal"
       class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
     >
-      <div class="bg-white dark:bg-gray-800 rounded-lg w-[90%] max-w-md shadow-xl">
+      <div data-app-modal class="bg-white dark:bg-gray-800 w-[90%] max-w-md shadow-xl">
         <div
           class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700"
         >
@@ -423,6 +430,13 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import type { Component } from 'vue';
+import {
+  InboxIcon,
+  UserGroupIcon,
+  UserPlusIcon,
+  ViewColumnsIcon,
+} from '@heroicons/vue/24/solid';
 import { useRoute, useRouter } from 'vue-router';
 import { ticketService } from '@/services/ticketService';
 import { useTicketsStore } from '@/stores/tickets';
@@ -477,6 +491,32 @@ const getInitialTab = (): TicketsTab => {
 };
 
 const activeTab = ref<TicketsTab>(getInitialTab());
+
+type TabItem = {
+  id: TicketsTab;
+  label: string;
+  shortLabel: string;
+  icon: Component;
+};
+
+const tabItems = computed<TabItem[]>(() => {
+  const items: TabItem[] = [
+    { id: 'recebidas', label: 'Recebidas', shortLabel: 'Recebidas', icon: InboxIcon },
+    { id: 'criadas', label: 'Criadas por Mim', shortLabel: 'Criadas', icon: UserPlusIcon },
+    { id: 'setor', label: 'Tarefas do Setor', shortLabel: 'Setor', icon: UserGroupIcon },
+  ];
+
+  if (isTenantAdmin.value) {
+    items.push({
+      id: 'gerais',
+      label: 'Tarefas Gerais',
+      shortLabel: 'Gerais',
+      icon: ViewColumnsIcon,
+    });
+  }
+
+  return items;
+});
 
 const modalStatusFilter = ref<string>('');
 const modalPriorityFilter = ref<string>('');
@@ -852,6 +892,8 @@ const switchTab = async (tab: TicketsTab, skipUrlSync = false) => {
   }
 
   if (previousTab !== tab) {
+    statChipTickets.value = [];
+
     const hasDataForTab = (() => {
       switch (tab) {
         case 'recebidas':
@@ -875,25 +917,33 @@ const switchTab = async (tab: TicketsTab, skipUrlSync = false) => {
     })();
 
     if (!hasDataForTab) {
-      fetchTicketsWithFilters();
+      await fetchTicketsWithFilters();
+    } else if (!isKanbanView.value) {
+      await fetchStatChipTickets();
     }
   }
 };
 
-const fetchTicketsWithFilters = async () => {
+const statChipTickets = ref<Ticket[]>([]);
+
+const getActiveStoreType = ():
+  | 'received'
+  | 'createdByMe'
+  | 'department'
+  | 'tenant'
+  | null => {
   const typeMap: Record<TicketsTab, 'received' | 'createdByMe' | 'department' | 'tenant'> = {
     recebidas: 'received',
     criadas: 'createdByMe',
     setor: 'department',
     gerais: 'tenant',
   };
+  return typeMap[activeTab.value] ?? null;
+};
 
-  const storeType = typeMap[activeTab.value];
-
-  if (!storeType) {
-    return;
-  }
-
+const buildTicketListFilters = (options?: { includeStatus?: boolean }) => {
+  const includeStatus = options?.includeStatus ?? true;
+  const storeType = getActiveStoreType();
   const currentFilters = filtersStore.currentFilters;
 
   const filters: {
@@ -909,7 +959,11 @@ const fetchTicketsWithFilters = async () => {
     filters.priority = currentFilters.priority as TicketPriority;
   }
 
-  if (currentFilters.status && String(currentFilters.status).trim() !== '') {
+  if (
+    includeStatus &&
+    currentFilters.status &&
+    String(currentFilters.status).trim() !== ''
+  ) {
     filters.status = currentFilters.status as DefaultTicketStatus;
   }
 
@@ -934,31 +988,136 @@ const fetchTicketsWithFilters = async () => {
     filters.reviewerUuid = String(currentFilters.reviewerUuid);
   }
 
-  await ticketsStore.setCurrentPage(storeType, currentPage.value, filters);
+  return filters;
+};
+
+const toTicketServiceParams = (
+  filters: ReturnType<typeof buildTicketListFilters>,
+  extra?: { page?: number; limit?: number; paginated?: boolean },
+) => {
+  const params: {
+    priority?: TicketPriority;
+    status?: DefaultTicketStatus;
+    name?: string;
+    departmentUuid?: string;
+    targetUserUuid?: string;
+    reviewerUuid?: string;
+    page?: number;
+    limit?: number;
+    paginated?: boolean;
+  } = { ...extra };
+
+  if (filters.priority) {
+    params.priority = filters.priority;
+  }
+  if (filters.status) {
+    params.status = filters.status;
+  }
+  if (filters.name) {
+    params.name = filters.name;
+  }
+  if (filters.departmentUuid) {
+    params.departmentUuid = filters.departmentUuid;
+  }
+  if (filters.targetUserUuid) {
+    params.targetUserUuid = filters.targetUserUuid;
+  }
+  if (filters.reviewerUuid) {
+    params.reviewerUuid = filters.reviewerUuid;
+  }
+
+  return params;
+};
+
+const fetchStatChipTickets = async () => {
+  if (isKanbanView.value || !userStore.user) {
+    return;
+  }
+
+  const storeType = getActiveStoreType();
+  if (!storeType) {
+    statChipTickets.value = [];
+    return;
+  }
+
+  const filters = buildTicketListFilters({ includeStatus: false });
+  const params = toTicketServiceParams(filters, {
+    page: 1,
+    limit: 10,
+    paginated: false,
+  });
+
+  try {
+    let items: Ticket[] = [];
+
+    switch (storeType) {
+      case 'received':
+        items = (await ticketService.getReceivedTickets(userStore.user.id, params)).data.items;
+        break;
+      case 'createdByMe':
+        items = (await ticketService.getByRequester(userStore.user.id, params)).data.items;
+        break;
+      case 'department':
+        if (!userStore.user.departmentId) {
+          statChipTickets.value = [];
+          return;
+        }
+        items = (await ticketService.getByDepartment(userStore.user.departmentId, params)).data
+          .items;
+        break;
+      case 'tenant':
+        items = (await ticketService.fetch(params)).data.items;
+        break;
+    }
+
+    statChipTickets.value = items;
+  } catch (error) {
+    console.error('Error fetching stat chip tickets:', error);
+  }
+};
+
+const fetchTicketsWithFilters = async () => {
+  const storeType = getActiveStoreType();
+
+  if (!storeType) {
+    return;
+  }
+
+  const filters = buildTicketListFilters({ includeStatus: true });
+
+  await Promise.all([
+    ticketsStore.setCurrentPage(storeType, currentPage.value, filters),
+    fetchStatChipTickets(),
+  ]);
 };
 
 const getTicketStatus = (ticket: Ticket): string => {
   return ticket.ticketStatus?.key || ticket.status || '';
 };
 
-const totalTickets = computed(() => tickets.value.length);
+const excludeCanceledAndRejected = (ticketList: Ticket[]) =>
+  ticketList.filter(
+    (ticket) =>
+      ticket.ticketStatus?.key !== DefaultTicketStatus.Canceled &&
+      ticket.status !== DefaultTicketStatus.Canceled &&
+      ticket.ticketStatus?.key !== DefaultTicketStatus.Rejected &&
+      ticket.status !== DefaultTicketStatus.Rejected,
+  );
+
+const statChipTicketList = computed(() => excludeCanceledAndRejected(statChipTickets.value));
+
+const totalTickets = computed(() => statChipTicketList.value.length);
 const pendingTickets = computed(
   () =>
-    tickets.value.filter((ticket) => getTicketStatus(ticket) === DefaultTicketStatus.Pending)
+    statChipTicketList.value.filter((ticket) => getTicketStatus(ticket) === DefaultTicketStatus.Pending)
       .length,
 );
-const inProgressTickets = computed(() => {
-  const excludedStatuses = new Set([
-    DefaultTicketStatus.Pending,
-    DefaultTicketStatus.Completed,
-    DefaultTicketStatus.Canceled,
-    DefaultTicketStatus.Rejected,
-  ]);
-
-  return tickets.value.filter(
-    (ticket) => !excludedStatuses.has(getTicketStatus(ticket) as DefaultTicketStatus),
-  ).length;
-});
+const inProgressTickets = computed(
+  () =>
+    statChipTicketList.value.filter(
+      (ticket) => getTicketStatus(ticket) === DefaultTicketStatus.InProgress,
+    ).length,
+);
 
 const handleViewTicket = (ticket: Ticket) => {
   const query = { ...route.query, ticket: ticket.customId };
@@ -1194,6 +1353,13 @@ const setStatusFilter = (status: DefaultTicketStatus | '') => {
     },
     false,
   );
+};
+
+const isStatChipActive = (status: DefaultTicketStatus | '') => {
+  if (status === '') {
+    return !statusFilter.value;
+  }
+  return statusFilter.value === status;
 };
 
 watch(

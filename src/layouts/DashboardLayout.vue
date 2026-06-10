@@ -2,7 +2,7 @@
   <div>
     <div class="min-h-screen bg-surface-soft dark:bg-gray-900">
       <header
-        class="flex items-center justify-between p-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-[var(--header-height)] sticky top-0 z-50 shadow-soft-xs"
+        class="flex items-center justify-between p-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-[var(--header-height)] sticky top-0 z-50"
       >
         <div
           class="hidden md:flex items-center justify-center px-6 min-w-[150px] bg-[var(--secondary-dark-color)] dark:bg-gray-900 h-full relative shadow-soft-xs"

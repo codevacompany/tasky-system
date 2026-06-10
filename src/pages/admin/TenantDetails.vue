@@ -670,7 +670,8 @@
       class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] backdrop-blur-sm p-4"
     >
       <div
-        class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700 animate-in fade-in zoom-in duration-200"
+        data-app-modal
+        class="bg-white dark:bg-gray-800 w-full max-w-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700 animate-in fade-in zoom-in duration-200"
       >
         <div
           class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center"
@@ -749,7 +750,8 @@
       class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] backdrop-blur-sm p-4"
     >
       <div
-        class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700 animate-in fade-in zoom-in duration-200"
+        data-app-modal
+        class="bg-white dark:bg-gray-800 w-full max-w-lg shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700 animate-in fade-in zoom-in duration-200"
       >
         <div
           class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50"
@@ -872,7 +874,8 @@
       class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] backdrop-blur-sm p-4 animate-in fade-in duration-200"
     >
       <div
-        class="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl border border-gray-100 dark:border-gray-700 animate-in zoom-in duration-200"
+        data-app-modal
+        class="bg-white dark:bg-gray-800 p-6 max-w-md w-full mx-4 shadow-2xl border border-gray-100 dark:border-gray-700 animate-in zoom-in duration-200"
       >
         <div class="flex items-center gap-3 mb-6">
           <div

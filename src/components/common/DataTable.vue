@@ -20,7 +20,7 @@
               v-for="(header, idx) in headers"
               :key="idx"
               scope="col"
-              :class="[getHeaderClasses(header), columnWidths[idx], idx === 0 ? 'pl-6' : '']"
+              :class="[getHeaderClasses(header), columnWidths[idx], idx === 0 && !flush ? 'pl-6' : '']"
               @click="header.sortable && header.sortKey && handleSort(header.sortKey)"
             >
               <div :class="getHeaderContentClasses(header)">
@@ -77,7 +77,7 @@
                 :class="[
                   getCellClasses(header, headerIdx),
                   columnWidths[headerIdx],
-                  headerIdx === 0 ? 'pl-6' : '',
+                  headerIdx === 0 && !flush ? 'pl-6' : '',
                 ]"
               >
                 <div
@@ -146,7 +146,7 @@
                 :class="[
                   getCellClasses(header, headerIdx),
                   columnWidths[headerIdx],
-                  headerIdx === 0 ? 'pl-6' : '',
+                  headerIdx === 0 && !flush ? 'pl-6' : '',
                 ]"
                 @click="header.clickable && handleCellClick(item, header)"
               >
@@ -197,7 +197,14 @@
     </div>
 
     <!-- Pagination -->
-    <div v-if="pagination" class="mt-5 flex items-center justify-between px-6 py-1 pb-6">
+    <div
+      v-if="pagination"
+      :class="
+        flush
+          ? 'flex items-center justify-between dark:border-gray-700 px-4 py-5'
+          : 'mt-5 flex items-center justify-between px-6 py-1 pb-6'
+      "
+    >
       <span class="text-sm text-gray-600 dark:text-gray-400">
         Página {{ pagination.currentPage }} de {{ pagination.totalPages }}
       </span>
@@ -271,6 +278,7 @@ export interface DataTableProps<T = any> {
   deletableKey?: keyof T | string;
   selectableKey?: keyof T | string;
   rowClassName?: (item: T) => string;
+  flush?: boolean;
 }
 
 // Props
@@ -282,6 +290,7 @@ const props = withDefaults(defineProps<DataTableProps<T>>(), {
   clickable: false,
   minWidth: '1000px',
   rowKey: () => 'id',
+  flush: false,
 });
 
 // Emits

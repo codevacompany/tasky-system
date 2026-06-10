@@ -327,7 +327,8 @@
               @click="showScoreDetailsModal = false"
             ></div>
             <div
-              class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+              data-app-modal
+              class="relative bg-white dark:bg-gray-800 shadow-xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col"
             >
               <div
                 class="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700"
