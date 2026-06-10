@@ -9,6 +9,7 @@
       rowKey="customId"
       minWidth="1000px"
       :showActions="true"
+      :flush="true"
       :rowClassName="getRowClassName"
       @rowClick="openTicketDetails"
       @pageChange="changePage"
@@ -16,7 +17,7 @@
     >
       <template #column-customId="{ value }">
         <span
-          class="text-sm text-center text-blue-600 dark:text-blue-400 font-medium whitespace-nowrap"
+          class="text-sm text-center text-primary dark:text-primary-light font-semibold whitespace-nowrap"
         >
           {{ value }}
         </span>
@@ -53,7 +54,7 @@
                 :class="[
                   'whitespace-nowrap overflow-hidden text-ellipsis',
                   shouldHighlightTargetUser(item, targetUser.userId)
-                    ? 'text-blue-600 dark:text-blue-400'
+                    ? 'text-primary dark:text-primary-light'
                     : 'text-txt-primary dark:text-gray-100',
                 ]"
               >
@@ -93,7 +94,7 @@
               :class="[
                 'whitespace-nowrap overflow-hidden text-ellipsis',
                 shouldHighlightTargetUser(item, targetUser.userId)
-                  ? 'text-blue-600 dark:text-blue-400'
+                  ? 'text-primary dark:text-primary-light'
                   : 'text-txt-primary dark:text-gray-100',
               ]"
             >
@@ -114,7 +115,7 @@
                 :class="[
                   'whitespace-nowrap overflow-hidden text-ellipsis',
                   shouldHighlightTargetUser(item, targetUser.userId)
-                    ? 'text-blue-600 dark:text-blue-400'
+                    ? 'text-primary dark:text-primary-light'
                     : 'text-txt-primary dark:text-gray-100',
                 ]"
               >
@@ -130,7 +131,7 @@
                 :key="targetUser.userId"
                 :class="[
                   shouldHighlightTargetUser(item, targetUser.userId)
-                    ? 'text-blue-600 dark:text-blue-400'
+                    ? 'text-primary dark:text-primary-light'
                     : 'text-txt-primary dark:text-gray-100',
                 ]"
               >

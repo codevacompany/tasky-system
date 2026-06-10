@@ -109,73 +109,116 @@
       </button>
     </div>
 
-    <!-- Summary cards - moved to top, only visible in table view -->
-    <div v-if="!isKanbanView" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 mb-6">
-      <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-soft-xs cursor-pointer hover:-translate-y-1 transition-transform duration-200"
-        @click="setStatusFilter('')"
-        :title="'Mostrar todas as tarefas'"
-      >
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div
-              class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white"
-            >
-              <font-awesome-icon icon="ticket" />
-            </div>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total</span>
-          </div>
-          <span class="text-xl font-bold text-blue-600 dark:text-blue-400">{{ totalTickets }}</span>
-        </div>
-      </div>
-      <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-soft-xs cursor-pointer hover:-translate-y-1 transition-transform duration-200"
-        @click="setStatusFilter(DefaultTicketStatus.Pending)"
-        :title="'Filtrar por tarefas pendentes'"
-      >
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div
-              class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white"
-            >
-              <font-awesome-icon icon="clock" />
-            </div>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Pendentes</span>
-          </div>
-          <span class="text-xl font-bold text-orange-500 dark:text-orange-400">{{
-            pendingTickets
-          }}</span>
-        </div>
-      </div>
-      <div
-        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-3 shadow-soft-xs cursor-pointer hover:-translate-y-1 transition-transform duration-200"
-        @click="setStatusFilter(DefaultTicketStatus.InProgress)"
-        :title="'Filtrar por tarefas em andamento'"
-      >
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div
-              class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white"
-            >
-              <font-awesome-icon icon="spinner" />
-            </div>
-            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Em Andamento</span>
-          </div>
-          <span class="text-xl font-bold text-blue-500 dark:text-blue-400">{{
-            inProgressTickets
-          }}</span>
-        </div>
-      </div>
-    </div>
-
     <div class="mt-5" :class="isKanbanView ? 'flex flex-1 flex-col min-h-0' : ''">
       <div
         class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-soft-xs"
         :class="isKanbanView ? 'flex flex-1 flex-col min-h-0' : 'min-h-[300px]'"
       >
         <div
-          class="px-2 pt-1.5"
-          :class="isKanbanView ? 'flex flex-1 flex-col min-h-0 overflow-hidden pb-1' : 'overflow-x-auto pb-1.5'"
+          v-if="!isKanbanView"
+          class="flex flex-wrap items-center gap-2 px-3 pt-3 pb-2.5 border-b border-gray-200 dark:border-gray-700"
+        >
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 pl-2.5 pr-2 py-1.5 rounded-lg border transition-colors cursor-pointer"
+            :class="
+              isStatChipActive('')
+                ? 'border-gray-500 dark:border-gray-500 bg-white dark:bg-gray-800'
+                : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+            "
+            @click="setStatusFilter('')"
+            title="Mostrar todas as tarefas"
+          >
+            <font-awesome-icon
+              icon="ticket"
+              class="w-3.5 h-3.5 shrink-0"
+              :class="isStatChipActive('') ? 'text-txt-primary dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'"
+            />
+            <span
+              class="text-[13px] font-semibold whitespace-nowrap"
+              :class="isStatChipActive('') ? 'text-txt-primary dark:text-gray-100' : 'text-gray-600 dark:text-gray-300'"
+            >
+              Total
+            </span>
+            <span
+              class="inline-flex items-center justify-center min-w-[1.375rem] h-[1.375rem] px-1.5 rounded-[8px] text-[12px] font-semibold leading-none bg-gray-100 dark:bg-gray-700/50 text-txt-primary dark:text-gray-100"
+            >
+              {{ totalTickets }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 pl-2.5 pr-2 py-1.5 rounded-lg border transition-colors cursor-pointer"
+            :class="
+              isStatChipActive(DefaultTicketStatus.Pending)
+                ? 'border-orange-400 dark:border-orange-500/70 bg-white dark:bg-gray-800'
+                : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+            "
+            @click="setStatusFilter(DefaultTicketStatus.Pending)"
+            title="Filtrar por tarefas pendentes"
+          >
+            <font-awesome-icon
+              icon="clock"
+              class="w-3.5 h-3.5 shrink-0"
+              :class="isStatChipActive(DefaultTicketStatus.Pending) ? 'text-orange-500 dark:text-orange-400' : 'text-orange-500/80'"
+            />
+            <span
+              class="text-[13px] font-semibold whitespace-nowrap"
+              :class="
+                isStatChipActive(DefaultTicketStatus.Pending)
+                  ? 'text-orange-600 dark:text-orange-400'
+                  : 'text-gray-600 dark:text-gray-300'
+              "
+            >
+              Pendentes
+            </span>
+            <span
+              class="inline-flex items-center justify-center min-w-[1.375rem] h-[1.375rem] px-1.5 rounded-[8px] text-[12px] font-semibold leading-none bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300"
+            >
+              {{ pendingTickets }}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 pl-2.5 pr-2 py-1.5 rounded-lg border transition-colors cursor-pointer"
+            :class="
+              isStatChipActive(DefaultTicketStatus.InProgress)
+                ? 'border-blue-500 dark:border-blue-400/80 bg-white dark:bg-gray-800'
+                : 'border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+            "
+            @click="setStatusFilter(DefaultTicketStatus.InProgress)"
+            title="Filtrar por tarefas em andamento"
+          >
+            <font-awesome-icon
+              icon="spinner"
+              class="w-3.5 h-3.5 shrink-0"
+              :class="
+                isStatChipActive(DefaultTicketStatus.InProgress)
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-blue-600/80 dark:text-blue-400/80'
+              "
+            />
+            <span
+              class="text-[13px] font-semibold whitespace-nowrap"
+              :class="
+                isStatChipActive(DefaultTicketStatus.InProgress)
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-gray-600 dark:text-gray-300'
+              "
+            >
+              Em Andamento
+            </span>
+            <span
+              class="inline-flex items-center justify-center min-w-[1.375rem] h-[1.375rem] px-1.5 rounded-[8px] text-[12px] font-semibold leading-none bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+            >
+              {{ inProgressTickets }}
+            </span>
+          </button>
+        </div>
+        <div
+          :class="isKanbanView ? 'flex flex-1 flex-col min-h-0 overflow-hidden px-2 pt-1.5 pb-1' : 'overflow-x-auto'"
         >
           <TicketTable
             v-if="!isKanbanView"
@@ -849,6 +892,8 @@ const switchTab = async (tab: TicketsTab, skipUrlSync = false) => {
   }
 
   if (previousTab !== tab) {
+    statChipTickets.value = [];
+
     const hasDataForTab = (() => {
       switch (tab) {
         case 'recebidas':
@@ -872,25 +917,33 @@ const switchTab = async (tab: TicketsTab, skipUrlSync = false) => {
     })();
 
     if (!hasDataForTab) {
-      fetchTicketsWithFilters();
+      await fetchTicketsWithFilters();
+    } else if (!isKanbanView.value) {
+      await fetchStatChipTickets();
     }
   }
 };
 
-const fetchTicketsWithFilters = async () => {
+const statChipTickets = ref<Ticket[]>([]);
+
+const getActiveStoreType = ():
+  | 'received'
+  | 'createdByMe'
+  | 'department'
+  | 'tenant'
+  | null => {
   const typeMap: Record<TicketsTab, 'received' | 'createdByMe' | 'department' | 'tenant'> = {
     recebidas: 'received',
     criadas: 'createdByMe',
     setor: 'department',
     gerais: 'tenant',
   };
+  return typeMap[activeTab.value] ?? null;
+};
 
-  const storeType = typeMap[activeTab.value];
-
-  if (!storeType) {
-    return;
-  }
-
+const buildTicketListFilters = (options?: { includeStatus?: boolean }) => {
+  const includeStatus = options?.includeStatus ?? true;
+  const storeType = getActiveStoreType();
   const currentFilters = filtersStore.currentFilters;
 
   const filters: {
@@ -906,7 +959,11 @@ const fetchTicketsWithFilters = async () => {
     filters.priority = currentFilters.priority as TicketPriority;
   }
 
-  if (currentFilters.status && String(currentFilters.status).trim() !== '') {
+  if (
+    includeStatus &&
+    currentFilters.status &&
+    String(currentFilters.status).trim() !== ''
+  ) {
     filters.status = currentFilters.status as DefaultTicketStatus;
   }
 
@@ -931,31 +988,136 @@ const fetchTicketsWithFilters = async () => {
     filters.reviewerUuid = String(currentFilters.reviewerUuid);
   }
 
-  await ticketsStore.setCurrentPage(storeType, currentPage.value, filters);
+  return filters;
+};
+
+const toTicketServiceParams = (
+  filters: ReturnType<typeof buildTicketListFilters>,
+  extra?: { page?: number; limit?: number; paginated?: boolean },
+) => {
+  const params: {
+    priority?: TicketPriority;
+    status?: DefaultTicketStatus;
+    name?: string;
+    departmentUuid?: string;
+    targetUserUuid?: string;
+    reviewerUuid?: string;
+    page?: number;
+    limit?: number;
+    paginated?: boolean;
+  } = { ...extra };
+
+  if (filters.priority) {
+    params.priority = filters.priority;
+  }
+  if (filters.status) {
+    params.status = filters.status;
+  }
+  if (filters.name) {
+    params.name = filters.name;
+  }
+  if (filters.departmentUuid) {
+    params.departmentUuid = filters.departmentUuid;
+  }
+  if (filters.targetUserUuid) {
+    params.targetUserUuid = filters.targetUserUuid;
+  }
+  if (filters.reviewerUuid) {
+    params.reviewerUuid = filters.reviewerUuid;
+  }
+
+  return params;
+};
+
+const fetchStatChipTickets = async () => {
+  if (isKanbanView.value || !userStore.user) {
+    return;
+  }
+
+  const storeType = getActiveStoreType();
+  if (!storeType) {
+    statChipTickets.value = [];
+    return;
+  }
+
+  const filters = buildTicketListFilters({ includeStatus: false });
+  const params = toTicketServiceParams(filters, {
+    page: 1,
+    limit: 10,
+    paginated: false,
+  });
+
+  try {
+    let items: Ticket[] = [];
+
+    switch (storeType) {
+      case 'received':
+        items = (await ticketService.getReceivedTickets(userStore.user.id, params)).data.items;
+        break;
+      case 'createdByMe':
+        items = (await ticketService.getByRequester(userStore.user.id, params)).data.items;
+        break;
+      case 'department':
+        if (!userStore.user.departmentId) {
+          statChipTickets.value = [];
+          return;
+        }
+        items = (await ticketService.getByDepartment(userStore.user.departmentId, params)).data
+          .items;
+        break;
+      case 'tenant':
+        items = (await ticketService.fetch(params)).data.items;
+        break;
+    }
+
+    statChipTickets.value = items;
+  } catch (error) {
+    console.error('Error fetching stat chip tickets:', error);
+  }
+};
+
+const fetchTicketsWithFilters = async () => {
+  const storeType = getActiveStoreType();
+
+  if (!storeType) {
+    return;
+  }
+
+  const filters = buildTicketListFilters({ includeStatus: true });
+
+  await Promise.all([
+    ticketsStore.setCurrentPage(storeType, currentPage.value, filters),
+    fetchStatChipTickets(),
+  ]);
 };
 
 const getTicketStatus = (ticket: Ticket): string => {
   return ticket.ticketStatus?.key || ticket.status || '';
 };
 
-const totalTickets = computed(() => tickets.value.length);
+const excludeCanceledAndRejected = (ticketList: Ticket[]) =>
+  ticketList.filter(
+    (ticket) =>
+      ticket.ticketStatus?.key !== DefaultTicketStatus.Canceled &&
+      ticket.status !== DefaultTicketStatus.Canceled &&
+      ticket.ticketStatus?.key !== DefaultTicketStatus.Rejected &&
+      ticket.status !== DefaultTicketStatus.Rejected,
+  );
+
+const statChipTicketList = computed(() => excludeCanceledAndRejected(statChipTickets.value));
+
+const totalTickets = computed(() => statChipTicketList.value.length);
 const pendingTickets = computed(
   () =>
-    tickets.value.filter((ticket) => getTicketStatus(ticket) === DefaultTicketStatus.Pending)
+    statChipTicketList.value.filter((ticket) => getTicketStatus(ticket) === DefaultTicketStatus.Pending)
       .length,
 );
-const inProgressTickets = computed(() => {
-  const excludedStatuses = new Set([
-    DefaultTicketStatus.Pending,
-    DefaultTicketStatus.Completed,
-    DefaultTicketStatus.Canceled,
-    DefaultTicketStatus.Rejected,
-  ]);
-
-  return tickets.value.filter(
-    (ticket) => !excludedStatuses.has(getTicketStatus(ticket) as DefaultTicketStatus),
-  ).length;
-});
+const inProgressTickets = computed(
+  () =>
+    statChipTicketList.value.filter(
+      (ticket) => getTicketStatus(ticket) === DefaultTicketStatus.InProgress,
+    ).length,
+);
 
 const handleViewTicket = (ticket: Ticket) => {
   const query = { ...route.query, ticket: ticket.customId };
@@ -1191,6 +1353,13 @@ const setStatusFilter = (status: DefaultTicketStatus | '') => {
     },
     false,
   );
+};
+
+const isStatChipActive = (status: DefaultTicketStatus | '') => {
+  if (status === '') {
+    return !statusFilter.value;
+  }
+  return statusFilter.value === status;
 };
 
 watch(
