@@ -274,7 +274,7 @@
     class="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 p-4"
     @click.self="closeEditModal"
   >
-    <div class="w-full max-w-xl rounded-xl bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700">
+    <div data-app-modal class="w-full max-w-xl bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700">
       <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
         <h3 class="text-lg font-semibold text-txt-primary dark:text-gray-100">Editar cadastro</h3>
         <button

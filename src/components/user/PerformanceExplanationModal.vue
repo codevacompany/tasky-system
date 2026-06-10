@@ -11,7 +11,8 @@
 
         <!-- Modal -->
         <div
-          class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+          data-app-modal
+          class="relative bg-white dark:bg-gray-800 shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
         >
           <!-- Header -->
           <div

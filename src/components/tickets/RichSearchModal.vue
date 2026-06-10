@@ -5,7 +5,8 @@
       @click.self="$emit('close')"
     >
       <div
-        class="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] animate-searchSlideIn"
+        data-app-modal
+        class="w-full max-w-2xl bg-white dark:bg-gray-800 shadow-2xl overflow-hidden flex flex-col max-h-[80vh] animate-searchSlideIn"
         @click.stop
       >
         <!-- Search Header -->

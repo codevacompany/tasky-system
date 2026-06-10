@@ -52,7 +52,7 @@ const variantClasses = computed(() => {
     case 'primary': {
       if (props.primaryTone === 'gradient') {
         return twMerge(
-          'text-white border border-transparent rounded-[4px] shadow-soft-xs',
+          'text-white border border-transparent shadow-soft-xs',
           'bg-gradient-to-br from-[#00143b] to-[#142046] hover:opacity-90',
         );
       }
@@ -78,7 +78,7 @@ const variantClasses = computed(() => {
 
 const rootClass = computed(() =>
   twMerge(
-    'inline-flex items-center justify-center gap-2 min-h-9 px-[0.85rem] py-2 text-sm font-medium whitespace-nowrap rounded-[5px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
+    'inline-flex items-center justify-center gap-2 min-h-9 px-[0.85rem] py-2 text-sm font-medium whitespace-nowrap rounded-[8px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
     variantClasses.value,
     attrs.class as string | undefined,
   ),

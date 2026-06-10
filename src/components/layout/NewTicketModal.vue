@@ -1181,20 +1181,20 @@ const handleSubmit = async () => {
 
 .quill-wrapper {
   border: 1px solid #d7dee8;
-  border-radius: 6px;
+  border-radius: var(--control-radius);
   overflow: hidden;
 }
 
 :deep(.ql-toolbar) {
   border: none !important;
   border-bottom: 1px solid #e5e7eb !important;
-  border-radius: 6px 6px 0 0 !important;
+  border-radius: var(--control-radius) var(--control-radius) 0 0 !important;
   padding: 10px 12px;
 }
 
 :deep(.ql-container) {
   border: none !important;
-  border-radius: 0 0 6px 6px !important;
+  border-radius: 0 0 var(--control-radius) var(--control-radius) !important;
   min-height: 10px;
 }
 
