@@ -16,6 +16,42 @@ export const ticketDetailsEditorOptions = {
   placeholder: 'Adicionar comentário...',
 };
 
+const COLOR_STYLE_PROPERTIES = ['color', 'background-color', 'background', '-webkit-text-fill-color'];
+
+export const stripInlineTextColors = (html: string): string => {
+  if (typeof window === 'undefined' || !html) return html;
+
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+
+  tempDiv.querySelectorAll('*').forEach((element) => {
+    if (element.tagName === 'A' || element.classList.contains('mention')) {
+      return;
+    }
+
+    const htmlElement = element as HTMLElement;
+    htmlElement.removeAttribute('color');
+    htmlElement.removeAttribute('bgcolor');
+
+    COLOR_STYLE_PROPERTIES.forEach((property) => {
+      htmlElement.style.removeProperty(property);
+    });
+
+    if (!htmlElement.getAttribute('style')?.trim()) {
+      htmlElement.removeAttribute('style');
+    }
+
+    const classesToRemove = [...htmlElement.classList].filter(
+      (className) => className.startsWith('ql-color') || className.startsWith('ql-bg'),
+    );
+    if (classesToRemove.length > 0) {
+      htmlElement.classList.remove(...classesToRemove);
+    }
+  });
+
+  return tempDiv.innerHTML;
+};
+
 const dataUrlToBlob = (dataUrl: string) => {
   const arr = dataUrl.split(',');
   const mimeMatch = arr[0].match(/:(.*?);/);
@@ -46,7 +82,7 @@ export const convertUrlsToLinks = (html: string): string => {
   if (typeof window === 'undefined' || !html) return html;
 
   const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = html;
+  tempDiv.innerHTML = stripInlineTextColors(html);
 
   const urlRegex =
     /(https?:\/\/[^\s<>"{}|\\^`[\]]+|www\.[^\s<>"{}|\\^`[\]]+|[a-zA-Z0-9-]+\.[a-zA-Z]{2,}[^\s<>"{}|\\^`[\]]*)/gi;
