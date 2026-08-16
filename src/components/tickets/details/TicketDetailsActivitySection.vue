@@ -431,5 +431,17 @@ const isCommentLoading = computed(() => ctx.isCommentLoading.value);
   min-height: 120px;
   max-height: 400px;
   overflow-y: auto;
+  color: #374151;
+}
+
+.dark .activity-comment-editor :deep(.ql-editor) {
+  color: #d1d5db;
+}
+
+.comment-text :deep(*:not(a):not(.mention)),
+.activity-comment-editor :deep(.ql-editor *:not(a):not(.mention)) {
+  color: inherit !important;
+  background-color: transparent !important;
+  -webkit-text-fill-color: inherit !important;
 }
 </style>

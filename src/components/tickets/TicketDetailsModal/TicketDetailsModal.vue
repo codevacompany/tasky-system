@@ -458,6 +458,13 @@ const {
   color: #f3f4f6 !important;
 }
 
+.quill-wrapper :deep(.ql-editor *:not(a):not(.mention)),
+.dark .quill-wrapper :deep(.ql-editor *:not(a):not(.mention)) {
+  color: inherit !important;
+  background-color: transparent !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
 :deep(.ql-editor.ql-blank::before) {
   color: #9ca3af;
   font-style: italic;
