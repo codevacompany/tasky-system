@@ -272,7 +272,7 @@
       />
 
       <!-- Últimos Tickets Recebidos e Criados -->
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
         <CompactTicketTable
           title="Últimas Tarefas Recebidas"
           type="received"
@@ -282,6 +282,21 @@
           title="Últimas Tarefas Criadas"
           type="created"
           :viewAllUrl="'/minhas-tarefas?tab=criadas'"
+        />
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <HomeActionNeeded
+          :items="displayedActionItems"
+          :total-count="actionItems.length"
+          :is-loading="isWidgetsLoading"
+          @select="openTicket"
+        />
+        <HomeDeadlines
+          :items="displayedDeadlineItems"
+          :total-count="deadlineItems.length"
+          :is-loading="isWidgetsLoading"
+          @select="openTicket"
         />
       </div>
     </section>
@@ -296,6 +311,9 @@ import { useUserStore } from '@/stores/user';
 import { useTicketsStore } from '@/stores/tickets';
 import { toast } from 'vue-sonner';
 import CompactTicketTable from '@/components/tickets/CompactTicketTable.vue';
+import HomeActionNeeded from '@/components/home/HomeActionNeeded.vue';
+import HomeDeadlines from '@/components/home/HomeDeadlines.vue';
+import { useHomeDashboardWidgets } from '@/composables/useHomeDashboardWidgets';
 import { formatTimeShort } from '@/utils/generic-helper';
 import WelcomeModal from '@/components/common/WelcomeModal.vue';
 import TutorialGuideModal from '@/components/common/TutorialGuideModal.vue';
@@ -313,6 +331,14 @@ import {
 
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
+const {
+  isLoading: isWidgetsLoading,
+  actionItems,
+  displayedActionItems,
+  deadlineItems,
+  displayedDeadlineItems,
+  openTicket,
+} = useHomeDashboardWidgets();
 const isLoading = ref(true);
 const userStats = ref<UserStatistics | null>(null);
 const showPerformanceModal = ref(false);

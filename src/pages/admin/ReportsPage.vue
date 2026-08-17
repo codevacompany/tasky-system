@@ -77,7 +77,7 @@
               :key="tab.id"
               @click="setReportsTab(tab.id)"
               :class="[
-                'flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0',
+                'flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium border-b-2 !rounded-none transition-colors whitespace-nowrap flex-shrink-0',
                 currentTab === tab.id
                   ? 'border-primary text-primary hover:text-primary-dark dark:border-blue-500 dark:text-blue-500 dark:hover:text-blue-500'
                   : 'border-transparent text-txt-muted dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600',

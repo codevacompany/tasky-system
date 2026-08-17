@@ -17,7 +17,31 @@ export type QuillInstance = InstanceType<typeof Quill> & {
   insertEmbed: (index: number, type: string, value: object, source?: string) => void;
   focus: () => void;
   on: (event: string, handler: (...args: unknown[]) => void) => void;
+  clipboard: {
+    addMatcher: (
+      nodeType: number | string,
+      matcher: (node: Node, delta: { ops?: Array<{ attributes?: Record<string, unknown> }> }) => {
+        ops?: Array<{ attributes?: Record<string, unknown> }>;
+      },
+    ) => void;
+  };
 };
+
+const quillsWithPasteColorSanitizer = new WeakSet<object>();
+
+function sanitizePastedTextColors(quill: QuillInstance) {
+  if (quillsWithPasteColorSanitizer.has(quill)) return;
+  quillsWithPasteColorSanitizer.add(quill);
+
+  quill.clipboard?.addMatcher(Node.ELEMENT_NODE, (_node, delta) => {
+    delta.ops?.forEach((op) => {
+      if (!op.attributes) return;
+      delete op.attributes.color;
+      delete op.attributes.background;
+    });
+    return delta;
+  });
+}
 
 const Embed = Quill.import('blots/embed');
 
@@ -80,6 +104,7 @@ export class QuillMention {
     this.quill = quill;
     this.mentionableUsers = mentionableUsers;
     this.onMentionInserted = onMentionInserted;
+    sanitizePastedTextColors(quill);
     this.setupEventListeners();
   }
 

@@ -69,8 +69,8 @@
                 v-if="isAdmin"
                 class="relative"
                 ref="adminDropdownRef"
-                @mouseenter="showAdminDropdown = true"
-                @mouseleave="showAdminDropdown = false"
+                @mouseenter="openAdminDropdown"
+                @mouseleave="scheduleCloseAdminDropdown"
               >
                 <div
                   :class="{
@@ -92,12 +92,15 @@
                 </div>
                 <div
                   v-show="showAdminDropdown"
-                  class="absolute top-[calc(100%-3px)] left-0 text-[14px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[200px] z-50 mt-1 flex flex-col"
+                  class="absolute top-full left-0 z-50 min-w-[200px] mt-[1px]"
                 >
+                  <div
+                    class="flex flex-col rounded-lg border border-gray-200 bg-white text-[14px] shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                  >
                   <router-link
                     v-if="isTenantAdmin"
                     to="/admin/usuarios"
-                    @click="showAdminDropdown = false"
+                    @click="closeAdminDropdown"
                   >
                     <div
                       :class="
@@ -114,7 +117,7 @@
                   <router-link
                     v-if="isTenantAdmin"
                     to="/admin/setores"
-                    @click="showAdminDropdown = false"
+                    @click="closeAdminDropdown"
                   >
                     <div
                       :class="
@@ -131,7 +134,7 @@
                   <router-link
                     v-if="isTenantAdmin"
                     to="/admin/categorias"
-                    @click="showAdminDropdown = false"
+                    @click="closeAdminDropdown"
                   >
                     <div
                       :class="
@@ -147,7 +150,7 @@
                   </router-link>
                   <router-link
                     to="/admin/clientes"
-                    @click="showAdminDropdown = false"
+                    @click="closeAdminDropdown"
                     v-if="isGlobalAdmin"
                   >
                     <div
@@ -163,7 +166,7 @@
                   </router-link>
                   <router-link
                     to="/admin/cadastros"
-                    @click="showAdminDropdown = false"
+                    @click="closeAdminDropdown"
                     v-if="isGlobalAdmin"
                   >
                     <div
@@ -177,6 +180,7 @@
                       Cadastros
                     </div>
                   </router-link>
+                  </div>
                 </div>
               </li>
             </ul>
@@ -508,6 +512,34 @@ const showAdminDropdown = ref(false);
 const showMobileMenu = ref(false);
 const showMobileAdminDropdown = ref(false);
 const adminDropdownRef = ref<HTMLElement | null>(null);
+let adminDropdownCloseTimeout: number | null = null;
+
+const ADMIN_DROPDOWN_CLOSE_DELAY_MS = 150;
+
+const clearAdminDropdownCloseTimeout = () => {
+  if (adminDropdownCloseTimeout !== null) {
+    clearTimeout(adminDropdownCloseTimeout);
+    adminDropdownCloseTimeout = null;
+  }
+};
+
+const openAdminDropdown = () => {
+  clearAdminDropdownCloseTimeout();
+  showAdminDropdown.value = true;
+};
+
+const scheduleCloseAdminDropdown = () => {
+  clearAdminDropdownCloseTimeout();
+  adminDropdownCloseTimeout = window.setTimeout(() => {
+    showAdminDropdown.value = false;
+    adminDropdownCloseTimeout = null;
+  }, ADMIN_DROPDOWN_CLOSE_DELAY_MS);
+};
+
+const closeAdminDropdown = () => {
+  clearAdminDropdownCloseTimeout();
+  showAdminDropdown.value = false;
+};
 
 const fetchUnseenCount = async () => {
   try {
@@ -583,7 +615,7 @@ function playNotificationSound() {
 // Close dropdown when clicking outside (for hover behavior, this helps with edge cases)
 const handleClickOutside = (event: MouseEvent) => {
   if (adminDropdownRef.value && !adminDropdownRef.value.contains(event.target as Node)) {
-    showAdminDropdown.value = false;
+    closeAdminDropdown();
   }
 };
 
@@ -726,6 +758,10 @@ onUnmounted(() => {
   if (reconnectionTimeout.value) {
     clearTimeout(reconnectionTimeout.value);
   }
+  if (adminDropdownCloseTimeout !== null) {
+    clearTimeout(adminDropdownCloseTimeout);
+  }
+
   document.removeEventListener('click', handleClickOutside);
   document.removeEventListener('keydown', handleGlobalKeydown, true);
 });
