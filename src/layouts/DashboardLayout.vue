@@ -469,6 +469,8 @@
     />
 
     <RichSearchModal v-if="showRichSearch" @close="closeRichSearch" />
+
+    <FeatureTipHost />
   </div>
 </template>
 
@@ -479,6 +481,7 @@ import Button from '@/components/common/Button.vue';
 import ProfileModal from '@/components/layout/ProfileModal.vue';
 import RichSearchModal from '@/components/tickets/RichSearchModal.vue';
 import NotificationsDropdown from '@/components/layout/NotificationsDropdown.vue';
+import FeatureTipHost from '@/components/common/FeatureTipHost.vue';
 import { useUserStore } from '@/stores/user';
 import { showRichSearch, openRichSearch, closeRichSearch } from '@/stores/richSearch';
 import { useUserPreferencesStore } from '@/stores/userPreferences';
