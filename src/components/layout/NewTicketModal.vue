@@ -356,7 +356,12 @@
               <Button type="button" variant="primary" class="px-4 py-2" @click="addChecklistItem">
                 Adicionar
               </Button>
-              <Button variant="outlined" type="button" class="px-4 py-2" @click="cancelAddChecklist">
+              <Button
+                variant="outlined"
+                type="button"
+                class="px-4 py-2"
+                @click="cancelAddChecklist"
+              >
                 Cancelar
               </Button>
             </div>

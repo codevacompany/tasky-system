@@ -2,7 +2,11 @@
   <section
     id="ticketsSection"
     class="px-4 pt-4 md:px-6 md:pt-5"
-    :class="isKanbanView ? 'pb-2 flex flex-col h-[calc(100vh-var(--header-height)-1.25rem)]' : 'pb-4 md:pb-4'"
+    :class="
+      isKanbanView
+        ? 'pb-2 flex flex-col h-[calc(100vh-var(--header-height)-1.25rem)]'
+        : 'pb-4 md:pb-4'
+    "
   >
     <div class="flex items-center gap-2 sm:gap-3 min-w-0 shrink-0">
       <h1 class="text-2xl font-bold text-txt-primary dark:text-white shrink-0">Tarefas</h1>
@@ -90,11 +94,19 @@
             <span class="hidden sm:inline">{{ tab.label }}</span>
             <span class="sm:hidden">{{ tab.shortLabel }}</span>
             <span
-              v-if="tab.id === 'recebidas' && ticketsStore.hasNewReceivedTickets && activeTab !== 'recebidas'"
+              v-if="
+                tab.id === 'recebidas' &&
+                ticketsStore.hasNewReceivedTickets &&
+                activeTab !== 'recebidas'
+              "
               class="absolute top-1.5 left-1.5 w-[5px] h-[5px] bg-primary rounded-full"
             />
             <span
-              v-if="tab.id === 'criadas' && ticketsStore.hasNewAwaitingVerificationTickets && activeTab !== 'criadas'"
+              v-if="
+                tab.id === 'criadas' &&
+                ticketsStore.hasNewAwaitingVerificationTickets &&
+                activeTab !== 'criadas'
+              "
               class="absolute top-1.5 left-1.5 w-[5px] h-[5px] bg-primary rounded-full"
             />
           </button>
@@ -140,11 +152,19 @@
             <font-awesome-icon
               icon="ticket"
               class="w-3.5 h-3.5 shrink-0"
-              :class="isStatChipActive('') ? 'text-txt-primary dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'"
+              :class="
+                isStatChipActive('')
+                  ? 'text-txt-primary dark:text-gray-100'
+                  : 'text-gray-500 dark:text-gray-400'
+              "
             />
             <span
               class="text-[13px] font-semibold whitespace-nowrap"
-              :class="isStatChipActive('') ? 'text-txt-primary dark:text-gray-100' : 'text-gray-600 dark:text-gray-300'"
+              :class="
+                isStatChipActive('')
+                  ? 'text-txt-primary dark:text-gray-100'
+                  : 'text-gray-600 dark:text-gray-300'
+              "
             >
               Total
             </span>
@@ -169,7 +189,11 @@
             <font-awesome-icon
               icon="clock"
               class="w-3.5 h-3.5 shrink-0"
-              :class="isStatChipActive(DefaultTicketStatus.Pending) ? 'text-orange-500 dark:text-orange-400' : 'text-orange-500/80'"
+              :class="
+                isStatChipActive(DefaultTicketStatus.Pending)
+                  ? 'text-orange-500 dark:text-orange-400'
+                  : 'text-orange-500/80'
+              "
             />
             <span
               class="text-[13px] font-semibold whitespace-nowrap"
@@ -226,7 +250,11 @@
           </button>
         </div>
         <div
-          :class="isKanbanView ? 'flex flex-1 flex-col min-h-0 overflow-hidden px-2 pt-1.5 pb-1' : 'overflow-x-auto'"
+          :class="
+            isKanbanView
+              ? 'flex flex-1 flex-col min-h-0 overflow-hidden px-2 pt-1.5 pb-1'
+              : 'overflow-x-auto'
+          "
         >
           <TicketTable
             v-if="!isKanbanView"
@@ -362,7 +390,12 @@
           </div>
         </div>
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
-          <Button variant="outlined" type="button" class="rounded-md px-4 py-2 text-sm" @click="clearFilters">
+          <Button
+            variant="outlined"
+            type="button"
+            class="rounded-md px-4 py-2 text-sm"
+            @click="clearFilters"
+          >
             Limpar
           </Button>
           <Button
@@ -418,7 +451,12 @@
           </div>
         </div>
         <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
-          <Button variant="outlined" type="button" class="rounded-md px-4 py-2 text-sm" @click="cancelCorrection">
+          <Button
+            variant="outlined"
+            type="button"
+            class="rounded-md px-4 py-2 text-sm"
+            @click="cancelCorrection"
+          >
             Cancelar
           </Button>
           <Button
@@ -439,12 +477,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import type { Component } from 'vue';
-import {
-  InboxIcon,
-  UserGroupIcon,
-  UserPlusIcon,
-  ViewColumnsIcon,
-} from '@heroicons/vue/24/solid';
+import { InboxIcon, UserGroupIcon, UserPlusIcon, ViewColumnsIcon } from '@heroicons/vue/24/solid';
 import { useRoute, useRouter } from 'vue-router';
 import { ticketService } from '@/services/ticketService';
 import { useTicketsStore } from '@/stores/tickets';
@@ -934,12 +967,7 @@ const switchTab = async (tab: TicketsTab, skipUrlSync = false) => {
 
 const statChipTickets = ref<Ticket[]>([]);
 
-const getActiveStoreType = ():
-  | 'received'
-  | 'createdByMe'
-  | 'department'
-  | 'tenant'
-  | null => {
+const getActiveStoreType = (): 'received' | 'createdByMe' | 'department' | 'tenant' | null => {
   const typeMap: Record<TicketsTab, 'received' | 'createdByMe' | 'department' | 'tenant'> = {
     recebidas: 'received',
     criadas: 'createdByMe',
@@ -967,11 +995,7 @@ const buildTicketListFilters = (options?: { includeStatus?: boolean }) => {
     filters.priority = currentFilters.priority as TicketPriority;
   }
 
-  if (
-    includeStatus &&
-    currentFilters.status &&
-    String(currentFilters.status).trim() !== ''
-  ) {
+  if (includeStatus && currentFilters.status && String(currentFilters.status).trim() !== '') {
     filters.status = currentFilters.status as DefaultTicketStatus;
   }
 
@@ -1117,8 +1141,9 @@ const statChipTicketList = computed(() => excludeCanceledAndRejected(statChipTic
 const totalTickets = computed(() => statChipTicketList.value.length);
 const pendingTickets = computed(
   () =>
-    statChipTicketList.value.filter((ticket) => getTicketStatus(ticket) === DefaultTicketStatus.Pending)
-      .length,
+    statChipTicketList.value.filter(
+      (ticket) => getTicketStatus(ticket) === DefaultTicketStatus.Pending,
+    ).length,
 );
 const inProgressTickets = computed(
   () =>

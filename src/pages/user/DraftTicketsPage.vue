@@ -13,8 +13,12 @@
       <h1 class="text-2xl font-bold text-txt-primary dark:text-white">Tarefas em Rascunho</h1>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-soft-xs">
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-4 px-6 gap-3 border-b border-gray-200 dark:border-gray-700">
+    <div
+      class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-soft-xs"
+    >
+      <div
+        class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-4 px-6 gap-3 border-b border-gray-200 dark:border-gray-700"
+      >
         <div class="flex items-center justify-start gap-2 w-full lg:w-auto">
           <div class="relative w-full max-w-xs lg:w-56">
             <font-awesome-icon
