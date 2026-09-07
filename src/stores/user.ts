@@ -54,6 +54,10 @@ export const useUserStore = defineStore('auth', () => {
     localStorageService.clear();
     setUser(null);
     setHasActiveSubscription(undefined);
+    // Lazy import avoids circular dependency with featureTips → user store
+    import('@/stores/featureTips').then(({ useFeatureTipsStore }) => {
+      useFeatureTipsStore().reset();
+    });
   };
 
   return {
