@@ -46,7 +46,7 @@
 
       <template #column-person="{ item }">
         <div class="text-sm text-txt-primary dark:text-gray-100">
-          <template v-if="tableType === 'criadas'">
+          <template v-if="tableType === 'criadas' || tableType === 'rascunhos'">
             <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
               <div
                 v-for="targetUser in getSortedTargetUsers(item)"
@@ -485,6 +485,16 @@
             </div>
           </template>
 
+          <template v-else-if="tableType === 'rascunhos'">
+            <button
+              class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white transition-colors duração-200"
+              @click.stop="openTicketDetails(item)"
+              title="Visualizar"
+            >
+              <font-awesome-icon icon="eye" class="text-xs md:text-sm" />
+            </button>
+          </template>
+
           <template v-else-if="tableType === 'setor'">
             <button
               class="inline-flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white transition-colors duração-200"
@@ -678,7 +688,7 @@ import {
   getDeadlineInfo,
 } from '@/utils/generic-helper';
 
-type TableType = 'recebidas' | 'criadas' | 'setor' | 'arquivadas' | 'gerais';
+type TableType = 'recebidas' | 'criadas' | 'setor' | 'arquivadas' | 'rascunhos' | 'gerais';
 
 const props = defineProps<{
   tableType: TableType;
@@ -709,6 +719,8 @@ const activeFilters = computed<TicketListFilters | undefined>(() => {
       return ticketsStore.departmentTickets.currentFilters;
     case 'arquivadas':
       return ticketsStore.archivedTickets.currentFilters;
+    case 'rascunhos':
+      return ticketsStore.draftTickets.currentFilters;
     case 'gerais':
       return ticketsStore.tenantTickets.currentFilters;
     default:
@@ -764,7 +776,7 @@ const tableHeaders = computed<TableHeader<Ticket>[]>(() => {
     },
     {
       key: 'person',
-      label: props.tableType === 'criadas' ? 'Destinatário' : 'Solicitante',
+      label: props.tableType === 'criadas' || props.tableType === 'rascunhos' ? 'Destinatário' : 'Solicitante',
       align: 'center',
       width: 0.18,
     },
@@ -828,6 +840,8 @@ const displayedTickets = computed(() => {
       return ticketsStore.departmentTickets.data;
     case 'arquivadas':
       return ticketsStore.archivedTickets.data;
+    case 'rascunhos':
+      return ticketsStore.draftTickets.data;
     case 'gerais':
       return ticketsStore.tenantTickets.data;
     default:
@@ -845,6 +859,8 @@ const isLoading = computed(() => {
       return ticketsStore.departmentTickets.isLoading;
     case 'arquivadas':
       return ticketsStore.archivedTickets.isLoading;
+    case 'rascunhos':
+      return ticketsStore.draftTickets.isLoading;
     case 'gerais':
       return ticketsStore.tenantTickets.isLoading;
     default:
@@ -866,6 +882,9 @@ const totalPages = computed(() => {
       break;
     case 'arquivadas':
       totalCount = ticketsStore.archivedTickets.totalCount;
+      break;
+    case 'rascunhos':
+      totalCount = ticketsStore.draftTickets.totalCount;
       break;
     case 'gerais':
       totalCount = ticketsStore.tenantTickets.totalCount;
@@ -978,6 +997,9 @@ const refreshTickets = async (pageOverride?: number) => {
     case 'arquivadas':
       await ticketsStore.fetchArchivedTickets(pageToUse, 10, filters);
       break;
+    case 'rascunhos':
+      await ticketsStore.fetchDraftTickets(pageToUse, 10, filters);
+      break;
     case 'gerais':
       await ticketsStore.fetchTenantTickets(pageToUse, 10, filters);
       break;
@@ -1030,6 +1052,8 @@ const getStatusClass = (status: string) => {
       return 'bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800';
     case DefaultTicketStatus.Canceled:
       return 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
+    case 'rascunho':
+      return 'bg-gray-50 text-gray-600 border border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800';
     default:
       return 'bg-gray-50 text-gray-700 border border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800';
   }
@@ -1432,6 +1456,7 @@ const formatDateOnly = (date: string | Date): string => {
 
 // Helper function to get ticket status (supports both new and old format)
 const getTicketStatus = (ticket: Ticket): string => {
+  if (ticket.isDraft) return 'rascunho';
   return ticket.ticketStatus?.key || ticket.status || '';
 };
 

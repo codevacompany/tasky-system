@@ -70,7 +70,7 @@
       </div>
     </div>
     <form
-      @submit.prevent="handleSubmit"
+      @submit.prevent="handleSubmit(false)"
       class="w-full md:min-w-[748px] min-h-[320px] -mt-1 sm:-mt-2.5"
     >
       <!-- Step 1: Basic Information -->
@@ -390,13 +390,25 @@
         {{ currentStep === 1 ? 'Cancelar' : 'Voltar' }}
       </Button>
       <Button
+        v-if="currentStep === 2"
+        type="button"
+        variant="outlined"
+        class="w-full sm:w-auto min-w-20 px-4 py-2"
+        data-feature-tip="drafts.save-button"
+        @click="handleSaveDraft"
+        :disabled="isLoading"
+      >
+        <LoadingSpinner v-if="isLoading && submitMode === 'draft'" :size="16" :color="'#3b82f6'" />
+        <span v-else>Salvar rascunho</span>
+      </Button>
+      <Button
         type="button"
         variant="primary"
         class="w-full sm:w-auto min-w-20 px-4 py-2"
         @click="handleConfirm"
         :disabled="isLoading"
       >
-        <LoadingSpinner v-if="isLoading" :size="16" :color="'white'" />
+        <LoadingSpinner v-if="isLoading && submitMode === 'create'" :size="16" :color="'white'" />
         <span v-else>{{ currentStep === 1 ? 'Próximo' : 'Criar Tarefa' }}</span>
       </Button>
     </template>
@@ -447,6 +459,7 @@ const categories = ref<Category[]>([]);
 const selectedCategory = ref<number | null>(null);
 const selectedFiles = ref<File[]>([]);
 const isLoading = ref(false);
+const submitMode = ref<'create' | 'draft' | null>(null);
 const quillWrapperRef = ref<HTMLElement | null>(null);
 
 // Checklist state
@@ -873,16 +886,6 @@ const validateStep1 = (): boolean => {
     return false;
   }
 
-  if (!targetUsers.value.some((tu) => tu.userId !== null)) {
-    toast.error('Selecione pelo menos um usuário destino');
-    return false;
-  }
-
-  if (!formData.value.priority) {
-    toast.error('O campo Prioridade é obrigatório');
-    return false;
-  }
-
   return true;
 };
 
@@ -892,8 +895,12 @@ const handleConfirm = () => {
       goToNextStep();
     }
   } else {
-    handleSubmit();
+    handleSubmit(false);
   }
+};
+
+const handleSaveDraft = () => {
+  handleSubmit(true);
 };
 
 let quillObserver: MutationObserver | null = null;
@@ -1076,14 +1083,26 @@ const uploadFilesToS3 = async () => {
   return uploadedFiles;
 };
 
-const handleSubmit = async () => {
-  if (!validateForm()) return;
+const handleSubmit = async (asDraft = false) => {
+  if (asDraft) {
+    if (!formData.value.name.trim()) {
+      toast.error('O campo Assunto é obrigatório');
+      return;
+    }
+    if (formData.value.name.trim().length < 2) {
+      toast.error('O assunto deve ter pelo menos 2 caracteres');
+      return;
+    }
+  } else if (!validateForm()) {
+    return;
+  }
 
+  submitMode.value = asDraft ? 'draft' : 'create';
   isLoading.value = true;
 
   try {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(formData.value.description, 'text/html');
+    const doc = parser.parseFromString(formData.value.description || '', 'text/html');
     const images = Array.from(doc.querySelectorAll('img'));
 
     for (const img of images) {
@@ -1111,38 +1130,37 @@ const handleSubmit = async () => {
         toast.error('Erro ao fazer upload de imagem');
         console.error(err);
         isLoading.value = false;
+        submitMode.value = null;
         return;
       }
     }
 
     formData.value.description = doc.body.innerHTML;
-
     formData.value.categoryId = selectedCategory.value;
 
-    // Extract target user IDs from targetUsers array
     const targetUserIds = targetUsers.value
       .filter((tu) => tu.userId !== null)
       .map((tu) => tu.userId!);
 
-    if (targetUserIds.length === 0) {
+    if (!asDraft && targetUserIds.length === 0) {
       toast.error('Selecione pelo menos um usuário destino');
       isLoading.value = false;
+      submitMode.value = null;
       return;
     }
 
     const fileUrls = await uploadFilesToS3();
-
-    // Convert Date object to ISO string
     const dueAtISO = dueAtDate.value ? dueAtDate.value.toISOString() : undefined;
 
     const ticketData = {
       name: formData.value.name,
       priority: formData.value.priority,
-      description: formData.value.description,
+      description: formData.value.description || '',
       requesterId: formData.value.requesterId!,
       dueAt: dueAtISO,
       categoryId: selectedCategory.value ?? null,
       isPrivate: formData.value.isPrivate,
+      isDraft: asDraft || undefined,
       reviewerId: formData.value.reviewerId,
       files: fileUrls,
       targetUserIds,
@@ -1151,14 +1169,14 @@ const handleSubmit = async () => {
 
     await ticketService.create(ticketData);
 
-    toast.success('Tarefa criada com sucesso!');
+    toast.success(asDraft ? 'Rascunho salvo com sucesso!' : 'Tarefa criada com sucesso!');
     emit('ticketCreated');
     closeModal();
-    // router.push('/minhas-tarefas?tab=criadas');
   } catch {
-    toast.error('Erro ao criar tarefa');
+    toast.error(asDraft ? 'Erro ao salvar rascunho' : 'Erro ao criar tarefa');
   } finally {
     isLoading.value = false;
+    submitMode.value = null;
   }
 };
 </script>

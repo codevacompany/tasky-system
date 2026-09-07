@@ -27,15 +27,15 @@
           <span
             :class="[
               'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium max-w-[140px] sm:max-w-[220px]',
-              getStatusClass(ticketStatus),
+              getStatusClass(displayedStatus),
             ]"
           >
             <font-awesome-icon
-              :icon="getStatusIcon(ticketStatus)"
+              :icon="getStatusIcon(displayedStatus)"
               class="text-xs mr-1.5 flex-shrink-0"
             />
             <span class="truncate">{{
-              ticketStatus ? formatSnakeToNaturalCase(ticketStatus) : '-'
+              displayedStatus ? formatSnakeToNaturalCase(displayedStatus) : '-'
             }}</span>
           </span>
         </div>
@@ -197,6 +197,7 @@
                   </p>
                 </div>
               </div>
+              <p v-else class="text-sm text-gray-400 dark:text-gray-500 italic">Sem responsável</p>
             </div>
           </div>
         </div>
@@ -475,6 +476,9 @@ const canEditDueDate = computed(
 const { formatDateOnly } = dueDate;
 
 const loadedTicket = computed(() => ctx.loadedTicket.value!);
+const displayedStatus = computed(() =>
+  loadedTicket.value?.isDraft ? 'rascunho' : ticketStatus.value,
+);
 
 // Hover state for editable fields
 const assigneeHovered = ref(false);

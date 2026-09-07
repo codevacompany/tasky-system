@@ -48,6 +48,8 @@ export function useTicketDetailsWorkflow(
     isSelfAssigned,
   } = access;
 
+  const isDraftTicket = computed(() => Boolean(loadedTicket.value?.isDraft));
+
   const { openConfirmationModal, closeConfirmationModal, handleConfirm, handleCancel } =
     confirmation;
 
@@ -334,9 +336,90 @@ export function useTicketDetailsWorkflow(
     isPrimary?: boolean;
   };
 
+  const publishDraft = async () => {
+    const ticket = loadedTicket.value;
+    if (!ticket) return;
+
+    const hasAssignees = (ticket.targetUsers?.length ?? 0) > 0;
+    if (!hasAssignees) {
+      toast.error('Defina pelo menos um responsável antes de publicar');
+      return;
+    }
+
+    if (!ticket.category) {
+      toast.error('Defina uma categoria antes de publicar');
+      return;
+    }
+
+    openConfirmationModal(
+      'Publicar Tarefa',
+      'A tarefa será enviada aos responsáveis e deixará de ser um rascunho. Deseja continuar?',
+      async () => {
+        try {
+          const response = await ticketService.publish(ticket.customId);
+          ticketsStore.updateTicketInCollections(response.data);
+          toast.success('Tarefa publicada com sucesso');
+          await refreshSelectedTicket();
+        } catch {
+          toast.error('Erro ao publicar rascunho');
+        }
+      },
+      false,
+      [],
+    );
+  };
+
+  const deleteDraft = async () => {
+    const ticket = loadedTicket.value;
+    if (!ticket) return;
+
+    openConfirmationModal(
+      'Excluir rascunho',
+      'Esta ação não pode ser desfeita. Deseja excluir este rascunho?',
+      async () => {
+        try {
+          await ticketService.deleteDraft(ticket.customId);
+          ticketsStore.removeTicketFromCollections(ticket.customId);
+          toast.success('Rascunho excluído com sucesso');
+          emit('close');
+        } catch {
+          toast.error('Erro ao excluir rascunho');
+        }
+      },
+      false,
+      [],
+    );
+  };
+
   const headerActions = computed(() => {
     const actions: HeaderAction[] = [];
     if (!loadedTicket.value) return actions;
+
+    if (isDraftTicket.value && isRequester.value) {
+      actions.push({
+        id: 'publish',
+        label: 'Publicar',
+        icon: 'paper-plane',
+        color: 'bg-green-600 hover:bg-green-700',
+        onClick: () => {
+          void publishDraft();
+          isActionsDropdownOpen.value = false;
+        },
+        isPrimary: true,
+      });
+      actions.push({
+        id: 'delete-draft',
+        label: 'Excluir',
+        icon: 'trash',
+        color: 'bg-red-600 hover:bg-red-700',
+        onClick: () => {
+          void deleteDraft();
+          isActionsDropdownOpen.value = false;
+        },
+        isPrimary: false,
+      });
+      return actions;
+    }
 
     const currentStatus = ticketStatus.value;
 
@@ -480,7 +563,7 @@ export function useTicketDetailsWorkflow(
 
   const applyPostLoadAlerts = (silent: boolean) => {
     const ticket = loadedTicket.value;
-    if (!ticket || silent) return;
+    if (!ticket || silent || ticket.isDraft) return;
 
     if (
       userStore.user?.id === ticket.reviewer?.id &&

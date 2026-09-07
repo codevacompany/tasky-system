@@ -20,6 +20,7 @@
         <div class="relative view-menu-container">
           <button
             class="flex items-center justify-center w-[34px] h-[34px] border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
+            data-feature-tip="drafts.ellipsis-menu"
             @click.stop="showViewMenu = !showViewMenu"
             title="Opções"
           >
@@ -31,13 +32,20 @@
             class="absolute left-0 sm:left-auto sm:right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50"
             @click.stop
           >
-            <div class="py-1">
+            <div class="py-2 whitespace-nowrap">
               <button
                 @click="navigateToArchived"
                 class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
               >
-                <font-awesome-icon icon="archive" class="w-4 h-4" />
+                <font-awesome-icon icon="archive" class="w-4 h-4 opacity-85" />
                 <span>Tarefas arquivadas</span>
+              </button>
+              <button
+                @click="navigateToDrafts"
+                class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+              >
+                <font-awesome-icon icon="file-alt" class="w-4 h-4 opacity-85" />
+                <span>Tarefas em rascunho</span>
               </button>
             </div>
           </div>
@@ -1266,6 +1274,11 @@ const toggleView = async () => {
 const navigateToArchived = () => {
   showViewMenu.value = false;
   router.push('/minhas-tarefas/arquivadas');
+};
+
+const navigateToDrafts = () => {
+  showViewMenu.value = false;
+  router.push('/minhas-tarefas/rascunhos');
 };
 
 const clearFilters = () => {
