@@ -197,6 +197,14 @@
                   </p>
                 </div>
               </div>
+              <div v-else class="flex items-center gap-2">
+                <div
+                  class="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-400 border border-dashed border-gray-300 dark:border-gray-500"
+                >
+                  <font-awesome-icon icon="user-plus" class="text-[10px]" />
+                </div>
+                <p class="text-sm text-txt-muted dark:text-gray-400 font-medium">Sem responsável</p>
+              </div>
             </div>
           </div>
         </div>
