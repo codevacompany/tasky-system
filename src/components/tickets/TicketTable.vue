@@ -72,7 +72,7 @@
                 <span class="text-orange-500 text-xs font-medium">Desativado</span>
               </div>
             </div>
-            <div v-else>-</div>
+            <div v-else class="text-txt-muted dark:text-gray-400">Sem responsável</div>
           </template>
           <template v-else>
             <span class="whitespace-nowrap overflow-hidden text-ellipsis block">
@@ -101,7 +101,7 @@
               {{ targetUser.user.firstName }} {{ targetUser.user.lastName }}
             </div>
           </div>
-          <div v-else>-</div>
+          <div v-else class="text-txt-muted dark:text-gray-400">Sem responsável</div>
         </div>
       </template>
 
@@ -122,7 +122,7 @@
                 {{ targetUser.user.firstName }} {{ targetUser.user.lastName }}
               </div>
             </div>
-            <div v-else>-</div>
+            <div v-else class="text-txt-muted dark:text-gray-400">Sem responsável</div>
           </template>
           <template v-else>
             <div v-if="item.targetUsers && item.targetUsers.length > 0" class="space-y-1">
