@@ -5,7 +5,7 @@ import { useUserStore } from '@/stores/user';
 import { localStorageService } from '@/utils/localStorageService';
 
 interface SignUpPayload {
-  cnpj?: string;
+  cnpj: string;
   contactName: string;
   contactEmail: string;
   contactPhone: string;
@@ -13,6 +13,14 @@ interface SignUpPayload {
   termsVersion?: string;
   privacyPolicyAccepted: boolean;
   privacyPolicyVersion?: string;
+}
+
+interface CreateSignUpResponse {
+  id: number;
+  activationToken: string;
+  status: string;
+  companyName?: string;
+  contactEmail?: string;
 }
 
 interface UpdateSignUpPayload {
@@ -37,7 +45,7 @@ class SignupService {
   private readonly baseUrl = '/sign-up';
 
   async createSignUp(data: SignUpPayload) {
-    return apiClient.post(this.baseUrl, data);
+    return apiClient.post<CreateSignUpResponse>(this.baseUrl, data);
   }
 
   async getSignups(params: PaginationParams) {
