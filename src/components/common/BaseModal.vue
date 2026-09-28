@@ -26,6 +26,7 @@
             : 'min-w-[95vw] max-h-[calc(90vh-100px)]',
           // Desktop defaults: rounded, height + horizontal margin
           'sm:rounded-[var(--modal-radius)] sm:min-w-[500px] sm:max-h-[94vh] sm:mx-4',
+          modalClass,
         ]"
       >
         <div v-if="hasCustomHeader">
@@ -107,6 +108,8 @@ const props = defineProps({
   blurBackdrop: { type: Boolean, default: false },
   // Optional Tailwind classes to control desktop width when isFullScreenMobile is true
   desktopWidthClass: { type: String, default: '' },
+  /** Extra classes for the dialog panel (e.g. compact width overrides) */
+  modalClass: { type: String, default: '' },
 });
 
 const emit = defineEmits(['close', 'cancel', 'confirm']);

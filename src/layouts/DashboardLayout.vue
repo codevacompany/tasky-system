@@ -97,89 +97,89 @@
                   <div
                     class="flex flex-col rounded-lg border border-gray-200 bg-white text-[14px] shadow-lg dark:border-gray-700 dark:bg-gray-800"
                   >
-                  <router-link
-                    v-if="isTenantAdmin"
-                    to="/admin/usuarios"
-                    @click="closeAdminDropdown"
-                  >
-                    <div
-                      :class="
-                        isActive('/admin/usuarios')
-                          ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
-                          : 'text-txt-secondary dark:text-gray-300'
-                      "
-                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                    <router-link
+                      v-if="isTenantAdmin"
+                      to="/admin/usuarios"
+                      @click="closeAdminDropdown"
                     >
-                      <font-awesome-icon icon="users" />
-                      Usuários
-                    </div>
-                  </router-link>
-                  <router-link
-                    v-if="isTenantAdmin"
-                    to="/admin/setores"
-                    @click="closeAdminDropdown"
-                  >
-                    <div
-                      :class="
-                        isActive('/admin/setores')
-                          ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
-                          : 'text-txt-secondary dark:text-gray-300'
-                      "
-                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                      <div
+                        :class="
+                          isActive('/admin/usuarios')
+                            ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
+                            : 'text-txt-secondary dark:text-gray-300'
+                        "
+                        class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
+                        <font-awesome-icon icon="users" />
+                        Usuários
+                      </div>
+                    </router-link>
+                    <router-link
+                      v-if="isTenantAdmin"
+                      to="/admin/setores"
+                      @click="closeAdminDropdown"
                     >
-                      <font-awesome-icon icon="building" />
-                      Setores
-                    </div>
-                  </router-link>
-                  <router-link
-                    v-if="isTenantAdmin"
-                    to="/admin/categorias"
-                    @click="closeAdminDropdown"
-                  >
-                    <div
-                      :class="
-                        isActive('/admin/categorias')
-                          ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
-                          : 'text-txt-secondary dark:text-gray-300'
-                      "
-                      class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                      <div
+                        :class="
+                          isActive('/admin/setores')
+                            ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
+                            : 'text-txt-secondary dark:text-gray-300'
+                        "
+                        class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
+                        <font-awesome-icon icon="building" />
+                        Setores
+                      </div>
+                    </router-link>
+                    <router-link
+                      v-if="isTenantAdmin"
+                      to="/admin/categorias"
+                      @click="closeAdminDropdown"
                     >
-                      <font-awesome-icon icon="tag" />
-                      Categorias
-                    </div>
-                  </router-link>
-                  <router-link
-                    to="/admin/clientes"
-                    @click="closeAdminDropdown"
-                    v-if="isGlobalAdmin"
-                  >
-                    <div
-                      :class="{
-                        'admin-submenu-active bg-gray-50 dark:bg-gray-700':
-                          isActive('/admin/clientes'),
-                      }"
-                      class="flex items-center gap-2 px-4 py-3 text-txt-secondary dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                      <div
+                        :class="
+                          isActive('/admin/categorias')
+                            ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
+                            : 'text-txt-secondary dark:text-gray-300'
+                        "
+                        class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
+                        <font-awesome-icon icon="tag" />
+                        Categorias
+                      </div>
+                    </router-link>
+                    <router-link
+                      to="/admin/clientes"
+                      @click="closeAdminDropdown"
+                      v-if="isGlobalAdmin"
                     >
-                      <font-awesome-icon icon="building" />
-                      Clientes
-                    </div>
-                  </router-link>
-                  <router-link
-                    to="/admin/cadastros"
-                    @click="closeAdminDropdown"
-                    v-if="isGlobalAdmin"
-                  >
-                    <div
-                      :class="{
-                        'admin-submenu-active bg-gray-50 dark:bg-gray-700':
-                          isActive('/admin/cadastros'),
-                      }"
-                      class="flex items-center gap-2 px-4 py-3 text-txt-secondary dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                      <div
+                        :class="{
+                          'admin-submenu-active bg-gray-50 dark:bg-gray-700':
+                            isActive('/admin/clientes'),
+                        }"
+                        class="flex items-center gap-2 px-4 py-3 text-txt-secondary dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
+                        <font-awesome-icon icon="building" />
+                        Clientes
+                      </div>
+                    </router-link>
+                    <router-link
+                      to="/admin/cadastros"
+                      @click="closeAdminDropdown"
+                      v-if="isGlobalAdmin"
                     >
-                      <font-awesome-icon icon="user-plus" />
-                      Cadastros
-                    </div>
-                  </router-link>
+                      <div
+                        :class="{
+                          'admin-submenu-active bg-gray-50 dark:bg-gray-700':
+                            isActive('/admin/cadastros'),
+                        }"
+                        class="flex items-center gap-2 px-4 py-3 text-txt-secondary dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
+                        <font-awesome-icon icon="user-plus" />
+                        Cadastros
+                      </div>
+                    </router-link>
                   </div>
                 </div>
               </li>
@@ -469,6 +469,8 @@
     />
 
     <RichSearchModal v-if="showRichSearch" @close="closeRichSearch" />
+
+    <FeatureTipHost />
   </div>
 </template>
 
@@ -479,6 +481,7 @@ import Button from '@/components/common/Button.vue';
 import ProfileModal from '@/components/layout/ProfileModal.vue';
 import RichSearchModal from '@/components/tickets/RichSearchModal.vue';
 import NotificationsDropdown from '@/components/layout/NotificationsDropdown.vue';
+import FeatureTipHost from '@/components/common/FeatureTipHost.vue';
 import { useUserStore } from '@/stores/user';
 import { showRichSearch, openRichSearch, closeRichSearch } from '@/stores/richSearch';
 import { useUserPreferencesStore } from '@/stores/userPreferences';
@@ -810,8 +813,8 @@ onUnmounted(() => {
 }
 
 .menu-item-active {
-  color: #1C2260;
-  border-bottom: 2px solid #1C2260;
+  color: #1c2260;
+  border-bottom: 2px solid #1c2260;
 }
 
 .dark-mode .menu-item-active {

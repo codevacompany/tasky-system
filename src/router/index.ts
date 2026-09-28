@@ -62,6 +62,10 @@ const routes: RouteRecordRaw[] = [
         path: 'minhas-tarefas/arquivadas',
         component: () => import('@/pages/user/ArchivedTicketsPage.vue'),
       },
+      {
+        path: 'minhas-tarefas/rascunhos',
+        component: () => import('@/pages/user/DraftTicketsPage.vue'),
+      },
       { path: 'perfil', component: () => import('@/pages/user/ProfilePage.vue') },
       {
         path: 'preferencias',

@@ -3,10 +3,20 @@
     v-if="showEditTargetUsersModal"
     title="Gerenciar Responsáveis"
     :showFooter="false"
+    modal-class="!min-w-0 w-[min(95vw,480px)] sm:!min-w-[460px] sm:max-w-[480px]"
     @close="closeEditTargetUsersModal"
   >
-    <div class="p-4 sm:p-6" style="overflow: visible">
-      <div v-if="!isEditingAssignee && !isAddingAssignee" class="space-y-3">
+    <div
+      :class="{
+        'flex items-center justify-center min-h-[120px]':
+          !isEditingAssignee && !isAddingAssignee && sortedTargetUsers.length === 0,
+      }"
+      style="overflow: visible"
+    >
+      <div
+        v-if="!isEditingAssignee && !isAddingAssignee"
+        :class="sortedTargetUsers.length === 0 ? 'w-full max-w-sm' : 'space-y-3 w-full'"
+      >
         <div
           v-for="targetUser in sortedTargetUsers"
           :key="targetUser.userId"
@@ -74,7 +84,10 @@
         <button
           v-if="canAddNewAssignee"
           @click="startAddingAssignee"
-          class="w-full mt-3 px-4 py-2.5 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:border-blue-500 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center justify-center gap-2"
+          :class="[
+            'px-4 py-2.5 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:border-blue-500 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center justify-center gap-2',
+            sortedTargetUsers.length === 0 ? 'w-full' : 'w-full mt-3',
+          ]"
         >
           <font-awesome-icon icon="plus" class="text-xs" />
           Adicionar Responsável

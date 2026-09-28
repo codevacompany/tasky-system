@@ -1,5 +1,5 @@
 <template>
-  <section id="archivedTicketsSection" class="px-4 pt-4 pb-4 md:px-6 md:pt-4 md:pb-0">
+  <section id="draftTicketsSection" class="px-4 pt-4 pb-4 md:px-6 md:pt-4 md:pb-0">
     <div class="flex items-center gap-2 mb-6">
       <button
         type="button"
@@ -8,15 +8,14 @@
         aria-label="Voltar"
         @click="goBack"
       >
-        <font-awesome-icon icon="chevron-left" class="text-base" />
+        <font-awesome-icon icon="chevron-left" class="text-sm" />
       </button>
-      <h1 class="text-2xl font-bold text-txt-primary dark:text-white">Tarefas Arquivadas</h1>
+      <h1 class="text-2xl font-bold text-txt-primary dark:text-white">Tarefas em Rascunho</h1>
     </div>
 
     <div
       class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-soft-xs"
     >
-      <!-- Search and Filters Bar -->
       <div
         class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-4 px-6 gap-3 border-b border-gray-200 dark:border-gray-700"
       >
@@ -29,7 +28,7 @@
             <Input
               v-model="searchTerm"
               type="text"
-              placeholder="Buscar tarefas"
+              placeholder="Buscar rascunhos"
               padding="tight"
               class="pl-9 pr-3 w-full text-sm transition-all duration-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
             />
@@ -50,12 +49,11 @@
         </div>
       </div>
 
-      <!-- Content Area -->
       <div class="overflow-x-auto">
         <TicketTable
-          :tickets="archivedTickets"
+          :tickets="draftTickets"
           :isLoading="isLoading"
-          tableType="arquivadas"
+          tableType="rascunhos"
           :currentPage="currentPage"
           :totalPages="totalPages"
           :pagination="true"
@@ -65,14 +63,12 @@
       </div>
     </div>
 
-    <!-- Ticket Details Modal -->
     <TicketDetailsModal
       v-if="selectedTicketCustomId"
       :ticketCustomId="selectedTicketCustomId"
       @close="closeTicketModal"
     />
 
-    <!-- Modal de Filtros -->
     <div
       v-if="showFiltersModal"
       class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
@@ -150,9 +146,9 @@ const currentPage = ref(1);
 const showFiltersModal = ref(false);
 const selectedTicketCustomId = ref<string | null>(null);
 
-const archivedTickets = computed(() => ticketsStore.archivedTickets.data);
-const isLoading = computed(() => ticketsStore.archivedTickets.isLoading);
-const totalPages = computed(() => Math.ceil(ticketsStore.archivedTickets.totalCount / 10));
+const draftTickets = computed(() => ticketsStore.draftTickets.data);
+const isLoading = computed(() => ticketsStore.draftTickets.isLoading);
+const totalPages = computed(() => Math.ceil(ticketsStore.draftTickets.totalCount / 10));
 
 const priorityOptions = computed(() => [
   { value: '', label: 'Todas' },
@@ -168,7 +164,7 @@ const activeFiltersCount = computed(() => {
   return count;
 });
 
-const fetchArchivedTickets = async () => {
+const fetchDraftTickets = async () => {
   const filters: {
     priority?: TicketPriority | null;
     name?: string;
@@ -182,11 +178,11 @@ const fetchArchivedTickets = async () => {
     filters.name = searchTerm.value.trim();
   }
 
-  await ticketsStore.setCurrentPage('archived', currentPage.value, filters);
+  await ticketsStore.setCurrentPage('draft', currentPage.value, filters);
 };
 
 onMounted(async () => {
-  await fetchArchivedTickets();
+  await fetchDraftTickets();
 
   const ticketCustomId = route.query.ticket as string;
   if (ticketCustomId) {
@@ -195,7 +191,7 @@ onMounted(async () => {
 });
 
 const debouncedSearch = debounce(() => {
-  fetchArchivedTickets();
+  fetchDraftTickets();
 }, 400);
 
 const handleViewTicket = (ticket: Ticket) => {
@@ -213,11 +209,11 @@ const closeTicketModal = () => {
 const clearFilters = () => {
   priorityFilter.value = '';
   searchTerm.value = '';
-  fetchArchivedTickets();
+  fetchDraftTickets();
 };
 
 const applyFilters = () => {
-  fetchArchivedTickets();
+  fetchDraftTickets();
   showFiltersModal.value = false;
 };
 
@@ -239,10 +235,6 @@ watch(searchTerm, () => {
 });
 
 watch(currentPage, () => {
-  fetchArchivedTickets();
+  fetchDraftTickets();
 });
 </script>
-
-<style scoped>
-/* All styles have been converted to Tailwind classes */
-</style>

@@ -18,8 +18,15 @@
       </div>
 
       <div class="col-span-1 flex flex-col gap-1.5 relative">
-        <label :for="`targetUser-${index}`" class="text-sm text-gray-800 dark:text-gray-200">
-          Usuário Destino: <span v-if="index === 0" class="text-red-500">*</span>
+        <label :for="`targetUser-${index}`" class="text-sm text-gray-800 dark:text-gray-200 inline-flex items-center gap-1.5">
+          <span>
+            Usuário Destino: <span v-if="index === 0" class="text-red-500">*</span>
+          </span>
+          <InfoTooltip
+            v-if="index === 0"
+            message="Obrigatório para criar a tarefa. Não é necessário para salvar rascunho."
+            width="240px"
+          />
         </label>
         <Select
           :id="`targetUser-${index}`"
@@ -55,6 +62,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import Select from '@/components/common/Select.vue';
+import InfoTooltip from '@/components/common/InfoTooltip.vue';
 import { type Department, type User } from '@/models';
 
 interface TargetUser {

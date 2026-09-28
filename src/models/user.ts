@@ -23,6 +23,9 @@ export interface User {
   privacyPolicyAcceptedAt?: string | Date | null;
   privacyPolicyVersion?: string | null;
   completedOnboarding?: boolean;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  seenFeatureTipIds?: string[];
 }
 
 export interface CreateUserDto {

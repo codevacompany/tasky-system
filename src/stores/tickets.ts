@@ -79,6 +79,15 @@ interface TicketsState {
     currentPage: number;
     currentFilters?: TicketListFilters;
   };
+  draftTickets: {
+    data: Ticket[];
+    isLoading: boolean;
+    error: string | null;
+    totalCount: number;
+    lastFetched: Date | null;
+    currentPage: number;
+    currentFilters?: TicketListFilters;
+  };
   tenantTickets: {
     data: Ticket[];
     isLoading: boolean;
@@ -144,6 +153,15 @@ export const useTicketsStore = defineStore('tickets', () => {
     currentPage: 1,
   });
 
+  const draftTickets = ref<TicketsState['draftTickets']>({
+    data: [],
+    isLoading: false,
+    error: null,
+    totalCount: 0,
+    lastFetched: null,
+    currentPage: 1,
+  });
+
   const tenantTickets = ref<TicketsState['tenantTickets']>({
     data: [],
     isLoading: false,
@@ -191,6 +209,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         ...receivedTickets.value.data,
         ...departmentTickets.value.data,
         ...archivedTickets.value.data,
+        ...draftTickets.value.data,
         ...tenantTickets.value.data,
       ];
 
@@ -565,6 +584,54 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
   }
 
+  async function fetchDraftTickets(page?: number, limit = 10, filters?: TicketListFilters) {
+    const userStore = useUserStore();
+
+    if (!userStore.user?.termsAccepted || !userStore.user?.privacyPolicyAccepted) {
+      return;
+    }
+
+    const currentPage = page ?? draftTickets.value.currentPage;
+    const currentFilters = filters ?? draftTickets.value.currentFilters;
+
+    if (!isPollingActive.value) {
+      draftTickets.value.isLoading = true;
+    }
+
+    draftTickets.value.currentPage = currentPage;
+    draftTickets.value.currentFilters = currentFilters;
+    draftTickets.value.error = null;
+
+    try {
+      const params: Record<string, unknown> = { page: currentPage, limit };
+
+      if (currentFilters) {
+        if (currentFilters.priority !== undefined && currentFilters.priority !== null) {
+          params.priority = currentFilters.priority;
+        }
+        if (currentFilters.name) {
+          params.name = currentFilters.name;
+        }
+        if (currentFilters.sortBy) {
+          params.sortBy = currentFilters.sortBy;
+        }
+        if (currentFilters.sortOrder) {
+          params.sortOrder = currentFilters.sortOrder;
+        }
+      }
+
+      const response = await ticketService.getDrafts(params);
+      draftTickets.value.data = response.data.items;
+      draftTickets.value.totalCount = response.data.total;
+      draftTickets.value.lastFetched = new Date();
+    } catch (error) {
+      draftTickets.value.error = 'Failed to fetch draft tickets';
+      console.error('Error fetching draft tickets:', error);
+    } finally {
+      draftTickets.value.isLoading = false;
+    }
+  }
+
   async function fetchTenantTickets(page?: number, limit = 10, filters?: TicketListFilters) {
     if (!isTenantAdmin.value) {
       tenantTickets.value.isLoading = false;
@@ -688,6 +755,24 @@ export const useTicketsStore = defineStore('tickets', () => {
     };
 
     const isMeRequester = updatedTicket.requester?.id === currentUserId;
+
+    if (updatedTicket.isDraft) {
+      if (!findAndReplace(draftTickets.value) && isMeRequester) {
+        if (draftTickets.value.currentPage === 1) {
+          draftTickets.value.data.unshift(updatedTicket);
+        }
+        draftTickets.value.totalCount++;
+      }
+      return;
+    }
+
+    const wasInDrafts = draftTickets.value.data.some((t) => t.customId === updatedTicket.customId);
+    if (wasInDrafts) {
+      draftTickets.value.data = draftTickets.value.data.filter(
+        (t) => t.customId !== updatedTicket.customId,
+      );
+      draftTickets.value.totalCount = Math.max(0, draftTickets.value.totalCount - 1);
+    }
 
     const viewPreference = localStorageService.getTicketsViewPreference();
     const isKanbanView = viewPreference === 'kanban';
@@ -845,6 +930,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     removeFromCollection(receivedTickets);
     removeFromCollection(departmentTickets);
     removeFromCollection(archivedTickets);
+    removeFromCollection(draftTickets);
     removeFromCollection(tenantTickets);
 
     // Also remove from recent lists
@@ -972,6 +1058,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     receivedTickets.value = emptyCollection();
     departmentTickets.value = emptyCollection();
     archivedTickets.value = emptyCollection();
+    draftTickets.value = emptyCollection();
     tenantTickets.value = emptyCollection();
     recentReceivedTickets.value = [];
     recentCreatedTickets.value = [];
@@ -1051,6 +1138,17 @@ export const useTicketsStore = defineStore('tickets', () => {
     return fetchArchivedTickets(page, 10, filters);
   }
 
+  function setDraftTicketsPage(
+    page: number,
+    filters?: {
+      priority?: TicketPriority | null;
+      name?: string;
+    },
+  ) {
+    draftTickets.value.currentPage = page;
+    return fetchDraftTickets(page, 10, filters);
+  }
+
   function setTenantTicketsPage(
     page: number,
     filters?: {
@@ -1064,7 +1162,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   function setCurrentPage(
-    type: 'createdByMe' | 'received' | 'department' | 'archived' | 'tenant',
+    type: 'createdByMe' | 'received' | 'department' | 'archived' | 'draft' | 'tenant',
     page: number,
     filters?: {
       status?: DefaultTicketStatus | null;
@@ -1081,6 +1179,8 @@ export const useTicketsStore = defineStore('tickets', () => {
         return setDepartmentTicketsPage(page, filters);
       case 'archived':
         return setArchivedTicketsPage(page, filters);
+      case 'draft':
+        return setDraftTicketsPage(page, filters);
       case 'tenant':
         return setTenantTicketsPage(page, filters);
     }
@@ -1092,6 +1192,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     receivedTickets,
     departmentTickets,
     archivedTickets,
+    draftTickets,
     tenantTickets,
     selectedTicket,
     lastTicketUpdateEvent,
@@ -1113,6 +1214,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     fetchReceivedTickets,
     fetchDepartmentTickets,
     fetchArchivedTickets,
+    fetchDraftTickets,
     fetchTenantTickets,
     fetchTicketDetails,
     refreshAllTickets,
@@ -1134,6 +1236,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     setReceivedTicketsPage,
     setDepartmentTicketsPage,
     setArchivedTicketsPage,
+    setDraftTicketsPage,
     setTenantTicketsPage,
   };
 });

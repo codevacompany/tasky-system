@@ -63,6 +63,8 @@ export interface Ticket {
   correctionRequests?: CorrectionRequest[];
   cancellationReason?: TicketCancellationReason;
   isPrivate: boolean;
+  isDraft?: boolean;
+  publishedAt?: string | null;
   files: TicketFile[];
   checklistItems?: ChecklistItem[];
   createdAt: string;
@@ -79,6 +81,9 @@ export interface CreateTicketDto {
   dueAt?: string;
   canceledAt?: string;
   isPrivate: boolean;
+  isDraft?: boolean;
+  reviewerId?: number | null;
+  checklistItems?: { title: string }[];
   files?: Array<{ url: string; name: string; mimeType: string; size: number }>;
 }
 

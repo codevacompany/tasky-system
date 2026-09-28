@@ -15,7 +15,7 @@
         <div class="flex items-center gap-3">
           <div v-if="loadedTicket">
             <h2 class="text-sm sm:text-lg font-semibold text-txt-primary dark:text-gray-100">
-              Detalhes da Tarefa
+              {{ loadedTicket.isDraft ? 'Rascunho' : 'Detalhes da Tarefa' }}
             </h2>
             <p class="text-xs sm:text-base text-gray-600 font-medium dark:text-gray-400">
               {{ loadedTicket.customId }}

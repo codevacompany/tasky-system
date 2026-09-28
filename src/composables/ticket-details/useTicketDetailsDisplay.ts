@@ -93,6 +93,8 @@ export function useTicketDetailsDisplay() {
         return 'times-circle';
       case DefaultTicketStatus.Returned:
         return 'exclamation-circle';
+      case 'rascunho':
+        return 'file-alt';
       default:
         return 'question-circle';
     }

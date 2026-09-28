@@ -141,6 +141,17 @@ export const ticketService = {
     return apiClient.get('/tickets/archived', { params });
   },
 
+  async getDrafts(params?: {
+    name?: string;
+    priority?: TicketPriority;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
+    return apiClient.get('/tickets/drafts', { params });
+  },
+
   async getTenantRecentTickets(
     limit: number = 10,
   ): Promise<AxiosResponse<PaginatedResponse<Ticket>>> {
@@ -163,6 +174,14 @@ export const ticketService = {
 
   async accept(customId: string): Promise<AxiosResponse<Ticket>> {
     return apiClient.post(`/tickets/${customId}/accept`);
+  },
+
+  async publish(customId: string): Promise<AxiosResponse<Ticket>> {
+    return apiClient.post(`/tickets/${customId}/publish`);
+  },
+
+  async deleteDraft(customId: string): Promise<AxiosResponse<void>> {
+    return apiClient.delete(`/tickets/${customId}`);
   },
 
   async approve(customId: string): Promise<AxiosResponse<Ticket>> {
