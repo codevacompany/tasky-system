@@ -19,7 +19,7 @@
               Cadastro
             </h1>
             <p class="text-sm text-gray-600 mt-2">
-              Preencha os dados do responsável e o CNPJ da empresa. O CNPJ é opcional, podendo ser informado posteriormente. Nós entraremos em contato através do telefone informado.
+              Preencha os dados do responsável e o CNPJ da empresa para iniciar seu teste gratuito.
             </p>
           </div>
 
@@ -44,7 +44,7 @@
                 v-model="form.contactEmail"
                 type="email"
                 required
-                placeholder="E-mail corporativo"
+                placeholder="E-mail"
                 @input="form.contactEmail = maskEmail(form.contactEmail)"
                 @blur="contactEmailTouched = true"
                 class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
@@ -73,8 +73,9 @@
               <Input
                 v-model="form.cnpj"
                 type="text"
+                required
                 maxlength="18"
-                placeholder="CNPJ da empresa (opcional)"
+                placeholder="CNPJ da empresa"
                 @input="form.cnpj = maskCNPJ(form.cnpj)"
                 @blur="cnpjTouched = true"
                 class="w-full px-4 py-2.5 lg:py-3 border border-gray-300 rounded-[5px] bg-gray-50 text-txt-primary placeholder-gray-500 transition-colors text-sm lg:text-base"
@@ -92,15 +93,15 @@
                 type="submit"
                 variant="secondary"
                 :disabled="isSubmitting"
-                class="w-full py-2.5 text-sm font-semibold lg:py-3 lg:text-base disabled:bg-blue-400"
+                class="w-full py-2.5 text-sm font-semibold lg:py-3 lg:text-base"
               >
-                <span v-if="isSubmitting">Enviando...</span>
-                <span v-else>Cadastrar</span>
+                <span v-if="isSubmitting">Processando...</span>
+                <span v-else>Continuar</span>
               </Button>
             </div>
           </form>
 
-          <!-- Success Step -->
+          <!-- Fallback if navigation to complete fails -->
           <div v-else class="text-center space-y-6">
             <div class="bg-white rounded-xl p-6 lg:p-8">
               <div
@@ -122,10 +123,11 @@
               </div>
 
               <h2 class="text-xl lg:text-2xl font-bold text-txt-primary mb-3">
-                Cadastro realizado com sucesso!
+                Quase lá!
               </h2>
               <p class="text-gray-600 text-sm lg:text-base mb-6">
-                Obrigado por se cadastrar.<br />Em breve entraremos em contato com você fornecendo suas credenciais de acesso.
+                Enviamos um link para concluir o cadastro no seu e-mail.<br />
+                Verifique também a caixa de spam.
               </p>
 
               <div class="flex flex-col sm:flex-row gap-3">
@@ -298,16 +300,16 @@ function goToLogin() {
 async function submitSignUp() {
   if (isSubmitting.value) return;
 
-  if (form.cnpj && !validateCNPJ(form.cnpj)) {
-    cnpjTouched.value = true;
-    cnpjError.value = 'CNPJ inválido';
+  cnpjTouched.value = true;
+  if (!form.cnpj || !validateCNPJ(form.cnpj)) {
+    cnpjError.value = form.cnpj ? 'CNPJ inválido' : 'CNPJ é obrigatório';
     return;
   }
 
   isSubmitting.value = true;
   try {
     const payload = {
-      cnpj: form.cnpj ? form.cnpj.replace(/[^\d]/g, '') : undefined,
+      cnpj: form.cnpj.replace(/[^\d]/g, ''),
       contactName: form.contactName,
       contactEmail: form.contactEmail,
       contactPhone: form.contactPhone.replace(/[^\d]/g, ''),
@@ -317,8 +319,16 @@ async function submitSignUp() {
       privacyPolicyVersion: '1.0',
     };
 
-    await signupService.createSignUp(payload);
+    const response = await signupService.createSignUp(payload);
     trackSignUpSuccess();
+
+    const activationToken = response.data?.activationToken;
+    if (activationToken) {
+      await router.push(`/completar-cadastro/${activationToken}`);
+      return;
+    }
+
+    // Fallback if token missing (should not happen)
     signupCompleted.value = true;
   } catch (error: unknown) {
     if (error instanceof AxiosError && error.response?.status === 409) {

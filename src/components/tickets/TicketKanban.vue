@@ -140,28 +140,36 @@
                     v-else-if="props.activeTab !== 'recebidas'"
                     class="flex items-center gap-1.5"
                   >
+                    <template v-if="ticket.targetUsers && ticket.targetUsers.length > 0">
+                      <div
+                        v-for="targetUser in getSortedTargetUsers(ticket)"
+                        :key="targetUser.userId"
+                        :class="[
+                          'w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold',
+                          ticket.targetUsers.length > 1 &&
+                          targetUser.userId === ticket.currentTargetUserId
+                            ? 'ring-2 ring-blue-500'
+                            : '',
+                        ]"
+                        :style="{
+                          backgroundColor: getAvatarColor(targetUser.user.department?.name || ''),
+                        }"
+                        :title="`${targetUser.user.firstName} ${targetUser.user.lastName}${targetUser.user.department?.name ? ' - ' + targetUser.user.department.name : ''}`"
+                      >
+                        {{
+                          getUserInitials({
+                            firstName: targetUser.user.firstName,
+                            lastName: targetUser.user.lastName,
+                          })
+                        }}
+                      </div>
+                    </template>
                     <div
-                      v-if="ticket.targetUsers && ticket.targetUsers.length > 0"
-                      v-for="targetUser in getSortedTargetUsers(ticket)"
-                      :key="targetUser.userId"
-                      :class="[
-                        'w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-semibold',
-                        ticket.targetUsers.length > 1 &&
-                        targetUser.userId === ticket.currentTargetUserId
-                          ? 'ring-2 ring-blue-500'
-                          : '',
-                      ]"
-                      :style="{
-                        backgroundColor: getAvatarColor(targetUser.user.department?.name || ''),
-                      }"
-                      :title="`${targetUser.user.firstName} ${targetUser.user.lastName}${targetUser.user.department?.name ? ' - ' + targetUser.user.department.name : ''}`"
+                      v-else
+                      class="w-7 h-7 rounded-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-400 border border-dashed border-gray-300 dark:border-gray-500"
+                      title="Sem responsável"
                     >
-                      {{
-                        getUserInitials({
-                          firstName: targetUser.user.firstName,
-                          lastName: targetUser.user.lastName,
-                        })
-                      }}
+                      <font-awesome-icon icon="user-plus" class="text-[10px]" />
                     </div>
                   </div>
                 </div>

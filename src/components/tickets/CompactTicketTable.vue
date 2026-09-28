@@ -64,43 +64,63 @@
           >
             <!-- Avatar and User Info -->
             <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0 w-[140px] sm:w-[200px]">
-              <div
-                class="w-[30px] sm:w-[34px] h-[30px] sm:h-[34px] rounded-full flex items-center justify-center text-white text-[10px] sm:text-xs font-semibold flex-shrink-0"
-                :style="
-                  title === 'Últimas Tarefas Criadas'
-                    ? getAvatarStyle(getTargetUserDepartment(ticket))
-                    : getAvatarStyle(ticket.requester?.department?.name || '')
-                "
-              >
-                <template v-if="title === 'Últimas Tarefas Criadas'">
-                  {{ getTargetUserInitials(ticket) }}
-                </template>
-                <template v-else>
-                  {{ getRequesterInitials(ticket) }}
-                </template>
-              </div>
-              <div class="flex flex-col min-w-0">
-                <p
-                  class="text-[13px] sm:text-sm font-semibold text-txt-primary dark:text-white m-0 truncate"
+              <template v-if="title === 'Últimas Tarefas Criadas' && !hasAssignee(ticket)">
+                <div
+                  class="w-[30px] sm:w-[34px] h-[30px] sm:h-[34px] rounded-full flex items-center justify-center flex-shrink-0 bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-400 border border-dashed border-gray-300 dark:border-gray-500"
+                  title="Sem responsável"
+                >
+                  <font-awesome-icon icon="user-plus" class="text-[11px] sm:text-xs" />
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <p
+                    class="text-[13px] sm:text-sm font-semibold text-txt-muted dark:text-gray-400 m-0 truncate"
+                  >
+                    Sem responsável
+                  </p>
+                </div>
+              </template>
+              <template v-else>
+                <div
+                  class="w-[30px] sm:w-[34px] h-[30px] sm:h-[34px] rounded-full flex items-center justify-center text-white text-[10px] sm:text-xs font-semibold flex-shrink-0"
+                  :style="
+                    title === 'Últimas Tarefas Criadas'
+                      ? getAvatarStyle(getTargetUserDepartment(ticket))
+                      : getAvatarStyle(ticket.requester?.department?.name || '')
+                  "
                 >
                   <template v-if="title === 'Últimas Tarefas Criadas'">
-                    {{ getTargetUserName(ticket) }}
+                    {{ getTargetUserInitials(ticket) }}
                   </template>
                   <template v-else>
-                    {{ getRequesterName(ticket) }}
+                    {{ getRequesterInitials(ticket) }}
                   </template>
-                </p>
-                <p
-                  class="text-[11px] sm:text-xs text-txt-light font-medium dark:text-gray-400 m-0 truncate"
-                >
-                  <template v-if="title === 'Últimas Tarefas Criadas'">
-                    {{ getTargetUserDepartment(ticket) }}
-                  </template>
-                  <template v-else>
-                    {{ ticket.requester?.department?.name || '-' }}
-                  </template>
-                </p>
-              </div>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <p
+                    class="text-[13px] sm:text-sm font-semibold text-txt-primary dark:text-white m-0 truncate"
+                  >
+                    <template v-if="title === 'Últimas Tarefas Criadas'">
+                      {{ getTargetUserName(ticket) }}
+                    </template>
+                    <template v-else>
+                      {{ getRequesterName(ticket) }}
+                    </template>
+                  </p>
+                  <p
+                    v-if="
+                      title !== 'Últimas Tarefas Criadas' || getTargetUserDepartment(ticket)
+                    "
+                    class="text-[11px] sm:text-xs text-txt-light font-medium dark:text-gray-400 m-0 truncate"
+                  >
+                    <template v-if="title === 'Últimas Tarefas Criadas'">
+                      {{ getTargetUserDepartment(ticket) }}
+                    </template>
+                    <template v-else>
+                      {{ ticket.requester?.department?.name || '' }}
+                    </template>
+                  </p>
+                </div>
+              </template>
             </div>
             <!-- Ticket Title -->
             <div class="flex-1 min-w-0 text-left">
@@ -336,6 +356,13 @@ function getTicketStatus(ticket: Ticket): string {
   return ticket.ticketStatus?.key || ticket.status || '';
 }
 
+function hasAssignee(ticket: Ticket): boolean {
+  return Boolean(
+    ticket.currentTargetUser ||
+      (ticket.targetUsers && ticket.targetUsers.length > 0 && ticket.targetUsers[0]?.user),
+  );
+}
+
 function getTargetUserName(ticket: Ticket): string {
   if (ticket.currentTargetUser) {
     return `${ticket.currentTargetUser.firstName} ${ticket.currentTargetUser.lastName}`;
@@ -343,7 +370,7 @@ function getTargetUserName(ticket: Ticket): string {
   if (ticket.targetUsers && ticket.targetUsers.length > 0 && ticket.targetUsers[0]?.user) {
     return `${ticket.targetUsers[0].user.firstName} ${ticket.targetUsers[0].user.lastName}`;
   }
-  return '-';
+  return 'Sem responsável';
 }
 
 function getTargetUserInitials(ticket: Ticket): string {
@@ -353,7 +380,7 @@ function getTargetUserInitials(ticket: Ticket): string {
   if (ticket.targetUsers && ticket.targetUsers.length > 0 && ticket.targetUsers[0]?.user) {
     return getUserInitials(ticket.targetUsers[0].user);
   }
-  return '??';
+  return '';
 }
 
 function getTargetUserDepartment(ticket: Ticket): string {
@@ -367,7 +394,7 @@ function getTargetUserDepartment(ticket: Ticket): string {
   ) {
     return ticket.targetUsers[0].user.department.name;
   }
-  return '-';
+  return '';
 }
 
 function getRequesterName(ticket: Ticket): string {

@@ -271,21 +271,7 @@
         @close="showPerformanceModal = false"
       />
 
-      <!-- Últimos Tickets Recebidos e Criados -->
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
-        <CompactTicketTable
-          title="Últimas Tarefas Recebidas"
-          type="received"
-          :viewAllUrl="'/minhas-tarefas?tab=recebidas'"
-        />
-        <CompactTicketTable
-          title="Últimas Tarefas Criadas"
-          type="created"
-          :viewAllUrl="'/minhas-tarefas?tab=criadas'"
-        />
-      </div>
-
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <HomeActionNeeded
           :items="displayedActionItems"
           :total-count="actionItems.length"
@@ -297,6 +283,20 @@
           :total-count="deadlineItems.length"
           :is-loading="isWidgetsLoading"
           @select="openTicket"
+        />
+      </div>
+
+      <!-- Últimos Tickets Recebidos e Criados -->
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <CompactTicketTable
+          title="Últimas Tarefas Recebidas"
+          type="received"
+          :viewAllUrl="'/minhas-tarefas?tab=recebidas'"
+        />
+        <CompactTicketTable
+          title="Últimas Tarefas Criadas"
+          type="created"
+          :viewAllUrl="'/minhas-tarefas?tab=criadas'"
         />
       </div>
     </section>

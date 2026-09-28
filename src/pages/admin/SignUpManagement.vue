@@ -4,6 +4,9 @@
       <div class="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <div>
           <h1 class="text-2xl font-semibold text-txt-primary dark:text-white">Gestão de Cadastros</h1>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Novos cadastros já entram como aprovados e concluem senha/chave sozinhos. Aprovar/rejeitar permanece disponível para registros antigos pendentes.
+          </p>
         </div>
         <div class="flex items-center">
           <div class="relative min-w-[300px] max-w-[400px]">
