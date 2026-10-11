@@ -28,10 +28,7 @@
         v-model="form.suggestedForDepartmentIds"
         :departments="departments"
       />
-      <p
-        v-else
-        class="text-xs text-gray-500 dark:text-gray-400"
-      >
+      <p v-else class="text-xs text-gray-500 dark:text-gray-400">
         Esta tag permanece sugerida para o seu setor.
       </p>
 

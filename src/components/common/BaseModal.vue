@@ -3,9 +3,7 @@
     <div
       :class="[
         'fixed inset-0 flex items-center justify-center z-[1000]',
-        blurBackdrop
-          ? 'bg-black/50 backdrop-blur-sm'
-          : 'bg-black/50',
+        blurBackdrop ? 'bg-black/50 backdrop-blur-sm' : 'bg-black/50',
       ]"
       id="newTicketModal"
       :data-tag-create-modal="tagCreateModal || undefined"

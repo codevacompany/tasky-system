@@ -213,14 +213,8 @@ const computePosition = (
     left = anchor.right + offset;
   }
 
-  left = Math.max(
-    VIEWPORT_PAD,
-    Math.min(left, window.innerWidth - size.width - VIEWPORT_PAD),
-  );
-  top = Math.max(
-    VIEWPORT_PAD,
-    Math.min(top, window.innerHeight - size.height - VIEWPORT_PAD),
-  );
+  left = Math.max(VIEWPORT_PAD, Math.min(left, window.innerWidth - size.width - VIEWPORT_PAD));
+  top = Math.max(VIEWPORT_PAD, Math.min(top, window.innerHeight - size.height - VIEWPORT_PAD));
 
   return { top, left };
 };
