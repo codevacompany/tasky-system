@@ -109,6 +109,8 @@ export function useTicketDetailsDisplay() {
     if (description.includes('solicitou correção')) return 'undo';
     if (description.includes('cancelou')) return 'ban';
     if (description.includes('iniciou correção')) return 'wrench';
+    if (description.includes('adicionou a tag')) return 'tag';
+    if (description.includes('removeu a tag')) return 'tag';
     return 'info-circle';
   };
 

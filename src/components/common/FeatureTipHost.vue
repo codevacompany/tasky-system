@@ -2,7 +2,8 @@
   <Teleport to="body">
     <div
       v-if="activeTip && anchorRect"
-      class="fixed inset-0 z-[10000] pointer-events-none"
+      class="fixed inset-0 pointer-events-none"
+      :class="tipTargetsModal ? 'z-[11050]' : 'z-[990]'"
       aria-live="polite"
     >
       <Transition name="feature-tip">
@@ -68,6 +69,8 @@ const { activeTip, markingTipId } = storeToRefs(featureTipsStore);
 const { dismissActiveTip, recomputeActiveTip, findAnchor, syncFromUser } = featureTipsStore;
 
 const anchorRect = ref<DOMRect | null>(null);
+/** True when the tip's target lives inside an open modal — tip must stack above modals. */
+const tipTargetsModal = ref(false);
 const tipSize = ref({ ...ESTIMATED_TIP_SIZE });
 const tooltipEl = ref<HTMLElement | null>(null);
 const isRevealed = ref(false);
@@ -119,14 +122,37 @@ const scheduleReveal = (tipId: string) => {
   }, APPEAR_DELAY_MS);
 };
 
+const isInsideAppModal = (el: Element) => Boolean(el.closest('[data-app-modal]'));
+
+const isAppModalOpen = () => Boolean(document.querySelector('[data-app-modal]'));
+
 const updateAnchorRect = () => {
   const tip = activeTip.value;
   if (!tip) {
     anchorRect.value = null;
+    tipTargetsModal.value = false;
     return;
   }
+
   const el = findAnchor(tip.id);
-  anchorRect.value = el ? el.getBoundingClientRect() : null;
+  if (!el) {
+    anchorRect.value = null;
+    tipTargetsModal.value = false;
+    return;
+  }
+
+  const anchorInModal = isInsideAppModal(el);
+  tipTargetsModal.value = anchorInModal;
+
+  // Modal open but target is on the page underneath — hide until the modal closes.
+  // If the target is inside the modal, keep showing (with higher z-index).
+  if (!anchorInModal && isAppModalOpen()) {
+    anchorRect.value = null;
+    tipTargetsModal.value = false;
+    return;
+  }
+
+  anchorRect.value = el.getBoundingClientRect();
 };
 
 const scheduleRecompute = () => {
@@ -187,14 +213,8 @@ const computePosition = (
     left = anchor.right + offset;
   }
 
-  left = Math.max(
-    VIEWPORT_PAD,
-    Math.min(left, window.innerWidth - size.width - VIEWPORT_PAD),
-  );
-  top = Math.max(
-    VIEWPORT_PAD,
-    Math.min(top, window.innerHeight - size.height - VIEWPORT_PAD),
-  );
+  left = Math.max(VIEWPORT_PAD, Math.min(left, window.innerWidth - size.width - VIEWPORT_PAD));
+  top = Math.max(VIEWPORT_PAD, Math.min(top, window.innerHeight - size.height - VIEWPORT_PAD));
 
   return { top, left };
 };

@@ -114,6 +114,7 @@ import {
   faClipboardCheck,
   faStopwatch,
   faPalette,
+  faRightLeft,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -244,6 +245,7 @@ const icons = [
   faClipboardCheck,
   faStopwatch,
   faPalette,
+  faRightLeft,
   faCircleCheckRegular,
   faRectangleListRegular,
   faHourglassRegular,

@@ -37,6 +37,7 @@
     "vue-datepicker-next": "^1.0.3",
     "vue-router": "^4.5.0",
     "vue-sonner": "^2.0.9",
+    "vue3-swatches": "^1.2.4",
     "vue3-toastify": "^0.2.8",
     "xlsx": "^0.18.5"
   },

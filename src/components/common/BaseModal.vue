@@ -3,11 +3,10 @@
     <div
       :class="[
         'fixed inset-0 flex items-center justify-center z-[1000]',
-        blurBackdrop
-          ? 'bg-black/50 backdrop-blur-sm'
-          : 'bg-black/50',
+        blurBackdrop ? 'bg-black/50 backdrop-blur-sm' : 'bg-black/50',
       ]"
       id="newTicketModal"
+      :data-tag-create-modal="tagCreateModal || undefined"
       @click.self="closeOnClickOutside ? close() : null"
     >
       <LoadingSpinner v-if="isLoading" :size="50" :color="'white'" />
@@ -15,7 +14,8 @@
         v-else
         data-app-modal
         :class="[
-          'bg-white dark:bg-gray-800 shadow-lg flex flex-col overflow-hidden animate-modalSlideIn',
+          'bg-white dark:bg-gray-800 shadow-lg flex flex-col animate-modalSlideIn',
+          overflowVisible ? 'overflow-visible' : 'overflow-hidden',
           // Rounded corners - always except when full screen mobile
           isFullScreenMobile ? '' : 'rounded-[var(--modal-radius)]',
           // Margins - only when not full screen mobile
@@ -35,7 +35,10 @@
 
         <div
           v-else
-          class="primary-gradient flex items-center justify-between p-3 sm:p-4 text-white"
+          :class="[
+            'primary-gradient flex items-center justify-between p-3 sm:p-4 text-white',
+            overflowVisible && !isFullScreenMobile ? 'rounded-t-[var(--modal-radius)]' : '',
+          ]"
         >
           <slot name="header">
             <h2 class="text-base sm:text-lg font-semibold">{{ title }}</h2>
@@ -48,12 +51,23 @@
           </button>
         </div>
 
-        <div class="p-3 sm:p-6 overflow-y-auto overflow-x-hidden">
+        <div
+          :class="[
+            'p-3 sm:p-6',
+            overflowVisible
+              ? 'overflow-visible relative z-10'
+              : 'overflow-y-auto overflow-x-hidden',
+          ]"
+        >
           <slot></slot>
         </div>
         <div
           v-if="showFooter"
-          class="p-3 sm:p-4 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 border-t border-gray-200 dark:border-gray-700"
+          :class="[
+            'p-3 sm:p-4 flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 border-t border-gray-200 dark:border-gray-700',
+            overflowVisible ? 'relative z-0' : '',
+            overflowVisible && !isFullScreenMobile ? 'rounded-b-[var(--modal-radius)]' : '',
+          ]"
         >
           <slot name="footer">
             <Button
@@ -110,6 +124,13 @@ const props = defineProps({
   desktopWidthClass: { type: String, default: '' },
   /** Extra classes for the dialog panel (e.g. compact width overrides) */
   modalClass: { type: String, default: '' },
+  /**
+   * When true, panel/body do not clip overflow so popovers (color picker, etc.)
+   * can paint over the footer and outside the modal bounds.
+   */
+  overflowVisible: { type: Boolean, default: false },
+  /** Marks overlay so tag-picker outside-click ignores this create-tag modal. */
+  tagCreateModal: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['close', 'cancel', 'confirm']);
