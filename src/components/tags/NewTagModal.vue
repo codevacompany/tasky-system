@@ -51,7 +51,7 @@ import { tagService } from '@/services/tagService';
 import { toast } from 'vue-sonner';
 
 const props = defineProps<{
-  /** When set (supervisor), tag is always scoped to this department — no global tags. */
+  /** When set (supervisor), tag is always suggested for this department. */
   lockToDepartmentId?: number;
 }>();
 
