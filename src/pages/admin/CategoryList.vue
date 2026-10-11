@@ -1,30 +1,28 @@
 <template>
-  <section id="categoriasSection" class="p-5 sm:px-6 sm:py-6 lg:px-8 lg:py-6">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-      <h1 class="text-xl sm:text-2xl font-bold text-txt-primary dark:text-white tracking-tight">
-        Categorias
-      </h1>
-      <Button
-        id="newCategoriaBtn"
-        variant="primary"
-        type="button"
-        class="shrink-0 rounded-md"
-        @click="openModal"
-      >
-        <font-awesome-icon icon="plus" />
-        <span>Nova Categoria</span>
-      </Button>
-    </div>
-
+  <section id="categoriasSection">
     <div
       class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 sm:p-6 shadow-soft-xs mb-6"
     >
-      <h2 class="text-lg font-bold text-txt-primary dark:text-white tracking-tight">
-        Gestão de Categorias
-      </h2>
-      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-        Visualize e gerencie as categorias do sistema.
-      </p>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-txt-primary dark:text-white tracking-tight">
+            Gestão de Categorias
+          </h2>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Uma categoria por tarefa. Use para classificação principal.
+          </p>
+        </div>
+        <Button
+          id="newCategoriaBtn"
+          variant="primary"
+          type="button"
+          class="shrink-0 rounded-md"
+          @click="openModal"
+        >
+          <font-awesome-icon icon="plus" />
+          <span>Nova Categoria</span>
+        </Button>
+      </div>
     </div>
 
     <div

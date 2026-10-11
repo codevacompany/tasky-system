@@ -66,6 +66,65 @@
               </router-link>
 
               <li
+                v-if="isSupervisor"
+                class="relative"
+                ref="sectorDropdownRef"
+                @mouseenter="openSectorDropdown"
+                @mouseleave="scheduleCloseSectorDropdown"
+              >
+                <div
+                  :class="{
+                    'menu-item-active':
+                      isActive('/setor/colaboradores') || isActive('/setor/tags'),
+                  }"
+                  class="nav-menu-item flex items-center px-4 py-2 text-[14px] text-txt-secondary dark:text-gray-300 font-medium transition-all duration-200 whitespace-nowrap gap-2 menu-item-hover cursor-pointer relative"
+                >
+                  <font-awesome-icon icon="building" class="text-sm" />
+                  Gerenciar setor
+                  <font-awesome-icon
+                    icon="chevron-down"
+                    class="transition-transform duration-200"
+                    :class="{ 'rotate-180': showSectorDropdown }"
+                  />
+                </div>
+                <div
+                  v-show="showSectorDropdown"
+                  class="absolute top-full left-0 z-50 min-w-[200px] mt-[1px]"
+                >
+                  <div
+                    class="flex flex-col rounded-lg border border-gray-200 bg-white text-[14px] shadow-lg dark:border-gray-700 dark:bg-gray-800"
+                  >
+                    <router-link to="/setor/colaboradores" @click="closeSectorDropdown">
+                      <div
+                        :class="
+                          isActive('/setor/colaboradores')
+                            ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
+                            : 'text-txt-secondary dark:text-gray-300'
+                        "
+                        class="flex items-center gap-2 px-4 py-3 font-medium dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
+                        <font-awesome-icon icon="users" />
+                        Colaboradores
+                      </div>
+                    </router-link>
+                    <router-link to="/setor/tags" @click="closeSectorDropdown">
+                      <div
+                        :class="
+                          isActive('/setor/tags')
+                            ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
+                            : 'text-txt-secondary dark:text-gray-300'
+                        "
+                        class="flex items-center gap-2 px-4 py-3 font-medium dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                      >
+                        <font-awesome-icon icon="tags" />
+                        Tags
+                      </div>
+                    </router-link>
+                  </div>
+                </div>
+              </li>
+
+              <li
                 v-if="isAdmin"
                 class="relative"
                 ref="adminDropdownRef"
@@ -77,7 +136,7 @@
                     'menu-item-active':
                       isActive('/admin/usuarios') ||
                       isActive('/admin/setores') ||
-                      isActive('/admin/categorias') ||
+                      isActive('/admin/categorias-e-tags') ||
                       isActive('/admin/clientes') ||
                       isActive('/admin/cadastros'),
                   }"
@@ -108,7 +167,7 @@
                             ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
                             : 'text-txt-secondary dark:text-gray-300'
                         "
-                        class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                        class="flex items-center gap-2 px-4 py-3 font-medium dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                       >
                         <font-awesome-icon icon="users" />
                         Usuários
@@ -125,7 +184,7 @@
                             ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
                             : 'text-txt-secondary dark:text-gray-300'
                         "
-                        class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                        class="flex items-center gap-2 px-4 py-3 font-medium dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                       >
                         <font-awesome-icon icon="building" />
                         Setores
@@ -133,19 +192,19 @@
                     </router-link>
                     <router-link
                       v-if="isTenantAdmin"
-                      to="/admin/categorias"
+                      to="/admin/categorias-e-tags"
                       @click="closeAdminDropdown"
                     >
                       <div
                         :class="
-                          isActive('/admin/categorias')
+                          isActive('/admin/categorias-e-tags')
                             ? 'admin-submenu-active bg-gray-50 dark:bg-gray-700'
                             : 'text-txt-secondary dark:text-gray-300'
                         "
-                        class="flex items-center gap-2 px-4 py-3 dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                        class="flex items-center gap-2 px-4 py-3 font-medium dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                       >
-                        <font-awesome-icon icon="tag" />
-                        Categorias
+                        <font-awesome-icon icon="tags" />
+                        Categorias e Tags
                       </div>
                     </router-link>
                     <router-link
@@ -158,7 +217,7 @@
                           'admin-submenu-active bg-gray-50 dark:bg-gray-700':
                             isActive('/admin/clientes'),
                         }"
-                        class="flex items-center gap-2 px-4 py-3 text-txt-secondary dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                        class="flex items-center gap-2 px-4 py-3 font-medium text-txt-secondary dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                       >
                         <font-awesome-icon icon="building" />
                         Clientes
@@ -174,7 +233,7 @@
                           'admin-submenu-active bg-gray-50 dark:bg-gray-700':
                             isActive('/admin/cadastros'),
                         }"
-                        class="flex items-center gap-2 px-4 py-3 text-txt-secondary dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                        class="flex items-center gap-2 px-4 py-3 font-medium text-txt-secondary dark:text-gray-300 no-underline transition-all duration-200 w-full text-left admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                       >
                         <font-awesome-icon icon="user-plus" />
                         Cadastros
@@ -352,6 +411,52 @@
               </li>
             </router-link>
 
+            <!-- Mobile Sector Management -->
+            <li v-if="isSupervisor">
+              <div
+                :class="{
+                  'menu-item-active':
+                    isActive('/setor/colaboradores') || isActive('/setor/tags'),
+                }"
+                class="flex items-center px-4 py-3 rounded text-gray-800 dark:text-gray-200 font-medium transition-all duration-200 gap-3 menu-item-hover cursor-pointer"
+                @click="toggleMobileSectorDropdown"
+              >
+                <font-awesome-icon icon="building" />
+                Gerenciar setor
+                <font-awesome-icon
+                  icon="chevron-down"
+                  class="ml-auto transition-transform duration-200"
+                  :class="{ 'rotate-180': showMobileSectorDropdown }"
+                />
+              </div>
+              <div v-show="showMobileSectorDropdown" class="ml-4 mt-2 space-y-1">
+                <router-link to="/setor/colaboradores" @click="closeMobileMenu">
+                  <div
+                    :class="{
+                      'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                        isActive('/setor/colaboradores'),
+                    }"
+                    class="flex items-center gap-3 px-4 py-2 font-medium text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    <font-awesome-icon icon="users" />
+                    Colaboradores
+                  </div>
+                </router-link>
+                <router-link to="/setor/tags" @click="closeMobileMenu">
+                  <div
+                    :class="{
+                      'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
+                        isActive('/setor/tags'),
+                    }"
+                    class="flex items-center gap-3 px-4 py-2 font-medium text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    <font-awesome-icon icon="tags" />
+                    Tags
+                  </div>
+                </router-link>
+              </div>
+            </li>
+
             <!-- Mobile Admin Section -->
             <li v-if="isAdmin">
               <div
@@ -359,7 +464,7 @@
                   'menu-item-active':
                     isActive('/admin/usuarios') ||
                     isActive('/admin/setores') ||
-                    isActive('/admin/categorias') ||
+                    isActive('/admin/categorias-e-tags') ||
                     isActive('/admin/clientes') ||
                     isActive('/admin/cadastros'),
                 }"
@@ -381,7 +486,7 @@
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/usuarios'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 font-medium text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="users" />
                     Usuários
@@ -393,22 +498,26 @@
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/setores'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 font-medium text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="building" />
                     Setores
                   </div>
                 </router-link>
-                <router-link v-if="isTenantAdmin" to="/admin/categorias" @click="closeMobileMenu">
+                <router-link
+                  v-if="isTenantAdmin"
+                  to="/admin/categorias-e-tags"
+                  @click="closeMobileMenu"
+                >
                   <div
                     :class="{
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
-                        isActive('/admin/categorias'),
+                        isActive('/admin/categorias-e-tags'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 font-medium text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
-                    <font-awesome-icon icon="tag" />
-                    Categorias
+                    <font-awesome-icon icon="tags" />
+                    Categorias e Tags
                   </div>
                 </router-link>
                 <router-link to="/admin/clientes" @click="closeMobileMenu" v-if="isGlobalAdmin">
@@ -417,7 +526,7 @@
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/clientes'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 font-medium text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="building" />
                     Clientes
@@ -429,7 +538,7 @@
                       'text-primary bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400':
                         isActive('/admin/cadastros'),
                     }"
-                    class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
+                    class="flex items-center gap-3 px-4 py-2 font-medium text-gray-600 dark:text-gray-400 rounded transition-all duration-200 admin-submenu-hover hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <font-awesome-icon icon="user-plus" />
                     Cadastros
@@ -512,10 +621,14 @@ const source = ref<EventSource | null>(null);
 const reconnectionTimeout = ref<number | null>(null);
 
 const showAdminDropdown = ref(false);
+const showSectorDropdown = ref(false);
 const showMobileMenu = ref(false);
 const showMobileAdminDropdown = ref(false);
+const showMobileSectorDropdown = ref(false);
 const adminDropdownRef = ref<HTMLElement | null>(null);
+const sectorDropdownRef = ref<HTMLElement | null>(null);
 let adminDropdownCloseTimeout: number | null = null;
+let sectorDropdownCloseTimeout: number | null = null;
 
 const ADMIN_DROPDOWN_CLOSE_DELAY_MS = 150;
 
@@ -526,9 +639,21 @@ const clearAdminDropdownCloseTimeout = () => {
   }
 };
 
+const clearSectorDropdownCloseTimeout = () => {
+  if (sectorDropdownCloseTimeout !== null) {
+    clearTimeout(sectorDropdownCloseTimeout);
+    sectorDropdownCloseTimeout = null;
+  }
+};
+
 const openAdminDropdown = () => {
   clearAdminDropdownCloseTimeout();
   showAdminDropdown.value = true;
+};
+
+const openSectorDropdown = () => {
+  clearSectorDropdownCloseTimeout();
+  showSectorDropdown.value = true;
 };
 
 const scheduleCloseAdminDropdown = () => {
@@ -542,6 +667,19 @@ const scheduleCloseAdminDropdown = () => {
 const closeAdminDropdown = () => {
   clearAdminDropdownCloseTimeout();
   showAdminDropdown.value = false;
+};
+
+const scheduleCloseSectorDropdown = () => {
+  clearSectorDropdownCloseTimeout();
+  sectorDropdownCloseTimeout = window.setTimeout(() => {
+    showSectorDropdown.value = false;
+    sectorDropdownCloseTimeout = null;
+  }, ADMIN_DROPDOWN_CLOSE_DELAY_MS);
+};
+
+const closeSectorDropdown = () => {
+  clearSectorDropdownCloseTimeout();
+  showSectorDropdown.value = false;
 };
 
 const fetchUnseenCount = async () => {
@@ -586,13 +724,21 @@ const toggleMobileMenu = () => {
 const closeMobileMenu = () => {
   showMobileMenu.value = false;
   showMobileAdminDropdown.value = false;
+  showMobileSectorDropdown.value = false;
 };
 
 const toggleMobileAdminDropdown = () => {
   showMobileAdminDropdown.value = !showMobileAdminDropdown.value;
 };
 
-const isActive = (path: string) => route.path === path;
+const toggleMobileSectorDropdown = () => {
+  showMobileSectorDropdown.value = !showMobileSectorDropdown.value;
+};
+
+const isActive = (path: string) => {
+  if (path === '/') return route.path === '/';
+  return route.path === path || route.path.startsWith(`${path}/`);
+};
 
 const userInitials = computed(() => {
   if (user?.firstName && user?.lastName) {

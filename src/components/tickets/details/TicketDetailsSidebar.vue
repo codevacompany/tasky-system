@@ -26,15 +26,16 @@
           </div>
           <span
             :class="[
-              'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium max-w-[140px] sm:max-w-[220px]',
+              'inline-flex items-center gap-1 h-6 min-w-0 max-w-full rounded-md px-2 text-xs font-medium leading-none border',
               getStatusClass(displayedStatus),
             ]"
+            :title="displayedStatus ? formatSnakeToNaturalCase(displayedStatus) : undefined"
           >
             <font-awesome-icon
               :icon="getStatusIcon(displayedStatus)"
-              class="text-xs mr-1.5 flex-shrink-0"
+              class="text-[10px] shrink-0"
             />
-            <span class="truncate">{{
+            <span class="min-w-0 truncate">{{
               displayedStatus ? formatSnakeToNaturalCase(displayedStatus) : '-'
             }}</span>
           </span>
@@ -257,47 +258,121 @@
         </div>
 
         <div class="flex items-start gap-3">
-          <div class="w-[40%] flex items-center gap-1.5">
+          <div class="w-[40%]">
             <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Categoria</p>
-            <font-awesome-icon
-              v-if="canEditTicketMeta && categoryHovered"
-              icon="edit"
-              class="text-gray-400 text-xs mb-1"
-            />
           </div>
-          <div class="flex-1 min-w-0 relative" data-category-dropdown>
-            <div
-              :class="[
-                'rounded px-1.5 py-1 -mx-1.5 -my-1 transition-colors',
-                canEditTicketMeta ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700' : '',
-              ]"
-              @mouseenter="categoryHovered = true"
-              @mouseleave="categoryHovered = false"
-              @click="canEditTicketMeta ? (showCategoryDropdown = !showCategoryDropdown) : undefined"
+          <template v-if="canEditTicketMeta">
+            <InlineMetaPicker
+              v-model:open="showCategoryDropdown"
+              v-model:search="categorySearch"
+              dropdown-key="category"
+              placeholder="Selecionar categoria"
+              :loading="categoryLoading"
             >
+              <template #value="{ open }">
+                <span
+                  v-if="loadedTicket.category?.name && !open"
+                  class="inline-flex items-center gap-1 min-h-6 min-w-0 max-w-full rounded-md px-2 py-0.5 text-xs font-medium leading-4 border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  :title="loadedTicket.category.name"
+                >
+                  <span class="min-w-0 truncate leading-4">{{ loadedTicket.category.name }}</span>
+                </span>
+              </template>
+              <template #empty>
+                <span
+                  v-if="!loadedTicket.category?.name"
+                  class="text-sm text-gray-400 dark:text-gray-500"
+                >
+                  Adicionar categoria
+                </span>
+              </template>
+              <template #panel="{ reposition }">
+                <div class="max-h-64 overflow-y-auto py-1">
+                  <p class="px-3 pt-2.5 pb-1.5 text-xs font-semibold text-gray-600 dark:text-gray-300">
+                    Todas as categorias
+                  </p>
+                  <button
+                    v-for="cat in filteredCategories"
+                    :key="cat.id"
+                    type="button"
+                    class="category-picker-option relative w-full flex items-center min-w-0 px-2 py-1.5 text-left rounded-none hover:bg-gray-50 dark:hover:bg-gray-700/60 transition-colors"
+                    :class="{ 'font-semibold': loadedTicket.category?.id === cat.id }"
+                    :title="cat.name"
+                    @click="updateCategory(cat.id)"
+                  >
+                    <span
+                      class="inline-flex items-center gap-1 min-h-6 min-w-0 max-w-full rounded-md px-2 py-0.5 text-xs font-medium leading-4 border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                    >
+                      <span class="min-w-0 truncate leading-4">{{ cat.name }}</span>
+                    </span>
+                  </button>
+                  <p
+                    v-if="!filteredCategories.length"
+                    class="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 text-center"
+                  >
+                    Nenhuma categoria encontrada
+                  </p>
+                </div>
+              </template>
+            </InlineMetaPicker>
+          </template>
+          <div v-else class="flex-1 min-w-0">
+            <span
+              v-if="loadedTicket.category?.name"
+              class="inline-flex items-center gap-1 min-h-6 min-w-0 max-w-full rounded-md px-2 py-0.5 text-xs font-medium leading-4 border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+              :title="loadedTicket.category.name"
+            >
+              <span class="min-w-0 truncate leading-4">{{ loadedTicket.category.name }}</span>
+            </span>
+            <span v-else class="text-sm text-gray-400 dark:text-gray-500">Sem categoria</span>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-[40%]">
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Tags</p>
+          </div>
+          <InlineMetaPicker
+            ref="tagMetaPickerRef"
+            v-model:open="showTagPicker"
+            v-model:search="tagSearch"
+            dropdown-key="tags"
+            placeholder="Selecionar tag"
+            :loading="tagLoading"
+            :hide-panel="tagCreating"
+            :ignore-outside-selectors="['[data-tag-create-modal]']"
+            wrap-chips
+          >
+            <template #value="{ open }">
+              <TagChip
+                v-for="tag in sortedTicketTags"
+                :key="tag.uuid"
+                :tag="tag"
+                removable
+                @remove="removeTag"
+              />
+            </template>
+            <template #empty>
               <span
-                v-if="loadedTicket.category?.name"
-                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                v-if="!sortedTicketTags.length"
+                class="text-sm text-gray-400 dark:text-gray-500"
               >
-                {{ loadedTicket.category.name }}
+                Adicionar tags
               </span>
-              <span v-else class="text-sm text-gray-400 dark:text-gray-500 italic">Sem categoria</span>
-            </div>
-            <div
-              v-if="showCategoryDropdown"
-              class="absolute left-0 top-full mt-1 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 min-w-[160px] max-h-48 overflow-y-auto"
-            >
-              <button
-                v-for="cat in categories"
-                :key="cat.id"
-                class="w-full text-left px-3 py-2 text-sm text-txt-primary dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                :class="{ 'font-semibold': loadedTicket.category?.id === cat.id }"
-                @click="updateCategory(cat.id)"
-              >
-                {{ cat.name }}
-              </button>
-            </div>
-          </div>
+            </template>
+            <template #panel="{ reposition }">
+              <TagPicker
+                v-if="showTagPicker"
+                :ticket-custom-id="loadedTicket.customId"
+                :applied-tag-uuids="appliedTagUuids"
+                :search="tagSearch"
+                @select="applyTag"
+                @update:loading="tagLoading = $event"
+                @update:creating="tagCreating = $event"
+                @content-change="reposition()"
+              />
+            </template>
+          </InlineMetaPicker>
         </div>
 
         <div class="flex items-start gap-3">
@@ -352,7 +427,7 @@
               :append-to-body="true"
               :time-picker-options="{ start: '00:00', step: '00:15', end: '23:45' }"
               style="width: 100%; display: block;"
-              input-class="w-full px-2 py-1 text-sm border border-blue-400 rounded bg-white dark:bg-gray-700 text-txt-primary dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              input-class="w-full px-2 py-1 text-sm border border-primary rounded-md bg-white dark:bg-gray-800 text-txt-primary dark:text-gray-100 shadow-[0_0_0_2px_rgba(var(--primary-rgb),0.2)] focus:outline-none"
               @change="saveDueDateInline"
               @close="showDueDateInline = false"
             />
@@ -450,7 +525,10 @@ import {
 import { TicketPriority, DefaultTicketStatus } from '@/models/ticket';
 import { ticketService } from '@/services/ticketService';
 import { categoryService } from '@/services/categoryService';
-import type { Category } from '@/models';
+import type { Category, Tag } from '@/models';
+import InlineMetaPicker from '@/components/common/InlineMetaPicker.vue';
+import TagChip from '@/components/tags/TagChip.vue';
+import TagPicker from '@/components/tags/TagPicker.vue';
 import { toast } from 'vue-sonner';
 import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
@@ -491,12 +569,18 @@ const displayedStatus = computed(() =>
 const assigneeHovered = ref(false);
 const reviewerHovered = ref(false);
 const priorityHovered = ref(false);
-const categoryHovered = ref(false);
 const dueDateHovered = ref(false);
 
 // Inline edit dropdowns
 const showPriorityDropdown = ref(false);
 const showCategoryDropdown = ref(false);
+const categorySearch = ref('');
+const categoryLoading = ref(false);
+const showTagPicker = ref(false);
+const tagSearch = ref('');
+const tagLoading = ref(false);
+const tagCreating = ref(false);
+const tagMetaPickerRef = ref<InstanceType<typeof InlineMetaPicker> | null>(null);
 const showDueDateInline = ref(false);
 const inlineDueDateValue = ref<string | null>(null);
 const dueDatePickerRef = ref<any>(null);
@@ -508,6 +592,66 @@ const priorityOptions = [
 ];
 
 const categories = ref<Category[]>([]);
+
+const filteredCategories = computed(() => {
+  const q = categorySearch.value.trim().toLowerCase();
+  if (!q) return categories.value;
+  return categories.value.filter((c) => c.name.toLowerCase().includes(q));
+});
+
+const sortedTicketTags = computed(() =>
+  [...(loadedTicket.value.tags || [])].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
+);
+
+const appliedTagUuids = computed(() => sortedTicketTags.value.map((t) => t.uuid));
+
+watch(showCategoryDropdown, async (open) => {
+  if (!open) {
+    categoryLoading.value = false;
+    return;
+  }
+  categoryLoading.value = true;
+  try {
+    await fetchCategories();
+  } finally {
+    categoryLoading.value = false;
+  }
+});
+
+watch(showTagPicker, (open) => {
+  if (open) {
+    tagLoading.value = true;
+    tagCreating.value = false;
+  } else {
+    tagLoading.value = false;
+    tagCreating.value = false;
+  }
+});
+
+const applyTag = async (tag: Tag) => {
+  try {
+    const { data } = await ticketService.applyTag(loadedTicket.value.customId, tag.uuid);
+    ctx.loadedTicket.value = data;
+    ctx.ticketsStore.updateTicketInCollections(data);
+    tagSearch.value = '';
+    await nextTick();
+    tagMetaPickerRef.value?.focusSearch();
+    toast.success('Tag adicionada');
+  } catch {
+    toast.error('Erro ao adicionar tag');
+  }
+};
+
+const removeTag = async (tag: Tag) => {
+  try {
+    const { data } = await ticketService.removeTag(loadedTicket.value.customId, tag.uuid);
+    ctx.loadedTicket.value = data;
+    ctx.ticketsStore.updateTicketInCollections(data);
+    toast.success('Tag removida');
+  } catch {
+    toast.error('Erro ao remover tag');
+  }
+};
 
 const fetchCategories = async () => {
   try {
@@ -530,8 +674,10 @@ const updatePriority = async (priority: TicketPriority) => {
   }
 };
 
-const updateCategory = async (categoryId: number | null) => {
+const updateCategory = async (categoryId: number) => {
   showCategoryDropdown.value = false;
+  categorySearch.value = '';
+  if (categoryId === loadedTicket.value.category?.id) return;
   try {
     await ticketService.update(loadedTicket.value.customId, { categoryId });
     ctx.loadedTicket.value = await ctx.ticketsStore.fetchTicketDetails(loadedTicket.value.customId);
@@ -597,21 +743,34 @@ const closePriorityDropdown = (e: MouseEvent) => {
     showPriorityDropdown.value = false;
   }
 };
-const closeCategoryDropdown = (e: MouseEvent) => {
-  if (!(e.target as Element).closest('[data-category-dropdown]')) {
-    showCategoryDropdown.value = false;
-  }
-};
-
 onMounted(() => {
-  fetchCategories();
   document.addEventListener('click', closeDueDateInline);
   document.addEventListener('click', closePriorityDropdown);
-  document.addEventListener('click', closeCategoryDropdown);
 });
 onUnmounted(() => {
   document.removeEventListener('click', closeDueDateInline);
   document.removeEventListener('click', closePriorityDropdown);
-  document.removeEventListener('click', closeCategoryDropdown);
 });
 </script>
+
+<style scoped>
+button.category-picker-option {
+  border-radius: 0 !important;
+}
+
+button.category-picker-option::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  border-radius: 0;
+  background: transparent;
+}
+
+button.category-picker-option:hover::before,
+button.category-picker-option:focus-visible::before {
+  background: var(--primary-color, #5564db);
+}
+</style>

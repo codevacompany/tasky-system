@@ -1,6 +1,7 @@
 export * from './user';
 export * from './ticket';
 export * from './category';
+export * from './tag';
 export * from './department';
 export * from './notification';
 export * from './ticketComment';

@@ -20,7 +20,7 @@
           <div
             v-for="m in 3"
             :key="`card-skeleton-${n}-${m}`"
-            class="bg-white dark:bg-gray-700 rounded-lg p-3.5 border border-gray-200 dark:border-gray-600 shadow-soft-xs"
+            class="bg-white dark:bg-[#2d3643] rounded-lg p-3.5 border border-gray-200 dark:border-gray-600 shadow-soft-xs"
           >
             <div class="h-4 bg-gray-200 dark:bg-gray-600 rounded w-3/4 mb-2"></div>
             <div class="h-4 bg-gray-200 dark:bg-gray-600 rounded w-1/2 mb-3"></div>
@@ -54,7 +54,7 @@
             v-for="ticket in getTicketsByColumn(column)"
             :key="ticket.customId"
             :class="[
-              'min-h-[100px] bg-gre flex-shrink-0 bg-white dark:bg-gray-700 rounded-xl p-3.5 cursor-pointer transition-all duration-200 border shadow-soft-xs mb-3.5 flex flex-col hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
+              'min-h-[100px] bg-gre flex-shrink-0 bg-white dark:bg-[#2d3643] rounded-xl p-3.5 cursor-pointer transition-all duration-200 border shadow-soft-xs mb-3.5 flex flex-col hover:shadow-md hover:shadow-black/8 dark:hover:shadow-black/30',
               ticket.ticketStatus?.key === DefaultTicketStatus.Returned ||
               ticket.status === DefaultTicketStatus.Returned
                 ? 'border-orange-300 dark:border-orange-600 dark:bg-orange-900/10 hover:border-orange-400 dark:hover:border-orange-500'
@@ -228,8 +228,20 @@
                   </div>
                 </div>
               </div>
+              <div
+                v-if="cardTags(ticket).length"
+                class="flex flex-wrap items-center gap-1 min-w-0"
+              >
+                <TagChip
+                  v-for="tag in cardTags(ticket)"
+                  :key="tag.uuid || tag.id"
+                  :tag="tag"
+                  size="sm"
+                  class="!max-w-[9rem]"
+                />
+              </div>
               <div class="flex items-center justify-between gap-3 mb-0">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 min-w-0">
                   <div
                     class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300 font-medium whitespace-nowrap"
                     title="ID do Ticket"
@@ -237,35 +249,42 @@
                     {{ ticket.customId }}
                   </div>
                   <div
+                    v-if="isTicketOverdue(ticket)"
                     class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-300 opacity-70 whitespace-nowrap"
-                    title="Última atualização"
+                    title="Última movimentação"
                   >
-                    <font-awesome-icon icon="clock-rotate-left" />
-                    {{ formatRelativeTime(ticket.updatedAt) }}
+                    <font-awesome-icon icon="right-left" />
+                    {{ formatRelativeTime(ticket.lastStatusMovedAt || ticket.createdAt) }}
                   </div>
                 </div>
-                <div
-                  v-if="
-                    ticket.dueAt &&
-                    ticket.ticketStatus?.key !== DefaultTicketStatus.Completed &&
-                    ticket.status !== DefaultTicketStatus.Completed
-                  "
-                  :class="[
-                    'flex items-center gap-1 px-1.5 py-1 rounded-md text-xs font-medium whitespace-nowrap',
-                    getDeadlineClass(ticket.dueAt) === 'normal'
-                      ? 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
-                      : getDeadlineClass(ticket.dueAt) === 'warning'
-                        ? 'bg-yellow-100 dark:bg-yellow-400/60 text-yellow-800 dark:text-white'
-                        : getDeadlineClass(ticket.dueAt) === 'urgent'
-                          ? 'bg-orange-400 dark:bg-orange-500 text-white'
-                          : getDeadlineClass(ticket.dueAt) === 'overdue'
-                            ? 'bg-red-500 dark:bg-red-600 text-white'
-                            : 'bg-gray-200 text-gray-600',
-                  ]"
-                  :title="'Prazo: ' + (ticket.dueAt ? formatDate(ticket.dueAt) : 'Não definido')"
-                >
-                  <font-awesome-icon :icon="getDeadlineIcon(ticket)" />
-                  {{ calculateDeadline(ticket) }}
+                <div class="flex items-center gap-2 shrink-0">
+                  <div
+                    v-if="!isTicketOverdue(ticket)"
+                    class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-300 opacity-70 whitespace-nowrap"
+                    title="Última movimentação"
+                  >
+                    <font-awesome-icon icon="right-left" />
+                    {{ formatRelativeTime(ticket.lastStatusMovedAt || ticket.createdAt) }}
+                  </div>
+                  <div
+                    v-if="showDeadlineBadge(ticket)"
+                    :class="[
+                      'flex items-center gap-1 px-1.5 py-0.5 rounded text-[11.5px] font-medium whitespace-nowrap leading-4',
+                      getDeadlineClass(ticket.dueAt) === 'normal'
+                        ? 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
+                        : getDeadlineClass(ticket.dueAt) === 'warning'
+                          ? 'bg-yellow-100 dark:bg-yellow-400/60 text-yellow-800 dark:text-white'
+                          : getDeadlineClass(ticket.dueAt) === 'urgent'
+                            ? 'bg-orange-400 dark:bg-orange-500 text-white'
+                            : getDeadlineClass(ticket.dueAt) === 'overdue'
+                              ? 'bg-red-500 dark:bg-red-600 text-white'
+                              : 'bg-gray-200 text-gray-600',
+                    ]"
+                    :title="'Prazo: ' + (ticket.dueAt ? formatDate(ticket.dueAt) : 'Não definido')"
+                  >
+                    <font-awesome-icon :icon="getDeadlineIcon(ticket)" class="text-[10px]" />
+                    {{ calculateDeadline(ticket) }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -368,7 +387,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import type { Ticket } from '@/models';
+import type { Tag, Ticket } from '@/models';
 import type { StatusColumn, TicketStatus as ColumnTicketStatus } from '@/models/statusColumn';
 import { DefaultTicketStatus, TicketPriority } from '@/models';
 import {
@@ -385,6 +404,7 @@ import { ticketService } from '@/services/ticketService';
 import { toast } from 'vue-sonner';
 import BaseModal from '@/components/common/BaseModal.vue';
 import Button from '@/components/common/Button.vue';
+import TagChip from '@/components/tags/TagChip.vue';
 
 const props = defineProps<{
   tickets: Ticket[];
@@ -404,6 +424,11 @@ const pendingAcceptanceTicket = ref<Ticket | null>(null);
 const userStore = useUserStore();
 const ticketsStore = useTicketsStore();
 const { isSupervisor } = useRoles();
+
+const cardTags = (ticket: Ticket): Tag[] => {
+  const tags = ticket.tags || [];
+  return [...tags].sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+};
 
 const getSortedTargetUsers = (ticket: Ticket) => {
   if (!ticket?.targetUsers || ticket.targetUsers.length === 0)
@@ -521,6 +546,16 @@ const calculateDeadline = (ticket: Ticket) => {
     .replace(/\s+/g, ' ')
     .trim();
 };
+
+const showDeadlineBadge = (ticket: Ticket) =>
+  Boolean(
+    ticket.dueAt &&
+      ticket.ticketStatus?.key !== DefaultTicketStatus.Completed &&
+      ticket.status !== DefaultTicketStatus.Completed,
+  );
+
+const isTicketOverdue = (ticket: Ticket) =>
+  showDeadlineBadge(ticket) && getDeadlineClass(ticket.dueAt) === 'overdue';
 
 const getDeadlineClass = (dueDate: string | null) => {
   if (!dueDate) return 'normal';
