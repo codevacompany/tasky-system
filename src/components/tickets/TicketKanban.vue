@@ -557,7 +557,7 @@ const showDeadlineBadge = (ticket: Ticket) =>
 const isTicketOverdue = (ticket: Ticket) =>
   showDeadlineBadge(ticket) && getDeadlineClass(ticket.dueAt) === 'overdue';
 
-const getDeadlineClass = (dueDate: string | null) => {
+const getDeadlineClass = (dueDate?: string | null) => {
   if (!dueDate) return 'normal';
 
   const now = new Date();
