@@ -8,6 +8,7 @@ import UserList from '@/pages/admin/UserList.vue';
 import DepartmentList from '@/pages/admin/DepartmentList.vue';
 import ReportsPage from '@/pages/admin/ReportsPage.vue';
 import CategoryList from '@/pages/admin/CategoryList.vue';
+import TagList from '@/pages/admin/TagList.vue';
 import TicketsPage from '@/pages/user/TicketsPage.vue';
 import ClientManagement from '@/pages/admin/ClientManagement.vue';
 import ClientUsers from '@/pages/admin/ClientUsers.vue';
@@ -88,6 +89,27 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true },
   },
 
+  // Sector management (supervisors)
+  {
+    path: '/setor',
+    component: DashboardLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: 'colaboradores',
+        name: 'SectorCollaborators',
+        component: () => import('@/pages/sector/SectorCollaboratorsPage.vue'),
+        meta: { roles: [RoleName.Supervisor] },
+      },
+      {
+        path: 'tags',
+        name: 'SectorTags',
+        component: () => import('@/pages/sector/SectorTagsPage.vue'),
+        meta: { roles: [RoleName.Supervisor] },
+      },
+    ],
+  },
+
   // Admin Panel Routes
   {
     path: '/admin',
@@ -124,8 +146,30 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'categorias',
-        component: CategoryList,
+        redirect: '/admin/categorias-e-tags/categorias',
+      },
+      {
+        path: 'tags',
+        redirect: '/admin/categorias-e-tags/tags',
+      },
+      {
+        path: 'categorias-e-tags',
+        component: () => import('@/pages/admin/CategoriesAndTagsSettings.vue'),
         meta: { roles: [RoleName.TenantAdmin] },
+        children: [
+          {
+            path: '',
+            redirect: '/admin/categorias-e-tags/categorias',
+          },
+          {
+            path: 'categorias',
+            component: CategoryList,
+          },
+          {
+            path: 'tags',
+            component: TagList,
+          },
+        ],
       },
       {
         path: 'configuracoes',

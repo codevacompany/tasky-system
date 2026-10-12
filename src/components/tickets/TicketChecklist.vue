@@ -26,7 +26,7 @@
                 stroke-width="2"
                 stroke-linecap="round"
                 :class="[
-                  'transition-all duration-300',
+                  'transition-[stroke-dashoffset,color] duration-150',
                   progressPercentage === 100
                     ? 'text-green-500 dark:text-green-400'
                     : 'text-primary',
@@ -47,15 +47,14 @@
       <!-- Checklist Items -->
       <div class="space-y-2">
         <div
-          v-for="item in items"
+          v-for="item in localItems"
           :key="item.id"
           class="group flex items-start gap-2 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
         >
-          <input
-            type="checkbox"
-            :checked="item.isCompleted"
-            @change="toggleItem(item)"
-            class="checklist-checkbox mt-1 w-4 h-4 rounded focus:ring-blue-500 flex-shrink-0"
+          <Checkbox
+            class="mt-0.5 shrink-0"
+            :model-value="item.isCompleted"
+            @update:model-value="(checked) => setItemCompleted(item, Boolean(checked))"
           />
           <div class="flex-1 min-w-0">
             <div
@@ -146,11 +145,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, computed } from 'vue';
+import { ref, nextTick, computed, watch } from 'vue';
 import type { ChecklistItem } from '@/models/checklist';
 import { checklistService } from '@/services/checklistService';
 import { toast } from 'vue-sonner';
 import { formatDate } from '@/utils/date';
+import Checkbox from '@/components/common/Checkbox.vue';
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue';
 import Input from '@/components/common/Input.vue';
 import Button from '@/components/common/Button.vue';
@@ -176,20 +176,36 @@ const confirmationModal = ref({
   itemToDelete: null as ChecklistItem | null,
 });
 
-const totalItems = computed(() => props.items.length);
-const completedItems = computed(() => props.items.filter((item) => item.isCompleted).length);
+/** Local copy so checkbox/progress update immediately (optimistic), then sync from props. */
+const localItems = ref<ChecklistItem[]>([]);
+
+watch(
+  () => props.items,
+  (items) => {
+    localItems.value = items.map((item) => ({ ...item }));
+  },
+  { immediate: true, deep: true },
+);
+
+const totalItems = computed(() => localItems.value.length);
+const completedItems = computed(() => localItems.value.filter((item) => item.isCompleted).length);
 const progressPercentage = computed(() => {
   if (totalItems.value === 0) return 0;
   return Math.round((completedItems.value / totalItems.value) * 100);
 });
 
-const toggleItem = async (item: ChecklistItem) => {
+const setItemCompleted = async (item: ChecklistItem, isCompleted: boolean) => {
+  const target = localItems.value.find((i) => i.id === item.id);
+  if (!target || target.isCompleted === isCompleted) return;
+
+  const previous = target.isCompleted;
+  target.isCompleted = isCompleted;
+
   try {
-    await checklistService.updateItem(item.id, {
-      isCompleted: !item.isCompleted,
-    });
+    await checklistService.updateItem(item.id, { isCompleted });
     emit('update');
-  } catch (error) {
+  } catch {
+    target.isCompleted = previous;
     toast.error('Erro ao atualizar item');
   }
 };
@@ -299,14 +315,3 @@ defineExpose({
   startAddItem,
 });
 </script>
-
-<style scoped>
-.checklist-checkbox {
-  accent-color: #3772f3;
-  cursor: pointer;
-}
-
-.dark .checklist-checkbox {
-  accent-color: #3b82f6;
-}
-</style>

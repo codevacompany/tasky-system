@@ -242,6 +242,14 @@ export const ticketService = {
     return apiClient.post(`/tickets/${customId}/send-to-next-department`);
   },
 
+  async applyTag(customId: string, tagUuid: string): Promise<AxiosResponse<Ticket>> {
+    return apiClient.post(`/tickets/${customId}/tags`, { tagUuid });
+  },
+
+  async removeTag(customId: string, tagUuid: string): Promise<AxiosResponse<Ticket>> {
+    return apiClient.delete(`/tickets/${customId}/tags/${tagUuid}`);
+  },
+
   /**
    * Get a lightweight change checksum for efficient polling.
    * Returns count and latest update timestamp.

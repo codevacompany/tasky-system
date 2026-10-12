@@ -8,6 +8,9 @@ export enum TicketActionType {
   Update = 'atualização',
   Cancellation = 'cancelamento',
   AssigneeChange = 'mudança_de_responsável',
+  AssigneeRemove = 'remoção_de_responsável',
+  TagAdd = 'adição_de_tag',
+  TagRemove = 'remoção_de_tag',
 }
 
 export interface TicketUpdate {

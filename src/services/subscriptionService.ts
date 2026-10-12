@@ -173,12 +173,22 @@ class SubscriptionService {
     return response.data;
   }
 
-  // User validation method (to be used before creating users)
-  async validateUserCreation(usersToAdd: number = 1): Promise<unknown> {
-    const response = await apiClient.post('/users/validate-creation', {
-      usersToAdd,
-    });
+  async getUserLimit(tenantId: number): Promise<{
+    isValid: boolean;
+    currentUsers: number;
+    maxUsers: number | null;
+  }> {
+    const response = await apiClient.get(`/tenant-subscriptions/tenant/${tenantId}/user-limit`);
     return response.data;
+  }
+
+  /** True when adding `usersToAdd` active users would exceed the plan limit. */
+  canAddUsers(
+    limit: { currentUsers: number; maxUsers: number | null },
+    usersToAdd: number = 1,
+  ): boolean {
+    if (limit.maxUsers === null) return true;
+    return limit.currentUsers + usersToAdd <= limit.maxUsers;
   }
 
   async createCustomerPortalSession(

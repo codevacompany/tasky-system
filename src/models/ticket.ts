@@ -1,4 +1,5 @@
 import type { Category } from './category';
+import type { Tag } from './tag';
 import type { ChecklistItem } from './checklist';
 import type { CorrectionRequest } from './correctionRequest';
 import type { TicketCancellationReason } from './ticketCancellationReason';
@@ -57,6 +58,7 @@ export interface Ticket {
   dueAt?: string;
   canceledAt?: string;
   category?: Category;
+  tags?: Tag[];
   comments: TicketComment[];
   updates: TicketUpdate[];
   disapprovalReason?: TicketDisapprovalReason;
@@ -69,6 +71,8 @@ export interface Ticket {
   checklistItems?: ChecklistItem[];
   createdAt: string;
   updatedAt: string;
+  /** Last status movement (criação / mudança de status / finalização / cancelamento). */
+  lastStatusMovedAt?: string;
 }
 
 export interface CreateTicketDto {

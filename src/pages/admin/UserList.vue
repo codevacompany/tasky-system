@@ -338,7 +338,19 @@
       </DataTable>
     </div>
 
-    <NewUserModal v-if="isModalOpen" @close="closeModal" @userCreated="loadUsers" />
+    <NewUserModal
+      v-if="isModalOpen"
+      @close="closeModal"
+      @userCreated="loadUsers"
+      @userLimitReached="onUserLimitReached"
+    />
+
+    <UserLimitReachedModal
+      v-if="isUserLimitModalOpen"
+      :max-users="userLimitInfo.maxUsers"
+      :current-users="userLimitInfo.currentUsers"
+      @close="isUserLimitModalOpen = false"
+    />
 
     <EditUserModal
       v-if="isEditModalOpen && userToEdit"
@@ -466,6 +478,7 @@ import { ref, onMounted, watch, computed } from 'vue';
 import { userService } from '@/services/userService';
 import type { User, UserDeactivationPreview } from '@/models';
 import NewUserModal from '@/components/users/NewUserModal.vue';
+import UserLimitReachedModal from '@/components/users/UserLimitReachedModal.vue';
 import EditUserModal from '@/components/users/EditUserModal.vue';
 import DeactivateUserModal from '@/components/users/DeactivateUserModal.vue';
 import ConfirmationModal from '@/components/common/ConfirmationModal.vue';
@@ -477,6 +490,7 @@ import type { PaginationInfo } from '@/components/common/DataTable.vue';
 import { toast } from 'vue-sonner';
 import { useUserStore } from '@/stores/user';
 import { useFiltersStore } from '@/stores/filters';
+import { subscriptionService } from '@/services/subscriptionService';
 import Input from '@/components/common/Input.vue';
 import Button from '@/components/common/Button.vue';
 
@@ -497,6 +511,11 @@ const sortUserOptions = SORT_USER_OPTIONS.map((o) => ({ value: o.value, label: o
 
 const users = ref<User[]>([]);
 const isModalOpen = ref(false);
+const isUserLimitModalOpen = ref(false);
+const userLimitInfo = ref<{ currentUsers: number | null; maxUsers: number | null }>({
+  currentUsers: null,
+  maxUsers: null,
+});
 const isEditModalOpen = ref(false);
 const isLoading = ref(false);
 const isProcessing = ref(false);
@@ -752,6 +771,14 @@ const handleConfirmAction = async () => {
     await loadUsers();
   } catch (error: any) {
     console.error(`Erro ao ${type === 'deactivate' ? 'desativar' : 'ativar'} usuário:`, error);
+    if (type === 'activate' && error?.response?.data?.code === 'user-limit-reached') {
+      onUserLimitReachedFromError(error);
+      return;
+    }
+    toast.error(
+      error?.response?.data?.message ||
+        `Erro ao ${type === 'deactivate' ? 'desativar' : 'ativar'} usuário`,
+    );
   } finally {
     isProcessing.value = false;
     pendingAction.value = null;
@@ -792,7 +819,48 @@ const handleDeactivateWithReassignment = async (data: {
   }
 };
 
-const openModal = () => {
+const showUserLimitModal = (currentUsers?: number | null, maxUsers?: number | null) => {
+  userLimitInfo.value = {
+    currentUsers: currentUsers ?? null,
+    maxUsers: maxUsers ?? null,
+  };
+  isUserLimitModalOpen.value = true;
+};
+
+const onUserLimitReached = (payload: { currentUsers?: number; maxUsers?: number }) => {
+  showUserLimitModal(payload.currentUsers, payload.maxUsers);
+};
+
+const onUserLimitReachedFromError = (error: any) => {
+  let currentUsers: number | undefined;
+  let maxUsers: number | undefined;
+  try {
+    const parsed = JSON.parse(error?.response?.data?.data || '{}');
+    currentUsers = parsed.currentUsers;
+    maxUsers = parsed.maxUsers;
+  } catch {
+    /* ignore */
+  }
+  showUserLimitModal(currentUsers, maxUsers);
+};
+
+const openModal = async () => {
+  const tenantId = userStore.user?.tenantId;
+  if (!tenantId) {
+    isModalOpen.value = true;
+    return;
+  }
+
+  try {
+    const limit = await subscriptionService.getUserLimit(tenantId);
+    if (!subscriptionService.canAddUsers(limit)) {
+      showUserLimitModal(limit.currentUsers, limit.maxUsers);
+      return;
+    }
+  } catch (error) {
+    console.error('Erro ao validar limite de usuários:', error);
+  }
+
   isModalOpen.value = true;
 };
 
