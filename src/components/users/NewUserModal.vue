@@ -104,7 +104,11 @@ import type { CreateUserDto } from '@/models';
 
 const isLoading = ref(false);
 
-const emit = defineEmits(['close', 'userCreated']);
+const emit = defineEmits<{
+  close: [];
+  userCreated: [];
+  userLimitReached: [{ currentUsers?: number; maxUsers?: number }];
+}>();
 
 const userData = ref<CreateUserDto>({
   firstName: '',
@@ -187,9 +191,24 @@ const createUser = async () => {
     emit('userCreated');
     toast.success('Criado com sucesso!');
     closeModal();
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    toast.error('Algo deu errado. Tente novamente.');
+    const code = error?.response?.data?.code;
+    if (code === 'user-limit-reached') {
+      let currentUsers: number | undefined;
+      let maxUsers: number | undefined;
+      try {
+        const parsed = JSON.parse(error?.response?.data?.data || '{}');
+        currentUsers = parsed.currentUsers;
+        maxUsers = parsed.maxUsers;
+      } catch {
+        /* ignore */
+      }
+      emit('userLimitReached', { currentUsers, maxUsers });
+      closeModal();
+      return;
+    }
+    toast.error(error?.response?.data?.message || 'Algo deu errado. Tente novamente.');
   } finally {
     isLoading.value = false;
   }
